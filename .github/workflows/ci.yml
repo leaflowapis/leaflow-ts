@@ -86,6 +86,11 @@ jobs:
           node-version: 24
           cache: npm
           registry-url: https://registry.npmjs.org
+      # npm 的 trusted publishing 要 CLI >= 11.5.1，而 setup-node 给的是 Node 自带那一版
+      # ——版本不够时它不会说「你的 npm 太老」，而是照常发，然后被 registry 以一句
+      # `E404 ... could not be found or you do not have permission` 挡回来。那句话看起来像
+      # 包名写错了或者没权限，指不到真正的原因。
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run build
       - run: npm version "0.0.0-dev.${{ github.run_number }}.g${GITHUB_SHA::7}" --no-git-tag-version
@@ -111,6 +116,11 @@ jobs:
           node-version: 24
           cache: npm
           registry-url: https://registry.npmjs.org
+      # npm 的 trusted publishing 要 CLI >= 11.5.1，而 setup-node 给的是 Node 自带那一版
+      # ——版本不够时它不会说「你的 npm 太老」，而是照常发，然后被 registry 以一句
+      # `E404 ... could not be found or you do not have permission` 挡回来。那句话看起来像
+      # 包名写错了或者没权限，指不到真正的原因。
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm run build
       - run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
