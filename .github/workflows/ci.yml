@@ -95,17 +95,10 @@ jobs:
       # `E404 ... could not be found or you do not have permission` 挡回来。那句话看起来像
       # 包名写错了或者没权限，指不到真正的原因。
       - run: npm install -g npm@latest
-      - name: 诊断 OIDC 环境
-        run: |
-          echo "npm = $(npm --version)"
-          echo "ACTIONS_ID_TOKEN_REQUEST_URL 设了吗: ${ACTIONS_ID_TOKEN_REQUEST_URL:+yes}"
-          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN 设了吗: ${ACTIONS_ID_TOKEN_REQUEST_TOKEN:+yes}"
-          echo "--- .npmrc ---"; cat ~/.npmrc 2>/dev/null || echo "(没有 ~/.npmrc)"
-          cat .npmrc 2>/dev/null || echo "(没有仓库内 .npmrc)"
       - run: npm ci
       - run: npm run build
       - run: npm version "0.0.0-dev.${{ github.run_number }}.g${GITHUB_SHA::7}" --no-git-tag-version
-      - run: npm publish --provenance --tag dev --loglevel verbose
+      - run: npm publish --provenance --tag dev
 
   # v1.2.3 → npm 正式版。
   #
