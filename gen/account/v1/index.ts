@@ -54,6 +54,10 @@ export type SubmitIdentityVerificationBody = NonNullable<
 export type ListMyInvitationsResult =
   operations["list-my-invitations"]["responses"][200]["content"]["application/json"];
 
+/** `GET /account/v1/me/invitations` 的查询参数。 */
+export type ListMyInvitationsQuery =
+  operations["list-my-invitations"]["parameters"]["query"];
+
 /** `POST /account/v1/me/invitations/accept` 成功时的响应体。 */
 export type AcceptInvitationByTokenResult =
   operations["accept-invitation-by-token"]["responses"][200]["content"]["application/json"];
@@ -70,6 +74,10 @@ export type AcceptInvitationResult =
 /** `GET /account/v1/projects` 成功时的响应体。 */
 export type ListProjectsResult =
   operations["list-projects"]["responses"][200]["content"]["application/json"];
+
+/** `GET /account/v1/projects` 的查询参数。 */
+export type ListProjectsQuery =
+  operations["list-projects"]["parameters"]["query"];
 
 /** `POST /account/v1/projects` 成功时的响应体。 */
 export type CreateProjectResult =

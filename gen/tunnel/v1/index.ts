@@ -11,6 +11,10 @@ import type { operations } from "./schema.js";
 export type ListTunnelOperationLogsResult =
   operations["list-tunnel-operation-logs"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/operation-logs` 的查询参数。 */
+export type ListTunnelOperationLogsQuery =
+  operations["list-tunnel-operation-logs"]["parameters"]["query"];
+
 /** `GET /api/v1/plans` 成功时的响应体。 */
 export type ListTunnelPlansResult =
   operations["list-tunnel-plans"]["responses"][200]["content"]["application/json"];
@@ -74,3 +78,7 @@ export type GetTunnelUsageResult =
 /** `GET /api/v1/tunnel/usage/series` 成功时的响应体。 */
 export type ListTunnelUsageSeriesResult =
   operations["list-tunnel-usage-series"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/tunnel/usage/series` 的查询参数。 */
+export type ListTunnelUsageSeriesQuery =
+  operations["list-tunnel-usage-series"]["parameters"]["query"];

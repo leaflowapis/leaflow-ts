@@ -36,6 +36,10 @@ export type GetProjectMembershipResult =
 export type ListProjectInvitationsResult =
   operations["list-project-invitations"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/invitations` 的查询参数。 */
+export type ListProjectInvitationsQuery =
+  operations["list-project-invitations"]["parameters"]["query"];
+
 /** `POST /api/v1/invitations` 成功时的响应体。 */
 export type IssueInvitationResult =
   operations["issue-invitation"]["responses"][201]["content"]["application/json"];
@@ -48,6 +52,10 @@ export type IssueInvitationBody = NonNullable<
 /** `GET /api/v1/members` 成功时的响应体。 */
 export type ListMembersResult =
   operations["list-members"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/members` 的查询参数。 */
+export type ListMembersQuery =
+  operations["list-members"]["parameters"]["query"];
 
 /** `PUT /api/v1/members/{userId}/roles` 成功时的响应体。 */
 export type SetMemberRolesResult =
@@ -96,6 +104,10 @@ export type UpdateRoleBody = NonNullable<
 /** `GET /api/v1/ssh-keys` 成功时的响应体。 */
 export type ListSshKeysResult =
   operations["list-ssh-keys"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/ssh-keys` 的查询参数。 */
+export type ListSshKeysQuery =
+  operations["list-ssh-keys"]["parameters"]["query"];
 
 /** `POST /api/v1/ssh-keys` 成功时的响应体。 */
 export type CreateSshKeyResult =
