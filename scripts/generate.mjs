@@ -114,9 +114,18 @@ for (const { service, version, spec } of contractList) {
   const destination = join(output, service, version);
   mkdirSync(destination, { recursive: true });
 
+  // --default-non-nullable false：**有 default 不等于必填**。
+  //
+  // 不加的话，任何带 `default` 的字段都会被生成成必填，而 Go 那边同一份契约生成的是指针
+  // （`Most *int64`）。两种语言对同一个字段给出相反的结论，而契约本身说的是「可选，服务端有
+  // 默认值」——两个契约里一共 38 个字段是这种。
+  //
+  // 表现只在少数地方冒出来：绝大多数字段前端表单总会传，所以类型是不是必填看不出区别。
+  // 唯一炸出来的是「展开地址」那个按钮——它本来就不带 body，于是 `{}` 通不过类型检查。
   execFileSync(
     "npx",
-    ["openapi-typescript", spec, "-o", join(destination, "schema.ts")],
+    ["openapi-typescript", spec, "--default-non-nullable", "false",
+     "-o", join(destination, "schema.ts")],
     { stdio: "inherit" },
   );
 
