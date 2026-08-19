@@ -16,6 +16,20 @@
 # 不带的话 leaflowapis/ 是个空目录，生成器会说「一份契约都没有」然后退出——而那个错看起来像
 # 契约仓库出了问题。
 #
+# # 没有 NPM_TOKEN
+#
+# 发布走 npm 的 trusted publishing（OIDC）：npm 那边登记了「@leaflow/sdk 只接受来自
+# LeaflowNET/leaflow-ts 的 ci.yml 的发布」，运行时用 GitHub 签发的 id-token 换一次性凭据。
+#
+# 所以这个仓库里**一个发布凭据都不存**。那不只是省事：一把长期 token 会过期、会被轮换、
+# 会在 fork 的 PR 里被人试图读出来，而这三件事都不报错——它们的表现都是「某天发布突然挂了」
+# 或者「某天有人发了一个我们没发的版本」。npm 自己也在收紧 token 发布（CI 日志里那句
+# "npm tokens that bypass 2FA are being restricted"）。
+#
+# `--provenance` 因此不用显式写：trusted publishing 本来就带溯源。
+#
+# permissions 里的 id-token: write 是这套东西的前提，删了它表现是 ENEEDAUTH。
+#
 # # 版本号来自 tag，不来自 package.json
 #
 # 两处各写一遍的话，忘改的那处会让 npm 上出现一个和 tag 对不上的版本，而 npm 不会拒绝，
@@ -75,9 +89,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm version "0.0.0-dev.${{ github.run_number }}.g${GITHUB_SHA::7}" --no-git-tag-version
-      - run: npm publish --provenance --tag dev
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --tag dev
 
   # v1.2.3 → npm 正式版。
   #
@@ -102,6 +114,4 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
-      - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --access public
