@@ -11,6 +11,10 @@ import type { operations } from "./schema.js";
 export type ListIncidentsResult =
   operations["list-incidents"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/incidents` 的查询参数。 */
+export type ListIncidentsQuery =
+  operations["list-incidents"]["parameters"]["query"];
+
 /** `GET /api/v1/incidents/{incidentId}` 成功时的响应体。 */
 export type GetIncidentResult =
   operations["get-incident"]["responses"][200]["content"]["application/json"];
@@ -68,6 +72,10 @@ export type ReopenIncidentResult =
 export type ListIncidentTimelineResult =
   operations["list-incident-timeline"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/incidents/{incidentId}/timeline` 的查询参数。 */
+export type ListIncidentTimelineQuery =
+  operations["list-incident-timeline"]["parameters"]["query"];
+
 /** `GET /api/v1/maintenance-windows` 成功时的响应体。 */
 export type ListMaintenanceWindowsResult =
   operations["list-maintenance-windows"]["responses"][200]["content"]["application/json"];
@@ -93,9 +101,17 @@ export type GetProjectOverviewResult =
 export type ListServerItemsResult =
   operations["list-server-items"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/servers/{serverId}/items` 的查询参数。 */
+export type ListServerItemsQuery =
+  operations["list-server-items"]["parameters"]["query"];
+
 /** `GET /api/v1/servers/{serverId}/metrics` 成功时的响应体。 */
 export type GetServerMetricResult =
   operations["get-server-metric"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/servers/{serverId}/metrics` 的查询参数。 */
+export type GetServerMetricQuery =
+  operations["get-server-metric"]["parameters"]["query"];
 
 /** `GET /api/v1/servers/{serverId}/resources` 成功时的响应体。 */
 export type GetServerResourcesResult =
@@ -109,9 +125,17 @@ export type GetServerSnapshotResult =
 export type ListProjectTopItemsResult =
   operations["list-project-top-items"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/top-items` 的查询参数。 */
+export type ListProjectTopItemsQuery =
+  operations["list-project-top-items"]["parameters"]["query"];
+
 /** `GET /api/v1/servers` 成功时的响应体。 */
 export type ListServersResult =
   operations["list-servers"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/servers` 的查询参数。 */
+export type ListServersQuery =
+  operations["list-servers"]["parameters"]["query"];
 
 /** `GET /api/v1/servers/{serverId}` 成功时的响应体。 */
 export type GetServerResult =
@@ -156,9 +180,17 @@ export type PutWebCheckBody = NonNullable<
 export type ListWebChecksResult =
   operations["list-web-checks"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/web-checks` 的查询参数。 */
+export type ListWebChecksQuery =
+  operations["list-web-checks"]["parameters"]["query"];
+
 /** `GET /api/v1/sli-report` 成功时的响应体。 */
 export type GetSliReportResult =
   operations["get-sli-report"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/sli-report` 的查询参数。 */
+export type GetSliReportQuery =
+  operations["get-sli-report"]["parameters"]["query"];
 
 /** `GET /api/v1/slo` 成功时的响应体。 */
 export type GetSloResult =

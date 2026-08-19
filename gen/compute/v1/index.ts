@@ -11,6 +11,10 @@ import type { operations } from "./schema.js";
 export type ListBackupsResult =
   operations["list-backups"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/backups` 的查询参数。 */
+export type ListBackupsQuery =
+  operations["list-backups"]["parameters"]["query"];
+
 /** `POST /api/v1/backups` 成功时的响应体。 */
 export type CreateBackupResult =
   operations["create-backup"]["responses"][201]["content"]["application/json"];
@@ -46,13 +50,25 @@ export type RestoreBackupBody = NonNullable<
 export type ListDiskTypesResult =
   operations["list-disk-types"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/disk-types` 的查询参数。 */
+export type ListDiskTypesQuery =
+  operations["list-disk-types"]["parameters"]["query"];
+
 /** `GET /api/v1/images` 成功时的响应体。 */
 export type ListImagesResult =
   operations["list-images"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/images` 的查询参数。 */
+export type ListImagesQuery =
+  operations["list-images"]["parameters"]["query"];
+
 /** `GET /api/v1/instance-types` 成功时的响应体。 */
 export type ListInstanceTypesResult =
   operations["list-instance-types"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/instance-types` 的查询参数。 */
+export type ListInstanceTypesQuery =
+  operations["list-instance-types"]["parameters"]["query"];
 
 /** `GET /api/v1/regions` 成功时的响应体。 */
 export type ListRegionsResult =
@@ -65,6 +81,10 @@ export type ListAvailabilityZonesResult =
 /** `GET /api/v1/disks` 成功时的响应体。 */
 export type ListDisksResult =
   operations["list-disks"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/disks` 的查询参数。 */
+export type ListDisksQuery =
+  operations["list-disks"]["parameters"]["query"];
 
 /** `POST /api/v1/disks` 成功时的响应体。 */
 export type CreateDiskResult =
@@ -188,6 +208,10 @@ export type OpenInstanceConsoleResult =
 export type GetInstanceConsoleOutputResult =
   operations["get-instance-console-output"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/instances/{instanceId}/console-output` 的查询参数。 */
+export type GetInstanceConsoleOutputQuery =
+  operations["get-instance-console-output"]["parameters"]["query"];
+
 /** `POST /api/v1/instances/{instanceId}/password` 成功时的响应体。 */
 export type ResetInstancePasswordResult =
   operations["reset-instance-password"]["responses"][200]["content"]["application/json"];
@@ -274,6 +298,10 @@ export type DetachPortResult =
 export type ListOperationLogsResult =
   operations["list-operation-logs"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/operation-logs` 的查询参数。 */
+export type ListOperationLogsQuery =
+  operations["list-operation-logs"]["parameters"]["query"];
+
 /** `GET /api/v1/ports` 成功时的响应体。 */
 export type ListPortsResult =
   operations["list-ports"]["responses"][200]["content"]["application/json"];
@@ -290,6 +318,10 @@ export type CreatePortBody = NonNullable<
 /** `GET /api/v1/private-images` 成功时的响应体。 */
 export type ListPrivateImagesResult =
   operations["list-private-images"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/private-images` 的查询参数。 */
+export type ListPrivateImagesQuery =
+  operations["list-private-images"]["parameters"]["query"];
 
 /** `POST /api/v1/private-images` 成功时的响应体。 */
 export type CreatePrivateImageResult =
@@ -316,6 +348,10 @@ export type RenamePrivateImageBody = NonNullable<
 /** `GET /api/v1/private-networks` 成功时的响应体。 */
 export type ListPrivateNetworksResult =
   operations["list-private-networks"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/private-networks` 的查询参数。 */
+export type ListPrivateNetworksQuery =
+  operations["list-private-networks"]["parameters"]["query"];
 
 /** `POST /api/v1/private-networks` 成功时的响应体。 */
 export type CreatePrivateNetworkResult =
@@ -377,9 +413,17 @@ export type CreateSubnetBody = NonNullable<
 export type SuggestSubnetCidrResult =
   operations["suggest-subnet-cidr"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/private-networks/{privateNetworkId}/subnets/next-free-cidr` 的查询参数。 */
+export type SuggestSubnetCidrQuery =
+  operations["suggest-subnet-cidr"]["parameters"]["query"];
+
 /** `GET /api/v1/security-groups` 成功时的响应体。 */
 export type ListSecurityGroupsResult =
   operations["list-security-groups"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/security-groups` 的查询参数。 */
+export type ListSecurityGroupsQuery =
+  operations["list-security-groups"]["parameters"]["query"];
 
 /** `POST /api/v1/security-groups` 成功时的响应体。 */
 export type CreateSecurityGroupResult =
@@ -410,6 +454,10 @@ export type CreateSecurityGroupRuleBody = NonNullable<
 /** `GET /api/v1/snapshots` 成功时的响应体。 */
 export type ListSnapshotsResult =
   operations["list-snapshots"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/snapshots` 的查询参数。 */
+export type ListSnapshotsQuery =
+  operations["list-snapshots"]["parameters"]["query"];
 
 /** `POST /api/v1/snapshots` 成功时的响应体。 */
 export type CreateSnapshotResult =

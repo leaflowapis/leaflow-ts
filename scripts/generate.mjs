@@ -2,7 +2,7 @@
 //
 //   openapi/<服务>/<版本>/openapi.yaml
 //       → gen/<服务>/<版本>/schema.ts   openapi-typescript 的原样产出
-//       → gen/<服务>/<版本>/index.ts    好用的别名（<操作>Result / <操作>Body）
+//       → gen/<服务>/<版本>/index.ts    好用的别名（<操作>Result / <操作>Body / <操作>Query）
 //       → gen/index.ts                  按服务分命名空间的桶
 //
 // # 一个服务一个文件，没有 bundle 这一步
@@ -142,6 +142,13 @@ for (const { service, version, spec } of contractList) {
           `/** \`${method.toUpperCase()} ${path}\` 成功时的响应体。 */`,
           `export type ${name}Result =`,
           `  operations[${key}]["responses"][${status}]["content"]["application/json"];`,
+          "");
+      }
+      if ((operation.parameters ?? []).some((p) => p.in === "query")) {
+        aliases.push(
+          `/** \`${method.toUpperCase()} ${path}\` 的查询参数。 */`,
+          `export type ${name}Query =`,
+          `  operations[${key}]["parameters"]["query"];`,
           "");
       }
       if (operation.requestBody?.content?.[JSON_MEDIA]) {

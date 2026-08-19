@@ -15,6 +15,10 @@ export type UploadAttachmentResult =
 export type ListBindingsResult =
   operations["list-bindings"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/bindings` 的查询参数。 */
+export type ListBindingsQuery =
+  operations["list-bindings"]["parameters"]["query"];
+
 /** `GET /api/v1/bindings/{binding}` 成功时的响应体。 */
 export type GetBindingResult =
   operations["get-binding"]["responses"][200]["content"]["application/json"];
@@ -22,6 +26,10 @@ export type GetBindingResult =
 /** `GET /api/v1/channels` 成功时的响应体。 */
 export type ListChannelsResult =
   operations["list-channels"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/channels` 的查询参数。 */
+export type ListChannelsQuery =
+  operations["list-channels"]["parameters"]["query"];
 
 /** `POST /api/v1/channels` 成功时的响应体。 */
 export type CreateChannelResult =
@@ -53,6 +61,10 @@ export type CreateBindingCodeResult =
 export type ListChannelRejectionsResult =
   operations["list-channel-rejections"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/channels/{channel}/rejections` 的查询参数。 */
+export type ListChannelRejectionsQuery =
+  operations["list-channel-rejections"]["parameters"]["query"];
+
 /** `POST /api/v1/channels/{channel}/secret` 成功时的响应体。 */
 export type RotateChannelSecretResult =
   operations["rotate-channel-secret"]["responses"][200]["content"]["application/json"];
@@ -65,6 +77,10 @@ export type RotateChannelSecretBody = NonNullable<
 /** `GET /api/v1/channels/{channel}/sender-check` 成功时的响应体。 */
 export type CheckSenderResult =
   operations["check-sender"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/channels/{channel}/sender-check` 的查询参数。 */
+export type CheckSenderQuery =
+  operations["check-sender"]["parameters"]["query"];
 
 /** `POST /api/v1/channels/{channel}/weixin-logins` 成功时的响应体。 */
 export type BeginWeixinLoginResult =
@@ -94,6 +110,10 @@ export type ListModelsResult =
 /** `GET /api/v1/threads` 成功时的响应体。 */
 export type ListThreadsResult =
   operations["list-threads"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/threads` 的查询参数。 */
+export type ListThreadsQuery =
+  operations["list-threads"]["parameters"]["query"];
 
 /** `POST /api/v1/threads` 成功时的响应体。 */
 export type CreateThreadResult =
@@ -125,6 +145,10 @@ export type DecideApprovalBody = NonNullable<
 /** `GET /api/v1/threads/{thread}/earlier` 成功时的响应体。 */
 export type ListEarlierItemsResult =
   operations["list-earlier-items"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/threads/{thread}/earlier` 的查询参数。 */
+export type ListEarlierItemsQuery =
+  operations["list-earlier-items"]["parameters"]["query"];
 
 /** `POST /api/v1/threads/{thread}/messages` 成功时的响应体。 */
 export type SendMessageResult =

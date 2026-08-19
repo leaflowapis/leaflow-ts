@@ -11,6 +11,10 @@ import type { operations } from "./schema.js";
 export type ListApiKeysResult =
   operations["list-api-keys"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/keys` 的查询参数。 */
+export type ListApiKeysQuery =
+  operations["list-api-keys"]["parameters"]["query"];
+
 /** `POST /api/v1/keys` 成功时的响应体。 */
 export type CreateApiKeyResult =
   operations["create-api-key"]["responses"][201]["content"]["application/json"];
@@ -57,6 +61,10 @@ export type GetModelResult =
 export type ListRequestsResult =
   operations["list-requests"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/requests` 的查询参数。 */
+export type ListRequestsQuery =
+  operations["list-requests"]["parameters"]["query"];
+
 /** `GET /api/v1/requests/{requestId}` 成功时的响应体。 */
 export type GetRequestResult =
   operations["get-request"]["responses"][200]["content"]["application/json"];
@@ -65,14 +73,30 @@ export type GetRequestResult =
 export type ListUsageByApiKeyResult =
   operations["list-usage-by-api-key"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/usage/by-api-key` 的查询参数。 */
+export type ListUsageByApiKeyQuery =
+  operations["list-usage-by-api-key"]["parameters"]["query"];
+
 /** `GET /api/v1/usage/by-model` 成功时的响应体。 */
 export type ListUsageByModelResult =
   operations["list-usage-by-model"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/usage/by-model` 的查询参数。 */
+export type ListUsageByModelQuery =
+  operations["list-usage-by-model"]["parameters"]["query"];
 
 /** `GET /api/v1/usage/summary` 成功时的响应体。 */
 export type GetUsageSummaryResult =
   operations["get-usage-summary"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/usage/summary` 的查询参数。 */
+export type GetUsageSummaryQuery =
+  operations["get-usage-summary"]["parameters"]["query"];
+
 /** `GET /api/v1/usage/timeline` 成功时的响应体。 */
 export type GetUsageTimelineResult =
   operations["get-usage-timeline"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/usage/timeline` 的查询参数。 */
+export type GetUsageTimelineQuery =
+  operations["get-usage-timeline"]["parameters"]["query"];
