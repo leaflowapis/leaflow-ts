@@ -507,7 +507,7 @@ export interface components {
              * @default me
              * @enum {string}
              */
-            owner: "me" | "project";
+            owner?: "me" | "project";
             /** @description OpenSSH 格式的公钥。类型和指纹从它算出来，都不可改 */
             public_key: string;
             /** @description 用途标签，比如 ci、bastion */
