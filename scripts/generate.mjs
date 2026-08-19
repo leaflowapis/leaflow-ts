@@ -46,8 +46,9 @@
 // 而现在这个 SDK 给的是 compute.ListInstancesResult，控制台里到处在用（app/console/*/types.ts）。
 // 那层别名有价值，但它是从 operationId 机械推出来的，所以生成它，别手写。
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { parse as parseYaml } from "yaml";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -122,13 +123,12 @@ for (const { service, version, spec } of contractList) {
   // 别名。用 YAML 里的 operationId 而不是解析生成出来的 .ts——那份 .ts 的形状归
   // openapi-typescript 管，跟着它的版本变；operationId 是契约自己的东西。
   //
-  // 借 python 解析 YAML：这个仓库里 Go 那侧的生成器也是 python，两处对同一份文件的理解得一样。
+  // 在 Node 里解析，不借 python。这里一度 spawn 一个 python3 去转 YAML，理由是「Go 那侧的
+  // 生成器也是 python，两处对同一份文件的理解得一样」——拆成两个仓库之后那个前提没了，剩下的
+  // 只是让这个仓库凭空需要一个 python 运行时，而它在精简的 node 镜像里根本不存在
+  // （spawnSync python3 ENOENT）。
   const aliases = [];
-  const document = JSON.parse(
-    execFileSync("python3", ["-c",
-      "import sys,yaml,json;json.dump(yaml.safe_load(open(sys.argv[1])),sys.stdout)",
-      spec], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }),
-  );
+  const document = parseYaml(readFileSync(spec, "utf8"));
 
   for (const [path, item] of Object.entries(document.paths)) {
     for (const [method, operation] of Object.entries(item)) {
