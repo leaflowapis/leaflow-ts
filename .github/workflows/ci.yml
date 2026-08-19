@@ -1,0 +1,107 @@
+# 校验每次推送，发布只在打 tag 时。
+#
+# # 为什么每次推送也跑
+#
+# 跑的是「重新生成一遍，看签进来的产物和契约还对不对」加类型检查。它替开发挡住一类改动：
+# 契约改了、但生成物没跟着提交——那件事在 review 时发现是重跑一次生成，在发布那天发现是
+# 发布中断，而那时候 CI 手上明明有正确的产物。
+#
+# # CI 不写回生成物
+#
+# 一个会 commit 回来的流水线，在两次推送挨得近时要处理「我算完了但 main 又变了」，而处理方式
+# 无非是重试或者强推——前者会打架，后者会丢东西。所以这里只读不写：产物由开发在本地跑完提交。
+#
+# # 契约是 submodule，所以 checkout 要带 submodules
+#
+# 不带的话 leaflowapis/ 是个空目录，生成器会说「一份契约都没有」然后退出——而那个错看起来像
+# 契约仓库出了问题。
+#
+# # 版本号来自 tag，不来自 package.json
+#
+# 两处各写一遍的话，忘改的那处会让 npm 上出现一个和 tag 对不上的版本，而 npm 不会拒绝，
+# 它只是发出去了。
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: 生成物是最新的
+        run: |
+          npm run generate
+          if ! git diff --quiet; then
+            echo "::error::契约改了但生成物没跟着更新。本地跑一次 npm run generate 再提交。" >&2
+            git --no-pager diff --stat >&2
+            exit 1
+          fi
+
+      - run: npm run typecheck
+
+  # main 上的每次推送发一个 dev 快照。装它要显式写 @dev，`npm i @leaflow/sdk` 拿到的还是正式版。
+  #
+  # g 前缀让 commit hash 在以数字开头时仍然是合法的 semver 预发布标识；run number 让快照之间
+  # 有先后。
+  snapshot:
+    needs: verify
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run build
+      - run: npm version "0.0.0-dev.${{ github.run_number }}.g${GITHUB_SHA::7}" --no-git-tag-version
+      - run: npm publish --provenance --tag dev
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # v1.2.3 → npm 正式版。
+  #
+  # tag 不再带 ts/ 前缀：这个仓库只有 TS 一种产物，前缀是上一版用来和 go/ 分开的，而那正是
+  # 拆仓库要消除的东西。
+  release:
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run build
+      - run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
