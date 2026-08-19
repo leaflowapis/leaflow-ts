@@ -105,7 +105,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm version "0.0.0-dev.${{ github.run_number }}.g${GITHUB_SHA::7}" --no-git-tag-version
-      - run: npm publish --tag dev
+      - run: npm publish --provenance --tag dev
 
   # v1.2.3 → npm 正式版。
   #
@@ -139,4 +139,4 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
-      - run: npm publish --access public
+      - run: npm publish --provenance --access public
