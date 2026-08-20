@@ -11,16 +11,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出备份 */
+        /** List backups */
         get: operations["list-backups"];
         put?: never;
         /**
-         * 创建备份
-         * @description 备份是云硬盘在独立存储中的一份完整副本：**源云硬盘删除后仍可恢复，且可恢复到本地区的其他可用区。**快照不具备这两项能力，它与源云硬盘位于同一存储，且源云硬盘存在快照时无法删除。
+         * Create a backup
+         * @description A backup is a complete copy of a disk held in separate storage: **it remains restorable after the source disk is deleted, and can be restored to another availability zone in the same region.** A snapshot offers neither capability, as it resides in the same storage as the source disk and prevents that disk from being deleted while it exists.
          *
-         *     运行中云服务器上挂载的云硬盘、以及系统盘，均可创建备份。
+         *     Disks attached to a running instance, including system disks, can be backed up.
          *
-         *     备份耗时取决于数据量。接口返回时尚未完成，请轮询查看接口。
+         *     The duration depends on the amount of data. The backup is not complete when this endpoint returns; poll the retrieve endpoint.
          */
         post: operations["create-backup"];
         delete?: never;
@@ -37,20 +37,20 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看备份
-         * @description 会实时查询备份的当前状态，因此比列表接口慢但更准确。轮询创建进度请使用本接口。
+         * Retrieve a backup
+         * @description Queries the current state of the backup, which makes it slower but more accurate than the list endpoint. Use it to poll creation progress.
          */
         get: operations["get-backup"];
         put?: never;
         post?: never;
         /**
-         * 删除备份
-         * @description 与源云硬盘无关，源云硬盘是否存在都不影响删除。
+         * Delete a backup
+         * @description Independent of the source disk: deletion succeeds whether or not that disk still exists.
          */
         delete: operations["delete-backup"];
         options?: never;
         head?: never;
-        /** 重命名备份 */
+        /** Rename a backup */
         patch: operations["rename-backup"];
         trace?: never;
     };
@@ -64,10 +64,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 由备份恢复
-         * @description 恢复到一块**新建的**云硬盘上，源云硬盘不受影响，也不要求它仍然存在。
+         * Restore from a backup
+         * @description Restores onto a **newly created** disk. The source disk is unaffected and need not still exist.
          *
-         *     目标硬盘类型可位于本地区的其他可用区，容量不能小于备份。恢复完成前该云硬盘不可挂载，请轮询云硬盘查看接口。
+         *     The target disk type may belong to another availability zone of the same region, and its capacity must not be smaller than the backup. The disk cannot be attached until the restore completes; poll the disk retrieve endpoint.
          */
         post: operations["restore-backup"];
         delete?: never;
@@ -83,7 +83,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出在售硬盘类型 */
+        /** List disk types on sale */
         get: operations["list-disk-types"];
         put?: never;
         post?: never;
@@ -101,8 +101,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出在售镜像
-         * @description min_ram_mb 超过所选机型内存的镜像无法启动，请据此过滤可选项。
+         * List images on sale
+         * @description An image whose `min_ram_mb` exceeds the memory of the selected instance type cannot boot. Filter the options accordingly.
          */
         get: operations["list-images"];
         put?: never;
@@ -120,7 +120,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出在售机型 */
+        /** List instance types on sale */
         get: operations["list-instance-types"];
         put?: never;
         post?: never;
@@ -137,7 +137,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出可用的地区 */
+        /** List available regions */
         get: operations["list-regions"];
         put?: never;
         post?: never;
@@ -155,8 +155,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出一个地区的可用区
-         * @description 云硬盘与云服务器必须位于同一可用区才能挂载，创建前请确认所选可用区。
+         * List the availability zones of a region
+         * @description A disk and an instance must reside in the same availability zone to be attached. Confirm the zone before creating either.
          */
         get: operations["list-availability-zones"];
         put?: never;
@@ -175,14 +175,14 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出云硬盘
-         * @description 同时提供 region_code 与 availability_zone 时，只返回可挂载到该位置云服务器的云硬盘。
+         * List disks
+         * @description When both `region_code` and `availability_zone` are supplied, only disks attachable to an instance at that location are returned.
          */
         get: operations["list-disks"];
         put?: never;
         /**
-         * 创建云硬盘
-         * @description 云硬盘创建在所选硬盘类型所属的可用区，云服务器必须位于同一可用区才能挂载。因此选定硬盘类型即确定了可用区。
+         * Create a disk
+         * @description The disk is created in the availability zone of the selected disk type, and an instance must reside in the same zone to attach it. Choosing the disk type therefore determines the zone.
          */
         post: operations["create-disk"];
         delete?: never;
@@ -199,22 +199,22 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看云硬盘
-         * @description 会实时查询云硬盘的当前状态，因此比列表接口慢但更准确。
+         * Retrieve a disk
+         * @description Queries the current state of the disk, which makes it slower but more accurate than the list endpoint.
          */
         get: operations["get-disk"];
         put?: never;
         post?: never;
         /**
-         * 删除云硬盘
-         * @description 云硬盘处于挂载状态，或仍存在基于它创建的快照时，删除会被拒绝。
+         * Delete a disk
+         * @description Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
          */
         delete: operations["delete-disk"];
         options?: never;
         head?: never;
         /**
-         * 重命名云硬盘
-         * @description 仅可修改名称。容量请使用扩容接口，类型与可用区不可修改。
+         * Rename a disk
+         * @description Changes the name only. Use the resize endpoint for capacity; type and availability zone are immutable.
          */
         patch: operations["rename-disk"];
         trace?: never;
@@ -229,8 +229,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 扩容
-         * @description 容量只能增加，不支持缩容。扩容完成后需在云服务器内自行扩展文件系统。
+         * Resize a disk
+         * @description Capacity can only be increased; shrinking is not supported. Extend the file system inside the instance once the resize completes.
          */
         post: operations["resize-disk"];
         delete?: never;
@@ -249,12 +249,12 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 回滚到快照
-         * @description 将云硬盘的内容恢复到创建该快照的时刻。**该时刻之后写入的数据全部丢失，且无法撤销。**
+         * Revert to a snapshot
+         * @description Restores the contents of the disk to the moment the snapshot was taken. **All data written after that moment is lost and cannot be recovered.**
          *
-         *     三项限制：只能回滚到该云硬盘最新的一个快照；云硬盘必须先从云服务器上卸载；创建快照后扩容过的云硬盘不能回滚。需要回到更早的时刻，或需要保留现有云硬盘时，请改用由快照创建一块新的云硬盘。
+         *     Three restrictions apply: only the most recent snapshot of the disk can be reverted to; the disk must be detached from its instance first; and a disk resized since the snapshot was taken cannot be reverted. To return to an earlier point in time, or to keep the existing disk, create a new disk from the snapshot instead.
          *
-         *     接口返回时回滚尚未完成，请轮询查看接口。
+         *     The revert is not complete when this endpoint returns; poll the retrieve endpoint.
          */
         post: operations["revert-disk"];
         delete?: never;
@@ -270,14 +270,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出公网 IP */
+        /** List floating IPs */
         get: operations["list-floating-ips"];
         put?: never;
         /**
-         * 申领公网 IP
-         * @description 若该私有网络尚未连通外网，会一并为其接入外网。
+         * Allocate a floating IP
+         * @description If the private network is not yet connected to the internet, connectivity is established as part of this call.
          *
-         *     IPv6 不通过本接口申请。IPv6 地址由私有网络自动下发至云服务器，在私有网络上启用即可。
+         *     IPv6 is not requested through this endpoint. IPv6 addresses are assigned to instances by the private network; enable IPv6 on that network instead.
          */
         post: operations["allocate-floating-ip"];
         delete?: never;
@@ -293,13 +293,13 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看公网 IP */
+        /** Retrieve a floating IP */
         get: operations["get-floating-ip"];
         put?: never;
         post?: never;
         /**
-         * 释放公网 IP
-         * @description 地址释放后进入冷却期才会重新分配，以免仍指向它的 DNS 记录和访问白名单立即失效。因此释放后的短时间内**无法重新申领同一个地址**，请谨慎操作。
+         * Release a floating IP
+         * @description A released address enters a cooldown period before it is allocated again, so that DNS records and allow-lists still pointing at it do not break immediately. **The same address therefore cannot be re-allocated** for some time after release. Proceed with care.
          */
         delete: operations["release-floating-ip"];
         options?: never;
@@ -316,8 +316,8 @@ export interface paths {
         };
         get?: never;
         /**
-         * 设带宽上限
-         * @description 出入两个方向同时限速。仅限制出方向无法防止入方向流量打满上联带宽。
+         * Set the bandwidth limit
+         * @description Limits both directions at once. Limiting egress alone does not prevent ingress traffic from saturating the uplink.
          */
         put: operations["set-floating-ip-bandwidth"];
         post?: never;
@@ -335,12 +335,12 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** 将公网 IP 绑定到网卡 */
+        /** Bind a floating IP to a network interface */
         put: operations["bind-floating-ip"];
         post?: never;
         /**
-         * 解绑公网 IP
-         * @description 地址仍归本项目持有，只是不再指向任何网卡。
+         * Unbind a floating IP
+         * @description The address remains held by the project and simply no longer points at any network interface.
          */
         delete: operations["unbind-floating-ip"];
         options?: never;
@@ -355,22 +355,22 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出云服务器 */
+        /** List instances */
         get: operations["list-instances"];
         put?: never;
         /**
-         * 创建云服务器
-         * @description **必须在请求中设置密码**：不设置时请求会被拒绝，否则创建出的云服务器将无法登录。密码可由平台生成，此时仅在本次响应中返回一次。
+         * Create instances
+         * @description **A password must be set in the request.** The request is rejected otherwise, since the resulting instance would be unreachable. The platform can generate one, in which case it is returned only in this response.
          *
-         *     `count` 可一次创建多台（最多 20 台），名称自动加 `-1`、`-2` 编号，所有云服务器共用同一个密码。**响应中的 `instances` 始终是数组**，单台创建时也是。
+         *     `count` creates several instances at once, 20 at most. Names are numbered `-1`, `-2` automatically and all instances share one password. **`instances` in the response is always an array**, including for a single instance.
          *
-         *     批量创建按顺序逐台进行。若中途失败（例如配额不足），**已创建的云服务器会保留**，响应中的 `failure` 给出中止原因；第一台就失败时视为整次请求失败，不会创建任何云服务器。
+         *     Instances are created one by one in order. If the sequence stops part way through, because of a quota limit for example, **the instances already created are kept** and `failure` states why it stopped. A failure on the first instance is treated as a failure of the whole request and no instance is created.
          *
-         *     镜像二选一：`image_id` 使用平台提供的镜像，`private_image_id` 使用自制镜像。两者都给或都不给都会被拒绝。
+         *     Exactly one image source must be given: `image_id` for a platform image, `private_image_id` for a private image. Supplying both or neither is rejected.
          *
-         *     云服务器创建在机型所属的可用区。后续要挂载的云硬盘必须位于同一可用区。
+         *     Instances are created in the availability zone of the instance type. Disks to be attached later must reside in the same zone.
          *
-         *     接口返回时创建尚未完成（status 为 provisioning），请轮询 GET 确认结果。
+         *     Creation is not complete when this endpoint returns and `status` is `provisioning`. Poll GET to observe the outcome.
          */
         post: operations["launch-instance"];
         delete?: never;
@@ -387,24 +387,24 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看云服务器
-         * @description 会实时查询云服务器的当前状态，因此比列表接口慢但更准确。轮询创建进度请使用本接口。
+         * Retrieve an instance
+         * @description Queries the current state of the instance, which makes it slower but more accurate than the list endpoint. Use it to poll creation progress.
          */
         get: operations["get-instance"];
         put?: never;
         post?: never;
         /**
-         * 释放云服务器
-         * @description 系统盘随云服务器一并删除，**基于系统盘创建的快照也会一并删除**。数据盘会被卸载并保留，其快照与备份不受影响。主网卡随云服务器一并释放。
+         * Release an instance
+         * @description The system disk is deleted with the instance, and **snapshots created from the system disk are deleted with it**. Data disks are detached and kept, and their snapshots and backups are unaffected. The primary network interface is released with the instance.
          *
-         *     正在制作镜像的云服务器无法释放，请等待制作完成或先删除该镜像。
+         *     An instance being captured as a private image cannot be released. Wait for the capture to finish, or delete that image first.
          */
         delete: operations["delete-instance"];
         options?: never;
         head?: never;
         /**
-         * 重命名云服务器
-         * @description 仅修改显示名称。云服务器内的主机名不变，它等于云服务器 id。
+         * Rename an instance
+         * @description Changes the display name only. The hostname inside the instance is unchanged; it equals the instance id.
          */
         patch: operations["rename-instance"];
         trace?: never;
@@ -419,14 +419,14 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 开机、关机、重启
-         * @description 重启默认为软重启，由操作系统正常关闭后重新启动。
+         * Start, stop or reboot an instance
+         * @description Reboot defaults to a soft reboot, in which the operating system shuts down normally before starting again.
          *
-         *     系统已无响应时软重启不会生效，此时可设置 `force` 强制重启。强制重启不等待操作系统关闭，**未落盘的数据会丢失**。`force` 仅适用于 reboot。
+         *     A soft reboot has no effect once the system is unresponsive. Set `force` to reboot forcibly: a forced reboot does not wait for the operating system to shut down, so **unwritten data is lost**. `force` applies to `reboot` only.
          *
-         *     已被平台停服的云服务器需先解除停服。
+         *     An instance suspended by the platform must be unsuspended first.
          *
-         *     本接口立即返回，返回的 `status` 是变更中的瞬态：start 为 `starting`、stop 为 `stopping`、reboot 为 `rebooting`。轮询云服务器详情直至落定为 `running` 或 `stopped`。
+         *     This endpoint returns immediately and the `status` it returns is a transient state: `starting` for start, `stopping` for stop, `rebooting` for reboot. Poll the instance until it settles at `running` or `stopped`.
          */
         post: operations["act-on-instance"];
         delete?: never;
@@ -445,10 +445,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 打开远程控制台
-         * @description 在浏览器中直接操作云服务器，无需网络可达，适用于网络配置失误导致无法登录的情况。
+         * Open a remote console
+         * @description Operates the instance directly from a browser and does not require the instance to be reachable over the network, which makes it usable when a network misconfiguration prevents login.
          *
-         *     返回的地址一次性使用，数分钟后失效。**请勿缓存**，每次使用前重新获取。
+         *     The returned address is single-use and expires within minutes. **Do not cache it**; request a new one before each use.
          */
         post: operations["open-instance-console"];
         delete?: never;
@@ -465,10 +465,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 读取串口输出
-         * @description 云服务器启动过程与内核输出的原始文本。无法登录或远程控制台无输出时，应首先查看本接口。其中可查看启动停止于哪一步、系统盘是否正常挂载、初始化过程是否报错。
+         * Read the console output
+         * @description The raw text produced by the instance during boot and by the kernel. Consult it first when login fails or the remote console shows no output: it reveals where boot stopped, whether the system disk was mounted, and whether initialisation reported errors.
          *
-         *     处于错误状态或已被平台停服的云服务器同样可以读取。
+         *     Instances in an error state, and instances suspended by the platform, can be read as well.
          */
         get: operations["get-instance-console-output"];
         put?: never;
@@ -489,12 +489,12 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 重置登录密码
-         * @description 在不重启的情况下改掉 root 的密码，云服务器必须处于运行中。
+         * Reset the login password
+         * @description Changes the root password without a reboot. The instance must be running.
          *
-         *     **并非所有镜像都支持**：镜像列表中 `supports_password_reset` 为 false 的镜像做不到，此时只能通过重装系统设置新密码，而重装会清除系统盘上的全部数据。
+         *     **Not every image supports this.** Images whose `supports_password_reset` is false cannot, and a new password can then only be set by rebuilding the instance, which erases all data on the system disk.
          *
-         *     镜像标记为支持、但云服务器内相应组件已被卸载或停止时，本接口同样会被拒绝。
+         *     The request is also rejected when the image is marked as supported but the corresponding component has been removed or stopped inside the instance.
          */
         post: operations["reset-instance-password"];
         delete?: never;
@@ -513,8 +513,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 重装系统
-         * @description **系统盘数据将被清除且无法恢复。** 已挂载的数据盘不受影响。
+         * Rebuild an instance
+         * @description **All data on the system disk is erased and cannot be recovered.** Attached data disks are unaffected.
          */
         post: operations["rebuild-instance"];
         delete?: never;
@@ -533,12 +533,12 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 变配
-         * @description 只能变更为同一地区、同一可用区的机型，否则已挂载的云硬盘无法随之迁移。
+         * Resize an instance
+         * @description Only an instance type in the same region and availability zone can be selected, as attached disks cannot follow the instance elsewhere.
          *
-         *     变配分两步：本接口下发后云服务器会在新规格上重新启动，状态变为 `resize_verifying`，此时**必须**调用确认或回滚接口。目标机型在确认前记在 `pending_instance_type_id` 上，`instance_type_id` 仍为当前生效并计费的机型。
+         *     A resize has two steps. This endpoint restarts the instance on the new size and the status becomes `resize_verifying`, at which point the confirm or revert endpoint **must** be called. Until confirmation the target type is recorded in `pending_instance_type_id`, while `instance_type_id` remains the type in effect and billed.
          *
-         *     **未确认期间新旧两份规格同时占用资源。** 请在状态变为 `resize_verifying` 后尽快确认。
+         *     **Both sizes hold resources while the resize is unconfirmed.** Confirm promptly once the status becomes `resize_verifying`.
          */
         post: operations["resize-instance"];
         delete?: never;
@@ -557,8 +557,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 确认变配
-         * @description 释放原规格占用的资源，`pending_instance_type_id` 成为生效机型并从此按它计费。
+         * Confirm a resize
+         * @description Releases the resources held by the previous size. `pending_instance_type_id` becomes the type in effect and is billed from then on.
          */
         post: operations["confirm-instance-resize"];
         delete?: never;
@@ -577,8 +577,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 回滚变配
-         * @description 云服务器回到原规格，`pending_instance_type_id` 被丢弃，计费不受本次变配影响。
+         * Revert a resize
+         * @description The instance returns to its previous size, `pending_instance_type_id` is discarded, and billing is unaffected by the resize.
          */
         post: operations["revert-instance-resize"];
         delete?: never;
@@ -594,12 +594,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出云服务器已挂载的云硬盘 */
+        /** List the disks attached to an instance */
         get: operations["list-instance-disks"];
         put?: never;
         /**
-         * 挂载云硬盘
-         * @description 云硬盘必须与云服务器位于同一地区和可用区。挂载后需在云服务器内自行分区并挂载文件系统。
+         * Attach a disk
+         * @description The disk must be in the same region and availability zone as the instance. Partition it and mount the file system inside the instance once it is attached.
          */
         post: operations["attach-disk"];
         delete?: never;
@@ -619,8 +619,8 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * 卸载云硬盘
-         * @description 请先在云服务器内卸载（umount）该设备再调用本接口，正在写入的文件系统被强制卸载会损坏数据。
+         * Detach a disk
+         * @description Unmount the device inside the instance before calling this endpoint. Forcibly detaching a file system that is being written to corrupts data.
          */
         delete: operations["detach-disk"];
         options?: never;
@@ -638,8 +638,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 为云服务器绑定公网 IP
-         * @description 公网 IP 绑定在云服务器的主网卡上。
+         * Bind a floating IP to an instance
+         * @description The floating IP is bound to the primary network interface of the instance.
          */
         post: operations["attach-instance-floating-ip"];
         delete?: never;
@@ -658,7 +658,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** 解绑云服务器的公网 IP */
+        /** Unbind the floating IP of an instance */
         delete: operations["detach-instance-floating-ip"];
         options?: never;
         head?: never;
@@ -672,10 +672,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出云服务器的网卡 */
+        /** List the network interfaces of an instance */
         get: operations["list-instance-ports"];
         put?: never;
-        /** 挂载网卡 */
+        /** Attach a network interface */
         post: operations["attach-port"];
         delete?: never;
         options?: never;
@@ -694,8 +694,8 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * 卸载网卡
-         * @description 主网卡不可卸载，卸载后云服务器将失去网络地址。
+         * Detach a network interface
+         * @description The primary network interface cannot be detached; the instance would lose its network address.
          */
         delete: operations["detach-port"];
         options?: never;
@@ -711,12 +711,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出本项目的操作记录
-         * @description 记录本项目内的每一次写操作：谁、在什么时候、对什么做了什么、成功还是失败。读取操作不记录。
+         * List the operation log of the project
+         * @description Records every write operation in the project: who performed it, when, on what, and whether it succeeded. Read operations are not recorded.
          *
-         *     **平台代为执行的操作也在其中，但不显示具体执行人**，`by_platform` 为 true。例如欠费停机、违规封禁：需要知道机器何时被平台停止，但执行人属于平台内部信息。
+         *     **Operations performed by the platform are included, but the individual operator is not disclosed** and `by_platform` is true. Suspension for non-payment and bans for abuse are examples: the time at which an instance was stopped by the platform is needed, whereas the operator is internal information.
          *
-         *     密码一类的字段在写入时即被替换为占位符，不会出现在 `payload` 中。
+         *     Fields such as passwords are replaced with a placeholder as the record is written and never appear in `payload`.
          */
         get: operations["list-operation-logs"];
         put?: never;
@@ -734,12 +734,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出网卡 */
+        /** List network interfaces */
         get: operations["list-ports"];
         put?: never;
         /**
-         * 创建网卡
-         * @description 创建出的网卡尚未挂载到任何云服务器。主网卡不由本接口创建，它随云服务器一并创建。
+         * Create a network interface
+         * @description The new network interface is not attached to any instance. Primary network interfaces are not created here; they are created with the instance.
          */
         post: operations["create-port"];
         delete?: never;
@@ -759,8 +759,8 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * 删除网卡
-         * @description 主网卡不可单独删除，它随云服务器一并释放。仍挂载在云服务器上的网卡也无法删除。
+         * Delete a network interface
+         * @description The primary network interface cannot be deleted on its own, as it is released with the instance. A network interface still attached to an instance cannot be deleted either.
          */
         delete: operations["delete-port"];
         options?: never;
@@ -775,23 +775,23 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出自制镜像 */
+        /** List private images */
         get: operations["list-private-images"];
         put?: never;
         /**
-         * 将云服务器制作为镜像
-         * @description 依据云服务器的系统盘制作，数据盘不包含在内。制作出的镜像可用于创建云服务器或重装系统，并在源云服务器释放后继续可用。
+         * Capture an instance as a private image
+         * @description Captured from the system disk of the instance; data disks are not included. The resulting image can create instances and rebuild them, and remains usable after the source instance is released.
          *
-         *     **镜像内容取自开始制作的那一刻，此后对云服务器的改动不会包含在内。**
+         *     **The image reflects the moment the capture started. Later changes to the instance are not included.**
          *
-         *     制作分两个阶段，请轮询查看接口：
+         *     The capture has two phases. Poll the retrieve endpoint:
          *
-         *     - `provisioning` 正在读取系统盘，通常数十秒。此阶段云服务器可以继续使用，但为保证一致性建议先关机。
-         *     - `uploading` 已与系统盘无关，**此时即可开机，无需等待制作完成**。该阶段耗时与系统盘容量成正比，20 GB 约需 3 分钟。
+         *     - `provisioning` — the system disk is being read, usually for tens of seconds. The instance remains usable during this phase, although stopping it first is recommended for consistency.
+         *     - `uploading` — no longer tied to the system disk. **The instance may be started at this point; there is no need to wait for the capture to finish.** The duration of this phase is proportional to the size of the system disk, roughly 3 minutes for 20 GB.
          *
-         *     运行中的云服务器其文件系统可能处于写入中间状态，制作出的镜像等同于一次断电后的磁盘内容。对一致性有要求时，请在开始制作前关机，并在状态变为 `uploading` 后开机。
+         *     The file system of a running instance may be captured mid-write, in which case the image is equivalent to the disk contents after a power loss. Where consistency matters, stop the instance before starting the capture and start it again once the status becomes `uploading`.
          *
-         *     制作期间该云服务器可以正常启停与使用，但无法释放。
+         *     The instance can be started, stopped and used normally during the capture, but cannot be released.
          */
         post: operations["create-private-image"];
         delete?: never;
@@ -808,22 +808,22 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看自制镜像
-         * @description 轮询制作进度请使用本接口。status 为 error 时，failure 给出失败原因。
+         * Retrieve a private image
+         * @description Use this endpoint to poll capture progress. When `status` is `error`, `failure` states the reason.
          */
         get: operations["get-private-image"];
         put?: never;
         post?: never;
         /**
-         * 删除自制镜像
-         * @description 仍有云服务器由该镜像创建时，删除会被拒绝：这些云服务器需要它才能重装系统。
+         * Delete a private image
+         * @description Deletion is rejected while instances created from the image still exist, as they need it in order to be rebuilt.
          *
-         *     制作尚未完成的镜像也可以删除，制作会被终止。
+         *     An image whose capture has not finished can be deleted; the capture is aborted.
          */
         delete: operations["delete-private-image"];
         options?: never;
         head?: never;
-        /** 重命名自制镜像 */
+        /** Rename a private image */
         patch: operations["rename-private-image"];
         trace?: never;
     };
@@ -834,12 +834,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出私有网络 */
+        /** List private networks */
         get: operations["list-private-networks"];
         put?: never;
         /**
-         * 创建私有网络
-         * @description 同时创建一张网络、一台路由器和一个默认安全组。默认安全组拒绝全部入站流量、放行全部出站流量。
+         * Create a private network
+         * @description Creates a network, a router and a default security group in one call. The default security group denies all inbound traffic and permits all outbound traffic.
          */
         post: operations["create-private-network"];
         delete?: never;
@@ -855,20 +855,20 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看私有网络 */
+        /** Retrieve a private network */
         get: operations["get-private-network"];
         put?: never;
         post?: never;
         /**
-         * 释放私有网络
-         * @description 其中仍有云服务器或网卡时，释放会被拒绝。IPv6、路由器与安全组随之一并释放。
+         * Release a private network
+         * @description Release is rejected while instances or network interfaces remain in the network. IPv6, the router and the security groups are released with it.
          */
         delete: operations["delete-private-network"];
         options?: never;
         head?: never;
         /**
-         * 重命名私有网络
-         * @description 仅修改显示名称。网段、路由与外网网关均不可修改。
+         * Rename a private network
+         * @description Changes the display name only. The CIDR, the routes and the internet gateway are immutable.
          */
         patch: operations["rename-private-network"];
         trace?: never;
@@ -880,19 +880,19 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看私有网络的 IPv6 */
+        /** Retrieve the IPv6 configuration of a private network */
         get: operations["get-private-network-ipv6"];
         put?: never;
         /**
-         * 为私有网络启用 IPv6
-         * @description 为该私有网络分配一段 IPv6 地址。地址由私有网络自动下发至云服务器，无需也无法单独申领，也不占用公网 IPv4。
+         * Enable IPv6 on a private network
+         * @description Allocates an IPv6 prefix to the private network. Addresses are assigned to instances by the network itself, can be neither requested nor released individually, and consume no public IPv4 address.
          *
-         *     该私有网络尚未接入外网时会自动接入，无需单独操作。
+         *     If the private network is not yet connected to the internet, connectivity is established as part of this call.
          */
         post: operations["enable-private-network-ipv6"];
         /**
-         * 关闭私有网络的 IPv6
-         * @description 释放的前缀不会立即重新分配。
+         * Disable IPv6 on a private network
+         * @description A released prefix is not re-allocated immediately.
          */
         delete: operations["disable-private-network-ipv6"];
         options?: never;
@@ -907,12 +907,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出静态路由 */
+        /** List static routes */
         get: operations["list-routes"];
         put?: never;
         /**
-         * 创建静态路由
-         * @description 以下三种会导致网络中断的写法会被拒绝：目的网段为 0.0.0.0/0（覆盖默认路由，所有公网 IP 立即失效）、目的网段为某个子网自身（覆盖直连路由）、下一跳为某个子网的网关（指回路由器自身）。
+         * Create a static route
+         * @description Three forms that would sever connectivity are rejected: a destination of `0.0.0.0/0`, which overrides the default route and takes every floating IP offline immediately; a destination equal to the CIDR of a subnet, which overrides its directly connected route; and a next hop equal to the gateway of a subnet, which points back at the router itself.
          */
         post: operations["create-route"];
         delete?: never;
@@ -931,7 +931,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** 删除静态路由 */
+        /** Delete a static route */
         delete: operations["delete-route"];
         options?: never;
         head?: never;
@@ -946,12 +946,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出子网
-         * @description IPv6 子网也在返回结果中，ip_version 为 6。它在启用 IPv6 时自动创建，不可单独删除。
+         * List subnets
+         * @description IPv6 subnets are included, with `ip_version` 6. They are created when IPv6 is enabled and cannot be deleted individually.
          */
         get: operations["list-subnets"];
         put?: never;
-        /** 创建子网 */
+        /** Create a subnet */
         post: operations["create-subnet"];
         delete?: never;
         options?: never;
@@ -967,8 +967,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 推荐下一个空闲网段
-         * @description 返回的只是建议值，创建子网时仍会重新校验。用于避免手工计算下一个空闲网段时出错。
+         * Suggest the next free CIDR
+         * @description The returned value is a suggestion and is validated again when the subnet is created. It exists to avoid errors when computing the next free CIDR by hand.
          */
         get: operations["suggest-subnet-cidr"];
         put?: never;
@@ -990,8 +990,8 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * 删除子网
-         * @description 该子网中仍有网卡，或仍有静态路由的下一跳落在该网段内时，删除会被拒绝。
+         * Delete a subnet
+         * @description Deletion is rejected while network interfaces remain in the subnet, or while a static route has a next hop inside its CIDR.
          */
         delete: operations["delete-subnet"];
         options?: never;
@@ -1006,12 +1006,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出安全组 */
+        /** List security groups */
         get: operations["list-security-groups"];
         put?: never;
         /**
-         * 创建安全组
-         * @description 新建的安全组带有一条规则：放行 ICMP 需要分片（type 3 code 4）。缺少该规则会导致路径 MTU 发现失败，表现为连接建立后传输大数据包时卡住。
+         * Create a security group
+         * @description A new security group carries one rule, permitting ICMP fragmentation-needed messages (type 3, code 4). Without it path MTU discovery fails, which presents as connections that establish and then stall on large packets.
          */
         post: operations["create-security-group"];
         delete?: never;
@@ -1027,20 +1027,20 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看安全组 */
+        /** Retrieve a security group */
         get: operations["get-security-group"];
         put?: never;
         post?: never;
         /**
-         * 删除安全组
-         * @description 默认安全组不可删除，它随私有网络一并释放。仍被网卡引用的安全组也无法删除。
+         * Delete a security group
+         * @description The default security group cannot be deleted, as it is released with the private network. A security group still referenced by a network interface cannot be deleted either.
          */
         delete: operations["delete-security-group"];
         options?: never;
         head?: never;
         /**
-         * 重命名安全组
-         * @description 仅可修改名称，规则请用规则接口。
+         * Rename a security group
+         * @description Changes the name only. Use the rule endpoints to change rules.
          */
         patch: operations["rename-security-group"];
         trace?: never;
@@ -1052,12 +1052,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出安全组规则 */
+        /** List security group rules */
         get: operations["list-security-group-rules"];
         put?: never;
         /**
-         * 创建安全组规则
-         * @description 重复添加同一条规则会被拒绝。判重时 `0.0.0.0/0`、`::/0` 与留空视为等同。
+         * Create a security group rule
+         * @description Adding an identical rule twice is rejected. For that comparison `0.0.0.0/0`, `::/0` and an omitted value are treated as equivalent.
          */
         post: operations["create-security-group-rule"];
         delete?: never;
@@ -1076,7 +1076,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** 删除安全组规则 */
+        /** Delete a security group rule */
         delete: operations["delete-security-group-rule"];
         options?: never;
         head?: never;
@@ -1090,14 +1090,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出快照 */
+        /** List snapshots */
         get: operations["list-snapshots"];
         put?: never;
         /**
-         * 创建快照
-         * @description 运行中云服务器上挂载的云硬盘同样可以创建快照。快照记录的是某一时刻的块设备状态，文件系统层面可能不一致，重要数据建议先在云服务器内执行 sync。
+         * Create a snapshot
+         * @description Disks attached to a running instance can be snapshotted. A snapshot records the state of the block device at a point in time and may be inconsistent at the file-system level, so run `sync` inside the instance first where the data matters.
          *
-         *     **系统盘的快照不能用于回滚该系统盘**：回滚要求先从云服务器上卸载，而系统盘不可卸载。它可用于创建一块新的数据盘。需要保留并恢复整个系统时，请使用自制镜像；需要可跨可用区、且在云硬盘删除后仍可恢复的副本时，请使用备份。
+         *     **A snapshot of a system disk cannot be used to revert that system disk**: reverting requires the disk to be detached, and a system disk cannot be detached. It can be used to create a new data disk. To preserve and restore an entire system, use a private image; for a copy that crosses availability zones and survives deletion of the disk, use a backup.
          */
         post: operations["create-snapshot"];
         delete?: never;
@@ -1113,15 +1113,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看快照 */
+        /** Retrieve a snapshot */
         get: operations["get-snapshot"];
         put?: never;
         post?: never;
-        /** 删除快照 */
+        /** Delete a snapshot */
         delete: operations["delete-snapshot"];
         options?: never;
         head?: never;
-        /** 重命名快照 */
+        /** Rename a snapshot */
         patch: operations["rename-snapshot"];
         trace?: never;
     };
@@ -1139,7 +1139,7 @@ export interface components {
             status: number;
         };
         BackupResource: {
-            /** @description 源云硬盘所在的可用区。恢复时可选择本地区的其他可用区 */
+            /** @description Availability zone of the source disk. A restore may target another zone in the same region */
             availability_zone: string;
             /** Format: date-time */
             created_at: string;
@@ -1149,12 +1149,12 @@ export interface components {
             region_code: string;
             /**
              * Format: int64
-             * @description 创建备份时源云硬盘的容量。恢复出的云硬盘不能小于此容量
+             * @description Capacity of the source disk when the backup was created. A restored disk cannot be smaller than this
              */
             size_gb: number;
             /**
              * Format: uuid
-             * @description 备份来源。该云硬盘删除后本备份仍然可用
+             * @description The disk this backup was taken from. The backup remains usable after that disk is deleted
              */
             source_disk_id: string;
             /** @enum {string} */
@@ -1174,29 +1174,29 @@ export interface components {
         RestoreBackupRequestBody: {
             /**
              * Format: uuid
-             * @description 可选择与源云硬盘不同的可用区，但必须在同一地区
+             * @description May differ from the availability zone of the source disk, but must be in the same region
              */
             disk_type_id: string;
             name: string;
             /**
              * Format: int64
-             * @description 留空时与备份等大。给出时不能小于备份
+             * @description Matches the size of the backup when omitted. When given, it must not be smaller than the backup
              */
             size_gb?: number;
         };
         DiskResource: {
             attached_instance_id: string | null;
-            /** @description 云硬盘实际所在的可用区。挂载时云服务器必须位于同一可用区 */
+            /** @description Availability zone the disk actually resides in. An instance must be in the same zone to attach it */
             availability_zone: string;
             /** Format: date-time */
             created_at: string;
-            /** @description 系统分配的设备名，在云服务器内看到的即为该名称 */
+            /** @description Device name assigned by the system, as seen inside the instance */
             device: string | null;
             /** Format: uuid */
             disk_type_id: string;
             /** Format: uuid */
             id: string;
-            /** @description 系统盘随云服务器一并释放，不能卸载也不能单独删除 */
+            /** @description A system disk is released with its instance and can be neither detached nor deleted individually */
             is_system: boolean;
             name: string;
             region_code: string;
@@ -1237,14 +1237,14 @@ export interface components {
             os_family: string;
             os_version: string;
             region_code: string;
-            /** @description false 表示由该镜像创建的云服务器只能通过重装系统设置新密码 */
+            /** @description False means a new password can only be set by rebuilding an instance created from this image */
             supports_password_reset: boolean;
         };
         ImageListResponseBody: {
             items: components["schemas"]["ImageResource"][] | null;
         };
         InstanceTypeResource: {
-            /** @description 该机型所属的可用区。云硬盘必须位于同一可用区才能挂载 */
+            /** @description Availability zone of this instance type. A disk must be in the same zone to be attached */
             availability_zone_code: string;
             /** Format: uuid */
             id: string;
@@ -1290,7 +1290,7 @@ export interface components {
             size_gb: number;
             /**
              * Format: uuid
-             * @description 从该快照恢复。提供时容量只需不小于快照本身
+             * @description Restore from this snapshot. When given, the capacity need only be no smaller than the snapshot
              */
             snapshot_id?: string;
         };
@@ -1300,14 +1300,14 @@ export interface components {
         ResizeDiskRequestBody: {
             /**
              * Format: int64
-             * @description 必须大于当前容量
+             * @description Must be larger than the current capacity
              */
             size_gb: number;
         };
         RevertDiskRequestBody: {
             /**
              * Format: uuid
-             * @description 必须是该云硬盘最新的一个快照
+             * @description Must be the most recent snapshot of the disk
              */
             snapshot_id: string;
         };
@@ -1325,7 +1325,7 @@ export interface components {
             id: string;
             region_code: string;
             /**
-             * @description idle 表示尚未绑定到网卡
+             * @description `idle` means the address is not bound to a network interface
              * @enum {string}
              */
             status: "idle" | "bound";
@@ -1334,7 +1334,7 @@ export interface components {
             items: components["schemas"]["FloatingIPResource"][] | null;
         };
         AllocateFloatingIPRequestBody: {
-            /** @description 指定要申领的地址。留空时由平台自动分配 */
+            /** @description The address to allocate. Allocated by the platform when omitted */
             address?: string;
             /** Format: uuid */
             private_network_id: string;
@@ -1342,7 +1342,7 @@ export interface components {
         SetBandwidthRequestBody: {
             /**
              * Format: int64
-             * @description 出入方向均限制为该值
+             * @description Applied to both directions
              */
             mbps: number;
         };
@@ -1354,54 +1354,54 @@ export interface components {
             availability_zone: string;
             /** Format: date-time */
             created_at: string;
-            /** @description 云服务器内的主机名，等于云服务器 id */
+            /** @description Hostname inside the instance; equals the instance id */
             hostname: string;
             /** Format: uuid */
             id: string;
             /**
              * Format: uuid
-             * @description 从平台提供的镜像创建时非空
+             * @description Non-empty when the instance was created from a platform image
              */
             image_id: string | null;
             /**
              * Format: uuid
-             * @description 当前生效的机型，即当前计费依据
+             * @description The instance type in effect, and the basis for billing
              */
             instance_type_id: string;
-            /** @description 云服务器主网卡的 IPv6 地址。私有网络启用 IPv6 后自动下发 */
+            /** @description IPv6 address of the primary network interface. Assigned automatically once IPv6 is enabled on the private network */
             ipv6_address: string | null;
             name: string;
             /**
              * Format: uuid
-             * @description 非空表示存在待确认的变配。确认后该机型生效，回滚则丢弃
+             * @description Non-empty while a resize awaits confirmation. Confirming puts this type into effect, reverting discards it
              */
             pending_instance_type_id: string | null;
             /**
              * Format: uuid
-             * @description 从自制的私有镜像创建时非空
+             * @description Non-empty when the instance was created from a private image
              */
             private_image_id: string | null;
-            /** @description 云服务器的内网地址 */
+            /** @description Private address of the instance */
             private_ip: string | null;
-            /** @description 云服务器主网卡所在的私有网络 */
+            /** @description Private network of the primary network interface */
             private_network_id: string | null;
-            /** @description 云服务器主网卡上绑定的公网 IPv4，未绑定时为空数组 */
+            /** @description Floating IPv4 addresses bound to the primary network interface; an empty array when none are bound */
             public_ips: string[] | null;
             region_code: string;
             /**
-             * @description 只有 running 和 stopped 可以下命令，其余取值都表示云服务器正在变更中，此时开机、关机、重启、变配、重装、重置密码都会被拒绝。
+             * @description Only `running` and `stopped` accept commands. Every other value means the instance is changing, and start, stop, reboot, resize, rebuild and password reset are all rejected.
              *
-             *     `transitioning` 是「正在执行某项变更，但不属于上面任何一类」的兜底取值，见到它继续轮询即可，不代表出错。
+             *     `transitioning` is the fallback for a change that falls into none of the categories above. It does not indicate an error; keep polling.
              *
-             *     `resize_verifying` 不是瞬态：变配已在新规格上启动，会一直停在这里直到确认或回滚，期间新旧两份规格同时计费。
+             *     `resize_verifying` is not transient: the instance is running on the new size and stays there until the resize is confirmed or reverted, with both sizes billed in the meantime.
              * @enum {string}
              */
             status: "provisioning" | "running" | "stopped" | "starting" | "stopping" | "rebooting" | "transitioning" | "resizing" | "resize_verifying" | "error" | "deleting" | "suspended";
-            /** @description 云服务器主网卡所在的子网 */
+            /** @description Subnet of the primary network interface */
             subnet_id: string | null;
             /**
              * Format: date-time
-             * @description 非空表示已被平台停服，需先解除后才能操作
+             * @description Non-empty once the platform has suspended the instance, which must be lifted before any operation
              */
             suspended_at: string | null;
             /** Format: date-time */
@@ -1413,50 +1413,50 @@ export interface components {
         LaunchInstanceRequestBody: {
             /**
              * Format: int64
-             * @description 一次创建的台数，留空为 1。多台时名称自动编号
+             * @description Number of instances to create; 1 when omitted. Names are numbered automatically for several
              */
             count?: number;
-            /** @description 由平台生成随机密码，仅在本次响应中返回 */
+            /** @description Have the platform generate a random password, returned only in this response */
             generate_password?: boolean;
             /**
              * Format: uuid
-             * @description 平台提供的镜像。与 private_image_id 二选一
+             * @description A platform image. Exactly one of this and `private_image_id`
              */
             image_id?: string;
             /** Format: uuid */
             instance_type_id: string;
             name: string;
-            /** @description root 的登录密码。留空时仅使用项目的 SSH 公钥 */
+            /** @description Root password. Only the SSH public keys of the project are used when omitted */
             password?: string;
             /**
              * Format: uuid
-             * @description 使用已有网卡（可预先绑定公网 IP）。与 subnet_id 二选一；使用时只能创建一台
+             * @description Use an existing network interface, which may already have a floating IP bound. Exactly one of this and `subnet_id`; only one instance can be created when it is used
              */
             port_id?: string;
             /**
              * Format: uuid
-             * @description 自制镜像。与 image_id 二选一
+             * @description A private image. Exactly one of this and `image_id`
              */
             private_image_id?: string;
             /**
              * Format: int64
-             * @description 系统盘容量（GB）。留空时按镜像要求与平台下限自动选择
+             * @description System disk capacity in GB. Chosen automatically from the requirement of the image and the platform minimum when omitted
              */
             root_disk_gb?: number;
-            /** @description 新建主网卡时必填，至少一个；不会自动使用默认安全组。使用 port_id 时忽略——那张网卡的安全组在创建它时已经定了 */
+            /** @description Required when a primary network interface is created, at least one; the default security group is not applied automatically. Ignored together with `port_id`, as the security groups of that interface were fixed when it was created */
             security_group_ids?: string[] | null;
             /**
              * Format: uuid
-             * @description 在该子网内新建主网卡。与 port_id 二选一
+             * @description Create the primary network interface in this subnet. Exactly one of this and `port_id`
              */
             subnet_id?: string;
         };
         LaunchInstanceResponseBody: {
-            /** @description 非空表示只成功创建了部分云服务器，其余因该原因中止 */
+            /** @description Non-empty when only some of the instances were created, stating why the sequence stopped */
             failure: string | null;
-            /** @description 按请求顺序返回，单台创建时也是数组 */
+            /** @description Returned in request order; an array even for a single instance */
             instances: components["schemas"]["InstanceResource"][] | null;
-            /** @description 仅在本次响应中返回，请及时保存。批量创建时所有云服务器共用它 */
+            /** @description Returned only in this response; store it immediately. All instances of a batch share it */
             password: string;
         };
         RenameInstanceRequestBody: {
@@ -1465,50 +1465,50 @@ export interface components {
         ActOnInstanceRequestBody: {
             /** @enum {string} */
             action: "start" | "stop" | "reboot";
-            /** @description 仅适用于 reboot。强制重启不等待操作系统正常关闭，未落盘的数据会丢失，用于系统已无响应的情况 */
+            /** @description Applies to `reboot` only. A forced reboot does not wait for the operating system to shut down and unwritten data is lost; use it when the system is unresponsive */
             force?: boolean;
         };
         ConsoleResponseBody: {
-            /** @description 远程控制台的连接地址，一次性使用且数分钟后失效 */
+            /** @description Connection address of the remote console; single-use and expires within minutes */
             console_url: string;
         };
         ConsoleOutputResponseBody: {
-            /** @description 串口输出的原始文本，行序与云服务器内一致 */
+            /** @description Raw text of the console output, in the same line order as inside the instance */
             output: string;
         };
         ResetPasswordRequestBody: {
-            /** @description 由平台生成随机密码，仅在本次响应中返回 */
+            /** @description Have the platform generate a random password, returned only in this response */
             generate_password?: boolean;
-            /** @description 新的 root 密码。与 generate_password 二选一 */
+            /** @description New root password. Exactly one of this and `generate_password` */
             password?: string;
         };
         ResetPasswordResponseBody: {
-            /** @description 平台生成的密码，仅本次返回。自行设置密码时为空 */
+            /** @description The password generated by the platform, returned only in this response. Empty when the password was supplied in the request */
             password: string;
         };
         RebuildInstanceRequestBody: {
             generate_password?: boolean;
             /**
              * Format: uuid
-             * @description 平台提供的镜像。与 private_image_id 二选一
+             * @description A platform image. Exactly one of this and `private_image_id`
              */
             image_id?: string;
             password?: string;
             /**
              * Format: uuid
-             * @description 自制镜像。与 image_id 二选一
+             * @description A private image. Exactly one of this and `image_id`
              */
             private_image_id?: string;
         };
         RebuildInstanceResponseBody: {
             instance: components["schemas"]["InstanceResource"];
-            /** @description 仅在本次响应中返回，请及时保存 */
+            /** @description Returned only in this response; store it immediately */
             password: string;
         };
         ResizeInstanceRequestBody: {
             /**
              * Format: uuid
-             * @description 必须与当前机型位于同一地区和可用区
+             * @description Must be in the same region and availability zone as the current instance type
              */
             instance_type_id: string;
         };
@@ -1525,14 +1525,14 @@ export interface components {
             /** Format: uuid */
             id: string;
             ipv6_address: string | null;
-            /** @description 主网卡随云服务器一并创建和释放，不可单独卸载 */
+            /** @description A primary network interface is created and released with its instance and cannot be detached individually */
             is_primary: boolean;
             mac: string | null;
             name: string;
             private_ip: string | null;
             /** Format: uuid */
             private_network_id: string;
-            /** @description 绑在这张网卡上的公网 IPv4，未绑定时为空数组 */
+            /** @description Floating IPv4 addresses bound to this network interface; an empty array when none are bound */
             public_ips: string[] | null;
             /** Format: uuid */
             subnet_id: string;
@@ -1545,24 +1545,24 @@ export interface components {
             port_id: string;
         };
         OperationLogResource: {
-            /** @description 操作名，与接口的 operation id 一致 */
+            /** @description Name of the operation; matches the operation id of the endpoint */
             action: string;
-            /** @description 发起该操作的用户。平台执行时为空 */
+            /** @description The user who initiated the operation. Empty when the platform performed it */
             actor: string | null;
-            /** @description true 表示由平台代为执行 */
+            /** @description True when the operation was performed by the platform */
             by_platform: boolean;
             /** Format: date-time */
             created_at: string;
-            /** @description 失败时的简要原因 */
+            /** @description Brief reason for the failure */
             failure: string | null;
             /** Format: uuid */
             id: string;
-            /** @description 该次请求的路径与查询参数。密码一类的字段已被隐去 */
+            /** @description Path and query parameters of the request. Fields such as passwords are redacted */
             payload: {
                 [key: string]: unknown;
             };
             region_code: string | null;
-            /** @description 创建类操作为空：新资源的 id 在响应中，不在请求路径上 */
+            /** @description Empty for create operations: the id of the new resource is in the response, not in the request path */
             subject_id: string;
             subject_type: string;
             succeeded: boolean;
@@ -1574,9 +1574,9 @@ export interface components {
         };
         CreatePortRequestBody: {
             name?: string;
-            /** @description 指定私网地址。留空时自动分配 */
+            /** @description The private address to assign. Allocated automatically when omitted */
             private_ip?: string;
-            /** @description 至少一个，且必须属于同一个私有网络 */
+            /** @description At least one, and all must belong to the same private network */
             security_group_ids: string[] | null;
             /** Format: uuid */
             subnet_id: string;
@@ -1585,38 +1585,38 @@ export interface components {
             architecture: string;
             /** Format: date-time */
             created_at: string;
-            /** @description 制作失败的原因，仅在 status 为 error 时非空 */
+            /** @description Reason the capture failed; non-empty only when `status` is `error` */
             failure: string | null;
             /** Format: uuid */
             id: string;
             /**
              * Format: int64
-             * @description 使用本镜像创建云服务器时，系统盘不能小于此容量
+             * @description The system disk of an instance created from this image cannot be smaller than this
              */
             min_disk_gb: number;
             /**
              * Format: int64
-             * @description 使用本镜像创建云服务器时，机型内存不能小于此容量
+             * @description The instance type of an instance created from this image must have at least this much memory
              */
             min_ram_mb: number;
             name: string;
             os_family: string;
             os_version: string;
-            /** @description 镜像只能用于所在地区 */
+            /** @description An image can only be used in the region that holds it */
             region_code: string;
             /**
              * Format: int64
-             * @description 镜像占用的存储容量，制作完成前为 0
+             * @description Storage occupied by the image; 0 until the capture completes
              */
             size_bytes: number;
             /**
              * Format: uuid
-             * @description 制作来源。该云服务器释放后本镜像仍然可用
+             * @description The instance this image was captured from. The image remains usable after that instance is released
              */
             source_instance_id: string | null;
             /** @enum {string} */
             status: "provisioning" | "uploading" | "available" | "deleting" | "error";
-            /** @description false 表示由该镜像创建的云服务器只能通过重装系统设置新密码 */
+            /** @description False means a new password can only be set by rebuilding an instance created from this image */
             supports_password_reset: boolean;
         };
         PrivateImageListResponseBody: {
@@ -1625,7 +1625,7 @@ export interface components {
         CreatePrivateImageRequestBody: {
             /**
              * Format: uuid
-             * @description 制作依据其系统盘，数据盘不包含在内
+             * @description Captured from the system disk of this instance; data disks are not included
              */
             instance_id: string;
             name: string;
@@ -1651,7 +1651,7 @@ export interface components {
             items: components["schemas"]["PrivateNetworkResource"][] | null;
         };
         CreatePrivateNetworkRequestBody: {
-            /** @description 必须是 RFC1918 的私有网段，掩码在 /8 到 /24 之间，例如 10.0.0.0/16 */
+            /** @description Must be an RFC 1918 private CIDR with a prefix length between /8 and /24, for example `10.0.0.0/16` */
             cidr: string;
             name: string;
             region_code: string;
@@ -1660,11 +1660,11 @@ export interface components {
             name: string;
         };
         IPv6ResponseBody: {
-            /** @description 已分配的 /64 前缀，未启用时为空 */
+            /** @description The allocated /64 prefix; empty while IPv6 is disabled */
             cidr: string;
             enabled: boolean;
             /**
-             * @description 为 active 时表示 IPv6 已完全可用
+             * @description `active` means IPv6 is fully available
              * @enum {string}
              */
             status: "pending" | "active" | "draining";
@@ -1683,9 +1683,9 @@ export interface components {
         };
         CreateRouteRequestBody: {
             description?: string;
-            /** @description 目的网段。不能为 0.0.0.0/0，也不能为某个子网自身的网段 */
+            /** @description Destination CIDR. It cannot be `0.0.0.0/0`, nor the CIDR of a subnet of this network */
             destination: string;
-            /** @description 云服务器的私网地址，必须落在该私有网络的某个子网内 */
+            /** @description Private address of an instance; must fall inside a subnet of this private network */
             nexthop: string;
         };
         SubnetResource: {
@@ -1706,12 +1706,12 @@ export interface components {
             items: components["schemas"]["SubnetResource"][] | null;
         };
         CreateSubnetRequestBody: {
-            /** @description 必须落在私有网络的网段内，且不能与已有子网重叠 */
+            /** @description Must fall inside the CIDR of the private network and must not overlap an existing subnet */
             cidr: string;
             name: string;
         };
         NextFreeCidrResponseBody: {
-            /** @description 为空表示该私有网络内已无满足该掩码的空闲网段 */
+            /** @description Empty when the private network has no free CIDR left for that prefix length */
             cidr: string;
         };
         SecurityGroupResource: {
@@ -1720,7 +1720,7 @@ export interface components {
             description: string;
             /** Format: uuid */
             id: string;
-            /** @description 默认安全组随私有网络一并释放，不可单独删除 */
+            /** @description The default security group is released with its private network and cannot be deleted individually */
             is_default: boolean;
             name: string;
             /** Format: uuid */
@@ -1747,12 +1747,12 @@ export interface components {
             id: string;
             /**
              * Format: int64
-             * @description ICMP 协议下表示 code，而非端口
+             * @description Denotes the ICMP code rather than a port when the protocol is ICMP
              */
             port_range_max: number | null;
             /**
              * Format: int64
-             * @description ICMP 协议下表示 type，而非端口
+             * @description Denotes the ICMP type rather than a port when the protocol is ICMP
              */
             port_range_min: number | null;
             protocol: string | null;
@@ -1769,21 +1769,21 @@ export interface components {
             ethertype: "IPv4" | "IPv6";
             /**
              * Format: int64
-             * @description ICMP 协议下表示 code（0–255），而非端口
+             * @description Denotes the ICMP code (0–255) rather than a port when the protocol is ICMP
              */
             port_range_max?: number | null;
             /**
              * Format: int64
-             * @description ICMP 协议下表示 type（0–255），而非端口
+             * @description Denotes the ICMP type (0–255) rather than a port when the protocol is ICMP
              */
             port_range_min?: number | null;
-            /** @description 如 tcp、udp、icmp、ipv6-icmp。留空表示全部协议 */
+            /** @description For example `tcp`, `udp`, `icmp` or `ipv6-icmp`. All protocols when omitted */
             protocol?: string;
-            /** @description 留空等同于 0.0.0.0/0 或 ::/0 */
+            /** @description Equivalent to `0.0.0.0/0` or `::/0` when omitted */
             remote_ip_prefix?: string;
         };
         SnapshotResource: {
-            /** @description 由该快照恢复的云硬盘必须位于此可用区 */
+            /** @description A disk restored from this snapshot must reside in this availability zone */
             availability_zone: string;
             /** Format: date-time */
             created_at: string;
@@ -1795,7 +1795,7 @@ export interface components {
             region_code: string;
             /**
              * Format: int64
-             * @description 创建快照时源云硬盘的容量。由该快照恢复的云硬盘不能小于此容量
+             * @description Capacity of the source disk when the snapshot was created. A disk restored from it cannot be smaller
              */
             size_gb: number;
             /** @enum {string} */
@@ -1827,7 +1827,7 @@ export interface operations {
     "list-backups": {
         parameters: {
             query?: {
-                /** @description 只返回该云硬盘的备份 */
+                /** @description Return only the backups of this disk */
                 disk_id?: string;
             };
             header?: never;
@@ -2176,7 +2176,7 @@ export interface operations {
         parameters: {
             query?: {
                 region_code?: string;
-                /** @description 与 region_code 同时提供，用于筛选可挂载的云硬盘 */
+                /** @description Supplied together with `region_code` to filter attachable disks */
                 availability_zone?: string;
             };
             header?: never;
@@ -2852,7 +2852,7 @@ export interface operations {
     "get-instance-console-output": {
         parameters: {
             query?: {
-                /** @description 返回末尾多少行，0 表示全部 */
+                /** @description Number of trailing lines to return; 0 returns the entire output */
                 lines?: number;
             };
             header?: never;
@@ -3316,7 +3316,7 @@ export interface operations {
     "list-operation-logs": {
         parameters: {
             query?: {
-                /** @description 只看某一种操作，取值与接口的 operation id 一致 */
+                /** @description Return a single kind of operation; the value matches the operation id of the endpoint */
                 action?: string;
                 limit?: number;
                 offset?: number;
@@ -3441,7 +3441,7 @@ export interface operations {
     "list-private-images": {
         parameters: {
             query?: {
-                /** @description 只返回该地区的镜像。镜像只能用于所在地区 */
+                /** @description Return only the images of this region. An image can only be used in the region that holds it */
                 region_code?: string;
             };
             header?: never;
@@ -3601,7 +3601,7 @@ export interface operations {
     "list-private-networks": {
         parameters: {
             query?: {
-                /** @description 不传时返回全部地区 */
+                /** @description Returns every region when omitted */
                 region_code?: string;
             };
             header?: never;
@@ -4078,7 +4078,7 @@ export interface operations {
         parameters: {
             query?: {
                 region_code?: string;
-                /** @description 只返回该私有网络下的安全组 */
+                /** @description Return only the security groups of this private network */
                 private_network_id?: string;
             };
             header?: never;
@@ -4334,7 +4334,7 @@ export interface operations {
     "list-snapshots": {
         parameters: {
             query?: {
-                /** @description 只返回该云硬盘的快照 */
+                /** @description Return only the snapshots of this disk */
                 disk_id?: string;
             };
             header?: never;
