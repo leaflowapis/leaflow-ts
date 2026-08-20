@@ -4,6 +4,30 @@
  */
 
 export interface paths {
+    "/account/v1/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 这个平台现在收不收人
+         * @description 注册页和「新建项目」按钮用它决定画什么。不需要令牌。
+         *
+         *     `registration_mode` 不是 `OPEN` 时 `POST /account/v1/register` 会答 403：`CLOSED` 是整个关着，`INVITE_ONLY` 是只收手上有项目邀请的邮箱。`project_creation_mode` 同理，`VERIFIED_ONLY` 要先过实名。
+         *
+         *     两条配额是 0 表示不限。它们只用来提前提示，真正的判定在写入那一刻。
+         */
+        get: operations["get-settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/agreements": {
         parameters: {
             query?: never;
@@ -243,6 +267,28 @@ export interface components {
             /** Format: int64 */
             status: number;
         };
+        SettingsResource: {
+            /**
+             * Format: int64
+             * @description 一个项目最多几个成员，0 表示不限
+             */
+            max_members_per_project: number;
+            /**
+             * Format: int64
+             * @description 你最多能当几个项目的所有者，0 表示不限。已删除的项目不算在内
+             */
+            max_projects_per_user: number;
+            /**
+             * @description VERIFIED_ONLY 要求先过实名，审核中不算
+             * @enum {string}
+             */
+            project_creation_mode: "OPEN" | "VERIFIED_ONLY" | "CLOSED";
+            /**
+             * @description INVITE_ONLY 是只收手上有项目邀请的邮箱
+             * @enum {string}
+             */
+            registration_mode: "OPEN" | "INVITE_ONLY" | "CLOSED";
+        };
         AgreementResource: {
             /**
              * Format: date-time
@@ -449,6 +495,35 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "get-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     "list-agreements": {
         parameters: {
             query?: never;
