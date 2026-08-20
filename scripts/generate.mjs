@@ -49,6 +49,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { parse as parseYaml } from "yaml";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -65,8 +66,9 @@ const ref = existsSync(join(root, "CONTRACTS_REF"))
   ? readFileSync(join(root, "CONTRACTS_REF"), "utf8").trim()
   : "main";
 rmSync(contractsRoot, { recursive: true, force: true });
-execFileSync("git", ["clone", "--quiet", "--no-tags",
-  "https://github.com/leaflowapis/leaflowapis.git", contractsRoot], { stdio: "inherit" });
+// 默认 HTTPS：CI 里没有 ssh，SSH URL 会以一句 exit status 128 失败，不提认证。
+const remote = process.env.CONTRACTS_REMOTE ?? "https://github.com/leaflowapis/leaflowapis.git";
+execFileSync("git", ["clone", "--quiet", "--no-tags", remote, contractsRoot], { stdio: "inherit" });
 execFileSync("git", ["-C", contractsRoot, "checkout", "--quiet", ref], { stdio: "inherit" });
 console.log(`契约 ${ref} 已取到 leaflowapis/`);
 
