@@ -11,15 +11,10 @@
 # 一个会 commit 回来的流水线，在两次推送挨得近时要处理「我算完了但 main 又变了」，而处理方式
 # 无非是重试或者强推——前者会打架，后者会丢东西。所以这里只读不写：产物由开发在本地跑完提交。
 #
-# # 契约是 submodule，所以 checkout 要带 submodules
-#
-# 不带的话 leaflowapis/ 是个空目录，生成器会说「一份契约都没有」然后退出——而那个错看起来像
-# 契约仓库出了问题。
-#
 # # 没有 NPM_TOKEN
 #
 # 发布走 npm 的 trusted publishing（OIDC）：npm 那边登记了「@leaflow/sdk 只接受来自
-# LeaflowNET/leaflow-ts 的 ci.yml 的发布」，运行时用 GitHub 签发的 id-token 换一次性凭据。
+# leaflowapis/leaflow-ts 的 ci.yml 的发布」，运行时用 GitHub 签发的 id-token 换一次性凭据。
 #
 # 所以这个仓库里**一个发布凭据都不存**。那不只是省事：一把长期 token 会过期、会被轮换、
 # 会在 fork 的 PR 里被人试图读出来，而这三件事都不报错——它们的表现都是「某天发布突然挂了」
@@ -47,8 +42,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          submodules: true
       - uses: actions/setup-node@v5
         with:
           node-version: 24
@@ -79,8 +72,6 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v5
-        with:
-          submodules: true
       # **不设 registry-url。** 它会往 .npmrc 里写一行
       # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`，而我们走 trusted publishing、
       # 根本没有那个变量——于是那一行是一个**空凭据**，npm 拿着它去发，registry 把 401 伪装成
@@ -113,8 +104,6 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v5
-        with:
-          submodules: true
       # **不设 registry-url。** 它会往 .npmrc 里写一行
       # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`，而我们走 trusted publishing、
       # 根本没有那个变量——于是那一行是一个**空凭据**，npm 拿着它去发，registry 把 401 伪装成
