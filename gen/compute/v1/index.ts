@@ -438,6 +438,15 @@ export type CreateSecurityGroupBody = NonNullable<
 export type GetSecurityGroupResult =
   operations["get-security-group"]["responses"][200]["content"]["application/json"];
 
+/** `PATCH /api/v1/security-groups/{securityGroupId}` 成功时的响应体。 */
+export type RenameSecurityGroupResult =
+  operations["rename-security-group"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /api/v1/security-groups/{securityGroupId}` 的请求体。 */
+export type RenameSecurityGroupBody = NonNullable<
+  operations["rename-security-group"]["requestBody"]
+>["content"]["application/json"];
+
 /** `GET /api/v1/security-groups/{securityGroupId}/rules` 成功时的响应体。 */
 export type ListSecurityGroupRulesResult =
   operations["list-security-group-rules"]["responses"][200]["content"]["application/json"];
