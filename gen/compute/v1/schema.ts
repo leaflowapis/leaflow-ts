@@ -425,6 +425,8 @@ export interface paths {
          *     系统已无响应时软重启不会生效，此时可设置 `force` 强制重启。强制重启不等待操作系统关闭，**未落盘的数据会丢失**。`force` 仅适用于 reboot。
          *
          *     已被平台停服的云服务器需先解除停服。
+         *
+         *     本接口立即返回，返回的 `status` 是变更中的瞬态：start 为 `starting`、stop 为 `stopping`、reboot 为 `rebooting`。轮询云服务器详情直至落定为 `running` 或 `stopped`。
          */
         post: operations["act-on-instance"];
         delete?: never;
@@ -1386,8 +1388,15 @@ export interface components {
             /** @description 云服务器主网卡上绑定的公网 IPv4，未绑定时为空数组 */
             public_ips: string[] | null;
             region_code: string;
-            /** @enum {string} */
-            status: "provisioning" | "running" | "stopped" | "rebooting" | "resizing" | "resize_verifying" | "error" | "deleting" | "suspended";
+            /**
+             * @description 只有 running 和 stopped 可以下命令，其余取值都表示云服务器正在变更中，此时开机、关机、重启、变配、重装、重置密码都会被拒绝。
+             *
+             *     `transitioning` 是「正在执行某项变更，但不属于上面任何一类」的兜底取值，见到它继续轮询即可，不代表出错。
+             *
+             *     `resize_verifying` 不是瞬态：变配已在新规格上启动，会一直停在这里直到确认或回滚，期间新旧两份规格同时计费。
+             * @enum {string}
+             */
+            status: "provisioning" | "running" | "stopped" | "starting" | "stopping" | "rebooting" | "transitioning" | "resizing" | "resize_verifying" | "error" | "deleting" | "suspended";
             /** @description 云服务器主网卡所在的子网 */
             subnet_id: string | null;
             /**
