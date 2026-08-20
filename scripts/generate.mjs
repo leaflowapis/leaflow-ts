@@ -46,14 +46,29 @@
 // 而现在这个 SDK 给的是 compute.ListInstancesResult，控制台里到处在用（app/console/*/types.ts）。
 // 那层别名有价值，但它是从 operationId 机械推出来的，所以生成它，别手写。
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const contracts = join(root, "leaflowapis");
+const contractsRoot = join(root, "leaflowapis");
+// leaflow/ 是命名空间层，与 googleapis 的 google/ 对应。
+const contracts = join(contractsRoot, "leaflow");
 const output = join(root, "gen");
+
+// 契约由这里拉到本地，版本记在 CONTRACTS_REF 里。
+//
+// 语言仓库是契约的**产物**，产物不该反过来持有源的一个 git 指针——那正是 submodule 干的事，
+// 而它换来四类只在 CI 上出现的失败，报出的都不是「submodule 配置有误」。
+const ref = existsSync(join(root, "CONTRACTS_REF"))
+  ? readFileSync(join(root, "CONTRACTS_REF"), "utf8").trim()
+  : "main";
+rmSync(contractsRoot, { recursive: true, force: true });
+execFileSync("git", ["clone", "--quiet", "--no-tags",
+  "https://github.com/leaflowapis/leaflowapis.git", contractsRoot], { stdio: "inherit" });
+execFileSync("git", ["-C", contractsRoot, "checkout", "--quiet", ref], { stdio: "inherit" });
+console.log(`契约 ${ref} 已取到 leaflowapis/`);
 
 const METHODS = ["get", "post", "put", "patch", "delete", "options", "head", "trace"];
 const JSON_MEDIA = "application/json";
@@ -69,6 +84,8 @@ const contractList = readdirSync(contracts, { withFileTypes: true })
         version: version.name,
         spec: join(contracts, entry.name, version.name, "openapi.yaml"),
       })))
+  // type/ 下是共用的形状，不是一个服务，没有 openapi.yaml。
+  .filter((entry) => existsSync(entry.spec))
   .sort((a, b) => a.service.localeCompare(b.service) || a.version.localeCompare(b.version));
 
 if (contractList.length === 0) {
