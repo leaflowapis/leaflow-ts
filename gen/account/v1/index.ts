@@ -7,6 +7,10 @@ export type { paths, components, operations, webhooks } from "./schema.js";
 
 import type { operations } from "./schema.js";
 
+/** `GET /account/v1/settings` 成功时的响应体。 */
+export type GetSettingsResult =
+  operations["get-settings"]["responses"][200]["content"]["application/json"];
+
 /** `GET /account/v1/agreements` 成功时的响应体。 */
 export type ListAgreementsResult =
   operations["list-agreements"]["responses"][200]["content"]["application/json"];
