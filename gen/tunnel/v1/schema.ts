@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/v1/operation-logs": {
+    "/api/v1/tunnel/l4": {
         parameters: {
             query?: never;
             header?: never;
@@ -12,135 +12,27 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看本项目的操作日志
-         * @description 记录每一次**写**操作：谁、什么时候、做了什么、成功还是失败。读操作不记录。
+         * 查看本项目的四层隧道
+         * @description 还没生成过时返回 `TUNNEL_NOT_FOUND`——首屏据此决定画「生成订阅链接」那个按钮还是画结果。
          *
-         *     `actor` 为 null 表示该操作由平台执行（例如自动重试删除、项目停服）——平台做了什么是看得到的，但具体是哪位运营人员不会展示。
-         *
-         *     `payload` 只包含路径参数与查询串，且其中像凭据的字段已被替换为占位符。
+         *     订阅地址、用量、配额各有自己的接口，这里不重复返回。
          */
-        get: operations["list-tunnel-operation-logs"];
+        get: operations["get-l4-tunnel"];
         put?: never;
-        post?: never;
+        /**
+         * 生成四层隧道
+         * @description **幂等**：已经有了再调一次返回同一条，不报错。按钮被点两次是安全的。
+         *
+         *     生成之后请调订阅接口取地址，本接口不返回它。
+         */
+        post: operations["generate-l4-tunnel"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/plans": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 列出可开通的套餐
-         * @description 只返回在售的套餐，按 `sort` 升序。已下架的不在其中——但正在用它的隧道仍然正常，下架只是不再接新单。
-         *
-         *     `quota_bytes` 是套餐**标称**的额度，仅供比较；实际额度由上游按线路分组决定，以隧道用量接口返回的 `quota_bytes` 为准。
-         */
-        get: operations["list-tunnel-plans"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tunnel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * 查看本项目的隧道
-         * @description 每个项目最多一条隧道。尚未开通时返回 404（`TUNNEL_NOT_FOUND`）。
-         *
-         *     响应里的 `usage` 是**缓存**的用量，`usage.synced_at` 说明它是什么时候采集的；为 null 表示尚未采集过，而不是用量为零。需要当前值请调用量接口。
-         *
-         *     **订阅地址不在这里**，它是一条长期有效的凭据，只由订阅接口单独返回。
-         */
-        get: operations["get-tunnel"];
-        put?: never;
-        /**
-         * 开通隧道
-         * @description 为当前项目开通一条隧道，返回时订阅通常处于 `preparing`——节点仍在下发，但**订阅地址此时已经可用**，内容会在拉取那一刻按当时的状态重新派生。
-         *
-         *     一个项目只能有一条。已经有了返回 `TUNNEL_ALREADY_OPEN`；上一条还在退订中返回 `TUNNEL_CLOSING`，稍后重试即可。
-         *
-         *     套餐必须处于在售状态，已下架的返回 `TUNNEL_PLAN_RETIRED`。若返回 `TUNNEL_PLAN_GROUPS_MISSING`，说明该套餐在上游对应的线路分组不存在——这是一个配置问题，请联系运营，换一款套餐或稍后重试都不会有帮助。
-         */
-        post: operations["open-tunnel"];
-        /**
-         * 退订隧道
-         * @description **不可逆。** 上游账户会被删除，订阅地址立刻失效，重新开通得到的是一条全新的隧道和一条全新的订阅地址。
-         *
-         *     删除是异步的：返回时 `status` 可能仍是 `deleting`，表示上游还没删干净（通常是某台服务器暂时连不上）。平台会自动重试，期间这条隧道仍然出现在查询接口里。退订完成前无法重新开通。
-         *
-         *     只是暂时不用的话请用停用，它保留端口和订阅地址。
-         */
-        delete: operations["close-tunnel"];
-        options?: never;
-        head?: never;
-        /**
-         * 修改隧道的显示信息
-         * @description 改显示名和联系邮箱，**不影响订阅、用量或线路**。
-         *
-         *     `email` 不传表示不改动，传空字符串表示清空。它会被转发给上游面板——上游拿它做什么由面板决定，平台不使用它。
-         */
-        patch: operations["update-tunnel-profile"];
-        trace?: never;
-    };
-    "/api/v1/tunnel/actions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * 启用或停用隧道
-         * @description **停用不是退订。** 停用会把这条隧道的实例从上游调度器撤下，但端口保留，重新启用后原样回来，订阅地址也不变。适合「这段时间不用」。
-         *
-         *     被平台停用的隧道（`suspended` 为 true）无法自行启用，会返回 `TUNNEL_SUSPENDED`——那通常是欠费或违规，需要先处理对应的问题。
-         */
-        post: operations["act-on-tunnel"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tunnel/plan": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * 更换套餐
-         * @description 换套餐会立刻重判线路资格：多出来的线路马上可用，**少掉的那些进入删除队列——宽限期内照常可用，到期才真正释放**。所以换套餐不是一次瞬时切换，订阅内容会在接下来一段时间内变化。
-         *
-         *     换完之后建议重新拉取一次订阅。
-         */
-        put: operations["change-tunnel-plan"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/tunnel/subscription": {
+    "/api/v1/tunnel/l4/subscription": {
         parameters: {
             query?: never;
             header?: never;
@@ -149,15 +41,13 @@ export interface paths {
         };
         /**
          * 获取订阅地址
-         * @description **返回的是一条长期有效的凭据，等同于密码。** 拿到它就能取得本项目全部节点与密码，请勿转发、截图或提交到工单。
+         * @description **这条 URL 是凭据，等同于密码。** 拿着它就能取到这个项目的全部节点和密码，所以它只在这一个接口里出现，一次一条——不进任何列表，也不在隧道详情里。
          *
-         *     它不会出现在隧道详情或任何列表里，只由这个接口返回。
+         *     客户端不应在用户主动请求之前调用它：这个接口的每一次调用都会被记进操作日志。
          *
-         *     `status` 为 `preparing` 时链接**照样可用**，内容会在拉取那一刻按当时的状态重新派生。
-         *
-         *     怀疑泄露时请调用重置接口。
+         *     `status` 为 `preparing` 时链接**照样有效**，内容会在拉取那一刻重新派生。它只该影响页面上说什么。
          */
-        get: operations["get-tunnel-subscription"];
+        get: operations["get-l4-tunnel-subscription"];
         put?: never;
         post?: never;
         delete?: never;
@@ -166,7 +56,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/tunnel/subscription/rotate": {
+    "/api/v1/tunnel/l4/subscription/rotate": {
         parameters: {
             query?: never;
             header?: never;
@@ -181,16 +71,18 @@ export interface paths {
          *
          *     订阅 token 和节点密码同时更换，所有客户端都必须重新拉取一次订阅才能继续使用。调用前请确认这确实是想要的结果。
          *
-         *     重置后再调订阅接口取新地址。
+         *     隧道被平台停用时无法重置（`TUNNEL_DISABLED_FOR_ROTATE`），需要先处理停用的原因。
+         *
+         *     重置后请调订阅接口取新地址，**本接口不返回它**。
          */
-        post: operations["rotate-tunnel-subscription"];
+        post: operations["rotate-l4-tunnel-subscription"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/tunnel/usage": {
+    "/api/v1/tunnel/l4/usage": {
         parameters: {
             query?: never;
             header?: never;
@@ -199,13 +91,11 @@ export interface paths {
         };
         /**
          * 查看本期用量
-         * @description 现场向上游查询，比隧道详情里那份缓存新。
+         * @description 实时查询，不经过缓存。
          *
-         *     **判断是否超额只看 `billed_bytes`**：线路可以设置倍率（如 1.5× 或 0×），`raw_bytes` 是实际传输量，两者不一定相等。`over_quota` 已经算好。
-         *
-         *     用量由上游定期采集，**最多滞后一个采集周期**，适合用量管控，不适合作为计费结算依据。
+         *     判断是否超额只看 `billed_bytes`：线路可以设置倍率（如 1.5× 或 0×），`raw_bytes` 是实际传输量，两者不一定相等。`quota_bytes` 为 0 表示不限量。
          */
-        get: operations["get-tunnel-usage"];
+        get: operations["get-l4-tunnel-usage"];
         put?: never;
         post?: never;
         delete?: never;
@@ -214,7 +104,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/tunnel/usage/series": {
+    "/api/v1/tunnel/l4/usage/series": {
         parameters: {
             query?: never;
             header?: never;
@@ -223,13 +113,11 @@ export interface paths {
         };
         /**
          * 查看按天用量
-         * @description 按**自然日**切分，用于画趋势图。
+         * @description 按自然日切分。没有流量的日子不会出现在结果里（不补零），画图那一侧要自己补齐日期轴——否则一段没人用的日子会被画成一条直接连过去的线，看起来像那几天一直在匀速跑流量。
          *
-         *     **没有流量的日子不会出现在结果里**（不补零），画图前需要自行补齐日期轴，否则空档会被连成一条斜线。
-         *
-         *     **把这里的天加起来不等于本期用量**，这是有意的：本期用量按计费周期切，而且「重置本期用量」只作用于本期，日汇总一行都不删。两者回答的是不同的问题。
+         *     把这里的天加起来**不等于**本期用量，这是有意的：本期按计费周期切，而且「重置本期用量」只作用于本期，日汇总一行都不删。
          */
-        get: operations["list-tunnel-usage-series"];
+        get: operations["list-l4-tunnel-usage-series"];
         put?: never;
         post?: never;
         delete?: never;
@@ -251,152 +139,6 @@ export interface components {
             /** Format: int64 */
             status: number;
         };
-        OperationLogResource: {
-            action: string;
-            /** @description 操作者的用户 id；null 表示由平台执行 */
-            actor: string | null;
-            /** Format: date-time */
-            created_at: string;
-            failure: string;
-            /** Format: uuid */
-            id: string;
-            payload: {
-                [key: string]: unknown;
-            };
-            subject_id: string;
-            subject_type: string;
-            succeeded: boolean;
-        };
-        LengthAwarePageOperationLogResource: {
-            /** @description 这一页的内容 */
-            items: components["schemas"]["OperationLogResource"][];
-            /**
-             * Format: int64
-             * @description 这一页最多几条，回显请求里的值
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description 跳过了多少条，回显请求里的值
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description 命中的总条数，不只是这一页
-             */
-            total: number;
-        };
-        TunnelPlanResource: {
-            description: string;
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /**
-             * Format: int64
-             * @description 套餐标称的流量额度，仅供比较。实际额度以隧道用量接口返回的 quota_bytes 为准
-             */
-            quota_bytes: number;
-            /**
-             * Format: int64
-             * @description 货架上的排列顺序，越小越靠前
-             */
-            sort: number;
-        };
-        TunnelPlanListResponseBody: {
-            items: components["schemas"]["TunnelPlanResource"][];
-        };
-        TunnelUsageSnapshot: {
-            /**
-             * Format: int64
-             * @description 按线路倍率折算后的用量，配额比对以此为准
-             */
-            billed_bytes: number;
-            /** @description billed_bytes 是否已超过 quota_bytes；配额为 0 时恒为 false */
-            over_quota: boolean;
-            /**
-             * Format: int64
-             * @description 上游给出的真实配额，0 表示不限量
-             */
-            quota_bytes: number;
-            /**
-             * Format: int64
-             * @description 实际传输的字节，不用于配额比对
-             */
-            raw_bytes: number;
-            /**
-             * Format: date-time
-             * @description 这份用量是什么时候采集的；null 表示尚未采集
-             */
-            synced_at: string | null;
-            /** Format: int64 */
-            upload_bytes: number;
-        };
-        TunnelResource: {
-            /** Format: date-time */
-            created_at: string;
-            display_name: string;
-            /** @description 转发给上游面板的联系邮箱；平台不使用它 */
-            email: string | null;
-            /** @description 用户自己的开关。停用会把实例从调度器撤下，但端口保留，启用后原样回来 */
-            enabled: boolean;
-            /** @description 最近一次上游拒绝的说明，仅在存在时非空 */
-            failure: string | null;
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            plan_id: string;
-            plan_name: string;
-            /**
-             * @description deleting 表示已退订但上游尚未删除完成
-             * @enum {string}
-             */
-            status: "active" | "deleting";
-            /**
-             * @description preparing 表示节点仍在下发；订阅链接此时照样可用
-             * @enum {string}
-             */
-            subscription_status: "preparing" | "ready";
-            /**
-             * Format: int64
-             * @description 每次重置订阅后递增
-             */
-            subscription_version: number;
-            /** @description 被平台停用（欠费、违规或项目停服）。为 true 时无法自行启用 */
-            suspended: boolean;
-            /**
-             * Format: date-time
-             * @description 被平台停用的时刻
-             */
-            suspended_at: string | null;
-            usage: components["schemas"]["TunnelUsageSnapshot"];
-        };
-        OpenTunnelRequestBody: {
-            /** @description 这条隧道的名字，只影响显示 */
-            display_name: string;
-            /**
-             * Format: email
-             * @description 转发给上游面板的联系邮箱，可留空
-             */
-            email?: string;
-            /**
-             * Format: uuid
-             * @description 套餐 id，取自 GET /plans
-             */
-            plan_id: string;
-        };
-        UpdateTunnelProfileRequestBody: {
-            display_name: string;
-            /** @description 联系邮箱。不传表示不改动，传空字符串表示清空 */
-            email?: string | null;
-        };
-        ActOnTunnelRequestBody: {
-            /** @enum {string} */
-            action: "enable" | "disable";
-        };
-        ChangeTunnelPlanRequestBody: {
-            /** Format: uuid */
-            plan_id: string;
-        };
         SubscriptionResource: {
             /**
              * @description ready 表示节点已全部下发；preparing 表示仍在下发——此时链接照样可用
@@ -409,6 +151,23 @@ export interface components {
             url: string;
             /** Format: int64 */
             version: number;
+        };
+        /** @description 当前项目那条四层隧道。它只回答一个问题：生成过没有。 */
+        TunnelResource: {
+            /** Format: date-time */
+            created_at: string;
+            /** @description 隧道当前是否可用。为 false 表示被平台停用（欠费、违规或项目停服），需要先处理停用的原因 */
+            enabled: boolean;
+            /** Format: uuid */
+            id: string;
+        };
+        UsageDayResource: {
+            /** Format: int64 */
+            billed_bytes: number;
+            /** @description YYYY-MM-DD */
+            day: string;
+            /** Format: int64 */
+            raw_bytes: number;
         };
         UsageResource: {
             /**
@@ -444,14 +203,6 @@ export interface components {
              */
             usage_percent: number;
         };
-        UsageDayResource: {
-            /** Format: int64 */
-            billed_bytes: number;
-            /** @description YYYY-MM-DD */
-            day: string;
-            /** Format: int64 */
-            raw_bytes: number;
-        };
         UsageSeriesResource: {
             /**
              * Format: int64
@@ -469,72 +220,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "list-tunnel-operation-logs": {
-        parameters: {
-            query?: {
-                /** @description 这一页最多返回多少条 */
-                limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
-                offset?: number;
-                /** @description 只看某一种操作，取值是接口的 operation id，比如 open-tunnel */
-                action?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageOperationLogResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-tunnel-plans": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TunnelPlanListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-tunnel": {
+    "get-l4-tunnel": {
         parameters: {
             query?: never;
             header?: never;
@@ -563,40 +249,7 @@ export interface operations {
             };
         };
     };
-    "open-tunnel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["OpenTunnelRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TunnelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "close-tunnel": {
+    "generate-l4-tunnel": {
         parameters: {
             query?: never;
             header?: never;
@@ -625,106 +278,7 @@ export interface operations {
             };
         };
     };
-    "update-tunnel-profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateTunnelProfileRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TunnelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "act-on-tunnel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ActOnTunnelRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TunnelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "change-tunnel-plan": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChangeTunnelPlanRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TunnelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-tunnel-subscription": {
+    "get-l4-tunnel-subscription": {
         parameters: {
             query?: never;
             header?: never;
@@ -753,7 +307,7 @@ export interface operations {
             };
         };
     };
-    "rotate-tunnel-subscription": {
+    "rotate-l4-tunnel-subscription": {
         parameters: {
             query?: never;
             header?: never;
@@ -782,7 +336,7 @@ export interface operations {
             };
         };
     };
-    "get-tunnel-usage": {
+    "get-l4-tunnel-usage": {
         parameters: {
             query?: never;
             header?: never;
@@ -811,10 +365,10 @@ export interface operations {
             };
         };
     };
-    "list-tunnel-usage-series": {
+    "list-l4-tunnel-usage-series": {
         parameters: {
             query?: {
-                /** @description 取最近多少天，0 表示用上游的默认值（30）。上游只接受 1–365，超出会被它夹住 */
+                /** @description 取最近多少天。0 表示用上游的默认值（30）——上游只接受 1–365，超出会被它夹住 */
                 days?: number;
             };
             header?: never;

@@ -1036,7 +1036,11 @@ export interface paths {
         delete: operations["delete-security-group"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * 重命名安全组
+         * @description 仅可修改名称，规则请用规则接口。
+         */
+        patch: operations["rename-security-group"];
         trace?: never;
     };
     "/api/v1/security-groups/{securityGroupId}/rules": {
@@ -1794,6 +1798,9 @@ export interface components {
         CreateSnapshotRequestBody: {
             /** Format: uuid */
             disk_id: string;
+            name: string;
+        };
+        RenameSecurityGroupRequestBody: {
             name: string;
         };
         RenameSnapshotRequestBody: {
@@ -4172,6 +4179,41 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "rename-security-group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                securityGroupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenameSecurityGroupRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SecurityGroupResource"];
+                };
             };
             /** @description Error */
             default: {
