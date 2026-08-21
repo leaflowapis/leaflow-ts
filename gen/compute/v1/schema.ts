@@ -435,6 +435,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/instances/{instanceId}/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run a command on an instance
+         * @description Runs one command over SSH and returns what it wrote. **This is not a shell.** There is no terminal, no standard input and no way to answer a prompt: a command that waits for input produces nothing and is killed at the timeout. Chain steps with `&&`, or write a script and run that.
+         *
+         *     Three conditions must hold; the instance is unreachable otherwise:
+         *
+         *     - it is `running`
+         *     - a floating IP is bound to it, since this endpoint connects over the public internet
+         *     - its security group permits inbound TCP 22
+         *
+         *     Authentication uses the key the platform attaches to every instance at creation, so nothing has to be set up first. The instance must have applied that key at first boot, which images without a full cloud-init do not do.
+         *
+         *     **The host key is not verified.** Anyone in a position to intercept the connection can read the command and all of its output, so do not pass credentials this way.
+         *
+         *     Each stream is capped at 1 MiB. Beyond that the rest is discarded and `truncated` is true.
+         */
+        post: operations["run-instance-command"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/instances/{instanceId}/console": {
         parameters: {
             query?: never;
@@ -1467,6 +1499,33 @@ export interface components {
             action: "start" | "stop" | "reboot";
             /** @description Applies to `reboot` only. A forced reboot does not wait for the operating system to shut down and unwritten data is lost; use it when the system is unresponsive */
             force?: boolean;
+        };
+        RunCommandRequestBody: {
+            /** @description Run by the login shell, so pipes, redirection and `&&` work. It cannot read standard input */
+            command: string;
+            /**
+             * Format: int64
+             * @description Kill the command after this long. 60 when omitted
+             */
+            timeout_seconds?: number;
+            /**
+             * @description The SSH user to log in as. It is the account the platform sets a password for at creation
+             * @default root
+             */
+            username?: string;
+        };
+        CommandResultResponseBody: {
+            /**
+             * Format: int64
+             * @description Null when the command was killed rather than finishing on its own, which includes the timeout
+             */
+            exit_code: number | null;
+            stderr: string;
+            stdout: string;
+            /** @description True when the command was still running at the timeout and was killed */
+            timed_out: boolean;
+            /** @description True when either stream hit the 1 MiB cap and the rest was discarded */
+            truncated: boolean;
         };
         ConsoleResponseBody: {
             /** @description Connection address of the remote console; single-use and expires within minutes */
@@ -2805,6 +2864,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InstanceResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "run-instance-command": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instanceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunCommandRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandResultResponseBody"];
                 };
             };
             /** @description Error */
