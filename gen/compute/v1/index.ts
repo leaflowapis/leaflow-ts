@@ -200,6 +200,15 @@ export type ActOnInstanceBody = NonNullable<
   operations["act-on-instance"]["requestBody"]
 >["content"]["application/json"];
 
+/** `POST /api/v1/instances/{instanceId}/commands` 成功时的响应体。 */
+export type RunInstanceCommandResult =
+  operations["run-instance-command"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/instances/{instanceId}/commands` 的请求体。 */
+export type RunInstanceCommandBody = NonNullable<
+  operations["run-instance-command"]["requestBody"]
+>["content"]["application/json"];
+
 /** `POST /api/v1/instances/{instanceId}/console` 成功时的响应体。 */
 export type OpenInstanceConsoleResult =
   operations["open-instance-console"]["responses"][200]["content"]["application/json"];
