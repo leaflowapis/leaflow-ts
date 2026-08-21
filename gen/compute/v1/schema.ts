@@ -409,32 +409,6 @@ export interface paths {
         patch: operations["rename-instance"];
         trace?: never;
     };
-    "/api/v1/instances/{instanceId}/actions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Start, stop or reboot an instance
-         * @description Reboot defaults to a soft reboot, in which the operating system shuts down normally before starting again.
-         *
-         *     A soft reboot has no effect once the system is unresponsive. Set `force` to reboot forcibly: a forced reboot does not wait for the operating system to shut down, so **unwritten data is lost**. `force` applies to `reboot` only.
-         *
-         *     An instance suspended by the platform must be unsuspended first.
-         *
-         *     This endpoint returns immediately and the `status` it returns is a transient state: `starting` for start, `stopping` for stop, `rebooting` for reboot. Poll the instance until it settles at `running` or `stopped`.
-         */
-        post: operations["act-on-instance"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/instances/{instanceId}/commands": {
         parameters: {
             query?: never;
@@ -535,6 +509,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/instances/{instanceId}/reboot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reboot an instance
+         * @description A reboot defaults to soft, in which the operating system shuts down normally before starting again.
+         *
+         *     A soft reboot has no effect once the system is unresponsive. Set `force` to reboot forcibly: a forced reboot does not wait for the operating system to shut down, so **unwritten data is lost**.
+         *
+         *     An instance suspended by the platform must be unsuspended first.
+         *
+         *     This endpoint returns immediately and the `status` it returns is the transient `rebooting`. Poll the instance until it settles at `running`.
+         */
+        post: operations["reboot-instance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/instances/{instanceId}/rebuild": {
         parameters: {
             query?: never;
@@ -613,6 +613,52 @@ export interface paths {
          * @description The instance returns to its previous size, `pending_instance_type_id` is discarded, and billing is unaffected by the resize.
          */
         post: operations["revert-instance-resize"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instances/{instanceId}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start an instance
+         * @description An instance suspended by the platform must be unsuspended first.
+         *
+         *     This endpoint returns immediately and the `status` it returns is the transient `starting`. Poll the instance until it settles at `running`.
+         */
+        post: operations["start-instance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instances/{instanceId}/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop an instance
+         * @description The operating system is asked to shut down and is powered off once it does, or once it stops responding for long enough. Stopping does not release the instance: it keeps its disks, its addresses and its name, and starts again where it left off.
+         *
+         *     An instance suspended by the platform must be unsuspended first.
+         *
+         *     This endpoint returns immediately and the `status` it returns is the transient `stopping`. Poll the instance until it settles at `stopped`.
+         */
+        post: operations["stop-instance"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1494,10 +1540,8 @@ export interface components {
         RenameInstanceRequestBody: {
             name: string;
         };
-        ActOnInstanceRequestBody: {
-            /** @enum {string} */
-            action: "start" | "stop" | "reboot";
-            /** @description Applies to `reboot` only. A forced reboot does not wait for the operating system to shut down and unwritten data is lost; use it when the system is unresponsive */
+        RebootInstanceRequestBody: {
+            /** @description A forced reboot does not wait for the operating system to shut down and unwritten data is lost; use it when the system is unresponsive. False when omitted */
             force?: boolean;
         };
         RunCommandRequestBody: {
@@ -2842,41 +2886,6 @@ export interface operations {
             };
         };
     };
-    "act-on-instance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                instanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ActOnInstanceRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["InstanceResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
     "run-instance-command": {
         parameters: {
             query?: never;
@@ -3012,6 +3021,41 @@ export interface operations {
             };
         };
     };
+    "reboot-instance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instanceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RebootInstanceRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     "rebuild-instance": {
         parameters: {
             query?: never;
@@ -3114,6 +3158,68 @@ export interface operations {
         };
     };
     "revert-instance-resize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instanceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "start-instance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instanceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "stop-instance": {
         parameters: {
             query?: never;
             header?: never;

@@ -191,15 +191,6 @@ export type RenameInstanceBody = NonNullable<
   operations["rename-instance"]["requestBody"]
 >["content"]["application/json"];
 
-/** `POST /api/v1/instances/{instanceId}/actions` 成功时的响应体。 */
-export type ActOnInstanceResult =
-  operations["act-on-instance"]["responses"][200]["content"]["application/json"];
-
-/** `POST /api/v1/instances/{instanceId}/actions` 的请求体。 */
-export type ActOnInstanceBody = NonNullable<
-  operations["act-on-instance"]["requestBody"]
->["content"]["application/json"];
-
 /** `POST /api/v1/instances/{instanceId}/commands` 成功时的响应体。 */
 export type RunInstanceCommandResult =
   operations["run-instance-command"]["responses"][200]["content"]["application/json"];
@@ -230,6 +221,15 @@ export type ResetInstancePasswordBody = NonNullable<
   operations["reset-instance-password"]["requestBody"]
 >["content"]["application/json"];
 
+/** `POST /api/v1/instances/{instanceId}/reboot` 成功时的响应体。 */
+export type RebootInstanceResult =
+  operations["reboot-instance"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/instances/{instanceId}/reboot` 的请求体。 */
+export type RebootInstanceBody = NonNullable<
+  operations["reboot-instance"]["requestBody"]
+>["content"]["application/json"];
+
 /** `POST /api/v1/instances/{instanceId}/rebuild` 成功时的响应体。 */
 export type RebuildInstanceResult =
   operations["rebuild-instance"]["responses"][200]["content"]["application/json"];
@@ -255,6 +255,14 @@ export type ConfirmInstanceResizeResult =
 /** `POST /api/v1/instances/{instanceId}/resize/revert` 成功时的响应体。 */
 export type RevertInstanceResizeResult =
   operations["revert-instance-resize"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/instances/{instanceId}/start` 成功时的响应体。 */
+export type StartInstanceResult =
+  operations["start-instance"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/instances/{instanceId}/stop` 成功时的响应体。 */
+export type StopInstanceResult =
+  operations["stop-instance"]["responses"][200]["content"]["application/json"];
 
 /** `GET /api/v1/instances/{instanceId}/disks` 成功时的响应体。 */
 export type ListInstanceDisksResult =
