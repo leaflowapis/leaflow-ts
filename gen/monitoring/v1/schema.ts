@@ -364,6 +364,8 @@ export interface paths {
          *
          *     To change enrollment settings, use PATCH. This endpoint returns an error when the parameters differ, and does not update an existing configuration.
          *
+         *     A failed call leaves the machine recorded with `monitoring_status: FAILED`; the reason is reported in `last_error` via `GET /servers/{serverId}`.
+         *
          *     The `tls_psk` in the response is **returned only this once**; store it immediately. If it is lost, it must be rotated.
          */
         put: operations["enable-server-monitoring"];
@@ -2686,6 +2688,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Supplied by the caller; no operation issues one. Reuse the identifier the machine already carries in the originating system — a Leaflow Compute instance id, or the caller's own inventory identifier — or allocate a UUID and persist it before the first call. It is the idempotency key of the enrollment. */
                 serverId: string;
             };
             cookie?: never;
