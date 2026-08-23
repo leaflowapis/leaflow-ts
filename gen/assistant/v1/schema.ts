@@ -372,6 +372,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the skills this project can use
+         * @description Everything the assistant can reach in this project, including the ones that are turned off —
+         *     an entry that disappeared once it was switched off could not be switched back on.
+         *
+         *     `origin` says whether a skill can be edited here. Skills belonging to the project are
+         *     visible to everyone in it, whoever wrote them.
+         */
+        get: operations["list-skills"];
+        put?: never;
+        /**
+         * Write a skill for this project
+         * @description Creates it, or replaces the project's skill of that name. The whole package goes in each
+         *     time: files left out of a write are removed, so the stored skill is what was sent and not
+         *     what accumulated.
+         *
+         *     A project skill takes precedence over a built-in one of the same name for this project only.
+         *     The built-in is untouched and reappears if the project's is deleted.
+         */
+        post: operations["put-skill"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/skills/{skill}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read one skill, with its files
+         * @description Works for built-in skills too; they simply cannot be written.
+         */
+        get: operations["get-skill"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete this project's skill
+         * @description A built-in skill of the same name, if there was one, becomes visible again.
+         */
+        delete: operations["delete-skill"];
+        options?: never;
+        head?: never;
+        /**
+         * Turn a skill on or off
+         * @description Separate from writing it, because this is the frequent one: a skill that is off costs
+         *     nothing and stays where it is.
+         *
+         *     Only skills belonging to the project can be switched. To keep a built-in one out of the
+         *     way, write a project skill of the same name and turn that off.
+         */
+        patch: operations["set-skill-enabled"];
+        trace?: never;
+    };
     "/api/v1/threads": {
         parameters: {
             query?: never;
@@ -818,6 +883,61 @@ export interface components {
         };
         ModelListResponseBody: {
             models: components["schemas"]["ModelResource"][] | null;
+        };
+        SkillResource: {
+            /**
+             * @description True when the assistant wrote this skill during a conversation rather than a person
+             *     writing it here.
+             *
+             *     Which conversation is deliberately not returned: skills are shared across the project
+             *     while conversations belong to one person, so naming one would tell everybody in the
+             *     project that a particular colleague had it.
+             */
+            authoredByAssistant: boolean;
+            /** @description Why the assistant would open this skill. It sits in every request, so it is the one field worth writing carefully. */
+            description: string;
+            enabled: boolean;
+            /** @description Path to contents, `SKILL.md` among them. Only returned by `get-skill`; the list leaves it out. */
+            files?: {
+                [key: string]: string;
+            } | null;
+            name: string;
+            /**
+             * @description `builtin` — provided by the platform and read-only here.
+             *     `project` — written for this project and editable by anyone in it.
+             * @enum {string}
+             */
+            origin: "builtin" | "project";
+            shortDescription: string | null;
+            /**
+             * Format: date-time
+             * @description Null for built-in skills, which have no edit history here.
+             */
+            updatedAt: string | null;
+        };
+        SkillListResponseBody: {
+            skills: components["schemas"]["SkillResource"][];
+        };
+        SkillRequestBody: {
+            /** @description Why the assistant would open this skill. It sits in every request; write it as the answer to "when do I need this", not "what does it contain". */
+            description: string;
+            /** @default true */
+            enabled?: boolean;
+            /**
+             * @description Path to contents. `SKILL.md` is required; anything else it references goes alongside it.
+             *
+             *     Paths are relative to the skill and cannot leave it. At most 32 files, 256 KiB each and
+             *     1 MiB in total.
+             */
+            files: {
+                [key: string]: string;
+            };
+            /** @description Also how the assistant refers to it, so renaming is deleting and writing again. */
+            name: string;
+            shortDescription?: string;
+        };
+        SkillEnabledRequestBody: {
+            enabled: boolean;
         };
         ThreadSummaryResource: {
             /** @description The tier this conversation runs at, or null when it follows the model's own default. */
@@ -1811,6 +1931,164 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ModelListResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillListResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "put-skill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SkillRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-skill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The skill's name, as `list-skills` returned it. */
+                skill: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "delete-skill": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                skill: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "set-skill-enabled": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                skill: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SkillEnabledRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkillResource"];
                 };
             };
             /** @description Error */
