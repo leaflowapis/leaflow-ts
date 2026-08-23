@@ -288,6 +288,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/dynamic-calls/{call}/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report what an action produced
+         * @description The assistant asks the client to run an action by adding a tool call to the conversation
+         *     with the namespace `dynamic`; the client acts when that entry turns in_progress and reports
+         *     back here.
+         *
+         *     The first result wins. A second one — from another tab, or a retried request — is refused
+         *     rather than replacing it, because the action already ran once.
+         */
+        post: operations["submit-dynamic-call-result"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/memories": {
         parameters: {
             query?: never;
@@ -930,7 +955,56 @@ export interface components {
         SendMessageRequestBody: {
             /** @description Ids of attachments uploaded earlier that are not yet bound to any message */
             attachmentIds?: string[] | null;
+            client?: components["schemas"]["ClientContextRequest"];
             text: string;
+        };
+        /**
+         * @description What this client can do, so the assistant can ask it to do those things while it answers.
+         *
+         *     Send `actions` only when they differ from what was sent last — the list is repeated to the
+         *     model on every step of the turn, so an unchanged list costs more to resend than to omit.
+         *     Sending the block without `actions` keeps whatever was declared before.
+         */
+        ClientContextRequest: {
+            /** @description The actions on offer right now. Omit when unchanged since the last message. */
+            actions?: components["schemas"]["ClientActionRequest"][] | null;
+            /** @description Identifies this client while it stays open. Any stable string is fine; a fresh one per tab is expected. */
+            clientId: string;
+            /** @description How the client calls itself, shown to the model so it can name it — for example "Leaflow console (web)". */
+            label?: string;
+            page?: components["schemas"]["ClientPageRequest"];
+        };
+        ClientActionRequest: {
+            /** @description What the action does, written for the model. An action without one can only be guessed at from its name. */
+            description: string;
+            name: string;
+            /** @description JSON Schema for the arguments. Omit for an action that takes none. */
+            parameters?: {
+                [key: string]: unknown;
+            } | null;
+            /** @description True when the action changes nothing outside the client. Anything else goes through this conversation's approval before it runs. */
+            readOnly?: boolean;
+            /**
+             * Format: int64
+             * @description How long the assistant should wait for this action. 0 uses the default; longer values are capped.
+             */
+            timeoutMs?: number;
+        };
+        /** @description What the operator is looking at. The address alone answers most questions about context. */
+        ClientPageRequest: {
+            title?: string;
+            url?: string;
+        };
+        DynamicCallResultRequestBody: {
+            /** @description The same value sent with the message. A result from a client that is no longer the attached one is refused. */
+            clientId: string;
+            /** @description Why it failed, when `ok` is false. This reaches the model, so write it for a reader who cannot see the screen. */
+            error?: string;
+            /** @description Pass back when there is more to read. The assistant will call again with it. */
+            nextCursor?: string;
+            ok: boolean;
+            /** @description What the action produced. At most 64 KiB; paginate anything larger rather than truncating it. */
+            output?: string;
         };
         TodoResource: {
             /** @description The same step phrased as happening now — "Installing nginx". Show this one while the item is in progress. */
@@ -1558,6 +1632,40 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["LoginResource"];
                 };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "submit-dynamic-call-result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The id of the tool call entry in the conversation. */
+                call: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DynamicCallResultRequestBody"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Error */
             default: {
