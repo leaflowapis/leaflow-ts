@@ -116,6 +116,32 @@ export type ListMemoriesResult =
 export type ListModelsResult =
   operations["list-models"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/skills` 成功时的响应体。 */
+export type ListSkillsResult =
+  operations["list-skills"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/skills` 成功时的响应体。 */
+export type PutSkillResult =
+  operations["put-skill"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/skills` 的请求体。 */
+export type PutSkillBody = NonNullable<
+  operations["put-skill"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/skills/{skill}` 成功时的响应体。 */
+export type GetSkillResult =
+  operations["get-skill"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /api/v1/skills/{skill}` 成功时的响应体。 */
+export type SetSkillEnabledResult =
+  operations["set-skill-enabled"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /api/v1/skills/{skill}` 的请求体。 */
+export type SetSkillEnabledBody = NonNullable<
+  operations["set-skill-enabled"]["requestBody"]
+>["content"]["application/json"];
+
 /** `GET /api/v1/threads` 成功时的响应体。 */
 export type ListThreadsResult =
   operations["list-threads"]["responses"][200]["content"]["application/json"];
