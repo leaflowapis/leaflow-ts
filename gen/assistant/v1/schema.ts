@@ -303,8 +303,7 @@ export interface paths {
          *     with the namespace `dynamic`; the client acts when that entry turns in_progress and reports
          *     back here.
          *
-         *     The first result wins. A second one — from another tab, or a retried request — is refused
-         *     rather than replacing it, because the action already ran once.
+         *     The first result is the one that counts. A later one is refused rather than replacing it.
          */
         post: operations["submit-dynamic-call-result"];
         delete?: never;
@@ -413,7 +412,7 @@ export interface paths {
         head?: never;
         /**
          * Update conversation settings
-         * @description Changes the model, reasoning level, approval mode and archived state. A change takes effect from the next turn; a turn already running keeps the settings it started with. reasoningEffort only applies when model is given as well.
+         * @description Changes the model, reasoning level, approval mode and archived state. A change takes effect from the next turn; a turn already running keeps the settings it started with. Model and reasoning level change independently: sending one leaves the other alone.
          */
         patch: operations["update-thread"];
         trace?: never;
@@ -821,6 +820,8 @@ export interface components {
             models: components["schemas"]["ModelResource"][] | null;
         };
         ThreadSummaryResource: {
+            /** @description The tier this conversation runs at, or null when it follows the model's own default. */
+            reasoningEffort: string | null;
             /** @enum {string} */
             approvalMode: "guardian" | "manual" | "yolo";
             archived: boolean;
@@ -844,6 +845,8 @@ export interface components {
             approvalMode?: "guardian" | "manual" | "yolo";
         };
         ContextResource: {
+            /** @description The tier this conversation runs at, or null when it follows the model's own default. */
+            reasoningEffort: string | null;
             /** Format: int64 */
             compactAt: number | null;
             model: string;
@@ -872,6 +875,17 @@ export interface components {
             approvalReason?: string | null;
             arguments?: string;
             attachments?: components["schemas"]["AttachmentResource"][] | null;
+            /**
+             * @description The context blocks the client attached to this message.
+             *
+             *     **Not part of what the operator wrote** — `text` is. Render the message from `text` and
+             *     leave these out of the bubble; they are here so a client that did not send them, or one
+             *     that reloaded, can still read what the assistant was given.
+             *
+             *     The actions declared alongside them are not returned: they are re-declared as they
+             *     change and would make every fetch of the conversation carry them again.
+             */
+            clientContext?: components["schemas"]["ClientContextPart"][] | null;
             /** Format: date-time */
             createdAt: string;
             detail?: string | null;
@@ -942,7 +956,13 @@ export interface components {
             approvalMode?: "guardian" | "manual" | "yolo";
             archived?: boolean;
             model?: string;
-            reasoningEffort?: string;
+            /**
+             * @description Which reasoning tier to run at, from the model's `reasoningTiers`. Null puts it back to
+             *     the model's own default; leaving it out keeps whatever is set.
+             *
+             *     Independent of `model` — sending one does not touch the other.
+             */
+            reasoningEffort?: string | null;
         };
         DecideRequestBody: {
             approved: boolean;
@@ -953,57 +973,96 @@ export interface components {
             items: components["schemas"]["ItemResource"][] | null;
         };
         SendMessageRequestBody: {
-            /** @description Ids of attachments uploaded earlier that are not yet bound to any message */
-            attachmentIds?: string[] | null;
             client?: components["schemas"]["ClientContextRequest"];
-            text: string;
+            /**
+             * @description The message, in the order it was written. A message with nothing but text is a single
+             *     text part; that is the ordinary case and nothing else is required.
+             */
+            parts: components["schemas"]["MessagePart"][];
         };
         /**
-         * @description What this client can do, so the assistant can ask it to do those things while it answers.
+         * @description One piece of a message. `type` says which of the fields below carries it:
          *
-         *     Send `actions` only when they differ from what was sent last — the list is repeated to the
-         *     model on every step of the turn, so an unchanged list costs more to resend than to omit.
-         *     Sending the block without `actions` keeps whatever was declared before.
+         *     - `text` — the words, in `text`
+         *     - `file` — an attachment uploaded earlier, by id in `attachmentId`
+         *     - `data-<something>` — context from the client, in `data`. The name after `data-` is yours;
+         *       it is shown to the assistant so it can tell one kind of block from another.
+         *
+         *     Order matters: an image belongs where it was written, not at the end.
+         */
+        MessagePart: {
+            /** @description For `file` parts. The attachment must have been uploaded and not yet bound to another message. */
+            attachmentId?: string | null;
+            /** @description For `data-*` parts. Any object; its keys reach the assistant as they are. */
+            data?: {
+                [key: string]: unknown;
+            } | null;
+            /** @description For `text` parts. */
+            text?: string | null;
+            type: string;
+        };
+        /**
+         * @description Which client this is and what it can do, so the assistant can ask it to do those things
+         *     while it answers. What the operator is looking at travels as `data-*` parts on the message.
+         *
+         *     Send `actions` only when they differ from the last message on this conversation. Sending the
+         *     block without `actions` keeps whatever was declared before.
          */
         ClientContextRequest: {
             /** @description The actions on offer right now. Omit when unchanged since the last message. */
             actions?: components["schemas"]["ClientActionRequest"][] | null;
-            /** @description Identifies this client while it stays open. Any stable string is fine; a fresh one per tab is expected. */
+            /** @description Identifies this client while it stays open. Any stable string; one per tab or process. */
             clientId: string;
-            /** @description How the client calls itself, shown to the model so it can name it — for example "Leaflow console (web)". */
+            /** @description How the client calls itself, for example "Leaflow console (web)". */
             label?: string;
-            page?: components["schemas"]["ClientPageRequest"];
         };
+        /** @description A `data-*` part as it was sent. */
+        ClientContextPart: {
+            data: {
+                [key: string]: unknown;
+            };
+            type: string;
+        };
+        /** @description The shape of a tool in the OpenAI Chat Completions API, plus `readOnly` and `timeoutMs`. */
         ClientActionRequest: {
+            function: components["schemas"]["ClientFunctionRequest"];
+            /** @description True when the action changes nothing outside the client. Anything else goes through this conversation's approval before it runs. */
+            readOnly: boolean;
+            /**
+             * Format: int64
+             * @description How long the assistant should wait for this action. Omit for the default; longer values are capped.
+             */
+            timeoutMs?: number;
+            /**
+             * @description Only functions are supported.
+             * @default function
+             * @enum {string}
+             */
+            type?: "function";
+        };
+        /** @description The function object from the OpenAI tools format. */
+        ClientFunctionRequest: {
             /** @description What the action does, written for the model. An action without one can only be guessed at from its name. */
             description: string;
+            /** @description The MCP and Anthropic spelling of `parameters`. Give one or the other, not both. */
+            inputSchema?: {
+                [key: string]: unknown;
+            } | null;
             name: string;
             /** @description JSON Schema for the arguments. Omit for an action that takes none. */
             parameters?: {
                 [key: string]: unknown;
             } | null;
-            /** @description True when the action changes nothing outside the client. Anything else goes through this conversation's approval before it runs. */
-            readOnly?: boolean;
-            /**
-             * Format: int64
-             * @description How long the assistant should wait for this action. 0 uses the default; longer values are capped.
-             */
-            timeoutMs?: number;
-        };
-        /** @description What the operator is looking at. The address alone answers most questions about context. */
-        ClientPageRequest: {
-            title?: string;
-            url?: string;
         };
         DynamicCallResultRequestBody: {
-            /** @description The same value sent with the message. A result from a client that is no longer the attached one is refused. */
+            /** @description The same value sent with the message. A result from a different client is refused. */
             clientId: string;
-            /** @description Why it failed, when `ok` is false. This reaches the model, so write it for a reader who cannot see the screen. */
+            /** @description Why it failed, when `ok` is false. It reaches the assistant, so write it for a reader who cannot see the screen. */
             error?: string;
             /** @description Pass back when there is more to read. The assistant will call again with it. */
             nextCursor?: string;
             ok: boolean;
-            /** @description What the action produced. At most 64 KiB; paginate anything larger rather than truncating it. */
+            /** @description What the action produced. At most 64 KiB; use `nextCursor` for anything larger. */
             output?: string;
         };
         TodoResource: {
