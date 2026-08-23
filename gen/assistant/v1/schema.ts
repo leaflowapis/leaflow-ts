@@ -907,6 +907,8 @@ export interface components {
             status: string;
             stream: components["schemas"]["StreamResource"] | null;
             turn: components["schemas"]["TurnResource"] | null;
+            /** @description The assistant's checklist for the work in this conversation, in the order it intends to do it. Empty when it has not written one — short tasks do not get a list. It is rewritten in full each time, so what is here is the current state. */
+            todos?: components["schemas"]["TodoResource"][];
             turnId: string | null;
             wait: components["schemas"]["WaitResource"] | null;
         };
@@ -929,6 +931,17 @@ export interface components {
             /** @description Ids of attachments uploaded earlier that are not yet bound to any message */
             attachmentIds?: string[] | null;
             text: string;
+        };
+        TodoResource: {
+            /** @description The same step phrased as happening now — "Installing nginx". Show this one while the item is in progress. */
+            activeForm: string;
+            /** @description The step as an instruction — "Install nginx". */
+            content: string;
+            /**
+             * @description Where this step stands. At most one item is in_progress at any time.
+             * @enum {string}
+             */
+            status: "pending" | "in_progress" | "completed";
         };
         TurnIDResponseBody: {
             /** @description True when the assistant was already busy and this message was put in line instead of starting a turn. It is read at the next step of the turn already running, so there is nothing further to do — and turnId is empty in this case. */

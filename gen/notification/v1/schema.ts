@@ -641,8 +641,6 @@ export interface components {
             email_override_verified_at: string | null;
             /** @description The language notifications are written in, as an IETF language tag */
             locale: string;
-            /** @description The IANA time zone times in notifications are stated in */
-            timezone: string;
         };
         /** @description Fields that are omitted are left alone. */
         UpdatePreferencesRequestBody: {
@@ -650,8 +648,6 @@ export interface components {
             email_override?: string | null;
             /** @description An IETF language tag. A language that is not supported is rejected rather than approximated */
             locale?: string;
-            /** @description An IANA time zone name, such as Asia/Shanghai */
-            timezone?: string;
         };
         TypePreferenceResource: {
             /** @description Where this type is delivered */
