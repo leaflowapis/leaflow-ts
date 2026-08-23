@@ -369,7 +369,9 @@ export interface paths {
          *
          *     Instances are created one by one in order. If the sequence stops part way through, because of a quota limit for example, **the instances already created are kept** and `failure` states why it stopped. A failure on the first instance is treated as a failure of the whole request and no instance is created.
          *
-         *     Exactly one image source must be given: `image_id` for a platform image, `private_image_id` for a private image. Supplying both or neither is rejected.
+         *     Exactly one source must be given: `image_id` for a platform image, `private_image_id` for a private image, or `boot_disk_id` to boot a disk you already have. Supplying more than one, or none, is rejected.
+         *
+         *     `boot_disk_id` recovers an instance that can no longer be repaired from the inside. Snapshot its disk, restore that snapshot into a new disk, attach the new disk to another instance and repair it there, then create an instance from it. That disk is not deleted when the instance is released; it is detached and returned to you.
          *
          *     Instances are created in the availability zone of the instance type. Disks to be attached later must reside in the same zone.
          *
@@ -1497,6 +1499,11 @@ export interface components {
             id: string;
             /**
              * Format: uuid
+             * @description Non-empty when the instance was created from a disk you already had, instead of from an image
+             */
+            boot_disk_id: string | null;
+            /**
+             * Format: uuid
              * @description Non-empty when the instance was created from a platform image
              */
             image_id: string | null;
@@ -1565,13 +1572,20 @@ export interface components {
             generate_password?: boolean;
             /**
              * Format: uuid
-             * @description A platform image. Exactly one of this and `private_image_id`
+             * @description Boot a disk you already have instead of installing an image. The disk must be available, unattached, and in the same availability zone as the instance type. Exactly one of this, `image_id` and `private_image_id`
+             */
+            boot_disk_id?: string;
+            /**
+             * Format: uuid
+             * @description A platform image. Exactly one of this, `private_image_id` and `boot_disk_id`
              */
             image_id?: string;
             /** Format: uuid */
             instance_type_id: string;
+            /** @description The account the disk lets you log in as. Required with `boot_disk_id`, and rejected without it since an image states its own */
+            login_username?: string;
             name: string;
-            /** @description Root password. Only the SSH public keys of the project are used when omitted */
+            /** @description The password to set, on the login account and on root. Only the SSH public keys of the project are used when omitted */
             password?: string;
             /**
              * Format: uuid
@@ -1580,12 +1594,12 @@ export interface components {
             port_id?: string;
             /**
              * Format: uuid
-             * @description A private image. Exactly one of this and `image_id`
+             * @description A private image. Exactly one of this, `image_id` and `boot_disk_id`
              */
             private_image_id?: string;
             /**
              * Format: int64
-             * @description System disk capacity in GB. Chosen automatically from the requirement of the image and the platform minimum when omitted
+             * @description System disk capacity in GB. Chosen automatically from the requirement of the image and the platform minimum when omitted. Ignored with `boot_disk_id`, since that disk already has its capacity
              */
             root_disk_gb?: number;
             /** @description Required when a primary network interface is created, at least one; the default security group is not applied automatically. Ignored together with `port_id`, as the security groups of that interface were fixed when it was created */

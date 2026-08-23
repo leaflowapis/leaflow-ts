@@ -103,6 +103,11 @@ export type SubmitWeixinVerifyCodeBody = NonNullable<
   operations["submit-weixin-verify-code"]["requestBody"]
 >["content"]["application/json"];
 
+/** `POST /api/v1/dynamic-calls/{call}/result` 的请求体。 */
+export type SubmitDynamicCallResultBody = NonNullable<
+  operations["submit-dynamic-call-result"]["requestBody"]
+>["content"]["application/json"];
+
 /** `GET /api/v1/memories` 成功时的响应体。 */
 export type ListMemoriesResult =
   operations["list-memories"]["responses"][200]["content"]["application/json"];
