@@ -502,11 +502,11 @@ export interface paths {
         get?: never;
         /**
          * Replace an instance's labels
-         * @description Records what this instance is for, as key-value pairs, so that a person or an assistant can tell later. Nothing on the platform reads them: no scheduling, quota or billing decision keys off a label, which is what makes editing one safe.
+         * @description Records what this instance is for, as key-value pairs. Nothing on the platform reads them.
          *
-         *     **The whole set is replaced.** Whatever is absent from the request is removed — a merge could not express deleting a key, and it makes retrying the same request produce a different result each time.
+         *     **The whole set is replaced**: whatever is absent from the request is removed.
          *
-         *     Do not put credentials here. Labels appear in listings, in support tickets and in the operator console.
+         *     Do not put credentials here. Labels are visible to platform operators.
          */
         put: operations["set-instance-labels"];
         post?: never;
@@ -526,11 +526,11 @@ export interface paths {
         get?: never;
         /**
          * Replace an instance's note
-         * @description A free-text note: what this instance runs, and what to be careful about before touching it — "primary database, fail over before rebooting". It is read by whoever opens the instance next, including an assistant acting on your behalf.
+         * @description A free-text note about this instance — what it runs, and what to be careful about before touching it.
          *
          *     **The whole note is replaced**; send an empty string to clear it.
          *
-         *     Do not put credentials here. The note appears in the operator console.
+         *     Do not put credentials here. The note is visible to platform operators.
          */
         put: operations["set-instance-notes"];
         post?: never;
@@ -1364,6 +1364,8 @@ export interface components {
             architecture: string;
             /** Format: uuid */
             id: string;
+            /** @description The account this image lets you log in as. The password set at creation belongs to this account */
+            login_username: string;
             /** Format: int64 */
             min_disk_gb: number;
             /** Format: int64 */
@@ -1505,12 +1507,14 @@ export interface components {
             instance_type_id: string;
             /** @description IPv6 address of the primary network interface. Assigned automatically once IPv6 is enabled on the private network */
             ipv6_address: string | null;
-            /** @description Your own classification of this instance, as key-value pairs. Nothing on the platform reads these — they are recorded so that a person, or an assistant acting on your behalf, can tell what an instance is for. Empty when never set */
+            /** @description Your own classification of this instance, as key-value pairs. Empty when never set */
             labels: {
                 [key: string]: string;
             };
+            /** @description The account to log in as over SSH. The password set at creation belongs to this account */
+            login_username: string;
             name: string;
-            /** @description A free-text note about this instance — what it runs, and what to be careful about before touching it. Empty when never set */
+            /** @description A free-text note about this instance. Empty when never set */
             notes: string;
             /**
              * Format: uuid
@@ -1601,7 +1605,7 @@ export interface components {
             password: string;
         };
         SetInstanceLabelsRequestBody: {
-            /** @description The complete set of labels. Whatever is absent here is removed, so this is also how one is deleted; send an empty object to clear them all. A key may not contain a colon, whitespace or control characters — the colon because it separates key from value in the `label` filter */
+            /** @description The complete set of labels. Whatever is absent here is removed; send an empty object to clear them all. A key may not contain a colon, whitespace or control characters */
             labels: {
                 [key: string]: string;
             };
@@ -1625,11 +1629,6 @@ export interface components {
              * @description Kill the command after this long. 60 when omitted
              */
             timeout_seconds?: number;
-            /**
-             * @description The SSH user to log in as. It is the account the platform sets a password for at creation
-             * @default root
-             */
-            username?: string;
         };
         CommandResultResponseBody: {
             /**
@@ -1765,6 +1764,8 @@ export interface components {
             failure: string | null;
             /** Format: uuid */
             id: string;
+            /** @description The account this image lets you log in as. The password set at creation belongs to this account */
+            login_username: string;
             /**
              * Format: int64
              * @description The system disk of an instance created from this image cannot be smaller than this
@@ -2805,7 +2806,7 @@ export interface operations {
     "list-instances": {
         parameters: {
             query?: {
-                /** @description Only instances carrying this label, written as `key:value` — for example `env:prod`. Matched exactly on both halves. A key never contains a colon, so the split is at the first one; anything after it is the value, and `env:` means the key `env` with an empty value rather than "any value" */
+                /** @description Only instances carrying this label, written as `key:value` — for example `env:prod`. Both halves are matched exactly */
                 label?: string;
             };
             header?: never;

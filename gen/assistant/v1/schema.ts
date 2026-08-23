@@ -14,8 +14,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 上传图片
-         * @description 请求体直接是文件字节，不使用 multipart 封装，一次上传一个文件。类型由内容判定，与 Content-Type 无关。返回的 id 在发送消息时放进 attachmentIds；从未被任何消息引用的附件会被定期清除。
+         * Upload an image
+         * @description The body is the file bytes themselves, not multipart, one file per request. The type is determined from the content, not from Content-Type. Put the returned id in attachmentIds when sending a message; attachments never referenced by any message are cleared periodically.
          */
         post: operations["upload-attachment"];
         delete?: never;
@@ -32,8 +32,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 取回图片
-         * @description 按附件 id 取回原始字节，可直接作为 <img> 的地址使用。响应带长期缓存头，附件内容不会变化。附件不存在或不属于当前用户时返回 404。
+         * Fetch an image
+         * @description Returns the original bytes for an attachment id, usable directly as the address of an <img>. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
          */
         get: operations["download-attachment"];
         put?: never;
@@ -52,8 +52,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出绑定
-         * @description 接入面那张表按通道列出各自绑了谁时用 channelId 过滤。
+         * List bindings
+         * @description Filter by channelId to show, per channel, who is bound to it.
          */
         get: operations["list-bindings"];
         put?: never;
@@ -71,11 +71,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看绑定 */
+        /** Get a binding */
         get: operations["get-binding"];
         put?: never;
         post?: never;
-        /** 解除绑定 */
+        /** Remove a binding */
         delete: operations["delete-binding"];
         options?: never;
         head?: never;
@@ -89,12 +89,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出通道 */
+        /** List channels */
         get: operations["list-channels"];
         put?: never;
         /**
-         * 创建通道
-         * @description 回调密钥归谁定由平台决定，见 list-platforms 的 secretSource：generated 的平台不要传 webhookSecret，我们生成的那把仅在本次响应中返回一次、之后无法再次取回，错过了只能调轮换接口换一把新的；supplied 的平台必须把平台后台那把传进来，此时响应里的webhookSecret 为 null。
+         * Create a channel
+         * @description Which side owns the webhook secret is decided by the platform; see secretSource on list-platforms. For a `generated` platform, do not send webhookSecret — the one we generate is returned exactly once in this response and cannot be retrieved again; miss it and the only way forward is rotating to a new one. For a `supplied` platform you must pass the secret from that platform's own console, and webhookSecret in the response is null.
          */
         post: operations["create-channel"];
         delete?: never;
@@ -110,20 +110,20 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看通道 */
+        /** Get a channel */
         get: operations["get-channel"];
         put?: never;
         post?: never;
         /**
-         * 删除通道
-         * @description 删除后该通道不再接收入站消息，其上的绑定一并失效。项目处于停服或清理状态时本接口仍然可用。
+         * Delete a channel
+         * @description The channel stops accepting inbound messages and every binding on it stops working. This operation remains available while the project is suspended or being cleaned up.
          */
         delete: operations["delete-channel"];
         options?: never;
         head?: never;
         /**
-         * 修改通道
-         * @description 只修改传了的字段。senderPolicy 与 allowFrom 是一对，由 senderPolicy 决定是否替换；改动对常驻连接要等连接重建后才生效，回调型平台立即生效。
+         * Update a channel
+         * @description Only the fields present are changed. senderPolicy and allowFrom go together, and senderPolicy decides whether they are replaced. For platforms held open by a long-lived connection the change applies once that connection is rebuilt; for webhook platforms it applies at once.
          */
         patch: operations["update-channel"];
         trace?: never;
@@ -138,8 +138,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 签发绑定码
-         * @description 生成一个一次性绑定码交给待绑定的人，他在该平台上用自己的账号把这个码发给助手即完成绑定。绑定只能由本人以这种方式建立，不能直接指定平台账号。绑定码有有效期，过期后需重新签发。
+         * Issue a binding code
+         * @description Produces a single-use code to hand to the person being bound. They send that code to the assistant from their own account on that platform, which completes the binding. A binding can only be established this way, by the person themselves — a platform account cannot be named directly. Codes expire and have to be reissued.
          */
         post: operations["create-binding-code"];
         delete?: never;
@@ -156,8 +156,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看最近被拒绝的入站消息
-         * @description 排查「发了消息但助手没有响应」时使用。按时间倒序返回最近被这条通道拒绝的入站消息及其拒绝原因，最常见的原因是发送方尚未绑定。
+         * List recently rejected inbound messages
+         * @description For diagnosing "I sent a message and the assistant never answered". Returns the inbound messages this channel rejected most recently, newest first, each with its reason. The most common reason is that the sender is not bound yet.
          */
         get: operations["list-channel-rejections"];
         put?: never;
@@ -178,8 +178,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 轮换回调密钥
-         * @description 换一把新的回调密钥，旧的立即失效，通道降回待平台确认状态。密钥归谁定由平台决定，见 list-platforms 的 secretSource：generated 的平台不要传请求体，新密钥仅在本次响应中返回、之后无法再次取回；supplied 的平台必须把平台后台那把新密钥传进来。
+         * Rotate the webhook secret
+         * @description Replaces the webhook secret. The old one stops working immediately and the channel drops back to awaiting confirmation from the platform. Which side owns the secret is decided by the platform; see secretSource on list-platforms. For a `generated` platform, send no body — the new secret is returned in this response only and cannot be retrieved again. For a `supplied` platform you must pass the new secret from that platform's own console.
          */
         post: operations["rotate-channel-secret"];
         delete?: never;
@@ -196,8 +196,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 推演一个发件人会不会被放行
-         * @description 改完发件人策略之后用来自查，不发送任何消息、也不改变任何状态：它走的是和真实入站完全相同的那份判定，并说明结论由哪一条规则得出。无法推演绑定码那一条——是否是绑定码取决于对方发来的内容。
+         * Test whether a sender would be let through
+         * @description For checking a sender policy after changing it. Sends nothing and changes nothing: it runs exactly the same decision a real inbound message goes through, and says which rule produced the answer. The binding-code rule cannot be tested this way — whether something is a binding code depends on what the sender actually wrote.
          */
         get: operations["check-sender"];
         put?: never;
@@ -218,8 +218,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 发起微信扫码登录
-         * @description 微信个人号通道需要本人扫码登录后才能收发消息。本接口返回二维码，之后轮询 `GET /v1/weixin-logins/{login}` 获取进度；状态提示需要验证码时，调用 `POST /v1/weixin-logins/{login}/verify-code` 补交。
+         * Begin a WeChat QR login
+         * @description A personal WeChat channel can only send and receive once its owner has signed in by scanning a QR code. This returns that code; poll `GET /v1/weixin-logins/{login}` for progress, and when the status asks for a verification code, submit it with `POST /v1/weixin-logins/{login}/verify-code`.
          */
         post: operations["begin-weixin-login"];
         delete?: never;
@@ -236,8 +236,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出可接入的平台
-         * @description 返回本平台当前支持接入的即时通讯平台，以及各自建通道时要走的流程和要填的凭据字段。新建通道表单完全由这份响应驱动：setupMethod 决定展示录入表单还是扫码流程，credentialFields 是要填的字段，secretSource 决定要不要有回调密钥那一栏。
+         * List platforms that can be connected
+         * @description The instant messaging platforms that can currently be connected, along with the flow and the credential fields each one needs. The create-channel form is driven entirely by this response: setupMethod decides between a credential form and a QR flow, credentialFields is what to ask for, and secretSource decides whether there is a webhook secret field at all.
          */
         get: operations["list-platforms"];
         put?: never;
@@ -256,8 +256,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查询扫码登录状态
-         * @description 轮询本接口直到状态变为成功或失败。状态提示需要验证码时，调用补交验证码接口。
+         * Get the state of a QR login
+         * @description Poll this until the status is success or failure. When the status asks for a verification code, submit it with the verification-code operation.
          */
         get: operations["get-weixin-login"];
         put?: never;
@@ -278,8 +278,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 补交登录验证码
-         * @description 微信在扫码后要求短信或设备验证码时使用。验证码由登录发起人在自己手机上获取。
+         * Submit a login verification code
+         * @description For when WeChat asks for an SMS or device code after the scan. The person who started the login gets that code on their own phone.
          */
         post: operations["submit-weixin-verify-code"];
         delete?: never;
@@ -296,8 +296,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出助手记住的事
-         * @description 助手在这个项目里为当前账号记下的事实，它们会出现在之后每一次对话的开头。同一个项目里的不同成员各记各的，这里只返回当前账号的那些。不分页：条数有上限，一次全部返回。
+         * List what the assistant remembers
+         * @description Facts the assistant has written down for the current account in this project. They appear at the start of every later conversation. Members of the same project each have their own, and this returns only the current account's. Not paginated: there is a cap on how many there can be, and all of them come back at once.
          */
         get: operations["list-memories"];
         put?: never;
@@ -319,8 +319,8 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * 删掉一条记忆
-         * @description 助手不再记得这件事。删除立即生效，下一次对话就不会再带上它。助手可能会重新学到同一件事。
+         * Delete one memory
+         * @description The assistant stops remembering this. It takes effect at once, so the next conversation will not carry it. The assistant may well learn the same thing again.
          */
         delete: operations["delete-memory"];
         options?: never;
@@ -336,8 +336,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出可用模型
-         * @description 返回本平台当前提供的模型及其上下文窗口、推理档位和支持的输入类型。用于填充对话设置里的模型选择。
+         * List available models
+         * @description The models currently offered, with their context window, reasoning levels and supported input types. Use it to populate the model picker in conversation settings.
          */
         get: operations["list-models"];
         put?: never;
@@ -356,12 +356,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出对话
-         * @description 按最近活动排序，只返回当前账号在当前项目里的对话。archived 是一个二选一的开关而不是「包含归档」：归档的对话不出现在默认列表里，要看它们就把这个参数打开。
+         * List conversations
+         * @description Ordered by most recent activity, limited to the current account's conversations in the current project. `archived` selects between two sets rather than widening one: archived conversations are absent from the default list, and turning the flag on shows those instead.
          */
         get: operations["list-threads"];
         put?: never;
-        /** 创建对话 */
+        /** Create a conversation */
         post: operations["create-thread"];
         delete?: never;
         options?: never;
@@ -377,8 +377,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 取回对话文档
-         * @description 对话的完整当前状态，用于首屏渲染。文档中的 stream 给出实时输出地址和入场票据，流推送的是对这份文档的增量编辑，可直接套用同一套渲染逻辑。
+         * Fetch the conversation document
+         * @description The complete current state of a conversation, for the first render. Its `stream` gives the address and admission ticket for live output, and what that stream pushes are incremental edits to this same document, so the same rendering logic applies.
          */
         get: operations["get-thread"];
         put?: never;
@@ -387,8 +387,8 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * 修改对话设置
-         * @description 可修改模型、推理档位、审批模式和归档状态。改动从下一次 turn 起生效，正在执行的 turn 沿用它启动时的设置。reasoningEffort 仅在同时提供 model 时生效。
+         * Update conversation settings
+         * @description Changes the model, reasoning level, approval mode and archived state. A change takes effect from the next turn; a turn already running keeps the settings it started with. reasoningEffort only applies when model is given as well.
          */
         patch: operations["update-thread"];
         trace?: never;
@@ -403,8 +403,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 批准或拒绝一批工具调用
-         * @description 批次 id 来自对话文档的 wait 字段。本接口是幂等的：重复提交同一批次不会改变已经生效的决定，也不会报错。批次不属于该对话时返回 404。
+         * Approve or decline a batch of tool calls
+         * @description The batch id comes from the conversation document's `wait`. This is idempotent: submitting the same batch again neither changes a decision already in effect nor reports an error. Returns 404 when the batch does not belong to that conversation.
          */
         post: operations["decide-approval"];
         delete?: never;
@@ -421,8 +421,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 取回更早的对话内容
-         * @description 首屏只给对话最新的那一段，再往上的内容用本接口按需取回，一次一段。before 用文档里的 earlier.before，响应里的 earlier 是再往上那一段的游标，为 null 表示已经到顶。返回的条目和文档里的 items 是同一种形状，顺序也一样（由旧到新），直接接在现有内容前面即可。
+         * Fetch earlier parts of a conversation
+         * @description The first render only carries the latest stretch of a conversation; anything above it is fetched here, one stretch at a time. Pass the document's earlier.before as `before`; the `earlier` in the response is the cursor for the stretch above that, and null means the top has been reached. The entries have the same shape and the same order (oldest first) as `items` in the document, so they can be prepended as they are.
          */
         get: operations["list-earlier-items"];
         put?: never;
@@ -443,8 +443,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 中断正在执行的 turn
-         * @description 对没有正在执行的 turn 的对话调用同样返回 204，不视为错误——用户点击停止与 turn 自然结束之间存在竞争，两种结果一致。项目处于停服或清理状态时本接口仍然可用。
+         * Interrupt a running turn
+         * @description Calling this on a conversation with no running turn also returns 204 rather than an error — the user pressing stop races with the turn finishing on its own, and both outcomes are the same. This operation remains available while the project is suspended or being cleaned up.
          */
         post: operations["interrupt-thread"];
         delete?: never;
@@ -463,8 +463,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 发送消息并触发一次 turn
-         * @description 立即返回 turnId，不等待执行完成——一次 turn 可能持续数十分钟。执行进度通过对话文档中 stream 指向的实时流获取，不在本响应里。
+         * Send a message and start a turn
+         * @description Returns a turnId immediately without waiting for execution — a turn can run for tens of minutes. Progress arrives on the live stream the conversation document's `stream` points at, not in this response. Sending while the assistant is still working is allowed: the message is put in line and `queued` comes back true, to be read at the next step of the turn already running — so the editor should stay open rather than blocking on a busy conversation.
          */
         post: operations["send-message"];
         delete?: never;
@@ -483,8 +483,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 回答助手提出的问题
-         * @description 问题 id 来自对话文档的 wait 字段。已被回答过的问题同样返回 204——可能是另一个页面提交在先，也可能是自动应答窗口已到期，两种情况下 turn 都已带着答案继续执行。
+         * Answer the assistant's questions
+         * @description The question id comes from the conversation document's `wait`. An already-answered question also returns 204 — another tab may have submitted first, or the auto-answer window may have expired, and in both cases the turn has already continued with an answer.
          */
         post: operations["answer-question"];
         delete?: never;
@@ -502,7 +502,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 标记对话已读 */
+        /** Mark a conversation as read */
         post: operations["mark-thread-read"];
         delete?: never;
         options?: never;
@@ -520,8 +520,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 从指定位置起撤回
-         * @description 撤回 ordinal 及其之后的全部条目。被撤回的条目仍留在逐字稿中并标记 reverted，序号不会重排。返回实际撤回的条目数。
+         * Revert from a given point
+         * @description Reverts the entry at `ordinal` and everything after it. Reverted entries stay in the transcript marked `reverted`, and ordinals are not renumbered. Returns how many were actually reverted.
          */
         post: operations["revert-thread"];
         delete?: never;
@@ -567,28 +567,28 @@ export interface components {
             verifiedAt: string | null;
         };
         LengthAwarePageBindingResource: {
-            /** @description 这一页的内容 */
+            /** @description The entries on this page */
             items: components["schemas"]["BindingResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description The page size, echoing what was requested
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description How many were skipped, echoing what was requested
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description How many match in total, not just on this page
              */
             total: number;
         };
         ChannelResource: {
             allowFrom: string[] | null;
             /**
-             * @description 平台接入状态。只有 online 才收得到消息、也才签得出绑定码
+             * @description How far this channel is from working. Only `online` receives messages and can issue binding codes
              * @enum {string}
              */
             connState: "logged_out" | "qr_pending" | "online" | "expired";
@@ -599,7 +599,7 @@ export interface components {
             name: string;
             platform: string;
             /**
-             * @description 常驻连接此刻的状态。回调型平台恒为 stopped
+             * @description The state of the long-lived connection right now. Always `stopped` for webhook platforms
              * @enum {string}
              */
             runtimeState: "stopped" | "running";
@@ -609,33 +609,33 @@ export interface components {
             status: "active" | "suspended" | "disabled";
             /** Format: date-time */
             updatedAt: string;
-            /** @description 回调路径，网关配置和排查时用 */
+            /** @description The webhook path, for gateway configuration and for diagnosis */
             webhookPath: string;
-            /** @description 填到平台后台的回调地址。部署未声明公网入口时为 null */
+            /** @description The webhook address to paste into that platform's console. Null when the deployment declares no public entry point */
             webhookUrl: string | null;
         };
         LengthAwarePageChannelResource: {
-            /** @description 这一页的内容 */
+            /** @description The entries on this page */
             items: components["schemas"]["ChannelResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description The page size, echoing what was requested
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description How many were skipped, echoing what was requested
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description How many match in total, not just on this page
              */
             total: number;
         };
         CreateChannelRequestBody: {
             allowFrom?: string[] | null;
-            /** @description 平台侧凭据。只写不读，创建后无法取回 */
+            /** @description Credentials for that platform. Write-only: they cannot be read back after creation */
             credentials?: {
                 [key: string]: string;
             };
@@ -643,13 +643,13 @@ export interface components {
             platform: string;
             /** @enum {string} */
             senderPolicy?: "bound_only" | "open";
-            /** @description 平台生成密钥的平台（secretSource=supplied）必须传；我们生成的（generated）不能传，那把会在本次响应的 webhookSecret 里返回一次 */
+            /** @description Required for platforms that generate the secret themselves (secretSource=supplied). Must be absent for `generated` ones, where the secret we make is returned once in webhookSecret on this response */
             webhookSecret?: string;
         };
         ChannelWithSecretResponseBody: {
             allowFrom: string[] | null;
             /**
-             * @description 平台接入状态。只有 online 才收得到消息、也才签得出绑定码
+             * @description How far this channel is from working. Only `online` receives messages and can issue binding codes
              * @enum {string}
              */
             connState: "logged_out" | "qr_pending" | "online" | "expired";
@@ -660,7 +660,7 @@ export interface components {
             name: string;
             platform: string;
             /**
-             * @description 常驻连接此刻的状态。回调型平台恒为 stopped
+             * @description The state of the long-lived connection right now. Always `stopped` for webhook platforms
              * @enum {string}
              */
             runtimeState: "stopped" | "running";
@@ -670,24 +670,24 @@ export interface components {
             status: "active" | "suspended" | "disabled";
             /** Format: date-time */
             updatedAt: string;
-            /** @description 回调路径，网关配置和排查时用 */
+            /** @description The webhook path, for gateway configuration and for diagnosis */
             webhookPath: string;
-            /** @description 我们生成的那把回调密钥，拿去粘到平台后台。**之后无法再次取回**，只能轮换出新的一把。密钥由平台生成（secretSource=supplied）或该平台不走回调时为 null */
+            /** @description The webhook secret we generated, to paste into that platform's console. **It cannot be retrieved again** — the only way forward is rotating to a new one. Null when the platform generates the secret (secretSource=supplied) or does not use webhooks at all */
             webhookSecret: string | null;
-            /** @description 填到平台后台的回调地址。部署未声明公网入口时为 null */
+            /** @description The webhook address to paste into that platform's console. Null when the deployment declares no public entry point */
             webhookUrl: string | null;
         };
         UpdateChannelRequestBody: {
-            /** @description 放行名单。仅在同时传了 senderPolicy 时生效 */
+            /** @description The allow list. Only applied when senderPolicy is sent as well */
             allowFrom?: string[] | null;
-            /** @description 整份替换而不是逐键合并。不传表示不动 */
+            /** @description Replaced wholesale rather than merged key by key. Absent means unchanged */
             credentials?: {
                 [key: string]: string;
             };
             enabled?: boolean;
             name?: string;
             /**
-             * @description 传了才会连同 allowFrom 一起替换
+             * @description Only when this is sent is allowFrom replaced along with it
              * @enum {string}
              */
             senderPolicy?: "bound_only" | "open";
@@ -712,7 +712,7 @@ export interface components {
             rejections: components["schemas"]["RejectionResource"][] | null;
         };
         RotateSecretRequestBody: {
-            /** @description 平台生成密钥的平台（secretSource=supplied）必须传新的那把；我们生成的（generated）不能传 */
+            /** @description Required for platforms that generate the secret themselves (secretSource=supplied). Must be absent for `generated` ones */
             webhookSecret?: string;
         };
         WebhookSecretResponseBody: {
@@ -729,14 +729,14 @@ export interface components {
         LoginResource: {
             /**
              * Format: date-time
-             * @description 这条登录流的截止时间。到点之后不要再轮询，重新发起一次
+             * @description When this login flow expires. Past that, stop polling and start a new one
              */
             expiresAt: string;
             /** Format: uuid */
             id: string;
-            /** @description 二维码的内容，由客户端编码成二维码图形渲染（不是图片地址，也不是 data URI）。码过期时这条流会自己换一张接着等，所以每次轮询拿到的可能是新的一串 */
+            /** @description The text to encode and render as a QR code by the client — not an image address and not a data URI. When a code expires this flow issues another and keeps waiting, so each poll may return a new string */
             qrcodeData: string;
-            /** @description 失败原因。仅在 status 为 error 或 expired 时有内容 */
+            /** @description Why it failed. Present only when status is error or expired */
             reason: string;
             /** @enum {string} */
             status: "wait" | "scanned" | "confirmed" | "expired" | "error" | "need_verify_code";
@@ -758,9 +758,9 @@ export interface components {
             setupChallenge: "none" | "webhook" | "scan";
             /** @enum {string} */
             setupMethod: "credentials" | "scan";
-            /** @description 回调路径模板，{channel} 处替换为通道 id */
+            /** @description The webhook path template; {channel} is replaced with the channel id */
             webhookPath: string;
-            /** @description 完整回调地址模板。部署未声明公网入口时为 null */
+            /** @description The full webhook address template. Null when the deployment declares no public entry point */
             webhookUrlTemplate: string | null;
         };
         PlatformListResponseBody: {
@@ -780,14 +780,14 @@ export interface components {
             items: components["schemas"]["MemoryResource"][];
         };
         MemoryResource: {
-            /** @description 记住的那件事 */
+            /** @description The fact itself */
             body: string;
             /** Format: date-time */
             createdAt: string;
             id: string;
-            /** @description 助手给这件事起的名字，它用这个名字覆盖或者删掉自己写过的东西 */
+            /** @description The name the assistant gave this fact; it overwrites or deletes its own entries by that name */
             name: string;
-            /** @description 助手是在哪次对话里记下它的。那次对话可能已经被删掉了 */
+            /** @description Which conversation the assistant learned it in. That conversation may since have been deleted */
             sourceThreadId?: string;
             /** Format: date-time */
             updatedAt: string;
@@ -813,7 +813,7 @@ export interface components {
         };
         CreateThreadRequestBody: {
             /**
-             * @description 不传则使用平台默认审批模式
+             * @description Absent uses the platform's default approval mode
              * @enum {string}
              */
             approvalMode?: "guardian" | "manual" | "yolo";
@@ -853,7 +853,7 @@ export interface components {
             /** Format: int64 */
             durationMs?: number | null;
             id: string;
-            /** @description 产出这一条的模型。用户自己发的消息为 null */
+            /** @description The model that produced this entry. Null for messages the user sent */
             model: string | null;
             namespace?: string | null;
             /** Format: int64 */
@@ -865,7 +865,7 @@ export interface components {
             text?: string;
             tool?: string | null;
             /**
-             * @description 决定这一条包含哪些字段
+             * @description Determines which fields this entry carries
              * @enum {string}
              */
             type: "user_message" | "agent_message" | "reasoning" | "dynamic_tool_call" | "context_compaction" | "token_budget_reminder" | "turn_failure";
@@ -926,15 +926,23 @@ export interface components {
             items: components["schemas"]["ItemResource"][] | null;
         };
         SendMessageRequestBody: {
-            /** @description 此前上传、尚未绑定到任何消息的附件 id */
+            /** @description Ids of attachments uploaded earlier that are not yet bound to any message */
             attachmentIds?: string[] | null;
             text: string;
         };
         TurnIDResponseBody: {
+            /** @description True when the assistant was already busy and this message was put in line instead of starting a turn. It is read at the next step of the turn already running, so there is nothing further to do — and turnId is empty in this case. */
+            queued: boolean;
+            /**
+             * Format: int64
+             * @description How many messages were already waiting ahead of this one. Only meaningful when queued is true.
+             */
+            queuedAhead?: number;
+            /** @description The turn this message started. Empty when the message was queued instead. */
             turnId: string;
         };
         AnswerRequestBody: {
-            /** @description 问题 id 到所选答案的映射 */
+            /** @description A map from question id to the answer chosen */
             answers: {
                 [key: string]: string;
             };
@@ -942,7 +950,7 @@ export interface components {
         RevertRequestBody: {
             /**
              * Format: int64
-             * @description 起始序号，该条及其之后的全部条目都会被撤回
+             * @description The starting ordinal; that entry and everything after it is reverted
              */
             ordinal: number;
         };
@@ -1006,7 +1014,7 @@ export interface operations {
             /** @description OK */
             200: {
                 headers: {
-                    /** @description 私有而且长缓存：这些字节按 id 寻址而 id 永不复用，所以它们永远不会变；而它们属于一个人，所以不能进任何共享缓存。 */
+                    /** @description Private and long-lived: these bytes are addressed by an id that is never reused, so they never change; and they belong to one person, so they must not enter any shared cache. */
                     "Cache-Control"?: string;
                     [name: string]: unknown;
                 };
@@ -1028,13 +1036,13 @@ export interface operations {
     "list-bindings": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description How many entries this page returns at most */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description How many to skip. To page deeper, use the cursor-paged operation instead */
                 offset?: number;
                 platform?: string;
                 channelId?: string;
-                /** @description 仅返回处于活跃状态的绑定 */
+                /** @description Return only bindings that are active */
                 active?: boolean;
             };
             header?: never;
@@ -1126,12 +1134,12 @@ export interface operations {
     "list-channels": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description How many entries this page returns at most */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description How many to skip. To page deeper, use the cursor-paged operation instead */
                 offset?: number;
                 platform?: string;
-                /** @description 仅返回处于启用状态的通道 */
+                /** @description Return only channels that are enabled */
                 active?: boolean;
             };
             header?: never;
@@ -1390,9 +1398,9 @@ export interface operations {
     "check-sender": {
         parameters: {
             query: {
-                /** @description 平台上那个人的 id，和绑定、被拒记录里的是同一个值 */
+                /** @description That person's id on the platform, the same value that appears in bindings and rejections */
                 peerId: string;
-                /** @description 仅 Telegram 这类有用户名的平台填得出来，不带 @。留空即当作没有用户名 */
+                /** @description Only platforms with usernames, such as Telegram, can supply this. Without the @. Leave it empty to mean there is no username */
                 username?: string;
             };
             header?: never;
@@ -1639,9 +1647,9 @@ export interface operations {
     "list-threads": {
         parameters: {
             query?: {
-                /** @description 按标题搜索，大小写不敏感。留空则返回最近的对话 */
+                /** @description Search titles, case-insensitively. Leave it empty for the most recent conversations */
                 q?: string;
-                /** @description 为真时**只**返回已归档的对话，否则只返回未归档的 */
+                /** @description When true, returns **only** archived conversations; otherwise only unarchived ones */
                 archived?: boolean;
                 limit?: number;
             };
@@ -1807,7 +1815,7 @@ export interface operations {
     "list-earlier-items": {
         parameters: {
             query: {
-                /** @description 来自文档里的 earlier.before，取这个序号之前的条目 */
+                /** @description From the document's earlier.before; returns entries before this ordinal */
                 before: number;
             };
             header?: never;
