@@ -355,7 +355,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List instances */
+        /**
+         * List instances
+         * @description Every instance in the project, newest first. This endpoint does not query backend state; for the accurate state of one instance, use the retrieve endpoint.
+         */
         get: operations["list-instances"];
         put?: never;
         /**
@@ -482,6 +485,54 @@ export interface paths {
          */
         get: operations["get-instance-console-output"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instances/{instanceId}/labels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Replace an instance's labels
+         * @description Records what this instance is for, as key-value pairs, so that a person or an assistant can tell later. Nothing on the platform reads them: no scheduling, quota or billing decision keys off a label, which is what makes editing one safe.
+         *
+         *     **The whole set is replaced.** Whatever is absent from the request is removed — a merge could not express deleting a key, and it makes retrying the same request produce a different result each time.
+         *
+         *     Do not put credentials here. Labels appear in listings, in support tickets and in the operator console.
+         */
+        put: operations["set-instance-labels"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instances/{instanceId}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Replace an instance's note
+         * @description A free-text note: what this instance runs, and what to be careful about before touching it — "primary database, fail over before rebooting". It is read by whoever opens the instance next, including an assistant acting on your behalf.
+         *
+         *     **The whole note is replaced**; send an empty string to clear it.
+         *
+         *     Do not put credentials here. The note appears in the operator console.
+         */
+        put: operations["set-instance-notes"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1454,7 +1505,13 @@ export interface components {
             instance_type_id: string;
             /** @description IPv6 address of the primary network interface. Assigned automatically once IPv6 is enabled on the private network */
             ipv6_address: string | null;
+            /** @description Your own classification of this instance, as key-value pairs. Nothing on the platform reads these — they are recorded so that a person, or an assistant acting on your behalf, can tell what an instance is for. Empty when never set */
+            labels: {
+                [key: string]: string;
+            };
             name: string;
+            /** @description A free-text note about this instance — what it runs, and what to be careful about before touching it. Empty when never set */
+            notes: string;
             /**
              * Format: uuid
              * @description Non-empty while a resize awaits confirmation. Confirming puts this type into effect, reverting discards it
@@ -1542,6 +1599,16 @@ export interface components {
             instances: components["schemas"]["InstanceResource"][] | null;
             /** @description Returned only in this response; store it immediately. All instances of a batch share it */
             password: string;
+        };
+        SetInstanceLabelsRequestBody: {
+            /** @description The complete set of labels. Whatever is absent here is removed, so this is also how one is deleted; send an empty object to clear them all. A key may not contain a colon, whitespace or control characters — the colon because it separates key from value in the `label` filter */
+            labels: {
+                [key: string]: string;
+            };
+        };
+        SetInstanceNotesRequestBody: {
+            /** @description The complete note. Send an empty string to clear it */
+            notes: string;
         };
         RenameInstanceRequestBody: {
             name: string;
@@ -2737,7 +2804,10 @@ export interface operations {
     };
     "list-instances": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Only instances carrying this label, written as `key:value` — for example `env:prod`. Matched exactly on both halves. A key never contains a colon, so the split is at the first one; anything after it is the value, and `env:` means the key `env` with an empty value rather than "any value" */
+                label?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2979,6 +3049,76 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConsoleOutputResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "set-instance-labels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instanceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetInstanceLabelsRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "set-instance-notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instanceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetInstanceNotesRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceResource"];
                 };
             };
             /** @description Error */
