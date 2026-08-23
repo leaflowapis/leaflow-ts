@@ -352,26 +352,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/models": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List available models
-         * @description The models currently offered, with their context window, reasoning levels and supported input types. Use it to populate the model picker in conversation settings.
-         */
-        get: operations["list-models"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/skills": {
         parameters: {
             query?: never;
@@ -477,7 +457,7 @@ export interface paths {
         head?: never;
         /**
          * Update conversation settings
-         * @description Changes the model, reasoning level, approval mode and archived state. A change takes effect from the next turn; a turn already running keeps the settings it started with. Model and reasoning level change independently: sending one leaves the other alone.
+         * @description Changes the approval mode and archived state. A change takes effect from the next turn; a turn already running keeps the settings it started with.
          */
         patch: operations["update-thread"];
         trace?: never;
@@ -858,32 +838,6 @@ export interface components {
         VerifyCodeRequestBody: {
             code: string;
         };
-        ModelResource: {
-            /** Format: int64 */
-            contextWindow: number;
-            inputModalities: string[] | null;
-            key: string;
-            reasoningTiers: string[] | null;
-        };
-        MemoryListResponseBody: {
-            items: components["schemas"]["MemoryResource"][];
-        };
-        MemoryResource: {
-            /** @description The fact itself */
-            body: string;
-            /** Format: date-time */
-            createdAt: string;
-            id: string;
-            /** @description The name the assistant gave this fact; it overwrites or deletes its own entries by that name */
-            name: string;
-            /** @description Which conversation the assistant learned it in. That conversation may since have been deleted */
-            sourceThreadId?: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        ModelListResponseBody: {
-            models: components["schemas"]["ModelResource"][] | null;
-        };
         SkillResource: {
             /**
              * @description True when the assistant wrote this skill during a conversation rather than a person
@@ -940,8 +894,6 @@ export interface components {
             enabled: boolean;
         };
         ThreadSummaryResource: {
-            /** @description The tier this conversation runs at, or null when it follows the model's own default. */
-            reasoningEffort: string | null;
             /** @enum {string} */
             approvalMode: "guardian" | "manual" | "yolo";
             archived: boolean;
@@ -965,8 +917,6 @@ export interface components {
             approvalMode?: "guardian" | "manual" | "yolo";
         };
         ContextResource: {
-            /** @description The tier this conversation runs at, or null when it follows the model's own default. */
-            reasoningEffort: string | null;
             /** Format: int64 */
             compactAt: number | null;
             model: string;
@@ -1075,14 +1025,6 @@ export interface components {
             /** @enum {string} */
             approvalMode?: "guardian" | "manual" | "yolo";
             archived?: boolean;
-            model?: string;
-            /**
-             * @description Which reasoning tier to run at, from the model's `reasoningTiers`. Null puts it back to
-             *     the model's own default; leaving it out keeps whatever is set.
-             *
-             *     Independent of `model` — sending one does not touch the other.
-             */
-            reasoningEffort?: string | null;
         };
         DecideRequestBody: {
             approved: boolean;
@@ -1099,6 +1041,22 @@ export interface components {
              *     text part; that is the ordinary case and nothing else is required.
              */
             parts: components["schemas"]["MessagePart"][];
+        };
+        MemoryListResponseBody: {
+            items: components["schemas"]["MemoryResource"][];
+        };
+        MemoryResource: {
+            /** @description The fact itself */
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            id: string;
+            /** @description The name the assistant gave this fact; it overwrites or deletes its own entries by that name */
+            name: string;
+            /** @description Which conversation the assistant learned it in. That conversation may since have been deleted */
+            sourceThreadId?: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         /**
          * @description One piece of a message. `type` says which of the fields below carries it:
@@ -1903,35 +1861,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-models": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ModelListResponseBody"];
-                };
             };
             /** @description Error */
             default: {

@@ -112,10 +112,6 @@ export type SubmitDynamicCallResultBody = NonNullable<
 export type ListMemoriesResult =
   operations["list-memories"]["responses"][200]["content"]["application/json"];
 
-/** `GET /api/v1/models` 成功时的响应体。 */
-export type ListModelsResult =
-  operations["list-models"]["responses"][200]["content"]["application/json"];
-
 /** `GET /api/v1/skills` 成功时的响应体。 */
 export type ListSkillsResult =
   operations["list-skills"]["responses"][200]["content"]["application/json"];
