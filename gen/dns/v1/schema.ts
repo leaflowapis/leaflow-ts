@@ -151,21 +151,7 @@ export interface paths {
          */
         get: operations["list-records"];
         put?: never;
-        /**
-         * Add records to a record set
-         * @description **Adds values only.** Records already present under the same name and type are left in
-         *     place, and the submitted values are added alongside them.
-         *
-         *     `PUT` states the final contents of a record set, so two concurrent `PUT` requests against
-         *     the same set can discard one another's changes. This operation only adds, and is therefore
-         *     safe to issue concurrently. **Certificate issuance, which places several TXT records under
-         *     `_acme-challenge` at once, must use this operation**: issuing two certificates concurrently
-         *     with `PUT` causes one challenge record to displace the other.
-         *
-         *     The cost is that duplicate values can be created. Use `PUT` to state what a record set
-         *     should contain.
-         */
-        post: operations["append-records"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -190,21 +176,22 @@ export interface paths {
          *     name and type are the ones listed in `values`; any value present beforehand and absent here
          *     is removed.
          *
-         *     To add a value, retrieve the set with `GET`, append to the values it returns, and submit the
-         *     complete list. Submitting only the new value removes the others; both forms return 200.
-         *
-         *     The record set is created if it does not yet exist, so this operation both creates and
-         *     replaces, and is idempotent.
+         *     The record set is created if it does not exist, so this operation both creates and replaces,
+         *     and is idempotent.
          *
          *     Two concurrent requests against the same domain conflict; the second receives `ZONE_BUSY`
-         *     and may be retried. To add values concurrently, use `POST /records`.
+         *     and may be retried.
+         *
+         *     **Use `PATCH` to add or remove individual values.** Reading the set and submitting a
+         *     modified list is a read-modify-write: values added by anything else between those two steps
+         *     are stated to be absent, and are therefore removed, with both requests returning 200.
          */
         put: operations["set-record-set"];
         post?: never;
         /**
          * Delete a record set
-         * @description Removes every record under this name and type. To remove one value from a set, `PUT` the
-         *     values that should remain.
+         * @description Removes every record under this name and type. **To remove part of a set, use `PATCH`**,
+         *     which is safe to issue concurrently; this operation and `PUT` are not.
          *
          *     Providers reject removal of the last NS record set at the apex of a domain, which would
          *     withdraw the domain from DNS entirely.
@@ -212,7 +199,33 @@ export interface paths {
         delete: operations["delete-record-set"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Add or remove values in a record set
+         * @description **Names values to add and remove; anything not named is left in place.** Nothing is read
+         *     first, so this is the only operation on a record set safe to issue concurrently. The set is
+         *     created if it does not exist.
+         *
+         *     Certificate issuance must use this operation for both the challenge record and its cleanup.
+         *     `PUT` and `DELETE` state or remove the whole set, so a concurrent issuance's challenge
+         *     record is discarded — with every request returning 2xx, and the failure surfacing as the
+         *     second certificate failing validation.
+         *
+         *     `add` is applied before `remove`, so a request carrying both changes a value without the
+         *     name ever resolving without it: the set briefly holds one value too many rather than one too
+         *     few. The reverse order, as two requests, leaves a window in which the value is absent — for
+         *     a single-valued set, the name does not resolve at all — and an addition that then fails
+         *     leaves it gone.
+         *
+         *     A value appearing in both `add` and `remove` is rejected rather than resolved in one
+         *     direction.
+         *
+         *     Values in `remove` that are absent are skipped, so a retried cleanup reaches the same
+         *     result. Values in `add` that are already present are rejected by the provider: a record set
+         *     cannot hold the same value twice.
+         *
+         *     Removing every value leaves an empty set, reported as `values: []`, not `RECORD_SET_NOT_FOUND`.
+         */
+        patch: operations["modify-record-set"];
         trace?: never;
     };
 }
@@ -419,18 +432,18 @@ export interface components {
             /** @description The final contents of the record set. Syntax as described on RecordSetResource.values */
             values: string[];
         };
-        AppendRecordsRequestBody: {
-            /** @description The name relative to the domain. `@` denotes the domain itself */
-            name: string;
+        /** @description Names the values to add and to remove. Anything not named is left in place. At least one of `add` and `remove` is required, and no value may appear in both. */
+        ModifyRecordSetRequestBody: {
+            /** @description The values to add. Values already present are rejected by the provider. Syntax as described on RecordSetResource.values */
+            add?: string[];
+            /** @description The values to remove. Values that are not present are skipped. Syntax as described on RecordSetResource.values */
+            remove?: string[];
             /**
              * Format: int64
-             * @description Time to live, in seconds. 0 leaves the choice to the provider
+             * @description Time to live, in seconds, applied to the values in `add`. 0 leaves the choice to the provider. The time to live of values already in the set is not changed; use `PUT` for that
              * @default 300
              */
             ttl?: number;
-            type: components["schemas"]["RecordType"];
-            /** @description The values to add. Syntax as described on RecordSetResource.values */
-            values: string[];
         };
     };
     responses: never;
@@ -713,45 +726,6 @@ export interface operations {
             };
         };
     };
-    "append-records": {
-        parameters: {
-            query?: {
-                /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
-                credential_id?: string;
-            };
-            header?: never;
-            path: {
-                /** @description The domain. A trailing dot is optional */
-                zone: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AppendRecordsRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RecordSetResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
     "get-record-set": {
         parameters: {
             query?: never;
@@ -853,6 +827,48 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "modify-record-set": {
+        parameters: {
+            query?: {
+                /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
+                credential_id?: string;
+            };
+            header?: never;
+            path: {
+                /** @description The domain. A trailing dot is optional */
+                zone: string;
+                /** @description The name, given relative to the domain. `@` denotes the domain itself and `*` a wildcard */
+                name: string;
+                type: components["schemas"]["RecordType"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModifyRecordSetRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecordSetResource"];
+                };
             };
             /** @description Error */
             default: {

@@ -347,3 +347,29 @@ export type CancelStatusPageMaintenanceResult =
 /** `POST /api/v1/status-page/maintenances/{maintenanceId}/complete` 成功时的响应体。 */
 export type CompleteStatusPageMaintenanceResult =
   operations["complete-status-page-maintenance"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/web-checks/{checkId}` 成功时的响应体。 */
+export type GetProjectWebCheckResult =
+  operations["get-project-web-check"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/web-checks/{checkId}` 成功时的响应体。 */
+export type PutProjectWebCheckResult =
+  operations["put-project-web-check"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/web-checks/{checkId}` 的请求体。 */
+export type PutProjectWebCheckBody = NonNullable<
+  operations["put-project-web-check"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/status-page/domain` 成功时的响应体。 */
+export type GetStatusPageDomainResult =
+  operations["get-status-page-domain"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/domain` 成功时的响应体。 */
+export type PutStatusPageDomainResult =
+  operations["put-status-page-domain"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/domain` 的请求体。 */
+export type PutStatusPageDomainBody = NonNullable<
+  operations["put-status-page-domain"]["requestBody"]
+>["content"]["application/json"];

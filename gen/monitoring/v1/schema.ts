@@ -863,6 +863,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/web-checks/{checkId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                checkId: string;
+            };
+            cookie?: never;
+        };
+        /** Get a project-level web check */
+        get: operations["get-project-web-check"];
+        /**
+         * Create a web check that is not tied to a machine, or replace it by the same id
+         * @description **Create or replace**: to modify a check, call this endpoint again with the same id.
+         *
+         *     Unlike `/servers/{serverId}/web-checks/{checkId}`, this check does not belong to any machine — use it when the target is simply a URL. Nothing needs to be enrolled first.
+         *
+         *     A check bound to a machine is removed together with that machine; a project-level check is not. Where a check belongs cannot be changed afterwards: move it by deleting and recreating it.
+         */
+        put: operations["put-project-web-check"];
+        post?: never;
+        /**
+         * Delete a project-level web check
+         * @description The corresponding check task and trigger are removed from the monitoring system as well.
+         */
+        delete: operations["delete-project-web-check"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/domain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the custom domain and its certificate state
+         * @description Reports whether the domain currently resolves to the status page and where its certificate stands.
+         *
+         *     `expected_cname` is the value the domain must point at. `observed_cname` is what it currently resolves to, which is what to show the user when verification fails — "verification failed" on its own tells them nothing about what to fix.
+         */
+        get: operations["get-status-page-domain"];
+        /**
+         * Bind a custom domain to this status page
+         * @description The domain must already point at the status page by CNAME. Binding is rejected until it does, and the error carries both the expected and the observed target.
+         *
+         *     Ownership is verified before the domain is stored, and it is verified again before each certificate is issued: a domain whose CNAME is later removed stops being served.
+         *
+         *     A certificate is requested in the background — this call does not wait for it. Poll GET on this endpoint to follow its progress; until a certificate is active, the domain does not serve HTTPS while the page remains reachable at its shared address.
+         */
+        put: operations["put-status-page-domain"];
+        post?: never;
+        /**
+         * Unbind the custom domain
+         * @description The page stays reachable at its shared address. Certificate renewal for the domain stops; the certificate already issued is left to expire.
+         */
+        delete: operations["delete-status-page-domain"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1366,7 +1431,10 @@ export interface components {
             result: components["schemas"]["WebCheckResultResource"] | null;
             /** Format: int64 */
             retries: number;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description The machine this check is attached to. Empty for a project-level check, which is not tied to any machine
+             */
             server_id: string;
             steps: components["schemas"]["WebCheckStepResource"][] | null;
             /** @enum {string} */
@@ -1509,11 +1577,12 @@ export interface components {
             headline: string;
             logo_url: string;
             name: string;
-            /** @description The current public address of this page. It is returned even while unpublished, in which case opening it returns 404 */
+            /** @description The address this page is served at: the custom domain if one is bound, otherwise the shared domain with the slug, otherwise the shared domain with the project id */
             public_url: string;
             published: boolean;
             /** @description Whether search engines may index the page */
             search_engine_index: boolean;
+            /** @description The readable address segment, empty when none is set. The page is always reachable at /<project id> regardless */
             slug: string;
             /** Format: uuid */
             status_page_id: string;
@@ -1529,11 +1598,13 @@ export interface components {
              * @description Number of days covered by the availability bar
              */
             uptime_days: number;
+            /** @description The text shown on the support link. Empty means the page default is used */
+            support_label: string;
         };
         PutStatusPageRequestBody: {
             /** @description #RRGGBB. Applied to the page styling; only a strict six-digit hexadecimal value is accepted */
             brand_color?: string;
-            /** @description Your own domain, such as status.acme.com. Empty binds none. Globally unique */
+            /** @description Read-only here. Bind a custom domain through PUT /status-page/domain, which verifies ownership first; a value sent here is ignored */
             custom_domain?: string;
             /** @description The line of free-form text in the page footer. Plain text */
             footer_text?: string;
@@ -1552,8 +1623,8 @@ export interface components {
              * @default false
              */
             search_engine_index?: boolean;
-            /** @description The address segment under the shared domain. Lowercase letters, digits and hyphens. Globally unique */
-            slug: string;
+            /** @description An optional readable address segment under the shared domain. Lowercase letters, digits and hyphens; globally unique. Leave it empty and the page is served at /<project id>, which needs no configuration and cannot be taken by anyone else */
+            slug?: string;
             support_url?: string;
             /**
              * @default AUTO
@@ -1567,6 +1638,8 @@ export interface components {
              * @default 90
              */
             uptime_days?: number;
+            /** @description The text shown on the support link. Empty uses the page default. Different products call this different things — help centre, submit a ticket, support */
+            support_label?: string;
         };
         PutStatusPageOrderRequestBody: {
             items: components["schemas"]["StatusPageOrderItem"][];
@@ -1847,6 +1920,39 @@ export interface components {
              * @description Must be later than `scheduled_for`
              */
             scheduled_until: string;
+        };
+        StatusPageDomainResource: {
+            /**
+             * Format: date-time
+             * @description When the current certificate expires
+             */
+            certificate_not_after: string | null;
+            /**
+             * @description NONE means no certificate has been requested for this domain yet
+             * @enum {string}
+             */
+            certificate_status: "NONE" | "PENDING" | "ACTIVE" | "FAILED";
+            /** @description The bound custom domain. Empty means none is bound */
+            domain: string;
+            /** @description The value the domain must point at */
+            expected_cname: string;
+            /** @description Why the most recent issuance attempt failed. Empty when it did not */
+            last_error: string;
+            /** @description What the domain currently resolves to. Empty when it resolves to nothing */
+            observed_cname: string;
+            /** @description The address this page is served at, taking the custom domain into account */
+            public_url: string;
+            /** @description Whether the domain currently points at the status page */
+            verified: boolean;
+            /**
+             * Format: date-time
+             * @description When ownership was last confirmed
+             */
+            verified_at: string | null;
+        };
+        PutStatusPageDomainRequestBody: {
+            /** @description Your own domain, such as status.acme.com. It must already point at the status page by CNAME */
+            domain: string;
         };
     };
     responses: never;
@@ -3768,6 +3874,190 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["StatusPageMaintenanceResource"];
                 };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-project-web-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                checkId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebCheckResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "put-project-web-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                checkId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutWebCheckRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebCheckResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "delete-project-web-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                checkId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-status-page-domain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageDomainResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "put-status-page-domain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutStatusPageDomainRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageDomainResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "delete-status-page-domain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Error */
             default: {
