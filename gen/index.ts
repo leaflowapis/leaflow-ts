@@ -11,4 +11,6 @@ export type * as compute from "./compute/v1/index.js";
 export type * as dns from "./dns/v1/index.js";
 export type * as iam from "./iam/v1/index.js";
 export type * as monitoring from "./monitoring/v1/index.js";
+export type * as notification from "./notification/v1/index.js";
+export type * as support from "./support/v1/index.js";
 export type * as tunnel from "./tunnel/v1/index.js";

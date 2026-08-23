@@ -57,22 +57,22 @@ export type ListRecordsResult =
 export type ListRecordsQuery =
   operations["list-records"]["parameters"]["query"];
 
-/** `POST /api/v1/zones/{zone}/records` 成功时的响应体。 */
-export type AppendRecordsResult =
-  operations["append-records"]["responses"][201]["content"]["application/json"];
-
-/** `POST /api/v1/zones/{zone}/records` 的查询参数。 */
-export type AppendRecordsQuery =
-  operations["append-records"]["parameters"]["query"];
-
-/** `POST /api/v1/zones/{zone}/records` 的请求体。 */
-export type AppendRecordsBody = NonNullable<
-  operations["append-records"]["requestBody"]
->["content"]["application/json"];
-
 /** `GET /api/v1/zones/{zone}/records/{name}/{type}` 成功时的响应体。 */
 export type GetRecordSetResult =
   operations["get-record-set"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /api/v1/zones/{zone}/records/{name}/{type}` 成功时的响应体。 */
+export type ModifyRecordSetResult =
+  operations["modify-record-set"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /api/v1/zones/{zone}/records/{name}/{type}` 的查询参数。 */
+export type ModifyRecordSetQuery =
+  operations["modify-record-set"]["parameters"]["query"];
+
+/** `PATCH /api/v1/zones/{zone}/records/{name}/{type}` 的请求体。 */
+export type ModifyRecordSetBody = NonNullable<
+  operations["modify-record-set"]["requestBody"]
+>["content"]["application/json"];
 
 /** `PUT /api/v1/zones/{zone}/records/{name}/{type}` 成功时的响应体。 */
 export type SetRecordSetResult =
