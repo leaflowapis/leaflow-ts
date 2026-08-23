@@ -12,8 +12,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出告警
-         * @description `incident_status` 表示监控系统是否判定已恢复，`closed` 表示是否有人完成了处理。两者相互独立，可分别筛选。
+         * List incidents
+         * @description `incident_status` reports whether monitoring considers the problem recovered; `closed` reports whether someone has finished handling it. The two are independent and can be filtered separately.
          */
         get: operations["list-incidents"];
         put?: never;
@@ -31,7 +31,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查一条告警 */
+        /** Get an incident */
         get: operations["get-incident"];
         put?: never;
         post?: never;
@@ -51,8 +51,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 确认这条告警
-         * @description 同时会在监控系统中标记为已确认，便于其他渠道也能看到该告警已有人处理。
+         * Acknowledge an incident
+         * @description The incident is also marked as acknowledged in the monitoring system, so that other channels can see it already has an owner.
          */
         post: operations["acknowledge-incident"];
         delete?: never;
@@ -70,10 +70,10 @@ export interface paths {
         };
         get?: never;
         /**
-         * 把这条告警交给谁，或者收回来
-         * @description `assignee_user_id` 留空即取消指派。
+         * Assign an incident, or clear its assignee
+         * @description Leave `assignee_user_id` empty to clear the assignment.
          *
-         *     **这里不校验被指派的人在不在这个项目里**——那要问 IAM，而这个服务的准入还没接。
+         *     **Project membership of the assignee is not verified.** Any user identifier is accepted and recorded as given.
          */
         put: operations["assign-incident"];
         post?: never;
@@ -93,8 +93,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 了结这条告警
-         * @description 了结的是**平台上的处理流程**，不是告警本身的状态：尚未恢复的告警也可以按「已接受的风险」了结，它在监控系统中仍为未恢复。
+         * Close an incident
+         * @description Closing records **that the handling process is finished on this platform**; it does not change the state of the incident itself. An incident that has not recovered may still be closed as an accepted risk, and remains unrecovered in the monitoring system.
          */
         post: operations["close-incident"];
         delete?: never;
@@ -112,7 +112,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 在时间线上写一条备注 */
+        /** Add a note to the timeline */
         post: operations["add-incident-comment"];
         delete?: never;
         options?: never;
@@ -129,8 +129,8 @@ export interface paths {
         };
         get?: never;
         /**
-         * 关注这条告警，或者取消关注
-         * @description 关注的是**自己**：操作者就是被加进关注列表的那个人。
+         * Follow an incident, or stop following it
+         * @description You follow **yourself**: the caller is the user added to or removed from the follower list.
          */
         put: operations["set-incident-following"];
         post?: never;
@@ -149,7 +149,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 重新打开一条已经了结的告警 */
+        /** Reopen a closed incident */
         post: operations["reopen-incident"];
         delete?: never;
         options?: never;
@@ -165,8 +165,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出这条告警的时间线
-         * @description 游标翻页而不是偏移量：时间线是只增的，用偏移量翻页会在新记录写入时漏行和重行。
+         * List the timeline of an incident
+         * @description Cursor paging rather than offset paging: the timeline is append-only, and offset paging would skip or repeat entries whenever a new one is written.
          */
         get: operations["list-incident-timeline"];
         put?: never;
@@ -184,7 +184,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出维护窗口 */
+        /** List maintenance windows */
         get: operations["list-maintenance-windows"];
         put?: never;
         post?: never;
@@ -201,19 +201,19 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查一个维护窗口 */
+        /** Get a maintenance window */
         get: operations["get-maintenance-window"];
         /**
-         * 开一个维护窗口，或者按同一个 id 覆盖它
-         * @description **创建即覆盖**：延长一个正在进行的窗口就是用同一个 id 再调一次。
+         * Create a maintenance window, or replace it by the same id
+         * @description **Create or replace**: extending a window that is already running means calling this endpoint again with the same id.
          *
-         *     窗口期内这些机器的问题不告警，也不扣 SLA 的可用率。`server_ids` 留空表示整个项目，包括窗口开着的时候新接进来的机器。
+         *     While the window is open, problems on these machines do not alert and do not count against SLA availability. Leave `server_ids` empty to cover the entire project, including machines enrolled after the window opens.
          */
         put: operations["put-maintenance-window"];
         post?: never;
         /**
-         * 撤掉一个维护窗口
-         * @description 立刻恢复告警，哪怕窗口还没到期。
+         * Cancel a maintenance window
+         * @description Alerting resumes immediately, even if the window has not yet expired.
          */
         delete: operations["delete-maintenance-window"];
         options?: never;
@@ -229,8 +229,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 项目总览
-         * @description 项目下还没有任何机器时返回各项均为零的总览，而不是 404——空项目是一个正常状态。
+         * Project overview
+         * @description A project with no machines yet returns an overview with every figure at zero rather than a 404 — an empty project is a normal state.
          */
         get: operations["get-project-overview"];
         put?: never;
@@ -249,8 +249,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出一台机器的监控项
-         * @description 原样返回采集到的监控项，不做筛选或重命名。哪些属于重要指标，由调用方依据监控项自带的标签自行判断。
+         * List the monitoring items of a machine
+         * @description Items are returned exactly as collected, without filtering or renaming. Which of them count as important is for the caller to decide from the tags carried by each item.
          */
         get: operations["list-server-items"];
         put?: never;
@@ -269,8 +269,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 取一个监控项的时间序列
-         * @description `item_key` 是**前缀匹配**：按分区、按网卡发现出来的监控项 key 带参数（`vfs.fs.size[/var,pused]`），所以 `vfs.fs.size` 这一个请求就能画出每个挂载点一条线。
+         * Get the time series of a monitoring item
+         * @description `item_key` is matched **by prefix**. Keys discovered per partition or per interface carry parameters (`vfs.fs.size[/var,pused]`), so a single request for `vfs.fs.size` returns one series per mount point.
          */
         get: operations["get-server-metric"];
         put?: never;
@@ -288,7 +288,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 一台机器的硬件与接口 */
+        /** Hardware and interfaces of a machine */
         get: operations["get-server-resources"];
         put?: never;
         post?: never;
@@ -305,7 +305,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 一台机器此刻的状态 */
+        /** Current state of a machine */
         get: operations["get-server-snapshot"];
         put?: never;
         post?: never;
@@ -322,7 +322,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 某个指标最高的前几台 */
+        /** Machines ranked highest by a given metric */
         get: operations["list-project-top-items"];
         put?: never;
         post?: never;
@@ -339,7 +339,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出项目里的机器 */
+        /** List the machines in the project */
         get: operations["list-servers"];
         put?: never;
         post?: never;
@@ -356,28 +356,28 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查一台机器的接入情况 */
+        /** Get the enrollment state of a machine */
         get: operations["get-server"];
         /**
-         * 把一台机器接入监控
-         * @description **同一个 server id 重复调用是幂等的**：参数一致时返回已接入的那台，不会重复创建监控主机，因此接入失败可以安全重试。
+         * Enroll a machine into monitoring
+         * @description **Repeated calls with the same server id are idempotent**: given identical parameters, the already-enrolled machine is returned and no duplicate host is created, so a failed enrollment is safe to retry.
          *
-         *     修改接入参数请改用 PATCH。本接口在参数不一致时会返回错误，不会更新已有配置。
+         *     To change enrollment settings, use PATCH. This endpoint returns an error when the parameters differ, and does not update an existing configuration.
          *
-         *     响应中的 `tls_psk` **只返回这一次**，请及时保存；遗失后需要轮换。
+         *     The `tls_psk` in the response is **returned only this once**; store it immediately. If it is lost, it must be rotated.
          */
         put: operations["enable-server-monitoring"];
         post?: never;
         /**
-         * 删掉这台机器
-         * @description **不可逆**：监控主机、历史数据和这台机器名下的告警会一并删除。若只是想暂时停止采集，改用 /disable。
+         * Delete a machine
+         * @description **Irreversible**: the monitored host, its history and every incident recorded against this machine are removed together. To stop collection temporarily, use `/disable` instead.
          */
         delete: operations["delete-server"];
         options?: never;
         head?: never;
         /**
-         * 改一台机器的接入参数
-         * @description 只更新请求体中出现的字段。`address` 与 `address_kind` 必须一并提供：只改其中一个会得到互相矛盾的接入配置，该错误不会被报出，表现为 agent 连不上。
+         * Update the enrollment settings of a machine
+         * @description Only the fields present in the request body are updated. `address` and `address_kind` must be supplied together: changing one without the other produces a contradictory configuration that is not reported as an error and shows up only as an agent that cannot connect.
          */
         patch: operations["update-server"];
         trace?: never;
@@ -392,8 +392,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 停止监控这台机器
-         * @description 可逆操作：监控主机保留，仅停止采集，历史数据不受影响。重新接入即可恢复采集。如需连同历史数据一并删除，改用 DELETE。
+         * Stop monitoring a machine
+         * @description Reversible: the monitored host is retained, only collection stops, and history is unaffected. Enrolling again resumes collection. To remove the history as well, use DELETE.
          */
         post: operations["disable-server-monitoring"];
         delete?: never;
@@ -412,8 +412,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 换一把 agent 的 PSK
-         * @description 换完要同步改 agent 侧的配置，否则那台机器立刻失联。新密钥同样**只在这个响应里明文出现一次**。
+         * Rotate the agent PSK
+         * @description The agent configuration must be updated to match, otherwise the machine loses contact immediately. The new key is likewise **returned in clear text only in this response**.
          */
         post: operations["rotate-agent-psk"];
         delete?: never;
@@ -429,17 +429,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查一个网页检查 */
+        /** Get a web check */
         get: operations["get-web-check"];
         /**
-         * 建一个网页检查，或者按同一个 id 覆盖它
-         * @description **创建即覆盖**：修改一个检查即用同一个 id 再次调用本接口，无需先判断它是否已存在。
+         * Create a web check, or replace it by the same id
+         * @description **Create or replace**: to modify a check, call this endpoint again with the same id. There is no need to determine first whether it already exists.
          */
         put: operations["put-web-check"];
         post?: never;
         /**
-         * 删掉一个网页检查
-         * @description 同时删除监控系统中对应的检查任务和触发器，不会遗留永远无法恢复的告警。
+         * Delete a web check
+         * @description The corresponding check task and trigger are removed from the monitoring system as well, so no permanently unrecoverable alert is left behind.
          */
         delete: operations["delete-web-check"];
         options?: never;
@@ -454,7 +454,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出网页检查 */
+        /** List web checks */
         get: operations["list-web-checks"];
         put?: never;
         post?: never;
@@ -472,10 +472,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查实测的达成情况
-         * @description SLI 是测出来的数，SLO 是定下来的目标——这里返回的是前者。
+         * Get measured availability
+         * @description SLI is what was measured; SLO is what was promised — this endpoint returns the former.
          *
-         *     `server_id` 为空的那一行是项目整体。
+         *     The row with an empty `server_id` covers the project as a whole.
          */
         get: operations["get-sli-report"];
         put?: never;
@@ -494,23 +494,370 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查这个项目的可用率目标
-         * @description 没定过就是 404，而不是一份默认目标：没承诺过和承诺了 99.9% 是两回事。
+         * Get the availability target of this project
+         * @description A project that has never set one returns 404 rather than a default target: making no promise and promising 99.9% are different things.
          */
         get: operations["get-slo"];
         /**
-         * 定下这个项目的可用率目标，或者改它
-         * @description 一个项目一条 SLO，**创建即覆盖**。
+         * Set the availability target of this project, or change it
+         * @description One SLO per project, **create or replace**.
          *
-         *     `min_severity` 必须显式选：它决定什么算「不可用」，是这条承诺的一半内容。
+         *     `min_severity` must be chosen explicitly: it defines what counts as unavailable, which is half of what the target means.
          */
         put: operations["put-slo"];
         post?: never;
         /**
-         * 撤掉这个项目的可用率目标
-         * @description 同时移除监控系统中对应的服务树，此后不再统计可用率。
+         * Remove the availability target of this project
+         * @description Availability is no longer tracked from this point on.
          */
         delete: operations["delete-slo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the status page of this project
+         * @description A project has at most one status page. A project that has never created one returns 404.
+         */
+        get: operations["get-status-page"];
+        /**
+         * Create the status page, or replace its configuration
+         * @description **Create or replace**: changing the title, switching the domain, publishing and unpublishing are all done by sending the complete configuration again.
+         *
+         *     While `published` is false the public address returns 404, including any custom domain already bound. A newly created page is unpublished by default, so that a page still being configured has no address that opens.
+         *
+         *     `slug` and `custom_domain` are **globally unique**; a value already taken returns 409.
+         */
+        put: operations["put-status-page"];
+        post?: never;
+        /**
+         * Delete the status page
+         * @description Its groups, components, availability history, incident notices and scheduled maintenance are removed together, and cannot be recovered. The slug and custom domain are released.
+         */
+        delete: operations["delete-status-page"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set the order of the top level of the page
+         * @description Submits the **entire** top-level order in one call rather than moving a single entry to a given position.
+         *
+         *     The top level interleaves groups and ungrouped components, so the order is expressed as one list covering both.
+         *
+         *     Each entry carries either `group_id` or `component_id`. Entries not listed are placed after those that are.
+         */
+        put: operations["put-status-page-order"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List groups */
+        get: operations["list-status-page-groups"];
+        put?: never;
+        /**
+         * Create a group
+         * @description A group is one level of collapsing applied to components on the page. There is exactly one level; groups cannot be nested.
+         */
+        post: operations["create-status-page-group"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/groups/{groupId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a group */
+        put: operations["update-status-page-group"];
+        post?: never;
+        /**
+         * Delete a group
+         * @description The components in it are **not deleted**. They return to the top level as ungrouped components, keeping their availability history and the incident notices that reference them.
+         */
+        delete: operations["delete-status-page-group"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/groups/{groupId}/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set the order of components within a group */
+        put: operations["put-status-page-group-order"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/components": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List components
+         * @description A component is one row on the status page: an externally promised capability. It is not a machine — a single component may be backed by several machines and several web checks.
+         */
+        get: operations["list-status-page-components"];
+        put?: never;
+        /**
+         * Create a component
+         * @description `name` is **customer-facing copy** and appears verbatim on the public page; do not use machine names.
+         *
+         *     `auto_status_min_severity` sets how severe an alert must be before it changes the status of this row; anything below it has no effect. The default is AVERAGE. Lower settings tend to keep the page permanently off-green, at which point people stop reading it.
+         */
+        post: operations["create-status-page-component"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/components/{componentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                componentId: string;
+            };
+            cookie?: never;
+        };
+        /** Get a component */
+        get: operations["get-status-page-component"];
+        /**
+         * Update a component
+         * @description `started_on` cannot be changed: it determines where the availability bar stops showing as unmeasured, and changing it would rewrite history that has already been published.
+         */
+        put: operations["update-status-page-component"];
+        post?: never;
+        /**
+         * Delete a component
+         * @description Its availability history is removed along with it. Passages in already-published notices that refer to it are retained, since customers may already have read them.
+         */
+        delete: operations["delete-status-page-component"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/components/{componentId}/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                componentId: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * List the monitored sources bound to a component
+         * @description Monitored sources are internal information and **never appear on the public page**.
+         */
+        get: operations["list-status-page-component-sources"];
+        /**
+         * Set the complete list of monitored sources for a component
+         * @description Submits the **complete** set of sources; anything not listed is unbound.
+         *
+         *     Once bound, alerts on these machines and web checks drive the status of the component automatically: DISASTER and HIGH are reported as a major outage, AVERAGE as a partial outage, and WARNING as degraded performance. Alerts below `auto_status_min_severity` have no effect.
+         *
+         *     `show_url` controls whether the checked address is shown on the public page. It is off by default.
+         */
+        put: operations["put-status-page-component-sources"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the incident notices on the status page
+         * @description These are **customer-facing notices**, distinct from the monitoring incidents under `/incidents`. Nothing from the latter is carried over; the text here is written by your team.
+         */
+        get: operations["list-status-page-incidents"];
+        put?: never;
+        /**
+         * Publish an incident notice
+         * @description Publishing a notice and writing its first update are a single operation: a notice with no updates would appear as a bare title on a page that has already been delivered to readers.
+         *
+         *     `started_at` is when the **incident began**, not when the notice was published. The two are usually minutes to hours apart, and using the publication time would understate the impact window that customers can compare against their own logs. Backfilling a past incident relies on the same field.
+         *
+         *     The statuses given in `components` take effect on the public page immediately and count towards availability.
+         */
+        post: operations["publish-status-page-incident"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/incidents/{incidentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an incident notice */
+        get: operations["get-status-page-incident"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/incidents/{incidentId}/updates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Append an update to an incident notice
+         * @description Published updates are never modified; a correction is issued as a new update. Customers may already have forwarded the original, and a silent rewrite would leave the two sides with different histories.
+         *
+         *     `components` lists only the components **being changed** by this update; those not listed keep their current status. Setting `status` to `RESOLVED` returns every component this notice has affected to operational and closes the notice. A closed notice accepts no further updates.
+         */
+        post: operations["post-status-page-incident-update"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/maintenances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List scheduled maintenance */
+        get: operations["list-status-page-maintenances"];
+        put?: never;
+        /**
+         * Schedule maintenance
+         * @description Maintenance starts and finishes automatically at the scheduled times; nobody needs to be present. While it runs, the affected components are shown as under maintenance and **availability is not reduced** — planned work should not consume the availability you promise to customers, which is the point of announcing it in advance.
+         *
+         *     This is separate from `/maintenance-windows`, which suppresses alerting for a period. This endpoint announces the work to your customers. The two are usually created together: without suppression, restarts during the maintenance raise alerts and mark the components unavailable.
+         */
+        post: operations["schedule-status-page-maintenance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/maintenances/{maintenanceId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a scheduled maintenance */
+        get: operations["get-status-page-maintenance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/maintenances/{maintenanceId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a maintenance that has not started
+         * @description Cancelled rather than deleted, so that readers who saw the announcement have an explanation. Maintenance that has already started cannot be cancelled; finish it early instead.
+         */
+        post: operations["cancel-status-page-maintenance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/status-page/maintenances/{maintenanceId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish a running maintenance early
+         * @description Optional: maintenance finishes on its own at the scheduled end time. Use this endpoint when the work is done ahead of schedule; the affected components return to operational immediately.
+         */
+        post: operations["complete-status-page-maintenance"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -536,7 +883,7 @@ export interface components {
             user_id: string;
         };
         MonitoringItemResource: {
-            /** @description last / avg / min / max 之类 */
+            /** @description Such as last, avg, min or max */
             aggregation_function: string;
             /** Format: int64 */
             evaluation_window_seconds: number;
@@ -546,11 +893,11 @@ export interface components {
             operator: string;
             /**
              * Format: double
-             * @description 只有 threshold_status 为 RESOLVED 时才有
+             * @description Present only when `threshold_status` is RESOLVED
              */
             threshold: number | null;
             threshold_status: string;
-            /** @description 触发那一刻的值，原样存下来的 */
+            /** @description The value at the moment of the trigger, stored as collected */
             value: string;
         };
         TagResource: {
@@ -582,13 +929,13 @@ export interface components {
             /** Format: uuid */
             id: string;
             /**
-             * @description 监控系统是否判定已恢复。它与是否有人了结这条告警是两件事
+             * @description Whether monitoring considers the problem recovered. Independent of whether anyone has closed the incident
              * @enum {string}
              */
             incident_status: "PROBLEM" | "RESOLVED";
             items: components["schemas"]["MonitoringItemResource"][] | null;
             name: string;
-            /** @description 触发器配的那行现场数据 */
+            /** @description The operational data line configured on the trigger */
             operational_data: string;
             /** Format: uuid */
             project_id: string;
@@ -607,35 +954,35 @@ export interface components {
             zabbix_event_id: string;
         };
         LengthAwarePageIncidentResource: {
-            /** @description 这一页的内容 */
+            /** @description The records in this page */
             items: components["schemas"]["IncidentResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description Maximum records per page, echoing the request
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description Number of records skipped, echoing the request
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description Total number of matches, not just this page
              */
             total: number;
         };
         AcknowledgeIncidentRequestBody: {
-            /** @description 会一并写入监控系统的确认记录 */
+            /** @description Also written to the acknowledgement record in the monitoring system */
             message?: string;
         };
         AssignIncidentRequestBody: {
-            /** @description 不给就用 user id：时间线上要留一个当时的人名副本 */
+            /** @description Defaults to the user id. The timeline keeps a copy of the name as it was at the time */
             assignee_display_name?: string;
             assignee_user_id?: string;
         };
         CloseIncidentRequestBody: {
-            /** @description reason 为 OTHER 时必填，否则请求会被拒绝 */
+            /** @description Required when `reason` is OTHER; the request is rejected otherwise */
             message?: string;
             /** @enum {string} */
             reason: "RECOVERED" | "FIXED" | "FALSE_POSITIVE" | "DUPLICATE" | "NO_ACTION_REQUIRED" | "ACCEPTED_RISK" | "OTHER";
@@ -647,7 +994,7 @@ export interface components {
             /** @enum {string} */
             activity_type: "OPENED" | "RECOVERED" | "ACKNOWLEDGED" | "ASSIGNED" | "UNASSIGNED" | "FOLLOWER_ADDED" | "FOLLOWER_REMOVED" | "COMMENT" | "CLOSED" | "REOPENED";
             actor_display_name: string;
-            /** @description 操作者；来源为 SYSTEM 或 ZABBIX 时为空 */
+            /** @description The operator. Empty when the source is SYSTEM or ZABBIX */
             actor_user_id: string;
             close_reason: string;
             /** Format: uuid */
@@ -660,16 +1007,16 @@ export interface components {
             /** @enum {string} */
             source: "SYSTEM" | "OPERATOR" | "ZABBIX";
             subject_display_name: string;
-            /** @description 被指派 / 被取消关注的那个人 */
+            /** @description The user who was assigned, or removed from the followers */
             subject_user_id: string;
         };
         SetFollowingRequestBody: {
             following: boolean;
         };
         CursorPageIncidentActivityResource: {
-            /** @description 这一页的内容 */
+            /** @description The records in this page */
             items: components["schemas"]["IncidentActivityResource"][];
-            /** @description 下一页的游标；为空表示已经到底 */
+            /** @description Cursor for the next page. Empty means the end has been reached */
             next_cursor: string;
         };
         MaintenancePeriodResource: {
@@ -677,24 +1024,24 @@ export interface components {
             duration_seconds: number;
             /**
              * Format: int64
-             * @description DAILY / WEEKLY：每 N 天 / 每 N 周
+             * @description DAILY and WEEKLY: every N days or every N weeks
              */
             every: number;
             /** @enum {string} */
             kind: "ONCE" | "DAILY" | "WEEKLY";
             /**
              * Format: int64
-             * @description DAILY / WEEKLY：当天零点起的秒数，按窗口自己的时区算
+             * @description DAILY and WEEKLY: seconds from midnight, in the timezone of the window
              */
             start_time_seconds: number;
             /**
              * Format: date-time
-             * @description 只有 ONCE 有
+             * @description Present only for ONCE
              */
             starts_at: string | null;
             /**
              * Format: int64
-             * @description WEEKLY：星期几的位图，**周一是最低位**
+             * @description WEEKLY: bitmap of weekdays, **Monday is the lowest bit**
              */
             weekdays: number;
         };
@@ -709,7 +1056,7 @@ export interface components {
             period: components["schemas"]["MaintenancePeriodResource"];
             /** Format: uuid */
             project_id: string;
-            /** @description 空表示**整个项目** */
+            /** @description Empty covers the **entire project** */
             server_ids: string[] | null;
             /** @enum {string} */
             sync_status: "PENDING" | "ACTIVE" | "FAILED" | "EXPIRED";
@@ -725,31 +1072,31 @@ export interface components {
             duration_seconds?: number;
             /**
              * Format: int64
-             * @description DAILY / WEEKLY：每 N 天 / 每 N 周
+             * @description DAILY and WEEKLY: every N days or every N weeks
              */
             every?: number;
             /** @enum {string} */
             kind: "ONCE" | "DAILY" | "WEEKLY";
             /**
              * Format: int64
-             * @description DAILY / WEEKLY：当天零点起的秒数，按窗口自己的时区算
+             * @description DAILY and WEEKLY: seconds from midnight, in the timezone of the window
              */
             start_time_seconds?: number;
             /**
              * Format: date-time
-             * @description 只有 ONCE 用得上
+             * @description Used only by ONCE
              */
             starts_at?: string;
             /**
              * Format: int64
-             * @description WEEKLY：星期几的位图，**周一是最低位**
+             * @description WEEKLY: bitmap of weekdays, **Monday is the lowest bit**
              */
             weekdays?: number;
         };
         PutMaintenanceWindowRequestBody: {
             /**
              * Format: date-time
-             * @description 整条规则的生效区间起点
+             * @description Start of the period in which the rule is effective
              */
             active_since: string;
             /** Format: date-time */
@@ -758,7 +1105,7 @@ export interface components {
             name: string;
             period: components["schemas"]["MaintenancePeriodRequest"];
             server_ids?: string[] | null;
-            /** @description IANA 名字，比如 Asia/Shanghai；空即用部署配的默认 */
+            /** @description IANA name such as Asia/Shanghai. Empty uses the configured default */
             timezone?: string;
         };
         CountResource: {
@@ -815,7 +1162,7 @@ export interface components {
             severity: string;
             /** Format: double */
             threshold: number;
-            /** @description 图例上说明这条线是什么 */
+            /** @description Labels the line in the chart legend */
             trigger_name: string;
         };
         MetricResponseBody: {
@@ -824,7 +1171,7 @@ export interface components {
             effective_from: string;
             /** Format: date-time */
             effective_to: string;
-            /** @description 数据来自趋势表，每个点是一小时的聚合 */
+            /** @description Data comes from hourly aggregates, one point per hour */
             from_trends: boolean;
             series: components["schemas"]["MetricSeriesResource"][] | null;
             thresholds: components["schemas"]["ItemThresholdResource"][] | null;
@@ -840,7 +1187,7 @@ export interface components {
         };
         ServerResourcesResource: {
             interfaces: components["schemas"]["HostInterfaceResource"][] | null;
-            /** @description 自动采集的硬件与系统清单：CPU、内存、操作系统等 */
+            /** @description Hardware and system inventory collected automatically: CPU, memory, operating system and so on */
             inventory: {
                 [key: string]: string;
             };
@@ -849,7 +1196,7 @@ export interface components {
         SnapshotResource: {
             agent_error: string;
             /**
-             * @description AGENT_DOWN 是 agent 不通但机器还活着；UNREACHABLE 是连这一点都说不上
+             * @description AGENT_DOWN means the agent is unreachable while the machine is still alive; UNREACHABLE means neither can be established
              * @enum {string}
              */
             agent_reachability: "UNKNOWN" | "REACHABLE" | "AGENT_DOWN" | "UNREACHABLE";
@@ -893,7 +1240,7 @@ export interface components {
             id: string;
             last_error: string;
             /**
-             * @description FAILED 时看 last_error
+             * @description Consult `last_error` when this is FAILED
              * @enum {string}
              */
             monitoring_status: "PENDING" | "ACTIVE" | "DISABLED" | "FAILED";
@@ -903,30 +1250,30 @@ export interface components {
             templates: components["schemas"]["ServerTemplateResource"][] | null;
             /** Format: date-time */
             updated_at: string;
-            /** @description agent 配置里的 Hostname 必须与它一致，主动式采集靠它认人 */
+            /** @description The Hostname in the agent configuration must match this value; active checks identify the machine by it */
             zabbix_host_name: string;
         };
         LengthAwarePageServerResource: {
-            /** @description 这一页的内容 */
+            /** @description The records in this page */
             items: components["schemas"]["ServerResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description Maximum records per page, echoing the request
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description Number of records skipped, echoing the request
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description Total number of matches, not just this page
              */
             total: number;
         };
         TemplateBindingRequest: {
-            /** @description 模板自己声明的参数，密钥参数写明文，返回时只报名字 */
+            /** @description Parameters declared by the template. Secret parameters are supplied in clear text and returned by name only */
             parameters?: {
                 [key: string]: string;
             };
@@ -938,13 +1285,13 @@ export interface components {
             /** @enum {string} */
             address_kind: "ip" | "dns";
             /**
-             * @description 空即被动式：它对 agent 侧配置要求最少
+             * @description Empty selects passive mode, which requires the least agent-side configuration
              * @enum {string}
              */
             agent_mode?: "PASSIVE" | "ACTIVE";
             /**
              * Format: int64
-             * @description 0 表示用默认的 10050
+             * @description 0 uses the default of 10050
              */
             agent_port?: number;
             description?: string;
@@ -952,14 +1299,14 @@ export interface components {
             template_bindings?: components["schemas"]["TemplateBindingRequest"][] | null;
         };
         EnrollmentResource: {
-            /** @description 含 PSK，与 tls_psk 一样只出现这一次 */
+            /** @description Includes the PSK. Like `tls_psk`, it is returned only this once */
             install_command: string;
             install_script_url: string;
-            /** @description **只出现这一次** */
+            /** @description **Returned only this once** */
             tls_psk: string;
             tls_psk_identity: string;
             zabbix_host_name: string;
-            /** @description agent 配置里的 Server / ServerActive */
+            /** @description The Server and ServerActive values for the agent configuration */
             zabbix_server_address: string;
         };
         ServerEnrollmentResponseBody: {
@@ -969,12 +1316,12 @@ export interface components {
         UpdateServerRequestBody: {
             address?: string;
             /**
-             * @description 要改地址就必须和 address 一起给
+             * @description Must be supplied together with `address` when changing the address
              * @enum {string}
              */
             address_kind?: "ip" | "dns";
             /**
-             * @description 改采集模式会把全部模板换成另一个变体
+             * @description Changing the collection mode rebinds every template to the corresponding variant
              * @enum {string}
              */
             agent_mode?: "PASSIVE" | "ACTIVE";
@@ -990,7 +1337,7 @@ export interface components {
             error: string;
             /**
              * Format: int64
-             * @description 第几步失败的，从 1 数；healthy 时为 0
+             * @description Index of the failed step, counting from 1. 0 when healthy
              */
             failed_step: number;
             healthy: boolean;
@@ -1000,7 +1347,7 @@ export interface components {
             response_time_seconds: number;
         };
         WebCheckStepResource: {
-            /** @description 状态码表达式，比如 200 或者 200,301-302 */
+            /** @description Status code expression, such as 200 or 200,301-302 */
             expected_status_codes: string;
             follow_redirects: boolean;
             name: string;
@@ -1015,7 +1362,7 @@ export interface components {
             last_error: string;
             /** Format: int64 */
             response_time_threshold_seconds: number;
-            /** @description null 表示这个检查还一轮都没跑过。零值会把「还不知道」显示成「响应 0 秒、状态码 0」 */
+            /** @description null means the check has not completed a round yet. A zero value would present "not yet known" as "0 seconds, status code 0" */
             result: components["schemas"]["WebCheckResultResource"] | null;
             /** Format: int64 */
             retries: number;
@@ -1028,23 +1375,23 @@ export interface components {
             timeout_seconds: number;
         };
         WebCheckStepRequest: {
-            /** @description 状态码表达式，比如 200 或者 200,301-302；留空表示不检查状态码 */
+            /** @description Status code expression, such as 200 or 200,301-302. Empty disables status code checking */
             expected_status_codes?: string;
             follow_redirects?: boolean;
             name: string;
-            /** @description 响应体里必须出现的字符串 */
+            /** @description A string that must appear in the response body */
             required_pattern?: string;
             url: string;
         };
         PutWebCheckRequestBody: {
             /**
              * Format: int64
-             * @description 0 表示用默认
+             * @description 0 uses the default
              */
             interval_seconds?: number;
             /**
              * Format: int64
-             * @description 超过它算慢，0 表示不看响应时间
+             * @description Slower than this counts as slow. 0 disables the response time check
              */
             response_time_threshold_seconds?: number;
             /** Format: int64 */
@@ -1061,19 +1408,19 @@ export interface components {
             downtime_seconds: number;
             /**
              * Format: int64
-             * @description 为负表示这个周期的额度已经超支
+             * @description A negative value means the budget for this period is already exhausted
              */
             error_budget_seconds: number;
             /**
              * Format: int64
-             * @description 被计划内维护排除掉的那部分
+             * @description The portion excluded by planned maintenance
              */
             excluded_downtime_seconds: number;
             /** Format: date-time */
             period_from: string;
             /** Format: date-time */
             period_to: string;
-            /** @description 空表示这一行是项目整体 */
+            /** @description Empty means this row covers the project as a whole */
             server_id: string;
             /** Format: double */
             sli_percent: number;
@@ -1090,7 +1437,7 @@ export interface components {
             start_time_seconds: number;
             /**
              * Format: int64
-             * @description 星期几的位图，**周一是最低位**，与维护窗口同一套编码
+             * @description Bitmap of weekdays, **Monday is the lowest bit**, using the same encoding as maintenance windows
              */
             weekdays: number;
         };
@@ -1105,13 +1452,13 @@ export interface components {
             period: "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY" | "ANNUALLY";
             /** Format: uuid */
             project_id: string;
-            /** @description 空表示 7×24 全天候承诺 */
+            /** @description Empty means a 24x7 commitment */
             schedule: components["schemas"]["ScheduleWindowResource"][] | null;
             /** Format: uuid */
             slo_id: string;
             /**
              * Format: double
-             * @description 目标可用率，比如 99.9
+             * @description Target availability, such as 99.9
              */
             slo_percent: number;
             /** @enum {string} */
@@ -1125,7 +1472,7 @@ export interface components {
             start_time_seconds?: number;
             /**
              * Format: int64
-             * @description 星期几的位图，**周一是最低位**（1=周一 … 64=周日）
+             * @description Bitmap of weekdays, **Monday is the lowest bit** (1 = Monday … 64 = Sunday)
              */
             weekdays: number;
         };
@@ -1136,7 +1483,7 @@ export interface components {
             min_severity: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
             name: string;
             /**
-             * @description 空即按月
+             * @description Empty selects monthly
              * @enum {string}
              */
             period?: "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY" | "ANNUALLY";
@@ -1145,11 +1492,361 @@ export interface components {
             slo_id: string;
             /**
              * Format: double
-             * @description 目标可用率，比如 99.9；最多四位小数
+             * @description Target availability, such as 99.9. At most four decimal places
              */
             slo_percent: number;
-            /** @description 决定统计周期的边界，即每个周期从哪一刻开始 */
+            /** @description Determines the boundaries of each reporting period, that is, the moment each period begins */
             timezone?: string;
+        };
+        StatusPageResource: {
+            /** @description #RRGGBB */
+            brand_color: string;
+            /** Format: date-time */
+            created_at: string;
+            /** @description The custom domain bound to this page. Empty means it is served only at /{slug} under the shared domain */
+            custom_domain: string;
+            footer_text: string;
+            headline: string;
+            logo_url: string;
+            name: string;
+            /** @description The current public address of this page. It is returned even while unpublished, in which case opening it returns 404 */
+            public_url: string;
+            published: boolean;
+            /** @description Whether search engines may index the page */
+            search_engine_index: boolean;
+            slug: string;
+            /** Format: uuid */
+            status_page_id: string;
+            support_url: string;
+            /** @enum {string} */
+            theme: "AUTO" | "LIGHT" | "DARK";
+            /** @description Determines where the day boundary falls on the availability bar */
+            timezone: string;
+            /** Format: date-time */
+            updated_at: string;
+            /**
+             * Format: int64
+             * @description Number of days covered by the availability bar
+             */
+            uptime_days: number;
+        };
+        PutStatusPageRequestBody: {
+            /** @description #RRGGBB. Applied to the page styling; only a strict six-digit hexadecimal value is accepted */
+            brand_color?: string;
+            /** @description Your own domain, such as status.acme.com. Empty binds none. Globally unique */
+            custom_domain?: string;
+            /** @description The line of free-form text in the page footer. Plain text */
+            footer_text?: string;
+            /** @description The line shown below the title */
+            headline?: string;
+            logo_url?: string;
+            /** @description Page title */
+            name: string;
+            /**
+             * @description While false, the public address returns 404. Unpublished by default
+             * @default false
+             */
+            published?: boolean;
+            /**
+             * @description Not indexed by default. Once a page has been crawled, switching back does not remove copies already held in third-party indexes
+             * @default false
+             */
+            search_engine_index?: boolean;
+            /** @description The address segment under the shared domain. Lowercase letters, digits and hyphens. Globally unique */
+            slug: string;
+            support_url?: string;
+            /**
+             * @default AUTO
+             * @enum {string}
+             */
+            theme?: "AUTO" | "LIGHT" | "DARK";
+            /** @description IANA name. Empty selects UTC */
+            timezone?: string;
+            /**
+             * Format: int64
+             * @default 90
+             */
+            uptime_days?: number;
+        };
+        PutStatusPageOrderRequestBody: {
+            items: components["schemas"]["StatusPageOrderItem"][];
+        };
+        /** @description Exactly one of the two: `group_id` marks this position as a group, `component_id` as an ungrouped component */
+        StatusPageOrderItem: {
+            /** Format: uuid */
+            component_id?: string;
+            /** Format: uuid */
+            group_id?: string;
+        };
+        PutStatusPageGroupOrderRequestBody: {
+            component_ids: string[];
+        };
+        StatusPageGroupResource: {
+            /** @description Whether the group is collapsed by default on the page */
+            collapsed: boolean;
+            /** Format: date-time */
+            created_at: string;
+            description: string;
+            /** Format: uuid */
+            group_id: string;
+            name: string;
+            /** Format: int64 */
+            position: number;
+        };
+        StatusPageGroupListResponseBody: {
+            data: components["schemas"]["StatusPageGroupResource"][];
+        };
+        PutStatusPageGroupRequestBody: {
+            /** @default true */
+            collapsed?: boolean;
+            description?: string;
+            name: string;
+        };
+        StatusPageComponentResource: {
+            /** @enum {string} */
+            auto_status_min_severity: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
+            /** Format: uuid */
+            component_id: string;
+            /** Format: date-time */
+            created_at: string;
+            /**
+             * @description The status currently shown to the public. OPERATIONAL means normal
+             * @enum {string}
+             */
+            current_status: "OPERATIONAL" | "DEGRADED_PERFORMANCE" | "PARTIAL_OUTAGE" | "MAJOR_OUTAGE" | "UNDER_MAINTENANCE";
+            description: string;
+            /** @description Empty means ungrouped, placed directly at the top level of the page */
+            group_id: string;
+            name: string;
+            /** @description Hide this row while everything is normal */
+            only_show_if_degraded: boolean;
+            /** Format: int64 */
+            position: number;
+            /** @description Whether the availability bar is shown. Components with this disabled are also excluded from the aggregate of their group */
+            show_uptime: boolean;
+            /**
+             * Format: date-time
+             * @description The moment this component started being covered. Earlier days are shown as unmeasured rather than operational
+             */
+            started_on: string;
+            /**
+             * Format: double
+             * @description Availability over the past `uptime_days` days
+             */
+            uptime_percent: number;
+        };
+        StatusPageComponentListResponseBody: {
+            data: components["schemas"]["StatusPageComponentResource"][];
+        };
+        PutStatusPageComponentRequestBody: {
+            /**
+             * @description Alerts below this severity do not change the status of this row
+             * @default AVERAGE
+             * @enum {string}
+             */
+            auto_status_min_severity?: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
+            description?: string;
+            /**
+             * Format: uuid
+             * @description Empty leaves the component ungrouped
+             */
+            group_id?: string;
+            /** @description Customer-facing copy; appears verbatim on the public page */
+            name: string;
+            /** @default false */
+            only_show_if_degraded?: boolean;
+            /** @default true */
+            show_uptime?: boolean;
+            /**
+             * Format: date-time
+             * @description Meaningful only at creation and immutable afterwards. Empty selects the current moment
+             */
+            started_on?: string;
+        };
+        StatusPageComponentSourceServer: {
+            /** Format: uuid */
+            server_id: string;
+        };
+        StatusPageComponentSourceWebCheck: {
+            /**
+             * @description Whether the checked address is shown on the public page
+             * @default false
+             */
+            show_url?: boolean;
+            /** Format: uuid */
+            web_check_id: string;
+        };
+        StatusPageComponentSourcesResource: {
+            servers: components["schemas"]["StatusPageComponentSourceServer"][];
+            web_checks: components["schemas"]["StatusPageComponentSourceWebCheck"][];
+        };
+        /** @description Submits the complete set; anything not listed is unbound */
+        PutStatusPageComponentSourcesRequestBody: {
+            servers?: components["schemas"]["StatusPageComponentSourceServer"][];
+            web_checks?: components["schemas"]["StatusPageComponentSourceWebCheck"][];
+        };
+        /** @description A status transition of one component within one update. The component name is a snapshot taken at the time */
+        StatusPageIncidentComponentResource: {
+            /** Format: uuid */
+            component_id: string;
+            component_name: string;
+            /** @enum {string} */
+            new_status: "OPERATIONAL" | "DEGRADED_PERFORMANCE" | "PARTIAL_OUTAGE" | "MAJOR_OUTAGE" | "UNDER_MAINTENANCE";
+            /** @enum {string} */
+            old_status: "OPERATIONAL" | "DEGRADED_PERFORMANCE" | "PARTIAL_OUTAGE" | "MAJOR_OUTAGE" | "UNDER_MAINTENANCE";
+        };
+        StatusPageIncidentUpdateResource: {
+            affected_components: components["schemas"]["StatusPageIncidentComponentResource"][] | null;
+            /** @description Body text. Plain text */
+            body: string;
+            /** @enum {string} */
+            incident_status: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
+            /** Format: date-time */
+            published_at: string;
+            /** Format: uuid */
+            update_id: string;
+        };
+        StatusPageIncidentResource: {
+            /** @enum {string} */
+            impact: "NONE" | "MINOR" | "MAJOR" | "CRITICAL";
+            /** Format: uuid */
+            incident_id: string;
+            /** @enum {string} */
+            incident_status: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
+            name: string;
+            /** Format: date-time */
+            published_at: string;
+            /** Format: date-time */
+            resolved_at: string | null;
+            /**
+             * Format: date-time
+             * @description When the incident began, not when the notice was published
+             */
+            started_at: string;
+            /** @description Most recently published first */
+            updates: components["schemas"]["StatusPageIncidentUpdateResource"][] | null;
+        };
+        LengthAwarePageStatusPageIncidentResource: {
+            data: components["schemas"]["StatusPageIncidentResource"][];
+            /** Format: int64 */
+            limit: number;
+            /** Format: int64 */
+            offset: number;
+            /** Format: int64 */
+            total: number;
+        };
+        StatusPageIncidentComponentRequest: {
+            /** Format: uuid */
+            component_id: string;
+            /**
+             * @description Empty returns this component to operational
+             * @enum {string}
+             */
+            status?: "OPERATIONAL" | "DEGRADED_PERFORMANCE" | "PARTIAL_OUTAGE" | "MAJOR_OUTAGE" | "UNDER_MAINTENANCE";
+        };
+        PublishStatusPageIncidentRequestBody: {
+            /** @description Body of the first update. Plain text */
+            body: string;
+            components?: components["schemas"]["StatusPageIncidentComponentRequest"][];
+            /**
+             * @description Empty derives the impact from the affected components
+             * @enum {string}
+             */
+            impact?: "NONE" | "MINOR" | "MAJOR" | "CRITICAL";
+            /**
+             * @default INVESTIGATING
+             * @enum {string}
+             */
+            incident_status?: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
+            /** @description The public title */
+            name: string;
+            /**
+             * Format: date-time
+             * @description Empty selects the current moment. Backfilling a past incident sets it in the past
+             */
+            published_at?: string;
+            /**
+             * Format: date-time
+             * @description When the incident began. Empty uses the publication time
+             */
+            started_at?: string;
+        };
+        PostStatusPageIncidentUpdateRequestBody: {
+            /** @description Body text. Plain text */
+            body: string;
+            /** @description Lists only the components being changed by this update; those not listed keep their current status */
+            components?: components["schemas"]["StatusPageIncidentComponentRequest"][];
+            /**
+             * @description Empty keeps the current stage. RESOLVED closes the notice and returns every affected component to operational
+             * @enum {string}
+             */
+            incident_status?: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
+            /** Format: date-time */
+            published_at?: string;
+        };
+        StatusPageMaintenanceComponentResource: {
+            /** Format: uuid */
+            component_id: string;
+            component_name: string;
+            /** @enum {string} */
+            component_status: "UNDER_MAINTENANCE" | "DEGRADED_PERFORMANCE";
+        };
+        StatusPageMaintenanceResource: {
+            affected_components: components["schemas"]["StatusPageMaintenanceComponentResource"][] | null;
+            /** @description Maintenance description. Plain text */
+            body: string;
+            /**
+             * Format: date-time
+             * @description When the maintenance actually finished
+             */
+            completed_at: string | null;
+            /** Format: uuid */
+            maintenance_id: string;
+            /** @enum {string} */
+            maintenance_status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+            name: string;
+            /** Format: date-time */
+            scheduled_for: string;
+            /** Format: date-time */
+            scheduled_until: string;
+            /**
+             * Format: date-time
+             * @description When the maintenance actually started, which may differ from the scheduled time
+             */
+            started_at: string | null;
+        };
+        LengthAwarePageStatusPageMaintenanceResource: {
+            data: components["schemas"]["StatusPageMaintenanceResource"][];
+            /** Format: int64 */
+            limit: number;
+            /** Format: int64 */
+            offset: number;
+            /** Format: int64 */
+            total: number;
+        };
+        StatusPageMaintenanceComponentRequest: {
+            /** Format: uuid */
+            component_id: string;
+            /**
+             * @description How this component is shown while the maintenance runs. Neither value reduces availability
+             * @default UNDER_MAINTENANCE
+             * @enum {string}
+             */
+            component_status?: "UNDER_MAINTENANCE" | "DEGRADED_PERFORMANCE";
+        };
+        ScheduleStatusPageMaintenanceRequestBody: {
+            /** @description Maintenance description. Plain text */
+            body: string;
+            /** @description At least one. Maintenance that affects no component reads on the page as an announcement with no subject */
+            components: components["schemas"]["StatusPageMaintenanceComponentRequest"][];
+            name: string;
+            /** Format: date-time */
+            scheduled_for: string;
+            /**
+             * Format: date-time
+             * @description Must be later than `scheduled_for`
+             */
+            scheduled_until: string;
         };
     };
     responses: never;
@@ -1163,24 +1860,24 @@ export interface operations {
     "list-incidents": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description Maximum number of records in this page */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description Number of records to skip. For deeper paging, use the cursor-paged endpoint instead */
                 offset?: number;
-                /** @description 只看某一台机器的 */
+                /** @description Restrict to a single machine */
                 server_id?: string;
                 incident_status?: "PROBLEM" | "RESOLVED";
-                /** @description 按不低于该等级匹配，而非精确匹配 */
+                /** @description Matches at or above this severity, not exactly this severity */
                 min_severity?: "NOT_CLASSIFIED" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
                 started_after?: string;
                 started_before?: string;
-                /** @description 与 [active_from, active_to] **有交集**的告警，给指标图叠加故障区间要的是这个 */
+                /** @description Incidents that **overlap** [active_from, active_to]. This is what you want when overlaying incident bands on a metric chart */
                 active_from?: string;
                 active_to?: string;
-                /** @description 形如 key 或 key=value，可重复；多个标签之间是与关系 */
+                /** @description Given as `key` or `key=value`, repeatable. Multiple tags are combined with AND */
                 tag?: string[] | null;
                 assignee_user_id?: string;
-                /** @description 有没有人在这边把它处理完，与 incident_status 无关 */
+                /** @description Whether someone has finished handling it here. Independent of `incident_status` */
                 closed?: "true" | "false";
                 acknowledged?: "true" | "false";
                 unassigned?: "true" | "false";
@@ -1453,7 +2150,7 @@ export interface operations {
         parameters: {
             query?: {
                 limit?: number;
-                /** @description 上一页返回的 next_cursor，空即从头开始 */
+                /** @description The `next_cursor` returned by the previous page. Empty starts from the beginning */
                 cursor?: string;
             };
             header?: never;
@@ -1640,9 +2337,9 @@ export interface operations {
     "list-server-items": {
         parameters: {
             query?: {
-                /** @description 按 key 或名字模糊匹配 */
+                /** @description Fuzzy match on key or name */
                 keyword?: string;
-                /** @description 形如 key 或 key=value，可重复。官方模板打好的 component 标签（cpu / memory / filesystem…）就是靠它筛 */
+                /** @description Given as `key` or `key=value`, repeatable. The `component` tags applied by the official templates (cpu, memory, filesystem and so on) are filtered through this */
                 tag?: string[] | null;
             };
             header?: never;
@@ -1676,15 +2373,15 @@ export interface operations {
     "get-server-metric": {
         parameters: {
             query?: {
-                /** @description **前缀匹配**：vfs.fs.size 一次拿回每个挂载点一条线。与 item_id 至少给一个 */
+                /** @description **Prefix match**: `vfs.fs.size` returns one series per mount point. Supply this or `item_id` */
                 item_key?: string;
                 item_id?: string;
-                /** @description 不给就是一小时前 */
+                /** @description Defaults to one hour ago */
                 from?: string;
                 to?: string;
-                /** @description 降采样的桶数，0 表示原样返回采集到的数据点 */
+                /** @description Number of downsampling buckets. 0 returns the collected data points unchanged */
                 max_points?: number;
-                /** @description 顺带取这些监控项当前生效的阈值线 */
+                /** @description Also return the thresholds currently in effect for these items */
                 include_thresholds?: boolean;
             };
             header?: never;
@@ -1781,7 +2478,7 @@ export interface operations {
         parameters: {
             query: {
                 kind: "CPU_UTILIZATION" | "MEMORY_UTILIZATION" | "ROOT_FILESYSTEM_USED";
-                /** @description 0 表示用默认 */
+                /** @description 0 uses the default */
                 limit?: number;
             };
             header?: never;
@@ -1813,11 +2510,11 @@ export interface operations {
     "list-servers": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description Maximum number of records in this page */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description Number of records to skip. For deeper paging, use the cursor-paged endpoint instead */
                 offset?: number;
-                /** @description 按名字或地址模糊匹配 */
+                /** @description Fuzzy match on name or address */
                 keyword?: string;
                 monitoring_status?: "PENDING" | "ACTIVE" | "DISABLED" | "FAILED";
             };
@@ -2138,7 +2835,7 @@ export interface operations {
     "list-web-checks": {
         parameters: {
             query?: {
-                /** @description 只看某一台机器的检查；不给就是整个项目的 */
+                /** @description Restrict to the checks of a single machine. Omit for the whole project */
                 server_id?: string;
             };
             header?: never;
@@ -2172,7 +2869,7 @@ export interface operations {
             query?: {
                 from?: string;
                 to?: string;
-                /** @description 取最近 N 个完整周期，与 from/to 二选一 */
+                /** @description Return the most recent N complete periods. Use this or from/to, not both */
                 periods?: number;
             };
             header?: never;
@@ -2278,6 +2975,799 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-status-page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "put-status-page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutStatusPageRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "delete-status-page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "put-status-page-order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutStatusPageOrderRequestBody"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-status-page-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageGroupListResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "create-status-page-group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutStatusPageGroupRequestBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageGroupResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "update-status-page-group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutStatusPageGroupRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageGroupResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "delete-status-page-group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "put-status-page-group-order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                groupId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutStatusPageGroupOrderRequestBody"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-status-page-components": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageComponentListResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "create-status-page-component": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutStatusPageComponentRequestBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageComponentResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-status-page-component": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                componentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageComponentResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "update-status-page-component": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                componentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutStatusPageComponentRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageComponentResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "delete-status-page-component": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                componentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-status-page-component-sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                componentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageComponentSourcesResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "put-status-page-component-sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                componentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PutStatusPageComponentSourcesRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageComponentSourcesResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-status-page-incidents": {
+        parameters: {
+            query?: {
+                /** @description Maximum number of records in this page */
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LengthAwarePageStatusPageIncidentResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "publish-status-page-incident": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishStatusPageIncidentRequestBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageIncidentResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-status-page-incident": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                incidentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageIncidentResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "post-status-page-incident-update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                incidentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PostStatusPageIncidentUpdateRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageIncidentResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-status-page-maintenances": {
+        parameters: {
+            query?: {
+                /** @description Maximum number of records in this page */
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LengthAwarePageStatusPageMaintenanceResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "schedule-status-page-maintenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScheduleStatusPageMaintenanceRequestBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageMaintenanceResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-status-page-maintenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                maintenanceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageMaintenanceResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "cancel-status-page-maintenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                maintenanceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageMaintenanceResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "complete-status-page-maintenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                maintenanceId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatusPageMaintenanceResource"];
+                };
             };
             /** @description Error */
             default: {

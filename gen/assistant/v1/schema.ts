@@ -288,6 +288,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/memories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 列出助手记住的事
+         * @description 助手在这个项目里为当前账号记下的事实，它们会出现在之后每一次对话的开头。同一个项目里的不同成员各记各的，这里只返回当前账号的那些。不分页：条数有上限，一次全部返回。
+         */
+        get: operations["list-memories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/memories/{memory}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * 删掉一条记忆
+         * @description 助手不再记得这件事。删除立即生效，下一次对话就不会再带上它。助手可能会重新学到同一件事。
+         */
+        delete: operations["delete-memory"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/models": {
         parameters: {
             query?: never;
@@ -735,6 +775,22 @@ export interface components {
             inputModalities: string[] | null;
             key: string;
             reasoningTiers: string[] | null;
+        };
+        MemoryListResponseBody: {
+            items: components["schemas"]["MemoryResource"][];
+        };
+        MemoryResource: {
+            /** @description 记住的那件事 */
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            id: string;
+            /** @description 助手给这件事起的名字，它用这个名字覆盖或者删掉自己写过的东西 */
+            name: string;
+            /** @description 助手是在哪次对话里记下它的。那次对话可能已经被删掉了 */
+            sourceThreadId?: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         ModelListResponseBody: {
             models: components["schemas"]["ModelResource"][] | null;
@@ -1481,6 +1537,64 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["LoginResource"];
                 };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-memories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemoryListResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "delete-memory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                memory: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Error */
             default: {

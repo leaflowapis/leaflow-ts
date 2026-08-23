@@ -204,3 +204,146 @@ export type PutSloResult =
 export type PutSloBody = NonNullable<
   operations["put-slo"]["requestBody"]
 >["content"]["application/json"];
+
+/** `GET /api/v1/status-page` 成功时的响应体。 */
+export type GetStatusPageResult =
+  operations["get-status-page"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/status-page` 成功时的响应体。 */
+export type PutStatusPageResult =
+  operations["put-status-page"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/status-page` 的请求体。 */
+export type PutStatusPageBody = NonNullable<
+  operations["put-status-page"]["requestBody"]
+>["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/order` 的请求体。 */
+export type PutStatusPageOrderBody = NonNullable<
+  operations["put-status-page-order"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/status-page/groups` 成功时的响应体。 */
+export type ListStatusPageGroupsResult =
+  operations["list-status-page-groups"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/groups` 成功时的响应体。 */
+export type CreateStatusPageGroupResult =
+  operations["create-status-page-group"]["responses"][201]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/groups` 的请求体。 */
+export type CreateStatusPageGroupBody = NonNullable<
+  operations["create-status-page-group"]["requestBody"]
+>["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/groups/{groupId}` 成功时的响应体。 */
+export type UpdateStatusPageGroupResult =
+  operations["update-status-page-group"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/groups/{groupId}` 的请求体。 */
+export type UpdateStatusPageGroupBody = NonNullable<
+  operations["update-status-page-group"]["requestBody"]
+>["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/groups/{groupId}/order` 的请求体。 */
+export type PutStatusPageGroupOrderBody = NonNullable<
+  operations["put-status-page-group-order"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/status-page/components` 成功时的响应体。 */
+export type ListStatusPageComponentsResult =
+  operations["list-status-page-components"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/components` 成功时的响应体。 */
+export type CreateStatusPageComponentResult =
+  operations["create-status-page-component"]["responses"][201]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/components` 的请求体。 */
+export type CreateStatusPageComponentBody = NonNullable<
+  operations["create-status-page-component"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/status-page/components/{componentId}` 成功时的响应体。 */
+export type GetStatusPageComponentResult =
+  operations["get-status-page-component"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/components/{componentId}` 成功时的响应体。 */
+export type UpdateStatusPageComponentResult =
+  operations["update-status-page-component"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/components/{componentId}` 的请求体。 */
+export type UpdateStatusPageComponentBody = NonNullable<
+  operations["update-status-page-component"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/status-page/components/{componentId}/sources` 成功时的响应体。 */
+export type ListStatusPageComponentSourcesResult =
+  operations["list-status-page-component-sources"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/components/{componentId}/sources` 成功时的响应体。 */
+export type PutStatusPageComponentSourcesResult =
+  operations["put-status-page-component-sources"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/status-page/components/{componentId}/sources` 的请求体。 */
+export type PutStatusPageComponentSourcesBody = NonNullable<
+  operations["put-status-page-component-sources"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/status-page/incidents` 成功时的响应体。 */
+export type ListStatusPageIncidentsResult =
+  operations["list-status-page-incidents"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/status-page/incidents` 的查询参数。 */
+export type ListStatusPageIncidentsQuery =
+  operations["list-status-page-incidents"]["parameters"]["query"];
+
+/** `POST /api/v1/status-page/incidents` 成功时的响应体。 */
+export type PublishStatusPageIncidentResult =
+  operations["publish-status-page-incident"]["responses"][201]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/incidents` 的请求体。 */
+export type PublishStatusPageIncidentBody = NonNullable<
+  operations["publish-status-page-incident"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/status-page/incidents/{incidentId}` 成功时的响应体。 */
+export type GetStatusPageIncidentResult =
+  operations["get-status-page-incident"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/incidents/{incidentId}/updates` 成功时的响应体。 */
+export type PostStatusPageIncidentUpdateResult =
+  operations["post-status-page-incident-update"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/incidents/{incidentId}/updates` 的请求体。 */
+export type PostStatusPageIncidentUpdateBody = NonNullable<
+  operations["post-status-page-incident-update"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/status-page/maintenances` 成功时的响应体。 */
+export type ListStatusPageMaintenancesResult =
+  operations["list-status-page-maintenances"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/status-page/maintenances` 的查询参数。 */
+export type ListStatusPageMaintenancesQuery =
+  operations["list-status-page-maintenances"]["parameters"]["query"];
+
+/** `POST /api/v1/status-page/maintenances` 成功时的响应体。 */
+export type ScheduleStatusPageMaintenanceResult =
+  operations["schedule-status-page-maintenance"]["responses"][201]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/maintenances` 的请求体。 */
+export type ScheduleStatusPageMaintenanceBody = NonNullable<
+  operations["schedule-status-page-maintenance"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/status-page/maintenances/{maintenanceId}` 成功时的响应体。 */
+export type GetStatusPageMaintenanceResult =
+  operations["get-status-page-maintenance"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/maintenances/{maintenanceId}/cancel` 成功时的响应体。 */
+export type CancelStatusPageMaintenanceResult =
+  operations["cancel-status-page-maintenance"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/status-page/maintenances/{maintenanceId}/complete` 成功时的响应体。 */
+export type CompleteStatusPageMaintenanceResult =
+  operations["complete-status-page-maintenance"]["responses"][200]["content"]["application/json"];

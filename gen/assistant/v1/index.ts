@@ -103,6 +103,10 @@ export type SubmitWeixinVerifyCodeBody = NonNullable<
   operations["submit-weixin-verify-code"]["requestBody"]
 >["content"]["application/json"];
 
+/** `GET /api/v1/memories` 成功时的响应体。 */
+export type ListMemoriesResult =
+  operations["list-memories"]["responses"][200]["content"]["application/json"];
+
 /** `GET /api/v1/models` 成功时的响应体。 */
 export type ListModelsResult =
   operations["list-models"]["responses"][200]["content"]["application/json"];

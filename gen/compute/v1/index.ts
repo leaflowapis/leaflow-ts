@@ -169,6 +169,10 @@ export type BindFloatingIpBody = NonNullable<
 export type ListInstancesResult =
   operations["list-instances"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/instances` 的查询参数。 */
+export type ListInstancesQuery =
+  operations["list-instances"]["parameters"]["query"];
+
 /** `POST /api/v1/instances` 成功时的响应体。 */
 export type LaunchInstanceResult =
   operations["launch-instance"]["responses"][201]["content"]["application/json"];
@@ -211,6 +215,24 @@ export type GetInstanceConsoleOutputResult =
 /** `GET /api/v1/instances/{instanceId}/console-output` 的查询参数。 */
 export type GetInstanceConsoleOutputQuery =
   operations["get-instance-console-output"]["parameters"]["query"];
+
+/** `PUT /api/v1/instances/{instanceId}/labels` 成功时的响应体。 */
+export type SetInstanceLabelsResult =
+  operations["set-instance-labels"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/instances/{instanceId}/labels` 的请求体。 */
+export type SetInstanceLabelsBody = NonNullable<
+  operations["set-instance-labels"]["requestBody"]
+>["content"]["application/json"];
+
+/** `PUT /api/v1/instances/{instanceId}/notes` 成功时的响应体。 */
+export type SetInstanceNotesResult =
+  operations["set-instance-notes"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/instances/{instanceId}/notes` 的请求体。 */
+export type SetInstanceNotesBody = NonNullable<
+  operations["set-instance-notes"]["requestBody"]
+>["content"]["application/json"];
 
 /** `POST /api/v1/instances/{instanceId}/password` 成功时的响应体。 */
 export type ResetInstancePasswordResult =
