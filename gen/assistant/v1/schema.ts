@@ -766,6 +766,22 @@ export interface components {
             /** Format: date-time */
             expiresAt: string;
         };
+        PartResource: {
+            /** @description For `file` parts. Points at one of this entry's `attachments`. */
+            attachmentId?: string | null;
+            /**
+             * @description Addresses this part in the live stream — text arrives as `append` frames pointing at
+             *     `/items/{item}/parts/{id}/text`.
+             *
+             *     Not an array index. It looks like one today because parts are only ever appended, and a
+             *     client that treats it as one keeps working right up until that stops being true.
+             */
+            id: string;
+            /** @description For `text` parts. Grows as the answer is written. */
+            text?: string | null;
+            /** @enum {string} */
+            type: "text" | "file";
+        };
         RejectionResource: {
             /** Format: date-time */
             at: string;
@@ -971,7 +987,14 @@ export interface components {
             /** @enum {string} */
             status: "pending" | "in_progress" | "completed" | "failed" | "declined" | "interrupted";
             target?: string | null;
-            text?: string;
+            /**
+             * @description The content of this entry, in the order it was written. A message that is only text is a
+             *     single part, which is most of them.
+             *
+             *     An image belongs where it was written, so render these in order rather than putting
+             *     attachments at the end.
+             */
+            parts?: components["schemas"]["PartResource"][] | null;
             tool?: string | null;
             /**
              * @description Determines which fields this entry carries
@@ -1087,7 +1110,13 @@ export interface components {
          *     block without `actions` keeps whatever was declared before.
          */
         ClientContextRequest: {
-            /** @description The actions on offer right now. Omit when unchanged since the last message. */
+            /**
+             * @description The actions on offer right now.
+             *
+             *     Omit it when nothing changed since the last message. Send `[]` to say there is nothing
+             *     on offer — those are different: a client that moves off the page it was attached to has
+             *     to be able to say so, or the assistant keeps calling actions that no longer make sense.
+             */
             actions?: components["schemas"]["ClientActionRequest"][] | null;
             /** @description Identifies this client while it stays open. Any stable string; one per tab or process. */
             clientId: string;
