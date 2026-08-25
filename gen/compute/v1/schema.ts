@@ -1738,6 +1738,12 @@ export interface components {
             action: string;
             /** @description The user who initiated the operation. Empty when the platform performed it */
             actor: string | null;
+            /**
+             * @description The name this user went by at the time of the operation, recorded alongside the operation itself. It is not refreshed afterwards: the record states who acted then, and a name read today is a statement about a different moment.
+             *
+             *     Null on entries recorded before this field existed, and on entries performed by the platform. An empty string means the account had no name recorded.
+             */
+            actor_name: string | null;
             /** @description True when the operation was performed by the platform */
             by_platform: boolean;
             /** Format: date-time */
