@@ -1009,8 +1009,12 @@ export interface components {
             /** Format: date-time */
             resolved_at: string | null;
             resolved_trigger_expression: string;
-            /** Format: uuid */
-            server_id: string;
+            /**
+             * Format: uuid
+             * @description The machine this alert is about. Null when the alert is not about a machine
+             */
+            server_id: string | null;
+            /** @description Empty when server_id is null */
             server_name: string;
             /** @enum {string} */
             severity: "NOT_CLASSIFIED" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
@@ -1018,6 +1022,11 @@ export interface components {
             started_at: string;
             tags: components["schemas"]["TagResource"][] | null;
             trigger_expression: string;
+            /**
+             * Format: uuid
+             * @description The web check that reported this alert. Null when the alert did not come from a web check. Both this and server_id are set when the check runs on one of your machines
+             */
+            web_check_id: string | null;
             zabbix_event_id: string;
         };
         LengthAwarePageIncidentResource: {
@@ -1974,6 +1983,8 @@ export interface operations {
                 offset?: number;
                 /** @description Restrict to a single machine */
                 server_id?: string;
+                /** @description Restrict to a single web check */
+                web_check_id?: string;
                 incident_status?: "PROBLEM" | "RESOLVED";
                 /** @description Matches at or above this severity, not exactly this severity */
                 min_severity?: "NOT_CLASSIFIED" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
