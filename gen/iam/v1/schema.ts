@@ -394,6 +394,8 @@ export interface components {
             token: string;
         };
         MemberResource: {
+            /** @description MD5 hash of the lowercased, trimmed email address, for use with Gravatar-compatible avatar services. Empty if the account has no email address. */
+            avatar_hash: string;
             /** Format: date-time */
             created_at: string;
             created_by: string;
