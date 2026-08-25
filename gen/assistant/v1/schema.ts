@@ -975,6 +975,7 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             detail?: string | null;
+            presentation?: components["schemas"]["PresentationResource"] | null;
             /** Format: int64 */
             durationMs?: number | null;
             id: string;
@@ -1001,6 +1002,54 @@ export interface components {
              * @enum {string}
              */
             type: "user_message" | "agent_message" | "reasoning" | "dynamic_tool_call" | "context_compaction" | "token_budget_reminder" | "turn_failure";
+        };
+        /**
+         * @description Structured detail produced by a tool call, in addition to the single-line `detail`. Null
+         *     when the call produced none.
+         *
+         *     `kind` determines which of the remaining fields is populated.
+         */
+        PresentationResource: {
+            fileDiff?: components["schemas"]["FileDiffResource"] | null;
+            /**
+             * @description Determines which of the remaining fields is populated
+             * @enum {string}
+             */
+            kind: "file_diff";
+        };
+        /**
+         * @description The change a tool call applied to a single file.
+         *
+         *     Populated once the call has completed successfully. It is absent while the call is pending
+         *     or awaiting approval, as the file's prior contents are read during execution. To preview an
+         *     edit awaiting approval, derive it from the call's `old_string` and `new_string` arguments.
+         */
+        FileDiffResource: {
+            /**
+             * Format: int64
+             * @description Lines added. Complete even when `unified` is null
+             */
+            added: number;
+            /** @description Absolute path of the file on the instance */
+            path: string;
+            /**
+             * Format: int64
+             * @description Lines removed. Complete even when `unified` is null
+             */
+            removed: number;
+            /**
+             * @description What the call did to the file
+             * @enum {string}
+             */
+            status: "added" | "modified" | "deleted";
+            /**
+             * @description The change as a unified diff with three lines of context. A file created by the call is
+             *     diffed against `/dev/null`.
+             *
+             *     Null when the change exceeds the service's size limit. The diff is omitted in full
+             *     rather than truncated; `added` and `removed` remain complete.
+             */
+            unified?: string | null;
         };
         StreamResource: {
             path: string;
