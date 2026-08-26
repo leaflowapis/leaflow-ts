@@ -110,6 +110,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/members:batchGet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve members by id, including those who have left
+         * @description Resolves a set of account ids to the people behind them, scoped to the current project and **including members who have since left it**.
+         *
+         *     This is what turns the ids held elsewhere in the product — who created a machine, who performed a logged operation — into names. The current member list cannot answer for somebody who has left, and those rows are exactly the ones a reader most often needs explained.
+         *
+         *     Only ids that have belonged to the current project resolve; anything else is omitted, as are ids that do not resolve at all. Match the response against the request by id; the order is not significant.
+         */
+        post: operations["batch-get-members"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/members": {
         parameters: {
             query?: never;
@@ -392,6 +416,25 @@ export interface components {
             invitation: components["schemas"]["InvitationResource"];
             /** @description 兑现用的明文，**只在这一次响应里出现**。库里只有它的哈希，丢了只能撤销重发 */
             token: string;
+        };
+        BatchGetMembersRequestBody: {
+            /** @description The account ids to resolve. Blank entries are ignored. */
+            ids: string[];
+        };
+        BatchGetMembersResponseBody: {
+            /** @description The people that resolved. Ids that never belonged to this project are absent, as are ids that do not resolve at all. */
+            items: components["schemas"]["ResolvedMemberResource"][];
+        };
+        /** @description A person referred to by an id held elsewhere in the project. Carries who they are, not what they may do — a member who has left holds nothing, and this shape has no grant to say so. */
+        ResolvedMemberResource: {
+            /** @description MD5 hash of the lowercased, trimmed email address, for use with Gravatar-compatible avatar services. Empty if the account has no email address. */
+            avatar_hash: string;
+            email: string;
+            first_name: string;
+            last_name: string;
+            /** @description True when this person is no longer a member of the project. */
+            left: boolean;
+            user_id: string;
         };
         MemberResource: {
             /** @description MD5 hash of the lowercased, trimmed email address, for use with Gravatar-compatible avatar services. Empty if the account has no email address. */
@@ -760,6 +803,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "batch-get-members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchGetMembersRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchGetMembersResponseBody"];
+                };
             };
             /** @description Error */
             default: {
