@@ -1198,7 +1198,7 @@ export interface components {
         };
         /** @description The function object from the OpenAI tools format. */
         ClientFunctionRequest: {
-            /** @description What the action does, written for the model. An action without one can only be guessed at from its name. */
+            /** @description What the action does, written for the model. An action without one can only be guessed at from its name. The 1024 ceiling is OpenAI's own limit on `tools[].function.description`, not a number chosen here: over it the upstream call fails with `string_above_max_length`, and refusing at submission is the clearer of the two places to refuse. It was 500, which ran out at about six enumerated entries — an action that must list what it accepts had nowhere to put the list. */
             description: string;
             /** @description The MCP and Anthropic spelling of `parameters`. Give one or the other, not both. */
             inputSchema?: {
