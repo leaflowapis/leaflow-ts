@@ -49,6 +49,15 @@ export type IssueInvitationBody = NonNullable<
   operations["issue-invitation"]["requestBody"]
 >["content"]["application/json"];
 
+/** `POST /api/v1/members:batchGet` 成功时的响应体。 */
+export type BatchGetMembersResult =
+  operations["batch-get-members"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/members:batchGet` 的请求体。 */
+export type BatchGetMembersBody = NonNullable<
+  operations["batch-get-members"]["requestBody"]
+>["content"]["application/json"];
+
 /** `GET /api/v1/members` 成功时的响应体。 */
 export type ListMembersResult =
   operations["list-members"]["responses"][200]["content"]["application/json"];
