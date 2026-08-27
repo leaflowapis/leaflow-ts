@@ -732,11 +732,16 @@ export interface components {
             currency?: components["schemas"]["Currency"];
         };
         /**
-         * @description ISO 4217. `USD` is the only value the platform issues today; the field is carried so that an
-         *     amount is never ambiguous about what it is denominated in.
-         * @enum {string}
+         * @description ISO 4217, uppercase. `USD` is the only value the platform issues today, and a request
+         *     naming any other is refused with `BILLING_CURRENCY_UNSUPPORTED`.
+         *
+         *     Deliberately not an enumeration. The set of currency codes is governed outside this API, so
+         *     a client generated today must still be able to read a response naming a code added later —
+         *     an enumeration turns that response into a decode failure in a client nobody can redeploy.
+         *     Restricting what may be *sent* is a rule about what the platform supports, and it lives
+         *     where that rule can change without regenerating anything.
          */
-        Currency: "USD";
+        Currency: string;
     };
     responses: never;
     parameters: {
