@@ -332,6 +332,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the monitoring templates that can be bound to a machine
+         * @description The catalog every template binding is validated against — which templates exist, which parameters each of them accepts, and what each parameter defaults to. It is identical for every project and changes only when this deployment is upgraded. Read it rather than keeping a copy. A copy drifts, and only one of the ways it drifts fails loudly — an unknown parameter name is rejected, but a stale `default` and a stale `required` both look correct on screen.
+         */
+        get: operations["list-templates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/servers": {
         parameters: {
             query?: never;
@@ -367,6 +387,8 @@ export interface paths {
          *     A failed call leaves the machine recorded with `monitoring_status: FAILED`; the reason is reported in `last_error` via `GET /servers/{serverId}`.
          *
          *     The `tls_psk` in the response is **returned only this once**; store it immediately. If it is lost, it must be rotated.
+         *
+         *     It is also how collection is resumed after `/disable`. On a machine that already exists, **omitting `template_bindings` keeps the bindings it already has**; it does not fall back to the default of Linux alone, which would silently drop every other template together with its parameters. Secret parameters are likewise carried over — see `parameters` on the binding.
          */
         put: operations["enable-server-monitoring"];
         post?: never;
@@ -1292,6 +1314,46 @@ export interface components {
         TopItemListResponseBody: {
             items: components["schemas"]["TopItemResource"][] | null;
         };
+        TemplateCatalogParameterResource: {
+            /** @description The value that takes effect when the parameter is omitted. An empty string is a real default, not an absent one */
+            default: string;
+            /**
+             * @description The shape of the accepted value. Surrounding whitespace is trimmed before the value is checked, and an omitted or empty value is replaced by `default` and not checked at all.
+             *
+             *     - `string` — no constraint; empty is accepted
+             *     - `non_empty_string` — must not be empty once trimmed
+             *     - `percent` — a number in the **closed** interval 0 to 100; fractions are accepted
+             *     - `positive_number` — a number **strictly** greater than 0; fractions are accepted
+             *     - `port` — an integer from 1 to 65535 inclusive; `8080/tcp` is not a port
+             *     - `host` — an IP address, or a hostname of at most 255 characters whose dot-separated labels are at most 63 characters of `A-Z a-z 0-9 - _` and neither begin nor end with `-`. A single label such as `localhost` is accepted, as is a trailing dot
+             *     - `ip_or_empty` — an IP address, or empty to mean "not specified"
+             *     - `regexp` — must compile as a **Go RE2** pattern. RE2 has no backreferences and no lookaround, so a pattern that a browser's `new RegExp()` accepts may still be rejected here. Validating client-side narrows the gap but does not close it
+             * @enum {string}
+             */
+            kind: "string" | "non_empty_string" | "percent" | "positive_number" | "port" | "host" | "ip_or_empty" | "regexp";
+            /** @description The key to use in `template_bindings[].parameters`. It is not the Zabbix macro name, which is internal and changes between Zabbix versions */
+            name: string;
+            /** @description Independent of `default`. The three NGINX connection parameters carry a default and are still required, because the template's own default (localhost:80/basic_status) is almost never right */
+            required: boolean;
+            /** @description Supplied in clear text and never returned. A configured one is reported by name only, through `configured_secret_parameters` on the bound template. When updating a machine that already has one stored, omit it to keep the stored value and supply it only to replace it — a caller cannot read it back, so requiring it on every write would make resuming collection impossible */
+            secret: boolean;
+        };
+        TemplateCatalogEntryResource: {
+            /** @description Exactly one template with this set must be bound to every machine. Binding none enrolls a machine that can never alert; binding both loads the Linux and Windows items onto one machine, half of which must fail */
+            is_base: boolean;
+            /** @description False means the template collects without an agent on the machine — ICMP_PING is pinged by the Zabbix server, PROXMOX_VE is polled over the PVE API */
+            needs_agent: boolean;
+            /** @description In declaration order — connection parameters first, thresholds after — and meant to be rendered in that order. It is deliberately not alphabetical, which would split a template's connection parameters apart with thresholds between them even though they only make sense filled in together */
+            parameters: components["schemas"]["TemplateCatalogParameterResource"][] | null;
+            /** @description Templates that must be bound alongside this one. Values are `template_key`s */
+            requires: string[] | null;
+            /** @description Whether this template may be bound when `agent_mode` is ACTIVE. It already combines both reasons it may not be — no active variant exists, or this deployment does not have one installed — because the two are rejected identically and call for the same fix */
+            supports_active_mode: boolean;
+            template_key: string;
+        };
+        TemplateCatalogResponseBody: {
+            items: components["schemas"]["TemplateCatalogEntryResource"][] | null;
+        };
         ServerTemplateResource: {
             configured_secret_parameters: string[] | null;
             parameters: {
@@ -1349,7 +1411,11 @@ export interface components {
             total: number;
         };
         TemplateBindingRequest: {
-            /** @description Parameters declared by the template. Secret parameters are supplied in clear text and returned by name only */
+            /**
+             * @description Parameters declared by the template, keyed by `name` from `GET /templates`. This is a full replacement: a parameter that is omitted takes the `default` reported there, so send back the whole `parameters` map read from the machine rather than only the field being changed.
+             *
+             *     Secret parameters are the one exception, because they are never returned and so cannot be sent back. Omit one to keep the value already stored, and supply it only to replace it. An empty or blank value counts as omitted.
+             */
             parameters?: {
                 [key: string]: string;
             };
@@ -2613,6 +2679,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TopItemListResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateCatalogResponseBody"];
                 };
             };
             /** @description Error */
