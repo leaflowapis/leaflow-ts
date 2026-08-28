@@ -86,9 +86,17 @@ export type CancelSubscriptionQuery =
 export type ReadTopUpResult =
   operations["read-top-up"]["responses"][200]["content"]["application/json"];
 
+/** `GET /account/v1/billing-accounts/{accountKey}/card` 成功时的响应体。 */
+export type ReadPaymentMethodResult =
+  operations["read-payment-method"]["responses"][200]["content"]["application/json"];
+
 /** `POST /account/v1/billing-accounts/{accountKey}/card` 成功时的响应体。 */
 export type StartCardSetupResult =
   operations["start-card-setup"]["responses"][200]["content"]["application/json"];
+
+/** `POST /account/v1/billing-accounts/{accountKey}/billing-portal` 成功时的响应体。 */
+export type StartBillingPortalResult =
+  operations["start-billing-portal"]["responses"][200]["content"]["application/json"];
 
 /** `GET /account/v1/billing-accounts/{accountKey}/offers` 成功时的响应体。 */
 export type ListOffersResult =
