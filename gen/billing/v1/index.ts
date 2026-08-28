@@ -20,6 +20,23 @@ export type CreateBillingAccountBody = NonNullable<
   operations["create-billing-account"]["requestBody"]
 >["content"]["application/json"];
 
+/** `GET /account/v1/billing-accounts/{accountKey}` 成功时的响应体。 */
+export type GetBillingAccountResult =
+  operations["get-billing-account"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /account/v1/billing-accounts/{accountKey}` 成功时的响应体。 */
+export type UpdateBillingAccountResult =
+  operations["update-billing-account"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /account/v1/billing-accounts/{accountKey}` 的请求体。 */
+export type UpdateBillingAccountBody = NonNullable<
+  operations["update-billing-account"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /account/v1/billing-accounts/{accountKey}/credit-transactions` 成功时的响应体。 */
+export type ListCreditTransactionsResult =
+  operations["list-credit-transactions"]["responses"][200]["content"]["application/json"];
+
 /** `GET /account/v1/billing-accounts/{accountKey}/balance` 成功时的响应体。 */
 export type ReadBillingAccountBalanceResult =
   operations["read-billing-account-balance"]["responses"][200]["content"]["application/json"];
@@ -27,6 +44,10 @@ export type ReadBillingAccountBalanceResult =
 /** `PUT /account/v1/billing-accounts/{accountKey}/projects/{projectId}` 成功时的响应体。 */
 export type BindProjectToBillingAccountResult =
   operations["bind-project-to-billing-account"]["responses"][200]["content"]["application/json"];
+
+/** `GET /account/v1/billing-accounts/{accountKey}/top-ups` 成功时的响应体。 */
+export type ListTopUpsResult =
+  operations["list-top-ups"]["responses"][200]["content"]["application/json"];
 
 /** `POST /account/v1/billing-accounts/{accountKey}/top-ups` 成功时的响应体。 */
 export type StartTopUpResult =
