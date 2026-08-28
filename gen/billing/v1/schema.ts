@@ -371,7 +371,30 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Whether this account can be charged
+         * @description Answers whether a card is on file, and nothing else.
+         *
+         *     ## Why there is no brand, no last four digits, no expiry
+         *
+         *     Those would have to be read from the payment provider, and the two answers can disagree: a
+         *     card present at the provider that the billing engine has not recorded as the default is
+         *     exactly the state in which money cannot be collected — while a page built on the provider's
+         *     answer would be showing a card. What matters here is whether the party that will run the
+         *     charge believes it can, so the answer comes from that party alone.
+         *
+         *     To see the card, replace it, or remove it, open the billing portal.
+         *
+         *     ## Read this before offering a paid plan, not after
+         *
+         *     `ready` being false is why the engine refuses to start a paid subscription. Discovering it
+         *     at purchase time turns a missing card into a rejection whose wording is about something
+         *     else entirely.
+         *
+         *     An account that has never had a card returns `ready: false`. That is the normal state of a
+         *     new account, not an error.
+         */
+        get: operations["read-payment-method"];
         put?: never;
         /**
          * Add or replace the card on file
@@ -390,6 +413,41 @@ export interface paths {
          *     stops being used; nothing else about the account changes.
          */
         post: operations["start-card-setup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/billing-portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open the hosted billing portal
+         * @description Returns a URL to the payment provider's own portal, where the card can be replaced or
+         *     removed, the billing address changed, and past invoices downloaded.
+         *
+         *     ## Why replacing a card is not a form on this platform
+         *
+         *     A form would mean a card number field, and no card data ever reaches this platform. The
+         *     portal moves the whole interaction to the provider; only a session URL comes back.
+         *
+         *     ## Something has to be able to replace an expiring card
+         *
+         *     Cards expire. Once one does, the invoices for a plan stop being collectable, dunning runs
+         *     out, and the projects paid for by this account are suspended for non-payment. Without this
+         *     operation the account holder watches that happen with nowhere to fix it — adding a card
+         *     does not help, since that operation only makes sense when there is none.
+         *
+         *     The URL is single-use and expires. Do not store it.
+         */
+        post: operations["start-billing-portal"];
         delete?: never;
         options?: never;
         head?: never;
@@ -739,6 +797,28 @@ export interface components {
              * @description Send the browser here. It expires, so do not store it
              */
             url: string;
+        };
+        BillingPortalSession: {
+            /**
+             * Format: uri
+             * @description Send the browser here. It expires, so do not store it
+             */
+            url: string;
+        };
+        /** @description Whether money can be collected from this account */
+        PaymentMethod: {
+            /**
+             * @description True when the billing engine holds a default payment method for this account and can
+             *     therefore collect an invoice.
+             *
+             *     This is the precondition for a paid plan. While it is false, starting a paid
+             *     subscription is refused, and the refusal is about billing setup rather than about the
+             *     plan — so check this first and say what is actually missing.
+             *
+             *     A free plan does not require it, which is what allows a new account to be placed on the
+             *     default tier before anyone has entered a card.
+             */
+            ready: boolean;
         };
         TopUpSession: {
             /**
@@ -1442,6 +1522,41 @@ export interface operations {
             };
         };
     };
+    "read-payment-method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentMethod"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     "start-card-setup": {
         parameters: {
             query?: never;
@@ -1464,6 +1579,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CardSetupSession"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "start-billing-portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingPortalSession"];
                 };
             };
             /** @description Error */
