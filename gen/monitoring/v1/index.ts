@@ -129,6 +129,10 @@ export type ListProjectTopItemsResult =
 export type ListProjectTopItemsQuery =
   operations["list-project-top-items"]["parameters"]["query"];
 
+/** `GET /api/v1/templates` 成功时的响应体。 */
+export type ListTemplatesResult =
+  operations["list-templates"]["responses"][200]["content"]["application/json"];
+
 /** `GET /api/v1/servers` 成功时的响应体。 */
 export type ListServersResult =
   operations["list-servers"]["responses"][200]["content"]["application/json"];
