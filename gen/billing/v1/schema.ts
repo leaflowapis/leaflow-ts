@@ -364,7 +364,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/account/v1/billing-accounts/{accountKey}/card": {
+    "/account/v1/billing-accounts/{accountKey}/payment-method": {
         parameters: {
             query?: never;
             header?: never;
@@ -373,46 +373,58 @@ export interface paths {
         };
         /**
          * Whether this account can be charged
-         * @description Answers whether a card is on file, and nothing else.
+         * @description Answers whether a payment method is on file, and nothing else.
+         *
+         *     ## It is a payment method, not a card
+         *
+         *     A card is one kind. Direct debit and the recurring-payment mandates offered by regional
+         *     wallets are others, and they occupy the same slot: something the provider can charge later
+         *     without the account holder present. Naming the slot after cards would put an assumption
+         *     into the contract that stops being true the day a second kind is accepted.
          *
          *     ## Why there is no brand, no last four digits, no expiry
          *
          *     Those would have to be read from the payment provider, and the two answers can disagree: a
-         *     card present at the provider that the billing engine has not recorded as the default is
+         *     method present at the provider that the billing engine has not recorded as the default is
          *     exactly the state in which money cannot be collected — while a page built on the provider's
-         *     answer would be showing a card. What matters here is whether the party that will run the
+         *     answer would be showing one. What matters here is whether the party that will run the
          *     charge believes it can, so the answer comes from that party alone.
          *
-         *     To see the card, replace it, or remove it, open the billing portal.
+         *     To see it, replace it, or remove it, open the billing portal.
          *
          *     ## Read this before offering a paid plan, not after
          *
          *     `ready` being false is why the engine refuses to start a paid subscription. Discovering it
-         *     at purchase time turns a missing card into a rejection whose wording is about something
-         *     else entirely.
+         *     at purchase time turns a missing payment method into a rejection whose wording is about
+         *     something else entirely.
          *
-         *     An account that has never had a card returns `ready: false`. That is the normal state of a
+         *     An account that has never had one returns `ready: false`. That is the normal state of a
          *     new account, not an error.
          */
         get: operations["read-payment-method"];
         put?: never;
         /**
-         * Add or replace the card on file
-         * @description Begins adding a card. Returns a URL to send the browser to; the card is entered there, on the
-         *     payment provider's own page, and **no card data ever reaches this platform**.
+         * Add or replace the payment method on file
+         * @description Begins adding a payment method. Returns a URL to send the browser to; the details are
+         *     entered there, on the payment provider's own page, and **no card data ever reaches this
+         *     platform**.
+         *
+         *     Which kinds are offered is the provider's decision, not this API's — a card today, a
+         *     wallet mandate or a direct debit wherever the provider supports charging one later without
+         *     the account holder present.
          *
          *     ## This is a prerequisite for buying a plan, not a convenience
          *
-         *     A plan is charged by invoice, and the invoice is collected from the card on file. The billing
-         *     a subscription cannot start for an account that has none — so "add a card, then
+         *     A plan is charged by invoice, and the invoice is collected from the method on file. A
+         *     subscription cannot start for an account that has none — so "add a payment method, then
          *     buy" is the order the system requires, not a flow that was chosen.
          *
          *     It is *not* a prerequisite for topping up: a top-up collects the money there and then.
          *
-         *     Replacing the card uses the same operation. The new card becomes the default and the old one
-         *     stops being used; nothing else about the account changes.
+         *     Replacing uses the same operation. The new method becomes the default and the old one stops
+         *     being used; nothing else about the account changes.
          */
-        post: operations["start-card-setup"];
+        post: operations["start-payment-method-setup"];
         delete?: never;
         options?: never;
         head?: never;
@@ -791,7 +803,7 @@ export interface components {
              */
             offer_key?: string;
         };
-        CardSetupSession: {
+        PaymentMethodSetupSession: {
             /**
              * Format: uri
              * @description Send the browser here. It expires, so do not store it
@@ -805,7 +817,12 @@ export interface components {
              */
             url: string;
         };
-        /** @description Whether money can be collected from this account */
+        /**
+         * @description Whether money can be collected from this account later, without the account holder present.
+         *
+         *     Deliberately not called a card: a card is one kind of payment method, and direct debit and
+         *     the recurring mandates offered by regional wallets occupy the same slot.
+         */
         PaymentMethod: {
             /**
              * @description True when the billing engine holds a default payment method for this account and can
@@ -814,6 +831,9 @@ export interface components {
              *     This is the precondition for a paid plan. While it is false, starting a paid
              *     subscription is refused, and the refusal is about billing setup rather than about the
              *     plan — so check this first and say what is actually missing.
+             *
+             *     It says nothing about which kind is on file. To show or change that, send the account
+             *     holder to the billing portal.
              *
              *     A free plan does not require it, which is what allows a new account to be placed on the
              *     default tier before anyone has entered a card.
@@ -1557,7 +1577,7 @@ export interface operations {
             };
         };
     };
-    "start-card-setup": {
+    "start-payment-method-setup": {
         parameters: {
             query?: never;
             header?: never;
@@ -1578,7 +1598,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CardSetupSession"];
+                    "application/json": components["schemas"]["PaymentMethodSetupSession"];
                 };
             };
             /** @description Error */
