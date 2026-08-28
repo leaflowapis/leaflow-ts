@@ -39,6 +39,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/billing-accounts/{accountKey}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Read one of my billing accounts
+         * @description One account, with the projects it currently pays for.
+         *
+         *     The list returns the same objects, so this exists for the case the list cannot serve: a link
+         *     straight to one account. Making the caller fetch every account and filter turns a bookmarked
+         *     page into a request whose cost grows with how many accounts they hold.
+         */
+        get: operations["get-billing-account"];
+        /**
+         * Rename a billing account
+         * @description Changes the display name. Nothing else about the account can be changed here.
+         *
+         *     The key is not among the fields and never will be: ownership is stated by the key, and
+         *     invoices already issued refer to it. The name is what tells two accounts apart in a list, so
+         *     a mistake made while creating one is otherwise permanent.
+         */
+        put: operations["update-billing-account"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/credit-transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * How the balance got to where it is
+         * @description Every movement of credit on this account: what was added, what was spent, what expired, what
+         *     was voided. Newest first.
+         *
+         *     The balance on its own is a number with no account of itself. Asked why it is lower than
+         *     expected, it cannot answer, and the holder is left to guess between "I was charged" and
+         *     "something expired" — which lead to different next steps.
+         */
+        get: operations["list-credit-transactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/billing-accounts/{accountKey}/balance": {
         parameters: {
             query?: never;
@@ -91,7 +148,21 @@ export interface paths {
          */
         put: operations["bind-project-to-billing-account"];
         post?: never;
-        delete?: never;
+        /**
+         * Stop paying for a project
+         * @description Unbinds the project from this account. Nothing pays for it afterwards, and **everything in it
+         *     is refused admission** until some account takes it on — no new machines, no forwarded
+         *     requests.
+         *
+         *     That consequence is the reason this exists rather than an argument against it: a project
+         *     bound to the wrong account has no other way out, and moving it to another of the caller's
+         *     accounts is not a correction when the answer is that this account should not be paying for
+         *     it at all.
+         *
+         *     Charges already accrued stay where they are. They were incurred while this account held the
+         *     project, and an invoice has to keep pointing at what it was based on.
+         */
+        delete: operations["unbind-project-from-billing-account"];
         options?: never;
         head?: never;
         patch?: never;
@@ -104,7 +175,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * My top-ups
+         * @description Every top-up this account has made, newest first.
+         *
+         *     Reading one top-up requires already holding its identifier, and the only place that
+         *     identifier appears is the redirect that started it — so without this list a top-up becomes
+         *     unfindable the moment the browser tab is closed, which is exactly when somebody wants to
+         *     check whether their money arrived.
+         */
+        get: operations["list-top-ups"];
         put?: never;
         /**
          * Start a top-up
@@ -486,6 +566,43 @@ export interface components {
              */
             one_time?: boolean;
         };
+        UpdateBillingAccountRequestBody: {
+            display_name: string;
+        };
+        TopUpList: {
+            top_ups: components["schemas"]["TopUpStatus"][];
+        };
+        CreditTransactionList: {
+            transactions: components["schemas"]["CreditTransaction"][];
+        };
+        /**
+         * @description One movement of credit. Immutable — a correction is another movement, never an edit of this
+         *     one, which is what lets the balance be recomputed from the list at any time
+         */
+        CreditTransaction: {
+            id: string;
+            type: components["schemas"]["CreditTransactionType"];
+            /** @description A decimal string. Never a float — a balance that rounds is a balance that drifts */
+            amount: string;
+            currency: string;
+            /**
+             * Format: date-time
+             * @description When it landed on the ledger, which is not always when it was requested
+             */
+            booked_at: string;
+            /**
+             * @description What the balance became. Recorded by the metering engine rather than recomputed here —
+             *     recomputing assumes our understanding of the burn-down order matches its own, and this
+             *     is its own account of it
+             */
+            balance_after: string;
+        };
+        /**
+         * @description `funded` is credit arriving, `consumed` is it being spent, `expired` is a grant reaching the
+         *     end of its life unspent, and `voided` is one cancelled — a refund, or a correction
+         * @enum {string}
+         */
+        CreditTransactionType: "funded" | "consumed" | "expired" | "voided";
         /**
          * @description What a top-up bundle costs and what it grants. Present only on offers that sell credit.
          *
@@ -819,6 +936,115 @@ export interface operations {
             };
         };
     };
+    "get-billing-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingAccount"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "update-billing-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBillingAccountRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingAccount"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-credit-transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditTransactionList"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     "read-billing-account-balance": {
         parameters: {
             query?: never;
@@ -878,6 +1104,76 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectBinding"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "unbind-project-from-billing-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+                /** @description The project to stop paying for */
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unbound */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-top-ups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopUpList"];
                 };
             };
             /** @description Error */
