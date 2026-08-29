@@ -11,6 +11,10 @@ import type { operations } from "./schema.js";
 export type GetSettingsResult =
   operations["get-settings"]["responses"][200]["content"]["application/json"];
 
+/** `GET /account/v1/locales` 成功时的响应体。 */
+export type ListLocalesResult =
+  operations["list-locales"]["responses"][200]["content"]["application/json"];
+
 /** `GET /account/v1/agreements` 成功时的响应体。 */
 export type ListAgreementsResult =
   operations["list-agreements"]["responses"][200]["content"]["application/json"];
@@ -40,6 +44,15 @@ export type RegisterBody = NonNullable<
 /** `GET /account/v1/me` 成功时的响应体。 */
 export type GetAccountResult =
   operations["get-account"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /account/v1/me` 成功时的响应体。 */
+export type UpdateAccountResult =
+  operations["update-account"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /account/v1/me` 的请求体。 */
+export type UpdateAccountBody = NonNullable<
+  operations["update-account"]["requestBody"]
+>["content"]["application/json"];
 
 /** `GET /account/v1/me/identity-verification` 成功时的响应体。 */
 export type GetIdentityVerificationResult =
