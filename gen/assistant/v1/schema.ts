@@ -1328,7 +1328,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/octet-stream": string;
+                "*/*": string;
             };
         };
         responses: {
