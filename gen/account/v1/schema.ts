@@ -493,10 +493,24 @@ export interface components {
         GrantResource: {
             admin: boolean;
             owner: boolean;
-            /** @description 持有的全部自定义角色的权限并集，已去重排序 */
-            permissions: string[] | null;
             /** @description 持有的角色编码，只用于展示 */
             roles: string[] | null;
+            /** @description 他全部策略编译出来的规则。**不要自己遍历它做判定**——拿它配上自己那份权限目录交给 pkg/rbac：那里面的顺序（所有者不可被 deny、deny 优先于管理员、带资源范围的规则不 参与项目级判定）每一条都对着一种会静默放行的写法。 */
+            rules: components["schemas"]["RuleResource"][] | null;
+        };
+        ResourceRefResource: {
+            /** @description 是字符串而不是 uuid：dns 的 zone 标识是一个域名，而且它根本不在 IAM 的库里。匹配 语义是 glob，所以 *.example.com 能表达一批子域名；uuid 和域名都不含 glob 元字符， 对它们来说这就是精确相等。 */
+            id: string;
+            /** @description 形如 compute:instance、dns:zone，和权限名同一个命名空间 */
+            type: string;
+        };
+        RuleResource: {
+            /** @enum {string} */
+            effect: "allow" | "deny";
+            /** @description 支持尾部通配（compute:instance.*），通配必须带服务前缀 */
+            permissions: string[] | null;
+            /** @description 为空表示这条规则在整个项目范围内成立；非空则表示它只在这些资源上成立，而那意味着 它回答不了项目级的问题。 */
+            resources: components["schemas"]["ResourceRefResource"][] | null;
         };
         ProjectAccessResource: {
             grant: components["schemas"]["GrantResource"];
