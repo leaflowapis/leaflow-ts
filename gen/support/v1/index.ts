@@ -82,9 +82,9 @@ export type UploadAttachmentResult =
 export type UploadAttachmentQuery =
   operations["upload-attachment"]["parameters"]["query"];
 
-/** `GET /api/v1/attachments/{attachmentId}/download-url` 成功时的响应体。 */
-export type DescribeAttachmentDownloadResult =
-  operations["describe-attachment-download"]["responses"][200]["content"]["application/json"];
+/** `GET /api/v1/attachments/{attachmentId}/content` 的查询参数。 */
+export type DownloadAttachmentQuery =
+  operations["download-attachment"]["parameters"]["query"];
 
 /** `GET /api/v1/maintenances` 成功时的响应体。 */
 export type ListMaintenancesResult =
