@@ -45,6 +45,14 @@ export type ReadBillingAccountBalanceResult =
 export type BindProjectToBillingAccountResult =
   operations["bind-project-to-billing-account"]["responses"][200]["content"]["application/json"];
 
+/** `GET /account/v1/billing-accounts/{accountKey}/orders` 成功时的响应体。 */
+export type ListOrdersResult =
+  operations["list-orders"]["responses"][200]["content"]["application/json"];
+
+/** `GET /account/v1/billing-accounts/{accountKey}/orders/{orderId}` 成功时的响应体。 */
+export type GetOrderResult =
+  operations["get-order"]["responses"][200]["content"]["application/json"];
+
 /** `GET /account/v1/billing-accounts/{accountKey}/top-ups` 成功时的响应体。 */
 export type ListTopUpsResult =
   operations["list-top-ups"]["responses"][200]["content"]["application/json"];
