@@ -78,6 +78,15 @@ export type ListInvoicesResult =
 export type GetInvoiceResult =
   operations["get-invoice"]["responses"][200]["content"]["application/json"];
 
+/** `POST /account/v1/projects/{projectId}/quote` 成功时的响应体。 */
+export type QuoteProjectUsageResult =
+  operations["quote-project-usage"]["responses"][200]["content"]["application/json"];
+
+/** `POST /account/v1/projects/{projectId}/quote` 的请求体。 */
+export type QuoteProjectUsageBody = NonNullable<
+  operations["quote-project-usage"]["requestBody"]
+>["content"]["application/json"];
+
 /** `POST /account/v1/billing-accounts/{accountKey}/quote` 成功时的响应体。 */
 export type QuoteUsageResult =
   operations["quote-usage"]["responses"][200]["content"]["application/json"];
