@@ -28,6 +28,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/locales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 注册页要用的国家/地区和语言清单
+         * @description 免认证：注册页在还没有账号的时候就要画出这两个下拉框。
+         *     国家名和排序都跟着 `Accept-Language` 走——一个英文用户看到的是 China 而不是「中国」， 而顺序按那种语言自己的规则（中文按拼音，英文按字母），不是按码点。头缺失时用简体中文。
+         *     清单来自 CLDR，不是我们自己维护的一份：ISO 3166 每年都改，而抄下来的那份不会跟着改。 已经退役的代码（苏联、南斯拉夫）和不是地方的代码（欧盟、联合国）都不在里面。
+         */
+        get: operations["list-locales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/agreements": {
         parameters: {
             query?: never;
@@ -115,7 +137,11 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * 改当前账号的国家/地区和语言
+         * @description 姓名和邮箱不在这里改：它们来自身份提供方，改了会在下一次登录同步时被覆盖回去。
+         */
+        patch: operations["update-account"];
         trace?: never;
     };
     "/account/v1/me/identity-verification": {
@@ -340,6 +366,10 @@ export interface components {
             id: string;
             /** @description 来自登录信息，可能为空 */
             last_name: string;
+            /** @description ISO 3166-1 alpha-2。这两个字段是后加的，注册时才开始要求填——已经注册过的人这里 是空串，让他们在设置里补，补之前一切照常。 */
+            country?: string;
+            /** @description 为空表示没设过，那时按请求头（Accept-Language）走，两者都没有才用平台默认 */
+            locale?: string;
             pending_agreements: components["schemas"]["AgreementResource"][] | null;
             /** @enum {string} */
             status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING";
@@ -347,6 +377,35 @@ export interface components {
         RegisterRequestBody: {
             /** @description 当前生效的必签文件全部要在里面，版本号要和 GET /api/v1/agreements 给的一致 */
             consents: components["schemas"]["ConsentBody"][] | null;
+            /** @description ISO 3166-1 alpha-2（CN、HK、US）。必须是现实世界里真实存在的国家或地区——EU、ZZ 这类在标准里有位置但不是国家的代码会被拒。存代码不存名字：名字是本地化的，存下来 的那份只会是某一种语言的。 */
+            country: string;
+            locale: components["schemas"]["Locale"];
+        };
+        LocaleOptionsResource: {
+            countries: components["schemas"]["CountryOption"][];
+            languages: components["schemas"]["LanguageOption"][];
+        };
+        CountryOption: {
+            /** @description ISO 3166-1 alpha-2，注册时原样回传 */
+            code: string;
+            /** @description 按 Accept-Language 渲染的名字 */
+            name: string;
+        };
+        LanguageOption: {
+            code: components["schemas"]["Locale"];
+            /** @description 这种语言的自称，用它自己写（「简体中文」「繁體中文（香港）」「English」）。不跟着 Accept-Language 变——一个只看得懂繁体的人，在一个全简体的列表里找不到自己那一项。 */
+            name: string;
+        };
+        /**
+         * @description 界面和邮件用哪种语言。它和 country 是两件事，不能互相推——一个在香港的人可能读简体， 一个在美国的人可能读繁体。
+         * @enum {string}
+         */
+        Locale: "zh-Hans" | "zh-Hant-HK" | "en";
+        /** @description 两个字段都是「不传就不动」。设置页上它们是两个独立的控件，用户可能只改其中一个；做成 整体替换的话，一次只想改语言的提交会把国家清掉，而那种丢失不报错。 */
+        UpdateAccountRequestBody: {
+            /** @description 同注册时那个 country */
+            country?: string;
+            locale?: components["schemas"]["Locale"];
         };
         IdentityVerificationResource: {
             reject_reason: string;
@@ -524,6 +583,35 @@ export interface operations {
             };
         };
     };
+    "list-locales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocaleOptionsResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     "list-agreements": {
         parameters: {
             query?: never;
@@ -656,6 +744,39 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "update-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAccountRequestBody"];
+            };
+        };
         responses: {
             /** @description OK */
             200: {
