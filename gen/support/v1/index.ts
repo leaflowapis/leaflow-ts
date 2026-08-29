@@ -86,26 +86,6 @@ export type UploadAttachmentQuery =
 export type DescribeAttachmentDownloadResult =
   operations["describe-attachment-download"]["responses"][200]["content"]["application/json"];
 
-/** `GET /api/v1/announcements` 成功时的响应体。 */
-export type ListAnnouncementsResult =
-  operations["list-announcements"]["responses"][200]["content"]["application/json"];
-
-/** `GET /api/v1/announcements` 的查询参数。 */
-export type ListAnnouncementsQuery =
-  operations["list-announcements"]["parameters"]["query"];
-
-/** `GET /api/v1/announcements/unread-count` 成功时的响应体。 */
-export type CountUnreadAnnouncementsResult =
-  operations["count-unread-announcements"]["responses"][200]["content"]["application/json"];
-
-/** `GET /api/v1/announcements/{announcementId}` 成功时的响应体。 */
-export type GetAnnouncementResult =
-  operations["get-announcement"]["responses"][200]["content"]["application/json"];
-
-/** `POST /api/v1/announcements/{announcementId}/read` 成功时的响应体。 */
-export type MarkAnnouncementReadResult =
-  operations["mark-announcement-read"]["responses"][200]["content"]["application/json"];
-
 /** `GET /api/v1/maintenances` 成功时的响应体。 */
 export type ListMaintenancesResult =
   operations["list-maintenances"]["responses"][200]["content"]["application/json"];
