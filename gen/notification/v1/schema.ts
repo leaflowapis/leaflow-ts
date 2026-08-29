@@ -135,6 +135,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List platform announcements
+         * @description Announcements the platform published for everyone, filtered to the ones you can still see:
+         *     published, not expired, and targeted at you.
+         *
+         *     They are not part of `GET /api/v1/notifications`. A notification is addressed to you and has
+         *     a row per recipient; an announcement is one row for the whole platform and never fans out —
+         *     a hundred thousand users would be a hundred thousand rows, and almost none of them would
+         *     ever be read. Whether you have read one is recorded separately, so unread means "no such
+         *     record" rather than "a record with a null timestamp".
+         *
+         *     The list is short by design: expired announcements drop out of it. There is no paging.
+         *
+         *     Text comes back in the language on your preferences. An announcement that has no text in
+         *     that language falls back to the platform default — a readable announcement in the wrong
+         *     language beats a blank title.
+         */
+        get: operations["list-announcements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/announcements/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark every visible announcement as read
+         * @description Idempotent. Announcements you had already read stay read, and the count only covers the ones this call changed.
+         */
+        post: operations["read-all-announcements"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/announcements/{announcementId}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark one announcement as read
+         * @description Idempotent: marking one twice is the same as marking it once. There is no way to mark it
+         *     unread — having read something is a fact, not a state.
+         */
+        post: operations["read-announcement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notification-types": {
         parameters: {
             query?: never;
@@ -526,6 +600,38 @@ export interface components {
          * @enum {string}
          */
         NotificationAudience: "explicit" | "account" | "address" | "project_members" | "project_owner" | "project_admins" | "broadcast";
+        /** @description One announcement, with its text in the language on your preferences. */
+        AnnouncementResource: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** @description The text as a fragment of HTML, same rules as a notification body */
+            body: string;
+            severity: components["schemas"]["NotificationSeverity"];
+            /** @description You cannot dismiss this one. It is a property of the announcement rather than a second type, because what the operator judges when writing it is "is this important enough to push", and that is the question this asks. */
+            critical: boolean;
+            /** Format: date-time */
+            published_at: string;
+            /**
+             * Format: date-time
+             * @description When it drops out of this list; null means it stays
+             */
+            expires_at?: string | null;
+            /**
+             * Format: date-time
+             * @description When you read it; null means you have not
+             */
+            read_at?: string | null;
+        };
+        AnnouncementListResource: {
+            items: components["schemas"]["AnnouncementResource"][];
+            /** @description How many of them you have not read */
+            unread: number;
+        };
+        AnnouncementReadResultResource: {
+            /** @description How many this call changed; already-read ones are not counted */
+            marked: number;
+        };
         /**
          * @description One notification, with its text rendered in the language on your preferences at the moment
          *     it was read.
@@ -1057,6 +1163,93 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["NotificationResource"];
                 };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnouncementListResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "read-all-announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnouncementReadResultResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "read-announcement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                announcementId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Error */
             default: {
