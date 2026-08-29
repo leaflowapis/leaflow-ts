@@ -327,6 +327,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/billing-accounts/{accountKey}/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * What a usage would cost on this account's plan
+         * @description Prices a set of usages against whatever plan this account is currently on, and returns **every
+         *     intermediate step** rather than a single number.
+         *
+         *     # What it is for
+         *
+         *     Showing someone what a machine will cost before they create it. The console asks for the usage a
+         *     machine of that shape produces in an hour, and gets back what that hour costs them — on their
+         *     plan, with their discounts.
+         *
+         *     # Quantities are raw
+         *
+         *     Seconds, token counts, GiB-seconds: the amount a service reports. Conversion happens here, which
+         *     is why services keep no conversion tables of their own and why the console must not do the
+         *     arithmetic itself.
+         *
+         *     # It is an estimate
+         *
+         *     The engine computes the real amount; this reproduces the same rules. Every step comes back for
+         *     that reason — a single number that disagrees with the bill says nothing about which step was
+         *     wrong.
+         *
+         *     `404` means this account is not on any plan, and there is therefore nothing to price against.
+         */
+        post: operations["quote-usage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/billing-accounts/{accountKey}/subscription": {
         parameters: {
             query?: never;
@@ -593,6 +634,95 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * @description The usages to price. Quantities are the **raw amounts a service reports** — seconds, token
+         *     counts, GiB-seconds. Conversion happens on the billing side, which is why services keep no
+         *     conversion tables of their own.
+         */
+        QuoteRequest: {
+            lines: components["schemas"]["QuoteUsage"][];
+        };
+        /**
+         * @description One usage to price. Name the thing **either** by its rate card key **or** by the service and
+         *     product it belongs to — exactly one of the two.
+         *
+         *     # Why the second form exists
+         *
+         *     A meter's key is a hash of `(service, product_id, variant)`, computed by a function that lives in
+         *     one place on purpose: get it wrong and usage lands in the wrong bucket, or in none, and nothing
+         *     reports it. A caller that derived the key itself would be a second copy of that convention.
+         *
+         *     So callers that know what they are buying — a machine of a given type, a model's input tokens —
+         *     give the service and product, and this side derives the key.
+         */
+        QuoteUsage: {
+            /**
+             * @description The rate card's key. For a card tied to a meter that is the meter's key, because the engine
+             *     requires the two to be identical.
+             *
+             *     Leave it out when giving `service` and `product_id` instead
+             */
+            key?: string;
+            /** @description The service that owns the product, as it appears in its usage events */
+            service?: string;
+            /** @description That service's own catalogue id for the thing being bought */
+            product_id?: string;
+            /**
+             * @description The fixed dimension values that split one product into several meters — canopy's token kind,
+             *     for instance. Part of the key, so leaving it out names a different meter
+             */
+            variant?: {
+                [key: string]: string;
+            };
+            /** @description The raw amount, before any conversion. A decimal string */
+            quantity: string;
+        };
+        /**
+         * @description One rate card priced, with every intermediate step.
+         *
+         *     Each step is here on purpose: a single total that disagrees with the bill says nothing about
+         *     which step went wrong, and this is a second implementation of the engine's rules
+         */
+        QuoteLine: {
+            key: string;
+            name: string;
+            /** @description False for a flat fee, which ignores usage entirely */
+            metered: boolean;
+            /** @description The quantity as given */
+            raw: string;
+            /** @description After unit conversion, before rounding */
+            converted: string;
+            /**
+             * @description After rounding. `unit_config.rounding` applies to this step only — entitlement uses the
+             *     exact converted value, which is the engine's documented behaviour
+             */
+            billable: string;
+            /** @description Units covered by the usage discount */
+            free_units: string;
+            charged: string;
+            unit_price: string;
+            /** @description Before the percentage discount */
+            gross: string;
+            discount: string;
+            /**
+             * @description Rounded to the currency's minor unit, **per line**. Not by rounding the sum: the engine
+             *     rounds each line, and the difference grows with the number of lines
+             */
+            total: string;
+        };
+        Quote: {
+            lines: components["schemas"]["QuoteLine"][];
+            /** @description The sum of the already-rounded lines */
+            total: string;
+            /**
+             * @description Keys that were given a usage but have no rate card on this plan.
+             *
+             *     **Reported rather than ignored**, because ignoring them yields a smaller but entirely
+             *     normal-looking number — and that is the most expensive misconfiguration there is: usage
+             *     lands, the usage chart shows it, and the bill has no line for it
+             */
+            unpriced?: string[];
+        };
         /**
          * @description When a plan change takes effect. There is no default: an upgrade and a downgrade want opposite
          *     answers, and the difference is money
@@ -1568,6 +1698,45 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InvoiceDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "quote-usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
                 };
             };
             /** @description Error */
