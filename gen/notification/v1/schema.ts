@@ -276,11 +276,78 @@ export interface paths {
          * Update your delivery preferences
          * @description Fields that are omitted are left alone.
          *
-         *     Setting `email_override` starts verification of that address: email continues to be
-         *     delivered to the address on the account until the new one is confirmed. Setting it to null
-         *     returns delivery to the account address.
+         *     Setting `email_override` records it as the pending address; nothing is sent to it until
+         *     `send-email-override-code` is called, and email keeps going where it went before. Setting
+         *     it to null clears the pending address and any address in use, returning delivery to the
+         *     account address.
+         *
+         *     An address is never used until somebody proves they can read it. Without that, anybody
+         *     could point their own notifications at a stranger's mailbox, and the stranger would get
+         *     mail about an account they have never heard of.
          */
         patch: operations["update-notification-preferences"];
+        trace?: never;
+    };
+    "/api/v1/preferences/email-override/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a code to the pending address
+         * @description Emails a short code to the address waiting to be confirmed. That address receives this and
+         *     nothing else; every other notification keeps going where it went before.
+         *
+         *     The code stops working after a few minutes, and a wrong one can only be tried a handful of
+         *     times before it is thrown away and a new one has to be sent. Both limits exist for the same
+         *     reason: a six digit code is guessable if it lives forever and can be tried forever.
+         *
+         *     Sending is rate limited per account and per destination address. The second limit is the one
+         *     that matters to somebody who never asked to be involved: without it, this operation is a way
+         *     to make the platform mail a stranger repeatedly.
+         */
+        post: operations["send-email-override-code"];
+        /**
+         * Give up on the pending address
+         * @description Drops the pending address and the code that was sent to it. Nothing else changes: an address
+         *     that was already confirmed keeps receiving email.
+         *
+         *     It exists because starting this and then changing your mind is ordinary, and the alternative
+         *     is a settings page that shows an address waiting to be confirmed forever.
+         */
+        delete: operations["cancel-email-override"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/preferences/email-override/code/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm the pending address with its code
+         * @description A correct code moves the pending address into use: email starts going there instead of the
+         *     account address, and the pending slot is emptied.
+         *
+         *     A wrong code counts against the attempts on that code. Running out of attempts throws the
+         *     code away, and a new one has to be sent; the pending address itself is kept, so nobody
+         *     loses their place by mistyping.
+         */
+        post: operations["confirm-email-override"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/preferences/types": {
@@ -757,11 +824,26 @@ export interface components {
         PreferencesResource: {
             /** @description Where email is delivered right now, which is the account address unless a verified override replaces it */
             email_address: string;
-            /** @description An address to receive email instead of the account address; null when the account address is used */
+            /**
+             * @description The address email goes to instead of the account address; null when the account address
+             *     is used. Only ever an address that was confirmed by code
+             */
             email_override: string | null;
             /**
+             * @description An address waiting to be confirmed; null when nothing is waiting. It receives nothing but
+             *     the code, and the address in `email_override` keeps being used until this one is
+             *     confirmed
+             */
+            email_override_pending: string | null;
+            /**
              * Format: date-time
-             * @description When the override was confirmed; null while it is pending, during which email still goes to the account address
+             * @description When the code last sent to the pending address stops working; null when no code is
+             *     outstanding, in which case a new one has to be sent before it can be confirmed
+             */
+            email_override_pending_expires_at: string | null;
+            /**
+             * Format: date-time
+             * @description When the address in `email_override` was confirmed; null when there is no override
              */
             email_override_verified_at: string | null;
             /** @description The language notifications are written in, as an IETF language tag */
@@ -769,10 +851,35 @@ export interface components {
         };
         /** @description Fields that are omitted are left alone. */
         UpdatePreferencesRequestBody: {
-            /** @description An address to receive email instead of the account address. Null returns delivery to the account address */
+            /**
+             * @description An address to receive email instead of the account address. It is stored as pending and
+             *     receives nothing until it is confirmed by code, so the address in use does not change
+             *     here. Null clears both the pending address and the one in use, returning delivery to
+             *     the account address
+             */
             email_override?: string | null;
             /** @description An IETF language tag. A language that is not supported is rejected rather than approximated */
             locale?: string;
+        };
+        /** @description What was sent, and when the next one may be asked for. */
+        EmailOverrideCodeResource: {
+            /** @description Where the code went. It is the pending address, echoed so a client can show it */
+            address: string;
+            /**
+             * Format: date-time
+             * @description When this code stops working
+             */
+            expires_at: string;
+            /**
+             * Format: date-time
+             * @description The earliest another code may be asked for. Asking sooner is refused rather than
+             *     silently ignored, so a client can show the wait instead of a failure
+             */
+            resend_available_at: string;
+        };
+        ConfirmEmailOverrideRequestBody: {
+            /** @description The code from the email, exactly as it appears there */
+            code: string;
         };
         TypePreferenceResource: {
             /** @description Where this type is delivered */
@@ -1413,6 +1520,97 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["UpdatePreferencesRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "send-email-override-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailOverrideCodeResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "cancel-email-override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "confirm-email-override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmEmailOverrideRequestBody"];
             };
         };
         responses: {

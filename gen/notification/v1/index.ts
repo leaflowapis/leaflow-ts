@@ -77,6 +77,23 @@ export type UpdateNotificationPreferencesBody = NonNullable<
   operations["update-notification-preferences"]["requestBody"]
 >["content"]["application/json"];
 
+/** `POST /api/v1/preferences/email-override/code` 成功时的响应体。 */
+export type SendEmailOverrideCodeResult =
+  operations["send-email-override-code"]["responses"][200]["content"]["application/json"];
+
+/** `DELETE /api/v1/preferences/email-override/code` 成功时的响应体。 */
+export type CancelEmailOverrideResult =
+  operations["cancel-email-override"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/preferences/email-override/code/confirm` 成功时的响应体。 */
+export type ConfirmEmailOverrideResult =
+  operations["confirm-email-override"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/preferences/email-override/code/confirm` 的请求体。 */
+export type ConfirmEmailOverrideBody = NonNullable<
+  operations["confirm-email-override"]["requestBody"]
+>["content"]["application/json"];
+
 /** `GET /api/v1/preferences/types` 成功时的响应体。 */
 export type ListTypePreferencesResult =
   operations["list-type-preferences"]["responses"][200]["content"]["application/json"];
