@@ -327,6 +327,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/projects/{projectId}/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * What a usage would cost in this project
+         * @description Prices a set of usages against whatever plan pays for this project, and returns **every
+         *     intermediate step** rather than a single number.
+         *
+         *     # Why by project rather than by billing account
+         *
+         *     The page that needs this is the one where somebody is about to create a machine, and all it has
+         *     is a project. Which account pays for that project is billing's own bookkeeping — asking the
+         *     caller to resolve it first would put that mapping into a page that otherwise has no business
+         *     knowing accounts exist.
+         *
+         *     # Quantities are raw
+         *
+         *     Seconds, token counts, GiB-seconds: the amount a service reports. Conversion happens here, which
+         *     is why services keep no conversion tables of their own and why the caller must not do the
+         *     arithmetic itself.
+         *
+         *     Name each usage by `service` and `product_id` rather than by key: the key is a hash of a
+         *     convention that has exactly one implementation on purpose.
+         *
+         *     # It is an estimate
+         *
+         *     The engine computes the real amount; this reproduces the same rules. Every step comes back for
+         *     that reason — a single number that disagrees with the bill says nothing about which step was
+         *     wrong.
+         *
+         *     `404` means the project has no billing account, or its account is on no plan. Both are worth
+         *     showing: nothing can be created in either case, because admission refuses it.
+         */
+        post: operations["quote-project-usage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/billing-accounts/{accountKey}/quote": {
         parameters: {
             query?: never;
@@ -1698,6 +1744,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InvoiceDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "quote-project-usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuoteRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
                 };
             };
             /** @description Error */
