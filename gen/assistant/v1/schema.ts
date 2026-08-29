@@ -456,12 +456,24 @@ export interface paths {
         get: operations["get-thread"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete a conversation
+         * @description Removes the conversation from every list and makes it unreachable by id. The assistant can no longer find it either — neither by searching past conversations nor by reading one back.
+         *
+         *     Deleting is not the same as archiving, and the two are not degrees of the same thing. An archived conversation is still there and still readable, it just takes no new input; a deleted one is gone from view. Archiving can be undone; this cannot.
+         *
+         *     What survives is the record itself, because a conversation with this assistant is an account of what was done to real infrastructure — which machine was changed, which disk was removed. That record is kept even though nobody can reach it here.
+         *
+         *     Fails while a turn is running: stop it first. Deleting an already deleted conversation succeeds and changes nothing.
+         */
+        delete: operations["delete-thread"];
         options?: never;
         head?: never;
         /**
          * Update conversation settings
-         * @description Changes the approval mode and archived state. A change takes effect from the next turn; a turn already running keeps the settings it started with.
+         * @description Changes the title, the approval mode, and whether the conversation is archived. A change to the approval mode takes effect from the next turn; a turn already running keeps the settings it started with.
+         *
+         *     Archiving makes a conversation read-only: it stays in the list under "archived", stays readable, and the assistant can still find it when it searches past conversations — it just takes no new input. Unarchive it to continue. Archiving fails while a turn is running; stop it first.
          */
         patch: operations["update-thread"];
         trace?: never;
@@ -2256,6 +2268,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["DocumentResource"];
                 };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "delete-thread": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                thread: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Error */
             default: {
