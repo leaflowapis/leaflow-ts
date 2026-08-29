@@ -12,16 +12,15 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List announcements and maintenance in effect right now
-         * @description Returns the announcements published for general visibility and the maintenance windows that
-         *     have not finished yet.
+         * List the maintenance in effect right now
+         * @description Returns the maintenance windows that have not finished yet.
          *
          *     **This operation requires no credentials.** It is intended for sign-in pages and status
          *     pages, which are reached before a project has been selected. It returns a narrower shape
          *     than the authenticated operations and is not paginated.
          *
-         *     Announcements appear here only when an operator has published them for general visibility;
-         *     the authenticated `GET /api/v1/announcements` returns more of them.
+         *     Platform announcements are not served here. They belong to the notification service, which
+         *     owns announcements for the whole platform.
          */
         get: operations["list-notices"];
         put?: never;
@@ -227,90 +226,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/announcements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List announcements
-         * @description Returns the announcements in effect for the current user, most recently published first.
-         *     Announcements that are scheduled but not yet published, and those that have expired, are
-         *     omitted.
-         *
-         *     `read_at` is null when this user has not marked the announcement as read.
-         */
-        get: operations["list-announcements"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/announcements/unread-count": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Count the announcements this user has not read */
-        get: operations["count-unread-announcements"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/announcements/{announcementId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get an announcement
-         * @description Returns 404 for an announcement that is not in effect for this user.
-         */
-        get: operations["get-announcement"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/announcements/{announcementId}/read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Mark an announcement as read
-         * @description Marking an announcement that is already marked succeeds and changes nothing; `read_at` keeps
-         *     its original value.
-         *
-         *     Read state is per person, not per project.
-         */
-        post: operations["mark-announcement-read"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/maintenances": {
         parameters: {
             query?: never;
@@ -405,11 +320,6 @@ export interface components {
          */
         TicketAuthorType: "USER" | "OPERATOR";
         /**
-         * @description How prominently an announcement should be presented.
-         * @enum {string}
-         */
-        AnnouncementSeverity: "INFO" | "WARNING" | "CRITICAL";
-        /**
          * @description `SCHEDULED` has been announced but has not started. `IN_PROGRESS` is under way. `COMPLETED`
          *     has finished. `CANCELLED` was announced and then called off, and never took place.
          * @enum {string}
@@ -491,22 +401,6 @@ export interface components {
             /** Format: int64 */
             score: number;
         };
-        /** @description A platform announcement. */
-        AnnouncementResource: {
-            /** @description Markdown */
-            body: string;
-            /** Format: uuid */
-            id: string;
-            /** Format: date-time */
-            published_at: string;
-            /**
-             * Format: date-time
-             * @description When this user marked the announcement as read; null when they have not
-             */
-            read_at: string | null;
-            severity: components["schemas"]["AnnouncementSeverity"];
-            title: string;
-        };
         /** @description A scheduled maintenance notice published by platform operators. */
         MaintenanceResource: {
             /** @description Markdown */
@@ -558,18 +452,7 @@ export interface components {
          *     state.
          */
         NoticeResource: {
-            announcements: components["schemas"]["NoticeAnnouncementResource"][];
             maintenances: components["schemas"]["NoticeMaintenanceResource"][];
-        };
-        NoticeAnnouncementResource: {
-            /** @description Markdown */
-            body: string;
-            /** Format: uuid */
-            id: string;
-            /** Format: date-time */
-            published_at: string;
-            severity: components["schemas"]["AnnouncementSeverity"];
-            title: string;
         };
         NoticeMaintenanceResource: {
             /** @description Markdown */
@@ -595,10 +478,6 @@ export interface components {
             expires_at: string;
             /** @description A temporary address serving the file */
             url: string;
-        };
-        UnreadCountResource: {
-            /** Format: int64 */
-            count: number;
         };
         CreateTicketRequestBody: {
             /** @description Attachments to reference from the first message. Each must have been uploaded in this project and not yet referenced */
@@ -653,16 +532,6 @@ export interface components {
         LengthAwarePageTicketCategoryResource: {
             /** @description The contents of this page */
             items: components["schemas"]["TicketCategoryResource"][];
-            /** Format: int64 */
-            limit: number;
-            /** Format: int64 */
-            offset: number;
-            /** Format: int64 */
-            total: number;
-        };
-        LengthAwarePageAnnouncementResource: {
-            /** @description The contents of this page */
-            items: components["schemas"]["AnnouncementResource"][];
             /** Format: int64 */
             limit: number;
             /** Format: int64 */
@@ -1090,131 +959,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AttachmentDownloadResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-announcements": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of items to return in this page */
-                limit?: number;
-                /** @description Number of items to skip */
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageAnnouncementResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "count-unread-announcements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UnreadCountResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-announcement": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                announcementId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AnnouncementResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "mark-announcement-read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                announcementId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AnnouncementResource"];
                 };
             };
             /** @description Error */
