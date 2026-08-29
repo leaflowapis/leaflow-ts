@@ -14,8 +14,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Upload an image
-         * @description The body is the file bytes themselves, not multipart, one file per request. The type is determined from the content, not from Content-Type. Put the returned id in attachmentIds when sending a message; attachments never referenced by any message are cleared periodically.
+         * Upload a file
+         * @description The body is the file bytes themselves, not multipart, one file per request. The kind is determined from the content, not from Content-Type or from the name. Put the returned id in attachmentIds when sending a message; attachments never referenced by any message are cleared periodically.
+         *
+         *     The returned `kind` says how the assistant will see it. An `image` is read directly, and only by models that accept image input. A small `text` file is placed inline in the message. A large `text` file, and anything `binary`, arrives as a reference the assistant reads on demand — for a binary that usually means downloading it onto one of the project's cloud instances.
          */
         post: operations["upload-attachment"];
         delete?: never;
@@ -32,8 +34,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Fetch an image
-         * @description Returns the original bytes for an attachment id, usable directly as the address of an <img>. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
+         * Download a file
+         * @description Returns the original bytes for an attachment id. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
+         *
+         *     Only an attachment whose `kind` is `image` comes back with its own image type and is usable as the address of an `<img>`. Everything else is served as `application/octet-stream` with `Content-Disposition: attachment`, deliberately: an uploaded file is arbitrary bytes under a name its uploader chose, and serving it back inline would run it on this origin.
          */
         get: operations["download-attachment"];
         put?: never;
@@ -613,11 +617,32 @@ export interface components {
             status: number;
         };
         UploadedResource: {
-            /** Format: int64 */
-            height: number;
+            /**
+             * Format: int64
+             * @description Size of what was stored. For an image that has been resized, this is the resized size, not what was uploaded.
+             */
+            byteSize: number;
+            filename: string;
+            /**
+             * Format: int64
+             * @description Null unless kind is image.
+             */
+            height: number | null;
             id: string;
-            /** Format: int64 */
-            width: number;
+            /**
+             * @description How the assistant will see this file.
+             *
+             *     - `image` — read directly, and only by models that accept image input
+             *     - `text` — placed inline in the message when small enough, otherwise read on demand
+             *     - `binary` — never read directly; the assistant downloads it onto a cloud instance to work with it
+             * @enum {string}
+             */
+            kind: "image" | "text" | "binary";
+            /**
+             * Format: int64
+             * @description Null unless kind is image.
+             */
+            width: number | null;
         };
         BindingResource: {
             /** Format: uuid */
@@ -935,7 +960,13 @@ export interface components {
         ContextResource: {
             /** Format: int64 */
             compactAt: number | null;
-            /** @description What kinds of input the model behind this conversation accepts, as modality names: text, image. A client uses this to decide whether a control exists — an attach button on a model that cannot read pictures is a control whose only outcome is a refusal, and the refusal arrives after somebody has chosen a file. An empty list is not a claim that the model reads nothing: it means this deployment has not stated the modalities, or the conversation names a model that has since been retired. Treat empty as unknown and keep the control, because hiding one for a reason nobody can see is worse than a refusal that says why. */
+            /**
+             * @description What kinds of input the model behind this conversation accepts, as modality names: text, image.
+             *
+             *     This governs images and nothing else. Text and binary attachments reach every model: a small text file is placed inline, a large one is read on demand, and a binary is downloaded onto a cloud instance — none of which asks the model to see a picture. So this decides whether pasting a screenshot does anything, not whether the attach control exists. Hiding file upload on a text-only model takes away something that would have worked.
+             *
+             *     An empty list is not a claim that the model reads nothing: it means this deployment has not stated the modalities, or the conversation names a model that has since been retired. Treat empty as unknown and keep the control, because hiding one for a reason nobody can see is worse than a refusal that says why.
+             */
             inputModalities: string[];
             model: string;
             /** Format: int64 */
@@ -952,10 +983,24 @@ export interface components {
         };
         AttachmentResource: {
             /** Format: int64 */
-            height: number;
+            byteSize: number;
+            filename: string;
+            /**
+             * Format: int64
+             * @description Null unless kind is image. Width and height are here so a client can hold the space before the image itself has loaded.
+             */
+            height: number | null;
             id: string;
-            /** Format: int64 */
-            width: number;
+            /**
+             * @description What this attachment is. A client renders an image in place and everything else as a file to download.
+             * @enum {string}
+             */
+            kind: "image" | "text" | "binary";
+            /**
+             * Format: int64
+             * @description Null unless kind is image.
+             */
+            width: number | null;
         };
         ItemResource: {
             /** @enum {string|null} */
@@ -994,8 +1039,8 @@ export interface components {
              * @description The content of this entry, in the order it was written. A message that is only text is a
              *     single part, which is most of them.
              *
-             *     An image belongs where it was written, so render these in order rather than putting
-             *     attachments at the end.
+             *     An attachment belongs where it was written, so render these in order rather than putting
+             *     them all at the end.
              */
             parts?: components["schemas"]["PartResource"][] | null;
             tool?: string | null;
@@ -1140,7 +1185,7 @@ export interface components {
          *     - `data-<something>` — context from the client, in `data`. The name after `data-` is yours;
          *       it is shown to the assistant so it can tell one kind of block from another.
          *
-         *     Order matters: an image belongs where it was written, not at the end.
+         *     Order matters: an attachment belongs where it was written, not at the end.
          */
         MessagePart: {
             /** @description For `file` parts. The attachment must have been uploaded and not yet bound to another message. */
@@ -1273,7 +1318,10 @@ export type $defs = Record<string, never>;
 export interface operations {
     "upload-attachment": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description The name to show and to give the assistant. Images do not need one; anything else does, because the name is most of what says what the file is. Falls back to a generated name. */
+                filename?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1320,10 +1368,12 @@ export interface operations {
                 headers: {
                     /** @description Private and long-lived: these bytes are addressed by an id that is never reused, so they never change; and they belong to one person, so they must not enter any shared cache. */
                     "Cache-Control"?: string;
+                    /** @description Present on everything that is not an image, carrying the original filename. Absent on images, which are meant to be rendered in place. */
+                    "Content-Disposition"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "image/*": string;
+                    "*/*": string;
                 };
             };
             /** @description Error */

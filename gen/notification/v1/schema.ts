@@ -1059,6 +1059,13 @@ export interface components {
             key: string;
             /** Format: int64 */
             port: number;
+            /**
+             * @description The channel carrying announcements. It is public: subscribing to it needs no
+             *     authorization, because an announcement is addressed to everybody. The events on it
+             *     carry an identifier and nothing else, so a client fetches the list and sees the
+             *     announcements it is entitled to
+             */
+            announcements_channel: string;
             /** @description The channel carrying events about the project in the token; empty when the token names no project */
             project_channel: string;
             /** @description Whether to connect over TLS */
