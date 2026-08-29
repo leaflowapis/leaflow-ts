@@ -203,7 +203,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/attachments/{attachmentId}/download-url": {
+    "/api/v1/attachments/{attachmentId}/content": {
         parameters: {
             query?: never;
             header?: never;
@@ -211,13 +211,16 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get a download address for an attachment
-         * @description Returns a temporary address that serves the file. The address expires; request a new one
-         *     rather than storing it.
+         * Download an attachment
+         * @description Serves the file itself. The bytes are proxied by this API; the object store is not reachable
+         *     from outside, and no address to it is ever handed out.
          *
-         *     Returns 404 for an attachment uploaded in another project.
+         *     `Content-Type` is the type determined from the content at upload time, not the one the
+         *     client claimed. `Content-Disposition` is `attachment` unless `inline` is requested **and**
+         *     the content type is one that can be rendered safely, in which case it is `inline`. Asking
+         *     for `inline` on anything else still yields a download.
          */
-        get: operations["describe-attachment-download"];
+        get: operations["download-attachment"];
         put?: never;
         post?: never;
         delete?: never;
@@ -469,15 +472,6 @@ export interface components {
             started_at: string | null;
             status: components["schemas"]["MaintenanceStatus"];
             title: string;
-        };
-        AttachmentDownloadResource: {
-            /**
-             * Format: date-time
-             * @description After this moment the address stops working; request a new one
-             */
-            expires_at: string;
-            /** @description A temporary address serving the file */
-            url: string;
         };
         CreateTicketRequestBody: {
             /** @description Attachments to reference from the first message. Each must have been uploaded in this project and not yet referenced */
@@ -941,9 +935,12 @@ export interface operations {
             };
         };
     };
-    "describe-attachment-download": {
+    "download-attachment": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Render in the browser instead of downloading, where the content type allows it */
+                inline?: boolean;
+            };
             header?: never;
             path: {
                 attachmentId: string;
@@ -955,10 +952,12 @@ export interface operations {
             /** @description OK */
             200: {
                 headers: {
+                    /** @description `inline` when the content type can be rendered safely and `inline` was asked for, `attachment` otherwise. Carries the original file name */
+                    "Content-Disposition"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AttachmentDownloadResource"];
+                    "*/*": string;
                 };
             };
             /** @description Error */
