@@ -75,6 +75,45 @@ export type SetMemberRolesBody = NonNullable<
   operations["set-member-roles"]["requestBody"]
 >["content"]["application/json"];
 
+/** `PUT /api/v1/members/{userId}/permissions` 成功时的响应体。 */
+export type SetMemberPermissionsResult =
+  operations["set-member-permissions"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/members/{userId}/permissions` 的请求体。 */
+export type SetMemberPermissionsBody = NonNullable<
+  operations["set-member-permissions"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/policies` 成功时的响应体。 */
+export type ListPoliciesResult =
+  operations["list-policies"]["responses"][200]["content"]["application/json"];
+
+/** `GET /api/v1/policies` 的查询参数。 */
+export type ListPoliciesQuery =
+  operations["list-policies"]["parameters"]["query"];
+
+/** `POST /api/v1/policies` 成功时的响应体。 */
+export type AttachPolicyResult =
+  operations["attach-policy"]["responses"][201]["content"]["application/json"];
+
+/** `POST /api/v1/policies` 的请求体。 */
+export type AttachPolicyBody = NonNullable<
+  operations["attach-policy"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/policies/{policyId}` 成功时的响应体。 */
+export type GetPolicyResult =
+  operations["get-policy"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/policies/{policyId}` 成功时的响应体。 */
+export type UpdatePolicyResult =
+  operations["update-policy"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /api/v1/policies/{policyId}` 的请求体。 */
+export type UpdatePolicyBody = NonNullable<
+  operations["update-policy"]["requestBody"]
+>["content"]["application/json"];
+
 /** `POST /api/v1/transfer-ownership` 成功时的响应体。 */
 export type TransferProjectOwnershipResult =
   operations["transfer-project-ownership"]["responses"][200]["content"]["application/json"];

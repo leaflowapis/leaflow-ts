@@ -12,8 +12,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出 IAM 自己声明的权限
-         * @description **只有 IAM 这一份。** 别的服务的操作不在这里——权限目录由各个服务自己声明，IAM 认识它们就等于要跟着每个下游一起发版。
+         * 列出全平台可授予的权限
+         * @description 各服务在启动时把自己那份目录注册进 IAM（和 AddFinalizer 同一段代码），所以这里是一份汇总，不只是 IAM 自己那几条。**IAM 不用它做判定**——判定在各服务自己那边，拿 Grant 配它自己那份目录算；这份汇总只是让界面画得出勾选框，它落后一个版本只会让界面上少几条可选项，不会让判定出错。一个还没启动过的服务，它的权限不在这里。
          */
         get: operations["list-permissions"];
         put?: never;
@@ -191,6 +191,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/members/{userId}/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * 设置一个成员直挂的权限
+         * @description 整体替换基础策略上直挂的那些权限。直挂让「给某个人临时开一条」不必先造一个只有他一个人持有的角色，但它不会随角色调整而更新，所以它适合一次性的、说得出理由的授予——角色仍然是主要的组织方式。要 iam:members.manage。
+         */
+        put: operations["set-member-permissions"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/policies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 列出这个项目里的策略
+         * @description 在项目里就看得到，和成员列表同一条规则：谁被授了什么也是「这个项目有谁」的一部分。
+         */
+        get: operations["list-policies"];
+        put?: never;
+        /**
+         * 附加一条策略
+         * @description 它建的是**附加**策略——要么带资源范围，要么方向是 deny。一条不限资源的 allow 是基础策略，每个成员只有一条，改它走 set-member-roles 和 set-member-permissions。roles 里不能有 OWNER 或 ADMIN：它们是规则而不是权限集合，「限定在三台机器上的所有者」讲不通。要 iam:members.manage。
+         */
+        post: operations["attach-policy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/policies/{policyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 查看一条策略
+         * @description 和 list-policies 同一条规则，在项目里就看得到：谁被授了什么也是「这个项目有谁」的一部分，读它不需要额外的权限。
+         */
+        get: operations["get-policy"];
+        /**
+         * 改一条策略
+         * @description 整体替换而不是逐字段改：resources、roles、permissions 各自整份覆盖，没发的那份就是空的——只有「这就是这条策略现在的全貌」这一种语义说得清一次写入到底收回了什么。改不动的是策略的**种类**：基础策略（不限资源的 allow）加不上资源范围，这个成员的角色就存在它上面，给它加个范围等于让他在别的资源上什么都不是；一条带范围的策略反过来也不能把范围清空变成基础策略，那个位置每个成员只有一条。要换种类就删了重建。要 iam:members.manage。
+         */
+        put: operations["update-policy"];
+        post?: never;
+        /**
+         * 摘掉一条策略
+         * @description 基础策略摘不掉——它是这个成员角色的落点，删了它这个人就不再持有任何角色，而「让他离开这个项目」是 remove-member 的事。要 iam:members.manage。
+         */
+        delete: operations["detach-policy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/transfer-ownership": {
         parameters: {
             query?: never;
@@ -321,17 +393,43 @@ export interface components {
             name: string;
             /** @description 只有项目所有者能做，绑到自定义角色上也不会生效 */
             owner_only: boolean;
+            /** @description 这条权限的判定对象是哪类资源，空表示它是项目级的。**它不必等于操作对象本身**——compute 的 route 表上没有 project_id，隔离本来就经父网络传递，所以 compute:route.create 的判定对象是 compute:private_network。非空同时意味着这条权限可以被限定到具体实例；create 和 list 一律留空 */
+            resource_type: string;
         };
-        PermissionListResponseBody: {
-            items: components["schemas"]["PermissionResource"][] | null;
+        ResourceTypeResource: {
+            description: string;
+            name: string;
+        };
+        CatalogResource: {
+            permissions: components["schemas"]["PermissionResource"][] | null;
+            /** @description 这个服务声明的资源类型。带资源范围的规则只落得到它们上面——一个没有被声明过的类型没人认得，限定在它上面的规则谁都判不出来 */
+            resource_types: components["schemas"]["ResourceTypeResource"][] | null;
+            service: string;
+        };
+        CatalogListResponseBody: {
+            items: components["schemas"]["CatalogResource"][] | null;
+        };
+        ResourceRefResource: {
+            /** @description 是字符串不是 uuid：dns 的 zone 标识是域名，而且不在 IAM 库里。匹配语义是 glob，所以 *.example.com 能表达一批子域名；uuid 和域名都不含 glob 元字符，对它们来说就是精确相等 */
+            id: string;
+            /** @description 形如 compute:instance、dns:zone，和权限名同一个命名空间 */
+            type: string;
+        };
+        RuleResource: {
+            /** @enum {string} */
+            effect: "allow" | "deny";
+            /** @description 权限名，支持尾部通配（compute:instance.*）。通配必须带服务前缀——一条光秃秃的 * 会把日后新上线的服务的操作也一起授出去，而那件事发生的时候没有任何人在场 */
+            permissions: string[] | null;
+            /** @description 为空表示整个项目范围；非空表示这条规则只在这些资源上成立，而那意味着它回答不了项目级的问题 */
+            resources: components["schemas"]["ResourceRefResource"][] | null;
         };
         GrantResource: {
             admin: boolean;
             owner: boolean;
-            /** @description 持有的全部自定义角色的权限并集，已去重排序 */
-            permissions: string[] | null;
             /** @description 持有的角色编码，只用于展示 */
             roles: string[] | null;
+            /** @description 他全部策略编译出来的规则。**不要自己遍历它做判定**——拿它配上自己那份权限目录交给 pkg/rbac：owner 不可被 deny、deny 优先于 admin、带资源范围的规则不参与项目级判定，那里面的顺序每一条都对着一种会静默放行的写法 */
+            rules: components["schemas"]["RuleResource"][] | null;
         };
         ProjectResource: {
             ban_reason: string;
@@ -471,6 +569,63 @@ export interface components {
             /** @description 这个人应当持有的**全部**角色编码。OWNER 不能出现在这里 */
             roles: string[] | null;
         };
+        SetMemberPermissionsRequestBody: {
+            /** @description 这个人应当直挂的**全部**权限名，整体替换。角色给的那些不在这里，也不会被这次写入碰到 */
+            permissions: string[] | null;
+        };
+        PolicyResource: {
+            /** @description 基础策略是方向 allow、不限资源的那一条，每个成员恰好一条，装的是他的常规角色。改它走 PUT /members/{userId}/roles 和 PUT /members/{userId}/permissions */
+            base: boolean;
+            /** Format: date-time */
+            created_at: string;
+            /** @description 给人看的理由。一条附加策略事后最难回答的是「当初为什么开这一条」 */
+            description: string;
+            /** @enum {string} */
+            effect: "allow" | "deny";
+            /** Format: uuid */
+            id: string;
+            /** @description 直挂在这个人身上的权限名，不经过角色 */
+            permissions: string[] | null;
+            /** @description 为空表示整个项目范围 */
+            resources: components["schemas"]["ResourceRefResource"][] | null;
+            /** @description 这条策略带上的角色编码 */
+            roles: string[] | null;
+            /** Format: date-time */
+            updated_at: string;
+            user_id: string;
+        };
+        PolicyListResponseBody: {
+            items: components["schemas"]["PolicyResource"][] | null;
+        };
+        AttachPolicyRequestBody: {
+            /** @description 给人看的理由。一条附加策略事后最难回答的是「当初为什么开这一条」 */
+            description?: string;
+            /** @enum {string} */
+            effect: "allow" | "deny";
+            /** @description 直挂的权限名，用它就不必为一个人临时造一个只有他持有的角色 */
+            permissions?: string[] | null;
+            /** @description 这条策略只在这些资源上成立。留空只有配合 deny 才讲得通——一条不限资源的 allow 是基础策略，那一条已经有了 */
+            resources?: components["schemas"]["ResourceRefResource"][] | null;
+            /** @description 必须是这个项目已经定义的角色。OWNER 和 ADMIN 不行——它们是规则而不是权限集合，「限定在三台机器上的所有者」讲不通 */
+            roles?: string[] | null;
+            /** @description 必须已经是这个项目的成员 */
+            user_id: string;
+        };
+        UpdatePolicyRequestBody: {
+            /** @description 给人看的理由。它和这次改动一起替换，不然留下来的会是一句解释着上一个版本的话 */
+            description?: string;
+            /**
+             * @description 必须和这条策略当前的方向一致。方向改不动——那不是「改一条策略」，是一次意思完全相反的授权决定，改它的人多半以为自己在收紧，而读这行数据的下一个人看到的是一条方向和当初授予时不同、说明文字却还是旧的策略。仍然要求发这个字段而不是干脆不收，是因为整体替换的语义是「这就是这条策略现在的全貌」：少一个字段的话，调用方以为自己把 deny 改成了 allow，而服务端默默忽略了它。不一致时返回 PROJECT_POLICY_EFFECT_IMMUTABLE
+             * @enum {string}
+             */
+            effect: "allow" | "deny";
+            /** @description 直挂的权限名，整份替换。没列进来的就是被收回了——它不是往上加一条 */
+            permissions?: string[] | null;
+            /** @description 这条策略的资源范围，整份替换。范围内容能改，有没有范围改不了：基础策略加不上范围，带范围的也清不空——清空之后它就是基础策略的形状，而那个位置每个成员只有一条 */
+            resources?: components["schemas"]["ResourceRefResource"][] | null;
+            /** @description 必须是这个项目已经定义的角色，整份替换。和挂上去那次一样不能有 OWNER 或 ADMIN */
+            roles?: string[] | null;
+        };
         TransferOwnershipRequestBody: {
             /** @description 接手的人必须已经是这个项目的成员 */
             to_user_id: string;
@@ -585,7 +740,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PermissionListResponseBody"];
+                    "application/json": components["schemas"]["CatalogListResponseBody"];
                 };
             };
             /** @description Error */
@@ -936,6 +1091,201 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["MemberResource"];
                 };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "set-member-permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetMemberPermissionsRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-policies": {
+        parameters: {
+            query?: {
+                /** @description 只看这个人身上的。不传表示整个项目的 */
+                userId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyListResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "attach-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttachPolicyRequestBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                policyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "update-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                policyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePolicyRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "detach-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                policyId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Error */
             default: {
