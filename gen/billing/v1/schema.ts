@@ -168,6 +168,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/billing-accounts/{accountKey}/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My orders
+         * @description Every provisioning request made against the projects this account pays for, newest first.
+         *
+         *     An order that never went through stays here on purpose. Removing it would leave nothing to
+         *     look at in exactly the case someone wants to look: a resource was asked for, was not
+         *     delivered, and the question is what happened.
+         *
+         *     The list carries no lines. An order has only a handful, but shipping them on every page
+         *     means carrying data no column shows.
+         */
+        get: operations["list-orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/orders/{orderId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One order, with its lines
+         * @description Each line names what was asked for and how much of it. This is the only route that carries
+         *     them.
+         */
+        get: operations["get-order"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/billing-accounts/{accountKey}/top-ups": {
         parameters: {
             query?: never;
@@ -638,6 +686,36 @@ export interface components {
         };
         UpdateBillingAccountRequestBody: {
             display_name: string;
+        };
+        Order: {
+            id: string;
+            project_id: string;
+            placed_by: string;
+            /**
+             * @description Whether the request went through. It is not the state of what was provisioned: that
+             *     belongs to each resource and outlives the order.
+             * @enum {string}
+             */
+            state: "pending" | "fulfilled" | "failed";
+            failure_reason?: string;
+            /** Format: date-time */
+            created_at: string;
+            /** @description Only present on the single-order route. */
+            lines?: components["schemas"]["OrderLine"][];
+        };
+        OrderLine: {
+            id: string;
+            /** @enum {string} */
+            action: "add" | "renew" | "modify" | "remove";
+            /** @description Which service holds the thing, for example `compute`. */
+            service: string;
+            /** @description That service's own catalogue identifier for what was asked for. */
+            product_id: string;
+            /** Format: int64 */
+            quantity: number;
+        };
+        OrderList: {
+            orders: components["schemas"]["Order"][];
         };
         TopUpList: {
             top_ups: components["schemas"]["TopUpStatus"][];
@@ -1240,6 +1318,77 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderList"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
             };
             /** @description Error */
             default: {

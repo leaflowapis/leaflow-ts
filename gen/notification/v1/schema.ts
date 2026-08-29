@@ -15,9 +15,10 @@ export interface paths {
          * List notifications addressed to you
          * @description Returns notifications in reverse chronological order, newest first.
          *
-         *     Announcements published to the whole platform appear here alongside notifications
-         *     addressed to you individually and are distinguished by `kind`. They are read and archived
-         *     through the same operations.
+         *     Announcements are not in this list. They are one row for the whole platform rather than
+         *     one per reader, so they are listed, read and counted by their own operations under
+         *     `/api/v1/announcements`. `kind` is on every item here for clients that merge the two lists
+         *     themselves, and it is `notification` for everything this operation returns.
          */
         get: operations["list-notifications"];
         put?: never;
@@ -108,7 +109,14 @@ export interface paths {
          * @description Marking a notification that is already read succeeds and changes nothing.
          */
         post: operations["mark-notification-read"];
-        delete?: never;
+        /**
+         * Mark one notification as unread
+         * @description Puts it back in the unread count, which is what somebody wants after opening a thing by
+         *     accident and needing it to stay in front of them.
+         *
+         *     Marking one that is already unread succeeds and changes nothing.
+         */
+        delete: operations["mark-notification-unread"];
         options?: never;
         head?: never;
         patch?: never;
@@ -129,7 +137,18 @@ export interface paths {
          *     `include_archived` to see it again. Archiving also marks it read.
          */
         post: operations["archive-notification"];
-        delete?: never;
+        /**
+         * Take one notification out of the archive
+         * @description Returns it to the default listing. Archiving is one click away from anything in the list,
+         *     so undoing it has to be too; without this operation a mistaken archive is permanent, and
+         *     the notification stays reachable only by asking for archived ones.
+         *
+         *     It does not mark it unread again: archiving marked it read, and that it was read is still
+         *     true. Use `mark-notification-unread` for that.
+         *
+         *     Unarchiving one that is not archived succeeds and changes nothing.
+         */
+        delete: operations["unarchive-notification"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1143,7 +1162,71 @@ export interface operations {
             };
         };
     };
+    "mark-notification-unread": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The notification, or the announcement when kind is announcement */
+                notificationId: components["parameters"]["NotificationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     "archive-notification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The notification, or the announcement when kind is announcement */
+                notificationId: components["parameters"]["NotificationId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "unarchive-notification": {
         parameters: {
             query?: never;
             header?: never;

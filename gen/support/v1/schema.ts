@@ -19,8 +19,8 @@ export interface paths {
          *     pages, which are reached before a project has been selected. It returns a narrower shape
          *     than the authenticated operations and is not paginated.
          *
-         *     Platform announcements are not served here. They belong to the notification service, which
-         *     owns announcements for the whole platform.
+         *     Platform announcements are not part of this API. They are served by the notification
+         *     service, which owns platform-wide announcements.
          */
         get: operations["list-notices"];
         put?: never;
