@@ -11,6 +11,10 @@ import type { operations } from "./schema.js";
 export type UploadAttachmentResult =
   operations["upload-attachment"]["responses"][201]["content"]["application/json"];
 
+/** `POST /api/v1/attachments` 的查询参数。 */
+export type UploadAttachmentQuery =
+  operations["upload-attachment"]["parameters"]["query"];
+
 /** `GET /api/v1/bindings` 成功时的响应体。 */
 export type ListBindingsResult =
   operations["list-bindings"]["responses"][200]["content"]["application/json"];
