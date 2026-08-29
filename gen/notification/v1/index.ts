@@ -40,9 +40,17 @@ export type GetNotificationResult =
 export type MarkNotificationReadResult =
   operations["mark-notification-read"]["responses"][200]["content"]["application/json"];
 
+/** `DELETE /api/v1/notifications/{notificationId}/read` 成功时的响应体。 */
+export type MarkNotificationUnreadResult =
+  operations["mark-notification-unread"]["responses"][200]["content"]["application/json"];
+
 /** `POST /api/v1/notifications/{notificationId}/archive` 成功时的响应体。 */
 export type ArchiveNotificationResult =
   operations["archive-notification"]["responses"][200]["content"]["application/json"];
+
+/** `DELETE /api/v1/notifications/{notificationId}/archive` 成功时的响应体。 */
+export type UnarchiveNotificationResult =
+  operations["unarchive-notification"]["responses"][200]["content"]["application/json"];
 
 /** `GET /api/v1/announcements` 成功时的响应体。 */
 export type ListAnnouncementsResult =
