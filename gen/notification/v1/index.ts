@@ -44,6 +44,14 @@ export type MarkNotificationReadResult =
 export type ArchiveNotificationResult =
   operations["archive-notification"]["responses"][200]["content"]["application/json"];
 
+/** `GET /api/v1/announcements` 成功时的响应体。 */
+export type ListAnnouncementsResult =
+  operations["list-announcements"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/announcements/read` 成功时的响应体。 */
+export type ReadAllAnnouncementsResult =
+  operations["read-all-announcements"]["responses"][200]["content"]["application/json"];
+
 /** `GET /api/v1/notification-types` 成功时的响应体。 */
 export type ListNotificationTypesResult =
   operations["list-notification-types"]["responses"][200]["content"]["application/json"];
