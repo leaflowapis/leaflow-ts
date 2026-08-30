@@ -327,6 +327,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/projects/{projectId}/billing-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Which account pays for this project
+         * @description The account a project's resources are charged to, resolved from the project rather than
+         *     guessed.
+         *
+         *     ## Why a console needs this
+         *
+         *     Everything in a console happens inside a project, while billing accounts belong to a person —
+         *     and a person can have many. Showing "the first one" next to a sentence like *you are
+         *     overdrawn, new resources will be refused* pairs one account's balance with another account's
+         *     rule. Both directions are wrong and one of them is silent: the figures look healthy while
+         *     creating anything is refused, and the refusal names a reason the page just contradicted.
+         *
+         *     ## Being a member is enough to ask, but not to see the money
+         *
+         *     The answer is the account's identity, not its balance. A project's members are not
+         *     necessarily the people paying for it — a company account can pay for a project someone else
+         *     works in — and their balance is not those members' business. Whoever owns the account reads
+         *     the figures from the balance route as before; `owned_by_me` says which case this is, so a
+         *     page can tell "you are overdrawn" apart from "ask whoever pays for this project".
+         *
+         *     ## A project with no account is a normal state, and it answers 404
+         *
+         *     A project nobody has bound yet cannot create resources at all — admission refuses it. That is
+         *     worth saying plainly ("this project has no billing account, bind one") rather than falling
+         *     back to some other account of theirs, which is how the wrong-account problem started.
+         */
+        get: operations["read-project-billing-account"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/projects/{projectId}/quote": {
         parameters: {
             query?: never;
@@ -1232,6 +1275,19 @@ export interface components {
              */
             available: string;
         };
+        /** @description The account a project's resources are charged to */
+        ProjectBillingAccount: {
+            account_key: string;
+            project_id: string;
+            display_name: string;
+            currency: components["schemas"]["Currency"];
+            /**
+             * @description Whether the caller owns this account, and therefore whether the balance routes will
+             *     answer for it. False means someone else pays for this project: the figures are theirs,
+             *     not the caller's, and a page should say so rather than showing nothing.
+             */
+            owned_by_me: boolean;
+        };
         /** @description Which account pays for which project, as it stands once the request has been applied */
         ProjectBinding: {
             account_key: string;
@@ -1989,6 +2045,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InvoiceDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "read-project-billing-account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The project being worked in */
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectBillingAccount"];
                 };
             };
             /** @description Error */
