@@ -135,3 +135,24 @@ export type PurchaseOfferResult =
 /** `POST /account/v1/billing-accounts/{accountKey}/offers/{offerKey}/purchase` 的查询参数。 */
 export type PurchaseOfferQuery =
   operations["purchase-offer"]["parameters"]["query"];
+
+/** `GET /account/v1/billing-accounts/{accountKey}/prepaid-assets` 成功时的响应体。 */
+export type ListPrepaidAssetsResult =
+  operations["list-prepaid-assets"]["responses"][200]["content"]["application/json"];
+
+/** `GET /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal-quote` 成功时的响应体。 */
+export type QuoteRenewalResult =
+  operations["quote-renewal"]["responses"][200]["content"]["application/json"];
+
+/** `GET /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal-quote` 的查询参数。 */
+export type QuoteRenewalQuery =
+  operations["quote-renewal"]["parameters"]["query"];
+
+/** `POST /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renew` 成功时的响应体。 */
+export type RenewPrepaidAssetResult =
+  operations["renew-prepaid-asset"]["responses"][200]["content"]["application/json"];
+
+/** `POST /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renew` 的请求体。 */
+export type RenewPrepaidAssetBody = NonNullable<
+  operations["renew-prepaid-asset"]["requestBody"]
+>["content"]["application/json"];

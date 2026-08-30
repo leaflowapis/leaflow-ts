@@ -75,6 +75,14 @@ export type ListMyInvitationsResult =
 export type ListMyInvitationsQuery =
   operations["list-my-invitations"]["parameters"]["query"];
 
+/** `GET /account/v1/invitations/by-token` 成功时的响应体。 */
+export type PreviewInvitationByTokenResult =
+  operations["preview-invitation-by-token"]["responses"][200]["content"]["application/json"];
+
+/** `GET /account/v1/invitations/by-token` 的查询参数。 */
+export type PreviewInvitationByTokenQuery =
+  operations["preview-invitation-by-token"]["parameters"]["query"];
+
 /** `POST /account/v1/me/invitations/accept` 成功时的响应体。 */
 export type AcceptInvitationByTokenResult =
   operations["accept-invitation-by-token"]["responses"][200]["content"]["application/json"];

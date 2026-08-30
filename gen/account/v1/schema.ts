@@ -188,6 +188,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/invitations/by-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 看一眼这封邀请是谁发的、加入哪儿、什么角色
+         * @description 免认证，而且是有意的：点邮件里那条链接的人多半还没登录，甚至还没有账号。要他先注册再 告诉他这是谁发来的、加入哪个项目，等于让他在不知道要加入什么的情况下决定要不要注册。
+         *     它不多泄露任何东西。 这三样——项目名、邀请人、角色——邮件正文里已经写着了，而读得到 这个令牌的人就是收得到那封邮件的人。同一个令牌本来就能把持有者加进项目（见 `accept-invitation-by-token`），读一个项目名比那件事轻得多。
+         *     收件地址打了码（`t***@example.com`）。 不打码的话，这个接口就成了「拿一个令牌反查它 当初寄给了哪个地址」——而那是邮件正文里没有、持有者也未必知道的一件事。
+         *     令牌不存在、已经用过、被撤回、过期，四种情况同一个 404 和同一句话。分开报会把它变成 一个可以拿来试令牌的探针，而这个接口免认证，任何人都试得起。
+         *     它不在 `/me` 下面，隔壁那两条接受要约的在。 `/me` 的意思是「按这次请求的身份认出来 的、属于我的那些」，而这条路上没有身份——持有令牌的人未必是收件人本人。挂在 `/me` 下面会让读的人以为它认过身份，而那正是这条路唯一不做的事。
+         */
+        get: operations["preview-invitation-by-token"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/me/invitations/accept": {
         parameters: {
             query?: never;
@@ -425,6 +449,21 @@ export interface components {
             /** @description 真实姓名。敏感个人信息，加密入库，任何接口都不会再把它读出来 */
             real_name: string;
         };
+        /**
+         * @description 一封邀请在被接受之前能给出的全部信息。
+         *     它比 InvitationResource 少两样：要约 id 和完整的收件地址。id 不给是因为持有令牌不等于 这封要约列在你名下——真正列在你名下的那些走 list-my-invitations，那条是认过身份的。
+         */
+        InvitationPreviewResource: {
+            /** @description 打过码的收件地址，只够收件人认出「这是发给我的」 */
+            email_masked: string;
+            /** Format: date-time */
+            expires_at: string;
+            /** @description 邀请人的显示名，姓名都空时是他的邮箱 */
+            invited_by_name: string;
+            project_name: string;
+            /** @description 接受之后会拿到的角色，显示名 */
+            role_names: string[] | null;
+        };
         InvitationResource: {
             /** Format: date-time */
             created_at: string;
@@ -433,11 +472,21 @@ export interface components {
             expires_at: string;
             /** Format: uuid */
             id: string;
+            /** @description 发出这份要约的账号 id */
             invited_by: string;
+            /** @description 发出这份要约的人的显示名，姓名都空时是他的邮箱。它是读取那一刻的事实，不是发信时的快照 */
+            invited_by_name: string;
             /** Format: uuid */
             project_id: string;
+            /**
+             * @description 目标项目的名字。
+             *     它在这里，而这一度是刻意不给的——理由是「没接受就不是成员，而名字只有成员能读」。 那条克制在这个场景下站不住：邀请邮件正文里就写着项目名，收件人早就知道了，而一个 只显示 uuid 的邀请列表让人没法判断该不该接受。
+             */
+            project_name: string;
             /** @description 兑现时会授予的角色编码 */
             roles: string[] | null;
+            /** @description 上面那些编码的显示名，按同样的顺序。读者看的是「管理员」，不是 ADMIN */
+            role_names: string[] | null;
         };
         LengthAwarePageInvitationResource: {
             /** @description 这一页的内容 */
@@ -895,6 +944,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LengthAwarePageInvitationResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "preview-invitation-by-token": {
+        parameters: {
+            query: {
+                /** @description 邀请链接里那串令牌 */
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationPreviewResource"];
                 };
             };
             /** @description Error */
