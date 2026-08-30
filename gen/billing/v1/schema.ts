@@ -283,6 +283,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/billing-accounts/{accountKey}/charges/{chargeId}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What produced this charge
+         * @description Splits one charge back into the projects that produced it, and lists the resources it could
+         *     have come from.
+         *
+         *     ## Why this is not a field on the charge
+         *
+         *     A charge has no project, and that is not an omission: the billing subject is the **account**,
+         *     and the project is a dimension on each usage event. When three of an account's projects use
+         *     the same product, their usage aggregates into one charge — that charge genuinely spans three
+         *     projects, and stamping any single project id on it would be wrong.
+         *
+         *     A split is also more useful than a label would be: it gives proportions, and proportions are
+         *     what decide which project's resources to switch off.
+         *
+         *     ## The quantity here is what was reported, not what was billed
+         *
+         *     Conversion (machine-seconds to machine-hours) happens on the pricing side, and the engine
+         *     does not echo `unit_config` back on a charge. So this figure times the unit price does not
+         *     equal the total — a step is missing in between, and that step only becomes visible on the
+         *     invoice, where the whole pricing configuration is frozen onto each line.
+         *
+         *     Reported quantity is still the right number for "which project is burning this", which is
+         *     what the split is for.
+         *
+         *     ## The resource list says which, not how much
+         *
+         *     Usage events carry no resource id — it is not a grouping dimension, and making it one would
+         *     mean one time series per machine per hour. So the engine cannot attribute a charge to a
+         *     machine. What it can be attributed to is a product, and which resources of that product
+         *     exist is something billing knows from its own records.
+         *
+         *     Destroyed resources are listed too: this period's charge includes the part they ran for.
+         *     Leaving them out is what makes the numbers fail to add up for someone who deleted a machine
+         *     mid-month — which is exactly the case they are trying to explain.
+         *
+         *     ## A flat fee answers with an empty split
+         *
+         *     There is no meter behind it, so there is nothing to attribute. That is an answer, not an
+         *     error.
+         */
+        get: operations["get-charge-usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/billing-accounts/{accountKey}/invoices": {
         parameters: {
             query?: never;
@@ -1414,6 +1471,51 @@ export interface components {
             discounts?: string;
             /** @description Free text from the charge, usually empty. Set on charges raised by hand. */
             description?: string;
+            /**
+             * @description What one unit costs, as a decimal string. Absent when the line has no single unit price
+             *     — a flat fee, or a tiered price whose rate changes with volume.
+             *
+             *     The conversion between reported and billed quantity is deliberately not here: the engine
+             *     does not echo it back on a charge, only on an invoice line. So a charge answers "what
+             *     does a unit cost", and an invoice answers "how the total was reached".
+             */
+            unit_price?: string;
+        };
+        /** @description What produced one charge */
+        ChargeUsage: {
+            charge_id: string;
+            /**
+             * @description Total reported quantity for the period, as a decimal string. Empty on a charge with no
+             *     meter behind it.
+             *
+             *     Reported, not billed: see the route's description.
+             */
+            quantity: string;
+            /**
+             * @description The same quantity split by project. Empty when the charge has no meter behind it — a
+             *     flat fee has nothing to attribute.
+             */
+            by_project: components["schemas"]["ProjectUsage"][];
+            /**
+             * @description Resources of this product in the account's projects — candidates for what produced the
+             *     charge, not a per-resource breakdown. Absent when billing could not look them up; the
+             *     charge itself is still answered.
+             */
+            resources?: components["schemas"]["ChargeResource"][];
+        };
+        ProjectUsage: {
+            project_id: string;
+            /** @description Decimal string. */
+            quantity: string;
+        };
+        ChargeResource: {
+            project_id: string;
+            /** @description Which service holds it, and therefore which console manages it. */
+            service: string;
+            product_id: string;
+            resource_id: string;
+            /** @enum {string} */
+            state: "pending" | "active" | "suspended" | "terminated";
         };
         ChargeList: {
             currency: components["schemas"]["Currency"];
@@ -1453,6 +1555,33 @@ export interface components {
             /** @description Before discounts and credit */
             amount: string;
             discounts_total?: string;
+            /**
+             * @description The billed quantity for this line, as a decimal string — after conversion. A machine
+             *     billed by the hour reports machine-seconds; this is machine-hours.
+             *
+             *     It comes from the line's detailed segments summed together: the engine splits a line
+             *     into segments (different cost categories, different sub-periods) and the quantity lives
+             *     on those.
+             */
+            quantity?: string;
+            /**
+             * @description What one unit cost, as a decimal string, frozen at billing time. Absent on a flat fee,
+             *     whose amount is the amount, and on tiered prices, whose rate changes with volume.
+             */
+            unit_price?: string;
+            /**
+             * @description How reported quantity became billed quantity — 3600 for a machine billed by the hour
+             *     from machine-seconds, 1000000 for a price per million tokens.
+             *
+             *     Without it, `quantity` disagrees with what the customer remembers doing, by whole orders
+             *     of magnitude, and there is nothing on the page that explains the gap.
+             */
+            conversion_factor?: string;
+            /**
+             * @description What was done with the factor.
+             * @enum {string}
+             */
+            conversion_operation?: "divide" | "multiply";
             /** @description How much of this line credit covered */
             credits_total?: string;
             total: string;
@@ -1974,6 +2103,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChargeList"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-charge-usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+                /** @description Which charge, from the charges list */
+                chargeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChargeUsage"];
                 };
             };
             /** @description Error */
