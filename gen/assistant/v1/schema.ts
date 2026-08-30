@@ -15,7 +15,9 @@ export interface paths {
         put?: never;
         /**
          * Upload a file
-         * @description The body is the file bytes themselves, not multipart, one file per request. The kind is determined from the content, not from Content-Type or from the name. Put the returned id in attachmentIds when sending a message; attachments never referenced by any message are cleared periodically.
+         * @description The body is the file bytes themselves, not multipart, one file per request. The kind is determined from the content, not from Content-Type or from the name. Put the returned id in attachmentIds when sending a message.
+         *
+         *     An upload that no message ever references is a draft, and drafts are collected — `draftExpiresAt` in the response says when this one goes. Sending a message with the id makes it permanent.
          *
          *     The returned `kind` says how the assistant will see it. An `image` is read directly, and only by models that accept image input. A small `text` file is placed inline in the message. A large `text` file, and anything `binary`, arrives as a reference the assistant reads on demand — for a binary that usually means downloading it onto one of the project's cloud instances.
          */
@@ -314,6 +316,62 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List folders
+         * @description The current account's folders in this project, oldest first. That order is fixed and does not react to what happens inside a folder: a folder is a place on the screen, and a place that moves whenever something is put into it is not one anybody can aim at. Not paginated — there is a cap on how many there can be, and all of them come back at once.
+         */
+        get: operations["list-folders"];
+        put?: never;
+        /**
+         * Create a folder
+         * @description A folder groups conversations in the sidebar and does nothing else. The assistant is never told which folder a conversation is in, and a conversation behaves exactly the same inside one as outside: no shared instructions, no shared files, no shared memory.
+         *
+         *     Names are unique within an account's folders in this project, because the only way to aim at a folder is to read its name.
+         */
+        post: operations["create-folder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/folders/{folder}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch one folder
+         * @description The list returns every folder at once, so this is for the case the list does not cover: a page opened straight at a folder, holding nothing but the id from the address bar. Its conversations are a separate request — `GET /api/v1/threads?folder=<id>`.
+         */
+        get: operations["get-folder"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a folder
+         * @description The conversations inside are **not** deleted. They leave the folder and go back to the ungrouped list, where they can be filed again. Emptying a shelf is not the same as throwing out what was on it, and deleting a conversation is a different request.
+         *
+         *     Idempotent: deleting a folder that is already gone succeeds and changes nothing.
+         */
+        delete: operations["delete-folder"];
+        options?: never;
+        head?: never;
+        /**
+         * Rename a folder
+         * @description The conversations in it are untouched, and none of them move in the list — a folder's name is not part of what any conversation is about.
+         */
+        patch: operations["update-folder"];
         trace?: never;
     };
     "/api/v1/memories": {
@@ -634,6 +692,13 @@ export interface components {
              * @description Size of what was stored. For an image that has been resized, this is the resized size, not what was uploaded.
              */
             byteSize: number;
+            /**
+             * Format: date-time
+             * @description When this upload gets cleared if no message ever references it. Sending a message with this id makes it permanent and this stops applying — a file that belongs to a conversation is kept as long as the conversation is.
+             *
+             *     It is here so the editor can say so before it happens. An attachment chip that quietly stops working a week later reads as a bug, and the person who hits it has no way to tell that what they are seeing is a draft being collected.
+             */
+            draftExpiresAt: string;
             filename: string;
             /**
              * Format: int64
@@ -952,6 +1017,8 @@ export interface components {
             archived: boolean;
             /** Format: date-time */
             createdAt: string;
+            /** @description The folder this conversation is filed under, or null when it is in none */
+            folderId: string | null;
             id: string;
             model: string;
             title: string | null;
@@ -960,6 +1027,8 @@ export interface components {
             updatedAt: string;
         };
         ThreadListResponseBody: {
+            /** @description Pass this back as `cursor` for the next page. Null means this was the last one — it is only set when there is genuinely more, so an empty final page never happens. */
+            nextCursor: string | null;
             threads: components["schemas"]["ThreadSummaryResource"][] | null;
         };
         CreateThreadRequestBody: {
@@ -1157,6 +1226,12 @@ export interface components {
             approvalMode?: "guardian" | "manual" | "yolo";
             archived?: boolean;
             /**
+             * @description File this conversation into a folder, or `null` to take it out of the one it is in. Omit the field to leave it where it is.
+             *
+             *     Filing does not move the conversation in the list. The order answers "which conversation has something new in it", and putting one away is not that.
+             */
+            folderId?: string | null;
+            /**
              * @description Rename this conversation.
              *
              *     A conversation names itself: the first message gives it a working title, and the assistant replaces that with a better one once it has answered. Setting this stops both — a name somebody chose is never overwritten by one that was generated.
@@ -1326,6 +1401,28 @@ export interface components {
         RevertedCountResponseBody: {
             /** Format: int64 */
             reverted: number;
+        };
+        FolderResource: {
+            /** Format: date-time */
+            createdAt: string;
+            id: string;
+            name: string;
+            /**
+             * Format: int64
+             * @description How many conversations are filed here and would show up in the default list. Archived and deleted ones are not counted, so this is exactly what `GET /api/v1/threads?folder=<id>` returns.
+             */
+            threadCount: number;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        FolderListResponseBody: {
+            folders: components["schemas"]["FolderResource"][] | null;
+        };
+        CreateFolderRequestBody: {
+            name: string;
+        };
+        UpdateFolderRequestBody: {
+            name: string;
         };
     };
     responses: never;
@@ -1965,6 +2062,163 @@ export interface operations {
             };
         };
     };
+    "list-folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderListResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "create-folder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateFolderRequestBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-folder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                folder: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "delete-folder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                folder: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "update-folder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                folder: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFolderRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderResource"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     "list-memories": {
         parameters: {
             query?: never;
@@ -2188,6 +2442,16 @@ export interface operations {
                 q?: string;
                 /** @description When true, returns **only** archived conversations; otherwise only unarchived ones */
                 archived?: boolean;
+                /** @description Narrow the list to one folder. Omitting it returns conversations from every folder and from none; a folder id returns that folder's; the empty value (`?folder=`) returns the ones that are in no folder at all. Empty is not the same as omitted, and a sidebar needs both: "chats" is exactly the ungrouped set, and asking for everything would let filed conversations crowd it out of the limit. */
+                folder?: string;
+                /**
+                 * @description Where the previous page ended, from its `nextCursor`. Omit it for the first page.
+                 *
+                 *     It is a position, not an offset, and that matters here: this list is ordered by recent activity, and the activity happens while it is being read. An offset would hand back a conversation twice when one moves up in between, and skip one when it moves down — silently, because a conversation that was skipped simply is not there.
+                 *
+                 *     Pass the same `q`, `archived` and `folder` along with it. A cursor carries a position, not the question that produced it, so changing the filters mid-scroll walks a range nobody asked for.
+                 */
+                cursor?: string;
                 limit?: number;
             };
             header?: never;

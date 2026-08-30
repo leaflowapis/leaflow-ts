@@ -112,6 +112,32 @@ export type SubmitDynamicCallResultBody = NonNullable<
   operations["submit-dynamic-call-result"]["requestBody"]
 >["content"]["application/json"];
 
+/** `GET /api/v1/folders` 成功时的响应体。 */
+export type ListFoldersResult =
+  operations["list-folders"]["responses"][200]["content"]["application/json"];
+
+/** `POST /api/v1/folders` 成功时的响应体。 */
+export type CreateFolderResult =
+  operations["create-folder"]["responses"][201]["content"]["application/json"];
+
+/** `POST /api/v1/folders` 的请求体。 */
+export type CreateFolderBody = NonNullable<
+  operations["create-folder"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /api/v1/folders/{folder}` 成功时的响应体。 */
+export type GetFolderResult =
+  operations["get-folder"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /api/v1/folders/{folder}` 成功时的响应体。 */
+export type UpdateFolderResult =
+  operations["update-folder"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /api/v1/folders/{folder}` 的请求体。 */
+export type UpdateFolderBody = NonNullable<
+  operations["update-folder"]["requestBody"]
+>["content"]["application/json"];
+
 /** `GET /api/v1/memories` 成功时的响应体。 */
 export type ListMemoriesResult =
   operations["list-memories"]["responses"][200]["content"]["application/json"];
