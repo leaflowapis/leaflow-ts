@@ -1316,6 +1316,48 @@ export interface components {
              *     just started as zero
              */
             total: string;
+            /**
+             * @description Which meter it is for, when the charge came from usage. A hash, not something to show —
+             *     it is here so two rows can be told apart programmatically and so support can line a row
+             *     up with the catalogue.
+             */
+            feature_key?: string;
+            /**
+             * @description Whether this figure moves. A usage charge climbs through the period; a flat fee does not.
+             *     Without it, the same number on two refreshes could mean "nobody used it" or "it never
+             *     moves", and those need different next steps.
+             * @enum {string}
+             */
+            type: "usage_based" | "flat_fee";
+            /**
+             * Format: date-time
+             * @description Start of the service period this charge covers.
+             *
+             *     This is what tells two same-named rows apart. Something billed by the hour produces
+             *     hundreds of identically named charges in a month, and a list carrying only a name and an
+             *     amount shows them as a wall of duplicates — which is what it looks like today.
+             */
+            period_from: string;
+            /**
+             * Format: date-time
+             * @description End of the service period this charge covers.
+             */
+            period_to: string;
+            /**
+             * @description How much of this charge was covered by credit, as a decimal string.
+             *
+             *     It is the answer to "I have a balance, why am I still being charged". Without it the
+             *     customer sees a number that disagrees with what they expected and the only thing that
+             *     explains it is on our side.
+             */
+            credits?: string;
+            /**
+             * @description How much was taken off by a discount, as a decimal string. A usage allowance (the first N
+             *     units free) lands here too.
+             */
+            discounts?: string;
+            /** @description Free text from the charge, usually empty. Set on charges raised by hand. */
+            description?: string;
         };
         ChargeList: {
             currency: components["schemas"]["Currency"];
