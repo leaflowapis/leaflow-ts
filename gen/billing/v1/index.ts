@@ -78,6 +78,10 @@ export type ListInvoicesResult =
 export type GetInvoiceResult =
   operations["get-invoice"]["responses"][200]["content"]["application/json"];
 
+/** `GET /account/v1/projects/{projectId}/billing-account` 成功时的响应体。 */
+export type ReadProjectBillingAccountResult =
+  operations["read-project-billing-account"]["responses"][200]["content"]["application/json"];
+
 /** `POST /account/v1/projects/{projectId}/quote` 成功时的响应体。 */
 export type QuoteProjectUsageResult =
   operations["quote-project-usage"]["responses"][200]["content"]["application/json"];
