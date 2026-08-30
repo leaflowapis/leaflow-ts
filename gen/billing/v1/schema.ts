@@ -676,6 +676,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/billing-accounts/{accountKey}/prepaid-assets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What I bought outright, and when it runs out
+         * @description Everything this account paid a term for, across every product, soonest to expire first.
+         *
+         *     ## Why this is one list rather than a page inside each product
+         *
+         *     Renewal is the one thing a customer forgets, and forgetting it stops the machine. Splitting
+         *     the list per product means the instance about to lapse tomorrow is only visible to someone
+         *     who thought to go and look at instances. Sorting by expiry rather than by purchase date is
+         *     the same reason: the row that matters is the one at the top.
+         *
+         *     ## Metered resources are not here
+         *
+         *     There is no term to run out. Listing them with an empty expiry would invite renewing
+         *     something that is already billed by the hour until it is deleted.
+         *
+         *     ## `state` and `desired_state` are both reported
+         *
+         *     A machine stopped because its term lapsed reads `suspended` for both. One that has just been
+         *     renewed reads `suspended` and `active` — it is on its way back. Without the second field
+         *     those look identical, and a customer who just paid concludes it did not work and pays again.
+         */
+        get: operations["list-prepaid-assets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal-quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What renewing this would cost
+         * @description Priced the same way the charge is, from the same table, so the number shown is the number
+         *     taken. Quoting separately from charging is what lets a customer see the price before
+         *     committing; computing it twice in two places is what makes the two disagree, and a bill that
+         *     disagrees with the page that sold it is a complaint rather than a bug report.
+         *
+         *     ## Both the current and the resulting expiry are returned
+         *
+         *     Renewing early adds the term to what is left, not to today — otherwise renewing a month
+         *     ahead throws that month away, and everyone learns to wait until the last moment. Something
+         *     that lapsed long ago is counted from now instead, because adding to a date in the past
+         *     produces an expiry that is still in the past.
+         *
+         *     Reporting only the new date leaves the customer unable to tell which of those happened.
+         *
+         *     ## A withdrawn price still quotes
+         *
+         *     Taking a product off sale means stop selling new ones. Refusing renewals as well would stop
+         *     a batch of existing machines on their expiry date, which is not what the operator pressed
+         *     that button for.
+         */
+        get: operations["quote-renewal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Renew it
+         * @description Takes the money from the balance and pushes the expiry out. The resource itself is not
+         *     touched — nothing is rebuilt, nothing restarts, the id stays the same.
+         *
+         *     ## An idempotency key is required, not optional
+         *
+         *     Renewal is a pure charge. Unlike creating something, there is no resource whose uniqueness
+         *     catches a repeat, so a double click is two charges and twice the term — and both calls
+         *     return success. Letting the field be omitted would mean losing that protection silently, in
+         *     the one case that looks completely normal until the books are reconciled.
+         *
+         *     Sending the same key again returns the order that was already placed. It does not charge
+         *     again, and it is not an error: reporting a repeat as a failure makes the caller retry
+         *     forever, and makes the customer press the button a second time with a fresh key.
+         *
+         *     ## What happens if the balance is short
+         *
+         *     The order is recorded as failed and nothing else changes: no money moves, the expiry stays
+         *     where it was, and the resource keeps running until its existing term ends. Retrying with the
+         *     same key after topping up goes through.
+         *
+         *     ## Renewing something that already lapsed brings it back
+         *
+         *     Its term is counted from now, and it is asked to start again. Coming back is the
+         *     reconciliation loop's job, so it is not instant — which is what `desired_state` on the asset
+         *     list is for.
+         */
+        post: operations["renew-prepaid-asset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -874,6 +994,19 @@ export interface components {
              */
             state: "pending" | "fulfilled" | "failed";
             failure_reason?: string;
+            /**
+             * @description What was taken, as a decimal string. Absent on a metered order, where the amount is not
+             *     known when the order is placed: it comes from usage afterwards. Absent must be read as
+             *     "billed by usage" — writing zero would make a metered order and a genuinely free one
+             *     look the same.
+             */
+            amount?: string;
+            currency?: string;
+            /**
+             * @description Always `none` on a metered order.
+             * @enum {string}
+             */
+            payment_state?: "none" | "paid" | "refunded";
             /** Format: date-time */
             created_at: string;
             /** @description Only present on the single-order route. */
@@ -889,6 +1022,74 @@ export interface components {
             product_id: string;
             /** Format: int64 */
             quantity: number;
+        };
+        PrepaidAsset: {
+            /** @description Use this to quote and to renew. */
+            id: string;
+            project_id: string;
+            /** @description Which service holds it. Also which console it is managed from. */
+            service: string;
+            /**
+             * @description That service's own catalogue id, not a billing sku. The price of a machine is made of
+             *     finer parts than the machine type — the type does not appear in the rate card at all.
+             */
+            product_id: string;
+            /** @description The id that service knows it by, so the two consoles can be lined up. */
+            resource_id?: string;
+            /**
+             * Format: int64
+             * @description GiB for a disk, 1 for a machine or an address.
+             */
+            quantity: number;
+            /**
+             * Format: date-time
+             * @description Paid up to this instant. It stops being served after it, not before.
+             */
+            term_end: string;
+            /** @enum {string} */
+            state: "pending" | "active" | "suspended" | "terminated";
+            /**
+             * @description What it is being moved to. Differs from `state` while a change is still being applied —
+             *     in particular right after a renewal, which is the moment a customer is most likely to
+             *     conclude that nothing happened.
+             * @enum {string}
+             */
+            desired_state: "active" | "suspended" | "terminated";
+        };
+        PrepaidAssetList: {
+            assets: components["schemas"]["PrepaidAsset"][];
+        };
+        RenewalQuote: {
+            provision_id: string;
+            term: string;
+            /**
+             * @description A decimal string, not a float. Money that survives a round trip through binary floating
+             *     point is money that stops adding up.
+             */
+            amount: string;
+            currency: string;
+            /**
+             * Format: date-time
+             * @description What it is paid up to now.
+             */
+            current_term_end: string;
+            /**
+             * Format: date-time
+             * @description What it would be paid up to after renewing.
+             */
+            term_end: string;
+        };
+        RenewRequestBody: {
+            /**
+             * @description How long to renew for, as an ISO 8601 duration (P1M, P1Y). It does not have to match the
+             *     term originally bought.
+             */
+            term: string;
+            /**
+             * @description Generate one per renewal the customer starts — when the dialog opens, not when it is
+             *     submitted — and send the same one on every retry of that renewal.
+             */
+            idempotency_key: string;
         };
         OrderList: {
             orders: components["schemas"]["Order"][];
@@ -1216,6 +1417,8 @@ export interface components {
     };
     responses: never;
     parameters: {
+        /** @description Which asset, from the prepaid list */
+        ProvisionId: string;
         /**
          * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
          *     which is why the key is what addresses the account.
@@ -2108,6 +2311,125 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Purchase"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-prepaid-assets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrepaidAssetList"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "quote-renewal": {
+        parameters: {
+            query: {
+                /**
+                 * @description How long to renew for, as an ISO 8601 duration (P1M, P1Y). A duration rather than a
+                 *     number of months: months are not the same length.
+                 */
+                term: string;
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+                /** @description Which asset, from the prepaid list */
+                provisionId: components["parameters"]["ProvisionId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenewalQuote"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "renew-prepaid-asset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+                /** @description Which asset, from the prepaid list */
+                provisionId: components["parameters"]["ProvisionId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenewRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
                 };
             };
             /** @description Error */

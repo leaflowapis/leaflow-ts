@@ -1382,6 +1382,19 @@ export interface components {
         ImageListResponseBody: {
             items: components["schemas"]["ImageResource"][] | null;
         };
+        PrepaidPrice: {
+            /**
+             * @description An ISO 8601 duration (P1M, P1Y). A duration rather than a number of months: months are not
+             *     the same length, and storing a number leaves whoever reads it to decide what it means.
+             */
+            term: string;
+            /**
+             * @description A decimal string, not a float. Money that survives a round trip through binary floating
+             *     point is money that stops adding up.
+             */
+            amount: string;
+            currency: string;
+        };
         InstanceTypeResource: {
             /** @description Availability zone of this instance type. A disk must be in the same zone to be attached */
             availability_zone_code: string;
@@ -1399,6 +1412,39 @@ export interface components {
             region_code: string;
             /** Format: int64 */
             vcpus: number;
+            /**
+             * @description Whether this type can be ordered right now.
+             *
+             *     It reflects a limit set by operations, not what the cloud can physically schedule — raising
+             *     the limit does not create capacity that is not there, and a type that is not sold out can
+             *     still fail to start if the zone is full.
+             *
+             *     It is advisory: it is read when the list is built, and the last one can be taken between
+             *     that read and the order. The order is what actually refuses.
+             */
+            sold_out: boolean;
+            /**
+             * Format: int64
+             * @description How many more may be created. Absent when this type is not limited at all.
+             *
+             *     Absent is not zero and not "unknown": a type with no limit simply has no number to show.
+             *     Reporting it as a number would need a sentinel, and any sentinel eventually gets compared
+             *     against a real count.
+             */
+            remaining?: number;
+            /**
+             * @description What buying this type outright costs, per term. Empty means this type is only sold by the
+             *     hour.
+             *
+             *     The hourly price is not here and is not missing: it is made of finer parts than the type
+             *     (cores and memory are priced separately, and the type itself does not appear in the rate
+             *     card at all), so there is no single number to show. A term price is one number because a
+             *     term is one purchase.
+             *
+             *     Advisory, like `sold_out`: it is read when the list is built. The order is what fixes the
+             *     price, and it refuses rather than falling back to hourly if the term is not sold.
+             */
+            prepaid_prices?: components["schemas"]["PrepaidPrice"][];
         };
         InstanceTypeListResponseBody: {
             items: components["schemas"]["InstanceTypeResource"][] | null;
@@ -1597,6 +1643,24 @@ export interface components {
              * @description A private image. Exactly one of this, `image_id` and `boot_disk_id`
              */
             private_image_id?: string;
+            /**
+             * @description Buy the instance outright for this long, as an ISO 8601 duration (P1M, P1Y). Billed by the
+             *     hour when omitted.
+             *
+             *     The money is taken from the balance when the order is placed, at the price the catalogue
+             *     reported for this type and term. If that term is not on sale for this type the request is
+             *     refused — it is never quietly sold by the hour instead, because the customer who asked for
+             *     a year would find out only from the bill.
+             *
+             *     The system disk is bought for the same term: it is the same purchase, and one order cannot
+             *     be half outright and half hourly. A term is therefore refused together with `boot_disk_id`,
+             *     where the disk already exists and is already billed its own way.
+             *
+             *     When the term runs out the instance is stopped, not deleted, and starts again once it is
+             *     renewed. Renewal lives in the billing console, across every product, because what a
+             *     customer needs to see is everything expiring this month rather than one product at a time.
+             */
+            term?: string;
             /**
              * Format: int64
              * @description System disk capacity in GB. Chosen automatically from the requirement of the image and the platform minimum when omitted. Ignored with `boot_disk_id`, since that disk already has its capacity
