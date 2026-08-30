@@ -70,6 +70,10 @@ export type StartTopUpBody = NonNullable<
 export type ListChargesResult =
   operations["list-charges"]["responses"][200]["content"]["application/json"];
 
+/** `GET /account/v1/billing-accounts/{accountKey}/charges/{chargeId}/usage` 成功时的响应体。 */
+export type GetChargeUsageResult =
+  operations["get-charge-usage"]["responses"][200]["content"]["application/json"];
+
 /** `GET /account/v1/billing-accounts/{accountKey}/invoices` 成功时的响应体。 */
 export type ListInvoicesResult =
   operations["list-invoices"]["responses"][200]["content"]["application/json"];
