@@ -1520,7 +1520,20 @@ export interface components {
         ChargeList: {
             currency: components["schemas"]["Currency"];
             charges: components["schemas"]["Charge"][];
-            /** @description The sum, which is the same number as `unsettled` on the balance */
+            /**
+             * Format: int64
+             * @description How many charges there are in total, across every page.
+             *
+             *     Without it, "is there another page" has to be guessed from whether this one came back
+             *     full — and that guess turns into one extra fetch of an empty page whenever the last page
+             *     happens to be exactly full.
+             */
+            total_count?: number;
+            /**
+             * @description The sum over the **whole period**, not this page — it is the same number as `unsettled`
+             *     on the balance, and paging must not change it. A page-scoped sum would disagree with the
+             *     balance card sitting next to it, and there would be no way to tell which one to believe.
+             */
             total: string;
         };
         /** @enum {string} */
@@ -2083,7 +2096,18 @@ export interface operations {
     };
     "list-charges": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: number;
+                /**
+                 * @description How many charges per page. Defaults to a full page.
+                 *
+                 *     Charge count grows with resource count — an account running dozens of machines produces
+                 *     hundreds of lines in a period, and a screen shows a dozen. Fetching all of them on every
+                 *     visit carries data nothing displays.
+                 */
+                page_size?: number;
+            };
             header?: never;
             path: {
                 /**
