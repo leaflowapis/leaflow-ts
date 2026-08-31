@@ -124,17 +124,13 @@ export type CancelSubscriptionQuery =
 export type ReadTopUpResult =
   operations["read-top-up"]["responses"][200]["content"]["application/json"];
 
-/** `GET /account/v1/billing-accounts/{accountKey}/payment-method` 成功时的响应体。 */
-export type ReadPaymentMethodResult =
-  operations["read-payment-method"]["responses"][200]["content"]["application/json"];
+/** `GET /account/v1/billing-accounts/{accountKey}/payment-methods` 成功时的响应体。 */
+export type ListPaymentMethodsResult =
+  operations["list-payment-methods"]["responses"][200]["content"]["application/json"];
 
-/** `POST /account/v1/billing-accounts/{accountKey}/payment-method` 成功时的响应体。 */
+/** `POST /account/v1/billing-accounts/{accountKey}/payment-methods` 成功时的响应体。 */
 export type StartPaymentMethodSetupResult =
   operations["start-payment-method-setup"]["responses"][200]["content"]["application/json"];
-
-/** `POST /account/v1/billing-accounts/{accountKey}/billing-portal` 成功时的响应体。 */
-export type StartBillingPortalResult =
-  operations["start-billing-portal"]["responses"][200]["content"]["application/json"];
 
 /** `GET /account/v1/billing-accounts/{accountKey}/offers` 成功时的响应体。 */
 export type ListOffersResult =
@@ -151,29 +147,3 @@ export type PurchaseOfferQuery =
 /** `GET /account/v1/billing-accounts/{accountKey}/prepaid-assets` 成功时的响应体。 */
 export type ListPrepaidAssetsResult =
   operations["list-prepaid-assets"]["responses"][200]["content"]["application/json"];
-
-/** `PUT /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal` 成功时的响应体。 */
-export type SetRenewalStatusResult =
-  operations["set-renewal-status"]["responses"][200]["content"]["application/json"];
-
-/** `PUT /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal` 的请求体。 */
-export type SetRenewalStatusBody = NonNullable<
-  operations["set-renewal-status"]["requestBody"]
->["content"]["application/json"];
-
-/** `GET /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal-quote` 成功时的响应体。 */
-export type QuoteRenewalResult =
-  operations["quote-renewal"]["responses"][200]["content"]["application/json"];
-
-/** `GET /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal-quote` 的查询参数。 */
-export type QuoteRenewalQuery =
-  operations["quote-renewal"]["parameters"]["query"];
-
-/** `POST /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renew` 成功时的响应体。 */
-export type RenewPrepaidAssetResult =
-  operations["renew-prepaid-asset"]["responses"][200]["content"]["application/json"];
-
-/** `POST /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renew` 的请求体。 */
-export type RenewPrepaidAssetBody = NonNullable<
-  operations["renew-prepaid-asset"]["requestBody"]
->["content"]["application/json"];
