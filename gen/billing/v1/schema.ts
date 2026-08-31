@@ -814,6 +814,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Choose what happens when it expires
+         * @description Three choices, not two.
+         *
+         *     ## Why automatic renewal has to be opted into
+         *
+         *     Charging someone automatically has to be something they chose. Defaulting to it means a
+         *     person who wanted to try one month is charged for a second they never agreed to — and that
+         *     is where chargebacks come from. So a resource bought outright starts on `manual`.
+         *
+         *     ## And why "let it expire" is its own choice, not just "not automatic"
+         *
+         *     `manual` keeps reminding: the notice before expiry is mandatory, because expiry stops the
+         *     resource. Someone who has decided to let it go does not want those, and the cost of sending
+         *     them anyway is not annoyance — it is that the reminders get filtered away, taking the ones
+         *     that mattered with them.
+         *
+         *     ## Turning it on needs a known cycle
+         *
+         *     Renewing automatically has to know for how long, which comes from the last purchase or
+         *     renewal. A resource adopted into billing, or bought before this was recorded, has no cycle
+         *     yet: renew it manually once and the cycle is written down.
+         */
+        put: operations["set-renewal-status"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal-quote": {
         parameters: {
             query?: never;
@@ -1155,6 +1194,19 @@ export interface components {
              * @enum {string}
              */
             desired_state: "active" | "suspended" | "terminated";
+            /**
+             * @description How long one renewal buys, as an ISO 8601 duration (P1M, P1Y). Empty on something adopted
+             *     into billing rather than bought through it — automatic renewal cannot be turned on until
+             *     one manual renewal records it.
+             */
+            billing_cycle?: string;
+            /**
+             * @description What happens at expiry. `manual` is where everything starts: charging automatically has
+             *     to be chosen. `none` also stops the reminders, which is a different thing from `manual`
+             *     — see the route that sets it.
+             * @enum {string}
+             */
+            renewal_status: "manual" | "auto" | "none";
         };
         PrepaidAssetList: {
             assets: components["schemas"]["PrepaidAsset"][];
@@ -1178,6 +1230,10 @@ export interface components {
              * @description What it would be paid up to after renewing.
              */
             term_end: string;
+        };
+        SetRenewalStatusRequestBody: {
+            /** @enum {string} */
+            status: "manual" | "auto" | "none";
         };
         RenewRequestBody: {
             /**
@@ -2666,6 +2722,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PrepaidAssetList"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "set-renewal-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+                /** @description Which asset, from the prepaid list */
+                provisionId: components["parameters"]["ProvisionId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetRenewalStatusRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrepaidAsset"];
                 };
             };
             /** @description Error */
