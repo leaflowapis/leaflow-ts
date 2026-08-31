@@ -816,6 +816,12 @@ export interface components {
             /** @description The service that reports this type */
             service: string;
             severity: components["schemas"]["NotificationSeverity"];
+            /**
+             * @description A short name for this type, in the reader's language — what a settings screen puts on
+             *     the row. It is not the subject line of the notification itself: a subject says what
+             *     happened this time and carries the ticket number, while this names the kind of thing.
+             */
+            title: string;
             type: string;
         };
         NotificationTypeListResponseBody: {

@@ -152,6 +152,15 @@ export type PurchaseOfferQuery =
 export type ListPrepaidAssetsResult =
   operations["list-prepaid-assets"]["responses"][200]["content"]["application/json"];
 
+/** `PUT /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal` 成功时的响应体。 */
+export type SetRenewalStatusResult =
+  operations["set-renewal-status"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal` 的请求体。 */
+export type SetRenewalStatusBody = NonNullable<
+  operations["set-renewal-status"]["requestBody"]
+>["content"]["application/json"];
+
 /** `GET /account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal-quote` 成功时的响应体。 */
 export type QuoteRenewalResult =
   operations["quote-renewal"]["responses"][200]["content"]["application/json"];
