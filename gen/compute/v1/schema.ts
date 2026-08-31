@@ -1478,6 +1478,31 @@ export interface components {
              * @description Restore from this snapshot. When given, the capacity need only be no smaller than the snapshot
              */
             snapshot_id?: string;
+            /**
+             * @description Buy the disk outright for this long, as an ISO 8601 duration (P1M, P1Y). Billed by the
+             *     hour when omitted.
+             *
+             *     A disk bought outright can still be expanded: the difference is prorated over the days
+             *     left in the term, and the expiry date does not move. It is stopped, not deleted, when the
+             *     term runs out — the data stays and comes back once renewed.
+             */
+            term?: string;
+            /**
+             * @description How to pay for a term bought outright. Only meaningful together with `term`.
+             *
+             *     `balance` takes it from the account balance and either succeeds or refuses on the spot.
+             *     `online` returns a `checkout_url` instead and **creates nothing** — the resource is only
+             *     created once the money arrives and the customer comes back to place it again. That last
+             *     part is deliberate: a successful payment should not silently turn into a machine, because
+             *     between paying and returning they may have changed their mind.
+             *
+             *     Online payment is not a second wallet. What arrives lands in the balance first and the
+             *     order is settled from there, so money topped up and money paid at checkout are the same
+             *     pool.
+             * @default balance
+             * @enum {string}
+             */
+            payment_method?: "balance" | "online";
         };
         RenameDiskRequestBody: {
             name: string;
@@ -1644,6 +1669,22 @@ export interface components {
              */
             private_image_id?: string;
             /**
+             * @description How to pay for a term bought outright. Only meaningful together with `term`.
+             *
+             *     `balance` takes it from the account balance and either succeeds or refuses on the spot.
+             *     `online` returns a `checkout_url` instead and **creates nothing** — the resource is only
+             *     created once the money arrives and the customer comes back to place it again. That last
+             *     part is deliberate: a successful payment should not silently turn into a machine, because
+             *     between paying and returning they may have changed their mind.
+             *
+             *     Online payment is not a second wallet. What arrives lands in the balance first and the
+             *     order is settled from there, so money topped up and money paid at checkout are the same
+             *     pool.
+             * @default balance
+             * @enum {string}
+             */
+            payment_method?: "balance" | "online";
+            /**
              * @description Buy the instance outright for this long, as an ISO 8601 duration (P1M, P1Y). Billed by the
              *     hour when omitted.
              *
@@ -1681,6 +1722,15 @@ export interface components {
             instances: components["schemas"]["InstanceResource"][] | null;
             /** @description Returned only in this response; store it immediately. All instances of a batch share it */
             password: string;
+            /**
+             * @description Present only when `payment_method` was `online`: **nothing was created**. Send the
+             *     customer here to pay.
+             *
+             *     What comes back is not a resource but a bill to settle. Treating this response as a
+             *     success and moving on is how something gets handed over without the money arriving —
+             *     and it looks exactly like a normal creation from the outside.
+             */
+            checkout_url?: string;
         };
         SetInstanceLabelsRequestBody: {
             /** @description The complete set of labels. Whatever is absent here is removed; send an empty object to clear them all. A key may not contain a colon, whitespace or control characters */
@@ -2488,6 +2538,33 @@ export interface operations {
                     "application/json": components["schemas"]["DiskResource"];
                 };
             };
+            /**
+             * @description Payment required: **nothing was created.**
+             *
+             *     Returned when `payment_method` is `online`. `meta.checkout_url` is where to send the
+             *     customer; `meta.order_id` is the order waiting on it.
+             *
+             *     ## Why this is a status and not a field on a 200
+             *
+             *     A field on a success response is something a client can forget to read, and forgetting it
+             *     means treating "we created nothing and are waiting for money" as "created" — which looks
+             *     identical from the outside until the bill does not add up. A 402 fails loudly in any
+             *     client that handles errors at all.
+             *
+             *     ## What happens after they pay
+             *
+             *     The money lands in the balance and the order is settled from it. The resource is **not**
+             *     created automatically: placing it again is the customer's move, because between paying
+             *     and coming back they may have changed their mind. The balance is theirs either way.
+             */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
             /** @description Error */
             default: {
                 headers: {
@@ -2939,6 +3016,33 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LaunchInstanceResponseBody"];
+                };
+            };
+            /**
+             * @description Payment required: **nothing was created.**
+             *
+             *     Returned when `payment_method` is `online`. `meta.checkout_url` is where to send the
+             *     customer; `meta.order_id` is the order waiting on it.
+             *
+             *     ## Why this is a status and not a field on a 200
+             *
+             *     A field on a success response is something a client can forget to read, and forgetting it
+             *     means treating "we created nothing and are waiting for money" as "created" — which looks
+             *     identical from the outside until the bill does not add up. A 402 fails loudly in any
+             *     client that handles errors at all.
+             *
+             *     ## What happens after they pay
+             *
+             *     The money lands in the balance and the order is settled from it. The resource is **not**
+             *     created automatically: placing it again is the customer's move, because between paying
+             *     and coming back they may have changed their mind. The balance is theirs either way.
+             */
+            402: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
                 };
             };
             /** @description Error */
