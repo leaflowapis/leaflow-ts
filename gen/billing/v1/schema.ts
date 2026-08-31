@@ -599,7 +599,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/account/v1/billing-accounts/{accountKey}/payment-method": {
+    "/account/v1/billing-accounts/{accountKey}/payment-methods": {
         parameters: {
             query?: never;
             header?: never;
@@ -607,57 +607,50 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Whether this account can be charged
-         * @description Answers whether a payment method is on file, and nothing else.
+         * The payment methods on file
+         * @description Every method saved against this account, and which one an invoice will be charged to.
          *
-         *     ## It is a payment method, not a card
+         *     ## Why the brand, last four and expiry are here
          *
-         *     A card is one kind. Direct debit and the recurring-payment mandates offered by regional
-         *     wallets are others, and they occupy the same slot: something the provider can charge later
-         *     without the account holder present. Naming the slot after cards would put an assumption
-         *     into the contract that stops being true the day a second kind is accepted.
+         *     They were deliberately absent while the billing engine held the card, because the answer
+         *     that mattered — can money be collected — came from the engine, and a page built on the
+         *     provider's answer could show a method the engine had not recorded. Collection now runs from
+         *     this service against the provider directly, so there is one answer, and it is the one shown.
          *
-         *     ## Why there is no brand, no last four digits, no expiry
+         *     Expiry is the reason this is worth showing at all: a card expires, the invoice then fails,
+         *     dunning runs out, and the project stops — with the account holder watching it happen and no
+         *     indication that a card was the cause.
          *
-         *     Those would have to be read from the payment provider, and the two answers can disagree: a
-         *     method present at the provider that the billing engine has not recorded as the default is
-         *     exactly the state in which money cannot be collected — while a page built on the provider's
-         *     answer would be showing one. What matters here is whether the party that will run the
-         *     charge believes it can, so the answer comes from that party alone.
+         *     No other card data exists here. The number, the expiry entered by the holder and the CVC go
+         *     from the browser to the provider and never reach this platform.
          *
-         *     To see it, replace it, or remove it, open the billing portal.
-         *
-         *     ## Read this before offering a paid plan, not after
-         *
-         *     `ready` being false is why the engine refuses to start a paid subscription. Discovering it
-         *     at purchase time turns a missing payment method into a rejection whose wording is about
-         *     something else entirely.
-         *
-         *     An account that has never had one returns `ready: false`. That is the normal state of a
-         *     new account, not an error.
+         *     An account that has never added one returns an empty list. That is the normal state of a new
+         *     account, not an error.
          */
-        get: operations["read-payment-method"];
+        get: operations["list-payment-methods"];
         put?: never;
         /**
-         * Add or replace the payment method on file
-         * @description Begins adding a payment method. Returns a URL to send the browser to; the details are
-         *     entered there, on the payment provider's own page, and **no card data ever reaches this
-         *     platform**.
+         * Begin adding a payment method
+         * @description Starts a session for adding a method, and returns the secret the browser needs to mount the
+         *     provider's own form.
          *
-         *     Which kinds are offered is the provider's decision, not this API's — a card today, a
-         *     wallet mandate or a direct debit wherever the provider supports charging one later without
-         *     the account holder present.
+         *     ## The form is embedded, not a redirect
+         *
+         *     The returned `client_secret` initialises the provider's JavaScript, which renders its form
+         *     inside an iframe on this platform's own page. **No card data reaches this platform** — the
+         *     number goes from the browser straight to the provider, exactly as it would on a redirect —
+         *     but the account holder never leaves the console.
+         *
+         *     A redirect would take them to a page with someone else's branding in the middle of adding a
+         *     payment method, which is the moment they are most likely to abandon it.
          *
          *     ## This is a prerequisite for buying a plan, not a convenience
          *
-         *     A plan is charged by invoice, and the invoice is collected from the method on file. A
-         *     subscription cannot start for an account that has none — so "add a payment method, then
-         *     buy" is the order the system requires, not a flow that was chosen.
+         *     A plan is charged by invoice, and the invoice is collected from a method on file. Discovering
+         *     that none exists at purchase time turns a missing payment method into a rejection whose
+         *     wording is about something else entirely.
          *
          *     It is *not* a prerequisite for topping up: a top-up collects the money there and then.
-         *
-         *     Replacing uses the same operation. The new method becomes the default and the old one stops
-         *     being used; nothing else about the account changes.
          */
         post: operations["start-payment-method-setup"];
         delete?: never;
@@ -666,7 +659,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/account/v1/billing-accounts/{accountKey}/billing-portal": {
+    "/account/v1/billing-accounts/{accountKey}/payment-methods/{paymentMethodId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -675,26 +668,43 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        post?: never;
         /**
-         * Open the hosted billing portal
-         * @description Returns a URL to the payment provider's own portal, where the card can be replaced or
-         *     removed, the billing address changed, and past invoices downloaded.
+         * Remove a payment method
+         * @description Detaches it from this account. Removing the last one is allowed.
          *
-         *     ## Why replacing a card is not a form on this platform
+         *     ## Why removing the last one is not blocked
          *
-         *     A form would mean a card number field, and no card data ever reaches this platform. The
-         *     portal moves the whole interaction to the provider; only a session URL comes back.
-         *
-         *     ## Something has to be able to replace an expiring card
-         *
-         *     Cards expire. Once one does, the invoices for a plan stop being collectable, dunning runs
-         *     out, and the projects paid for by this account are suspended for non-payment. Without this
-         *     operation the account holder watches that happen with nowhere to fix it — adding a card
-         *     does not help, since that operation only makes sense when there is none.
-         *
-         *     The URL is single-use and expires. Do not store it.
+         *     Blocking it leaves an account holder who wants to stop paying with no way out. The cost of
+         *     allowing it is that later invoices cannot be collected — and that path has notice, a grace
+         *     period and a way back. A card that cannot be removed is a dead end.
          */
-        post: operations["start-billing-portal"];
+        delete: operations["remove-payment-method"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/payment-methods/{paymentMethodId}/default": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Charge invoices to this one
+         * @description Makes this the method an invoice is collected from.
+         *
+         *     ## It is stored at the provider, not here
+         *
+         *     The charge itself reads that setting from the provider, so keeping a second copy here would
+         *     create two answers to the same question. When they disagree the visible symptom is that the
+         *     account holder changed the default and the charge still went to the old one.
+         */
+        put: operations["set-default-payment-method"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -784,151 +794,34 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * What I bought outright, and when it runs out
-         * @description Everything this account paid a term for, across every product, soonest to expire first.
+         * What I bought outright
+         * @description Everything this account holds on a term, across every product.
          *
-         *     ## Why this is one list rather than a page inside each product
+         *     ## Nothing here expires on its own
          *
-         *     Renewal is the one thing a customer forgets, and forgetting it stops the machine. Splitting
-         *     the list per product means the instance about to lapse tomorrow is only visible to someone
-         *     who thought to go and look at instances. Sorting by expiry rather than by purchase date is
-         *     the same reason: the row that matters is the one at the top.
+         *     A term renews for as long as the seat is held: the engine charges the next period, prorates
+         *     any change to the second, and stops the moment the seat is given up. So there is no renewal
+         *     to remember and no expiry to warn about — giving it up means deleting the resource, in the
+         *     console that owns it.
+         *
+         *     What the next period costs and when it falls due is on the charges route. That is read
+         *     straight from the engine rather than copied here, because a copy is a second answer that
+         *     drifts without saying so.
          *
          *     ## Metered resources are not here
          *
-         *     There is no term to run out. Listing them with an empty expiry would invite renewing
-         *     something that is already billed by the hour until it is deleted.
+         *     They have no term. Listing them would invite renewing something that is already billed by
+         *     the hour until it is deleted.
          *
          *     ## `state` and `desired_state` are both reported
          *
-         *     A machine stopped because its term lapsed reads `suspended` for both. One that has just been
-         *     renewed reads `suspended` and `active` — it is on its way back. Without the second field
-         *     those look identical, and a customer who just paid concludes it did not work and pays again.
+         *     A machine stopped for arrears reads `suspended` for both. One being brought back reads
+         *     `suspended` and `active` — it is on its way. Without the second field those look identical,
+         *     and a customer who just paid concludes it did not work and pays again.
          */
         get: operations["list-prepaid-assets"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Choose what happens when it expires
-         * @description Three choices, not two.
-         *
-         *     ## Why automatic renewal has to be opted into
-         *
-         *     Charging someone automatically has to be something they chose. Defaulting to it means a
-         *     person who wanted to try one month is charged for a second they never agreed to — and that
-         *     is where chargebacks come from. So a resource bought outright starts on `manual`.
-         *
-         *     ## And why "let it expire" is its own choice, not just "not automatic"
-         *
-         *     `manual` keeps reminding: the notice before expiry is mandatory, because expiry stops the
-         *     resource. Someone who has decided to let it go does not want those, and the cost of sending
-         *     them anyway is not annoyance — it is that the reminders get filtered away, taking the ones
-         *     that mattered with them.
-         *
-         *     ## Turning it on needs a known cycle
-         *
-         *     Renewing automatically has to know for how long, which comes from the last purchase or
-         *     renewal. A resource adopted into billing, or bought before this was recorded, has no cycle
-         *     yet: renew it manually once and the cycle is written down.
-         */
-        put: operations["set-renewal-status"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renewal-quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * What renewing this would cost
-         * @description Priced the same way the charge is, from the same table, so the number shown is the number
-         *     taken. Quoting separately from charging is what lets a customer see the price before
-         *     committing; computing it twice in two places is what makes the two disagree, and a bill that
-         *     disagrees with the page that sold it is a complaint rather than a bug report.
-         *
-         *     ## Both the current and the resulting expiry are returned
-         *
-         *     Renewing early adds the term to what is left, not to today — otherwise renewing a month
-         *     ahead throws that month away, and everyone learns to wait until the last moment. Something
-         *     that lapsed long ago is counted from now instead, because adding to a date in the past
-         *     produces an expiry that is still in the past.
-         *
-         *     Reporting only the new date leaves the customer unable to tell which of those happened.
-         *
-         *     ## A withdrawn price still quotes
-         *
-         *     Taking a product off sale means stop selling new ones. Refusing renewals as well would stop
-         *     a batch of existing machines on their expiry date, which is not what the operator pressed
-         *     that button for.
-         */
-        get: operations["quote-renewal"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/account/v1/billing-accounts/{accountKey}/prepaid-assets/{provisionId}/renew": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Renew it
-         * @description Takes the money from the balance and pushes the expiry out. The resource itself is not
-         *     touched — nothing is rebuilt, nothing restarts, the id stays the same.
-         *
-         *     ## An idempotency key is required, not optional
-         *
-         *     Renewal is a pure charge. Unlike creating something, there is no resource whose uniqueness
-         *     catches a repeat, so a double click is two charges and twice the term — and both calls
-         *     return success. Letting the field be omitted would mean losing that protection silently, in
-         *     the one case that looks completely normal until the books are reconciled.
-         *
-         *     Sending the same key again returns the order that was already placed. It does not charge
-         *     again, and it is not an error: reporting a repeat as a failure makes the caller retry
-         *     forever, and makes the customer press the button a second time with a fresh key.
-         *
-         *     ## What happens if the balance is short
-         *
-         *     The order is recorded as failed and nothing else changes: no money moves, the expiry stays
-         *     where it was, and the resource keeps running until its existing term ends. Retrying with the
-         *     same key after topping up goes through.
-         *
-         *     ## Renewing something that already lapsed brings it back
-         *
-         *     Its term is counted from now, and it is asked to start again. Coming back is the
-         *     reconciliation loop's job, so it is not instant — which is what `desired_state` on the asset
-         *     list is for.
-         */
-        post: operations["renew-prepaid-asset"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1163,7 +1056,6 @@ export interface components {
             quantity: number;
         };
         PrepaidAsset: {
-            /** @description Use this to quote and to renew. */
             id: string;
             project_id: string;
             /** @description Which service holds it. Also which console it is managed from. */
@@ -1181,59 +1073,25 @@ export interface components {
              */
             quantity: number;
             /**
-             * Format: date-time
-             * @description Paid up to this instant. It stops being served after it, not before.
+             * @description How long one period buys, as an ISO 8601 duration (P1M, P1Y).
+             *
+             *     There is no expiry to report. The engine keeps renewing this for as long as the seat is
+             *     held, so what runs out is not the term but the customer's decision to keep it. What the
+             *     next period costs, and when it is charged, is on the charges route — that is the engine's
+             *     own answer rather than a copy of it.
              */
-            term_end: string;
+            term: string;
             /** @enum {string} */
             state: "pending" | "active" | "suspended" | "terminated";
             /**
-             * @description What it is being moved to. Differs from `state` while a change is still being applied —
-             *     in particular right after a renewal, which is the moment a customer is most likely to
-             *     conclude that nothing happened.
+             * @description What it is being moved to. Differs from `state` while a change is still being applied,
+             *     which is the moment a customer is most likely to conclude that nothing happened.
              * @enum {string}
              */
             desired_state: "active" | "suspended" | "terminated";
-            /**
-             * @description How long one renewal buys, as an ISO 8601 duration (P1M, P1Y). Empty on something adopted
-             *     into billing rather than bought through it — automatic renewal cannot be turned on until
-             *     one manual renewal records it.
-             */
-            billing_cycle?: string;
-            /**
-             * @description What happens at expiry. `manual` is where everything starts: charging automatically has
-             *     to be chosen. `none` also stops the reminders, which is a different thing from `manual`
-             *     — see the route that sets it.
-             * @enum {string}
-             */
-            renewal_status: "manual" | "auto" | "none";
         };
         PrepaidAssetList: {
             assets: components["schemas"]["PrepaidAsset"][];
-        };
-        RenewalQuote: {
-            provision_id: string;
-            term: string;
-            /**
-             * @description A decimal string, not a float. Money that survives a round trip through binary floating
-             *     point is money that stops adding up.
-             */
-            amount: string;
-            currency: string;
-            /**
-             * Format: date-time
-             * @description What it is paid up to now.
-             */
-            current_term_end: string;
-            /**
-             * Format: date-time
-             * @description What it would be paid up to after renewing.
-             */
-            term_end: string;
-        };
-        SetRenewalStatusRequestBody: {
-            /** @enum {string} */
-            status: "manual" | "auto" | "none";
         };
         RenewRequestBody: {
             /**
@@ -1429,40 +1287,60 @@ export interface components {
         };
         PaymentMethodSetupSession: {
             /**
-             * Format: uri
-             * @description Send the browser here. It expires, so do not store it
+             * @description Initialises the provider's JavaScript, which mounts its form in an iframe on this page.
+             *
+             *     Not a URL: the form is embedded rather than redirected to, so the account holder stays
+             *     on the console. It expires, so fetch it when the form is about to be shown rather than
+             *     when the page loads.
              */
-            url: string;
-        };
-        BillingPortalSession: {
+            client_secret: string;
             /**
-             * Format: uri
-             * @description Send the browser here. It expires, so do not store it
+             * @description The provider's id for this attempt.
+             *
+             *     The browser does not need it — the callback carries the same id and is what actually
+             *     records the method. It is here so that a support conversation about one failed attempt
+             *     has something to look it up by.
              */
-            url: string;
+            session_id?: string;
         };
         /**
-         * @description Whether money can be collected from this account later, without the account holder present.
+         * @description One saved way of collecting money later, without the account holder present.
          *
-         *     Deliberately not called a card: a card is one kind of payment method, and direct debit and
-         *     the recurring mandates offered by regional wallets occupy the same slot.
+         *     Deliberately not called a card: a card is one kind, and direct debit and the recurring
+         *     mandates offered by regional wallets occupy the same slot.
          */
         PaymentMethod: {
+            /** @description The provider's id for it. Used to remove it or make it the default */
+            id: string;
+            /** @description Visa, Mastercard, and so on. Empty for kinds that have no brand */
+            brand?: string;
             /**
-             * @description True when the billing engine holds a default payment method for this account and can
-             *     therefore collect an invoice.
+             * @description The last four digits, for telling two saved methods apart.
              *
-             *     This is the precondition for a paid plan. While it is false, starting a paid
-             *     subscription is refused, and the refusal is about billing setup rather than about the
-             *     plan — so check this first and say what is actually missing.
-             *
-             *     It says nothing about which kind is on file. To show or change that, send the account
-             *     holder to the billing portal.
-             *
-             *     A free plan does not require it, which is what allows a new account to be placed on the
-             *     default tier before anyone has entered a card.
+             *     This and the expiry are the only parts of the instrument that exist here. The number,
+             *     the expiry the holder typed and the CVC never reach this platform.
              */
-            ready: boolean;
+            last4?: string;
+            /** Format: int32 */
+            exp_month?: number;
+            /**
+             * Format: int32
+             * @description Together with `exp_month`, when this stops working.
+             *
+             *     Worth showing because the failure is otherwise invisible: the card expires, the invoice
+             *     fails, dunning runs out, and the project stops — with nothing pointing at the card.
+             */
+            exp_year?: number;
+            /**
+             * @description True for the one an invoice is collected from.
+             *
+             *     Exactly one is the default while any exist. An account whose only method was removed
+             *     has none, and its next invoice cannot be collected.
+             */
+            default: boolean;
+        };
+        PaymentMethodList: {
+            payment_methods: components["schemas"]["PaymentMethod"][];
         };
         TopUpSession: {
             /**
@@ -2520,7 +2398,7 @@ export interface operations {
             };
         };
     };
-    "read-payment-method": {
+    "list-payment-methods": {
         parameters: {
             query?: never;
             header?: never;
@@ -2541,7 +2419,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentMethod"];
+                    "application/json": components["schemas"]["PaymentMethodList"];
                 };
             };
             /** @description Error */
@@ -2590,7 +2468,7 @@ export interface operations {
             };
         };
     };
-    "start-billing-portal": {
+    "remove-payment-method": {
         parameters: {
             query?: never;
             header?: never;
@@ -2600,19 +2478,52 @@ export interface operations {
                  *     which is why the key is what addresses the account.
                  */
                 accountKey: components["parameters"]["AccountKey"];
+                paymentMethodId: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BillingPortalSession"];
+                    "application/json": components["schemas"]["Error"];
                 };
+            };
+        };
+    };
+    "set-default-payment-method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+                paymentMethodId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Updated */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Error */
             default: {
@@ -2722,131 +2633,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PrepaidAssetList"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "set-renewal-status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
-                 *     which is why the key is what addresses the account.
-                 */
-                accountKey: components["parameters"]["AccountKey"];
-                /** @description Which asset, from the prepaid list */
-                provisionId: components["parameters"]["ProvisionId"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetRenewalStatusRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PrepaidAsset"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "quote-renewal": {
-        parameters: {
-            query: {
-                /**
-                 * @description How long to renew for, as an ISO 8601 duration (P1M, P1Y). A duration rather than a
-                 *     number of months: months are not the same length.
-                 */
-                term: string;
-            };
-            header?: never;
-            path: {
-                /**
-                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
-                 *     which is why the key is what addresses the account.
-                 */
-                accountKey: components["parameters"]["AccountKey"];
-                /** @description Which asset, from the prepaid list */
-                provisionId: components["parameters"]["ProvisionId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RenewalQuote"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "renew-prepaid-asset": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
-                 *     which is why the key is what addresses the account.
-                 */
-                accountKey: components["parameters"]["AccountKey"];
-                /** @description Which asset, from the prepaid list */
-                provisionId: components["parameters"]["ProvisionId"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RenewRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Order"];
                 };
             };
             /** @description Error */
