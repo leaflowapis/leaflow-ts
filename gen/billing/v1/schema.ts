@@ -1287,11 +1287,11 @@ export interface components {
         };
         PaymentMethodSetupSession: {
             /**
-             * @description Initialises the provider's JavaScript, which mounts its form in an iframe on this page.
+             * @description Confirms this attempt from the browser, against the provider's own inputs.
              *
-             *     Not a URL: the form is embedded rather than redirected to, so the account holder stays
-             *     on the console. It expires, so fetch it when the form is about to be shown rather than
-             *     when the page loads.
+             *     Not a URL and not a hosted page: only the inputs come from the provider, so the
+             *     heading, the button and the styling around them are this platform's. It expires, so
+             *     fetch it when the form is about to be shown rather than when the page loads.
              */
             client_secret: string;
             /**
@@ -1310,7 +1310,7 @@ export interface components {
              *     records the method. It is here so that a support conversation about one failed attempt
              *     has something to look it up by.
              */
-            session_id?: string;
+            setup_id?: string;
         };
         /**
          * @description One saved way of collecting money later, without the account holder present.
