@@ -70,10 +70,6 @@ export type StartTopUpBody = NonNullable<
 export type ListChargesResult =
   operations["list-charges"]["responses"][200]["content"]["application/json"];
 
-/** `GET /account/v1/billing-accounts/{accountKey}/charges` 的查询参数。 */
-export type ListChargesQuery =
-  operations["list-charges"]["parameters"]["query"];
-
 /** `GET /account/v1/billing-accounts/{accountKey}/charges/{chargeId}/usage` 成功时的响应体。 */
 export type GetChargeUsageResult =
   operations["get-charge-usage"]["responses"][200]["content"]["application/json"];
@@ -111,6 +107,10 @@ export type QuoteUsageBody = NonNullable<
 /** `GET /account/v1/billing-accounts/{accountKey}/subscription` 成功时的响应体。 */
 export type ReadSubscriptionResult =
   operations["read-subscription"]["responses"][200]["content"]["application/json"];
+
+/** `POST /account/v1/billing-accounts/{accountKey}/subscription/keep` 成功时的响应体。 */
+export type KeepSubscriptionResult =
+  operations["keep-subscription"]["responses"][200]["content"]["application/json"];
 
 /** `POST /account/v1/billing-accounts/{accountKey}/subscription/cancel` 成功时的响应体。 */
 export type CancelSubscriptionResult =
