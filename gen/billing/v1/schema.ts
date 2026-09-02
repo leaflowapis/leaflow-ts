@@ -539,6 +539,36 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/billing-accounts/{accountKey}/subscription/keep": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Undo an end-of-period cancellation
+         * @description Takes back a cancellation that was set for the end of the period, so the plan carries on.
+         *
+         *     **It only works on a cancellation, not on a scheduled downgrade.** Scheduling a change to
+         *     another plan leaves a second, scheduled subscription holding the customer's one slot, and the
+         *     engine offers no way to remove it: unscheduling is refused with a conflict and the scheduled
+         *     subscription cannot be deleted over HTTP. So a downgrade becomes final the moment it is
+         *     scheduled, and saying so up front is the only honest thing to do — this endpoint answers
+         *     `BILLING_NO_SCHEDULED_CHANGE` rather than pretending to undo it.
+         *
+         *     Without this, someone who cancels by accident has to wait out the period and buy the tier
+         *     again, losing whatever the tier had accumulated.
+         */
+        post: operations["keep-subscription"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/billing-accounts/{accountKey}/subscription/cancel": {
         parameters: {
             query?: never;
@@ -550,12 +580,13 @@ export interface paths {
         put?: never;
         /**
          * Come off the paid plan
-         * @description Moves the account off whatever plan it is on.
+         * @description Takes the account off its paid plan and back to the free tier.
          *
-         *     Where a default plan is configured this is a switch to it rather than a cancellation — an
-         *     account with no plan is refused admission, so cancelling outright would cut off someone who
-         *     only meant to drop back to the free tier. Without a default plan it is a real cancellation and
-         *     the account is left with no plan on purpose.
+         *     Ending immediately lands on the free tier straight away. Ending at the end of the period is a
+         *     plain cancellation that can still be undone (`subscription/keep`) — it deliberately does not
+         *     schedule a switch, because a scheduled switch holds the customer's one subscription slot and
+         *     the engine gives no way to cancel it afterwards. The free tier is applied once the period
+         *     actually ends, by the sweep that keeps every account on some plan.
          *
          *     `timing` has to be stated. Ending immediately on an account that has already paid for the
          *     current period takes back what they paid for; ending at the end of the period does not. There
@@ -928,6 +959,15 @@ export interface components {
          */
         PlanChangeTiming: "immediate" | "next_billing_cycle";
         OfferList: {
+            /**
+             * Format: int64
+             * @description How many entries there are in total, across every page.
+             *
+             *     Without it, "is there another page" has to be guessed from whether this one came back
+             *     full — and that guess turns into one extra fetch of an empty page whenever the last page
+             *     happens to be exactly full.
+             */
+            total_count?: number;
             offers: components["schemas"]["Offer"][];
         };
         /**
@@ -946,6 +986,15 @@ export interface components {
              * @description When this offer stops being purchasable. Absent means it does not expire
              */
             valid_until?: string;
+            /**
+             * @description The plan this offer sells, matching `plan_key` on the subscription. Present on offers
+             *     that sell a plan.
+             *
+             *     It is here so the pricing page can mark the tier the account is already on. Without it
+             *     the current tier looks like every other one, and the obvious thing to do — buy it — is
+             *     refused as a switch to the same plan
+             */
+            plan_key?: string;
             /** @description Present on offers that sell a plan */
             pricing?: components["schemas"]["Pricing"];
             /** @description Present on offers that sell credit */
@@ -972,6 +1021,21 @@ export interface components {
              *     one of those, last
              */
             phases: components["schemas"]["PricingPhase"][];
+            /**
+             * @description Credit handed out at the start of every period, as a decimal string in `currency`. Absent
+             *     when the tier comes with none.
+             *
+             *     It is what makes a paid tier worth buying — "$200 a month, and $200 of credit to spend" —
+             *     so leaving it off the pricing page turns that tier into a fee with nothing visibly
+             *     attached to it
+             */
+            included_credit?: string;
+            /**
+             * @description Whether unused credit is voided at the end of the period. Only meaningful alongside
+             *     `included_credit`, and worth showing either way: carried over, it accumulates, which is a
+             *     materially different offer at the same price
+             */
+            included_credit_expires?: boolean;
         };
         PricingPhase: {
             name: string;
@@ -1091,6 +1155,15 @@ export interface components {
             desired_state: "active" | "suspended" | "terminated";
         };
         PrepaidAssetList: {
+            /**
+             * Format: int64
+             * @description How many entries there are in total, across every page.
+             *
+             *     Without it, "is there another page" has to be guessed from whether this one came back
+             *     full — and that guess turns into one extra fetch of an empty page whenever the last page
+             *     happens to be exactly full.
+             */
+            total_count?: number;
             assets: components["schemas"]["PrepaidAsset"][];
         };
         RenewRequestBody: {
@@ -1106,12 +1179,39 @@ export interface components {
             idempotency_key: string;
         };
         OrderList: {
+            /**
+             * Format: int64
+             * @description How many entries there are in total, across every page.
+             *
+             *     Without it, "is there another page" has to be guessed from whether this one came back
+             *     full — and that guess turns into one extra fetch of an empty page whenever the last page
+             *     happens to be exactly full.
+             */
+            total_count?: number;
             orders: components["schemas"]["Order"][];
         };
         TopUpList: {
+            /**
+             * Format: int64
+             * @description How many entries there are in total, across every page.
+             *
+             *     Without it, "is there another page" has to be guessed from whether this one came back
+             *     full — and that guess turns into one extra fetch of an empty page whenever the last page
+             *     happens to be exactly full.
+             */
+            total_count?: number;
             top_ups: components["schemas"]["TopUpStatus"][];
         };
         CreditTransactionList: {
+            /**
+             * Format: int64
+             * @description How many entries there are in total, across every page.
+             *
+             *     Without it, "is there another page" has to be guessed from whether this one came back
+             *     full — and that guess turns into one extra fetch of an empty page whenever the last page
+             *     happens to be exactly full.
+             */
+            total_count?: number;
             transactions: components["schemas"]["CreditTransaction"][];
         };
         /**
@@ -1155,13 +1255,46 @@ export interface components {
             /** @description How much credit is granted. Equal to `pay` when there is no bonus */
             credit: string;
         };
+        /**
+         * @description The result of buying an offer — either it is done, or the money has to arrive first.
+         *
+         *     ## A paid tier is never granted before the money lands
+         *
+         *     A tier that charges a fee is paid for by card, not from the credit balance. Two reasons, and
+         *     the second is the one that decides it:
+         *
+         *     1. The engine bills a plan's fee **in arrears** — subscribing only records an unsettled
+         *        charge, while the tier's credit is handed over at once. Without payment first, an account
+         *        can subscribe, spend the credit, and walk away from an invoice nobody will pay.
+         *     2. Paying for the membership out of credit is a loop: the tier hands back credit of the same
+         *        value, so nothing the platform can bank ever enters. The membership fee is where real
+         *        money is supposed to arrive.
+         *
+         *     So `checkout_url` comes back instead of `subscription_id`, and the switch happens when the
+         *     payment does. The place on the offer is already held, so returning to it later finishes the
+         *     same purchase rather than starting a second one.
+         */
         Purchase: {
             offer_key: string;
             /**
              * @description The subscription now serving this account. When the change was set to take effect at the
-             *     end of the period, this is the one that takes over then, and its status says `scheduled`
+             *     end of the period, this is the one that takes over then, and its status says `scheduled`.
+             *
+             *     Absent when payment is still needed — see `checkout_url`
              */
-            subscription_id: string;
+            subscription_id?: string;
+            /**
+             * @description Where to send the buyer to pay. Present exactly when the tier charges a fee and the
+             *     payment has not been made yet.
+             *
+             *     The switch is performed by the payment callback, so a client that ignores this and reads
+             *     `subscription_id` gets nothing — which is the intended failure: pretending the tier is
+             *     active before the money arrives is the thing this whole route exists to prevent
+             */
+            checkout_url?: string;
+            /** @description What the buyer is being sent to pay, in `currency`. Present with `checkout_url` */
+            amount_due?: string;
+            currency?: components["schemas"]["Currency"];
         };
         Error: {
             code?: string;
@@ -1189,6 +1322,15 @@ export interface components {
             project_ids: string[];
         };
         BillingAccountList: {
+            /**
+             * Format: int64
+             * @description How many entries there are in total, across every page.
+             *
+             *     Without it, "is there another page" has to be guessed from whether this one came back
+             *     full — and that guess turns into one extra fetch of an empty page whenever the last page
+             *     happens to be exactly full.
+             */
+            total_count?: number;
             /** @description Every account belonging to the caller. Empty when they hold none */
             accounts: components["schemas"]["BillingAccount"][];
         };
@@ -1349,6 +1491,15 @@ export interface components {
             default: boolean;
         };
         PaymentMethodList: {
+            /**
+             * Format: int64
+             * @description How many entries there are in total, across every page.
+             *
+             *     Without it, "is there another page" has to be guessed from whether this one came back
+             *     full — and that guess turns into one extra fetch of an empty page whenever the last page
+             *     happens to be exactly full.
+             */
+            total_count?: number;
             payment_methods: components["schemas"]["PaymentMethod"][];
         };
         TopUpSession: {
@@ -1495,6 +1646,15 @@ export interface components {
             created_at: string;
         };
         InvoiceList: {
+            /**
+             * Format: int64
+             * @description How many entries there are in total, across every page.
+             *
+             *     Without it, "is there another page" has to be guessed from whether this one came back
+             *     full — and that guess turns into one extra fetch of an empty page whenever the last page
+             *     happens to be exactly full.
+             */
+            total_count?: number;
             invoices: components["schemas"]["Invoice"][];
         };
         InvoiceLine: {
@@ -1567,12 +1727,60 @@ export interface components {
         Subscription: {
             id: string;
             plan_key: string;
+            /** @description What this tier is called on the pricing page */
+            plan_name?: string;
             plan_version?: number;
             /**
              * @description `canceled` still counts as being on a plan — it is serving until the end of the period,
              *     which has already been paid for
              */
             status: string;
+            /**
+             * Format: date-time
+             * @description Start of the period being served. Absent for the moment right after subscribing, while
+             *     the engine is still writing the charge this is read from — absent means "not known yet"
+             *     rather than "no period"
+             */
+            current_period_start?: string;
+            /**
+             * Format: date-time
+             * @description End of the period being served, which is also when the next charge falls and when
+             *     anything scheduled takes effect
+             */
+            current_period_end?: string;
+            /**
+             * @description What takes over at the end of the period, when a downgrade has been scheduled.
+             *
+             *     Absent when nothing is pending. Leaving it out entirely would show someone who has
+             *     already scheduled a downgrade the tier they are on today, so they would schedule it
+             *     again.
+             */
+            scheduled?: components["schemas"]["ScheduledPlan"];
+            /**
+             * @description True once the account has been taken off its paid plan at the end of the period. It is
+             *     still being served until then, and this can still be undone — unlike a scheduled
+             *     downgrade
+             */
+            cancels_at_period_end?: boolean;
+            /**
+             * @description True when this is the free tier every account starts on.
+             *
+             *     Coming off it is not a thing that can happen: cancelling puts the account back on it, so
+             *     offering that as an action is at best a no-op and at worst a gap — between the period
+             *     ending and the sweep putting the tier back, the account has no plan at all and admission
+             *     refuses it. A console reads this to leave the action out.
+             */
+            is_default_plan?: boolean;
+        };
+        ScheduledPlan: {
+            plan_key: string;
+            plan_name?: string;
+            plan_version?: number;
+            /**
+             * Format: date-time
+             * @description When it takes over, which is the end of the current period
+             */
+            starts_at?: string;
         };
         TopUpStatus: {
             payment_id: string;
@@ -1600,6 +1808,16 @@ export interface components {
     };
     responses: never;
     parameters: {
+        /** @description 1-based page number; the first page when omitted. */
+        Page: number;
+        /**
+         * @description How many entries per page, at most 100.
+         *
+         *     Every list here grows without bound — charges with resources, transactions with time. A list
+         *     that returns everything works on the account it was written against and quietly turns into a
+         *     multi-megabyte response on the one that has been running for a year.
+         */
+        PageSize: number;
         /** @description Which asset, from the prepaid list */
         ProvisionId: string;
         /**
@@ -1616,7 +1834,18 @@ export type $defs = Record<string, never>;
 export interface operations {
     "list-billing-accounts": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1752,7 +1981,18 @@ export interface operations {
     };
     "list-credit-transactions": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 /**
@@ -1894,7 +2134,18 @@ export interface operations {
     };
     "list-orders": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 /**
@@ -1965,7 +2216,18 @@ export interface operations {
     };
     "list-top-ups": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 /**
@@ -2041,15 +2303,15 @@ export interface operations {
         parameters: {
             query?: {
                 /** @description 1-based page number; the first page when omitted. */
-                page?: number;
+                page?: components["parameters"]["Page"];
                 /**
-                 * @description How many charges per page. Defaults to a full page.
+                 * @description How many entries per page, at most 100.
                  *
-                 *     Charge count grows with resource count — an account running dozens of machines produces
-                 *     hundreds of lines in a period, and a screen shows a dozen. Fetching all of them on every
-                 *     visit carries data nothing displays.
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
                  */
-                page_size?: number;
+                page_size?: components["parameters"]["PageSize"];
             };
             header?: never;
             path: {
@@ -2122,7 +2384,18 @@ export interface operations {
     };
     "list-invoices": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 /**
@@ -2332,6 +2605,41 @@ export interface operations {
             };
         };
     };
+    "keep-subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Subscription"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     "cancel-subscription": {
         parameters: {
             query: {
@@ -2409,7 +2717,18 @@ export interface operations {
     };
     "list-payment-methods": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 /**
@@ -2547,7 +2866,18 @@ export interface operations {
     };
     "list-offers": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 /**
@@ -2622,7 +2952,18 @@ export interface operations {
     };
     "list-prepaid-assets": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
             header?: never;
             path: {
                 /**
