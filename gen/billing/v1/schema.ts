@@ -124,6 +124,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/billing-accounts/{accountKey}/balance/movement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * How the balance moved this month
+         * @description Opening balance, money in, money out, closing balance — for the current calendar month.
+         *
+         *     **The four add up**: `closing = opening + income - spending`. That is the point of the
+         *     endpoint. The balance alone answers "how much is left" and cannot answer "how did it get
+         *     there", which is what somebody watching their balance shrink is actually asking. Four
+         *     figures that add up can be checked by the holder; a single figure can only be taken on
+         *     faith or queried with support.
+         *
+         *     `closing` is computed from the other three rather than read separately. Reading the current
+         *     balance for it would leave the equation off by whatever was booked between the two reads —
+         *     and an equation that is off by a few cents is worse than no equation, because it puts the
+         *     ledger itself in doubt.
+         *
+         *     The window is the **calendar** month, not the engine's billing period. This is the month a
+         *     person means when they say "this month"; the billing anchor is an internal recurrence that
+         *     happens to line up.
+         *
+         *     A month with no movement reports opening equal to closing and zero on both sides — not all
+         *     zeroes, which would read as "your money is gone".
+         */
+        get: operations["read-billing-account-balance-movement"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/billing-accounts/{accountKey}/projects/{projectId}": {
         parameters: {
             query?: never;
@@ -183,8 +221,8 @@ export interface paths {
          *     look at in exactly the case someone wants to look: a resource was asked for, was not
          *     delivered, and the question is what happened.
          *
-         *     The list carries no lines. An order has only a handful, but shipping them on every page
-         *     means carrying data no column shows.
+         *     Lines come with each order. A list showing only identifiers and amounts is a page nobody can
+         *     read — recognising one ("which of these was last week's machine") is why it gets opened.
          */
         get: operations["list-orders"];
         put?: never;
@@ -204,8 +242,8 @@ export interface paths {
         };
         /**
          * One order, with its lines
-         * @description Each line names what was asked for and how much of it. This is the only route that carries
-         *     them.
+         * @description Each line names what was asked for, how much of it, and what it produced. The list route
+         *     carries lines too; this one exists for a permanent link to a single transaction.
          */
         get: operations["get-order"];
         put?: never;
@@ -944,13 +982,35 @@ export interface components {
             /** @description The sum of the already-rounded lines */
             total: string;
             /**
-             * @description Keys that were given a usage but have no rate card on this plan.
+             * @description The usages that have no rate card on this plan.
              *
              *     **Reported rather than ignored**, because ignoring them yields a smaller but entirely
              *     normal-looking number — and that is the most expensive misconfiguration there is: usage
-             *     lands, the usage chart shows it, and the bill has no line for it
+             *     lands, the usage chart shows it, and the bill has no line for it.
+             *
+             *     ## Each entry carries the caller's own naming, not only the key
+             *
+             *     A meter key is a hash, and callers are told not to compute it (see `QuoteUsage`). An answer
+             *     that named the unpriced usages by key alone was therefore unusable whenever more than one
+             *     usage was priced at a time: the caller could see that something was unsold but not which of
+             *     the things it asked about. That is the case a catalogue page needs — pricing thirty machine
+             *     types in one call and marking the ones this plan does not sell — so the answer echoes the
+             *     `service` and `product_id` that were given
              */
-            unpriced?: string[];
+            unpriced?: components["schemas"]["UnpricedUsage"][];
+        };
+        /** @description One usage that has no rate card on the plan it was priced against. */
+        UnpricedUsage: {
+            /** @description The meter key this usage resolved to */
+            key: string;
+            /** @description Echoed from the request when the usage was named by service and product */
+            service?: string;
+            /** @description Echoed from the request when the usage was named by service and product */
+            product_id?: string;
+            /** @description Echoed from the request */
+            variant?: {
+                [key: string]: string;
+            };
         };
         /**
          * @description When a plan change takes effect. There is no default: an upgrade and a downgrade want opposite
@@ -1099,14 +1159,68 @@ export interface components {
             amount?: string;
             currency?: string;
             /**
+             * Format: date-time
+             * @description When the money for this order arrived. Absent on an order nothing was charged for, and on
+             *     one still waiting to be paid.
+             *
+             *     Separate from `created_at` because the two can be far apart: an order paid online is
+             *     created first and paid whenever the customer gets round to it. Merged into one field,
+             *     "how long did this sit unpaid" has no answer anywhere — and that is the number chasing
+             *     payment looks at.
+             */
+            paid_at?: string;
+            /**
              * @description Always `none` on a metered order.
+             *
+             *     `pending` is an order paid for online whose money has not arrived yet: the checkout
+             *     session is open and nothing has been created. It was missing from this enum while the
+             *     column had it and the handler passed it through unchanged, so such an order read back
+             *     a value outside the enum — the one state where the caller most needs to know not to
+             *     expect the resource yet.
              * @enum {string}
              */
-            payment_state?: "none" | "paid" | "refunded";
+            payment_state?: "none" | "pending" | "paid" | "refunded";
             /** Format: date-time */
             created_at: string;
-            /** @description Only present on the single-order route. */
+            /**
+             * @description What this order was for. Present on the list route too — an order list that shows only
+             *     numbers and amounts is a page of identifiers with no content, and recognising one
+             *     ("which of these was last week's machine") is the reason anyone opens it.
+             */
             lines?: components["schemas"]["OrderLine"][];
+        };
+        BalanceMovement: {
+            currency: components["schemas"]["Currency"];
+            /**
+             * Format: date-time
+             * @description Start of the window — the first instant of the current calendar month, UTC.
+             */
+            from: string;
+            /**
+             * Format: date-time
+             * @description End of the window, which is **now** rather than the month's end. The month is not over.
+             */
+            to: string;
+            /**
+             * @description The balance when the window opened, as a decimal string.
+             *
+             *     Taken from the earliest transaction in the window rather than read separately: every
+             *     transaction carries the balance before and after it, so this figure and the totals below
+             *     come from one read of one ledger and therefore agree.
+             */
+            opening: string;
+            /** @description What came in — top-ups and credit issued by operations. Never negative. */
+            income: string;
+            /**
+             * @description What went out — consumption and expiry. **Never negative**: the direction is in the
+             *     name, not in the sign. Signed, a client would have to handle both `-20` and `20` meaning
+             *     the same thing.
+             */
+            spending: string;
+            /** @description `opening + income - spending`. Computed, not read separately — see the endpoint. */
+            closing: string;
+            /** @description False when this account has no balance record in this currency at all, which is not the same as a zero balance. */
+            present: boolean;
         };
         OrderLine: {
             id: string;
@@ -1116,8 +1230,62 @@ export interface components {
             service: string;
             /** @description That service's own catalogue identifier for what was asked for. */
             product_id: string;
+            /**
+             * @description What this was called when it was ordered.
+             *
+             *     A snapshot, not a lookup. `product_id` is usually a uuid, and an order page that shows it
+             *     shows a string of hex. Asking the owning service for the name later is worse: it is a
+             *     cross-service call per row, and by then the product may have been renamed or withdrawn —
+             *     a bill has to answer "what did I buy", and that answer has to be in the words used at the
+             *     time.
+             *
+             *     Empty on orders placed before this was recorded, and on the rare call that omits it.
+             *     Fall back to `product_id`.
+             */
+            product_name: string;
+            /**
+             * @description What was configured on this line at the moment of sale, as key–value pairs meant for a
+             *     person to read.
+             *
+             *     **Free-form, not fixed fields.** Every service's products have their own dimensions — a
+             *     machine has cores and memory, a disk has capacity and medium, an address has bandwidth.
+             *     Fixed fields would mean adding more of them for every service that comes along, or
+             *     squeezing one service's answers into another's boxes.
+             *
+             *     Do not parse it. The keys are written for the reader, in the reader's language, and they
+             *     change when the wording changes. Anything a program needs to decide on is in
+             *     `product_id` and `quantity`.
+             */
+            configuration?: {
+                [key: string]: string;
+            };
             /** Format: int64 */
             quantity: number;
+            /**
+             * @description How this line is paid for: empty is by the hour, an ISO 8601 duration (`P1M`, `P1Y`) is
+             *     bought outright for that long.
+             *
+             *     Fixed at the moment of sale. The asset's own term can move afterwards (renewing can
+             *     change the period); this one cannot, because an order is a transaction that already
+             *     happened.
+             */
+            term: string;
+            /**
+             * Format: date-time
+             * @description Start of the period this line bought. **Absent when billed by the hour** — that has no
+             *     service period, and filling in "today to today" would state a term that does not exist.
+             */
+            service_period_from?: string;
+            /**
+             * Format: date-time
+             * @description End of the period this line bought. Absent when billed by the hour.
+             */
+            service_period_to?: string;
+            /**
+             * @description The resource this line produced, in the owning service's own identifiers. Absent until
+             *     that service reports it back, which is also the moment the line starts being billed.
+             */
+            resource_id?: string;
         };
         PrepaidAsset: {
             id: string;
@@ -2047,6 +2215,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Balance"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "read-billing-account-balance-movement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BalanceMovement"];
                 };
             };
             /** @description Error */
