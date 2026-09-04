@@ -41,6 +41,10 @@ export type ListCreditTransactionsResult =
 export type ReadBillingAccountBalanceResult =
   operations["read-billing-account-balance"]["responses"][200]["content"]["application/json"];
 
+/** `GET /account/v1/billing-accounts/{accountKey}/balance/movement` 成功时的响应体。 */
+export type ReadBillingAccountBalanceMovementResult =
+  operations["read-billing-account-balance-movement"]["responses"][200]["content"]["application/json"];
+
 /** `PUT /account/v1/billing-accounts/{accountKey}/projects/{projectId}` 成功时的响应体。 */
 export type BindProjectToBillingAccountResult =
   operations["bind-project-to-billing-account"]["responses"][200]["content"]["application/json"];

@@ -83,7 +83,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List disk types on sale */
+        /**
+         * List disk types on sale
+         * @description Only disk types currently on sale are listed. A withdrawn one disappears from here and can no longer be bought, while the disks already on it keep working and can still be resized.
+         */
         get: operations["list-disk-types"];
         put?: never;
         post?: never;
@@ -103,6 +106,8 @@ export interface paths {
         /**
          * List images on sale
          * @description An image whose `min_ram_mb` exceeds the memory of the selected instance type cannot boot. Filter the options accordingly.
+         *
+         *     Only images currently on sale are listed. An image the platform withdraws disappears from here and can no longer install new instances, while the instances already running it keep running and can still be rebuilt onto it.
          */
         get: operations["list-images"];
         put?: never;
@@ -120,7 +125,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List instance types on sale */
+        /**
+         * List instance types on sale
+         * @description Only instance types currently on sale are listed. A withdrawn one disappears from here and can no longer be ordered, while the instances already running it keep running.
+         */
         get: operations["list-instance-types"];
         put?: never;
         post?: never;
@@ -183,6 +191,8 @@ export interface paths {
         /**
          * Create a disk
          * @description The disk is created in the availability zone of the selected disk type, and an instance must reside in the same zone to attach it. Choosing the disk type therefore determines the zone.
+         *
+         *     A disk type that has been withdrawn is rejected with `DISK_TYPE_RETIRED`, even though its identifier still resolves. Withdrawn types stop appearing in the disk type listing; disks already bought on one keep working and can still be resized.
          */
         post: operations["create-disk"];
         delete?: never;
@@ -370,6 +380,8 @@ export interface paths {
          *     Instances are created one by one in order. If the sequence stops part way through, because of a quota limit for example, **the instances already created are kept** and `failure` states why it stopped. A failure on the first instance is treated as a failure of the whole request and no instance is created.
          *
          *     Exactly one source must be given: `image_id` for a platform image, `private_image_id` for a private image, or `boot_disk_id` to boot a disk you already have. Supplying more than one, or none, is rejected.
+         *
+         *     A platform image that has been withdrawn is rejected with `IMAGE_RETIRED`, and an instance type that has been withdrawn with `INSTANCE_TYPE_RETIRED` — in both cases the identifier still resolves. Withdrawn entries stop appearing in their listing, so an identifier held in a script, a template or an earlier order is the way this is usually hit: reread the listing and pick another. Instances already running either are unaffected, and one on a withdrawn image can still be rebuilt onto it.
          *
          *     `boot_disk_id` recovers an instance that can no longer be repaired from the inside. Snapshot its disk, restore that snapshot into a new disk, attach the new disk to another instance and repair it there, then create an instance from it. That disk is not deleted when the instance is released; it is detached and returned to you.
          *
@@ -606,6 +618,8 @@ export interface paths {
         /**
          * Rebuild an instance
          * @description **All data on the system disk is erased and cannot be recovered.** Attached data disks are unaffected.
+         *
+         *     The image this instance already runs is accepted even after the platform has withdrawn it, since rebuilding is the only way back into an instance broken from the inside. Any *other* withdrawn image is rejected with `IMAGE_RETIRED`, which is a change of image and therefore a new order.
          */
         post: operations["rebuild-instance"];
         delete?: never;
@@ -1311,7 +1325,7 @@ export interface components {
         RestoreBackupRequestBody: {
             /**
              * Format: uuid
-             * @description May differ from the availability zone of the source disk, but must be in the same region
+             * @description May differ from the availability zone of the source disk, but must be in the same region. It has to be on sale — restoring creates a new disk, so a withdrawn type is rejected here as well
              */
             disk_type_id: string;
             name: string;
@@ -1341,6 +1355,17 @@ export interface components {
             size_gb: number;
             /** @enum {string} */
             status: "provisioning" | "available" | "attaching" | "in_use" | "detaching" | "resizing" | "reverting" | "restoring" | "releasing" | "deleting" | "error";
+            /**
+             * @description How this disk is paid for. `postpaid` is billed by the hour for as long as it exists;
+             *     `prepaid` was bought outright for a term.
+             *
+             *     **Not the term.** How long it was bought for belongs to the order, not to the disk:
+             *     renewing can change it, and a machine bought for a year and then renewed for a month is
+             *     still a prepaid machine. Ask billing for the term and the expiry — they live there, and
+             *     they are the only two values a renewal moves.
+             * @enum {string}
+             */
+            charge_type: "postpaid" | "prepaid";
         };
         DiskTypeResource: {
             availability_zone_code: string;
@@ -1358,6 +1383,48 @@ export interface components {
             /** Format: int64 */
             step_gb: number;
             throughput_display: string;
+            /**
+             * @description Whether any capacity is left in this type's pool.
+             *
+             *     The same shape as on an instance type, but it answers less here: a disk is sold by the
+             *     GiB, so "not sold out" does not mean the size being asked for fits. `remaining` is the
+             *     field that decides that, and this one only says whether the pool is empty outright.
+             *
+             *     It reflects a limit set by operations, not what the storage backend physically has —
+             *     raising the limit does not create capacity, and a type that is not sold out can still fail
+             *     to create if the backend is full.
+             *
+             *     Advisory: it is read when the list is built, and capacity can be taken between that read
+             *     and the order. The order is what actually refuses.
+             */
+            sold_out: boolean;
+            /**
+             * Format: int64
+             * @description How much capacity is left, **in GiB**. Absent when this type is not limited at all.
+             *
+             *     Unlike an instance type, where this is a count of machines, here it is an amount of
+             *     storage — and it is the number that bounds the size a customer may ask for. A picker that
+             *     offers sizes above it produces orders that are refused after the customer has chosen
+             *     everything else.
+             *
+             *     Absent is not zero and not "unknown": a type with no limit simply has no number to show.
+             *     Reporting it as a number would need a sentinel, and any sentinel eventually gets compared
+             *     against a real size.
+             */
+            remaining?: number;
+            /**
+             * @description What buying this type outright costs, per term. Empty means this type is only sold by the
+             *     hour.
+             *
+             *     **The amount is per GiB for the whole term**, not the price of one disk: a disk's size is
+             *     chosen by the customer, so the total is this figure times the size. That differs from an
+             *     instance type, where the same field is the price of one machine — the unit follows what
+             *     the product is sold by, and the order is priced the same way.
+             *
+             *     Advisory, like `sold_out`: it is read when the list is built. The order is what fixes the
+             *     price, and it refuses rather than falling back to hourly if the term is not sold.
+             */
+            prepaid_prices?: components["schemas"]["PrepaidPrice"][];
         };
         DiskTypeListResponseBody: {
             items: components["schemas"]["DiskTypeResource"][] | null;
@@ -1468,7 +1535,10 @@ export interface components {
             items: components["schemas"]["DiskResource"][] | null;
         };
         CreateDiskRequestBody: {
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description A disk type currently on sale. A withdrawn one is rejected even though its identifier still resolves
+             */
             disk_type_id: string;
             name: string;
             /** Format: int64 */
@@ -1546,6 +1616,18 @@ export interface components {
         AllocateFloatingIPRequestBody: {
             /** @description The address to allocate. Allocated by the platform when omitted */
             address?: string;
+            /**
+             * Format: int64
+             * @description The bandwidth ceiling of this address, in Mbit/s, applied to both directions.
+             *
+             *     Required, and there is no "unlimited": an address with no ceiling runs at line rate and is
+             *     charged nothing for the traffic, while the address itself bills normally — so the invoice
+             *     looks correct and nothing anywhere reports it.
+             *
+             *     It is billed separately from the address, per Mbit/s-hour, and appears as its own line on
+             *     the order. Changing it later goes through the bandwidth endpoint.
+             */
+            bandwidth_mbps: number;
             /** Format: uuid */
             private_network_id: string;
         };
@@ -1629,11 +1711,59 @@ export interface components {
             suspended_at: string | null;
             /** Format: date-time */
             updated_at: string;
+            /**
+             * @description How this instance is paid for. `postpaid` is billed by the hour for as long as it exists;
+             *     `prepaid` was bought outright for a term.
+             *
+             *     **Not the term.** How long it was bought for belongs to the order, not to the instance:
+             *     renewing can change it, and a machine bought for a year and then renewed for a month is
+             *     still a prepaid machine. Ask billing for the term and the expiry — they live there, and
+             *     they are the only two values a renewal moves.
+             * @enum {string}
+             */
+            charge_type: "postpaid" | "prepaid";
+            /**
+             * @description The order this instance was bought under, in billing's own identifiers. Empty when the
+             *     deployment has no billing wired in.
+             *
+             *     Kept so the question can be answered later. "Why was I charged for this" is asked days
+             *     after the fact, and an order id handed back only in the launch response is one the
+             *     person who needs it never had.
+             */
+            billing_order_id: string;
         };
         InstanceListResponseBody: {
             items: components["schemas"]["InstanceResource"][] | null;
         };
         LaunchInstanceRequestBody: {
+            /**
+             * Format: int64
+             * @description Give this instance a public address with this much bandwidth, in Mbit/s. Omitted or 0 means
+             *     no public address.
+             *
+             *     The bandwidth is what says whether an address is wanted, rather than a separate flag,
+             *     because an address with no ceiling would run at line rate and be charged nothing for the
+             *     traffic — while the address itself bills normally and the invoice looks correct.
+             *
+             *     The address and its bandwidth are two lines on the same order as the instance and its
+             *     system disk — one purchase with one total — and everything is created together or not at
+             *     all: if any step fails, the address goes back to the pool and no instance is created.
+             *     Asking for an address separately afterwards is still possible, but then they are separate
+             *     purchases, and a failure in between leaves an instance you cannot reach.
+             *
+             *     Both lines are always billed by the hour, even when the instance is bought outright for a
+             *     term: a public IPv4 is a scarce resource the platform keeps holding for as long as you have
+             *     it, so it is not something that can be paid for once.
+             *
+             *     Which address you get is not a choice here. Use the floating IP endpoints to claim a
+             *     particular address and bind it, which is what getting a known address back after a
+             *     migration needs.
+             *
+             *     Rejected together with `port_id` when that interface already has a floating IP: an
+             *     interface carries one IPv4, and one IPv4 takes one floating IP. Attach another interface to
+             *     hold a second address.
+             */
+            bandwidth_mbps?: number;
             /**
              * Format: int64
              * @description Number of instances to create; 1 when omitted. Names are numbered automatically for several
@@ -1648,10 +1778,13 @@ export interface components {
             boot_disk_id?: string;
             /**
              * Format: uuid
-             * @description A platform image. Exactly one of this, `private_image_id` and `boot_disk_id`
+             * @description A platform image, and it must be one currently on sale. Exactly one of this, `private_image_id` and `boot_disk_id`
              */
             image_id?: string;
-            /** Format: uuid */
+            /**
+             * Format: uuid
+             * @description An instance type currently on sale. A withdrawn one is rejected even though its identifier still resolves
+             */
             instance_type_id: string;
             /** @description The account the disk lets you log in as. Required with `boot_disk_id`, and rejected without it since an image states its own */
             login_username?: string;
@@ -1693,9 +1826,13 @@ export interface components {
              *     refused — it is never quietly sold by the hour instead, because the customer who asked for
              *     a year would find out only from the bill.
              *
-             *     The system disk is bought for the same term: it is the same purchase, and one order cannot
-             *     be half outright and half hourly. A term is therefore refused together with `boot_disk_id`,
-             *     where the disk already exists and is already billed its own way.
+             *     The system disk is bought for the same term, because it is the same purchase: an instance
+             *     bought for a year whose disk is billed hourly is a bill nobody would predict from what they
+             *     clicked. A term is therefore refused together with `boot_disk_id`, where the disk already
+             *     exists and is already billed its own way.
+             *
+             *     A public address asked for with `assign_public_ip` stays hourly regardless — it cannot be
+             *     bought outright — so one order can carry both.
              *
              *     When the term runs out the instance is stopped, not deleted, and starts again once it is
              *     renewed. Renewal lives in the billing console, across every product, because what a
@@ -1716,6 +1853,23 @@ export interface components {
             subnet_id?: string;
         };
         LaunchInstanceResponseBody: {
+            /**
+             * @description The orders these instances were bought under, in the same order as `instances`.
+             *
+             *     **One per instance, not one per request.** A batch of three places three orders, because
+             *     each machine is ordered as it is created — stopping halfway leaves the machines already
+             *     made, and they each have to be paid for. A caller showing "your order" for a batch has to
+             *     show all of them.
+             *
+             *     Empty when the deployment has no billing wired in, and on the `checkout_url` branch where
+             *     nothing was created yet.
+             *
+             *     Given so the caller can point at the transaction. Creating a resource takes money — by
+             *     the hour from that moment for a metered one, in full from the balance for a prepaid one —
+             *     and until now the only thing handed back was the resource itself. Somebody asking "why
+             *     was I charged" had nothing to open.
+             */
+            order_ids?: string[] | null;
             /** @description Non-empty when only some of the instances were created, stating why the sequence stopped */
             failure: string | null;
             /** @description Returned in request order; an array even for a single instance */
@@ -1793,7 +1947,7 @@ export interface components {
             generate_password?: boolean;
             /**
              * Format: uuid
-             * @description A platform image. Exactly one of this and `private_image_id`
+             * @description A platform image, which must be on sale unless it is the one this instance already runs. Exactly one of this and `private_image_id`
              */
             image_id?: string;
             password?: string;
