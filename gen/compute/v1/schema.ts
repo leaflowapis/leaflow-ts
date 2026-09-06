@@ -1536,6 +1536,30 @@ export interface components {
         };
         CreateDiskRequestBody: {
             /**
+             * @description A promotion code to apply to this order. Case and surrounding whitespace do not matter.
+             *
+             *     An unusable code is rejected outright rather than quietly ignored: somebody who typed a
+             *     code is buying at the discounted price, and letting it through silently means they pay
+             *     full price expecting the discount, with nothing anywhere saying so.
+             *
+             *     The discount applies to the lines the campaign covers, not the whole order — typically
+             *     the instance type and memory, not the system disk, the address, or traffic. Preview it
+             *     first at `POST /account/v1/billing-accounts/{accountKey}/promotion-codes/preview` to
+             *     show the customer what will actually be charged.
+             *
+             *     Metered orders reject any code: there is no amount to discount at this point.
+             */
+            promotion_code?: string;
+            /**
+             * @description "This is the same click". Generate one when the dialog opens — not when it is submitted —
+             *     and send the same one on every retry of that action.
+             *
+             *     Optional, and what happens without it is worth knowing: two identical requests inside the
+             *     same minute are treated as one, because there is nothing else to tell a double-click apart
+             *     from a deliberate second order. Sending your own key removes that guess entirely.
+             */
+            idempotency_key?: string;
+            /**
              * Format: uuid
              * @description A disk type currently on sale. A withdrawn one is rejected even though its identifier still resolves
              */
@@ -1736,6 +1760,30 @@ export interface components {
             items: components["schemas"]["InstanceResource"][] | null;
         };
         LaunchInstanceRequestBody: {
+            /**
+             * @description A promotion code to apply to this order. Case and surrounding whitespace do not matter.
+             *
+             *     An unusable code is rejected outright rather than quietly ignored: somebody who typed a
+             *     code is buying at the discounted price, and letting it through silently means they pay
+             *     full price expecting the discount, with nothing anywhere saying so.
+             *
+             *     The discount applies to the lines the campaign covers, not the whole order — typically
+             *     the instance type and memory, not the system disk, the address, or traffic. Preview it
+             *     first at `POST /account/v1/billing-accounts/{accountKey}/promotion-codes/preview` to
+             *     show the customer what will actually be charged.
+             *
+             *     Metered orders reject any code: there is no amount to discount at this point.
+             */
+            promotion_code?: string;
+            /**
+             * @description "This is the same click". Generate one when the dialog opens — not when it is submitted —
+             *     and send the same one on every retry of that action.
+             *
+             *     Optional, and what happens without it is worth knowing: two identical requests inside the
+             *     same minute are treated as one, because there is nothing else to tell a double-click apart
+             *     from a deliberate second order. Sending your own key removes that guess entirely.
+             */
+            idempotency_key?: string;
             /**
              * Format: uuid
              * @description Bind a floating IP you already hold, instead of allocating a new one. It must be idle and in
