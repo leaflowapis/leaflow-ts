@@ -151,3 +151,38 @@ export type PurchaseOfferQuery =
 /** `GET /account/v1/billing-accounts/{accountKey}/prepaid-assets` 成功时的响应体。 */
 export type ListPrepaidAssetsResult =
   operations["list-prepaid-assets"]["responses"][200]["content"]["application/json"];
+
+/** `POST /account/v1/billing-accounts/{accountKey}/prepaid-assets/{assetId}/renew` 成功时的响应体。 */
+export type RenewPrepaidAssetResult =
+  operations["renew-prepaid-asset"]["responses"][200]["content"]["application/json"];
+
+/** `POST /account/v1/billing-accounts/{accountKey}/prepaid-assets/{assetId}/renew` 的请求体。 */
+export type RenewPrepaidAssetBody = NonNullable<
+  operations["renew-prepaid-asset"]["requestBody"]
+>["content"]["application/json"];
+
+/** `PUT /account/v1/billing-accounts/{accountKey}/prepaid-assets/{assetId}/auto-renew` 成功时的响应体。 */
+export type SetPrepaidAutoRenewResult =
+  operations["set-prepaid-auto-renew"]["responses"][200]["content"]["application/json"];
+
+/** `PUT /account/v1/billing-accounts/{accountKey}/prepaid-assets/{assetId}/auto-renew` 的请求体。 */
+export type SetPrepaidAutoRenewBody = NonNullable<
+  operations["set-prepaid-auto-renew"]["requestBody"]
+>["content"]["application/json"];
+
+/** `POST /account/v1/billing-accounts/{accountKey}/promotion-codes/preview` 成功时的响应体。 */
+export type PreviewPromotionCodeResult =
+  operations["preview-promotion-code"]["responses"][200]["content"]["application/json"];
+
+/** `POST /account/v1/billing-accounts/{accountKey}/promotion-codes/preview` 的请求体。 */
+export type PreviewPromotionCodeBody = NonNullable<
+  operations["preview-promotion-code"]["requestBody"]
+>["content"]["application/json"];
+
+/** `GET /account/v1/billing-accounts/{accountKey}/vouchers` 成功时的响应体。 */
+export type ListAccountVouchersResult =
+  operations["list-account-vouchers"]["responses"][200]["content"]["application/json"];
+
+/** `GET /account/v1/billing-accounts/{accountKey}/refunds` 成功时的响应体。 */
+export type ListAccountRefundsResult =
+  operations["list-account-refunds"]["responses"][200]["content"]["application/json"];

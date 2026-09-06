@@ -866,16 +866,19 @@ export interface paths {
          * What I bought outright
          * @description Everything this account holds on a term, across every product.
          *
-         *     ## Nothing here expires on its own
+         *     ## Every one of these expires
          *
-         *     A term renews for as long as the seat is held: the engine charges the next period, prorates
-         *     any change to the second, and stops the moment the seat is given up. So there is no renewal
-         *     to remember and no expiry to warn about — giving it up means deleting the resource, in the
-         *     console that owns it.
+         *     A term is paid for once, up front, and buys exactly the period named by `term`. Nothing
+         *     renews it on its own: `expires_at` is when it runs out, and after that the machine is
+         *     stopped and — once the retention window is over — released.
          *
-         *     What the next period costs and when it falls due is on the charges route. That is read
-         *     straight from the engine rather than copied here, because a copy is a second answer that
-         *     drifts without saying so.
+         *     This route used to say the opposite. It described an engine that charged the next period by
+         *     itself for as long as the seat was held, which is how this worked before the money became a
+         *     single up-front charge. Reading the old text, a customer would have had no reason to renew
+         *     anything, and the first sign of trouble would have been a stopped machine.
+         *
+         *     Turn on `auto_renew` to have billing place the renewal order itself while there is balance
+         *     to pay for it. That is the only thing that makes a term continue.
          *
          *     ## Metered resources are not here
          *
@@ -889,6 +892,137 @@ export interface paths {
          *     and a customer who just paid concludes it did not work and pays again.
          */
         get: operations["list-prepaid-assets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/prepaid-assets/{assetId}/renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Buy another period
+         * @description Extends a term by one more period, paid for out of the account's balance right now.
+         *
+         *     **The new expiry is the old one plus the term, not now plus the term.** Renewing three days
+         *     early would otherwise throw those three days away, and renewing after the expiry would
+         *     quietly reward the delay. Neither shows up as an error — the date on the account looks
+         *     self-consistent either way, and only the customer notices.
+         *
+         *     `term` does not have to match what was bought originally: a monthly machine can be renewed
+         *     for a year.
+         *
+         *     Refused when the balance does not cover it. The alternative — placing the order and letting
+         *     the account go negative — turns a renewal the customer chose into a debt they did not.
+         */
+        post: operations["renew-prepaid-asset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/prepaid-assets/{assetId}/auto-renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Turn automatic renewal on or off
+         * @description With it on, billing places the renewal order itself a few days before the period runs out,
+         *     paying from the account's balance.
+         *
+         *     **Not enough balance is not an error here.** The switch only says what to attempt; whether
+         *     the money is there is settled at renewal time, and the customer is told either way — told it
+         *     renewed, or told it could not and by when it will expire.
+         */
+        put: operations["set-prepaid-auto-renew"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/promotion-codes/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * See what a code takes off before committing
+         * @description Runs the same checks and the same arithmetic that placing the order will run, so the price
+         *     shown here and the price charged agree. Writing the calculation twice — once for the page and
+         *     once for the order — means they drift, and the visible form of that drift is a page saying
+         *     "20 off" while the full amount is taken.
+         *
+         *     Nothing is redeemed. The allowance is only consumed when the order is actually placed.
+         *
+         *     A code that cannot be used is rejected here with the reason, so the user learns it before
+         *     filling in the rest of the form rather than at the moment they press buy.
+         *
+         *     **Metered orders are rejected.** They have no amount at this point — the money is worked out
+         *     later from usage. Applying a discount to a nil amount leaves the user believing they saved
+         *     something while the bill is unchanged.
+         */
+        post: operations["preview-promotion-code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/vouchers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List this account's vouchers
+         * @description Credit received from campaigns, most recent first. Not the credit ledger — this says which
+         *     campaign each amount came from, which is the question "where did this 50 come from" that the
+         *     ledger cannot answer.
+         */
+        get: operations["list-account-vouchers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/v1/billing-accounts/{accountKey}/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List this account's refunds
+         * @description Each refund carries how it was split. A customer asking "I was refunded 100, why is only 60
+         *     back on my card" is answered here and nowhere else.
+         */
+        get: operations["list-account-refunds"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1307,12 +1441,31 @@ export interface components {
             /**
              * @description How long one period buys, as an ISO 8601 duration (P1M, P1Y).
              *
-             *     There is no expiry to report. The engine keeps renewing this for as long as the seat is
-             *     held, so what runs out is not the term but the customer's decision to keep it. What the
-             *     next period costs, and when it is charged, is on the charges route — that is the engine's
-             *     own answer rather than a copy of it.
+             *     It is paid for once at purchase. Read it next to `expires_at`, which is when the period
+             *     actually runs out — the two are settled when the order is placed and neither moves on
+             *     its own.
              */
             term: string;
+            /**
+             * Format: date-time
+             * @description When the paid-for period runs out.
+             *
+             *     Settled when the order is placed, not when the resource lands, so a purchase paid for
+             *     online does not get a longer period by being paid later.
+             *
+             *     Absent means it was never settled — a row that has not finished being created. It is not
+             *     "does not expire": everything on this route does.
+             */
+            expires_at?: string;
+            /**
+             * @description Whether billing places the renewal order itself as the period runs out.
+             *
+             *     Off by default, and deliberately so: renewing charges the account, and a charge nobody
+             *     asked for is worse than an expiry that was warned about. With it on, the renewal is
+             *     placed only while there is balance to pay for it — when there is not, the customer is
+             *     told rather than put into debt.
+             */
+            auto_renew: boolean;
             /** @enum {string} */
             state: "pending" | "active" | "suspended" | "terminated";
             /**
@@ -1345,6 +1498,9 @@ export interface components {
              *     submitted — and send the same one on every retry of that renewal.
              */
             idempotency_key: string;
+        };
+        AutoRenewRequestBody: {
+            auto_renew: boolean;
         };
         OrderList: {
             /**
@@ -1973,6 +2129,100 @@ export interface components {
          *     where that rule can change without regenerating anything.
          */
         Currency: string;
+        PreviewPromotionCodeRequestBody: {
+            /** @description Case and surrounding whitespace do not matter. */
+            code: string;
+            /**
+             * Format: uuid
+             * @description Which project the order will be placed against — the price depends on its plan.
+             */
+            project_id: string;
+            /**
+             * @description The same lines the order will carry. The discount is computed over the ones in scope,
+             *     not the whole order, so leaving lines out changes the answer.
+             */
+            lines: components["schemas"]["PromotionPreviewLine"][];
+        };
+        /**
+         * @description One line of the order being previewed. Only what pricing and scope need — this is not the
+         *     order itself, and carrying the whole order here would mean two places that have to agree on
+         *     what an order looks like.
+         */
+        PromotionPreviewLine: {
+            service: string;
+            product_id: string;
+            /**
+             * @description ISO 8601 duration for a prepaid line. Empty means metered, and a metered line
+             *     contributes nothing to the discount — it has no amount at this point.
+             */
+            term?: string;
+            /** @default 1 */
+            quantity?: number;
+        };
+        PromotionPreview: {
+            /** @description The code as stored, upper-cased. */
+            code: string;
+            /** @description The campaign's name, to show next to the price. */
+            name?: string;
+            /** @enum {string} */
+            kind: "voucher" | "discount";
+            /** @description How much comes off this order, or how much credit is granted. */
+            benefit_amount: string;
+            /**
+             * @description The part of the order the discount applies to. Shown so "why did only 12 come off a 200
+             *     order" has an answer on the page rather than in a support ticket.
+             */
+            discount_base?: string;
+            original_amount: string;
+            /** @description What will actually be charged. This is the number to show as the price. */
+            payable_amount: string;
+            currency: string;
+        };
+        Voucher: {
+            /** Format: uuid */
+            redemption_id: string;
+            promotion_key: string;
+            name?: string;
+            amount: string;
+            currency: string;
+            /** Format: date-time */
+            granted_at: string;
+        };
+        VoucherList: {
+            items: components["schemas"]["Voucher"][];
+            total_count?: number;
+        };
+        AccountRefund: {
+            /** Format: uuid */
+            refund_id: string;
+            /** Format: uuid */
+            order_id?: string | null;
+            total_amount: string;
+            currency: string;
+            /**
+             * @description `partial` means some of it is back and some is not. Showing it as "refunded" would have
+             *     the customer looking for money that has not moved.
+             * @enum {string}
+             */
+            state: "pending" | "settled" | "partial";
+            legs: components["schemas"]["AccountRefundLeg"][];
+            /** Format: date-time */
+            created_at: string;
+        };
+        AccountRefundLeg: {
+            /** @enum {string} */
+            kind: "cash" | "voucher" | "balance";
+            amount: string;
+            currency: string;
+            /** @enum {string} */
+            state: "pending" | "done" | "failed";
+            /** Format: date-time */
+            settled_at?: string | null;
+        };
+        AccountRefundList: {
+            items: components["schemas"]["AccountRefund"][];
+            total_count?: number;
+        };
     };
     responses: never;
     parameters: {
@@ -3186,6 +3436,219 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PrepaidAssetList"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "renew-prepaid-asset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+                /** @description Which asset, from the prepaid list */
+                assetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenewRequestBody"];
+            };
+        };
+        responses: {
+            /** @description Renewed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrepaidAsset"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "set-prepaid-auto-renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+                /** @description Which asset, from the prepaid list */
+                assetId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutoRenewRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrepaidAsset"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "preview-promotion-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreviewPromotionCodeRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromotionPreview"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-account-vouchers": {
+        parameters: {
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoucherList"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "list-account-refunds": {
+        parameters: {
+            query?: {
+                /** @description 1-based page number; the first page when omitted. */
+                page?: components["parameters"]["Page"];
+                /**
+                 * @description How many entries per page, at most 100.
+                 *
+                 *     Every list here grows without bound — charges with resources, transactions with time. A list
+                 *     that returns everything works on the account it was written against and quietly turns into a
+                 *     multi-megabyte response on the one that has been running for a year.
+                 */
+                page_size?: components["parameters"]["PageSize"];
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description The account's key, of the form `u_<user_id>_<seq>`. Ownership is stated by the key itself,
+                 *     which is why the key is what addresses the account.
+                 */
+                accountKey: components["parameters"]["AccountKey"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountRefundList"];
                 };
             };
             /** @description Error */

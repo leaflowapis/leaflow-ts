@@ -524,11 +524,6 @@ export interface components {
             /** Format: uuid */
             id: string;
             name: string;
-            /**
-             * Format: date-time
-             * @description 欠费的起始时间
-             */
-            overdue_at: string | null;
             /** @enum {string} */
             status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
             /** @description 给人看的，不参与任何查询 */
