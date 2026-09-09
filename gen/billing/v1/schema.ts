@@ -337,8 +337,9 @@ export interface paths {
         put?: never;
         /**
          * Begin adding a payment method
-         * @description Returns an address at which the payment provider collects the card details. Nothing is
-         *     charged. The method appears in the list once the provider confirms it.
+         * @description Returns what is needed to hand the browser over to the payment provider's own card
+         *     form. Nothing is charged, and the method appears in the list once the provider
+         *     confirms it.
          *
          *     Card numbers are never sent to or stored by this service.
          */
@@ -498,6 +499,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/invoices/{invoiceId}/refund-quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invoiceId: components["parameters"]["InvoiceId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * What refunding this invoice would give back
+         * @description Show this before asking for a refund. Nothing is recorded and nothing is reserved; the
+         *     answer follows from what has been paid and what has already been returned, so it may
+         *     be read as often as required.
+         *
+         *     `refundable_amount` is `"0"` once nothing is left, which is also the answer for an
+         *     invoice already refunded in full.
+         */
+        get: operations["get-invoice-refund-quote"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/transactions": {
         parameters: {
             query?: never;
@@ -547,6 +575,9 @@ export interface paths {
          * Where each amount went
          * @description Give `source_id` to follow one top-up or grant through to everything it paid for. Give
          *     `target_id` to see which sources paid for one line of an invoice.
+         *
+         *     Give `source_type` on its own to separate what cash paid for from what granted credit
+         *     paid for.
          */
         get: operations["list-allocations"];
         put?: never;
@@ -1078,6 +1109,36 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/orders/{orderId}/refund-quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: components["parameters"]["OrderId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * What refunding this order would give back
+         * @description Show this before asking for a refund. Nothing is recorded and nothing is reserved; the
+         *     answer follows from what has been paid and what has already been returned, so it may
+         *     be read as often as required.
+         *
+         *     `refundable_amount` is `"0"` once nothing is left, which is also the answer for an
+         *     order already refunded in full.
+         *
+         *     Refunding an order also ends what it bought and reclaims whatever it provisioned. That
+         *     is not reflected in the amounts here.
+         */
+        get: operations["get-order-refund-quote"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{projectId}/orders/{orderId}/items": {
         parameters: {
             query?: never;
@@ -1249,11 +1310,13 @@ export interface components {
             /** @description Present for `per_unit`. */
             unit_amount?: components["schemas"]["Money"];
             /**
-             * @description Present for `tiered`. `graduated` charges each band at its own rate; `volume`
-             *     charges everything at the rate of the band the total falls in.
+             * @description `none` for a price that is not tiered, which is most of them.
+             *
+             *     Otherwise `graduated` charges each band at its own rate, and `volume` charges
+             *     everything at the rate of the band the total falls in.
              * @enum {string}
              */
-            tiers_mode?: "graduated" | "volume";
+            tiers_mode?: "none" | "graduated" | "volume";
             /** @description Present for `tiered`, in ascending order. */
             tiers?: components["schemas"]["Tier"][];
             /**
@@ -1625,17 +1688,47 @@ export interface components {
             id: string;
             /** Format: int64 */
             billing_account_id: number;
+            /** @description What is credited to the account, in the account's own currency. */
             amount: components["schemas"]["Money"];
             currency: string;
             /**
+             * @description How much of this top-up has not been spent yet. This is the part that can still be
+             *     returned to where it was paid from.
+             */
+            remaining_amount?: components["schemas"]["Money"];
+            /**
              * @description `pending` until the payment provider confirms. The balance increases on `succeeded`.
+             *
+             *     A checkout the payer abandoned ends up `failed` too, with `failure_reason` saying
+             *     so. Nothing was charged in that case.
              * @enum {string}
              */
             status: "pending" | "succeeded" | "failed";
+            /** @description Which payment provider collected it. */
+            provider?: string;
+            /**
+             * @description The currency the payer was actually charged in, when the checkout page collected a
+             *     local one. Absent when it was the same as the account's.
+             */
+            presentment_currency?: string;
+            /**
+             * @description What was charged, in `presentment_currency`. It will not equal `amount`, and it is
+             *     the figure that appears on the payer's card or wallet statement.
+             */
+            presentment_amount?: components["schemas"]["Money"];
+            /** @description Why it did not go through. Present with `failed`. */
+            failure_reason?: string;
             /** @description Where the payer completes the payment. Absent once it has completed. */
             checkout_url?: string;
             /** Format: date-time */
             created_at: string;
+            /**
+             * Format: date-time
+             * @description When the funds arrived. Later than `created_at` — by days for a bank transfer — so
+             *     reconciling against a statement uses this rather than the moment it was started.
+             *     Absent until the payment completes.
+             */
+            settled_at?: string | null;
         };
         TopUpCreate: {
             /** Format: int64 */
@@ -1693,9 +1786,27 @@ export interface components {
             billing_account_id: number;
             return_url?: string;
         };
+        /**
+         * @description What the payment provider's browser library needs in order to collect a card. There is
+         *     no address to redirect to: the form is rendered in the page, and the card goes straight
+         *     from the browser to the provider.
+         */
         PaymentMethodSetupResult: {
-            /** @description Where the payer enters their card details. */
-            setup_url: string;
+            /**
+             * @description The provider's identifier for this attempt. Use it to tell a reloaded page apart
+             *     from a second attempt.
+             */
+            setup_id: string;
+            /**
+             * @description Authorises this one attempt with the provider, and nothing else. Pass it to the
+             *     provider's library; it is not an API credential and grants no access here.
+             */
+            client_secret: string;
+            /**
+             * @description The provider's public key to initialise its library with. It differs between test
+             *     and live, so read it from here rather than compiling it in.
+             */
+            publishable_key: string;
             /** Format: date-time */
             expires_at?: string;
         };
@@ -1889,9 +2000,13 @@ export interface components {
             /**
              * @description `pending` is a payment still with the provider. Only one may be pending against any
              *     one invoice or order.
+             *
+             *     `failed` covers a payment the provider refused and one the payer walked away from
+             *     alike; `failure_reason` says which. There is no separate cancelled state, because
+             *     what to do next is the same either way — start a new one.
              * @enum {string}
              */
-            status: "pending" | "succeeded" | "failed" | "canceled";
+            status: "pending" | "succeeded" | "failed";
             /** Format: date-time */
             created_at: string;
         };
@@ -1905,8 +2020,12 @@ export interface components {
             id: string;
             /** Format: int64 */
             billing_account_id?: number;
-            /** @enum {string} */
-            source_type?: "promotional" | "voucher" | "compensation" | "membership";
+            /**
+             * @description Where it came from. `voucher` was redeemed from a code and carries its own
+             *     restrictions; `manual` was issued directly, typically to put something right.
+             * @enum {string}
+             */
+            source_type?: "promotion" | "voucher" | "manual" | "membership";
             name: string;
             amount: components["schemas"]["Money"];
             remaining_amount: components["schemas"]["Money"];
@@ -1916,7 +2035,7 @@ export interface components {
             /** @description The restrictions in one sentence, ready to display. */
             applies_to_summary?: string;
             /** @enum {string} */
-            status: "active" | "exhausted" | "expired" | "voided";
+            status: "active" | "depleted" | "expired" | "voided";
             /** Format: date-time */
             valid_from: string;
             /** Format: date-time */
@@ -1934,13 +2053,10 @@ export interface components {
             source_type: "transaction" | "credit_grant";
             /** Format: uuid */
             source_id: string;
-            /** @description A readable line, such as "Top-up of 100.00 on 3 September". */
-            source_description?: string;
             /** @enum {string} */
             target_type: "hold" | "order_item" | "invoice_item";
             /** Format: uuid */
             target_id: string;
-            target_description?: string;
             amount: components["schemas"]["Money"];
             currency: string;
             /** Format: date-time */
@@ -1991,14 +2107,28 @@ export interface components {
             requested_amount: components["schemas"]["Money"];
             /** @description What has actually been returned. */
             settled_amount?: components["schemas"]["Money"];
+            /**
+             * @description Withheld from what reaches the payer. It applies only to cash returned to a payment
+             *     method, so it is zero when `destination` is `balance`, and it is never taken out of
+             *     credit or a voucher.
+             *
+             *     `settled_amount` is the amount put back against what was paid; the payer receives
+             *     that less this.
+             */
+            fee_amount?: components["schemas"]["Money"];
             currency: string;
             /**
              * @description Where the cash went.
              * @enum {string}
              */
             destination?: "balance" | "provider";
-            /** @enum {string} */
-            status: "pending" | "succeeded" | "failed";
+            /**
+             * @description `pending` — accepted, not yet sent to the payment provider. `processing` — with the
+             *     provider and awaiting its answer, which takes days for some methods. Neither is
+             *     final, and neither means the money has moved.
+             * @enum {string}
+             */
+            status: "pending" | "processing" | "succeeded" | "failed";
             reason?: string;
             /** Format: date-time */
             created_at: string;
@@ -2007,6 +2137,51 @@ export interface components {
             items: components["schemas"]["Refund"][];
             /** Format: int64 */
             total_count?: number;
+        };
+        RefundSource: {
+            /**
+             * @description Where this part of the money came from, and therefore where it goes back to.
+             *     Only `cash` can reach a card or a spendable balance; credit and vouchers return
+             *     to themselves and never become cash.
+             * @enum {string}
+             */
+            type: "cash" | "credit" | "voucher";
+            amount: components["schemas"]["Money"];
+        };
+        /** @description What a full refund would return, and where each part of it would go. */
+        RefundQuote: {
+            /** @description The most that can still be returned, before any fee. */
+            refundable_amount: components["schemas"]["Money"];
+            /**
+             * @description Withheld from the cash part. Zero when `destination` is `balance`, and never taken
+             *     out of credit or a voucher.
+             */
+            fee_amount: components["schemas"]["Money"];
+            /** @description `refundable_amount` less `fee_amount`. */
+            net_amount: components["schemas"]["Money"];
+            currency: string;
+            /**
+             * @description Where the cash part would go. `provider` returns it to the method it was paid
+             *     with; `balance` credits the account instead, which is the answer whenever the cash
+             *     came from more than one place or never went through a provider at all.
+             * @enum {string}
+             */
+            destination: "balance" | "provider";
+            /**
+             * @description How `refundable_amount` splits by where the money came from. The amounts sum to it.
+             *
+             *     Show this rather than a single figure. A part returned as credit or as a voucher
+             *     does not appear on a card statement, so a customer told only the net amount will
+             *     ask why less than that arrived.
+             */
+            sources: components["schemas"]["RefundSource"][];
+            /**
+             * Format: date-time
+             * @description The last moment a refund can be asked for here. Measured from when the purchase was
+             *     paid for, not from today. Absent when this cannot be refunded without support at
+             *     all — metered usage, for one, which is never self-service.
+             */
+            self_service_until?: string | null;
         };
         UsageCharge: {
             /** Format: uuid */
@@ -2082,8 +2257,12 @@ export interface components {
             /** Format: uuid */
             product_id: string;
             product_key?: string;
-            /** @enum {string} */
-            status: "active" | "suspended" | "cancelled";
+            /**
+             * @description `pending` is a subscription created by an order that has not completed, so it
+             *     appears in the list before anything under it is running.
+             * @enum {string}
+             */
+            status: "pending" | "active" | "suspended" | "canceled" | "terminated";
             /** Format: int64 */
             item_count?: number;
         };
@@ -2118,7 +2297,7 @@ export interface components {
             paid_until?: string | null;
             auto_renew?: boolean;
             /** @enum {string} */
-            status: "pending" | "active" | "suspended" | "cancelled" | "terminated";
+            status: "pending" | "active" | "suspended" | "canceled" | "terminated";
             /** Format: date-time */
             started_at?: string | null;
             /** Format: date-time */
@@ -2396,6 +2575,12 @@ export interface components {
             id: string;
             /** Format: int64 */
             billing_account_id?: number;
+            /**
+             * @description Which service it covers, such as `compute`. Read it alongside `meter_key`: a meter
+             *     name is unique only within its own service, so two allowances for `egress_bytes`
+             *     may belong to different services and cover different traffic.
+             */
+            product_key: string;
             /** @description What it covers, such as `egress_bytes`. */
             meter_key: string;
             /** @description The unit it is counted in, such as `MiB`. */
@@ -3335,6 +3520,29 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    "get-invoice-refund-quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invoiceId: components["parameters"]["InvoiceId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefundQuote"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
     "list-transactions": {
         parameters: {
             query?: {
@@ -3375,7 +3583,7 @@ export interface operations {
                 page_size?: components["parameters"]["PageSize"];
                 /** @description Restrict to one of your accounts. All of them when omitted. */
                 billing_account_id?: components["parameters"]["AccountIdQuery"];
-                status?: "active" | "exhausted" | "expired" | "voided";
+                status?: "active" | "depleted" | "expired" | "voided";
             };
             header?: never;
             path?: never;
@@ -3404,6 +3612,8 @@ export interface operations {
                 page_size?: components["parameters"]["PageSize"];
                 /** @description Restrict to one of your accounts. All of them when omitted. */
                 billing_account_id?: components["parameters"]["AccountIdQuery"];
+                /** @description `transaction` is money paid in, `credit_grant` is granted credit or a voucher. */
+                source_type?: "transaction" | "credit_grant";
                 source_id?: string;
                 target_id?: string;
             };
@@ -3488,6 +3698,8 @@ export interface operations {
                 /** @description Restrict to one of your accounts. All of them when omitted. */
                 billing_account_id?: components["parameters"]["AccountIdQuery"];
                 project_id?: string;
+                /** @description Restrict to one service, such as `compute`. */
+                product_key?: string;
                 resource_id?: string;
                 from?: components["parameters"]["From"];
                 /** @description Exclusive. */
@@ -3744,6 +3956,12 @@ export interface operations {
                 /** @description How many per page, 100 at most. */
                 page_size?: components["parameters"]["PageSize"];
                 resource_id?: string;
+                /**
+                 * @description Restrict to one service, such as `compute`. Give it alongside `meter_key`: a meter
+                 *     name is unique only within its own service, and more than one service may measure
+                 *     `traffic_bytes`, so `meter_key` on its own can return charges from several.
+                 */
+                product_key?: string;
                 meter_key?: string;
                 from?: components["parameters"]["From"];
                 /** @description Exclusive. */
@@ -4103,6 +4321,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OrderItemList"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    "get-order-refund-quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: components["parameters"]["OrderId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefundQuote"];
                 };
             };
             default: components["responses"]["Error"];

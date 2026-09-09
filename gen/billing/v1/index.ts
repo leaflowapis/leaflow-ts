@@ -163,6 +163,10 @@ export type GetInvoiceResult =
 export type ListInvoiceItemsResult =
   operations["list-invoice-items"]["responses"][200]["content"]["application/json"];
 
+/** `GET /account/v1/invoices/{invoiceId}/refund-quote` 成功时的响应体。 */
+export type GetInvoiceRefundQuoteResult =
+  operations["get-invoice-refund-quote"]["responses"][200]["content"]["application/json"];
+
 /** `GET /account/v1/transactions` 成功时的响应体。 */
 export type ListTransactionsResult =
   operations["list-transactions"]["responses"][200]["content"]["application/json"];
@@ -353,6 +357,10 @@ export type GetOrderResult =
 /** `GET /account/v1/orders/{orderId}/items` 成功时的响应体。 */
 export type ListOrderItemsResult =
   operations["list-order-items"]["responses"][200]["content"]["application/json"];
+
+/** `GET /account/v1/orders/{orderId}/refund-quote` 成功时的响应体。 */
+export type GetOrderRefundQuoteResult =
+  operations["get-order-refund-quote"]["responses"][200]["content"]["application/json"];
 
 /** `GET /api/v1/projects/{projectId}/orders/{orderId}/items` 成功时的响应体。 */
 export type ListProjectOrderItemsResult =
