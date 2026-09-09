@@ -183,6 +183,15 @@ export type ListAllocationsResult =
 export type ListAllocationsQuery =
   operations["list-allocations"]["parameters"]["query"];
 
+/** `POST /account/v1/refunds` 成功时的响应体。 */
+export type RequestRefundResult =
+  operations["request-refund"]["responses"][201]["content"]["application/json"];
+
+/** `POST /account/v1/refunds` 的请求体。 */
+export type RequestRefundBody = NonNullable<
+  operations["request-refund"]["requestBody"]
+>["content"]["application/json"];
+
 /** `GET /account/v1/refunds` 成功时的响应体。 */
 export type ListRefundsResult =
   operations["list-refunds"]["responses"][200]["content"]["application/json"];
