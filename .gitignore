@@ -1,3 +1,6 @@
 node_modules/
 dist/
 leaflowapis/
+
+# 本地生成时的临时输出目录，没有任何东西引用它。
+.local-sdk/
