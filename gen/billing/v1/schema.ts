@@ -566,7 +566,20 @@ export interface paths {
         };
         get: operations["list-refunds"];
         put?: never;
-        post?: never;
+        /**
+         * Ask for a refund
+         * @description Refunding ends the subscription and reclaims whatever it provisioned. That is the
+         *     difference from letting a period lapse: a lapsed period keeps the machine around
+         *     for a while so that topping up brings it back, whereas a refund returns the money
+         *     and therefore cannot leave the thing running.
+         *
+         *     What can be refunded, for how long, and how much, is decided here rather than by
+         *     the caller. A request outside those bounds is refused with the reason.
+         *
+         *     The money goes back the way it came: card charges to the card, balance to the
+         *     balance, credit to credit. A grant never turns into cash.
+         */
+        post: operations["request-refund"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1395,16 +1408,37 @@ export interface components {
             /** @description Which line of the request this answers. */
             index: number;
             /**
-             * Format: uuid
-             * @description The price selected. Always returned, including when the request identified the item
-             *     indirectly, so that the choice can be confirmed.
+             * @description Whether a price was found for this line. Read this before anything else.
+             *
+             *     A single item with no price no longer fails the whole request. A catalogue
+             *     almost always has something not yet priced, and refusing the request would
+             *     leave no way to render a list in which a few entries are simply not on sale.
+             *
+             *     When false, `price_id`, `unit_amount` and `amount` are absent and
+             *     `unpriced_reason` states what is missing.
              */
-            price_id: string;
+            priced: boolean;
+            /**
+             * @description Why no price was found; `none` while `priced` is true.
+             *
+             *     The last four are told apart because their remedies differ: the price points
+             *     at no price list, the list holds no rate for that meter, that exact combination
+             *     of attributes is not configured, or it is configured but nothing is in effect
+             *     at the moment asked about.
+             * @enum {string}
+             */
+            unpriced_reason?: "none" | "no_price" | "no_rate_card" | "no_meter" | "no_dimensions" | "no_effective_rule";
+            /**
+             * Format: uuid
+             * @description The price selected. Returned whenever `priced` is true, including when the
+             *     request identified the item indirectly, so that the choice can be confirmed.
+             */
+            price_id?: string;
             plan_name?: string;
             unit_amount?: components["schemas"]["Money"];
             quantity?: string;
             /** @description Not rounded. Round only for display. */
-            amount: components["schemas"]["Money"];
+            amount?: components["schemas"]["Money"];
             currency: string;
         };
         QuoteChangeResult: {
@@ -1606,7 +1640,16 @@ export interface components {
         TopUpCreate: {
             /** Format: int64 */
             billing_account_id: number;
-            /** @description In the account's currency. */
+            /**
+             * @description In the account's currency, and no finer than that currency's smallest unit:
+             *     two decimals for most, none for the yen. A finer amount is refused here rather
+             *     than at the checkout page, where the payer would see the provider's own wording
+             *     instead of an explanation.
+             *
+             *     There is a minimum, which differs by currency. Below it the provider's fee
+             *     exceeds the top-up itself, so such a payment costs more to accept than it brings.
+             *     The minimum in force is returned with the rejection.
+             */
             amount: components["schemas"]["Money"];
             /**
              * Format: uuid
@@ -1746,7 +1789,7 @@ export interface components {
             /** Format: int64 */
             billing_account_id: number;
             /** @description Numbered per account and per month. */
-            number?: string;
+            number: string;
             /**
              * @description What produced it — metered usage for a period, a purchase, or a correction.
              * @enum {string}
@@ -1910,6 +1953,32 @@ export interface components {
             /** Format: int64 */
             total_count?: number;
         };
+        /**
+         * @description Name exactly one of the three targets. Naming none leaves the amount undecided;
+         *     naming two leaves it ambiguous, and both would have to be resolved by guessing.
+         */
+        RefundRequest: {
+            /** Format: uuid */
+            invoice_id?: string;
+            /** Format: uuid */
+            order_id?: string;
+            /**
+             * Format: uuid
+             * @description The period to end early. Use this to give back a prepaid term that still has
+             *     time left on it.
+             */
+            subscription_period_id?: string;
+            /**
+             * @description How much to give back. Absent asks for everything still refundable on the target.
+             *
+             *     More than what remains is refused rather than reduced to the remainder: a caller
+             *     asking for more than it can have has miscounted, and quietly giving it less
+             *     hides that.
+             */
+            amount?: components["schemas"]["Money"];
+            reason: string;
+            idempotency_key: string;
+        };
         Refund: {
             /** Format: uuid */
             id: string;
@@ -1919,7 +1988,7 @@ export interface components {
             invoice_id?: string | null;
             /** Format: uuid */
             order_id?: string | null;
-            requested_amount?: components["schemas"]["Money"];
+            requested_amount: components["schemas"]["Money"];
             /** @description What has actually been returned. */
             settled_amount?: components["schemas"]["Money"];
             currency: string;
@@ -3379,6 +3448,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RefundList"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    "request-refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefundRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted for processing */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Refund"];
                 };
             };
             default: components["responses"]["Error"];
