@@ -241,6 +241,12 @@ export interface paths {
         /**
          * Resize a disk
          * @description Capacity can only be increased; shrinking is not supported. Extend the file system inside the instance once the resize completes.
+         *
+         *     **A data disk whose performance grows with its size has to be detached first.** The storage backend decides a volume's limit when the volume is attached and never revisits it, so growing one that is attached would give you the capacity immediately and leave the speed at the old size's figure — indefinitely, and stopping the instance does not help. Rather than take the money for performance that does not arrive, this is refused with `DISK_RESIZE_NEEDS_DETACH`; detach the disk, resize it, and attach it again.
+         *
+         *     It is only refused when the two sizes really would differ in speed. A disk whose type has no QoS level, or whose performance has already reached the type's ceiling, grows online as before.
+         *
+         *     **A system disk is the exception and grows online**, because a root volume cannot be detached at all. Its performance does not change with size for exactly that reason — system disk types are required to carry a level that does not scale.
          */
         post: operations["resize-disk"];
         delete?: never;
@@ -328,6 +334,8 @@ export interface paths {
         /**
          * Set the bandwidth limit
          * @description Limits both directions at once. Limiting egress alone does not prevent ingress traffic from saturating the uplink.
+         *
+         *     While the address is bound to an instance, the ceiling has to fit that instance type's `max_bandwidth_mbps`; asking for more is refused with `INSTANCE_BANDWIDTH_CEILING`. An address bound to nothing is not checked against any type — there is none to check against — and is checked again when it is attached.
          */
         put: operations["set-floating-ip-bandwidth"];
         post?: never;
@@ -1353,6 +1361,20 @@ export interface components {
             region_code: string;
             /** Format: int64 */
             size_gb: number;
+            /**
+             * Format: int64
+             * @description IOPS this disk is allowed. Null when its type is not rate-limited.
+             *
+             *     Computed from the disk's own capacity, so it grows when the disk is grown — but see the
+             *     note on the resize endpoint: growing a disk that is attached is refused, precisely because
+             *     the new figure would not take effect until it was attached again.
+             */
+            iops: number | null;
+            /**
+             * Format: int64
+             * @description Throughput this disk is allowed, in bytes per second. Null when its type is not rate-limited
+             */
+            throughput_bytes_per_sec: number | null;
             /** @enum {string} */
             status: "provisioning" | "available" | "attaching" | "in_use" | "detaching" | "resizing" | "reverting" | "restoring" | "releasing" | "deleting" | "error";
             /**
@@ -1371,7 +1393,20 @@ export interface components {
             availability_zone_code: string;
             /** Format: uuid */
             id: string;
-            iops_display: string;
+            /**
+             * Format: int64
+             * @description IOPS a disk of `min_size_gb` gets. Null when this type is not rate-limited.
+             *
+             *     Performance grows with capacity, so this and `iops_at_max_size` are the two ends of the
+             *     range. The exact figure for the size actually bought appears on the disk itself once it
+             *     exists.
+             */
+            iops_at_min_size: number | null;
+            /**
+             * Format: int64
+             * @description IOPS a disk of `max_size_gb` gets. Null when this type is not rate-limited
+             */
+            iops_at_max_size: number | null;
             /** Format: int64 */
             max_size_gb: number;
             /** @enum {string} */
@@ -1382,7 +1417,20 @@ export interface components {
             region_code: string;
             /** Format: int64 */
             step_gb: number;
-            throughput_display: string;
+            /**
+             * Format: int64
+             * @description Throughput a disk of `min_size_gb` gets, in **bytes per second**. Null when this type is
+             *     not rate-limited.
+             *
+             *     Bytes rather than MiB so the number needs no rounding on the way out; divide by 1048576
+             *     for MiB/s at the point of display.
+             */
+            throughput_at_min_size: number | null;
+            /**
+             * Format: int64
+             * @description Throughput a disk of `max_size_gb` gets, in bytes per second. Null when this type is not rate-limited
+             */
+            throughput_at_max_size: number | null;
             /**
              * @description Whether any capacity is left in this type's pool.
              *
@@ -1467,8 +1515,29 @@ export interface components {
             availability_zone_code: string;
             /** Format: uuid */
             id: string;
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description The most public bandwidth a machine of this type may be given, in Mbps. Asking for more
+             *     when creating a machine, or raising a bound address past it, is refused.
+             *
+             *     A ceiling on what can be bought, not a speed. How fast the machine's own interfaces run is
+             *     `network_egress_kbps` / `network_ingress_kbps`.
+             */
             max_bandwidth_mbps: number;
+            /**
+             * Format: int64
+             * @description Outbound ceiling of **each** network interface, in kbps. Null when this type is not
+             *     rate-limited.
+             *
+             *     Per interface rather than per machine: a machine with two interfaces has this ceiling on
+             *     each of them, not shared between them. `max_ports` says how many it may have.
+             */
+            network_egress_kbps: number | null;
+            /**
+             * Format: int64
+             * @description Inbound ceiling of each network interface, in kbps. Null when this type is not rate-limited
+             */
+            network_ingress_kbps: number | null;
             /** Format: int64 */
             max_floating_ips: number;
             /** Format: int64 */
