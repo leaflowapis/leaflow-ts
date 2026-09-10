@@ -4,154 +4,154 @@
  */
 
 export interface paths {
-    "/api/v1/regions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List available regions
-         * @description Lists every region currently open to new orders, in display order.
-         *
-         *     The list is the same for every caller and changes rarely.
-         */
-        get: operations["list-regions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/api/v1/regions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/regions/{regionCode}/availability-zones": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the availability zones of a region
-         * @description Lists every availability zone of this region that is currently open to new orders, in display order.
-         *
-         *     Resources are generally required to share an availability zone in order to be attached to one another, so confirm the zone before creating either side.
-         *
-         *     A region that exists but is not open to new orders is reported as not found, exactly as an unknown code is: both mean that nothing can be created there.
-         */
-        get: operations["list-availability-zones"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List available regions
+     * @description Lists every region currently open to new orders, in display order.
+     *
+     *     The list is the same for every caller and changes rarely.
+     */
+    get: operations["list-regions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/regions/{regionCode}/availability-zones": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /**
+     * List the availability zones of a region
+     * @description Lists every availability zone of this region that is currently open to new orders, in display order.
+     *
+     *     Resources are generally required to share an availability zone in order to be attached to one another, so confirm the zone before creating either side.
+     *
+     *     A region that exists but is not open to new orders is reported as not found, exactly as an unknown code is: both mean that nothing can be created there.
+     */
+    get: operations["list-availability-zones"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Error: {
-            code?: string;
-            message: string;
-            /**
-             * @description What a given `code` carries alongside the message. The keys depend on the code,
-             *     and a client that does not recognise one ignores it.
-             */
-            meta?: {
-                [key: string]: unknown;
-            };
-            /** Format: int64 */
-            status: number;
-        };
-        RegionResource: {
-            /** @description Stable identifier of the region, used wherever a region has to be named */
-            code: string;
-            /** @description ISO 3166-1 alpha-2 code of the country this region is in */
-            country_code: string;
-            name: string;
-        };
-        AvailabilityZoneResource: {
-            /** @description Stable identifier of the availability zone, used wherever an availability zone has to be named */
-            code: string;
-            name: string;
-        };
-        RegionListResponseBody: {
-            items: components["schemas"]["RegionResource"][] | null;
-        };
-        AvailabilityZoneListResponseBody: {
-            items: components["schemas"]["AvailabilityZoneResource"][] | null;
-        };
+  schemas: {
+    Error: {
+      code?: string;
+      message: string;
+      /**
+       * @description What a given `code` carries alongside the message. The keys depend on the code,
+       *     and a client that does not recognise one ignores it.
+       */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /** Format: int64 */
+      status: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    RegionResource: {
+      /** @description Stable identifier of the region, used wherever a region has to be named */
+      code: string;
+      /** @description ISO 3166-1 alpha-2 code of the country this region is in */
+      country_code: string;
+      name: string;
+    };
+    AvailabilityZoneResource: {
+      /** @description Stable identifier of the availability zone, used wherever an availability zone has to be named */
+      code: string;
+      name: string;
+    };
+    RegionListResponseBody: {
+      items: components["schemas"]["RegionResource"][] | null;
+    };
+    AvailabilityZoneListResponseBody: {
+      items: components["schemas"]["AvailabilityZoneResource"][] | null;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "list-regions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RegionListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  "list-regions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "list-availability-zones": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                regionCode: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AvailabilityZoneListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["RegionListResponseBody"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
+  };
+  "list-availability-zones": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionCode: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AvailabilityZoneListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
 }

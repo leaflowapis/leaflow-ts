@@ -4,1151 +4,1151 @@
  */
 
 export interface paths {
-    "/account/v1/settings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get registration and project creation settings
-         * @description No token required.
-         *
-         *     While `registration_mode` is not `OPEN`, `POST /account/v1/register` answers 403: `CLOSED` refuses everyone, and `INVITE_ONLY` accepts only an email address holding a project invitation. `project_creation_mode` behaves the same way, and `VERIFIED_ONLY` requires identity verification to have completed.
-         *
-         *     Both quotas are `0` when unlimited. The decision itself is made at the moment of writing.
-         */
-        get: operations["get-settings"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/account/v1/settings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/locales": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List countries and languages for registration
-         * @description No token required: the registration page renders both lists before an account exists.
-         *
-         *     Country names and their order follow `Accept-Language`. A name is rendered in the requested language and the list is ordered by the rules of that language rather than by code point. Simplified Chinese applies when the header is absent.
-         *
-         *     Retired codes such as the Soviet Union and Yugoslavia, and codes that denote no country such as the European Union, are not listed.
-         */
-        get: operations["list-locales"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get registration and project creation settings
+     * @description No token required.
+     *
+     *     While `registration_mode` is not `OPEN`, `POST /account/v1/register` answers 403: `CLOSED` refuses everyone, and `INVITE_ONLY` accepts only an email address holding a project invitation. `project_creation_mode` behaves the same way, and `VERIFIED_ONLY` requires identity verification to have completed.
+     *
+     *     Both quotas are `0` when unlimited. The decision itself is made at the moment of writing.
+     */
+    get: operations["get-settings"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/locales": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/agreements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the agreements registration requires
-         * @description No token required. Send the `type` and `version` of each one back unchanged to `POST /account/v1/register`.
-         *
-         *     The array is empty while no agreement is in force, and registration then takes no `consents`.
-         */
-        get: operations["list-agreements"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List countries and languages for registration
+     * @description No token required: the registration page renders both lists before an account exists.
+     *
+     *     Country names and their order follow `Accept-Language`. A name is rendered in the requested language and the list is ordered by the rules of that language rather than by code point. Simplified Chinese applies when the header is absent.
+     *
+     *     Retired codes such as the Soviet Union and Yugoslavia, and codes that denote no country such as the European Union, are not listed.
+     */
+    get: operations["list-locales"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/agreements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/me/consents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the agreements the caller has consented to
-         * @description Every record, most recent first, including versions that are no longer current.
-         */
-        get: operations["list-consents"];
-        put?: never;
-        /**
-         * Consent to the current agreements
-         * @description Call this once a new version is published, which is whenever `pending_agreements` on `GET /account/v1/me` is not empty.
-         *
-         *     Only the version currently in force is accepted; consenting to an earlier one answers 409. Submitting the same version twice is not an error and leaves the first record in place.
-         */
-        post: operations["accept-agreements"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the agreements registration requires
+     * @description No token required. Send the `type` and `version` of each one back unchanged to `POST /account/v1/register`.
+     *
+     *     The array is empty while no agreement is in force, and registration then takes no `consents`.
+     */
+    get: operations["list-agreements"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/me/consents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Register an account
-         * @description Call this after signing in at auth.leaflow.net, carrying the access token. The name and email address are taken from the sign-in claims and are not read from the request body.
-         *
-         *     `consents` must cover every agreement returned by `GET /account/v1/agreements`, at the same versions. A missing agreement answers 400 and a stale version answers 409, in which case fetch the list again. An account that already exists answers 409.
-         */
-        post: operations["register"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the agreements the caller has consented to
+     * @description Every record, most recent first, including versions that are no longer current.
+     */
+    get: operations["list-consents"];
+    put?: never;
+    /**
+     * Consent to the current agreements
+     * @description Call this once a new version is published, which is whenever `pending_agreements` on `GET /account/v1/me` is not empty.
+     *
+     *     Only the version currently in force is accepted; consenting to an earlier one answers 409. Submitting the same version twice is not an error and leaves the first record in place.
+     */
+    post: operations["accept-agreements"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/register": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the current account
-         * @description `pending_agreements` holds the agreements not yet consented to. While it is not empty, obtain consent and call `POST /account/v1/me/consents`.
-         */
-        get: operations["get-account"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update the country and language of the current account
-         * @description The name and email address cannot be changed here. They come from the identity provider, and a change would be overwritten at the next sign-in.
-         */
-        patch: operations["update-account"];
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Register an account
+     * @description Call this after signing in at auth.leaflow.net, carrying the access token. The name and email address are taken from the sign-in claims and are not read from the request body.
+     *
+     *     `consents` must cover every agreement returned by `GET /account/v1/agreements`, at the same versions. A missing agreement answers 400 and a stale version answers 409, in which case fetch the list again. An account that already exists answers 409.
+     */
+    post: operations["register"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/me/identity-verification": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get identity verification status
-         * @description The status is `UNVERIFIED` rather than 404 when nothing has been submitted. The legal name and the document number appear in no response.
-         */
-        get: operations["get-identity-verification"];
-        put?: never;
-        /**
-         * Submit identity verification
-         * @description A submission awaiting review, and an account already verified, are both refused. A rejected submission may be corrected and sent again.
-         */
-        post: operations["submit-identity-verification"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the current account
+     * @description `pending_agreements` holds the agreements not yet consented to. While it is not empty, obtain consent and call `POST /account/v1/me/consents`.
+     */
+    get: operations["get-account"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Update the country and language of the current account
+     * @description The name and email address cannot be changed here. They come from the identity provider, and a change would be overwritten at the next sign-in.
+     */
+    patch: operations["update-account"];
+    trace?: never;
+  };
+  "/account/v1/me/identity-verification": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/me/invitations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List invitations addressed to the caller
-         * @description Matched against the email address of the current account.
-         */
-        get: operations["list-my-invitations"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get identity verification status
+     * @description The status is `UNVERIFIED` rather than 404 when nothing has been submitted. The legal name and the document number appear in no response.
+     */
+    get: operations["get-identity-verification"];
+    put?: never;
+    /**
+     * Submit identity verification
+     * @description A submission awaiting review, and an account already verified, are both refused. A rejected submission may be corrected and sent again.
+     */
+    post: operations["submit-identity-verification"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/me/invitations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/invitations/by-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Preview an invitation by its token
-         * @description No token required: whoever follows the link in an invitation email has usually not signed in, and may hold no account at all.
-         *
-         *     The recipient address is masked (`t***@example.com`).
-         *
-         *     A token that does not exist, one already redeemed, one revoked and one expired all answer the same 404.
-         */
-        get: operations["preview-invitation-by-token"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List invitations addressed to the caller
+     * @description Matched against the email address of the current account.
+     */
+    get: operations["list-my-invitations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/invitations/by-token": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/me/invitations/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Accept an invitation by its token
-         * @description A token that does not match, and an invitation that no longer stands, answer the same way.
-         */
-        post: operations["accept-invitation-by-token"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Preview an invitation by its token
+     * @description No token required: whoever follows the link in an invitation email has usually not signed in, and may hold no account at all.
+     *
+     *     The recipient address is masked (`t***@example.com`).
+     *
+     *     A token that does not exist, one already redeemed, one revoked and one expired all answer the same 404.
+     */
+    get: operations["preview-invitation-by-token"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/me/invitations/accept": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/me/invitations/{invitationId}/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Accept an invitation listed against the caller
-         * @description No token is required; the invitation is addressed to the email address of the current account.
-         */
-        post: operations["accept-invitation"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Accept an invitation by its token
+     * @description A token that does not match, and an invitation that no longer stands, answer the same way.
+     */
+    post: operations["accept-invitation-by-token"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/me/invitations/{invitationId}/accept": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/projects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the projects the caller belongs to
-         * @description Deleted projects are excluded unless `status=DELETED` asks for them by name.
-         */
-        get: operations["list-projects"];
-        put?: never;
-        /**
-         * Create a project
-         * @description The caller becomes its owner. The project is created with the built-in `OWNER` and `ADMIN` roles and a `member` role carrying no permissions.
-         */
-        post: operations["create-project"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Accept an invitation listed against the caller
+     * @description No token is required; the invitation is addressed to the email address of the current account.
+     */
+    post: operations["accept-invitation"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/projects": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/projects/{projectId}/scoped-tokens": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Exchange the access token for a scoped token
-         * @description Once a project has been chosen, exchange the access token for a scoped token for that project.
-         *
-         *     **Only an access token issued by auth.leaflow.net is accepted; a scoped token is not.** Once a scoped token has expired, obtain a fresh access token at auth.leaflow.net and call this endpoint again.
-         *
-         *     The exchange confirms that the account is usable, that the project exists, and that the caller is a member of it. A caller who is not a member obtains no token.
-         *
-         *     A scoped token states identity only — the user and the project — and **carries no permissions**. Permissions are evaluated on every request, so a change of role takes effect immediately rather than at the next expiry.
-         *
-         *     A project that is suspended, banned or being deleted still issues tokens; those states restrict writes, and the project remains readable.
-         */
-        post: operations["create-scoped-token"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the projects the caller belongs to
+     * @description Deleted projects are excluded unless `status=DELETED` asks for them by name.
+     */
+    get: operations["list-projects"];
+    put?: never;
+    /**
+     * Create a project
+     * @description The caller becomes its owner. The project is created with the built-in `OWNER` and `ADMIN` roles and a `member` role carrying no permissions.
+     */
+    post: operations["create-project"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/projects/{projectId}/scoped-tokens": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    get?: never;
+    put?: never;
+    /**
+     * Exchange the access token for a scoped token
+     * @description Once a project has been chosen, exchange the access token for a scoped token for that project.
+     *
+     *     **Only an access token issued by auth.leaflow.net is accepted; a scoped token is not.** Once a scoped token has expired, obtain a fresh access token at auth.leaflow.net and call this endpoint again.
+     *
+     *     The exchange confirms that the account is usable, that the project exists, and that the caller is a member of it. A caller who is not a member obtains no token.
+     *
+     *     A scoped token states identity only — the user and the project — and **carries no permissions**. Permissions are evaluated on every request, so a change of role takes effect immediately rather than at the next expiry.
+     *
+     *     A project that is suspended, banned or being deleted still issues tokens; those states restrict writes, and the project remains readable.
+     */
+    post: operations["create-scoped-token"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Error: {
-            code?: string;
-            message: string;
-            /**
-             * @description What a given `code` carries alongside the message. The keys depend on the code,
-             *     and a client that does not recognise one ignores it.
-             */
-            meta?: {
-                [key: string]: unknown;
-            };
-            /** Format: int64 */
-            status: number;
-        };
-        SettingsResource: {
-            /**
-             * Format: int64
-             * @description Maximum number of members a project may hold; 0 means unlimited
-             */
-            max_members_per_project: number;
-            /**
-             * Format: int64
-             * @description Maximum number of projects an account may own; 0 means unlimited. Deleted projects do not count
-             */
-            max_projects_per_user: number;
-            /**
-             * @description VERIFIED_ONLY requires identity verification to have completed; a submission under review does not qualify
-             * @enum {string}
-             */
-            project_creation_mode: "OPEN" | "VERIFIED_ONLY" | "CLOSED";
-            /**
-             * @description INVITE_ONLY accepts only an email address holding a project invitation
-             * @enum {string}
-             */
-            registration_mode: "OPEN" | "INVITE_ONLY" | "CLOSED";
-        };
-        AgreementResource: {
-            /**
-             * Format: date-time
-             * @description From this moment on, registration requires this version
-             */
-            effective_at: string;
-            /** @enum {string} */
-            type: "TERMS" | "PRIVACY" | "DPA";
-            /** @description Where the text is published */
-            url: string;
-            /** @description Send this value back unchanged when consenting */
-            version: string;
-        };
-        AgreementListResponseBody: {
-            items: components["schemas"]["AgreementResource"][] | null;
-        };
-        ConsentResource: {
-            /** Format: date-time */
-            consented_at: string;
-            /**
-             * @description OFFLINE is a consent given off the platform and recorded by an operator
-             * @enum {string}
-             */
-            method: "CLICKWRAP" | "OFFLINE";
-            /** @enum {string} */
-            type: "TERMS" | "PRIVACY" | "DPA";
-            version: string;
-        };
-        ConsentListResponseBody: {
-            items: components["schemas"]["ConsentResource"][] | null;
-        };
-        ConsentBody: {
-            /** @enum {string} */
-            type: "TERMS" | "PRIVACY" | "DPA";
-            version: string;
-        };
-        AcceptConsentsRequestBody: {
-            consents: components["schemas"]["ConsentBody"][] | null;
-        };
-        AccountResource: {
-            /** Format: date-time */
-            created_at: string;
-            email: string;
-            /** Format: date-time */
-            email_verified_at: string | null;
-            /** @description Taken from the sign-in claims; may be empty */
-            first_name: string;
-            /** @description The subject issued by the identity provider */
-            id: string;
-            /** @description Taken from the sign-in claims; may be empty */
-            last_name: string;
-            /** @description ISO 3166-1 alpha-2. Empty on an account that registered before this was required; such an account continues to work and can set it from the settings page */
-            country?: string;
-            /** @description Empty while never set, in which case `Accept-Language` applies, and the platform default when that is absent as well */
-            locale?: string;
-            pending_agreements: components["schemas"]["AgreementResource"][] | null;
-            /** @enum {string} */
-            status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING";
-        };
-        RegisterRequestBody: {
-            /** @description Must cover every agreement currently in force, at the versions returned by GET /account/v1/agreements */
-            consents: components["schemas"]["ConsentBody"][] | null;
-            /** @description ISO 3166-1 alpha-2 (CN, HK, US). Must denote a country or territory that exists; codes such as EU and ZZ hold a place in the standard without denoting one and are refused */
-            country: string;
-            locale: components["schemas"]["Locale"];
-        };
-        LocaleOptionsResource: {
-            countries: components["schemas"]["CountryOption"][];
-            languages: components["schemas"]["LanguageOption"][];
-        };
-        CountryOption: {
-            /** @description ISO 3166-1 alpha-2, sent back unchanged at registration */
-            code: string;
-            /** @description The name rendered according to `Accept-Language` */
-            name: string;
-        };
-        LanguageOption: {
-            code: components["schemas"]["Locale"];
-            /** @description The endonym of the language, written in that language itself. It does not follow `Accept-Language` */
-            name: string;
-        };
-        /**
-         * @description The language used for the interface and for email. It is independent of `country`, and neither can be inferred from the other
-         * @enum {string}
-         */
-        Locale: "zh-Hans" | "zh-Hant-HK" | "en";
-        /** @description Both fields are optional, and an omitted field is left unchanged */
-        UpdateAccountRequestBody: {
-            /** @description As at registration */
-            country?: string;
-            locale?: components["schemas"]["Locale"];
-        };
-        IdentityVerificationResource: {
-            reject_reason: string;
-            /**
-             * @description PERSONAL and ENTERPRISE are two kinds of subject rather than two levels, and are not ordered
-             * @enum {string}
-             */
-            status: "UNVERIFIED" | "PENDING" | "PERSONAL" | "ENTERPRISE" | "REJECTED";
-            /** Format: date-time */
-            submitted_at: string | null;
-            /** Format: date-time */
-            verified_at: string | null;
-        };
-        SubmitIdentityVerificationRequestBody: {
-            /** @description The document number. It is returned by no endpoint, and one number cannot be attached to two accounts */
-            id_number: string;
-            /** @description The legal name. It is returned by no endpoint */
-            real_name: string;
-        };
-        /** @description What an invitation states before it is accepted. It carries neither the invitation id nor the full recipient address; the invitations listed against the current account are returned by `list-my-invitations` */
-        InvitationPreviewResource: {
-            /** @description The masked recipient address, enough for the recipient to recognise it */
-            email_masked: string;
-            /** Format: date-time */
-            expires_at: string;
-            /** @description The display name of the sender, or their email address when no name is set */
-            invited_by_name: string;
-            project_name: string;
-            /** @description The display names of the roles granted on acceptance */
-            role_names: string[] | null;
-        };
-        InvitationResource: {
-            /** Format: date-time */
-            created_at: string;
-            email: string;
-            /** Format: date-time */
-            expires_at: string;
-            /** Format: uuid */
-            id: string;
-            /** @description The id of the account that issued the invitation */
-            invited_by: string;
-            /** @description The display name of that account, or its email address when no name is set. It reflects the value at the time of reading rather than at the time the invitation was sent */
-            invited_by_name: string;
-            /** Format: uuid */
-            project_id: string;
-            /** @description The name of the target project */
-            project_name: string;
-            /** @description The role codes granted on acceptance */
-            roles: string[] | null;
-            /** @description The display names of those codes, in the same order */
-            role_names: string[] | null;
-        };
-        LengthAwarePageInvitationResource: {
-            /** @description The items in this page */
-            items: components["schemas"]["InvitationResource"][];
-            /**
-             * Format: int64
-             * @description Maximum number of items in this page, echoing the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Number of items skipped, echoing the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matches, not only this page
-             */
-            total: number;
-        };
-        AcceptInvitationByTokenRequestBody: {
-            /** @description The token carried by the invitation link */
-            token: string;
-        };
-        ProjectResource: {
-            ban_reason: string;
-            /** Format: date-time */
-            created_at: string;
-            created_by: string;
-            /**
-             * Format: date-time
-             * @description When the project was deleted
-             */
-            deleted_at: string | null;
-            description: string;
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /** @enum {string} */
-            status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
-            /** @description Written for a reader; it takes part in no query */
-            status_reason: string;
-            /** Format: date-time */
-            updated_at: string;
-        };
-        AcceptedInvitationResponseBody: {
-            project: components["schemas"]["ProjectResource"];
-        };
-        GrantResource: {
-            admin: boolean;
-            owner: boolean;
-            /** @description The role codes held, for display only */
-            roles: string[] | null;
-            /** @description **Do not walk these rules to reach a decision.** They are compiled from every policy that applies to the caller, and serve to render what a user may do. Each request is decided by the service handling it */
-            rules: components["schemas"]["RuleResource"][] | null;
-        };
-        ResourceRefResource: {
-            /** @description A string rather than a UUID; a DNS zone, for one, is named by its domain. Matching is glob, so `*.example.com` covers a set of subdomains, while a value carrying no glob metacharacter matches exactly */
-            id: string;
-            /** @description Of the form compute:instance or dns:zone, in the same namespace as permission names */
-            type: string;
-        };
-        RuleResource: {
-            /** @enum {string} */
-            effect: "allow" | "deny";
-            /** @description A trailing wildcard is supported (compute:instance.*), and must carry the service prefix */
-            permissions: string[] | null;
-            /** @description Empty means the rule holds across the whole project. While it is not empty the rule holds only on those resources, and therefore answers no project-level question */
-            resources: components["schemas"]["ResourceRefResource"][] | null;
-        };
-        ProjectAccessResource: {
-            grant: components["schemas"]["GrantResource"];
-            project: components["schemas"]["ProjectResource"];
-        };
-        LengthAwarePageProjectAccessResource: {
-            /** @description The items in this page */
-            items: components["schemas"]["ProjectAccessResource"][];
-            /**
-             * Format: int64
-             * @description Maximum number of items in this page, echoing the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Number of items skipped, echoing the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matches, not only this page
-             */
-            total: number;
-        };
-        CreateProjectRequestBody: {
-            description?: string;
-            name: string;
-        };
-        ScopedTokenResponseBody: {
-            /**
-             * Format: date-time
-             * @description When the token expires. Exchange for a new one before then rather than waiting for the first 401
-             */
-            expires_at: string;
-            /**
-             * Format: int64
-             * @description Seconds remaining before expiry
-             */
-            expires_in: number;
-            /** @description **A snapshot taken at the moment of the exchange. It is not carried in the token, and must not be cached.** It serves to render what a user may do; each request is decided again */
-            grant: components["schemas"]["GrantResource"];
-            /** @description The project itself, so that no further lookup is needed after the exchange */
-            project: components["schemas"]["ProjectResource"];
-            /** @description The scoped token, to be sent as `Authorization: Bearer` */
-            token: string;
-            /** @description Always `Bearer` */
-            token_type: string;
-        };
+  schemas: {
+    Error: {
+      code?: string;
+      message: string;
+      /**
+       * @description What a given `code` carries alongside the message. The keys depend on the code,
+       *     and a client that does not recognise one ignores it.
+       */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /** Format: int64 */
+      status: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    SettingsResource: {
+      /**
+       * Format: int64
+       * @description Maximum number of members a project may hold; 0 means unlimited
+       */
+      max_members_per_project: number;
+      /**
+       * Format: int64
+       * @description Maximum number of projects an account may own; 0 means unlimited. Deleted projects do not count
+       */
+      max_projects_per_user: number;
+      /**
+       * @description VERIFIED_ONLY requires identity verification to have completed; a submission under review does not qualify
+       * @enum {string}
+       */
+      project_creation_mode: "OPEN" | "VERIFIED_ONLY" | "CLOSED";
+      /**
+       * @description INVITE_ONLY accepts only an email address holding a project invitation
+       * @enum {string}
+       */
+      registration_mode: "OPEN" | "INVITE_ONLY" | "CLOSED";
+    };
+    AgreementResource: {
+      /**
+       * Format: date-time
+       * @description From this moment on, registration requires this version
+       */
+      effective_at: string;
+      /** @enum {string} */
+      type: "TERMS" | "PRIVACY" | "DPA";
+      /** @description Where the text is published */
+      url: string;
+      /** @description Send this value back unchanged when consenting */
+      version: string;
+    };
+    AgreementListResponseBody: {
+      items: components["schemas"]["AgreementResource"][] | null;
+    };
+    ConsentResource: {
+      /** Format: date-time */
+      consented_at: string;
+      /**
+       * @description OFFLINE is a consent given off the platform and recorded by an operator
+       * @enum {string}
+       */
+      method: "CLICKWRAP" | "OFFLINE";
+      /** @enum {string} */
+      type: "TERMS" | "PRIVACY" | "DPA";
+      version: string;
+    };
+    ConsentListResponseBody: {
+      items: components["schemas"]["ConsentResource"][] | null;
+    };
+    ConsentBody: {
+      /** @enum {string} */
+      type: "TERMS" | "PRIVACY" | "DPA";
+      version: string;
+    };
+    AcceptConsentsRequestBody: {
+      consents: components["schemas"]["ConsentBody"][] | null;
+    };
+    AccountResource: {
+      /** Format: date-time */
+      created_at: string;
+      email: string;
+      /** Format: date-time */
+      email_verified_at: string | null;
+      /** @description Taken from the sign-in claims; may be empty */
+      first_name: string;
+      /** @description The subject issued by the identity provider */
+      id: string;
+      /** @description Taken from the sign-in claims; may be empty */
+      last_name: string;
+      /** @description ISO 3166-1 alpha-2. Empty on an account that registered before this was required; such an account continues to work and can set it from the settings page */
+      country?: string;
+      /** @description Empty while never set, in which case `Accept-Language` applies, and the platform default when that is absent as well */
+      locale?: string;
+      pending_agreements: components["schemas"]["AgreementResource"][] | null;
+      /** @enum {string} */
+      status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING";
+    };
+    RegisterRequestBody: {
+      /** @description Must cover every agreement currently in force, at the versions returned by GET /account/v1/agreements */
+      consents: components["schemas"]["ConsentBody"][] | null;
+      /** @description ISO 3166-1 alpha-2 (CN, HK, US). Must denote a country or territory that exists; codes such as EU and ZZ hold a place in the standard without denoting one and are refused */
+      country: string;
+      locale: components["schemas"]["Locale"];
+    };
+    LocaleOptionsResource: {
+      countries: components["schemas"]["CountryOption"][];
+      languages: components["schemas"]["LanguageOption"][];
+    };
+    CountryOption: {
+      /** @description ISO 3166-1 alpha-2, sent back unchanged at registration */
+      code: string;
+      /** @description The name rendered according to `Accept-Language` */
+      name: string;
+    };
+    LanguageOption: {
+      code: components["schemas"]["Locale"];
+      /** @description The endonym of the language, written in that language itself. It does not follow `Accept-Language` */
+      name: string;
+    };
+    /**
+     * @description The language used for the interface and for email. It is independent of `country`, and neither can be inferred from the other
+     * @enum {string}
+     */
+    Locale: "zh-Hans" | "zh-Hant-HK" | "en";
+    /** @description Both fields are optional, and an omitted field is left unchanged */
+    UpdateAccountRequestBody: {
+      /** @description As at registration */
+      country?: string;
+      locale?: components["schemas"]["Locale"];
+    };
+    IdentityVerificationResource: {
+      reject_reason: string;
+      /**
+       * @description PERSONAL and ENTERPRISE are two kinds of subject rather than two levels, and are not ordered
+       * @enum {string}
+       */
+      status: "UNVERIFIED" | "PENDING" | "PERSONAL" | "ENTERPRISE" | "REJECTED";
+      /** Format: date-time */
+      submitted_at: string | null;
+      /** Format: date-time */
+      verified_at: string | null;
+    };
+    SubmitIdentityVerificationRequestBody: {
+      /** @description The document number. It is returned by no endpoint, and one number cannot be attached to two accounts */
+      id_number: string;
+      /** @description The legal name. It is returned by no endpoint */
+      real_name: string;
+    };
+    /** @description What an invitation states before it is accepted. It carries neither the invitation id nor the full recipient address; the invitations listed against the current account are returned by `list-my-invitations` */
+    InvitationPreviewResource: {
+      /** @description The masked recipient address, enough for the recipient to recognise it */
+      email_masked: string;
+      /** Format: date-time */
+      expires_at: string;
+      /** @description The display name of the sender, or their email address when no name is set */
+      invited_by_name: string;
+      project_name: string;
+      /** @description The display names of the roles granted on acceptance */
+      role_names: string[] | null;
+    };
+    InvitationResource: {
+      /** Format: date-time */
+      created_at: string;
+      email: string;
+      /** Format: date-time */
+      expires_at: string;
+      /** Format: uuid */
+      id: string;
+      /** @description The id of the account that issued the invitation */
+      invited_by: string;
+      /** @description The display name of that account, or its email address when no name is set. It reflects the value at the time of reading rather than at the time the invitation was sent */
+      invited_by_name: string;
+      /** Format: uuid */
+      project_id: string;
+      /** @description The name of the target project */
+      project_name: string;
+      /** @description The role codes granted on acceptance */
+      roles: string[] | null;
+      /** @description The display names of those codes, in the same order */
+      role_names: string[] | null;
+    };
+    LengthAwarePageInvitationResource: {
+      /** @description The items in this page */
+      items: components["schemas"]["InvitationResource"][];
+      /**
+       * Format: int64
+       * @description Maximum number of items in this page, echoing the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Number of items skipped, echoing the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matches, not only this page
+       */
+      total: number;
+    };
+    AcceptInvitationByTokenRequestBody: {
+      /** @description The token carried by the invitation link */
+      token: string;
+    };
+    ProjectResource: {
+      ban_reason: string;
+      /** Format: date-time */
+      created_at: string;
+      created_by: string;
+      /**
+       * Format: date-time
+       * @description When the project was deleted
+       */
+      deleted_at: string | null;
+      description: string;
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** @enum {string} */
+      status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
+      /** @description Written for a reader; it takes part in no query */
+      status_reason: string;
+      /** Format: date-time */
+      updated_at: string;
+    };
+    AcceptedInvitationResponseBody: {
+      project: components["schemas"]["ProjectResource"];
+    };
+    GrantResource: {
+      admin: boolean;
+      owner: boolean;
+      /** @description The role codes held, for display only */
+      roles: string[] | null;
+      /** @description **Do not walk these rules to reach a decision.** They are compiled from every policy that applies to the caller, and serve to render what a user may do. Each request is decided by the service handling it */
+      rules: components["schemas"]["RuleResource"][] | null;
+    };
+    ResourceRefResource: {
+      /** @description A string rather than a UUID; a DNS zone, for one, is named by its domain. Matching is glob, so `*.example.com` covers a set of subdomains, while a value carrying no glob metacharacter matches exactly */
+      id: string;
+      /** @description Of the form compute:instance or dns:zone, in the same namespace as permission names */
+      type: string;
+    };
+    RuleResource: {
+      /** @enum {string} */
+      effect: "allow" | "deny";
+      /** @description A trailing wildcard is supported (compute:instance.*), and must carry the service prefix */
+      permissions: string[] | null;
+      /** @description Empty means the rule holds across the whole project. While it is not empty the rule holds only on those resources, and therefore answers no project-level question */
+      resources: components["schemas"]["ResourceRefResource"][] | null;
+    };
+    ProjectAccessResource: {
+      grant: components["schemas"]["GrantResource"];
+      project: components["schemas"]["ProjectResource"];
+    };
+    LengthAwarePageProjectAccessResource: {
+      /** @description The items in this page */
+      items: components["schemas"]["ProjectAccessResource"][];
+      /**
+       * Format: int64
+       * @description Maximum number of items in this page, echoing the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Number of items skipped, echoing the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matches, not only this page
+       */
+      total: number;
+    };
+    CreateProjectRequestBody: {
+      description?: string;
+      name: string;
+    };
+    ScopedTokenResponseBody: {
+      /**
+       * Format: date-time
+       * @description When the token expires. Exchange for a new one before then rather than waiting for the first 401
+       */
+      expires_at: string;
+      /**
+       * Format: int64
+       * @description Seconds remaining before expiry
+       */
+      expires_in: number;
+      /** @description **A snapshot taken at the moment of the exchange. It is not carried in the token, and must not be cached.** It serves to render what a user may do; each request is decided again */
+      grant: components["schemas"]["GrantResource"];
+      /** @description The project itself, so that no further lookup is needed after the exchange */
+      project: components["schemas"]["ProjectResource"];
+      /** @description The scoped token, to be sent as `Authorization: Bearer` */
+      token: string;
+      /** @description Always `Bearer` */
+      token_type: string;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "get-settings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SettingsResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  "get-settings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "list-locales": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LocaleOptionsResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["SettingsResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "list-agreements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgreementListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "list-locales": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "list-consents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ConsentListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["LocaleOptionsResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "accept-agreements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AcceptConsentsRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AccountResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "list-agreements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    register: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegisterRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["AgreementListResponseBody"];
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AccountResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-account": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AccountResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "list-consents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "update-account": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateAccountRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["ConsentListResponseBody"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AccountResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-identity-verification": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IdentityVerificationResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "accept-agreements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "submit-identity-verification": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SubmitIdentityVerificationRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Accepted */
-            202: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IdentityVerificationResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AcceptConsentsRequestBody"];
+      };
     };
-    "list-my-invitations": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of items in this page */
-                limit?: number;
-                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageInvitationResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["AccountResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "preview-invitation-by-token": {
-        parameters: {
-            query: {
-                /** @description The token carried by the invitation link */
-                token: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["InvitationPreviewResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  register: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "accept-invitation-by-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AcceptInvitationByTokenRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AcceptedInvitationResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RegisterRequestBody"];
+      };
     };
-    "accept-invitation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                invitationId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AcceptedInvitationResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["AccountResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "list-projects": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of items in this page */
-                limit?: number;
-                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
-                offset?: number;
-                /** @description Matches against name or description */
-                keyword?: string;
-                /** @description Filters by external status. Deleted projects are excluded while this is absent */
-                status?: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageProjectAccessResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "get-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "create-project": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateProjectRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["AccountResource"];
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectAccessResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "create-scoped-token": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ScopedTokenResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "update-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateAccountRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-identity-verification": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IdentityVerificationResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "submit-identity-verification": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SubmitIdentityVerificationRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Accepted */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IdentityVerificationResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-my-invitations": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of items in this page */
+        limit?: number;
+        /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageInvitationResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "preview-invitation-by-token": {
+    parameters: {
+      query: {
+        /** @description The token carried by the invitation link */
+        token: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["InvitationPreviewResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "accept-invitation-by-token": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AcceptInvitationByTokenRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcceptedInvitationResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "accept-invitation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invitationId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcceptedInvitationResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-projects": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of items in this page */
+        limit?: number;
+        /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
+        offset?: number;
+        /** @description Matches against name or description */
+        keyword?: string;
+        /** @description Filters by external status. Deleted projects are excluded while this is absent */
+        status?: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageProjectAccessResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-project": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateProjectRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectAccessResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-scoped-token": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ScopedTokenResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
 }

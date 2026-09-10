@@ -4,403 +4,403 @@
  */
 
 export interface paths {
-    "/api/v1/tunnel/l4": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the layer 4 tunnel of the current project
-         * @description `TUNNEL_NOT_FOUND` means no tunnel has been generated yet.
-         *
-         *     403 `TUNNEL_NOT_ENTITLED` states something else: the project has not been entitled to layer 4 at all.
-         *
-         *     The subscription address, the usage and the quota each have their own endpoint and are not repeated here.
-         */
-        get: operations["get-l4-tunnel"];
-        put?: never;
-        /**
-         * Generate the layer 4 tunnel
-         * @description **Idempotent**: calling it again returns the existing tunnel rather than an error.
-         *
-         *     Read the address from the subscription endpoint afterwards; it is not returned here.
-         */
-        post: operations["generate-l4-tunnel"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/api/v1/tunnel/l4": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/tunnel/l4/subscription": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the subscription address
-         * @description **This URL is a credential, equivalent to a password.** It yields every node of the project along with their passwords. It is returned here alone, and appears neither in the tunnel itself nor in any list.
-         *
-         *     Do not call this endpoint before the user asks for the address.
-         *
-         *     A `status` of `preparing` leaves the link usable; its contents are derived at the moment it is fetched.
-         */
-        get: operations["get-l4-tunnel-subscription"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the layer 4 tunnel of the current project
+     * @description `TUNNEL_NOT_FOUND` means no tunnel has been generated yet.
+     *
+     *     403 `TUNNEL_NOT_ENTITLED` states something else: the project has not been entitled to layer 4 at all.
+     *
+     *     The subscription address, the usage and the quota each have their own endpoint and are not repeated here.
+     */
+    get: operations["get-l4-tunnel"];
+    put?: never;
+    /**
+     * Generate the layer 4 tunnel
+     * @description **Idempotent**: calling it again returns the existing tunnel rather than an error.
+     *
+     *     Read the address from the subscription endpoint afterwards; it is not returned here.
+     */
+    post: operations["generate-l4-tunnel"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/tunnel/l4/subscription": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/tunnel/l4/subscription/rotate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Rotate the subscription address and the node passwords
-         * @description **This is the remedy for an exposed credential, and every subscription already distributed stops working at once.**
-         *
-         *     The subscription token and the node passwords are replaced together, so every client has to fetch the subscription again before it can carry on. Confirm that this is the intended outcome before calling.
-         *
-         *     A tunnel disabled by the platform cannot be rotated (`TUNNEL_DISABLED_FOR_ROTATE`); resolve the cause first.
-         *
-         *     Read the new address from the subscription endpoint afterwards; **it is not returned here**.
-         */
-        post: operations["rotate-l4-tunnel-subscription"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the subscription address
+     * @description **This URL is a credential, equivalent to a password.** It yields every node of the project along with their passwords. It is returned here alone, and appears neither in the tunnel itself nor in any list.
+     *
+     *     Do not call this endpoint before the user asks for the address.
+     *
+     *     A `status` of `preparing` leaves the link usable; its contents are derived at the moment it is fetched.
+     */
+    get: operations["get-l4-tunnel-subscription"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/tunnel/l4/subscription/rotate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/tunnel/l4/usage": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the usage of the current period
-         * @description Read live.
-         *
-         *     Only `billed_bytes` decides whether the quota is exceeded: a route may carry a multiplier such as 1.5× or 0×, so `raw_bytes`, the volume actually transferred, need not equal it. A `quota_bytes` of 0 means unlimited.
-         */
-        get: operations["get-l4-tunnel-usage"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Rotate the subscription address and the node passwords
+     * @description **This is the remedy for an exposed credential, and every subscription already distributed stops working at once.**
+     *
+     *     The subscription token and the node passwords are replaced together, so every client has to fetch the subscription again before it can carry on. Confirm that this is the intended outcome before calling.
+     *
+     *     A tunnel disabled by the platform cannot be rotated (`TUNNEL_DISABLED_FOR_ROTATE`); resolve the cause first.
+     *
+     *     Read the new address from the subscription endpoint afterwards; **it is not returned here**.
+     */
+    post: operations["rotate-l4-tunnel-subscription"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/tunnel/l4/usage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/tunnel/l4/usage/series": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get daily usage
-         * @description Cut by calendar day. A day carrying no traffic is absent rather than zero, so a chart has to fill the date axis itself.
-         *
-         *     These days do not sum to the usage of the current period, which is cut by billing period. Resetting the usage of the current period leaves every daily total in place.
-         */
-        get: operations["list-l4-tunnel-usage-series"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the usage of the current period
+     * @description Read live.
+     *
+     *     Only `billed_bytes` decides whether the quota is exceeded: a route may carry a multiplier such as 1.5× or 0×, so `raw_bytes`, the volume actually transferred, need not equal it. A `quota_bytes` of 0 means unlimited.
+     */
+    get: operations["get-l4-tunnel-usage"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/tunnel/l4/usage/series": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /**
+     * Get daily usage
+     * @description Cut by calendar day. A day carrying no traffic is absent rather than zero, so a chart has to fill the date axis itself.
+     *
+     *     These days do not sum to the usage of the current period, which is cut by billing period. Resetting the usage of the current period leaves every daily total in place.
+     */
+    get: operations["list-l4-tunnel-usage-series"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Error: {
-            code?: string;
-            message: string;
-            /**
-             * @description What a given `code` carries alongside the message. The keys depend on the code,
-             *     and a client that does not recognise one ignores it.
-             */
-            meta?: {
-                [key: string]: unknown;
-            };
-            /** Format: int64 */
-            status: number;
-        };
-        SubscriptionResource: {
-            /**
-             * @description ready means every node has been distributed; preparing means distribution is still under way, and the link works either way
-             * @enum {string}
-             */
-            status: "preparing" | "ready";
-            /** Format: date-time */
-            updated_at: string;
-            /** @description The subscription address. It is a long-lived credential equivalent to a password; do not forward it or share a screenshot of it */
-            url: string;
-            /** Format: int64 */
-            version: number;
-        };
-        /** @description The layer 4 tunnel of the current project. It answers a single question — whether the tunnel has been generated */
-        TunnelResource: {
-            /** Format: date-time */
-            created_at: string;
-            /** @description Whether the tunnel is currently usable. false means the platform has disabled it — for an unpaid balance, a violation, or a suspended project — and the cause has to be resolved first */
-            enabled: boolean;
-            /** Format: uuid */
-            id: string;
-        };
-        UsageDayResource: {
-            /** Format: int64 */
-            billed_bytes: number;
-            /** @description YYYY-MM-DD */
-            day: string;
-            /** Format: int64 */
-            raw_bytes: number;
-        };
-        UsageResource: {
-            /**
-             * Format: int64
-             * @description Usage after the multiplier of each route has been applied. Quota is measured against this value
-             */
-            billed_bytes: number;
-            over_quota: boolean;
-            /** @description Last day of the current billing period (YYYY-MM-DD) */
-            period_end: string;
-            /** @description First day of the current billing period (YYYY-MM-DD) */
-            period_start: string;
-            /**
-             * Format: int64
-             * @description The quota in force; 0 means unlimited
-             */
-            quota_bytes: number;
-            /**
-             * Format: date-time
-             * @description When the quota was found to be exceeded; null while it has not been
-             */
-            quota_exceeded_at: string | null;
-            /**
-             * Format: int64
-             * @description Bytes actually transferred. Quota is not measured against this value
-             */
-            raw_bytes: number;
-            /** Format: int64 */
-            upload_bytes: number;
-            /**
-             * Format: double
-             * @description Usage as a percentage of the quota
-             */
-            usage_percent: number;
-        };
-        UsageSeriesResource: {
-            /**
-             * Format: int64
-             * @description The number of days actually covered, which may have been clamped to the range 1–365
-             */
-            days: number;
-            points: components["schemas"]["UsageDayResource"][];
-        };
+  schemas: {
+    Error: {
+      code?: string;
+      message: string;
+      /**
+       * @description What a given `code` carries alongside the message. The keys depend on the code,
+       *     and a client that does not recognise one ignores it.
+       */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /** Format: int64 */
+      status: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    SubscriptionResource: {
+      /**
+       * @description ready means every node has been distributed; preparing means distribution is still under way, and the link works either way
+       * @enum {string}
+       */
+      status: "preparing" | "ready";
+      /** Format: date-time */
+      updated_at: string;
+      /** @description The subscription address. It is a long-lived credential equivalent to a password; do not forward it or share a screenshot of it */
+      url: string;
+      /** Format: int64 */
+      version: number;
+    };
+    /** @description The layer 4 tunnel of the current project. It answers a single question — whether the tunnel has been generated */
+    TunnelResource: {
+      /** Format: date-time */
+      created_at: string;
+      /** @description Whether the tunnel is currently usable. false means the platform has disabled it — for an unpaid balance, a violation, or a suspended project — and the cause has to be resolved first */
+      enabled: boolean;
+      /** Format: uuid */
+      id: string;
+    };
+    UsageDayResource: {
+      /** Format: int64 */
+      billed_bytes: number;
+      /** @description YYYY-MM-DD */
+      day: string;
+      /** Format: int64 */
+      raw_bytes: number;
+    };
+    UsageResource: {
+      /**
+       * Format: int64
+       * @description Usage after the multiplier of each route has been applied. Quota is measured against this value
+       */
+      billed_bytes: number;
+      over_quota: boolean;
+      /** @description Last day of the current billing period (YYYY-MM-DD) */
+      period_end: string;
+      /** @description First day of the current billing period (YYYY-MM-DD) */
+      period_start: string;
+      /**
+       * Format: int64
+       * @description The quota in force; 0 means unlimited
+       */
+      quota_bytes: number;
+      /**
+       * Format: date-time
+       * @description When the quota was found to be exceeded; null while it has not been
+       */
+      quota_exceeded_at: string | null;
+      /**
+       * Format: int64
+       * @description Bytes actually transferred. Quota is not measured against this value
+       */
+      raw_bytes: number;
+      /** Format: int64 */
+      upload_bytes: number;
+      /**
+       * Format: double
+       * @description Usage as a percentage of the quota
+       */
+      usage_percent: number;
+    };
+    UsageSeriesResource: {
+      /**
+       * Format: int64
+       * @description The number of days actually covered, which may have been clamped to the range 1–365
+       */
+      days: number;
+      points: components["schemas"]["UsageDayResource"][];
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "get-l4-tunnel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TunnelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  "get-l4-tunnel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "generate-l4-tunnel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TunnelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["TunnelResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-l4-tunnel-subscription": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "generate-l4-tunnel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "rotate-l4-tunnel-subscription": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TunnelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["TunnelResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-l4-tunnel-usage": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UsageResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "get-l4-tunnel-subscription": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "list-l4-tunnel-usage-series": {
-        parameters: {
-            query?: {
-                /** @description How many days to cover. 0 requests the default of 30; the range accepted is 1–365, and a larger value is clamped to it */
-                days?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UsageSeriesResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["SubscriptionResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
+  };
+  "rotate-l4-tunnel-subscription": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TunnelResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-l4-tunnel-usage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UsageResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-l4-tunnel-usage-series": {
+    parameters: {
+      query?: {
+        /** @description How many days to cover. 0 requests the default of 30; the range accepted is 1–365, and a larger value is clamped to it */
+        days?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UsageSeriesResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
 }

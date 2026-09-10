@@ -4,885 +4,885 @@
  */
 
 export interface paths {
-    "/api/v1/credentials": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List provider credentials */
-        get: operations["list-credentials"];
-        put?: never;
-        /**
-         * Register a provider credential
-         * @description The credential is validated against the provider before it is accepted. A credential that
-         *     cannot list domains is rejected with `CREDENTIAL_REJECTED_UPSTREAM` and is not stored.
-         *
-         *     `provider` selects which configuration block is required: `provider: cloudflare` requires
-         *     the `cloudflare` block, and the remaining blocks are ignored. Omitting the matching block
-         *     returns `CREDENTIAL_CONFIG_MISSING`.
-         *
-         *     Registering a credential that is already held by this project returns
-         *     `CREDENTIAL_DUPLICATE`. Provider rate limits apply per credential, so a second copy grants
-         *     no additional capacity.
-         *
-         *     The submitted credential material is not returned by this or any other operation.
-         */
-        post: operations["create-credential"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/api/v1/credentials": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/credentials/{credentialId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a provider credential */
-        get: operations["get-credential"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete a provider credential
-         * @description Domains reachable only through this credential stop appearing in `GET /zones` and can no
-         *     longer be read or written through this API.
-         *
-         *     **No DNS record is modified.** Deleting a credential withdraws this project's access to the
-         *     provider account; it does not remove anything that was published there.
-         */
-        delete: operations["delete-credential"];
-        options?: never;
-        head?: never;
-        /**
-         * Rename a provider credential
-         * @description Only the display name can be changed. To use different credential material, delete this
-         *     credential and register a new one: a credential's identity does not change over its
-         *     lifetime.
-         */
-        patch: operations["rename-credential"];
-        trace?: never;
+    /** List provider credentials */
+    get: operations["list-credentials"];
+    put?: never;
+    /**
+     * Register a provider credential
+     * @description The credential is validated against the provider before it is accepted. A credential that
+     *     cannot list domains is rejected with `CREDENTIAL_REJECTED_UPSTREAM` and is not stored.
+     *
+     *     `provider` selects which configuration block is required: `provider: cloudflare` requires
+     *     the `cloudflare` block, and the remaining blocks are ignored. Omitting the matching block
+     *     returns `CREDENTIAL_CONFIG_MISSING`.
+     *
+     *     Registering a credential that is already held by this project returns
+     *     `CREDENTIAL_DUPLICATE`. Provider rate limits apply per credential, so a second copy grants
+     *     no additional capacity.
+     *
+     *     The submitted credential material is not returned by this or any other operation.
+     */
+    post: operations["create-credential"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/credentials/{credentialId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/credentials/{credentialId}/verification": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Re-validate a provider credential
-         * @description Checks the credential against the provider and records the outcome in `last_verified_at`
-         *     and `last_verify_error`.
-         *
-         *     A credential is validated when it is registered. This operation exists for credentials whose
-         *     permissions or keys were subsequently changed at the provider, which is a change this API is
-         *     not notified of.
-         *
-         *     **A failed check returns 200, not an error.** The outcome is reported in
-         *     `last_verify_error`: the request itself succeeded, and the answer it obtained is that the
-         *     credential is no longer usable.
-         */
-        post: operations["verify-credential"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a provider credential */
+    get: operations["get-credential"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a provider credential
+     * @description Domains reachable only through this credential stop appearing in `GET /zones` and can no
+     *     longer be read or written through this API.
+     *
+     *     **No DNS record is modified.** Deleting a credential withdraws this project's access to the
+     *     provider account; it does not remove anything that was published there.
+     */
+    delete: operations["delete-credential"];
+    options?: never;
+    head?: never;
+    /**
+     * Rename a provider credential
+     * @description Only the display name can be changed. To use different credential material, delete this
+     *     credential and register a new one: a credential's identity does not change over its
+     *     lifetime.
+     */
+    patch: operations["rename-credential"];
+    trace?: never;
+  };
+  "/api/v1/credentials/{credentialId}/verification": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/zones": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List domains
-         * @description Lists every domain reachable through the credentials registered by this project.
-         *
-         *     Listings may briefly lag behind domains added or removed at the provider. Set `refresh` for
-         *     an up-to-date answer.
-         *
-         *     ## A domain that appears more than once
-         *
-         *     While a domain is being migrated it commonly exists in both provider accounts at once. Such
-         *     a domain is returned once per credential, with the same `zone` and different
-         *     `credential_id`.
-         *
-         *     `authoritative` reports which entry is the one currently serving queries, determined from
-         *     the domain's delegation. `null` means no determination was made: either the domain appears
-         *     only once, or its delegation does not identify any of the registered providers — for
-         *     example when custom nameservers are in use, or the domain is not delegated at all.
-         *
-         *     **Write operations are refused while the determination is `null` and the domain appears more
-         *     than once**, with `ZONE_AMBIGUOUS`. Supply `credential_id` on the write request to select a
-         *     credential explicitly.
-         */
-        get: operations["list-zones"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Re-validate a provider credential
+     * @description Checks the credential against the provider and records the outcome in `last_verified_at`
+     *     and `last_verify_error`.
+     *
+     *     A credential is validated when it is registered. This operation exists for credentials whose
+     *     permissions or keys were subsequently changed at the provider, which is a change this API is
+     *     not notified of.
+     *
+     *     **A failed check returns 200, not an error.** The outcome is reported in
+     *     `last_verify_error`: the request itself succeeded, and the answer it obtained is that the
+     *     credential is no longer usable.
+     */
+    post: operations["verify-credential"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/zones": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/zones/{zone}/records": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List record sets
-         * @description Returns the domain's records grouped into record sets: all records sharing a name and a type
-         *     are reported as one entry, with their values in `values`.
-         *
-         *     `limit` and `offset` reduce the size of the response but not the time taken to produce it.
-         *     For domains with many records, filter by `name` or `type`.
-         */
-        get: operations["list-records"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List domains
+     * @description Lists every domain reachable through the credentials registered by this project.
+     *
+     *     Listings may briefly lag behind domains added or removed at the provider. Set `refresh` for
+     *     an up-to-date answer.
+     *
+     *     ## A domain that appears more than once
+     *
+     *     While a domain is being migrated it commonly exists in both provider accounts at once. Such
+     *     a domain is returned once per credential, with the same `zone` and different
+     *     `credential_id`.
+     *
+     *     `authoritative` reports which entry is the one currently serving queries, determined from
+     *     the domain's delegation. `null` means no determination was made: either the domain appears
+     *     only once, or its delegation does not identify any of the registered providers — for
+     *     example when custom nameservers are in use, or the domain is not delegated at all.
+     *
+     *     **Write operations are refused while the determination is `null` and the domain appears more
+     *     than once**, with `ZONE_AMBIGUOUS`. Supply `credential_id` on the write request to select a
+     *     credential explicitly.
+     */
+    get: operations["list-zones"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/zones/{zone}/records": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/zones/{zone}/records/{name}/{type}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a record set
-         * @description Returns `RECORD_SET_NOT_FOUND` when no record of this type exists under this name.
-         */
-        get: operations["get-record-set"];
-        /**
-         * Replace a record set
-         * @description **This replaces the entire record set.** After this request, the only records under this
-         *     name and type are the ones listed in `values`; any value present beforehand and absent here
-         *     is removed.
-         *
-         *     The record set is created if it does not exist, so this operation both creates and replaces,
-         *     and is idempotent.
-         *
-         *     Two concurrent requests against the same domain conflict; the second receives `ZONE_BUSY`
-         *     and may be retried.
-         *
-         *     **Use `PATCH` to add or remove individual values.** Reading the set and submitting a
-         *     modified list is a read-modify-write: values added by anything else between those two steps
-         *     are stated to be absent, and are therefore removed, with both requests returning 200.
-         */
-        put: operations["set-record-set"];
-        post?: never;
-        /**
-         * Delete a record set
-         * @description Removes every record under this name and type. **To remove part of a set, use `PATCH`**,
-         *     which is safe to issue concurrently; this operation and `PUT` are not.
-         *
-         *     Providers reject removal of the last NS record set at the apex of a domain, which would
-         *     withdraw the domain from DNS entirely.
-         */
-        delete: operations["delete-record-set"];
-        options?: never;
-        head?: never;
-        /**
-         * Add or remove values in a record set
-         * @description **Names values to add and remove; anything not named is left in place.** Nothing is read
-         *     first, so this is the only operation on a record set safe to issue concurrently. The set is
-         *     created if it does not exist.
-         *
-         *     Certificate issuance must use this operation for both the challenge record and its cleanup.
-         *     `PUT` and `DELETE` state or remove the whole set, so a concurrent issuance's challenge
-         *     record is discarded — with every request returning 2xx, and the failure surfacing as the
-         *     second certificate failing validation.
-         *
-         *     `add` is applied before `remove`, so a request carrying both changes a value without the
-         *     name ever resolving without it: the set briefly holds one value too many rather than one too
-         *     few. The reverse order, as two requests, leaves a window in which the value is absent — for
-         *     a single-valued set, the name does not resolve at all — and an addition that then fails
-         *     leaves it gone.
-         *
-         *     A value appearing in both `add` and `remove` is rejected rather than resolved in one
-         *     direction.
-         *
-         *     Values in `remove` that are absent are skipped, so a retried cleanup reaches the same
-         *     result. Values in `add` that are already present are rejected by the provider: a record set
-         *     cannot hold the same value twice.
-         *
-         *     Removing every value leaves an empty set, reported as `values: []`, not `RECORD_SET_NOT_FOUND`.
-         */
-        patch: operations["modify-record-set"];
-        trace?: never;
+    /**
+     * List record sets
+     * @description Returns the domain's records grouped into record sets: all records sharing a name and a type
+     *     are reported as one entry, with their values in `values`.
+     *
+     *     `limit` and `offset` reduce the size of the response but not the time taken to produce it.
+     *     For domains with many records, filter by `name` or `type`.
+     */
+    get: operations["list-records"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/zones/{zone}/records/{name}/{type}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /**
+     * Get a record set
+     * @description Returns `RECORD_SET_NOT_FOUND` when no record of this type exists under this name.
+     */
+    get: operations["get-record-set"];
+    /**
+     * Replace a record set
+     * @description **This replaces the entire record set.** After this request, the only records under this
+     *     name and type are the ones listed in `values`; any value present beforehand and absent here
+     *     is removed.
+     *
+     *     The record set is created if it does not exist, so this operation both creates and replaces,
+     *     and is idempotent.
+     *
+     *     Two concurrent requests against the same domain conflict; the second receives `ZONE_BUSY`
+     *     and may be retried.
+     *
+     *     **Use `PATCH` to add or remove individual values.** Reading the set and submitting a
+     *     modified list is a read-modify-write: values added by anything else between those two steps
+     *     are stated to be absent, and are therefore removed, with both requests returning 200.
+     */
+    put: operations["set-record-set"];
+    post?: never;
+    /**
+     * Delete a record set
+     * @description Removes every record under this name and type. **To remove part of a set, use `PATCH`**,
+     *     which is safe to issue concurrently; this operation and `PUT` are not.
+     *
+     *     Providers reject removal of the last NS record set at the apex of a domain, which would
+     *     withdraw the domain from DNS entirely.
+     */
+    delete: operations["delete-record-set"];
+    options?: never;
+    head?: never;
+    /**
+     * Add or remove values in a record set
+     * @description **Names values to add and remove; anything not named is left in place.** Nothing is read
+     *     first, so this is the only operation on a record set safe to issue concurrently. The set is
+     *     created if it does not exist.
+     *
+     *     Certificate issuance must use this operation for both the challenge record and its cleanup.
+     *     `PUT` and `DELETE` state or remove the whole set, so a concurrent issuance's challenge
+     *     record is discarded — with every request returning 2xx, and the failure surfacing as the
+     *     second certificate failing validation.
+     *
+     *     `add` is applied before `remove`, so a request carrying both changes a value without the
+     *     name ever resolving without it: the set briefly holds one value too many rather than one too
+     *     few. The reverse order, as two requests, leaves a window in which the value is absent — for
+     *     a single-valued set, the name does not resolve at all — and an addition that then fails
+     *     leaves it gone.
+     *
+     *     A value appearing in both `add` and `remove` is rejected rather than resolved in one
+     *     direction.
+     *
+     *     Values in `remove` that are absent are skipped, so a retried cleanup reaches the same
+     *     result. Values in `add` that are already present are rejected by the provider: a record set
+     *     cannot hold the same value twice.
+     *
+     *     Removing every value leaves an empty set, reported as `values: []`, not `RECORD_SET_NOT_FOUND`.
+     */
+    patch: operations["modify-record-set"];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Error: {
-            code?: string;
-            message: string;
-            /**
-             * @description What a given `code` carries alongside the message. The keys depend on the code,
-             *     and a client that does not recognise one ignores it.
-             */
-            meta?: {
-                [key: string]: unknown;
-            };
-            /** Format: int64 */
-            status: number;
-        };
-        /**
-         * @description A DNS record type.
-         *
-         *     The listed types are those this API supports uniformly across every provider. HTTPS and
-         *     SVCB are not yet available.
-         * @enum {string}
-         */
-        RecordType: "A" | "AAAA" | "CNAME" | "TXT" | "MX" | "NS" | "SRV" | "CAA";
-        /**
-         * @description A supported DNS provider.
-         * @enum {string}
-         */
-        Provider: "cloudflare" | "tencentcloud" | "alidns" | "route53";
-        /**
-         * @description `active` is usable. `disabled` means the platform has disabled this credential and requires
-         *     contact with support.
-         *
-         *     A project that has been suspended is reported separately, in `suspended_at`.
-         * @enum {string}
-         */
-        CredentialStatus: "active" | "disabled";
-        /** @description A registered provider credential. The credential material itself is never included. */
-        CredentialResource: {
-            /** Format: date-time */
-            created_at: string;
-            /** @description Equal fingerprints denote the same credential material */
-            fingerprint: string;
-            /** Format: uuid */
-            id: string;
-            /**
-             * Format: date-time
-             * @description When the credential was last confirmed to work; null if it never has
-             */
-            last_verified_at: string | null;
-            /** @description Why the most recent check failed; null if the most recent check succeeded */
-            last_verify_error: string | null;
-            name: string;
-            provider: components["schemas"]["Provider"];
-            /** @description A partially masked fragment of the credential, for visual identification only */
-            redacted: string;
-            status: components["schemas"]["CredentialStatus"];
-            /**
-             * Format: date-time
-             * @description When the credential was suspended because the project was suspended; null if it was not. Cleared when the project is restored
-             */
-            suspended_at: string | null;
-            /** Format: date-time */
-            updated_at: string;
-        };
-        /** @description Cloudflare credentials, created under My Profile then API Tokens */
-        CloudflareConfig: {
-            /** @description An API token with the Zone.DNS edit permission */
-            api_token: string;
-            /** @description Optional, and required only when api_token is scoped to a single zone, in which case it is used to enumerate zones */
-            zone_token?: string;
-        };
-        /** @description Tencent Cloud DNSPod credentials, created under Access Management then Access Keys */
-        TencentCloudConfig: {
-            secret_id: string;
-            secret_key: string;
-        };
-        /** @description Alibaba Cloud DNS credentials, created under RAM */
-        AliDNSConfig: {
-            access_key_id: string;
-            access_key_secret: string;
-            /** @description Defaults to cn-hangzhou */
-            region_id?: string;
-        };
-        /** @description AWS Route 53 credentials */
-        Route53Config: {
-            access_key_id: string;
-            /** @description Defaults to us-east-1. Route 53 is a global service, so this affects request signing only */
-            region?: string;
-            secret_access_key: string;
-            /** @description Optional, and required only for temporary STS credentials. Such credentials expire, after which every operation against this provider fails */
-            session_token?: string;
-        };
-        /** @description `provider` selects which configuration block is read. The remaining blocks are ignored. */
-        CreateCredentialRequestBody: {
-            alidns?: components["schemas"]["AliDNSConfig"];
-            cloudflare?: components["schemas"]["CloudflareConfig"];
-            /** @description A display name for this credential */
-            name: string;
-            provider: components["schemas"]["Provider"];
-            route53?: components["schemas"]["Route53Config"];
-            tencentcloud?: components["schemas"]["TencentCloudConfig"];
-        };
-        RenameCredentialRequestBody: {
-            name: string;
-        };
-        LengthAwarePageCredentialResource: {
-            /** @description The contents of this page */
-            items: components["schemas"]["CredentialResource"][];
-            /**
-             * Format: int64
-             * @description Maximum items per page, echoing the value in the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Items skipped, echoing the value in the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matching items, not only those in this page
-             */
-            total: number;
-        };
-        ZoneResource: {
-            /**
-             * @description Whether this entry is the one currently serving queries for the domain.
-             *
-             *     `null` means no determination was made: either the domain appears only once, or its
-             *     delegation does not identify any registered provider. While this is `null` and the
-             *     domain appears more than once, write operations require an explicit `credential_id`.
-             */
-            authoritative: boolean | null;
-            /**
-             * Format: uuid
-             * @description The credential through which this domain is reachable
-             */
-            credential_id: string;
-            provider: components["schemas"]["Provider"];
-            /** @description The domain in absolute form, with a trailing dot */
-            zone: string;
-        };
-        ZoneListResponseBody: {
-            items: components["schemas"]["ZoneResource"][];
-            /**
-             * @description True when at least one provider could not be reached while producing this listing, so
-             *     recent additions or removals may be missing.
-             *
-             *     The listing remains usable and write operations are unaffected.
-             */
-            stale: boolean;
-        };
-        /** @description Every record sharing a name and a type. */
-        RecordSetResource: {
-            /** @description The name relative to the domain. `@` denotes the domain itself */
-            name: string;
-            /**
-             * Format: int64
-             * @description Time to live, in seconds. 0 leaves the choice to the provider
-             */
-            ttl: number;
-            type: components["schemas"]["RecordType"];
-            /**
-             * @description Every value in this record set, in unescaped zone-file RDATA syntax:
-             *
-             *     - `A`, `AAAA`: `192.0.2.1`, `2001:db8::1`
-             *     - `CNAME`, `NS`: `target.example.com.`, absolute, with a trailing dot
-             *     - `TXT`: the text itself, neither quoted nor escaped
-             *     - `MX`: `10 mail.example.com.`
-             *     - `SRV`: `10 20 443 target.example.com.`
-             *     - `CAA`: `0 issue "letsencrypt.org"`
-             */
-            values: string[];
-            /** @description The domain in absolute form, with a trailing dot */
-            zone: string;
-        };
-        LengthAwarePageRecordSetResource: {
-            /** @description The contents of this page */
-            items: components["schemas"]["RecordSetResource"][];
-            /**
-             * Format: int64
-             * @description Maximum items per page, echoing the value in the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Items skipped, echoing the value in the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matching items, not only those in this page
-             */
-            total: number;
-        };
-        /** @description `values` states the final contents of the record set. Values omitted here are removed. */
-        SetRecordSetRequestBody: {
-            /**
-             * Format: int64
-             * @description Time to live, in seconds. 0 leaves the choice to the provider. Providers enforce their own minimum and raise lower values to it
-             * @default 300
-             */
-            ttl?: number;
-            /** @description The final contents of the record set. Syntax as described on RecordSetResource.values */
-            values: string[];
-        };
-        /** @description Names the values to add and to remove. Anything not named is left in place. At least one of `add` and `remove` is required, and no value may appear in both. */
-        ModifyRecordSetRequestBody: {
-            /** @description The values to add. Values already present are rejected by the provider. Syntax as described on RecordSetResource.values */
-            add?: string[];
-            /** @description The values to remove. Values that are not present are skipped. Syntax as described on RecordSetResource.values */
-            remove?: string[];
-            /**
-             * Format: int64
-             * @description Time to live, in seconds, applied to the values in `add`. 0 leaves the choice to the provider. The time to live of values already in the set is not changed; use `PUT` for that
-             * @default 300
-             */
-            ttl?: number;
-        };
+  schemas: {
+    Error: {
+      code?: string;
+      message: string;
+      /**
+       * @description What a given `code` carries alongside the message. The keys depend on the code,
+       *     and a client that does not recognise one ignores it.
+       */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /** Format: int64 */
+      status: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    /**
+     * @description A DNS record type.
+     *
+     *     The listed types are those this API supports uniformly across every provider. HTTPS and
+     *     SVCB are not yet available.
+     * @enum {string}
+     */
+    RecordType: "A" | "AAAA" | "CNAME" | "TXT" | "MX" | "NS" | "SRV" | "CAA";
+    /**
+     * @description A supported DNS provider.
+     * @enum {string}
+     */
+    Provider: "cloudflare" | "tencentcloud" | "alidns" | "route53";
+    /**
+     * @description `active` is usable. `disabled` means the platform has disabled this credential and requires
+     *     contact with support.
+     *
+     *     A project that has been suspended is reported separately, in `suspended_at`.
+     * @enum {string}
+     */
+    CredentialStatus: "active" | "disabled";
+    /** @description A registered provider credential. The credential material itself is never included. */
+    CredentialResource: {
+      /** Format: date-time */
+      created_at: string;
+      /** @description Equal fingerprints denote the same credential material */
+      fingerprint: string;
+      /** Format: uuid */
+      id: string;
+      /**
+       * Format: date-time
+       * @description When the credential was last confirmed to work; null if it never has
+       */
+      last_verified_at: string | null;
+      /** @description Why the most recent check failed; null if the most recent check succeeded */
+      last_verify_error: string | null;
+      name: string;
+      provider: components["schemas"]["Provider"];
+      /** @description A partially masked fragment of the credential, for visual identification only */
+      redacted: string;
+      status: components["schemas"]["CredentialStatus"];
+      /**
+       * Format: date-time
+       * @description When the credential was suspended because the project was suspended; null if it was not. Cleared when the project is restored
+       */
+      suspended_at: string | null;
+      /** Format: date-time */
+      updated_at: string;
+    };
+    /** @description Cloudflare credentials, created under My Profile then API Tokens */
+    CloudflareConfig: {
+      /** @description An API token with the Zone.DNS edit permission */
+      api_token: string;
+      /** @description Optional, and required only when api_token is scoped to a single zone, in which case it is used to enumerate zones */
+      zone_token?: string;
+    };
+    /** @description Tencent Cloud DNSPod credentials, created under Access Management then Access Keys */
+    TencentCloudConfig: {
+      secret_id: string;
+      secret_key: string;
+    };
+    /** @description Alibaba Cloud DNS credentials, created under RAM */
+    AliDNSConfig: {
+      access_key_id: string;
+      access_key_secret: string;
+      /** @description Defaults to cn-hangzhou */
+      region_id?: string;
+    };
+    /** @description AWS Route 53 credentials */
+    Route53Config: {
+      access_key_id: string;
+      /** @description Defaults to us-east-1. Route 53 is a global service, so this affects request signing only */
+      region?: string;
+      secret_access_key: string;
+      /** @description Optional, and required only for temporary STS credentials. Such credentials expire, after which every operation against this provider fails */
+      session_token?: string;
+    };
+    /** @description `provider` selects which configuration block is read. The remaining blocks are ignored. */
+    CreateCredentialRequestBody: {
+      alidns?: components["schemas"]["AliDNSConfig"];
+      cloudflare?: components["schemas"]["CloudflareConfig"];
+      /** @description A display name for this credential */
+      name: string;
+      provider: components["schemas"]["Provider"];
+      route53?: components["schemas"]["Route53Config"];
+      tencentcloud?: components["schemas"]["TencentCloudConfig"];
+    };
+    RenameCredentialRequestBody: {
+      name: string;
+    };
+    LengthAwarePageCredentialResource: {
+      /** @description The contents of this page */
+      items: components["schemas"]["CredentialResource"][];
+      /**
+       * Format: int64
+       * @description Maximum items per page, echoing the value in the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Items skipped, echoing the value in the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matching items, not only those in this page
+       */
+      total: number;
+    };
+    ZoneResource: {
+      /**
+       * @description Whether this entry is the one currently serving queries for the domain.
+       *
+       *     `null` means no determination was made: either the domain appears only once, or its
+       *     delegation does not identify any registered provider. While this is `null` and the
+       *     domain appears more than once, write operations require an explicit `credential_id`.
+       */
+      authoritative: boolean | null;
+      /**
+       * Format: uuid
+       * @description The credential through which this domain is reachable
+       */
+      credential_id: string;
+      provider: components["schemas"]["Provider"];
+      /** @description The domain in absolute form, with a trailing dot */
+      zone: string;
+    };
+    ZoneListResponseBody: {
+      items: components["schemas"]["ZoneResource"][];
+      /**
+       * @description True when at least one provider could not be reached while producing this listing, so
+       *     recent additions or removals may be missing.
+       *
+       *     The listing remains usable and write operations are unaffected.
+       */
+      stale: boolean;
+    };
+    /** @description Every record sharing a name and a type. */
+    RecordSetResource: {
+      /** @description The name relative to the domain. `@` denotes the domain itself */
+      name: string;
+      /**
+       * Format: int64
+       * @description Time to live, in seconds. 0 leaves the choice to the provider
+       */
+      ttl: number;
+      type: components["schemas"]["RecordType"];
+      /**
+       * @description Every value in this record set, in unescaped zone-file RDATA syntax:
+       *
+       *     - `A`, `AAAA`: `192.0.2.1`, `2001:db8::1`
+       *     - `CNAME`, `NS`: `target.example.com.`, absolute, with a trailing dot
+       *     - `TXT`: the text itself, neither quoted nor escaped
+       *     - `MX`: `10 mail.example.com.`
+       *     - `SRV`: `10 20 443 target.example.com.`
+       *     - `CAA`: `0 issue "letsencrypt.org"`
+       */
+      values: string[];
+      /** @description The domain in absolute form, with a trailing dot */
+      zone: string;
+    };
+    LengthAwarePageRecordSetResource: {
+      /** @description The contents of this page */
+      items: components["schemas"]["RecordSetResource"][];
+      /**
+       * Format: int64
+       * @description Maximum items per page, echoing the value in the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Items skipped, echoing the value in the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matching items, not only those in this page
+       */
+      total: number;
+    };
+    /** @description `values` states the final contents of the record set. Values omitted here are removed. */
+    SetRecordSetRequestBody: {
+      /**
+       * Format: int64
+       * @description Time to live, in seconds. 0 leaves the choice to the provider. Providers enforce their own minimum and raise lower values to it
+       * @default 300
+       */
+      ttl?: number;
+      /** @description The final contents of the record set. Syntax as described on RecordSetResource.values */
+      values: string[];
+    };
+    /** @description Names the values to add and to remove. Anything not named is left in place. At least one of `add` and `remove` is required, and no value may appear in both. */
+    ModifyRecordSetRequestBody: {
+      /** @description The values to add. Values already present are rejected by the provider. Syntax as described on RecordSetResource.values */
+      add?: string[];
+      /** @description The values to remove. Values that are not present are skipped. Syntax as described on RecordSetResource.values */
+      remove?: string[];
+      /**
+       * Format: int64
+       * @description Time to live, in seconds, applied to the values in `add`. 0 leaves the choice to the provider. The time to live of values already in the set is not changed; use `PUT` for that
+       * @default 300
+       */
+      ttl?: number;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "list-credentials": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of items to return in this page */
-                limit?: number;
-                /** @description Number of items to skip */
-                offset?: number;
-                /** @description Return only credentials for this provider; omit for all providers */
-                provider?: components["schemas"]["Provider"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageCredentialResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  "list-credentials": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of items to return in this page */
+        limit?: number;
+        /** @description Number of items to skip */
+        offset?: number;
+        /** @description Return only credentials for this provider; omit for all providers */
+        provider?: components["schemas"]["Provider"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "create-credential": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateCredentialRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageCredentialResource"];
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CredentialResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-credential": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                credentialId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CredentialResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "create-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "delete-credential": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                credentialId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateCredentialRequestBody"];
+      };
     };
-    "rename-credential": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                credentialId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RenameCredentialRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["CredentialResource"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CredentialResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "verify-credential": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                credentialId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CredentialResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "get-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        credentialId: string;
+      };
+      cookie?: never;
     };
-    "list-zones": {
-        parameters: {
-            query?: {
-                /** @description Return only domains reachable through this credential */
-                credential_id?: string;
-                /** @description Return the current set of domains rather than a possibly slightly stale one. Slower, and consumes provider API quota */
-                refresh?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ZoneListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["CredentialResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "list-records": {
-        parameters: {
-            query?: {
-                /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
-                credential_id?: string;
-                /** @description Return only record sets with this name, given relative to the domain. `@` denotes the domain itself */
-                name?: string;
-                /** @description Return only record sets of this type */
-                type?: components["schemas"]["RecordType"];
-                /** @description Maximum number of items to return in this page */
-                limit?: number;
-                /** @description Number of items to skip */
-                offset?: number;
-            };
-            header?: never;
-            path: {
-                /** @description The domain. A trailing dot is optional */
-                zone: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageRecordSetResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "delete-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        credentialId: string;
+      };
+      cookie?: never;
     };
-    "get-record-set": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description The domain. A trailing dot is optional */
-                zone: string;
-                /** @description The name, given relative to the domain. `@` denotes the domain itself and `*` a wildcard */
-                name: string;
-                type: components["schemas"]["RecordType"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RecordSetResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "set-record-set": {
-        parameters: {
-            query?: {
-                /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
-                credential_id?: string;
-            };
-            header?: never;
-            path: {
-                /** @description The domain. A trailing dot is optional */
-                zone: string;
-                /** @description The name, given relative to the domain. `@` denotes the domain itself and `*` a wildcard */
-                name: string;
-                type: components["schemas"]["RecordType"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetRecordSetRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RecordSetResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "rename-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        credentialId: string;
+      };
+      cookie?: never;
     };
-    "delete-record-set": {
-        parameters: {
-            query?: {
-                /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
-                credential_id?: string;
-            };
-            header?: never;
-            path: {
-                /** @description The domain. A trailing dot is optional */
-                zone: string;
-                /** @description The name, given relative to the domain. `@` denotes the domain itself and `*` a wildcard */
-                name: string;
-                type: components["schemas"]["RecordType"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenameCredentialRequestBody"];
+      };
     };
-    "modify-record-set": {
-        parameters: {
-            query?: {
-                /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
-                credential_id?: string;
-            };
-            header?: never;
-            path: {
-                /** @description The domain. A trailing dot is optional */
-                zone: string;
-                /** @description The name, given relative to the domain. `@` denotes the domain itself and `*` a wildcard */
-                name: string;
-                type: components["schemas"]["RecordType"];
-            };
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ModifyRecordSetRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["CredentialResource"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RecordSetResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
+  };
+  "verify-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        credentialId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CredentialResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-zones": {
+    parameters: {
+      query?: {
+        /** @description Return only domains reachable through this credential */
+        credential_id?: string;
+        /** @description Return the current set of domains rather than a possibly slightly stale one. Slower, and consumes provider API quota */
+        refresh?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ZoneListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-records": {
+    parameters: {
+      query?: {
+        /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
+        credential_id?: string;
+        /** @description Return only record sets with this name, given relative to the domain. `@` denotes the domain itself */
+        name?: string;
+        /** @description Return only record sets of this type */
+        type?: components["schemas"]["RecordType"];
+        /** @description Maximum number of items to return in this page */
+        limit?: number;
+        /** @description Number of items to skip */
+        offset?: number;
+      };
+      header?: never;
+      path: {
+        /** @description The domain. A trailing dot is optional */
+        zone: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageRecordSetResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-record-set": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description The domain. A trailing dot is optional */
+        zone: string;
+        /** @description The name, given relative to the domain. `@` denotes the domain itself and `*` a wildcard */
+        name: string;
+        type: components["schemas"]["RecordType"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecordSetResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "set-record-set": {
+    parameters: {
+      query?: {
+        /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
+        credential_id?: string;
+      };
+      header?: never;
+      path: {
+        /** @description The domain. A trailing dot is optional */
+        zone: string;
+        /** @description The name, given relative to the domain. `@` denotes the domain itself and `*` a wildcard */
+        name: string;
+        type: components["schemas"]["RecordType"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetRecordSetRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecordSetResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-record-set": {
+    parameters: {
+      query?: {
+        /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
+        credential_id?: string;
+      };
+      header?: never;
+      path: {
+        /** @description The domain. A trailing dot is optional */
+        zone: string;
+        /** @description The name, given relative to the domain. `@` denotes the domain itself and `*` a wildcard */
+        name: string;
+        type: components["schemas"]["RecordType"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "modify-record-set": {
+    parameters: {
+      query?: {
+        /** @description Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS */
+        credential_id?: string;
+      };
+      header?: never;
+      path: {
+        /** @description The domain. A trailing dot is optional */
+        zone: string;
+        /** @description The name, given relative to the domain. `@` denotes the domain itself and `*` a wildcard */
+        name: string;
+        type: components["schemas"]["RecordType"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ModifyRecordSetRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RecordSetResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
 }

@@ -4,2842 +4,2853 @@
  */
 
 export interface paths {
-    "/api/v1/attachments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Upload a file
-         * @description The body is the file bytes themselves, not multipart, one file per request. The kind is determined from the content, not from Content-Type or from the name. Put the returned id in attachmentIds when sending a message.
-         *
-         *     An upload that no message ever references is a draft, and drafts are collected — `draftExpiresAt` in the response says when this one goes. Sending a message with the id makes it permanent.
-         *
-         *     The returned `kind` says how the assistant will see it. An `image` is read directly, and only by models that accept image input. A small `text` file is placed inline in the message. A large `text` file, and anything `binary`, arrives as a reference the assistant reads on demand — for a binary that usually means downloading it onto one of the project's cloud instances.
-         */
-        post: operations["upload-attachment"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/api/v1/attachments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/attachments/{attachment}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Download a file
-         * @description Returns the original bytes for an attachment id. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
-         *
-         *     Only an attachment whose `kind` is `image` comes back with its own image type and is usable as the address of an `<img>`. Everything else is served as `application/octet-stream` with `Content-Disposition: attachment`, deliberately: an uploaded file is arbitrary bytes under a name its uploader chose, and serving it back inline would run it on this origin.
-         */
-        get: operations["download-attachment"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Upload a file
+     * @description The body is the file bytes themselves, not multipart, one file per request. The kind is determined from the content, not from Content-Type or from the name. Put the returned id in attachmentIds when sending a message.
+     *
+     *     An upload that no message ever references is a draft, and drafts are collected — `draftExpiresAt` in the response says when this one goes. Sending a message with the id makes it permanent.
+     *
+     *     The returned `kind` says how the assistant will see it. An `image` is read directly, and only by models that accept image input. A small `text` file is placed inline in the message. A large `text` file, and anything `binary`, arrives as a reference the assistant reads on demand — for a binary that usually means downloading it onto one of the project's cloud instances.
+     */
+    post: operations["upload-attachment"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/attachments/{attachment}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/bindings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List bindings
-         * @description Filter by channelId to show, per channel, who is bound to it.
-         */
-        get: operations["list-bindings"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Download a file
+     * @description Returns the original bytes for an attachment id. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
+     *
+     *     Only an attachment whose `kind` is `image` comes back with its own image type and is usable as the address of an `<img>`. Everything else is served as `application/octet-stream` with `Content-Disposition: attachment`, deliberately: an uploaded file is arbitrary bytes under a name its uploader chose, and serving it back inline would run it on this origin.
+     */
+    get: operations["download-attachment"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/bindings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/bindings/{binding}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a binding */
-        get: operations["get-binding"];
-        put?: never;
-        post?: never;
-        /** Remove a binding */
-        delete: operations["delete-binding"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List bindings
+     * @description Filter by channelId to show, per channel, who is bound to it.
+     */
+    get: operations["list-bindings"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/bindings/{binding}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/channels": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List channels */
-        get: operations["list-channels"];
-        put?: never;
-        /**
-         * Create a channel
-         * @description Which side owns the webhook secret is decided by the platform; see secretSource on list-platforms. For a `generated` platform, do not send webhookSecret — the one we generate is returned exactly once in this response and cannot be retrieved again; miss it and the only way forward is rotating to a new one. For a `supplied` platform you must pass the secret from that platform's own console, and webhookSecret in the response is null.
-         */
-        post: operations["create-channel"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a binding */
+    get: operations["get-binding"];
+    put?: never;
+    post?: never;
+    /** Remove a binding */
+    delete: operations["delete-binding"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/channels": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/channels/{channel}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a channel */
-        get: operations["get-channel"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete a channel
-         * @description The channel stops accepting inbound messages and every binding on it stops working. This operation remains available while the project is suspended or being cleaned up.
-         */
-        delete: operations["delete-channel"];
-        options?: never;
-        head?: never;
-        /**
-         * Update a channel
-         * @description Only the fields present are changed. senderPolicy and allowFrom go together, and senderPolicy decides whether they are replaced. For platforms held open by a long-lived connection the change applies once that connection is rebuilt; for webhook platforms it applies at once.
-         */
-        patch: operations["update-channel"];
-        trace?: never;
+    /** List channels */
+    get: operations["list-channels"];
+    put?: never;
+    /**
+     * Create a channel
+     * @description Which side owns the webhook secret is decided by the platform; see secretSource on list-platforms. For a `generated` platform, do not send webhookSecret — the one we generate is returned exactly once in this response and cannot be retrieved again; miss it and the only way forward is rotating to a new one. For a `supplied` platform you must pass the secret from that platform's own console, and webhookSecret in the response is null.
+     */
+    post: operations["create-channel"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/channels/{channel}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/channels/{channel}/binding-codes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Issue a binding code
-         * @description Produces a single-use code to hand to the person being bound. They send that code to the assistant from their own account on that platform, which completes the binding. A binding can only be established this way, by the person themselves — a platform account cannot be named directly. Codes expire and have to be reissued.
-         */
-        post: operations["create-binding-code"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a channel */
+    get: operations["get-channel"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a channel
+     * @description The channel stops accepting inbound messages and every binding on it stops working. This operation remains available while the project is suspended or being cleaned up.
+     */
+    delete: operations["delete-channel"];
+    options?: never;
+    head?: never;
+    /**
+     * Update a channel
+     * @description Only the fields present are changed. senderPolicy and allowFrom go together, and senderPolicy decides whether they are replaced. For platforms held open by a long-lived connection the change applies once that connection is rebuilt; for webhook platforms it applies at once.
+     */
+    patch: operations["update-channel"];
+    trace?: never;
+  };
+  "/api/v1/channels/{channel}/binding-codes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/channels/{channel}/rejections": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List recently rejected inbound messages
-         * @description For diagnosing "I sent a message and the assistant never answered". Returns the inbound messages this channel rejected most recently, newest first, each with its reason. The most common reason is that the sender is not bound yet.
-         */
-        get: operations["list-channel-rejections"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Issue a binding code
+     * @description Produces a single-use code to hand to the person being bound. They send that code to the assistant from their own account on that platform, which completes the binding. A binding can only be established this way, by the person themselves — a platform account cannot be named directly. Codes expire and have to be reissued.
+     */
+    post: operations["create-binding-code"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/channels/{channel}/rejections": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/channels/{channel}/secret": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Rotate the webhook secret
-         * @description Replaces the webhook secret. The old one stops working immediately and the channel drops back to awaiting confirmation from the platform. Which side owns the secret is decided by the platform; see secretSource on list-platforms. For a `generated` platform, send no body — the new secret is returned in this response only and cannot be retrieved again. For a `supplied` platform you must pass the new secret from that platform's own console.
-         */
-        post: operations["rotate-channel-secret"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List recently rejected inbound messages
+     * @description For diagnosing "I sent a message and the assistant never answered". Returns the inbound messages this channel rejected most recently, newest first, each with its reason. The most common reason is that the sender is not bound yet.
+     */
+    get: operations["list-channel-rejections"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/channels/{channel}/secret": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/channels/{channel}/sender-check": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Test whether a sender would be let through
-         * @description For checking a sender policy after changing it. Sends nothing and changes nothing: it runs exactly the same decision a real inbound message goes through, and says which rule produced the answer. The binding-code rule cannot be tested this way — whether something is a binding code depends on what the sender actually wrote.
-         */
-        get: operations["check-sender"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Rotate the webhook secret
+     * @description Replaces the webhook secret. The old one stops working immediately and the channel drops back to awaiting confirmation from the platform. Which side owns the secret is decided by the platform; see secretSource on list-platforms. For a `generated` platform, send no body — the new secret is returned in this response only and cannot be retrieved again. For a `supplied` platform you must pass the new secret from that platform's own console.
+     */
+    post: operations["rotate-channel-secret"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/channels/{channel}/sender-check": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/channels/{channel}/weixin-logins": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Begin a WeChat QR login
-         * @description A personal WeChat channel can only send and receive once its owner has signed in by scanning a QR code. This returns that code; poll `GET /v1/weixin-logins/{login}` for progress, and when the status asks for a verification code, submit it with `POST /v1/weixin-logins/{login}/verify-code`.
-         */
-        post: operations["begin-weixin-login"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Test whether a sender would be let through
+     * @description For checking a sender policy after changing it. Sends nothing and changes nothing: it runs exactly the same decision a real inbound message goes through, and says which rule produced the answer. The binding-code rule cannot be tested this way — whether something is a binding code depends on what the sender actually wrote.
+     */
+    get: operations["check-sender"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/channels/{channel}/weixin-logins": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/platforms": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List platforms that can be connected
-         * @description The instant messaging platforms that can currently be connected, along with the flow and the credential fields each one needs. The create-channel form is driven entirely by this response: setupMethod decides between a credential form and a QR flow, credentialFields is what to ask for, and secretSource decides whether there is a webhook secret field at all.
-         */
-        get: operations["list-platforms"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Begin a WeChat QR login
+     * @description A personal WeChat channel can only send and receive once its owner has signed in by scanning a QR code. This returns that code; poll `GET /v1/weixin-logins/{login}` for progress, and when the status asks for a verification code, submit it with `POST /v1/weixin-logins/{login}/verify-code`.
+     */
+    post: operations["begin-weixin-login"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/platforms": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/weixin-logins/{login}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the state of a QR login
-         * @description Poll this until the status is success or failure. When the status asks for a verification code, submit it with the verification-code operation.
-         */
-        get: operations["get-weixin-login"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List platforms that can be connected
+     * @description The instant messaging platforms that can currently be connected, along with the flow and the credential fields each one needs. The create-channel form is driven entirely by this response: setupMethod decides between a credential form and a QR flow, credentialFields is what to ask for, and secretSource decides whether there is a webhook secret field at all.
+     */
+    get: operations["list-platforms"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/weixin-logins/{login}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/weixin-logins/{login}/verify-code": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Submit a login verification code
-         * @description For when WeChat asks for an SMS or device code after the scan. The person who started the login gets that code on their own phone.
-         */
-        post: operations["submit-weixin-verify-code"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the state of a QR login
+     * @description Poll this until the status is success or failure. When the status asks for a verification code, submit it with the verification-code operation.
+     */
+    get: operations["get-weixin-login"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/weixin-logins/{login}/verify-code": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/dynamic-calls/{call}/result": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Report what an action produced
-         * @description The assistant asks the client to run an action by adding a tool call to the conversation
-         *     with the namespace `dynamic`; the client acts when that entry turns in_progress and reports
-         *     back here.
-         *
-         *     The first result is the one that counts. A later one is refused rather than replacing it.
-         */
-        post: operations["submit-dynamic-call-result"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Submit a login verification code
+     * @description For when WeChat asks for an SMS or device code after the scan. The person who started the login gets that code on their own phone.
+     */
+    post: operations["submit-weixin-verify-code"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/dynamic-calls/{call}/result": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/folders": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List folders
-         * @description The current account's folders in this project, oldest first. That order is fixed and does not react to what happens inside a folder: a folder is a place on the screen, and a place that moves whenever something is put into it is not one anybody can aim at. Not paginated — there is a cap on how many there can be, and all of them come back at once.
-         */
-        get: operations["list-folders"];
-        put?: never;
-        /**
-         * Create a folder
-         * @description A folder groups conversations in the sidebar and does nothing else. The assistant is never told which folder a conversation is in, and a conversation behaves exactly the same inside one as outside: no shared instructions, no shared files, no shared memory.
-         *
-         *     Names are unique within an account's folders in this project, because the only way to aim at a folder is to read its name.
-         */
-        post: operations["create-folder"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Report what an action produced
+     * @description The assistant asks the client to run an action by adding a tool call to the conversation
+     *     with the namespace `dynamic`; the client acts when that entry turns in_progress and reports
+     *     back here.
+     *
+     *     The first result is the one that counts. A later one is refused rather than replacing it.
+     */
+    post: operations["submit-dynamic-call-result"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/folders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/folders/{folder}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch one folder
-         * @description The list returns every folder at once, so this is for the case the list does not cover: a page opened straight at a folder, holding nothing but the id from the address bar. Its conversations are a separate request — `GET /api/v1/threads?folder=<id>`.
-         */
-        get: operations["get-folder"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete a folder
-         * @description The conversations inside are **not** deleted. They leave the folder and go back to the ungrouped list, where they can be filed again. Emptying a shelf is not the same as throwing out what was on it, and deleting a conversation is a different request.
-         *
-         *     Idempotent: deleting a folder that is already gone succeeds and changes nothing.
-         */
-        delete: operations["delete-folder"];
-        options?: never;
-        head?: never;
-        /**
-         * Rename a folder
-         * @description The conversations in it are untouched, and none of them move in the list — a folder's name is not part of what any conversation is about.
-         */
-        patch: operations["update-folder"];
-        trace?: never;
+    /**
+     * List folders
+     * @description The current account's folders in this project, oldest first. That order is fixed and does not react to what happens inside a folder: a folder is a place on the screen, and a place that moves whenever something is put into it is not one anybody can aim at. Not paginated — there is a cap on how many there can be, and all of them come back at once.
+     */
+    get: operations["list-folders"];
+    put?: never;
+    /**
+     * Create a folder
+     * @description A folder groups conversations in the sidebar and does nothing else. The assistant is never told which folder a conversation is in, and a conversation behaves exactly the same inside one as outside: no shared instructions, no shared files, no shared memory.
+     *
+     *     Names are unique within an account's folders in this project, because the only way to aim at a folder is to read its name.
+     */
+    post: operations["create-folder"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/folders/{folder}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/memories": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List what the assistant remembers
-         * @description Facts the assistant has written down for the current account in this project. They appear at the start of every later conversation. Members of the same project each have their own, and this returns only the current account's. Not paginated: there is a cap on how many there can be, and all of them come back at once.
-         */
-        get: operations["list-memories"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Fetch one folder
+     * @description The list returns every folder at once, so this is for the case the list does not cover: a page opened straight at a folder, holding nothing but the id from the address bar. Its conversations are a separate request — `GET /api/v1/threads?folder=<id>`.
+     */
+    get: operations["get-folder"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a folder
+     * @description The conversations inside are **not** deleted. They leave the folder and go back to the ungrouped list, where they can be filed again. Emptying a shelf is not the same as throwing out what was on it, and deleting a conversation is a different request.
+     *
+     *     Idempotent: deleting a folder that is already gone succeeds and changes nothing.
+     */
+    delete: operations["delete-folder"];
+    options?: never;
+    head?: never;
+    /**
+     * Rename a folder
+     * @description The conversations in it are untouched, and none of them move in the list — a folder's name is not part of what any conversation is about.
+     */
+    patch: operations["update-folder"];
+    trace?: never;
+  };
+  "/api/v1/memories": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/memories/{memory}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete one memory
-         * @description The assistant stops remembering this. It takes effect at once, so the next conversation will not carry it. The assistant may well learn the same thing again.
-         */
-        delete: operations["delete-memory"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List what the assistant remembers
+     * @description Facts the assistant has written down for the current account in this project. They appear at the start of every later conversation. Members of the same project each have their own, and this returns only the current account's. Not paginated: there is a cap on how many there can be, and all of them come back at once.
+     */
+    get: operations["list-memories"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/memories/{memory}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/skills": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the skills this project can use
-         * @description Everything the assistant can reach in this project, including the ones that are turned off —
-         *     an entry that disappeared once it was switched off could not be switched back on.
-         *
-         *     `origin` says whether a skill can be edited here. Skills belonging to the project are
-         *     visible to everyone in it, whoever wrote them.
-         */
-        get: operations["list-skills"];
-        put?: never;
-        /**
-         * Write a skill for this project
-         * @description Creates it, or replaces the project's skill of that name. The whole package goes in each
-         *     time: files left out of a write are removed, so the stored skill is what was sent and not
-         *     what accumulated.
-         *
-         *     A project skill takes precedence over a built-in one of the same name for this project only.
-         *     The built-in is untouched and reappears if the project's is deleted.
-         */
-        post: operations["put-skill"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Delete one memory
+     * @description The assistant stops remembering this. It takes effect at once, so the next conversation will not carry it. The assistant may well learn the same thing again.
+     */
+    delete: operations["delete-memory"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/skills": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/skills/{skill}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Read one skill, with its files
-         * @description Works for built-in skills too; they simply cannot be written.
-         */
-        get: operations["get-skill"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete this project's skill
-         * @description A built-in skill of the same name, if there was one, becomes visible again.
-         */
-        delete: operations["delete-skill"];
-        options?: never;
-        head?: never;
-        /**
-         * Turn a skill on or off
-         * @description Separate from writing it, because this is the frequent one: a skill that is off costs
-         *     nothing and stays where it is.
-         *
-         *     Only skills belonging to the project can be switched. To keep a built-in one out of the
-         *     way, write a project skill of the same name and turn that off.
-         */
-        patch: operations["set-skill-enabled"];
-        trace?: never;
+    /**
+     * List the skills this project can use
+     * @description Everything the assistant can reach in this project, including the ones that are turned off —
+     *     an entry that disappeared once it was switched off could not be switched back on.
+     *
+     *     `origin` says whether a skill can be edited here. Skills belonging to the project are
+     *     visible to everyone in it, whoever wrote them.
+     */
+    get: operations["list-skills"];
+    put?: never;
+    /**
+     * Write a skill for this project
+     * @description Creates it, or replaces the project's skill of that name. The whole package goes in each
+     *     time: files left out of a write are removed, so the stored skill is what was sent and not
+     *     what accumulated.
+     *
+     *     A project skill takes precedence over a built-in one of the same name for this project only.
+     *     The built-in is untouched and reappears if the project's is deleted.
+     */
+    post: operations["put-skill"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/skills/{skill}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/threads": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List conversations
-         * @description Ordered by most recent activity, limited to the current account's conversations in the current project. `archived` selects between two sets rather than widening one: archived conversations are absent from the default list, and turning the flag on shows those instead.
-         */
-        get: operations["list-threads"];
-        put?: never;
-        /** Create a conversation */
-        post: operations["create-thread"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Read one skill, with its files
+     * @description Works for built-in skills too; they simply cannot be written.
+     */
+    get: operations["get-skill"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete this project's skill
+     * @description A built-in skill of the same name, if there was one, becomes visible again.
+     */
+    delete: operations["delete-skill"];
+    options?: never;
+    head?: never;
+    /**
+     * Turn a skill on or off
+     * @description Separate from writing it, because this is the frequent one: a skill that is off costs
+     *     nothing and stays where it is.
+     *
+     *     Only skills belonging to the project can be switched. To keep a built-in one out of the
+     *     way, write a project skill of the same name and turn that off.
+     */
+    patch: operations["set-skill-enabled"];
+    trace?: never;
+  };
+  "/api/v1/threads": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/threads/{thread}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch the conversation document
-         * @description The complete current state of a conversation, for the first render. Its `stream` gives the address and admission ticket for live output, and what that stream pushes are incremental edits to this same document, so the same rendering logic applies.
-         */
-        get: operations["get-thread"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete a conversation
-         * @description Removes the conversation from every list and makes it unreachable by id. The assistant can no longer find it either — neither by searching past conversations nor by reading one back.
-         *
-         *     Deleting is not the same as archiving, and the two are not degrees of the same thing. An archived conversation is still there and still readable, it just takes no new input; a deleted one is gone from view. Archiving can be undone; this cannot.
-         *
-         *     What survives is the record itself, because a conversation with this assistant is an account of what was done to real infrastructure — which machine was changed, which disk was removed. That record is kept even though nobody can reach it here.
-         *
-         *     Fails while a turn is running: stop it first. Deleting an already deleted conversation succeeds and changes nothing.
-         */
-        delete: operations["delete-thread"];
-        options?: never;
-        head?: never;
-        /**
-         * Update conversation settings
-         * @description Changes the title, the approval mode, and whether the conversation is archived. A change to the approval mode takes effect from the next turn; a turn already running keeps the settings it started with.
-         *
-         *     Archiving makes a conversation read-only: it stays in the list under "archived", stays readable, and the assistant can still find it when it searches past conversations — it just takes no new input. Unarchive it to continue. Archiving fails while a turn is running; stop it first.
-         */
-        patch: operations["update-thread"];
-        trace?: never;
+    /**
+     * List conversations
+     * @description Ordered by most recent activity, limited to the current account's conversations in the current project. `archived` selects between two sets rather than widening one: archived conversations are absent from the default list, and turning the flag on shows those instead.
+     */
+    get: operations["list-threads"];
+    put?: never;
+    /** Create a conversation */
+    post: operations["create-thread"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/threads/{thread}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/threads/{thread}/approvals/{batch}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Approve or decline a batch of tool calls
-         * @description The batch id comes from the conversation document's `wait`. This is idempotent: submitting the same batch again neither changes a decision already in effect nor reports an error. Returns 404 when the batch does not belong to that conversation.
-         */
-        post: operations["decide-approval"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Fetch the conversation document
+     * @description The complete current state of a conversation, for the first render. Its `stream` gives the address and admission ticket for live output, and what that stream pushes are incremental edits to this same document, so the same rendering logic applies.
+     */
+    get: operations["get-thread"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a conversation
+     * @description Removes the conversation from every list and makes it unreachable by id. The assistant can no longer find it either — neither by searching past conversations nor by reading one back.
+     *
+     *     Deleting is not the same as archiving, and the two are not degrees of the same thing. An archived conversation is still there and still readable, it just takes no new input; a deleted one is gone from view. Archiving can be undone; this cannot.
+     *
+     *     What survives is the record itself, because a conversation with this assistant is an account of what was done to real infrastructure — which machine was changed, which disk was removed. That record is kept even though nobody can reach it here.
+     *
+     *     Fails while a turn is running: stop it first. Deleting an already deleted conversation succeeds and changes nothing.
+     */
+    delete: operations["delete-thread"];
+    options?: never;
+    head?: never;
+    /**
+     * Update conversation settings
+     * @description Changes the title, the approval mode, and whether the conversation is archived. A change to the approval mode takes effect from the next turn; a turn already running keeps the settings it started with.
+     *
+     *     Archiving makes a conversation read-only: it stays in the list under "archived", stays readable, and the assistant can still find it when it searches past conversations — it just takes no new input. Unarchive it to continue. Archiving fails while a turn is running; stop it first.
+     */
+    patch: operations["update-thread"];
+    trace?: never;
+  };
+  "/api/v1/threads/{thread}/approvals/{batch}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/threads/{thread}/earlier": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch earlier parts of a conversation
-         * @description The first render only carries the latest stretch of a conversation; anything above it is fetched here, one stretch at a time. Pass the document's earlier.before as `before`; the `earlier` in the response is the cursor for the stretch above that, and null means the top has been reached. The entries have the same shape and the same order (oldest first) as `items` in the document, so they can be prepended as they are.
-         */
-        get: operations["list-earlier-items"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Approve or decline a batch of tool calls
+     * @description The batch id comes from the conversation document's `wait`. This is idempotent: submitting the same batch again neither changes a decision already in effect nor reports an error. Returns 404 when the batch does not belong to that conversation.
+     */
+    post: operations["decide-approval"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/threads/{thread}/earlier": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/threads/{thread}/interrupt": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Interrupt a running turn
-         * @description Calling this on a conversation with no running turn also returns 204 rather than an error — the user pressing stop races with the turn finishing on its own, and both outcomes are the same. This operation remains available while the project is suspended or being cleaned up.
-         */
-        post: operations["interrupt-thread"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Fetch earlier parts of a conversation
+     * @description The first render only carries the latest stretch of a conversation; anything above it is fetched here, one stretch at a time. Pass the document's earlier.before as `before`; the `earlier` in the response is the cursor for the stretch above that, and null means the top has been reached. The entries have the same shape and the same order (oldest first) as `items` in the document, so they can be prepended as they are.
+     */
+    get: operations["list-earlier-items"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/threads/{thread}/interrupt": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/threads/{thread}/messages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Send a message and start a turn
-         * @description Returns a turnId immediately without waiting for execution — a turn can run for tens of minutes. Progress arrives on the live stream the conversation document's `stream` points at, not in this response. Sending while the assistant is still working is allowed: the message is put in line and `queued` comes back true, to be read at the next step of the turn already running — so the editor should stay open rather than blocking on a busy conversation.
-         */
-        post: operations["send-message"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Interrupt a running turn
+     * @description Calling this on a conversation with no running turn also returns 204 rather than an error — the user pressing stop races with the turn finishing on its own, and both outcomes are the same. This operation remains available while the project is suspended or being cleaned up.
+     */
+    post: operations["interrupt-thread"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/threads/{thread}/messages": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/threads/{thread}/questions/{item}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Answer the assistant's questions
-         * @description The question id comes from the conversation document's `wait`. An already-answered question also returns 204 — another tab may have submitted first, or the auto-answer window may have expired, and in both cases the turn has already continued with an answer.
-         */
-        post: operations["answer-question"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Send a message and start a turn
+     * @description Returns a turnId immediately without waiting for execution — a turn can run for tens of minutes. Progress arrives on the live stream the conversation document's `stream` points at, not in this response. Sending while the assistant is still working is allowed: the message is put in line and `queued` comes back true, to be read at the next step of the turn already running — so the editor should stay open rather than blocking on a busy conversation.
+     */
+    post: operations["send-message"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/threads/{thread}/questions/{item}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/threads/{thread}/read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Mark a conversation as read */
-        post: operations["mark-thread-read"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Answer the assistant's questions
+     * @description The question id comes from the conversation document's `wait`. An already-answered question also returns 204 — another tab may have submitted first, or the auto-answer window may have expired, and in both cases the turn has already continued with an answer.
+     */
+    post: operations["answer-question"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/threads/{thread}/read": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/threads/{thread}/revert": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Revert from a given point
-         * @description Reverts the entry at `ordinal` and everything after it. Reverted entries stay in the transcript marked `reverted`, and ordinals are not renumbered. Returns how many were actually reverted.
-         */
-        post: operations["revert-thread"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Mark a conversation as read */
+    post: operations["mark-thread-read"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/threads/{thread}/revert": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    get?: never;
+    put?: never;
+    /**
+     * Revert from a given point
+     * @description Reverts the entry at `ordinal` and everything after it. Reverted entries stay in the transcript marked `reverted`, and ordinals are not renumbered. Returns how many were actually reverted.
+     */
+    post: operations["revert-thread"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Error: {
-            code?: string;
-            message: string;
-            /**
-             * @description What a given `code` carries alongside the message. The keys depend on the code,
-             *     and a client that does not recognise one ignores it.
-             */
-            meta?: {
-                [key: string]: unknown;
-            };
-            /** Format: int64 */
-            status: number;
-        };
-        UploadedResource: {
-            /**
-             * Format: int64
-             * @description Size of what was stored. For an image that has been resized, this is the resized size, not what was uploaded.
-             */
-            byteSize: number;
-            /**
-             * Format: date-time
-             * @description When this upload gets cleared if no message ever references it. Sending a message with this id makes it permanent and this stops applying — a file that belongs to a conversation is kept as long as the conversation is.
-             *
-             *     It is here so the editor can say so before it happens. An attachment chip that quietly stops working a week later reads as a bug, and the person who hits it has no way to tell that what they are seeing is a draft being collected.
-             */
-            draftExpiresAt: string;
-            filename: string;
-            /**
-             * Format: int64
-             * @description Null unless kind is image.
-             */
-            height: number | null;
-            id: string;
-            /**
-             * @description How the assistant will see this file.
-             *
-             *     - `image` — read directly, and only by models that accept image input
-             *     - `text` — placed inline in the message when small enough, otherwise read on demand
-             *     - `binary` — never read directly; the assistant downloads it onto a cloud instance to work with it
-             * @enum {string}
-             */
-            kind: "image" | "text" | "binary";
-            /**
-             * Format: int64
-             * @description Null unless kind is image.
-             */
-            width: number | null;
-        };
-        BindingResource: {
-            /** Format: uuid */
-            channelId: string;
-            /** @enum {string} */
-            connState: "logged_out" | "qr_pending" | "online" | "expired";
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: uuid */
-            id: string;
-            peerName: string;
-            platform: string;
-            /** @enum {string} */
-            status: "pending" | "active" | "revoked";
-            /** Format: date-time */
-            verifiedAt: string | null;
-        };
-        LengthAwarePageBindingResource: {
-            /** @description The entries on this page */
-            items: components["schemas"]["BindingResource"][];
-            /**
-             * Format: int64
-             * @description The page size, echoing what was requested
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description How many were skipped, echoing what was requested
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description How many match in total, not just on this page
-             */
-            total: number;
-        };
-        ChannelResource: {
-            allowFrom: string[] | null;
-            /**
-             * @description How far this channel is from working. Only `online` receives messages and can issue binding codes
-             * @enum {string}
-             */
-            connState: "logged_out" | "qr_pending" | "online" | "expired";
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: uuid */
-            id: string;
-            name: string;
-            platform: string;
-            /**
-             * @description The state of the long-lived connection right now. Always `stopped` for webhook platforms
-             * @enum {string}
-             */
-            runtimeState: "stopped" | "running";
-            /** @enum {string} */
-            senderPolicy: "bound_only" | "open";
-            /** @enum {string} */
-            status: "active" | "suspended" | "disabled";
-            /** Format: date-time */
-            updatedAt: string;
-            /** @description The webhook path, for gateway configuration and for diagnosis */
-            webhookPath: string;
-            /** @description The webhook address to paste into that platform's console. Null when the deployment declares no public entry point */
-            webhookUrl: string | null;
-        };
-        LengthAwarePageChannelResource: {
-            /** @description The entries on this page */
-            items: components["schemas"]["ChannelResource"][];
-            /**
-             * Format: int64
-             * @description The page size, echoing what was requested
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description How many were skipped, echoing what was requested
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description How many match in total, not just on this page
-             */
-            total: number;
-        };
-        CreateChannelRequestBody: {
-            allowFrom?: string[] | null;
-            /** @description Credentials for that platform. Write-only: they cannot be read back after creation */
-            credentials?: {
-                [key: string]: string;
-            };
-            name: string;
-            platform: string;
-            /** @enum {string} */
-            senderPolicy?: "bound_only" | "open";
-            /** @description Required for platforms that generate the secret themselves (secretSource=supplied). Must be absent for `generated` ones, where the secret we make is returned once in webhookSecret on this response */
-            webhookSecret?: string;
-        };
-        ChannelWithSecretResponseBody: {
-            allowFrom: string[] | null;
-            /**
-             * @description How far this channel is from working. Only `online` receives messages and can issue binding codes
-             * @enum {string}
-             */
-            connState: "logged_out" | "qr_pending" | "online" | "expired";
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: uuid */
-            id: string;
-            name: string;
-            platform: string;
-            /**
-             * @description The state of the long-lived connection right now. Always `stopped` for webhook platforms
-             * @enum {string}
-             */
-            runtimeState: "stopped" | "running";
-            /** @enum {string} */
-            senderPolicy: "bound_only" | "open";
-            /** @enum {string} */
-            status: "active" | "suspended" | "disabled";
-            /** Format: date-time */
-            updatedAt: string;
-            /** @description The webhook path, for gateway configuration and for diagnosis */
-            webhookPath: string;
-            /** @description The webhook secret we generated, to paste into that platform's console. **It cannot be retrieved again** — the only way forward is rotating to a new one. Null when the platform generates the secret (secretSource=supplied) or does not use webhooks at all */
-            webhookSecret: string | null;
-            /** @description The webhook address to paste into that platform's console. Null when the deployment declares no public entry point */
-            webhookUrl: string | null;
-        };
-        UpdateChannelRequestBody: {
-            /** @description The allow list. Only applied when senderPolicy is sent as well */
-            allowFrom?: string[] | null;
-            /** @description Replaced wholesale rather than merged key by key. Absent means unchanged */
-            credentials?: {
-                [key: string]: string;
-            };
-            enabled?: boolean;
-            name?: string;
-            /**
-             * @description Only when this is sent is allowFrom replaced along with it
-             * @enum {string}
-             */
-            senderPolicy?: "bound_only" | "open";
-        };
-        BindingCodeResponseBody: {
-            code: string;
-            /** Format: date-time */
-            expiresAt: string;
-        };
-        PartResource: {
-            /** @description For `file` parts. Points at one of this entry's `attachments`. */
-            attachmentId?: string | null;
-            /**
-             * @description Addresses this part in the live stream — text arrives as `append` frames pointing at
-             *     `/items/{item}/parts/{id}/text`.
-             *
-             *     Not an array index. It looks like one today because parts are only ever appended, and a
-             *     client that treats it as one keeps working right up until that stops being true.
-             */
-            id: string;
-            /** @description For `text` parts. Grows as the answer is written. */
-            text?: string | null;
-            /** @enum {string} */
-            type: "text" | "file";
-        };
-        RejectionResource: {
-            /** Format: date-time */
-            at: string;
-            peerId: string;
-            peerName: string;
-            peerUsername: string;
-            platform: string;
-            /** Format: int64 */
-            textLength: number;
-            verdict: string;
-        };
-        RejectionListResponseBody: {
-            rejections: components["schemas"]["RejectionResource"][] | null;
-        };
-        RotateSecretRequestBody: {
-            /** @description Required for platforms that generate the secret themselves (secretSource=supplied). Must be absent for `generated` ones */
-            webhookSecret?: string;
-        };
-        WebhookSecretResponseBody: {
-            webhookSecret: string;
-        };
-        SenderCheckResource: {
-            allowFrom: string[] | null;
-            allowed: boolean;
-            bindingId: string | null;
-            senderPolicy: string;
-            /** @enum {string} */
-            verdict: "ALLOWED_BY_BINDING" | "ALLOWED_BY_ALLOW_FROM" | "ALLOWED_BY_POLICY" | "REJECTED_NOT_ALLOWED";
-        };
-        LoginResource: {
-            /**
-             * Format: date-time
-             * @description When this login flow expires. Past that, stop polling and start a new one
-             */
-            expiresAt: string;
-            /** Format: uuid */
-            id: string;
-            /** @description The text to encode and render as a QR code by the client — not an image address and not a data URI. When a code expires this flow issues another and keeps waiting, so each poll may return a new string */
-            qrcodeData: string;
-            /** @description Why it failed. Present only when status is error or expired */
-            reason: string;
-            /** @enum {string} */
-            status: "wait" | "scanned" | "confirmed" | "expired" | "error" | "need_verify_code";
-        };
-        CredentialFieldResource: {
-            help: string;
-            key: string;
-            label: string;
-            required: boolean;
-            secret: boolean;
-        };
-        PlatformResource: {
-            credentialFields: components["schemas"]["CredentialFieldResource"][] | null;
-            name: string;
-            resident: boolean;
-            /** @enum {string} */
-            secretSource: "generated" | "supplied" | "none";
-            /** @enum {string} */
-            setupChallenge: "none" | "webhook" | "scan";
-            /** @enum {string} */
-            setupMethod: "credentials" | "scan";
-            /** @description The webhook path template; {channel} is replaced with the channel id */
-            webhookPath: string;
-            /** @description The full webhook address template. Null when the deployment declares no public entry point */
-            webhookUrlTemplate: string | null;
-        };
-        PlatformListResponseBody: {
-            platforms: components["schemas"]["PlatformResource"][] | null;
-        };
-        VerifyCodeRequestBody: {
-            code: string;
-        };
-        SkillResource: {
-            /**
-             * @description True when the assistant wrote this skill during a conversation rather than a person
-             *     writing it here.
-             *
-             *     Which conversation is deliberately not returned: skills are shared across the project
-             *     while conversations belong to one person, so naming one would tell everybody in the
-             *     project that a particular colleague had it.
-             */
-            authoredByAssistant: boolean;
-            /** @description Why the assistant would open this skill. It sits in every request, so it is the one field worth writing carefully. */
-            description: string;
-            enabled: boolean;
-            /** @description Path to contents, `SKILL.md` among them. Only returned by `get-skill`; the list leaves it out. */
-            files?: {
-                [key: string]: string;
-            } | null;
-            name: string;
-            /**
-             * @description `builtin` — provided by the platform and read-only here.
-             *     `project` — written for this project and editable by anyone in it.
-             * @enum {string}
-             */
-            origin: "builtin" | "project";
-            shortDescription: string | null;
-            /**
-             * Format: date-time
-             * @description Null for built-in skills, which have no edit history here.
-             */
-            updatedAt: string | null;
-        };
-        SkillListResponseBody: {
-            skills: components["schemas"]["SkillResource"][];
-        };
-        SkillRequestBody: {
-            /** @description Why the assistant would open this skill. It sits in every request; write it as the answer to "when do I need this", not "what does it contain". */
-            description: string;
-            /** @default true */
-            enabled?: boolean;
-            /**
-             * @description Path to contents. `SKILL.md` is required; anything else it references goes alongside it.
-             *
-             *     Paths are relative to the skill and cannot leave it. At most 32 files, 256 KiB each and
-             *     1 MiB in total.
-             */
-            files: {
-                [key: string]: string;
-            };
-            /** @description Also how the assistant refers to it, so renaming is deleting and writing again. */
-            name: string;
-            shortDescription?: string;
-        };
-        SkillEnabledRequestBody: {
-            enabled: boolean;
-        };
-        ThreadSummaryResource: {
-            /** @enum {string} */
-            approvalMode: "guardian" | "manual" | "yolo";
-            archived: boolean;
-            /** Format: date-time */
-            createdAt: string;
-            /** @description The folder this conversation is filed under, or null when it is in none */
-            folderId: string | null;
-            id: string;
-            model: string;
-            title: string | null;
-            unread: boolean;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        ThreadListResponseBody: {
-            /** @description Pass this back as `cursor` for the next page. Null means this was the last one — it is only set when there is genuinely more, so an empty final page never happens. */
-            nextCursor: string | null;
-            threads: components["schemas"]["ThreadSummaryResource"][] | null;
-        };
-        CreateThreadRequestBody: {
-            /**
-             * @description Absent uses the platform's default approval mode
-             * @enum {string}
-             */
-            approvalMode?: "guardian" | "manual" | "yolo";
-        };
-        ContextResource: {
-            /** Format: int64 */
-            compactAt: number | null;
-            /**
-             * @description What kinds of input the model behind this conversation accepts, as modality names: text, image.
-             *
-             *     This governs images and nothing else. Text and binary attachments reach every model: a small text file is placed inline, a large one is read on demand, and a binary is downloaded onto a cloud instance — none of which asks the model to see a picture. So this decides whether pasting a screenshot does anything, not whether the attach control exists. Hiding file upload on a text-only model takes away something that would have worked.
-             *
-             *     An empty list is not a claim that the model reads nothing: it means this deployment has not stated the modalities, or the conversation names a model that has since been retired. Treat empty as unknown and keep the control, because hiding one for a reason nobody can see is worse than a refusal that says why.
-             */
-            inputModalities: string[];
-            model: string;
-            /** Format: int64 */
-            used: number | null;
-            /** Format: int64 */
-            warnAt: number;
-            /** Format: int64 */
-            window: number | null;
-        };
-        EarlierResource: {
-            /** Format: int64 */
-            before: number;
-            foldedAbove: boolean;
-        };
-        AttachmentResource: {
-            /** Format: int64 */
-            byteSize: number;
-            filename: string;
-            /**
-             * Format: int64
-             * @description Null unless kind is image. Width and height are here so a client can hold the space before the image itself has loaded.
-             */
-            height: number | null;
-            id: string;
-            /**
-             * @description What this attachment is. A client renders an image in place and everything else as a file to download.
-             * @enum {string}
-             */
-            kind: "image" | "text" | "binary";
-            /**
-             * Format: int64
-             * @description Null unless kind is image.
-             */
-            width: number | null;
-        };
-        ItemResource: {
-            /** @enum {string|null} */
-            approval?: "approved" | "declined" | "auto_approved" | "unreviewed" | null;
-            approvalReason?: string | null;
-            arguments?: string;
-            attachments?: components["schemas"]["AttachmentResource"][] | null;
-            /**
-             * @description The context blocks the client attached to this message.
-             *
-             *     **Not part of what the operator wrote** — `text` is. Render the message from `text` and
-             *     leave these out of the bubble; they are here so a client that did not send them, or one
-             *     that reloaded, can still read what the assistant was given.
-             *
-             *     The actions declared alongside them are not returned: they are re-declared as they
-             *     change and would make every fetch of the conversation carry them again.
-             */
-            clientContext?: components["schemas"]["ClientContextPart"][] | null;
-            /** Format: date-time */
-            createdAt: string;
-            detail?: string | null;
-            presentation?: components["schemas"]["PresentationResource"] | null;
-            /** Format: int64 */
-            durationMs?: number | null;
-            id: string;
-            /** @description The model that produced this entry. Null for messages the user sent */
-            model: string | null;
-            namespace?: string | null;
-            /** Format: int64 */
-            ordinal: number;
-            reverted: boolean;
-            /** @enum {string} */
-            status: "pending" | "in_progress" | "completed" | "failed" | "declined" | "interrupted";
-            target?: string | null;
-            /**
-             * @description The content of this entry, in the order it was written. A message that is only text is a
-             *     single part, which is most of them.
-             *
-             *     An attachment belongs where it was written, so render these in order rather than putting
-             *     them all at the end.
-             */
-            parts?: components["schemas"]["PartResource"][] | null;
-            tool?: string | null;
-            /**
-             * @description Determines which fields this entry carries
-             * @enum {string}
-             */
-            type: "user_message" | "agent_message" | "reasoning" | "dynamic_tool_call" | "context_compaction" | "token_budget_reminder" | "turn_failure";
-        };
-        /**
-         * @description Structured detail produced by a tool call, in addition to the single-line `detail`. Null
-         *     when the call produced none.
-         *
-         *     `kind` determines which of the remaining fields is populated.
-         */
-        PresentationResource: {
-            fileDiff?: components["schemas"]["FileDiffResource"] | null;
-            /**
-             * @description Determines which of the remaining fields is populated
-             * @enum {string}
-             */
-            kind: "file_diff";
-        };
-        /**
-         * @description The change a tool call applied to a single file.
-         *
-         *     Populated once the call has completed successfully. It is absent while the call is pending
-         *     or awaiting approval, as the file's prior contents are read during execution. To preview an
-         *     edit awaiting approval, derive it from the call's `old_string` and `new_string` arguments.
-         */
-        FileDiffResource: {
-            /**
-             * Format: int64
-             * @description Lines added. Complete even when `unified` is null
-             */
-            added: number;
-            /** @description Absolute path of the file on the instance */
-            path: string;
-            /**
-             * Format: int64
-             * @description Lines removed. Complete even when `unified` is null
-             */
-            removed: number;
-            /**
-             * @description What the call did to the file
-             * @enum {string}
-             */
-            status: "added" | "modified" | "deleted";
-            /**
-             * @description The change as a unified diff with three lines of context. A file created by the call is
-             *     diffed against `/dev/null`.
-             *
-             *     Null when the change exceeds the service's size limit. The diff is omitted in full
-             *     rather than truncated; `added` and `removed` remain complete.
-             */
-            unified?: string | null;
-        };
-        StreamResource: {
-            path: string;
-            ticket: string;
-        };
-        TurnResource: {
-            /** @enum {string} */
-            approvalMode: "guardian" | "manual" | "yolo";
-        };
-        Choice: {
-            description: string;
-            label: string;
-        };
-        Question: {
-            choices: components["schemas"]["Choice"][] | null;
-            header: string;
-            id: string;
-            question: string;
-        };
-        WaitResource: {
-            /** Format: int64 */
-            autoResolutionMs?: number;
-            batchId?: string;
-            itemId?: string;
-            itemIds?: string[] | null;
-            /** @enum {string} */
-            kind: "tool_approval" | "user_input";
-            questions?: components["schemas"]["Question"][] | null;
-            turnId: string;
-        };
-        DocumentResource: {
-            context: components["schemas"]["ContextResource"];
-            cursor: string | null;
-            earlier: components["schemas"]["EarlierResource"] | null;
-            items: components["schemas"]["ItemResource"][] | null;
-            status: string;
-            stream: components["schemas"]["StreamResource"] | null;
-            turn: components["schemas"]["TurnResource"] | null;
-            /** @description The assistant's checklist for the work in this conversation, in the order it intends to do it. Empty when it has not written one — short tasks do not get a list. It is rewritten in full each time, so what is here is the current state. */
-            todos?: components["schemas"]["TodoResource"][];
-            turnId: string | null;
-            wait: components["schemas"]["WaitResource"] | null;
-        };
-        UpdateThreadRequestBody: {
-            /** @enum {string} */
-            approvalMode?: "guardian" | "manual" | "yolo";
-            archived?: boolean;
-            /**
-             * @description File this conversation into a folder, or `null` to take it out of the one it is in. Omit the field to leave it where it is.
-             *
-             *     Filing does not move the conversation in the list. The order answers "which conversation has something new in it", and putting one away is not that.
-             */
-            folderId?: string | null;
-            /**
-             * @description Rename this conversation.
-             *
-             *     A conversation names itself: the first message gives it a working title, and the assistant replaces that with a better one once it has answered. Setting this stops both — a name somebody chose is never overwritten by one that was generated.
-             *
-             *     Renaming does not move the conversation in the list. The order answers "which conversation has something new in it", and editing a title is not that.
-             */
-            title?: string;
-        };
-        DecideRequestBody: {
-            approved: boolean;
-            reason?: string;
-        };
-        EarlierResponseBody: {
-            earlier: components["schemas"]["EarlierResource"];
-            items: components["schemas"]["ItemResource"][] | null;
-        };
-        SendMessageRequestBody: {
-            client?: components["schemas"]["ClientContextRequest"];
-            /**
-             * @description The message, in the order it was written. A message with nothing but text is a single
-             *     text part; that is the ordinary case and nothing else is required.
-             */
-            parts: components["schemas"]["MessagePart"][];
-        };
-        MemoryListResponseBody: {
-            items: components["schemas"]["MemoryResource"][];
-        };
-        MemoryResource: {
-            /** @description The fact itself */
-            body: string;
-            /** Format: date-time */
-            createdAt: string;
-            id: string;
-            /** @description The name the assistant gave this fact; it overwrites or deletes its own entries by that name */
-            name: string;
-            /** @description Which conversation the assistant learned it in. That conversation may since have been deleted */
-            sourceThreadId?: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        /**
-         * @description One piece of a message. `type` says which of the fields below carries it:
-         *
-         *     - `text` — the words, in `text`
-         *     - `file` — an attachment uploaded earlier, by id in `attachmentId`
-         *     - `data-<something>` — context from the client, in `data`. The name after `data-` is yours;
-         *       it is shown to the assistant so it can tell one kind of block from another.
-         *
-         *     Order matters: an attachment belongs where it was written, not at the end.
-         */
-        MessagePart: {
-            /** @description For `file` parts. The attachment must have been uploaded and not yet bound to another message. */
-            attachmentId?: string | null;
-            /** @description For `data-*` parts. Any object; its keys reach the assistant as they are. */
-            data?: {
-                [key: string]: unknown;
-            } | null;
-            /** @description For `text` parts. */
-            text?: string | null;
-            type: string;
-        };
-        /**
-         * @description Which client this is and what it can do, so the assistant can ask it to do those things
-         *     while it answers. What the operator is looking at travels as `data-*` parts on the message.
-         *
-         *     Send `actions` only when they differ from the last message on this conversation. Sending the
-         *     block without `actions` keeps whatever was declared before.
-         */
-        ClientContextRequest: {
-            /**
-             * @description The actions on offer right now.
-             *
-             *     Omit it when nothing changed since the last message. Send `[]` to say there is nothing
-             *     on offer — those are different: a client that moves off the page it was attached to has
-             *     to be able to say so, or the assistant keeps calling actions that no longer make sense.
-             */
-            actions?: components["schemas"]["ClientActionRequest"][] | null;
-            /** @description Identifies this client while it stays open. Any stable string; one per tab or process. */
-            clientId: string;
-            /** @description How the client calls itself, for example "Leaflow console (web)". */
-            label?: string;
-        };
-        /** @description A `data-*` part as it was sent. */
-        ClientContextPart: {
-            data: {
-                [key: string]: unknown;
-            };
-            type: string;
-        };
-        /** @description The shape of a tool in the OpenAI Chat Completions API, plus `readOnly` and `timeoutMs`. */
-        ClientActionRequest: {
-            function: components["schemas"]["ClientFunctionRequest"];
-            /** @description True when the action changes nothing outside the client. Anything else goes through this conversation's approval before it runs. */
-            readOnly: boolean;
-            /**
-             * Format: int64
-             * @description How long the assistant should wait for this action. Omit for the default; longer values are capped.
-             */
-            timeoutMs?: number;
-            /**
-             * @description Only functions are supported.
-             * @default function
-             * @enum {string}
-             */
-            type?: "function";
-        };
-        /** @description The function object from the OpenAI tools format. */
-        ClientFunctionRequest: {
-            /** @description What the action does, written for the model. An action without one can only be guessed at from its name. The 1024 ceiling is OpenAI's own limit on `tools[].function.description`, not a number chosen here: over it the upstream call fails with `string_above_max_length`, and refusing at submission is the clearer of the two places to refuse. It was 500, which ran out at about six enumerated entries — an action that must list what it accepts had nowhere to put the list. */
-            description: string;
-            /** @description The MCP and Anthropic spelling of `parameters`. Give one or the other, not both. */
-            inputSchema?: {
-                [key: string]: unknown;
-            } | null;
-            name: string;
-            /** @description JSON Schema for the arguments. Omit for an action that takes none. */
-            parameters?: {
-                [key: string]: unknown;
-            } | null;
-        };
-        DynamicCallResultRequestBody: {
-            /** @description The same value sent with the message. A result from a different client is refused. */
-            clientId: string;
-            /** @description Why it failed, when `ok` is false. It reaches the assistant, so write it for a reader who cannot see the screen. */
-            error?: string;
-            /** @description Pass back when there is more to read. The assistant will call again with it. */
-            nextCursor?: string;
-            ok: boolean;
-            /** @description What the action produced. At most 64 KiB; use `nextCursor` for anything larger. */
-            output?: string;
-        };
-        TodoResource: {
-            /** @description The same step phrased as happening now — "Installing nginx". Show this one while the item is in progress. */
-            activeForm: string;
-            /** @description The step as an instruction — "Install nginx". */
-            content: string;
-            /**
-             * @description Where this step stands. At most one item is in_progress at any time.
-             * @enum {string}
-             */
-            status: "pending" | "in_progress" | "completed";
-        };
-        TurnIDResponseBody: {
-            /** @description True when the assistant was already busy and this message was put in line instead of starting a turn. It is read at the next step of the turn already running, so there is nothing further to do — and turnId is empty in this case. */
-            queued: boolean;
-            /**
-             * Format: int64
-             * @description How many messages were already waiting ahead of this one. Only meaningful when queued is true.
-             */
-            queuedAhead?: number;
-            /** @description The turn this message started. Empty when the message was queued instead. */
-            turnId: string;
-        };
-        AnswerRequestBody: {
-            /** @description A map from question id to the answer chosen */
-            answers: {
-                [key: string]: string;
-            };
-        };
-        RevertRequestBody: {
-            /**
-             * Format: int64
-             * @description The starting ordinal; that entry and everything after it is reverted
-             */
-            ordinal: number;
-        };
-        RevertedCountResponseBody: {
-            /** Format: int64 */
-            reverted: number;
-        };
-        FolderResource: {
-            /** Format: date-time */
-            createdAt: string;
-            id: string;
-            name: string;
-            /**
-             * Format: int64
-             * @description How many conversations are filed here and would show up in the default list. Archived and deleted ones are not counted, so this is exactly what `GET /api/v1/threads?folder=<id>` returns.
-             */
-            threadCount: number;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        FolderListResponseBody: {
-            folders: components["schemas"]["FolderResource"][] | null;
-        };
-        CreateFolderRequestBody: {
-            name: string;
-        };
-        UpdateFolderRequestBody: {
-            name: string;
-        };
+  schemas: {
+    Error: {
+      code?: string;
+      message: string;
+      /**
+       * @description What a given `code` carries alongside the message. The keys depend on the code,
+       *     and a client that does not recognise one ignores it.
+       */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /** Format: int64 */
+      status: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    UploadedResource: {
+      /**
+       * Format: int64
+       * @description Size of what was stored. For an image that has been resized, this is the resized size, not what was uploaded.
+       */
+      byteSize: number;
+      /**
+       * Format: date-time
+       * @description When this upload gets cleared if no message ever references it. Sending a message with this id makes it permanent and this stops applying — a file that belongs to a conversation is kept as long as the conversation is.
+       *
+       *     It is here so the editor can say so before it happens. An attachment chip that quietly stops working a week later reads as a bug, and the person who hits it has no way to tell that what they are seeing is a draft being collected.
+       */
+      draftExpiresAt: string;
+      filename: string;
+      /**
+       * Format: int64
+       * @description Null unless kind is image.
+       */
+      height: number | null;
+      id: string;
+      /**
+       * @description How the assistant will see this file.
+       *
+       *     - `image` — read directly, and only by models that accept image input
+       *     - `text` — placed inline in the message when small enough, otherwise read on demand
+       *     - `binary` — never read directly; the assistant downloads it onto a cloud instance to work with it
+       * @enum {string}
+       */
+      kind: "image" | "text" | "binary";
+      /**
+       * Format: int64
+       * @description Null unless kind is image.
+       */
+      width: number | null;
+    };
+    BindingResource: {
+      /** Format: uuid */
+      channelId: string;
+      /** @enum {string} */
+      connState: "logged_out" | "qr_pending" | "online" | "expired";
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: uuid */
+      id: string;
+      peerName: string;
+      platform: string;
+      /** @enum {string} */
+      status: "pending" | "active" | "revoked";
+      /** Format: date-time */
+      verifiedAt: string | null;
+    };
+    LengthAwarePageBindingResource: {
+      /** @description The entries on this page */
+      items: components["schemas"]["BindingResource"][];
+      /**
+       * Format: int64
+       * @description The page size, echoing what was requested
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description How many were skipped, echoing what was requested
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description How many match in total, not just on this page
+       */
+      total: number;
+    };
+    ChannelResource: {
+      allowFrom: string[] | null;
+      /**
+       * @description How far this channel is from working. Only `online` receives messages and can issue binding codes
+       * @enum {string}
+       */
+      connState: "logged_out" | "qr_pending" | "online" | "expired";
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: uuid */
+      id: string;
+      name: string;
+      platform: string;
+      /**
+       * @description The state of the long-lived connection right now. Always `stopped` for webhook platforms
+       * @enum {string}
+       */
+      runtimeState: "stopped" | "running";
+      /** @enum {string} */
+      senderPolicy: "bound_only" | "open";
+      /** @enum {string} */
+      status: "active" | "suspended" | "disabled";
+      /** Format: date-time */
+      updatedAt: string;
+      /** @description The webhook path, for gateway configuration and for diagnosis */
+      webhookPath: string;
+      /** @description The webhook address to paste into that platform's console. Null when the deployment declares no public entry point */
+      webhookUrl: string | null;
+    };
+    LengthAwarePageChannelResource: {
+      /** @description The entries on this page */
+      items: components["schemas"]["ChannelResource"][];
+      /**
+       * Format: int64
+       * @description The page size, echoing what was requested
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description How many were skipped, echoing what was requested
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description How many match in total, not just on this page
+       */
+      total: number;
+    };
+    CreateChannelRequestBody: {
+      allowFrom?: string[] | null;
+      /** @description Credentials for that platform. Write-only: they cannot be read back after creation */
+      credentials?: {
+        [key: string]: string;
+      };
+      name: string;
+      platform: string;
+      /** @enum {string} */
+      senderPolicy?: "bound_only" | "open";
+      /** @description Required for platforms that generate the secret themselves (secretSource=supplied). Must be absent for `generated` ones, where the secret we make is returned once in webhookSecret on this response */
+      webhookSecret?: string;
+    };
+    ChannelWithSecretResponseBody: {
+      allowFrom: string[] | null;
+      /**
+       * @description How far this channel is from working. Only `online` receives messages and can issue binding codes
+       * @enum {string}
+       */
+      connState: "logged_out" | "qr_pending" | "online" | "expired";
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: uuid */
+      id: string;
+      name: string;
+      platform: string;
+      /**
+       * @description The state of the long-lived connection right now. Always `stopped` for webhook platforms
+       * @enum {string}
+       */
+      runtimeState: "stopped" | "running";
+      /** @enum {string} */
+      senderPolicy: "bound_only" | "open";
+      /** @enum {string} */
+      status: "active" | "suspended" | "disabled";
+      /** Format: date-time */
+      updatedAt: string;
+      /** @description The webhook path, for gateway configuration and for diagnosis */
+      webhookPath: string;
+      /** @description The webhook secret we generated, to paste into that platform's console. **It cannot be retrieved again** — the only way forward is rotating to a new one. Null when the platform generates the secret (secretSource=supplied) or does not use webhooks at all */
+      webhookSecret: string | null;
+      /** @description The webhook address to paste into that platform's console. Null when the deployment declares no public entry point */
+      webhookUrl: string | null;
+    };
+    UpdateChannelRequestBody: {
+      /** @description The allow list. Only applied when senderPolicy is sent as well */
+      allowFrom?: string[] | null;
+      /** @description Replaced wholesale rather than merged key by key. Absent means unchanged */
+      credentials?: {
+        [key: string]: string;
+      };
+      enabled?: boolean;
+      name?: string;
+      /**
+       * @description Only when this is sent is allowFrom replaced along with it
+       * @enum {string}
+       */
+      senderPolicy?: "bound_only" | "open";
+    };
+    BindingCodeResponseBody: {
+      code: string;
+      /** Format: date-time */
+      expiresAt: string;
+    };
+    PartResource: {
+      /** @description For `file` parts. Points at one of this entry's `attachments`. */
+      attachmentId?: string | null;
+      /**
+       * @description Addresses this part in the live stream — text arrives as `append` frames pointing at
+       *     `/items/{item}/parts/{id}/text`.
+       *
+       *     Not an array index. It looks like one today because parts are only ever appended, and a
+       *     client that treats it as one keeps working right up until that stops being true.
+       */
+      id: string;
+      /** @description For `text` parts. Grows as the answer is written. */
+      text?: string | null;
+      /** @enum {string} */
+      type: "text" | "file";
+    };
+    RejectionResource: {
+      /** Format: date-time */
+      at: string;
+      peerId: string;
+      peerName: string;
+      peerUsername: string;
+      platform: string;
+      /** Format: int64 */
+      textLength: number;
+      verdict: string;
+    };
+    RejectionListResponseBody: {
+      rejections: components["schemas"]["RejectionResource"][] | null;
+    };
+    RotateSecretRequestBody: {
+      /** @description Required for platforms that generate the secret themselves (secretSource=supplied). Must be absent for `generated` ones */
+      webhookSecret?: string;
+    };
+    WebhookSecretResponseBody: {
+      webhookSecret: string;
+    };
+    SenderCheckResource: {
+      allowFrom: string[] | null;
+      allowed: boolean;
+      bindingId: string | null;
+      senderPolicy: string;
+      /** @enum {string} */
+      verdict:
+        | "ALLOWED_BY_BINDING"
+        | "ALLOWED_BY_ALLOW_FROM"
+        | "ALLOWED_BY_POLICY"
+        | "REJECTED_NOT_ALLOWED";
+    };
+    LoginResource: {
+      /**
+       * Format: date-time
+       * @description When this login flow expires. Past that, stop polling and start a new one
+       */
+      expiresAt: string;
+      /** Format: uuid */
+      id: string;
+      /** @description The text to encode and render as a QR code by the client — not an image address and not a data URI. When a code expires this flow issues another and keeps waiting, so each poll may return a new string */
+      qrcodeData: string;
+      /** @description Why it failed. Present only when status is error or expired */
+      reason: string;
+      /** @enum {string} */
+      status: "wait" | "scanned" | "confirmed" | "expired" | "error" | "need_verify_code";
+    };
+    CredentialFieldResource: {
+      help: string;
+      key: string;
+      label: string;
+      required: boolean;
+      secret: boolean;
+    };
+    PlatformResource: {
+      credentialFields: components["schemas"]["CredentialFieldResource"][] | null;
+      name: string;
+      resident: boolean;
+      /** @enum {string} */
+      secretSource: "generated" | "supplied" | "none";
+      /** @enum {string} */
+      setupChallenge: "none" | "webhook" | "scan";
+      /** @enum {string} */
+      setupMethod: "credentials" | "scan";
+      /** @description The webhook path template; {channel} is replaced with the channel id */
+      webhookPath: string;
+      /** @description The full webhook address template. Null when the deployment declares no public entry point */
+      webhookUrlTemplate: string | null;
+    };
+    PlatformListResponseBody: {
+      platforms: components["schemas"]["PlatformResource"][] | null;
+    };
+    VerifyCodeRequestBody: {
+      code: string;
+    };
+    SkillResource: {
+      /**
+       * @description True when the assistant wrote this skill during a conversation rather than a person
+       *     writing it here.
+       *
+       *     Which conversation is deliberately not returned: skills are shared across the project
+       *     while conversations belong to one person, so naming one would tell everybody in the
+       *     project that a particular colleague had it.
+       */
+      authoredByAssistant: boolean;
+      /** @description Why the assistant would open this skill. It sits in every request, so it is the one field worth writing carefully. */
+      description: string;
+      enabled: boolean;
+      /** @description Path to contents, `SKILL.md` among them. Only returned by `get-skill`; the list leaves it out. */
+      files?: {
+        [key: string]: string;
+      } | null;
+      name: string;
+      /**
+       * @description `builtin` — provided by the platform and read-only here.
+       *     `project` — written for this project and editable by anyone in it.
+       * @enum {string}
+       */
+      origin: "builtin" | "project";
+      shortDescription: string | null;
+      /**
+       * Format: date-time
+       * @description Null for built-in skills, which have no edit history here.
+       */
+      updatedAt: string | null;
+    };
+    SkillListResponseBody: {
+      skills: components["schemas"]["SkillResource"][];
+    };
+    SkillRequestBody: {
+      /** @description Why the assistant would open this skill. It sits in every request; write it as the answer to "when do I need this", not "what does it contain". */
+      description: string;
+      /** @default true */
+      enabled?: boolean;
+      /**
+       * @description Path to contents. `SKILL.md` is required; anything else it references goes alongside it.
+       *
+       *     Paths are relative to the skill and cannot leave it. At most 32 files, 256 KiB each and
+       *     1 MiB in total.
+       */
+      files: {
+        [key: string]: string;
+      };
+      /** @description Also how the assistant refers to it, so renaming is deleting and writing again. */
+      name: string;
+      shortDescription?: string;
+    };
+    SkillEnabledRequestBody: {
+      enabled: boolean;
+    };
+    ThreadSummaryResource: {
+      /** @enum {string} */
+      approvalMode: "guardian" | "manual" | "yolo";
+      archived: boolean;
+      /** Format: date-time */
+      createdAt: string;
+      /** @description The folder this conversation is filed under, or null when it is in none */
+      folderId: string | null;
+      id: string;
+      model: string;
+      title: string | null;
+      unread: boolean;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    ThreadListResponseBody: {
+      /** @description Pass this back as `cursor` for the next page. Null means this was the last one — it is only set when there is genuinely more, so an empty final page never happens. */
+      nextCursor: string | null;
+      threads: components["schemas"]["ThreadSummaryResource"][] | null;
+    };
+    CreateThreadRequestBody: {
+      /**
+       * @description Absent uses the platform's default approval mode
+       * @enum {string}
+       */
+      approvalMode?: "guardian" | "manual" | "yolo";
+    };
+    ContextResource: {
+      /** Format: int64 */
+      compactAt: number | null;
+      /**
+       * @description What kinds of input the model behind this conversation accepts, as modality names: text, image.
+       *
+       *     This governs images and nothing else. Text and binary attachments reach every model: a small text file is placed inline, a large one is read on demand, and a binary is downloaded onto a cloud instance — none of which asks the model to see a picture. So this decides whether pasting a screenshot does anything, not whether the attach control exists. Hiding file upload on a text-only model takes away something that would have worked.
+       *
+       *     An empty list is not a claim that the model reads nothing: it means this deployment has not stated the modalities, or the conversation names a model that has since been retired. Treat empty as unknown and keep the control, because hiding one for a reason nobody can see is worse than a refusal that says why.
+       */
+      inputModalities: string[];
+      model: string;
+      /** Format: int64 */
+      used: number | null;
+      /** Format: int64 */
+      warnAt: number;
+      /** Format: int64 */
+      window: number | null;
+    };
+    EarlierResource: {
+      /** Format: int64 */
+      before: number;
+      foldedAbove: boolean;
+    };
+    AttachmentResource: {
+      /** Format: int64 */
+      byteSize: number;
+      filename: string;
+      /**
+       * Format: int64
+       * @description Null unless kind is image. Width and height are here so a client can hold the space before the image itself has loaded.
+       */
+      height: number | null;
+      id: string;
+      /**
+       * @description What this attachment is. A client renders an image in place and everything else as a file to download.
+       * @enum {string}
+       */
+      kind: "image" | "text" | "binary";
+      /**
+       * Format: int64
+       * @description Null unless kind is image.
+       */
+      width: number | null;
+    };
+    ItemResource: {
+      /** @enum {string|null} */
+      approval?: "approved" | "declined" | "auto_approved" | "unreviewed" | null;
+      approvalReason?: string | null;
+      arguments?: string;
+      attachments?: components["schemas"]["AttachmentResource"][] | null;
+      /**
+       * @description The context blocks the client attached to this message.
+       *
+       *     **Not part of what the operator wrote** — `text` is. Render the message from `text` and
+       *     leave these out of the bubble; they are here so a client that did not send them, or one
+       *     that reloaded, can still read what the assistant was given.
+       *
+       *     The actions declared alongside them are not returned: they are re-declared as they
+       *     change and would make every fetch of the conversation carry them again.
+       */
+      clientContext?: components["schemas"]["ClientContextPart"][] | null;
+      /** Format: date-time */
+      createdAt: string;
+      detail?: string | null;
+      presentation?: components["schemas"]["PresentationResource"] | null;
+      /** Format: int64 */
+      durationMs?: number | null;
+      id: string;
+      /** @description The model that produced this entry. Null for messages the user sent */
+      model: string | null;
+      namespace?: string | null;
+      /** Format: int64 */
+      ordinal: number;
+      reverted: boolean;
+      /** @enum {string} */
+      status: "pending" | "in_progress" | "completed" | "failed" | "declined" | "interrupted";
+      target?: string | null;
+      /**
+       * @description The content of this entry, in the order it was written. A message that is only text is a
+       *     single part, which is most of them.
+       *
+       *     An attachment belongs where it was written, so render these in order rather than putting
+       *     them all at the end.
+       */
+      parts?: components["schemas"]["PartResource"][] | null;
+      tool?: string | null;
+      /**
+       * @description Determines which fields this entry carries
+       * @enum {string}
+       */
+      type:
+        | "user_message"
+        | "agent_message"
+        | "reasoning"
+        | "dynamic_tool_call"
+        | "context_compaction"
+        | "token_budget_reminder"
+        | "turn_failure";
+    };
+    /**
+     * @description Structured detail produced by a tool call, in addition to the single-line `detail`. Null
+     *     when the call produced none.
+     *
+     *     `kind` determines which of the remaining fields is populated.
+     */
+    PresentationResource: {
+      fileDiff?: components["schemas"]["FileDiffResource"] | null;
+      /**
+       * @description Determines which of the remaining fields is populated
+       * @enum {string}
+       */
+      kind: "file_diff";
+    };
+    /**
+     * @description The change a tool call applied to a single file.
+     *
+     *     Populated once the call has completed successfully. It is absent while the call is pending
+     *     or awaiting approval, as the file's prior contents are read during execution. To preview an
+     *     edit awaiting approval, derive it from the call's `old_string` and `new_string` arguments.
+     */
+    FileDiffResource: {
+      /**
+       * Format: int64
+       * @description Lines added. Complete even when `unified` is null
+       */
+      added: number;
+      /** @description Absolute path of the file on the instance */
+      path: string;
+      /**
+       * Format: int64
+       * @description Lines removed. Complete even when `unified` is null
+       */
+      removed: number;
+      /**
+       * @description What the call did to the file
+       * @enum {string}
+       */
+      status: "added" | "modified" | "deleted";
+      /**
+       * @description The change as a unified diff with three lines of context. A file created by the call is
+       *     diffed against `/dev/null`.
+       *
+       *     Null when the change exceeds the service's size limit. The diff is omitted in full
+       *     rather than truncated; `added` and `removed` remain complete.
+       */
+      unified?: string | null;
+    };
+    StreamResource: {
+      path: string;
+      ticket: string;
+    };
+    TurnResource: {
+      /** @enum {string} */
+      approvalMode: "guardian" | "manual" | "yolo";
+    };
+    Choice: {
+      description: string;
+      label: string;
+    };
+    Question: {
+      choices: components["schemas"]["Choice"][] | null;
+      header: string;
+      id: string;
+      question: string;
+    };
+    WaitResource: {
+      /** Format: int64 */
+      autoResolutionMs?: number;
+      batchId?: string;
+      itemId?: string;
+      itemIds?: string[] | null;
+      /** @enum {string} */
+      kind: "tool_approval" | "user_input";
+      questions?: components["schemas"]["Question"][] | null;
+      turnId: string;
+    };
+    DocumentResource: {
+      context: components["schemas"]["ContextResource"];
+      cursor: string | null;
+      earlier: components["schemas"]["EarlierResource"] | null;
+      items: components["schemas"]["ItemResource"][] | null;
+      status: string;
+      stream: components["schemas"]["StreamResource"] | null;
+      turn: components["schemas"]["TurnResource"] | null;
+      /** @description The assistant's checklist for the work in this conversation, in the order it intends to do it. Empty when it has not written one — short tasks do not get a list. It is rewritten in full each time, so what is here is the current state. */
+      todos?: components["schemas"]["TodoResource"][];
+      turnId: string | null;
+      wait: components["schemas"]["WaitResource"] | null;
+    };
+    UpdateThreadRequestBody: {
+      /** @enum {string} */
+      approvalMode?: "guardian" | "manual" | "yolo";
+      archived?: boolean;
+      /**
+       * @description File this conversation into a folder, or `null` to take it out of the one it is in. Omit the field to leave it where it is.
+       *
+       *     Filing does not move the conversation in the list. The order answers "which conversation has something new in it", and putting one away is not that.
+       */
+      folderId?: string | null;
+      /**
+       * @description Rename this conversation.
+       *
+       *     A conversation names itself: the first message gives it a working title, and the assistant replaces that with a better one once it has answered. Setting this stops both — a name somebody chose is never overwritten by one that was generated.
+       *
+       *     Renaming does not move the conversation in the list. The order answers "which conversation has something new in it", and editing a title is not that.
+       */
+      title?: string;
+    };
+    DecideRequestBody: {
+      approved: boolean;
+      reason?: string;
+    };
+    EarlierResponseBody: {
+      earlier: components["schemas"]["EarlierResource"];
+      items: components["schemas"]["ItemResource"][] | null;
+    };
+    SendMessageRequestBody: {
+      client?: components["schemas"]["ClientContextRequest"];
+      /**
+       * @description The message, in the order it was written. A message with nothing but text is a single
+       *     text part; that is the ordinary case and nothing else is required.
+       */
+      parts: components["schemas"]["MessagePart"][];
+    };
+    MemoryListResponseBody: {
+      items: components["schemas"]["MemoryResource"][];
+    };
+    MemoryResource: {
+      /** @description The fact itself */
+      body: string;
+      /** Format: date-time */
+      createdAt: string;
+      id: string;
+      /** @description The name the assistant gave this fact; it overwrites or deletes its own entries by that name */
+      name: string;
+      /** @description Which conversation the assistant learned it in. That conversation may since have been deleted */
+      sourceThreadId?: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    /**
+     * @description One piece of a message. `type` says which of the fields below carries it:
+     *
+     *     - `text` — the words, in `text`
+     *     - `file` — an attachment uploaded earlier, by id in `attachmentId`
+     *     - `data-<something>` — context from the client, in `data`. The name after `data-` is yours;
+     *       it is shown to the assistant so it can tell one kind of block from another.
+     *
+     *     Order matters: an attachment belongs where it was written, not at the end.
+     */
+    MessagePart: {
+      /** @description For `file` parts. The attachment must have been uploaded and not yet bound to another message. */
+      attachmentId?: string | null;
+      /** @description For `data-*` parts. Any object; its keys reach the assistant as they are. */
+      data?: {
+        [key: string]: unknown;
+      } | null;
+      /** @description For `text` parts. */
+      text?: string | null;
+      type: string;
+    };
+    /**
+     * @description Which client this is and what it can do, so the assistant can ask it to do those things
+     *     while it answers. What the operator is looking at travels as `data-*` parts on the message.
+     *
+     *     Send `actions` only when they differ from the last message on this conversation. Sending the
+     *     block without `actions` keeps whatever was declared before.
+     */
+    ClientContextRequest: {
+      /**
+       * @description The actions on offer right now.
+       *
+       *     Omit it when nothing changed since the last message. Send `[]` to say there is nothing
+       *     on offer — those are different: a client that moves off the page it was attached to has
+       *     to be able to say so, or the assistant keeps calling actions that no longer make sense.
+       */
+      actions?: components["schemas"]["ClientActionRequest"][] | null;
+      /** @description Identifies this client while it stays open. Any stable string; one per tab or process. */
+      clientId: string;
+      /** @description How the client calls itself, for example "Leaflow console (web)". */
+      label?: string;
+    };
+    /** @description A `data-*` part as it was sent. */
+    ClientContextPart: {
+      data: {
+        [key: string]: unknown;
+      };
+      type: string;
+    };
+    /** @description The shape of a tool in the OpenAI Chat Completions API, plus `readOnly` and `timeoutMs`. */
+    ClientActionRequest: {
+      function: components["schemas"]["ClientFunctionRequest"];
+      /** @description True when the action changes nothing outside the client. Anything else goes through this conversation's approval before it runs. */
+      readOnly: boolean;
+      /**
+       * Format: int64
+       * @description How long the assistant should wait for this action. Omit for the default; longer values are capped.
+       */
+      timeoutMs?: number;
+      /**
+       * @description Only functions are supported.
+       * @default function
+       * @enum {string}
+       */
+      type?: "function";
+    };
+    /** @description The function object from the OpenAI tools format. */
+    ClientFunctionRequest: {
+      /** @description What the action does, written for the model. An action without one can only be guessed at from its name. The 1024 ceiling is OpenAI's own limit on `tools[].function.description`, not a number chosen here: over it the upstream call fails with `string_above_max_length`, and refusing at submission is the clearer of the two places to refuse. It was 500, which ran out at about six enumerated entries — an action that must list what it accepts had nowhere to put the list. */
+      description: string;
+      /** @description The MCP and Anthropic spelling of `parameters`. Give one or the other, not both. */
+      inputSchema?: {
+        [key: string]: unknown;
+      } | null;
+      name: string;
+      /** @description JSON Schema for the arguments. Omit for an action that takes none. */
+      parameters?: {
+        [key: string]: unknown;
+      } | null;
+    };
+    DynamicCallResultRequestBody: {
+      /** @description The same value sent with the message. A result from a different client is refused. */
+      clientId: string;
+      /** @description Why it failed, when `ok` is false. It reaches the assistant, so write it for a reader who cannot see the screen. */
+      error?: string;
+      /** @description Pass back when there is more to read. The assistant will call again with it. */
+      nextCursor?: string;
+      ok: boolean;
+      /** @description What the action produced. At most 64 KiB; use `nextCursor` for anything larger. */
+      output?: string;
+    };
+    TodoResource: {
+      /** @description The same step phrased as happening now — "Installing nginx". Show this one while the item is in progress. */
+      activeForm: string;
+      /** @description The step as an instruction — "Install nginx". */
+      content: string;
+      /**
+       * @description Where this step stands. At most one item is in_progress at any time.
+       * @enum {string}
+       */
+      status: "pending" | "in_progress" | "completed";
+    };
+    TurnIDResponseBody: {
+      /** @description True when the assistant was already busy and this message was put in line instead of starting a turn. It is read at the next step of the turn already running, so there is nothing further to do — and turnId is empty in this case. */
+      queued: boolean;
+      /**
+       * Format: int64
+       * @description How many messages were already waiting ahead of this one. Only meaningful when queued is true.
+       */
+      queuedAhead?: number;
+      /** @description The turn this message started. Empty when the message was queued instead. */
+      turnId: string;
+    };
+    AnswerRequestBody: {
+      /** @description A map from question id to the answer chosen */
+      answers: {
+        [key: string]: string;
+      };
+    };
+    RevertRequestBody: {
+      /**
+       * Format: int64
+       * @description The starting ordinal; that entry and everything after it is reverted
+       */
+      ordinal: number;
+    };
+    RevertedCountResponseBody: {
+      /** Format: int64 */
+      reverted: number;
+    };
+    FolderResource: {
+      /** Format: date-time */
+      createdAt: string;
+      id: string;
+      name: string;
+      /**
+       * Format: int64
+       * @description How many conversations are filed here and would show up in the default list. Archived and deleted ones are not counted, so this is exactly what `GET /api/v1/threads?folder=<id>` returns.
+       */
+      threadCount: number;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    FolderListResponseBody: {
+      folders: components["schemas"]["FolderResource"][] | null;
+    };
+    CreateFolderRequestBody: {
+      name: string;
+    };
+    UpdateFolderRequestBody: {
+      name: string;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "upload-attachment": {
-        parameters: {
-            query?: {
-                /** @description The name to show and to give the assistant. Images do not need one; anything else does, because the name is most of what says what the file is. Falls back to a generated name. */
-                filename?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "*/*": string;
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UploadedResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  "upload-attachment": {
+    parameters: {
+      query?: {
+        /** @description The name to show and to give the assistant. Images do not need one; anything else does, because the name is most of what says what the file is. Falls back to a generated name. */
+        filename?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "download-attachment": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                attachment: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    /** @description Private and long-lived: these bytes are addressed by an id that is never reused, so they never change; and they belong to one person, so they must not enter any shared cache. */
-                    "Cache-Control"?: string;
-                    /** @description Present on everything that is not an image, carrying the original filename. Absent on images, which are meant to be rendered in place. */
-                    "Content-Disposition"?: string;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": string;
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "*/*": string;
+      };
     };
-    "list-bindings": {
-        parameters: {
-            query?: {
-                /** @description How many entries this page returns at most */
-                limit?: number;
-                /** @description How many to skip. To page deeper, use the cursor-paged operation instead */
-                offset?: number;
-                platform?: string;
-                channelId?: string;
-                /** @description Return only bindings that are active */
-                active?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageBindingResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["UploadedResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-binding": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                binding: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BindingResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "download-attachment": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        attachment: string;
+      };
+      cookie?: never;
     };
-    "delete-binding": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                binding: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          /** @description Private and long-lived: these bytes are addressed by an id that is never reused, so they never change; and they belong to one person, so they must not enter any shared cache. */
+          "Cache-Control"?: string;
+          /** @description Present on everything that is not an image, carrying the original filename. Absent on images, which are meant to be rendered in place. */
+          "Content-Disposition"?: string;
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "*/*": string;
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "list-channels": {
-        parameters: {
-            query?: {
-                /** @description How many entries this page returns at most */
-                limit?: number;
-                /** @description How many to skip. To page deeper, use the cursor-paged operation instead */
-                offset?: number;
-                platform?: string;
-                /** @description Return only channels that are enabled */
-                active?: boolean;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageChannelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "list-bindings": {
+    parameters: {
+      query?: {
+        /** @description How many entries this page returns at most */
+        limit?: number;
+        /** @description How many to skip. To page deeper, use the cursor-paged operation instead */
+        offset?: number;
+        platform?: string;
+        channelId?: string;
+        /** @description Return only bindings that are active */
+        active?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "create-channel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateChannelRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageBindingResource"];
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChannelWithSecretResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-channel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                channel: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChannelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "get-binding": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        binding: string;
+      };
+      cookie?: never;
     };
-    "delete-channel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                channel: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["BindingResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "update-channel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                channel: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateChannelRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChannelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "delete-binding": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        binding: string;
+      };
+      cookie?: never;
     };
-    "create-binding-code": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                channel: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BindingCodeResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "list-channel-rejections": {
-        parameters: {
-            query?: {
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                channel: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RejectionListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "list-channels": {
+    parameters: {
+      query?: {
+        /** @description How many entries this page returns at most */
+        limit?: number;
+        /** @description How many to skip. To page deeper, use the cursor-paged operation instead */
+        offset?: number;
+        platform?: string;
+        /** @description Return only channels that are enabled */
+        active?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "rotate-channel-secret": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                channel: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["RotateSecretRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageChannelResource"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WebhookSecretResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "check-sender": {
-        parameters: {
-            query: {
-                /** @description That person's id on the platform, the same value that appears in bindings and rejections */
-                peerId: string;
-                /** @description Only platforms with usernames, such as Telegram, can supply this. Without the @. Leave it empty to mean there is no username */
-                username?: string;
-            };
-            header?: never;
-            path: {
-                channel: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SenderCheckResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "create-channel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "begin-weixin-login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                channel: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LoginResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateChannelRequestBody"];
+      };
     };
-    "list-platforms": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlatformListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["ChannelWithSecretResponseBody"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-weixin-login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                login: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LoginResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "get-channel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        channel: string;
+      };
+      cookie?: never;
     };
-    "submit-weixin-verify-code": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                login: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["VerifyCodeRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["ChannelResource"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LoginResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "submit-dynamic-call-result": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description The id of the tool call entry in the conversation. */
-                call: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DynamicCallResultRequestBody"];
-            };
-        };
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "delete-channel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        channel: string;
+      };
+      cookie?: never;
     };
-    "list-folders": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FolderListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "create-folder": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateFolderRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FolderResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "update-channel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        channel: string;
+      };
+      cookie?: never;
     };
-    "get-folder": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                folder: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FolderResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateChannelRequestBody"];
+      };
     };
-    "delete-folder": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                folder: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["ChannelResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "update-folder": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                folder: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateFolderRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FolderResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "create-binding-code": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        channel: string;
+      };
+      cookie?: never;
     };
-    "list-memories": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MemoryListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["BindingCodeResponseBody"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "delete-memory": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                memory: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "list-channel-rejections": {
+    parameters: {
+      query?: {
+        limit?: number;
+      };
+      header?: never;
+      path: {
+        channel: string;
+      };
+      cookie?: never;
     };
-    "list-skills": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SkillListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["RejectionListResponseBody"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "put-skill": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SkillRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SkillResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "rotate-channel-secret": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        channel: string;
+      };
+      cookie?: never;
     };
-    "get-skill": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description The skill's name, as `list-skills` returned it. */
-                skill: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SkillResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["RotateSecretRequestBody"];
+      };
     };
-    "delete-skill": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                skill: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["WebhookSecretResponseBody"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "set-skill-enabled": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                skill: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SkillEnabledRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SkillResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "check-sender": {
+    parameters: {
+      query: {
+        /** @description That person's id on the platform, the same value that appears in bindings and rejections */
+        peerId: string;
+        /** @description Only platforms with usernames, such as Telegram, can supply this. Without the @. Leave it empty to mean there is no username */
+        username?: string;
+      };
+      header?: never;
+      path: {
+        channel: string;
+      };
+      cookie?: never;
     };
-    "list-threads": {
-        parameters: {
-            query?: {
-                /** @description Search titles, case-insensitively. Leave it empty for the most recent conversations */
-                q?: string;
-                /** @description When true, returns **only** archived conversations; otherwise only unarchived ones */
-                archived?: boolean;
-                /** @description Narrow the list to one folder. Omitting it returns conversations from every folder and from none; a folder id returns that folder's; the empty value (`?folder=`) returns the ones that are in no folder at all. Empty is not the same as omitted, and a sidebar needs both: "chats" is exactly the ungrouped set, and asking for everything would let filed conversations crowd it out of the limit. */
-                folder?: string;
-                /**
-                 * @description Where the previous page ended, from its `nextCursor`. Omit it for the first page.
-                 *
-                 *     It is a position, not an offset, and that matters here: this list is ordered by recent activity, and the activity happens while it is being read. An offset would hand back a conversation twice when one moves up in between, and skip one when it moves down — silently, because a conversation that was skipped simply is not there.
-                 *
-                 *     Pass the same `q`, `archived` and `folder` along with it. A cursor carries a position, not the question that produced it, so changing the filters mid-scroll walks a range nobody asked for.
-                 */
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ThreadListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["SenderCheckResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "create-thread": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateThreadRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ThreadSummaryResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "begin-weixin-login": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        channel: string;
+      };
+      cookie?: never;
     };
-    "get-thread": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                thread: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DocumentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["LoginResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "delete-thread": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                thread: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "list-platforms": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "update-thread": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                thread: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateThreadRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["PlatformListResponseBody"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ThreadSummaryResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "decide-approval": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                thread: string;
-                batch: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DecideRequestBody"];
-            };
-        };
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "get-weixin-login": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        login: string;
+      };
+      cookie?: never;
     };
-    "list-earlier-items": {
-        parameters: {
-            query: {
-                /** @description From the document's earlier.before; returns entries before this ordinal */
-                before: number;
-            };
-            header?: never;
-            path: {
-                thread: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EarlierResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["LoginResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "interrupt-thread": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                thread: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "submit-weixin-verify-code": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        login: string;
+      };
+      cookie?: never;
     };
-    "send-message": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                thread: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SendMessageRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Accepted */
-            202: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TurnIDResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VerifyCodeRequestBody"];
+      };
     };
-    "answer-question": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                thread: string;
-                item: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AnswerRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["LoginResource"];
         };
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "mark-thread-read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                thread: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "submit-dynamic-call-result": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description The id of the tool call entry in the conversation. */
+        call: string;
+      };
+      cookie?: never;
     };
-    "revert-thread": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                thread: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RevertRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RevertedCountResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DynamicCallResultRequestBody"];
+      };
     };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-folders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FolderListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-folder": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateFolderRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FolderResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-folder": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        folder: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FolderResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-folder": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        folder: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "update-folder": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        folder: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateFolderRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FolderResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-memories": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MemoryListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-memory": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        memory: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-skills": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SkillListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-skill": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SkillRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SkillResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-skill": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description The skill's name, as `list-skills` returned it. */
+        skill: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SkillResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-skill": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        skill: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "set-skill-enabled": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        skill: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SkillEnabledRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SkillResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-threads": {
+    parameters: {
+      query?: {
+        /** @description Search titles, case-insensitively. Leave it empty for the most recent conversations */
+        q?: string;
+        /** @description When true, returns **only** archived conversations; otherwise only unarchived ones */
+        archived?: boolean;
+        /** @description Narrow the list to one folder. Omitting it returns conversations from every folder and from none; a folder id returns that folder's; the empty value (`?folder=`) returns the ones that are in no folder at all. Empty is not the same as omitted, and a sidebar needs both: "chats" is exactly the ungrouped set, and asking for everything would let filed conversations crowd it out of the limit. */
+        folder?: string;
+        /**
+         * @description Where the previous page ended, from its `nextCursor`. Omit it for the first page.
+         *
+         *     It is a position, not an offset, and that matters here: this list is ordered by recent activity, and the activity happens while it is being read. An offset would hand back a conversation twice when one moves up in between, and skip one when it moves down — silently, because a conversation that was skipped simply is not there.
+         *
+         *     Pass the same `q`, `archived` and `folder` along with it. A cursor carries a position, not the question that produced it, so changing the filters mid-scroll walks a range nobody asked for.
+         */
+        cursor?: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ThreadListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-thread": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateThreadRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ThreadSummaryResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-thread": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DocumentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-thread": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "update-thread": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateThreadRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ThreadSummaryResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "decide-approval": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread: string;
+        batch: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DecideRequestBody"];
+      };
+    };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-earlier-items": {
+    parameters: {
+      query: {
+        /** @description From the document's earlier.before; returns entries before this ordinal */
+        before: number;
+      };
+      header?: never;
+      path: {
+        thread: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EarlierResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "interrupt-thread": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "send-message": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SendMessageRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Accepted */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TurnIDResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "answer-question": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread: string;
+        item: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AnswerRequestBody"];
+      };
+    };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "mark-thread-read": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "revert-thread": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RevertRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RevertedCountResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
 }

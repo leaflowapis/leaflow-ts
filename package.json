@@ -52,19 +52,21 @@
     "generate": "node scripts/generate.mjs",
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "format:check": "prettier --check gen scripts"
   },
   "devDependencies": {
-    "openapi-typescript": "7.13.0",
-    "typescript": "^5.9.3",
     "openapi-fetch": "^0.17.0",
+    "openapi-typescript": "7.13.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
     "yaml": "^2.8.1"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "openapi-fetch": ">=0.14"
+    "openapi-fetch": "^0.17.0"
   },
   "peerDependenciesMeta": {
     "openapi-fetch": {

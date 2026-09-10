@@ -48,14 +48,21 @@ jobs:
           cache: npm
       - run: npm ci
 
+      # 先 add -A 再比对暂存区：`git diff` 只看已跟踪的文件，而新增一个服务时它的
+      # client.ts 是未跟踪的，漏提交同样是绿的。
       - name: 生成物是最新的
         run: |
           npm run generate
-          if ! git diff --quiet; then
+          git add -A
+          if ! git diff --cached --quiet; then
             echo "::error::契约改了但生成物没跟着更新。本地跑一次 npm run generate 再提交。" >&2
-            git --no-pager diff --stat >&2
+            git --no-pager diff --cached --stat >&2
             exit 1
           fi
+
+      # 生成物的格式由 generate.mjs 末尾那次 prettier 保证，上一步已经覆盖到。这里查的是
+      # 手写的那部分：scripts/ 自己。
+      - run: npm run format:check
 
       - run: npm run typecheck
 
