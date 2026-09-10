@@ -2493,6 +2493,11 @@ export interface components {
             reservation_expires_at?: string | null;
             /** Format: date-time */
             created_at: string;
+            /**
+             * @description What was bought. Present on a single order and on every order in a list, so a list
+             *     can be rendered without a further request per row.
+             */
+            items?: components["schemas"]["OrderItem"][];
         };
         OrderList: {
             items: components["schemas"]["Order"][];
@@ -2654,6 +2659,16 @@ export interface components {
             order_id?: string;
             /** Format: uuid */
             price_id: string;
+            /**
+             * Format: uuid
+             * @description Which service this line belongs to.
+             */
+            product_id?: string;
+            /**
+             * Format: uuid
+             * @description Which plan was bought.
+             */
+            plan_id?: string;
             /**
              * @description What it was called when bought. It does not follow later catalogue renames and is
              *     not translated.
