@@ -2470,8 +2470,12 @@ export interface components {
       /** Format: int64 */
       billing_account_id?: number;
       currency: string;
-      /** @enum {string} */
-      type: "purchase" | "renew" | "change";
+      /**
+       * @description `adopt` brings a resource that already existed under billing. It charges nothing at
+       *     the time and starts billing from the moment agreed.
+       * @enum {string}
+       */
+      type: "purchase" | "renew" | "change" | "adopt";
       state: components["schemas"]["OrderState"];
       gross_amount?: components["schemas"]["Money"];
       discount_amount?: components["schemas"]["Money"];
