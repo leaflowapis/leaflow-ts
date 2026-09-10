@@ -11,7 +11,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** The services the platform sells */
+    /** List catalog products */
     get: operations["list-catalog-products"];
     put?: never;
     post?: never;
@@ -30,7 +30,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** What can be bought under one service */
+    /** List catalog plans */
     get: operations["list-catalog-plans"];
     put?: never;
     post?: never;
@@ -50,7 +50,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * The ways one plan can be bought
+     * List catalog prices
      * @description Public list prices only. An account holding a negotiated agreement may be charged less;
      *     it is never charged more.
      */
@@ -73,7 +73,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * The rates on a published price list
+     * List catalog rates
      * @description Only public price lists are readable here. A list written for a single agreement is not,
      *     and its identifier cannot be used to reach it.
      */
@@ -96,7 +96,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Estimate a purchase without signing in
+     * Estimate a basket
      * @description Uses public list prices. Nothing is reserved and nothing is recorded, so this may be
      *     called as often as required.
      *
@@ -120,11 +120,11 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** The billing accounts you own */
+    /** List billing accounts */
     get: operations["list-billing-accounts"];
     put?: never;
     /**
-     * Open a billing account
+     * Create billing account
      * @description The currency is chosen here and cannot be changed afterwards. Everything charged to the
      *     account — prices, orders, invoices, balance — is denominated in it.
      *
@@ -146,6 +146,7 @@ export interface paths {
       };
       cookie?: never;
     };
+    /** Get billing account */
     get: operations["get-billing-account"];
     put?: never;
     post?: never;
@@ -153,7 +154,7 @@ export interface paths {
     options?: never;
     head?: never;
     /**
-     * Change the account's details
+     * Update billing account
      * @description The legal name, address and tax identifier are copied onto each invoice when it is
      *     issued. Changing them here affects invoices issued afterwards, not those already sent.
      *
@@ -171,7 +172,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** What the account holds and what it can still spend */
+    /** Get account balance */
     get: operations["get-account-balance"];
     put?: never;
     post?: never;
@@ -188,7 +189,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** The projects your accounts pay for */
+    /** List paid projects */
     get: operations["list-paid-projects"];
     put?: never;
     post?: never;
@@ -208,12 +209,12 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Which account pays for a project
+     * Find project payer
      * @description Returns 404 when no account pays for it. No resources can be created until one does.
      */
     get: operations["find-project-payer"];
     /**
-     * Choose which account pays for a project
+     * Set project payer
      * @description Charges already recorded remain with the account that was paying when they occurred, and
      *     are still invoiced to it. Metered resources are settled up to the moment of the change.
      *
@@ -225,7 +226,7 @@ export interface paths {
     put: operations["set-project-payer"];
     post?: never;
     /**
-     * Stop paying for a project
+     * Unbind project payer
      * @description Permitted only when the project has nothing left to charge: no resources accruing
      *     charges, no subscriptions still running, no usage awaiting invoicing, and no unpaid
      *     invoice on the account.
@@ -253,7 +254,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Invoice a project's outstanding usage now
+     * Settle project usage
      * @description Metered usage is normally invoiced at the end of the month. This issues an invoice for
      *     everything charged to the project so far, to the account currently paying for it.
      *
@@ -274,10 +275,11 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** List top ups */
     get: operations["list-top-ups"];
     put?: never;
     /**
-     * Add funds to an account
+     * Create top up
      * @description Returns a checkout address. The balance increases when the payment provider confirms the
      *     payment, which may be after this call returns.
      *
@@ -300,7 +302,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** Whether a payment has completed */
+    /** Get top up */
     get: operations["get-top-up"];
     put?: never;
     post?: never;
@@ -317,6 +319,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** List payment methods */
     get: operations["list-payment-methods"];
     put?: never;
     post?: never;
@@ -336,7 +339,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Begin adding a payment method
+     * Create payment method setup
      * @description Returns what is needed to hand the browser over to the payment provider's own card
      *     form. Nothing is charged, and the method appears in the list once the provider
      *     confirms it.
@@ -360,7 +363,7 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Choose which method is used automatically */
+    /** Set default payment method */
     put: operations["set-default-payment-method"];
     post?: never;
     delete?: never;
@@ -382,7 +385,7 @@ export interface paths {
     put?: never;
     post?: never;
     /**
-     * Remove a payment method
+     * Delete payment method
      * @description Refused when it is the only method on an account that has resources billed by the hour,
      *     as there would be nothing left to charge when the balance runs out.
      */
@@ -404,7 +407,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Pay an outstanding invoice
+     * Pay invoice
      * @description Applies the account balance first, then charges the remainder to a payment method. Give
      *     `payment_method_id` to choose one, or omit it to use the default.
      *
@@ -430,7 +433,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Pay several outstanding invoices and orders at once
+     * Pay together
      * @description All of them or none. Nothing is settled unless everything named here can be, so a
      *     partial result is not a state this can leave behind.
      *
@@ -464,7 +467,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Complete payment for an order
+     * Pay order
      * @description Use this to resume an order whose checkout was interrupted.
      *
      *     An order reserves both funds and stock for a limited time. Once that reservation expires
@@ -485,6 +488,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** List invoices */
     get: operations["list-invoices"];
     put?: never;
     post?: never;
@@ -503,6 +507,7 @@ export interface paths {
       };
       cookie?: never;
     };
+    /** Get invoice */
     get: operations["get-invoice"];
     put?: never;
     post?: never;
@@ -521,7 +526,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** What an invoice is made up of */
+    /** List invoice items */
     get: operations["list-invoice-items"];
     put?: never;
     post?: never;
@@ -541,7 +546,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * What refunding this invoice would give back
+     * Get invoice refund quote
      * @description Show this before asking for a refund. Nothing is recorded and nothing is reserved; the
      *     answer follows from what has been paid and what has already been returned, so it may
      *     be read as often as required.
@@ -565,7 +570,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Every movement of funds on the account */
+    /** List transactions */
     get: operations["list-transactions"];
     put?: never;
     post?: never;
@@ -583,7 +588,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Credit and vouchers held on the account
+     * List credit grants
      * @description Each grant shows what remains and what it may be used for. Credit is spent before cash
      *     and cannot be withdrawn.
      */
@@ -604,7 +609,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Where each amount went
+     * List allocations
      * @description Give `source_id` to follow one top-up or grant through to everything it paid for. Give
      *     `target_id` to see which sources paid for one line of an invoice.
      *
@@ -627,10 +632,11 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** List refunds */
     get: operations["list-refunds"];
     put?: never;
     /**
-     * Ask for a refund
+     * Request refund
      * @description Refunding ends the subscription and reclaims whatever it provisioned. That is the
      *     difference from letting a period lapse: a lapsed period keeps the machine around
      *     for a while so that topping up brings it back, whereas a refund returns the money
@@ -657,7 +663,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Metered charges, line by line
+     * List usage charges
      * @description Includes charges that have not been invoiced yet, which is how the current month's
      *     spending is seen before the invoice is issued.
      */
@@ -677,6 +683,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** List subscriptions */
     get: operations["list-subscriptions"];
     put?: never;
     post?: never;
@@ -693,7 +700,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** What has been bought, and when each renews */
+    /** List subscription items */
     get: operations["list-subscription-items"];
     put?: never;
     post?: never;
@@ -715,7 +722,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Renew now rather than waiting for the renewal date
+     * Renew subscription item
      * @description Extends the paid period from its current end, not from today, so renewing early does not
      *     shorten what has already been paid for.
      *
@@ -740,7 +747,7 @@ export interface paths {
     };
     get?: never;
     /**
-     * Turn automatic renewal on or off
+     * Set auto renew
      * @description When on, the account balance is charged at the renewal date. Turning it off lets the
      *     current period run to its end and stops the resource afterwards.
      */
@@ -762,7 +769,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Check what a code would give you
+     * Preview code
      * @description Nothing is recorded and the code is not consumed. Use it to show the customer the effect
      *     before they commit.
      */
@@ -783,7 +790,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Redeem a code
+     * Redeem code
      * @description A voucher code adds credit to the account. A discount code records the entitlement, which
      *     is then applied to the next qualifying purchase.
      *
@@ -807,7 +814,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Who pays for this project, and how much is left
+     * Get project billing account
      * @description A deliberately narrow view: the payer's identity, its currency, and how much can still
      *     be spent. Cards, invoices and transaction history are not included; they belong to the
      *     account owner and are reached through `/account/v1/`.
@@ -834,7 +841,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * What this project spent, grouped
+     * List project spend
      * @description Covers a closed time range. Both bounds are required: a total without a stated period
      *     cannot be reconciled against an invoice.
      *
@@ -859,7 +866,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Metered charges for this project, line by line
+     * List project usage charges
      * @description The individual charges behind the figures in `/spend`. Amounts here sum to the totals
      *     reported there over the same period.
      */
@@ -881,7 +888,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** Which services this project has enabled */
+    /** List project subscriptions */
     get: operations["list-project-subscriptions"];
     put?: never;
     post?: never;
@@ -900,7 +907,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** What this project has bought, and when each renews */
+    /** List project subscription items */
     get: operations["list-project-subscription-items"];
     put?: never;
     post?: never;
@@ -922,7 +929,7 @@ export interface paths {
     };
     get?: never;
     /**
-     * Turn automatic renewal on or off
+     * Set project auto renew
      * @description Automatic renewal draws on the paying account's balance, which a project member may
      *     commit. Paying by card requires the account owner and is done from the billing centre.
      */
@@ -944,7 +951,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Purchases made for this project
+     * List project orders
      * @description An order awaiting payment shows what is outstanding. Paying it is done from the billing
      *     centre by the account owner.
      */
@@ -967,6 +974,7 @@ export interface paths {
       };
       cookie?: never;
     };
+    /** Get project order */
     get: operations["get-project-order"];
     put?: never;
     post?: never;
@@ -986,7 +994,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * What is accruing charges right now
+     * List project active resources
      * @description A resource that is running but does not appear here is not being charged for.
      */
     get: operations["list-project-active-resources"];
@@ -1010,7 +1018,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Price a purchase before making it
+     * Quote for a project
      * @description Priced in the paying account's currency, and at any rate negotiated for that account.
      *     Nothing is reserved and nothing is recorded, so this may be called as often as required.
      *
@@ -1035,7 +1043,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Included and purchased quantities, and what is left
+     * List allowances
      * @description A quantity rather than an amount of money: bytes, seconds or tokens that are used before
      *     anything is charged for.
      *
@@ -1067,7 +1075,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * What has been used from one quantity
+     * List allowance consumptions
      * @description Each entry names the charge it covered, so the granted amount, what has been used and
      *     what remains all reconcile.
      */
@@ -1088,7 +1096,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Purchases made against your accounts
+     * List orders
      * @description An order in `pending` still owes money; `amount_due` states how much and
      *     `reservation_expires_at` states how long it can still be paid.
      */
@@ -1110,6 +1118,7 @@ export interface paths {
       };
       cookie?: never;
     };
+    /** Get order */
     get: operations["get-order"];
     put?: never;
     post?: never;
@@ -1131,7 +1140,7 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Call off a plan change that has not taken effect yet
+     * Cancel scheduled change
      * @description Only for a change scheduled for the end of the period, and only while it is still
      *     pending. An immediate change has already happened by the time it is placed, and there is
      *     nothing to call off.
@@ -1156,7 +1165,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * What an order is made up of
+     * List order items
      * @description One entry per item bought, with the price charged and the period it covers.
      */
     get: operations["list-order-items"];
@@ -1178,7 +1187,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * What refunding this order would give back
+     * Get order refund quote
      * @description Show this before asking for a refund. Nothing is recorded and nothing is reserved; the
      *     answer follows from what has been paid and what has already been returned, so it may
      *     be read as often as required.
@@ -1208,7 +1217,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** What an order is made up of */
+    /** List project order items */
     get: operations["list-project-order-items"];
     put?: never;
     post?: never;
@@ -1228,7 +1237,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Quantities this project can draw on
+     * List project allowances
      * @description These belong to the paying account and are shared with every other project it pays for,
      *     so what is left here may be consumed elsewhere.
      */
@@ -1249,7 +1258,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * What your accounts can currently use
+     * List entitlements
      * @description Capabilities that come with what has been bought. A capability that is not held simply
      *     does not appear, so that "this does not exist" and "this has not been bought" cannot be
      *     confused.
@@ -1276,7 +1285,7 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * What this project can currently use
+     * List project entitlements
      * @description Includes capabilities bought for this project and those the paying account holds at
      *     account level.
      *
@@ -1394,7 +1403,7 @@ export interface components {
       allowances?: components["schemas"]["IncludedAllowance"][];
       /** @description Capabilities that buying this price makes available. */
       features?: components["schemas"]["IncludedFeature"][];
-      /** @description For prepaid prices */
+      /** @description For prepaid prices, how many periods one purchase covers. */
       term?: number;
       /** @enum {string} */
       period?: "none" | "day" | "month" | "year";
@@ -2086,7 +2095,7 @@ export interface components {
       /** @description Signed. Positive increases the balance, negative reduces it. */
       amount: components["schemas"]["Money"];
       currency: string;
-      /** @description Why */
+      /** @description Why the money moved, on a manual adjustment. */
       reason?: string;
       /** Format: uuid */
       invoice_id?: string | null;
@@ -2423,7 +2432,7 @@ export interface components {
     ActiveResource: {
       resource_id: string;
       product_key: string;
-      /** @description What it is */
+      /** @description What it is, as its own service names it. */
       resource_type?: string;
       meter_key: string;
       unit?: string;
@@ -2678,6 +2687,11 @@ export interface components {
        * @description Which service this line belongs to.
        */
       product_id?: string;
+      /**
+       * @description How that service is named, such as `compute`. Read from the catalogue rather than
+       *     recorded on the line, so it always matches the service it points at.
+       */
+      product_key?: string;
       /**
        * Format: uuid
        * @description Which plan was bought.
