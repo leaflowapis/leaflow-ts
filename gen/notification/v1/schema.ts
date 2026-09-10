@@ -625,13 +625,11 @@ export interface components {
         Error: {
             code?: string;
             message: string;
+            /**
+             * @description What a given `code` carries alongside the message. The keys depend on the code,
+             *     and a client that does not recognise one ignores it.
+             */
             meta?: {
-                /**
-                 * @description Present on every response whose `code` is `VALIDATION_FAILED`, and on no
-                 *     other response.
-                 */
-                violations?: components["schemas"]["Violation"][];
-            } & {
                 [key: string]: unknown;
             };
             /** Format: int64 */
@@ -1094,29 +1092,6 @@ export interface components {
         RealtimeAuthResource: {
             /** @description The authorization token for this subscription, passed back to the realtime server by the client library */
             auth: string;
-        };
-        /**
-         * @description A single mismatch between the request and the contract.
-         *
-         *     Use `field` to locate the input, `rule` to decide what to tell the user, and
-         *     `reason` only for diagnostics.
-         */
-        Violation: {
-            /**
-             * @description Dot-separated path to the field, such as `name` or
-             *     `schedule.0.start_time_seconds`.
-             */
-            field: string;
-            /**
-             * @description The JSON Schema keyword that failed, such as `minLength`, `minimum` or
-             *     `pattern`.
-             */
-            rule: string;
-            /**
-             * @description The validator's own wording, in English. Intended for diagnostics; do not
-             *     display it to end users.
-             */
-            reason?: string;
         };
     };
     responses: never;
