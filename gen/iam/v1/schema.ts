@@ -12,8 +12,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出全平台可授予的权限
-         * @description 各服务在启动时把自己那份目录注册进 IAM（和 AddFinalizer 同一段代码），所以这里是一份汇总，不只是 IAM 自己那几条。**IAM 不用它做判定**——判定在各服务自己那边，拿 Grant 配它自己那份目录算；这份汇总只是让界面画得出勾选框，它落后一个版本只会让界面上少几条可选项，不会让判定出错。一个还没启动过的服务，它的权限不在这里。
+         * List every permission the platform can grant
+         * @description Each service registers its own catalogue with IAM at start-up, so this is the platform-wide list rather than the permissions of IAM alone. **IAM does not decide anything with it** — each service decides using the caller's grant together with its own catalogue, and this list only serves to render the choices. A service that has never started does not appear here.
          */
         get: operations["list-permissions"];
         put?: never;
@@ -32,20 +32,20 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看一个项目
-         * @description 在项目里就看得到，不需要额外的读权限。
+         * Get a project
+         * @description Visible to any member; no further permission is required.
          */
         get: operations["get-project"];
         put?: never;
         post?: never;
         /**
-         * 删除项目
-         * @description 只有所有者能做，而且没有回头路：项目进入 DELETING，各服务开始清掉它下面的资源。项目行本身永远留着——查一个删掉的项目查得到，答案是它没了，而不是一个 404。
+         * Delete a project
+         * @description Only the owner can do this, and it cannot be undone. The project enters DELETING and each service begins removing the resources under it. The project itself remains readable afterwards, answering that it is gone rather than 404.
          */
         delete: operations["delete-project"];
         options?: never;
         head?: never;
-        /** 改项目的名称与描述 */
+        /** Update the name and description of a project */
         patch: operations["update-project"];
         trace?: never;
     };
@@ -57,8 +57,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看我在这个项目里的身份
-         * @description 只给事实，不给结论：这里没有 allowed，因为 IAM 不知道你要做的是哪个操作——哪个操作需要哪条权限那份目录属于各个服务，判断在它们那边。
+         * Get the caller's standing in this project
+         * @description Facts rather than a conclusion. There is no `allowed` field here, because each service holds the catalogue mapping its operations to permissions and decides on its own.
          */
         get: operations["get-project-membership"];
         put?: never;
@@ -77,14 +77,14 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出这个项目还在等的要约
-         * @description 在项目里就看得到，和成员列表同一条规则：谁被请了也是「这个项目有谁」的一部分。
+         * List the invitations this project is still waiting on
+         * @description Visible to any member, on the same rule as the member list. Who has been invited is part of who is in the project.
          */
         get: operations["list-project-invitations"];
         put?: never;
         /**
-         * 发出一份邀请
-         * @description 要约站 14 天。有上限是因为里面那些角色是按发出那一刻的项目校验的，一份活得比它所依据的安排还久的要约会授出现在没人打算授的权限。
+         * Send an invitation
+         * @description An invitation stands for 14 days. The roles it carries are validated against the project as it stood when the invitation was sent, so it expires rather than outliving the arrangement it rests on.
          */
         post: operations["issue-invitation"];
         delete?: never;
@@ -103,7 +103,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** 撤回一份还没被兑现的要约 */
+        /** Withdraw an invitation that has not been redeemed */
         delete: operations["revoke-invitation"];
         options?: never;
         head?: never;
@@ -141,7 +141,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出项目成员 */
+        /** List the members of a project */
         get: operations["list-members"];
         put?: never;
         post?: never;
@@ -162,8 +162,8 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * 移除成员，或者自己退出
-         * @description 移除别人要 iam:members.manage；退出只要求自己在这个项目里——任何人都可能被拉进一个项目，那么任何人就得能出去。所有者两条路都不行，先转移所有权。
+         * Remove a member, or leave the project
+         * @description Removing someone else requires `iam:members.manage`; leaving requires only membership of the project. The owner can do neither, and has to transfer ownership first.
          */
         delete: operations["remove-member"];
         options?: never;
@@ -180,8 +180,8 @@ export interface paths {
         };
         get?: never;
         /**
-         * 设置一个成员持有的角色
-         * @description 整体替换而不是增删：调用方拿到的就是一份完整清单，让它自己算差集只会让「我以为我取消了那个角色」这种事变得可能。所有者身上的 OWNER 不受影响。
+         * Set the roles a member holds
+         * @description The list is replaced in full rather than added to or removed from. The `OWNER` role of the owner is unaffected.
          */
         put: operations["set-member-roles"];
         post?: never;
@@ -200,8 +200,8 @@ export interface paths {
         };
         get?: never;
         /**
-         * 设置一个成员直挂的权限
-         * @description 整体替换基础策略上直挂的那些权限。直挂让「给某个人临时开一条」不必先造一个只有他一个人持有的角色，但它不会随角色调整而更新，所以它适合一次性的、说得出理由的授予——角色仍然是主要的组织方式。要 iam:members.manage。
+         * Set the permissions attached directly to a member
+         * @description Replaces, in full, the permissions attached directly to the base policy. A direct permission grants one person something without creating a role only they hold, and it does not follow later changes to any role. Requires `iam:members.manage`.
          */
         put: operations["set-member-permissions"];
         post?: never;
@@ -219,14 +219,14 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出这个项目里的策略
-         * @description 在项目里就看得到，和成员列表同一条规则：谁被授了什么也是「这个项目有谁」的一部分。
+         * List the policies in this project
+         * @description Visible to any member, on the same rule as the member list. What has been granted to whom is part of who is in the project.
          */
         get: operations["list-policies"];
         put?: never;
         /**
-         * 附加一条策略
-         * @description 它建的是**附加**策略——要么带资源范围，要么方向是 deny。一条不限资源的 allow 是基础策略，每个成员只有一条，改它走 set-member-roles 和 set-member-permissions。roles 里不能有 OWNER 或 ADMIN：它们是规则而不是权限集合，「限定在三台机器上的所有者」讲不通。要 iam:members.manage。
+         * Attach a policy
+         * @description This creates an **additional** policy, which either carries a resource scope or has `deny` as its effect. An `allow` covering every resource is a base policy, of which each member holds exactly one, and it is changed with set-member-roles and set-member-permissions. `roles` cannot contain `OWNER` or `ADMIN`. Requires `iam:members.manage`.
          */
         post: operations["attach-policy"];
         delete?: never;
@@ -243,19 +243,19 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看一条策略
-         * @description 和 list-policies 同一条规则，在项目里就看得到：谁被授了什么也是「这个项目有谁」的一部分，读它不需要额外的权限。
+         * Get a policy
+         * @description Visible to any member, on the same rule as list-policies; no further permission is required.
          */
         get: operations["get-policy"];
         /**
-         * 改一条策略
-         * @description 整体替换而不是逐字段改：resources、roles、permissions 各自整份覆盖，没发的那份就是空的——只有「这就是这条策略现在的全貌」这一种语义说得清一次写入到底收回了什么。改不动的是策略的**种类**：基础策略（不限资源的 allow）加不上资源范围，这个成员的角色就存在它上面，给它加个范围等于让他在别的资源上什么都不是；一条带范围的策略反过来也不能把范围清空变成基础策略，那个位置每个成员只有一条。要换种类就删了重建。要 iam:members.manage。
+         * Update a policy
+         * @description Replaced in full rather than field by field — `resources`, `roles` and `permissions` are each overwritten, and an omitted one becomes empty. The **kind** of a policy cannot change — a base policy (an `allow` covering every resource) cannot take a resource scope, and a scoped policy cannot have its scope cleared. Delete and recreate to change the kind. Requires `iam:members.manage`.
          */
         put: operations["update-policy"];
         post?: never;
         /**
-         * 摘掉一条策略
-         * @description 基础策略摘不掉——它是这个成员角色的落点，删了它这个人就不再持有任何角色，而「让他离开这个项目」是 remove-member 的事。要 iam:members.manage。
+         * Detach a policy
+         * @description A base policy cannot be detached; it is where a member's roles sit. Use remove-member to take someone out of the project. Requires `iam:members.manage`.
          */
         delete: operations["detach-policy"];
         options?: never;
@@ -273,8 +273,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 转移项目所有权
-         * @description OWNER 唯一的移动方式，只有所有者本人能发起——能像普通角色那样授予的话，任何管理员都可以顺手把自己变成所有者。
+         * Transfer ownership of a project
+         * @description The only way `OWNER` moves, and only the owner can initiate it.
          */
         post: operations["transfer-project-ownership"];
         delete?: never;
@@ -290,10 +290,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出项目里的角色 */
+        /** List the roles in this project */
         get: operations["list-roles"];
         put?: never;
-        /** 建一个角色 */
+        /** Create a role */
         post: operations["create-role"];
         delete?: never;
         options?: never;
@@ -308,17 +308,17 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看一个角色 */
+        /** Get a role */
         get: operations["get-role"];
         /**
-         * 改一个角色
-         * @description 名称、描述和权限整体替换。改完会在同一个事务里重新编译持有它的每一个成员——角色的权限变了，就是那些人的权限变了，而下一次请求是拿编译结果判定的。
+         * Update a role
+         * @description The name, the description and the permissions are replaced in full. Every member holding the role is recompiled in the same transaction, so the change takes effect on the next request.
          */
         put: operations["update-role"];
         post?: never;
         /**
-         * 删一个角色
-         * @description 还有人持有时会被拒。级联摘掉那些绑定等于把每个持有者悄悄降级——请求里没有一个字说了这件事，事后也查不到。
+         * Delete a role
+         * @description Refused while anyone still holds it. Cascading the removal would quietly demote every holder.
          */
         delete: operations["delete-role"];
         options?: never;
@@ -334,14 +334,14 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出这个项目的公钥
-         * @description 归成员的和归项目的都在里面，靠每一条上的 owner_user_id 区分。
+         * List the SSH keys of this project
+         * @description Both the keys belonging to members and the keys belonging to the project are listed; the `owner_user_id` on each one tells them apart.
          */
         get: operations["list-ssh-keys"];
         put?: never;
         /**
-         * 添加一把公钥
-         * @description owner=me 是自己的，是成员就能加；owner=project 是项目公用的，要 iam:ssh_keys.manage —— 它会进这个项目之后开出来的每一台机器。
+         * Add an SSH key
+         * @description `owner=me` adds a key of the caller's own, which any member may do. `owner=project` adds a key shared by the project, requires `iam:ssh_keys.manage`, and lands on every machine created in the project afterwards.
          */
         post: operations["create-ssh-key"];
         delete?: never;
@@ -357,20 +357,20 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看一把公钥 */
+        /** Get an SSH key */
         get: operations["get-ssh-key"];
         put?: never;
         post?: never;
         /**
-         * 吊销一把公钥
-         * @description 行留着，状态变成 REVOKED。事故之后要问的是当时信任的是哪把钥匙。
+         * Revoke an SSH key
+         * @description The row remains and its status becomes `REVOKED`, so it stays answerable afterwards which key was trusted at the time.
          */
         delete: operations["revoke-ssh-key"];
         options?: never;
         head?: never;
         /**
-         * 给公钥改名
-         * @description 只有名字能改：公钥、类型、指纹是同一样东西的三种说法，改其中一个会让这一行描述一把并不存在的钥匙。
+         * Rename an SSH key
+         * @description Only the name can change. The key, its type and its fingerprint are three statements about one thing, and changing one of them would leave the row describing a key that does not exist.
          */
         patch: operations["rename-ssh-key"];
         trace?: never;
@@ -383,26 +383,32 @@ export interface components {
             code?: string;
             message: string;
             meta?: {
+                /**
+                 * @description Present on every response whose `code` is `VALIDATION_FAILED`, and on no
+                 *     other response.
+                 */
+                violations?: components["schemas"]["Violation"][];
+            } & {
                 [key: string]: unknown;
             };
             /** Format: int64 */
             status: number;
         };
         PermissionResource: {
-            /** @description 权限的代码，形如 compute:instance.delete。**这里没有展示名**：一条权限对人显示成什么字是本地化的，服务端存一份的话那一份只会是某一种语言，而读它的人可能读别的语言。译名归渲染它的那一层；它没跟上时界面显示的就是这个代码——一个自解释的降级，而且看得见 */
+            /** @description The code of the permission, such as compute:instance.delete. **There is no display name here** — what a permission reads as is localised, and translation belongs to the layer rendering it. Until a translation catches up, the code itself is what is shown */
             name: string;
-            /** @description 只有项目所有者能做，绑到自定义角色上也不会生效 */
+            /** @description Reserved for the project owner. Attaching it to a custom role has no effect */
             owner_only: boolean;
-            /** @description 这条权限的判定对象是哪类资源，空表示它是项目级的。**它不必等于操作对象本身**——compute 的 route 表上没有 project_id，隔离本来就经父网络传递，所以 compute:route.create 的判定对象是 compute:private_network。非空同时意味着这条权限可以被限定到具体实例；create 和 list 一律留空 */
+            /** @description The kind of resource this permission is decided against; empty means it is decided at project level. **It need not be the object being operated on** — a compute route carries no project_id and is isolated through its parent network, so compute:route.create is decided against compute:private_network. A non-empty value also means the permission can be scoped to particular instances; create and list are always empty */
             resource_type: string;
         };
         ResourceTypeResource: {
-            /** @description 资源类型的代码，形如 dns:zone。同样没有展示名：它该显示成「托管域名」还是「Zone」由渲染它的那一层按读者的语言决定 */
+            /** @description The code of the resource type, such as dns:zone. There is no display name here either; what it reads as is decided by the layer rendering it */
             name: string;
         };
         CatalogResource: {
             permissions: components["schemas"]["PermissionResource"][] | null;
-            /** @description 这个服务声明的资源类型。带资源范围的规则只落得到它们上面——一个没有被声明过的类型没人认得，限定在它上面的规则谁都判不出来 */
+            /** @description The resource types this service declares. A scoped rule can only land on one of them */
             resource_types: components["schemas"]["ResourceTypeResource"][] | null;
             service: string;
         };
@@ -410,25 +416,25 @@ export interface components {
             items: components["schemas"]["CatalogResource"][] | null;
         };
         ResourceRefResource: {
-            /** @description 是字符串不是 uuid：dns 的 zone 标识是域名，而且不在 IAM 库里。匹配语义是 glob，所以 *.example.com 能表达一批子域名；uuid 和域名都不含 glob 元字符，对它们来说就是精确相等 */
+            /** @description A string rather than a UUID; a DNS zone is named by its domain, which IAM does not hold. Matching is glob, so `*.example.com` covers a set of subdomains, while a value carrying no glob metacharacter matches exactly */
             id: string;
-            /** @description 形如 compute:instance、dns:zone，和权限名同一个命名空间 */
+            /** @description Of the form compute:instance or dns:zone, in the same namespace as permission names */
             type: string;
         };
         RuleResource: {
             /** @enum {string} */
             effect: "allow" | "deny";
-            /** @description 权限名，支持尾部通配（compute:instance.*）。通配必须带服务前缀——一条光秃秃的 * 会把日后新上线的服务的操作也一起授出去，而那件事发生的时候没有任何人在场 */
+            /** @description A permission name, with a trailing wildcard supported (compute:instance.*). A wildcard must carry the service prefix; a bare wildcard would also grant the operations of services that go live later */
             permissions: string[] | null;
-            /** @description 为空表示整个项目范围；非空表示这条规则只在这些资源上成立，而那意味着它回答不了项目级的问题 */
+            /** @description Empty means the rule holds across the whole project. A non-empty value means it holds only on those resources, and therefore answers no project-level question */
             resources: components["schemas"]["ResourceRefResource"][] | null;
         };
         GrantResource: {
             admin: boolean;
             owner: boolean;
-            /** @description 持有的角色编码，只用于展示 */
+            /** @description The role codes held, for display only */
             roles: string[] | null;
-            /** @description 他全部策略编译出来的规则。**不要自己遍历它做判定**——拿它配上自己那份权限目录交给 pkg/rbac：owner 不可被 deny、deny 优先于 admin、带资源范围的规则不参与项目级判定，那里面的顺序每一条都对着一种会静默放行的写法 */
+            /** @description **The rules compiled from every policy that applies. Do not walk them to reach a decision.** They are here to render what a user may do; each request is decided by the service handling it */
             rules: components["schemas"]["RuleResource"][] | null;
         };
         ProjectResource: {
@@ -438,7 +444,7 @@ export interface components {
             created_by: string;
             /**
              * Format: date-time
-             * @description 盖上墓碑的那一刻
+             * @description When the project was deleted
              */
             deleted_at: string | null;
             description: string;
@@ -447,7 +453,7 @@ export interface components {
             name: string;
             /** @enum {string} */
             status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
-            /** @description 给人看的，不参与任何查询 */
+            /** @description Written for a reader; it takes part in no query */
             status_reason: string;
             /** Format: date-time */
             updated_at: string;
@@ -477,37 +483,37 @@ export interface components {
             invited_by: string;
             /** Format: uuid */
             project_id: string;
-            /** @description 兑现时会授予的角色编码 */
+            /** @description The role codes granted on redemption */
             roles: string[] | null;
         };
         LengthAwarePageInvitationResource: {
-            /** @description 这一页的内容 */
+            /** @description The items in this page */
             items: components["schemas"]["InvitationResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description Maximum number of items in this page, echoing the request
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description Number of items skipped, echoing the request
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description Total number of matches, not only this page
              */
             total: number;
         };
         IssueInvitationRequestBody: {
             /** Format: email */
             email: string;
-            /** @description 兑现时授予的角色编码。必须是这个项目已经定义的，OWNER 不行 */
+            /** @description The role codes granted on redemption. Each must already be defined in this project, and `OWNER` is not accepted */
             roles: string[] | null;
         };
         IssuedInvitationResponseBody: {
             invitation: components["schemas"]["InvitationResource"];
-            /** @description 兑现用的明文，**只在这一次响应里出现**。库里只有它的哈希，丢了只能撤销重发 */
+            /** @description The token that redeems the invitation, **returned in this response only**. If it is lost, withdraw the invitation and send another */
             token: string;
         };
         BatchGetMembersRequestBody: {
@@ -542,48 +548,48 @@ export interface components {
             user_id: string;
         };
         LengthAwarePageMemberResource: {
-            /** @description 这一页的内容 */
+            /** @description The items in this page */
             items: components["schemas"]["MemberResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description Maximum number of items in this page, echoing the request
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description Number of items skipped, echoing the request
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description Total number of matches, not only this page
              */
             total: number;
         };
         SetMemberRolesRequestBody: {
-            /** @description 这个人应当持有的**全部**角色编码。OWNER 不能出现在这里 */
+            /** @description **Every** role code this person is to hold. `OWNER` cannot appear here */
             roles: string[] | null;
         };
         SetMemberPermissionsRequestBody: {
-            /** @description 这个人应当直挂的**全部**权限名，整体替换。角色给的那些不在这里，也不会被这次写入碰到 */
+            /** @description **Every** permission name to be attached directly to this person, replaced in full. The permissions a role grants are neither listed here nor touched by this write */
             permissions: string[] | null;
         };
         PolicyResource: {
-            /** @description 基础策略是方向 allow、不限资源的那一条，每个成员恰好一条，装的是他的常规角色。改它走 PUT /members/{userId}/roles 和 PUT /members/{userId}/permissions */
+            /** @description The base policy is the one whose effect is `allow` and which covers every resource. Each member holds exactly one, and it carries their ordinary roles. Change it with PUT /members/{userId}/roles and PUT /members/{userId}/permissions */
             base: boolean;
             /** Format: date-time */
             created_at: string;
-            /** @description 给人看的理由。一条附加策略事后最难回答的是「当初为什么开这一条」 */
+            /** @description Why it was granted, written for a reader */
             description: string;
             /** @enum {string} */
             effect: "allow" | "deny";
             /** Format: uuid */
             id: string;
-            /** @description 直挂在这个人身上的权限名，不经过角色 */
+            /** @description Permission names attached directly to this person, without passing through a role */
             permissions: string[] | null;
-            /** @description 为空表示整个项目范围 */
+            /** @description Empty means the whole project */
             resources: components["schemas"]["ResourceRefResource"][] | null;
-            /** @description 这条策略带上的角色编码 */
+            /** @description The role codes this policy carries */
             roles: string[] | null;
             /** Format: date-time */
             updated_at: string;
@@ -593,45 +599,45 @@ export interface components {
             items: components["schemas"]["PolicyResource"][] | null;
         };
         AttachPolicyRequestBody: {
-            /** @description 给人看的理由。一条附加策略事后最难回答的是「当初为什么开这一条」 */
+            /** @description Why it was granted, written for a reader */
             description?: string;
             /** @enum {string} */
             effect: "allow" | "deny";
-            /** @description 直挂的权限名，用它就不必为一个人临时造一个只有他持有的角色 */
+            /** @description Permission names attached directly, which avoids creating a role only one person holds */
             permissions?: string[] | null;
-            /** @description 这条策略只在这些资源上成立。留空只有配合 deny 才讲得通——一条不限资源的 allow 是基础策略，那一条已经有了 */
+            /** @description The policy holds only on these resources. Leaving it empty makes sense only together with `deny`, since an `allow` covering every resource is the base policy, which already exists */
             resources?: components["schemas"]["ResourceRefResource"][] | null;
-            /** @description 必须是这个项目已经定义的角色。OWNER 和 ADMIN 不行——它们是规则而不是权限集合，「限定在三台机器上的所有者」讲不通 */
+            /** @description Each must be a role already defined in this project. `OWNER` and `ADMIN` are not accepted, being rules rather than sets of permissions */
             roles?: string[] | null;
-            /** @description 必须已经是这个项目的成员 */
+            /** @description Must already be a member of this project */
             user_id: string;
         };
         UpdatePolicyRequestBody: {
-            /** @description 给人看的理由。它和这次改动一起替换，不然留下来的会是一句解释着上一个版本的话 */
+            /** @description Why it was granted, written for a reader. It is replaced together with the change, so that what remains does not explain an earlier version */
             description?: string;
             /**
-             * @description 必须和这条策略当前的方向一致。方向改不动——那不是「改一条策略」，是一次意思完全相反的授权决定，改它的人多半以为自己在收紧，而读这行数据的下一个人看到的是一条方向和当初授予时不同、说明文字却还是旧的策略。仍然要求发这个字段而不是干脆不收，是因为整体替换的语义是「这就是这条策略现在的全貌」：少一个字段的话，调用方以为自己把 deny 改成了 allow，而服务端默默忽略了它。不一致时返回 PROJECT_POLICY_EFFECT_IMMUTABLE
+             * @description Must match the current effect of the policy. The effect itself cannot be changed; delete the policy and create another instead. It is still required in the request because the write replaces the policy in full, and omitting it would let a caller believe an effect had been changed while the field was ignored. A mismatch answers PROJECT_POLICY_EFFECT_IMMUTABLE
              * @enum {string}
              */
             effect: "allow" | "deny";
-            /** @description 直挂的权限名，整份替换。没列进来的就是被收回了——它不是往上加一条 */
+            /** @description Permission names attached directly, replaced in full. Anything not listed is withdrawn rather than kept */
             permissions?: string[] | null;
-            /** @description 这条策略的资源范围，整份替换。范围内容能改，有没有范围改不了：基础策略加不上范围，带范围的也清不空——清空之后它就是基础策略的形状，而那个位置每个成员只有一条 */
+            /** @description The resource scope of this policy, replaced in full. What the scope contains can change; whether the policy has one cannot. A base policy cannot take a scope, and a scoped policy cannot have its scope cleared */
             resources?: components["schemas"]["ResourceRefResource"][] | null;
-            /** @description 必须是这个项目已经定义的角色，整份替换。和挂上去那次一样不能有 OWNER 或 ADMIN */
+            /** @description Each must be a role already defined in this project, replaced in full. As when attaching, `OWNER` and `ADMIN` are not accepted */
             roles?: string[] | null;
         };
         TransferOwnershipRequestBody: {
-            /** @description 接手的人必须已经是这个项目的成员 */
+            /** @description The recipient must already be a member of this project */
             to_user_id: string;
         };
         OwnershipTransferResponseBody: {
-            /** @description 原所有者。他保留其余的角色——转让的是所有权，不是把人踢出去 */
+            /** @description The former owner, who keeps every other role held. Ownership is transferred rather than the person removed */
             from: components["schemas"]["MemberResource"];
             to: components["schemas"]["MemberResource"];
         };
         RoleResource: {
-            /** @description 内置角色不可删、不可改权限：OWNER 和 ADMIN 的语义写在代码里 */
+            /** @description A built-in role can be neither deleted nor have its permissions changed */
             builtin: boolean;
             code: string;
             /** Format: date-time */
@@ -646,11 +652,11 @@ export interface components {
             items: components["schemas"]["RoleResource"][] | null;
         };
         CreateRoleRequestBody: {
-            /** @description 小写字母开头，可含数字和下划线。建好之后不能改——成员绑定和邀请都指着它 */
+            /** @description Begins with a lower-case letter and may contain digits and underscores. It cannot be changed once created, as member bindings and invitations refer to it */
             code: string;
             description?: string;
             name: string;
-            /** @description 权限名。OwnerOnly 的那几条会被拒绝：绑上去也不会生效 */
+            /** @description A permission name. The ones reserved for the owner are refused, since attaching them would have no effect */
             permissions?: string[] | null;
         };
         UpdateRoleRequestBody: {
@@ -662,54 +668,77 @@ export interface components {
             /** Format: date-time */
             created_at: string;
             fingerprint: string;
-            /** @description 平台生成并保管的那把。它的私钥不对外提供 */
+            /** @description The key the platform generates and holds. Its private key is not handed out */
             has_private_key: boolean;
             /** Format: uuid */
             id: string;
             key_type: string;
             name: string;
-            /** @description 归属人；不给表示这把钥匙归项目本身 */
+            /** @description Who the key belongs to. Absent means it belongs to the project itself */
             owner_user_id?: string;
             public_key: string;
-            /** @description 用途标签。平台自己生成的那把是 platform */
+            /** @description A purpose label. The key the platform generates carries `platform` */
             purposes: string[] | null;
             /** @enum {string} */
             status: "ACTIVE" | "REVOKED";
         };
         LengthAwarePageSSHKeyResource: {
-            /** @description 这一页的内容 */
+            /** @description The items in this page */
             items: components["schemas"]["SSHKeyResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description Maximum number of items in this page, echoing the request
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description Number of items skipped, echoing the request
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description Total number of matches, not only this page
              */
             total: number;
         };
         CreateSSHKeyRequestBody: {
             name: string;
             /**
-             * @description 这把钥匙归谁
+             * @description Who this key belongs to
              * @default me
              * @enum {string}
              */
             owner?: "me" | "project";
-            /** @description OpenSSH 格式的公钥。类型和指纹从它算出来，都不可改 */
+            /** @description The public key in OpenSSH format. The type and the fingerprint are derived from it and cannot be changed */
             public_key: string;
-            /** @description 用途标签，比如 ci、bastion */
+            /** @description A purpose label, such as ci or bastion */
             purposes?: string[] | null;
         };
         RenameSSHKeyRequestBody: {
             name: string;
+        };
+        /**
+         * @description A single mismatch between the request and the contract.
+         *
+         *     Use `field` to locate the input, `rule` to decide what to tell the user, and
+         *     `reason` only for diagnostics.
+         */
+        Violation: {
+            /**
+             * @description Dot-separated path to the field, such as `name` or
+             *     `schedule.0.start_time_seconds`.
+             */
+            field: string;
+            /**
+             * @description The JSON Schema keyword that failed, such as `minLength`, `minimum` or
+             *     `pattern`.
+             */
+            rule: string;
+            /**
+             * @description The validator's own wording, in English. Intended for diagnostics; do not
+             *     display it to end users.
+             */
+            reason?: string;
         };
     };
     responses: never;
@@ -872,9 +901,9 @@ export interface operations {
     "list-project-invitations": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description Maximum number of items in this page */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
                 offset?: number;
             };
             header?: never;
@@ -1001,11 +1030,11 @@ export interface operations {
     "list-members": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description Maximum number of items in this page */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
                 offset?: number;
-                /** @description 按用户 ID、邮箱或姓名模糊匹配 */
+                /** @description Matches against user id, email address or name */
                 keyword?: string;
             };
             header?: never;
@@ -1136,7 +1165,7 @@ export interface operations {
     "list-policies": {
         parameters: {
             query?: {
-                /** @description 只看这个人身上的。不传表示整个项目的 */
+                /** @description Restricts the result to one person. Omitting it covers the whole project */
                 userId?: string;
             };
             header?: never;
@@ -1486,13 +1515,13 @@ export interface operations {
     "list-ssh-keys": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description Maximum number of items in this page */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
                 offset?: number;
-                /** @description 不传时两种都返回 */
+                /** @description Both kinds are returned while this is absent */
                 status?: "ACTIVE" | "REVOKED";
-                /** @description 只列挂着这个用途的钥匙。平台自己生成的那把是 platform */
+                /** @description Lists only the keys carrying this purpose. The key the platform generates carries `platform` */
                 purpose?: string;
             };
             header?: never;

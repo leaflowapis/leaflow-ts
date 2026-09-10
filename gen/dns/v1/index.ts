@@ -61,19 +61,6 @@ export type ListRecordsQuery =
 export type GetRecordSetResult =
   operations["get-record-set"]["responses"][200]["content"]["application/json"];
 
-/** `PATCH /api/v1/zones/{zone}/records/{name}/{type}` 成功时的响应体。 */
-export type ModifyRecordSetResult =
-  operations["modify-record-set"]["responses"][200]["content"]["application/json"];
-
-/** `PATCH /api/v1/zones/{zone}/records/{name}/{type}` 的查询参数。 */
-export type ModifyRecordSetQuery =
-  operations["modify-record-set"]["parameters"]["query"];
-
-/** `PATCH /api/v1/zones/{zone}/records/{name}/{type}` 的请求体。 */
-export type ModifyRecordSetBody = NonNullable<
-  operations["modify-record-set"]["requestBody"]
->["content"]["application/json"];
-
 /** `PUT /api/v1/zones/{zone}/records/{name}/{type}` 成功时的响应体。 */
 export type SetRecordSetResult =
   operations["set-record-set"]["responses"][200]["content"]["application/json"];
@@ -85,6 +72,19 @@ export type SetRecordSetQuery =
 /** `PUT /api/v1/zones/{zone}/records/{name}/{type}` 的请求体。 */
 export type SetRecordSetBody = NonNullable<
   operations["set-record-set"]["requestBody"]
+>["content"]["application/json"];
+
+/** `PATCH /api/v1/zones/{zone}/records/{name}/{type}` 成功时的响应体。 */
+export type ModifyRecordSetResult =
+  operations["modify-record-set"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /api/v1/zones/{zone}/records/{name}/{type}` 的查询参数。 */
+export type ModifyRecordSetQuery =
+  operations["modify-record-set"]["parameters"]["query"];
+
+/** `PATCH /api/v1/zones/{zone}/records/{name}/{type}` 的请求体。 */
+export type ModifyRecordSetBody = NonNullable<
+  operations["modify-record-set"]["requestBody"]
 >["content"]["application/json"];
 
 /** `DELETE /api/v1/zones/{zone}/records/{name}/{type}` 的查询参数。 */

@@ -11,14 +11,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 列出 API Key */
+        /** List API keys */
         get: operations["list-api-keys"];
         put?: never;
         /**
-         * 签发一把 API Key
-         * @description 响应里的 `secret` 是完整的 key，**只在这一次出现**——服务端只存它的哈希，之后任何接口都不会再返回它。丢了只能撤销重建。
+         * Issue an API key
+         * @description The `secret` in the response is the complete key and **appears in this response only**. It is returned by no other endpoint, and a key that has been lost has to be revoked and reissued.
          *
-         *     把它填进 `OPENAI_API_KEY` 一类的地方即可，转发接口同时接受 OpenAI、Anthropic、Gemini 三种调用格式。
+         *     Supply it wherever a value such as `OPENAI_API_KEY` is expected. The forwarding endpoints accept the OpenAI, Anthropic and Gemini request formats alike.
          */
         post: operations["create-api-key"];
         delete?: never;
@@ -34,7 +34,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看 API Key */
+        /** Get an API key */
         get: operations["get-api-key"];
         put?: never;
         post?: never;
@@ -42,12 +42,12 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * 修改 API Key
-         * @description 只改属性，不改状态——启用、停用、撤销各有自己的接口。
+         * Update an API key
+         * @description Attributes only. Enabling, disabling and revoking each have their own endpoint.
          *
-         *     没提到的字段保持不变。要把到期时间改成「永不过期」请传 `clear_expiry: true`，而不是把 `expires_at` 传成 null。
+         *     A field that is not supplied is left unchanged. To remove an expiry, send `clear_expiry` as true rather than a null `expires_at`.
          *
-         *     已撤销的 key 不接受任何修改。
+         *     A revoked key accepts no modification.
          */
         patch: operations["update-api-key"];
         trace?: never;
@@ -62,8 +62,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 停用 API Key
-         * @description 临时停用，随时可以启用回来。要永久失效请用撤销。
+         * Disable an API key
+         * @description A temporary measure; the key may be enabled again at any time. Use revocation to invalidate it permanently.
          */
         post: operations["disable-api-key"];
         delete?: never;
@@ -82,8 +82,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 启用 API Key
-         * @description 两种情况开不回来：已撤销的（`API_KEY_REVOKED`），以及因项目停服被停的（`API_KEY_PROJECT_SUSPENDED`，响应里 `suspended` 为 true）。后者要等项目恢复。
+         * Enable an API key
+         * @description Two cases cannot be enabled again. A revoked key answers `API_KEY_REVOKED`, and a key disabled because its project is suspended answers `API_KEY_PROJECT_SUSPENDED` with `suspended` set to true; the latter requires the project to be restored first.
          */
         post: operations["enable-api-key"];
         delete?: never;
@@ -102,12 +102,12 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 撤销 API Key
-         * @description **不可逆。** 用于这把 key 泄露了的情况——比如被提交进了仓库。
+         * Revoke an API key
+         * @description **Irreversible.** It is intended for a key that has been exposed, such as one committed to a repository.
          *
-         *     记录不删除：这把 key 在被撤销前打了多少请求仍然查得到，那正是出事之后要看的。
+         *     The record is retained, so the requests the key issued before it was revoked remain readable.
          *
-         *     只是想临时停一下请用停用。
+         *     Use disabling for a temporary measure.
          */
         post: operations["revoke-api-key"];
         delete?: never;
@@ -124,10 +124,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出可用模型
-         * @description 已下架（`retired`）的模型不出现在这里，但仍然查得到——见查看单个模型。
+         * List the available models
+         * @description A model that has been retired does not appear here, while it remains readable individually.
          *
-         *     `context_length` 和 `max_output_tokens` 仅供客户端提示：服务端不据此截断，请求体原样转给上游。
+         *     `context_length` and `max_output_tokens` are advisory. The server does not truncate on their basis, and the request body is forwarded upstream unchanged.
          */
         get: operations["list-models"];
         put?: never;
@@ -146,8 +146,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看模型
-         * @description 已下架的模型在这里查得到，但转发时会被拒（`MODEL_RETIRED`）——这和「这个模型不存在」是两件事，前者说明它曾经有过。
+         * Get a model
+         * @description A model that has been retired remains readable here, while forwarding to it is refused with `MODEL_RETIRED`. That is distinct from a model that does not exist.
          */
         get: operations["get-model"];
         put?: never;
@@ -166,12 +166,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出请求流水
-         * @description 游标翻页，按时间倒序。`next_cursor` 为空表示已经到底。
+         * List request records
+         * @description Cursor-paged, most recent first. An empty `next_cursor` indicates the last page.
          *
-         *     **不返回请求体和响应体**——canopy 一张表都不存它们。排障请提供 `upstream_request_id`。
+         *     **The request and response bodies are not returned**; they are not recorded. Quote the `upstream_request_id` when reporting a problem.
          *
-         *     `usage_source` 为 `estimated` 表示上游这次没给用量，那几个数是我们按字符类估的。
+         *     A `usage_source` of `estimated` indicates that the upstream provider reported no usage for that request, and that the figures are derived from the character classes of the payload.
          */
         get: operations["list-requests"];
         put?: never;
@@ -189,7 +189,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 查看单条流水 */
+        /** Get a single request record */
         get: operations["get-request"];
         put?: never;
         post?: never;
@@ -207,8 +207,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 按 API Key 看用量
-         * @description 用来回答「哪把 key 在烧钱」。已撤销的 key 仍然出现在这里——它在被撤销前的用量正是要看的东西。
+         * Get usage by API key
+         * @description Answers which key is consuming the budget. A key that has been revoked still appears, since the usage it accrued beforehand is part of that answer.
          */
         get: operations["list-usage-by-api-key"];
         put?: never;
@@ -226,7 +226,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 按模型看用量 */
+        /** Get usage by model */
         get: operations["list-usage-by-model"];
         put?: never;
         post?: never;
@@ -244,10 +244,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 用量合计
-         * @description `from` / `to` 必填，跨度不超过 31 天。两者带时区偏移，传 `2026-08-01T00:00:00+08:00` 得到的就是东八区那一刻起算。
+         * Get total usage
+         * @description `from` and `to` are required and may span no more than 31 days. Both carry a timezone offset, so `2026-08-01T00:00:00+08:00` starts at that instant in UTC+8.
          *
-         *     五档 token 分开给：缓存命中的读取比普通输入便宜一个数量级，合成一个总数就再也拆不开了。
+         *     The five token classes are reported separately. A cache read costs an order of magnitude less than ordinary input, and a single total cannot be decomposed again.
          */
         get: operations["get-usage-summary"];
         put?: never;
@@ -266,10 +266,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 用量曲线
-         * @description 从 `from` 起按 `bucket` 切段，最后一段可能不满。段数上限 100。
+         * Get a usage series
+         * @description Divided into buckets of `bucket`, starting at `from`. The final bucket may be partial, and the number of buckets is limited to 100.
          *
-         *     要按本地日切分就把 `from` 传成本地时间的零点（带偏移）、`bucket` 传 `24h`——服务端不猜时区。
+         *     To divide by local day, send `from` as midnight in local time with its offset and `bucket` as `24h`. The server does not infer a timezone.
          */
         get: operations["get-usage-timeline"];
         put?: never;
@@ -288,120 +288,126 @@ export interface components {
             code?: string;
             message: string;
             meta?: {
+                /**
+                 * @description Present on every response whose `code` is `VALIDATION_FAILED`, and on no
+                 *     other response.
+                 */
+                violations?: components["schemas"]["Violation"][];
+            } & {
                 [key: string]: unknown;
             };
             /** Format: int64 */
             status: number;
         };
         APIKeyResource: {
-            /** @description restrict_models 为 false 时无意义 */
+            /** @description Carries no meaning while `restrict_models` is false */
             allowed_models: string[];
             /** Format: date-time */
             created_at: string;
             /**
              * Format: uuid
-             * @description 建这把 key 的人
+             * @description Who created the key
              */
             created_by: string;
             /**
              * Format: date-time
-             * @description 到期时间；null 表示永不过期
+             * @description When the key expires. Null means it never expires
              */
             expires_at: string | null;
             /** Format: uuid */
             id: string;
-            /** @description 明文的后四位 */
+            /** @description The last four characters of the plaintext */
             last_four: string;
             /**
              * Format: date-time
-             * @description 最后一次成功用它转发的时刻，精度约一分钟
+             * @description When the key was last used to forward a request successfully, accurate to about a minute
              */
             last_used_at: string | null;
             name: string;
-            /** @description 明文的前几位，用来在列表里辨认 */
+            /** @description The leading characters of the plaintext, by which a key is recognised in a list */
             prefix: string;
-            /** @description true 时只允许 allowed_models 里的模型 */
+            /** @description While true, only the models listed in `allowed_models` are permitted */
             restrict_models: boolean;
             /** @enum {string} */
             status: "active" | "disabled" | "revoked";
-            /** @description true 表示这把 key 因项目停服被停，需要项目恢复后才能再用 */
+            /** @description True indicates that the key was disabled because its project is suspended, and that the project has to be restored before the key can be used again */
             suspended: boolean;
         };
         LengthAwarePageAPIKeyResource: {
-            /** @description 这一页的内容 */
+            /** @description The items in this page */
             items: components["schemas"]["APIKeyResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description Maximum number of items in this page, echoing the request
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description Number of items skipped, echoing the request
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description Total number of matches, not only this page
              */
             total: number;
         };
         CreateAPIKeyRequestBody: {
-            /** @description restrict_models 为 false 时忽略 */
+            /** @description Ignored while `restrict_models` is false */
             allowed_models?: string[] | null;
             /**
              * Format: date-time
-             * @description 到期时间；不填表示永不过期
+             * @description When the key expires. Omitted means it never expires
              */
             expires_at?: string | null;
-            /** @description 给自己看的名字，比如「CI」「生产」 */
+            /** @description A name for the holder's own use, such as CI or Production */
             name: string;
-            /** @description true 时只允许 allowed_models 里的模型 */
+            /** @description While true, only the models listed in `allowed_models` are permitted */
             restrict_models?: boolean;
         };
         IssuedAPIKeyResource: {
-            /** @description restrict_models 为 false 时无意义 */
+            /** @description Carries no meaning while `restrict_models` is false */
             allowed_models: string[];
             /** Format: date-time */
             created_at: string;
             /**
              * Format: uuid
-             * @description 建这把 key 的人
+             * @description Who created the key
              */
             created_by: string;
             /**
              * Format: date-time
-             * @description 到期时间；null 表示永不过期
+             * @description When the key expires. Null means it never expires
              */
             expires_at: string | null;
             /** Format: uuid */
             id: string;
-            /** @description 明文的后四位 */
+            /** @description The last four characters of the plaintext */
             last_four: string;
             /**
              * Format: date-time
-             * @description 最后一次成功用它转发的时刻，精度约一分钟
+             * @description When the key was last used to forward a request successfully, accurate to about a minute
              */
             last_used_at: string | null;
             name: string;
-            /** @description 明文的前几位，用来在列表里辨认 */
+            /** @description The leading characters of the plaintext, by which a key is recognised in a list */
             prefix: string;
-            /** @description true 时只允许 allowed_models 里的模型 */
+            /** @description While true, only the models listed in `allowed_models` are permitted */
             restrict_models: boolean;
-            /** @description 完整的 key，**只在这一次响应里出现**，请立即保存 */
+            /** @description The complete key, **returned in this response only**. Store it immediately */
             secret: string;
             /** @enum {string} */
             status: "active" | "disabled" | "revoked";
-            /** @description true 表示这把 key 因项目停服被停，需要项目恢复后才能再用 */
+            /** @description True indicates that the key was disabled because its project is suspended, and that the project has to be restored before the key can be used again */
             suspended: boolean;
         };
         UpdateAPIKeyRequestBody: {
             allowed_models?: string[] | null;
-            /** @description true 表示改成永不过期 */
+            /** @description True removes the expiry */
             clear_expiry?: boolean;
             /**
              * Format: date-time
-             * @description 改到期时间；要改成永不过期请用 clear_expiry
+             * @description Sets the expiry. To remove it, use `clear_expiry`
              */
             expires_at?: string | null;
             name?: string | null;
@@ -410,20 +416,20 @@ export interface components {
         ModelResource: {
             /**
              * Format: int64
-             * @description 上下文窗口，仅供客户端提示，服务端不据此截断
+             * @description The context window. Advisory only; the server does not truncate on its basis
              */
             context_length: number;
             display_name: string;
-            /** @description 同一系列聚在一起用，如 claude、gpt、gemini */
+            /** @description Groups the models of one family together, such as claude, gpt or gemini */
             family: string;
-            /** @description 请求体里 model 字段要填的那个字符串 */
+            /** @description The string to send in the `model` field of the request body */
             id: string;
             /**
              * Format: int64
-             * @description 最大输出，仅供客户端提示
+             * @description The maximum output length. Advisory only
              */
             max_output_tokens: number;
-            /** @description reasoning_effort 能填的值；空表示不支持 */
+            /** @description The values accepted for `reasoning_effort`. Empty means it is not supported */
             reasoning_tiers: string[];
             /** @enum {string} */
             status: "available" | "draining" | "retired";
@@ -439,12 +445,12 @@ export interface components {
             api_key_id: string;
             /**
              * Format: int64
-             * @description 命中上游前缀缓存的部分，比普通输入便宜一个数量级
+             * @description The portion served from the upstream prefix cache, which costs an order of magnitude less than ordinary input
              */
             cache_read_tokens: number;
             /** Format: int64 */
             cache_write_tokens: number;
-            /** @description 失败时的错误码；成功时为空 */
+            /** @description The error code on failure. Empty on success */
             error_code: string;
             /** Format: date-time */
             finished_at: string | null;
@@ -454,7 +460,7 @@ export interface components {
             id: string;
             /** Format: int64 */
             input_tokens: number;
-            /** @description 请求里写的模型名 */
+            /** @description The model named in the request */
             model_id: string;
             /** Format: int64 */
             output_tokens: number;
@@ -467,23 +473,23 @@ export interface components {
             /** @enum {string} */
             status: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
             stream: boolean;
-            /** @description 上游那边的请求 id，报障时提供给我们 */
+            /** @description The id of the request on the upstream side. Quote it when reporting a problem */
             upstream_request_id: string;
             /**
              * Format: int64
-             * @description 上游返回的 HTTP 状态码；0 表示没打到上游
+             * @description The HTTP status returned upstream. 0 indicates that the request never reached it
              */
             upstream_status: number;
             /**
-             * @description upstream 是上游报的，estimated 是我们按字符类估的
+             * @description upstream means the figures were reported by the provider; estimated means they were derived from the character classes of the payload
              * @enum {string}
              */
             usage_source: "none" | "upstream" | "estimated";
         };
         CursorPageRequestResource: {
-            /** @description 这一页的内容 */
+            /** @description The items in this page */
             items: components["schemas"]["RequestResource"][];
-            /** @description 下一页的游标；为空表示已经到底 */
+            /** @description The cursor for the next page. Empty on the last page */
             next_cursor: string;
         };
         APIKeyUsageResource: {
@@ -544,7 +550,7 @@ export interface components {
             cache_write_tokens: number;
             /**
              * Format: date-time
-             * @description 这一段的起点，含
+             * @description Start of the bucket, inclusive
              */
             from: string;
             /** Format: int64 */
@@ -557,12 +563,35 @@ export interface components {
             requests: number;
             /**
              * Format: date-time
-             * @description 这一段的终点，不含
+             * @description End of the bucket, exclusive
              */
             to: string;
         };
         UsageTimelineResponseBody: {
             items: components["schemas"]["UsageBucketResource"][];
+        };
+        /**
+         * @description A single mismatch between the request and the contract.
+         *
+         *     Use `field` to locate the input, `rule` to decide what to tell the user, and
+         *     `reason` only for diagnostics.
+         */
+        Violation: {
+            /**
+             * @description Dot-separated path to the field, such as `name` or
+             *     `schedule.0.start_time_seconds`.
+             */
+            field: string;
+            /**
+             * @description The JSON Schema keyword that failed, such as `minLength`, `minimum` or
+             *     `pattern`.
+             */
+            rule: string;
+            /**
+             * @description The validator's own wording, in English. Intended for diagnostics; do not
+             *     display it to end users.
+             */
+            reason?: string;
         };
     };
     responses: never;
@@ -576,11 +605,11 @@ export interface operations {
     "list-api-keys": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description Maximum number of items in this page */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
                 offset?: number;
-                /** @description 只看这个状态的；不传表示全部 */
+                /** @description Restricts the result to the specified status. Every status is returned while this is absent */
                 status?: "active" | "disabled" | "revoked";
             };
             header?: never;
@@ -864,19 +893,19 @@ export interface operations {
     "list-requests": {
         parameters: {
             query: {
-                /** @description 起点，含。RFC 3339，带时区偏移 */
+                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
                 from: string;
-                /** @description 终点，不含。RFC 3339，带时区偏移 */
+                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
                 to: string;
-                /** @description 只看这个模型 */
+                /** @description Restricts the result to the specified model */
                 model_id?: string;
-                /** @description 只看这把 key */
+                /** @description Restricts the result to the specified API key */
                 api_key_id?: string;
-                /** @description 只看这个状态的 */
+                /** @description Restricts the result to the specified status */
                 status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
-                /** @description 这一页最多返回多少条 */
+                /** @description Maximum number of items in this page */
                 limit?: number;
-                /** @description 上一页返回的 next_cursor；首页不填 */
+                /** @description The `next_cursor` returned by the previous page. Omitted on the first page */
                 cursor?: string;
             };
             header?: never;
@@ -939,15 +968,15 @@ export interface operations {
     "list-usage-by-api-key": {
         parameters: {
             query: {
-                /** @description 起点，含。RFC 3339，带时区偏移 */
+                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
                 from: string;
-                /** @description 终点，不含。RFC 3339，带时区偏移 */
+                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
                 to: string;
-                /** @description 只看这个模型 */
+                /** @description Restricts the result to the specified model */
                 model_id?: string;
-                /** @description 只看这把 key */
+                /** @description Restricts the result to the specified API key */
                 api_key_id?: string;
-                /** @description 只看这个状态的 */
+                /** @description Restricts the result to the specified status */
                 status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
             };
             header?: never;
@@ -979,15 +1008,15 @@ export interface operations {
     "list-usage-by-model": {
         parameters: {
             query: {
-                /** @description 起点，含。RFC 3339，带时区偏移 */
+                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
                 from: string;
-                /** @description 终点，不含。RFC 3339，带时区偏移 */
+                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
                 to: string;
-                /** @description 只看这个模型 */
+                /** @description Restricts the result to the specified model */
                 model_id?: string;
-                /** @description 只看这把 key */
+                /** @description Restricts the result to the specified API key */
                 api_key_id?: string;
-                /** @description 只看这个状态的 */
+                /** @description Restricts the result to the specified status */
                 status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
             };
             header?: never;
@@ -1019,15 +1048,15 @@ export interface operations {
     "get-usage-summary": {
         parameters: {
             query: {
-                /** @description 起点，含。RFC 3339，带时区偏移 */
+                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
                 from: string;
-                /** @description 终点，不含。RFC 3339，带时区偏移 */
+                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
                 to: string;
-                /** @description 只看这个模型 */
+                /** @description Restricts the result to the specified model */
                 model_id?: string;
-                /** @description 只看这把 key */
+                /** @description Restricts the result to the specified API key */
                 api_key_id?: string;
-                /** @description 只看这个状态的 */
+                /** @description Restricts the result to the specified status */
                 status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
             };
             header?: never;
@@ -1059,17 +1088,17 @@ export interface operations {
     "get-usage-timeline": {
         parameters: {
             query: {
-                /** @description 起点，含。RFC 3339，带时区偏移 */
+                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
                 from: string;
-                /** @description 终点，不含。RFC 3339，带时区偏移 */
+                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
                 to: string;
-                /** @description 只看这个模型 */
+                /** @description Restricts the result to the specified model */
                 model_id?: string;
-                /** @description 只看这把 key */
+                /** @description Restricts the result to the specified API key */
                 api_key_id?: string;
-                /** @description 只看这个状态的 */
+                /** @description Restricts the result to the specified status */
                 status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
-                /** @description 每段多长，Go 的时长写法，如 1h、24h。段数上限 100 */
+                /** @description The length of each bucket, written as a duration such as 1h or 24h. The number of buckets is limited to 100 */
                 bucket?: string;
             };
             header?: never;

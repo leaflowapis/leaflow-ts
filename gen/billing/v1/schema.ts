@@ -420,6 +420,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pay several outstanding invoices and orders at once
+         * @description All of them or none. Nothing is settled unless everything named here can be, so a
+         *     partial result is not a state this can leave behind.
+         *
+         *     The balance is not split across the two cases: either it covers the whole total and
+         *     everything is settled from it, or it is left untouched and the full total is collected
+         *     through the provider. It is never partly spent against an unpaid remainder.
+         *
+         *     When the provider is needed, this returns a checkout address and settles nothing.
+         *     Call it again once the payment has landed — the balance then covers the total and the
+         *     same call settles everything.
+         *
+         *     Anything already paid is skipped rather than refused, so a repeated call after a
+         *     partial success is safe.
+         */
+        post: operations["pay-together"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/orders/{orderId}/pay": {
         parameters: {
             query?: never;
@@ -1087,6 +1119,33 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/account/v1/orders/{orderId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: components["parameters"]["OrderId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Call off a plan change that has not taken effect yet
+         * @description Only for a change scheduled for the end of the period, and only while it is still
+         *     pending. An immediate change has already happened by the time it is placed, and there is
+         *     nothing to call off.
+         *
+         *     Nothing was charged or returned when it was scheduled, so nothing moves here either. The
+         *     subscription keeps running on what it is on now, and the item is free to be changed again.
+         */
+        post: operations["cancel-scheduled-change"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/v1/orders/{orderId}/items": {
         parameters: {
             query?: never;
@@ -1242,6 +1301,12 @@ export interface components {
             code?: string;
             message: string;
             meta?: {
+                /**
+                 * @description Present on every response whose `code` is `VALIDATION_FAILED`, and on no
+                 *     other response.
+                 */
+                violations?: components["schemas"]["Violation"][];
+            } & {
                 [key: string]: unknown;
             };
             /** Format: int64 */
@@ -1543,8 +1608,14 @@ export interface components {
         Quote: {
             lines?: components["schemas"]["QuoteLineResult"][];
             changes?: components["schemas"]["QuoteChangeResult"][];
-            /** @description What would be owed in total. Amounts to be returned are not netted off it. */
-            total: components["schemas"]["Money"];
+            /**
+             * @description What would be owed in total. Amounts to be returned are not netted off it.
+             *
+             *     Null when any line could not be priced. What would be owed is not knowable then, and a
+             *     total that silently left the unpriced lines out would read as a smaller bill rather than
+             *     an incomplete one — the per-line `priced` flag is easy to skip, a missing total is not.
+             */
+            total?: components["schemas"]["Money"] | null;
             /** @description What would be returned in total. */
             total_refundable?: components["schemas"]["Money"];
             currency: string;
@@ -1570,6 +1641,17 @@ export interface components {
             currency: string;
             /** @enum {string} */
             status: "active" | "suspended" | "closed";
+            /**
+             * @description How far past the suspension threshold this account may go before its resources are
+             *     suspended. "0" means none: the account is suspended as soon as it crosses the threshold.
+             */
+            grace_amount?: string;
+            /**
+             * Format: int64
+             * @description How long this account has to top up after crossing the suspension threshold.
+             *     0 means none. Whichever runs out first — this or grace_amount — ends the grace.
+             */
+            grace_period_seconds?: number;
             /** Format: date-time */
             created_at: string;
         };
@@ -1830,6 +1912,20 @@ export interface components {
              */
             use_balance?: boolean;
             return_url?: string;
+        };
+        /**
+         * @description Name at least one invoice or order. They must all belong to the same account and share
+         *     its currency; anything else is refused rather than partly paid.
+         */
+        PayTogetherRequest: {
+            invoice_ids?: string[];
+            order_ids?: string[];
+            return_url?: string;
+            /**
+             * @description Required when the provider is involved, because that is where the money moves. The
+             *     same key returns the same checkout address instead of opening a second one.
+             */
+            idempotency_key?: string;
         };
         /**
          * @description Where the payment has got to.
@@ -2374,11 +2470,23 @@ export interface components {
             amount: components["schemas"]["Money"];
             /** @description What is still outstanding. Zero once paid. */
             amount_due?: components["schemas"]["Money"];
-            /**
-             * @description Returned as part of a downgrade. It is returned to the sources that originally paid
-             *     rather than deducted from `amount`.
-             */
+            /** @description How much of `refundable_amount` has already gone back. */
             refunded_amount?: components["schemas"]["Money"];
+            /**
+             * @description When a plan change takes effect. `none` on anything that is not a change.
+             *
+             *     `period_end` orders stay pending until the current paid period runs out. Renewing in
+             *     the meantime moves that moment along with it.
+             * @enum {string}
+             */
+            change_effective?: "none" | "immediate" | "period_end";
+            /**
+             * @description What a downgrade gives back. It is returned to the sources that originally paid
+             *     rather than deducted from `amount`, so paying with granted credit gives back credit.
+             *
+             *     Always "0" on a `period_end` change: nothing is left of the period at its end.
+             */
+            refundable_amount?: components["schemas"]["Money"];
             /**
              * Format: date-time
              * @description When the funds and any stock held for this order are released. After this it can no
@@ -2707,6 +2815,29 @@ export interface components {
             items: components["schemas"]["Entitlement"][];
             /** Format: int64 */
             total_count?: number;
+        };
+        /**
+         * @description A single mismatch between the request and the contract.
+         *
+         *     Use `field` to locate the input, `rule` to decide what to tell the user, and
+         *     `reason` only for diagnostics.
+         */
+        Violation: {
+            /**
+             * @description Dot-separated path to the field, such as `name` or
+             *     `schedule.0.start_time_seconds`.
+             */
+            field: string;
+            /**
+             * @description The JSON Schema keyword that failed, such as `minLength`, `minimum` or
+             *     `pattern`.
+             */
+            rule: string;
+            /**
+             * @description The validator's own wording, in English. Intended for diagnostics; do not
+             *     display it to end users.
+             */
+            reason?: string;
         };
     };
     responses: {
@@ -3395,6 +3526,31 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": components["schemas"]["PayRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentResult"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    "pay-together": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PayTogetherRequest"];
             };
         };
         responses: {
@@ -4276,6 +4432,29 @@ export interface operations {
         };
     };
     "get-order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: components["parameters"]["OrderId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    "cancel-scheduled-change": {
         parameters: {
             query?: never;
             header?: never;

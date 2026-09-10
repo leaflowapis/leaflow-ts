@@ -12,12 +12,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 这个平台现在收不收人
-         * @description 注册页和「新建项目」按钮用它决定画什么。不需要令牌。
+         * Get registration and project creation settings
+         * @description No token required.
          *
-         *     `registration_mode` 不是 `OPEN` 时 `POST /account/v1/register` 会答 403：`CLOSED` 是整个关着，`INVITE_ONLY` 是只收手上有项目邀请的邮箱。`project_creation_mode` 同理，`VERIFIED_ONLY` 要先过实名。
+         *     While `registration_mode` is not `OPEN`, `POST /account/v1/register` answers 403: `CLOSED` refuses everyone, and `INVITE_ONLY` accepts only an email address holding a project invitation. `project_creation_mode` behaves the same way, and `VERIFIED_ONLY` requires identity verification to have completed.
          *
-         *     两条配额是 0 表示不限。它们只用来提前提示，真正的判定在写入那一刻。
+         *     Both quotas are `0` when unlimited. The decision itself is made at the moment of writing.
          */
         get: operations["get-settings"];
         put?: never;
@@ -36,10 +36,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 注册页要用的国家/地区和语言清单
-         * @description 免认证：注册页在还没有账号的时候就要画出这两个下拉框。
-         *     国家名和排序都跟着 `Accept-Language` 走——一个英文用户看到的是 China 而不是「中国」， 而顺序按那种语言自己的规则（中文按拼音，英文按字母），不是按码点。头缺失时用简体中文。
-         *     清单来自 CLDR，不是我们自己维护的一份：ISO 3166 每年都改，而抄下来的那份不会跟着改。 已经退役的代码（苏联、南斯拉夫）和不是地方的代码（欧盟、联合国）都不在里面。
+         * List countries and languages for registration
+         * @description No token required: the registration page renders both lists before an account exists.
+         *
+         *     Country names and their order follow `Accept-Language`. A name is rendered in the requested language and the list is ordered by the rules of that language rather than by code point. Simplified Chinese applies when the header is absent.
+         *
+         *     Retired codes such as the Soviet Union and Yugoslavia, and codes that denote no country such as the European Union, are not listed.
          */
         get: operations["list-locales"];
         put?: never;
@@ -58,10 +60,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出注册必须同意的文件
-         * @description 注册页显示它，用户同意之后把每一项的 `type` 和 `version` 原样回传给 `POST /api/v1/register`。
+         * List the agreements registration requires
+         * @description No token required. Send the `type` and `version` of each one back unchanged to `POST /account/v1/register`.
          *
-         *     不需要令牌。还没有任何文件生效时返回空数组，那时注册不需要提交 `consents`。
+         *     The array is empty while no agreement is in force, and registration then takes no `consents`.
          */
         get: operations["list-agreements"];
         put?: never;
@@ -80,16 +82,16 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出我同意过的文件
-         * @description 全部记录，最新的在前，包括已经不是当前版本的那些。
+         * List the agreements the caller has consented to
+         * @description Every record, most recent first, including versions that are no longer current.
          */
         get: operations["list-consents"];
         put?: never;
         /**
-         * 同意条款
-         * @description 条款改版之后用它重新同意，`GET /api/v1/me` 的 `pending_agreements` 非空时就该调。
+         * Consent to the current agreements
+         * @description Call this once a new version is published, which is whenever `pending_agreements` on `GET /account/v1/me` is not empty.
          *
-         *     只收当前生效的版本，签旧版答 409。重复提交同一版不报错，第一次那条记录会留着。
+         *     Only the version currently in force is accepted; consenting to an earlier one answers 409. Submitting the same version twice is not an error and leaves the first record in place.
          */
         post: operations["accept-agreements"];
         delete?: never;
@@ -108,10 +110,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 注册账号
-         * @description 在 auth.leaflow.net 登录之后调它，带上账号令牌。姓名和邮箱取自登录信息，不从请求体收。
+         * Register an account
+         * @description Call this after signing in at auth.leaflow.net, carrying the access token. The name and email address are taken from the sign-in claims and are not read from the request body.
          *
-         *     `consents` 要覆盖 `GET /api/v1/agreements` 返回的每一份，版本号也要一致；漏一份答 400，版本对不上答 409（多半是页面开着的时候条款改版了，重新拉一次清单即可）。已经注册过的答 409。
+         *     `consents` must cover every agreement returned by `GET /account/v1/agreements`, at the same versions. A missing agreement answers 400 and a stale version answers 409, in which case fetch the list again. An account that already exists answers 409.
          */
         post: operations["register"];
         delete?: never;
@@ -128,8 +130,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看当前账号
-         * @description `pending_agreements` 是还没同意的文件，非空就要先引导用户同意，再调 `POST /api/v1/me/consents`。
+         * Get the current account
+         * @description `pending_agreements` holds the agreements not yet consented to. While it is not empty, obtain consent and call `POST /account/v1/me/consents`.
          */
         get: operations["get-account"];
         put?: never;
@@ -138,8 +140,8 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * 改当前账号的国家/地区和语言
-         * @description 姓名和邮箱不在这里改：它们来自身份提供方，改了会在下一次登录同步时被覆盖回去。
+         * Update the country and language of the current account
+         * @description The name and email address cannot be changed here. They come from the identity provider, and a change would be overwritten at the next sign-in.
          */
         patch: operations["update-account"];
         trace?: never;
@@ -152,14 +154,14 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 查看实名核验状态
-         * @description 没交过材料时答 UNVERIFIED，不是 404。姓名和证件号不会出现在任何响应里。
+         * Get identity verification status
+         * @description The status is `UNVERIFIED` rather than 404 when nothing has been submitted. The legal name and the document number appear in no response.
          */
         get: operations["get-identity-verification"];
         put?: never;
         /**
-         * 提交实名核验材料
-         * @description 已经在等人审的和已经核过的都会被拒。被驳回之后可以改了再交。
+         * Submit identity verification
+         * @description A submission awaiting review, and an account already verified, are both refused. A rejected submission may be corrected and sent again.
          */
         post: operations["submit-identity-verification"];
         delete?: never;
@@ -176,8 +178,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出寄给我的要约
-         * @description 按当前账号的邮箱查，因为要约是寄给一个地址的——被邀请的人当时可能还没注册。
+         * List invitations addressed to the caller
+         * @description Matched against the email address of the current account.
          */
         get: operations["list-my-invitations"];
         put?: never;
@@ -196,12 +198,12 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 看一眼这封邀请是谁发的、加入哪儿、什么角色
-         * @description 免认证，而且是有意的：点邮件里那条链接的人多半还没登录，甚至还没有账号。要他先注册再 告诉他这是谁发来的、加入哪个项目，等于让他在不知道要加入什么的情况下决定要不要注册。
-         *     它不多泄露任何东西。 这三样——项目名、邀请人、角色——邮件正文里已经写着了，而读得到 这个令牌的人就是收得到那封邮件的人。同一个令牌本来就能把持有者加进项目（见 `accept-invitation-by-token`），读一个项目名比那件事轻得多。
-         *     收件地址打了码（`t***@example.com`）。 不打码的话，这个接口就成了「拿一个令牌反查它 当初寄给了哪个地址」——而那是邮件正文里没有、持有者也未必知道的一件事。
-         *     令牌不存在、已经用过、被撤回、过期，四种情况同一个 404 和同一句话。分开报会把它变成 一个可以拿来试令牌的探针，而这个接口免认证，任何人都试得起。
-         *     它不在 `/me` 下面，隔壁那两条接受要约的在。 `/me` 的意思是「按这次请求的身份认出来 的、属于我的那些」，而这条路上没有身份——持有令牌的人未必是收件人本人。挂在 `/me` 下面会让读的人以为它认过身份，而那正是这条路唯一不做的事。
+         * Preview an invitation by its token
+         * @description No token required: whoever follows the link in an invitation email has usually not signed in, and may hold no account at all.
+         *
+         *     The recipient address is masked (`t***@example.com`).
+         *
+         *     A token that does not exist, one already redeemed, one revoked and one expired all answer the same 404.
          */
         get: operations["preview-invitation-by-token"];
         put?: never;
@@ -222,8 +224,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 顺着邀请链接接受
-         * @description token 对不上和这份要约已经不作数了是同一个回答：持有者对这两种情况能做的事完全一样，分开报会把这个接口变成一个可以拿来试 token 的探针。
+         * Accept an invitation by its token
+         * @description A token that does not match, and an invitation that no longer stands, answer the same way.
          */
         post: operations["accept-invitation-by-token"];
         delete?: never;
@@ -242,8 +244,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 接受一份列在我名下的要约
-         * @description 不需要 token：token 证明的是「你就是这份要约寄给的那个人」，而当前账号的邮箱对得上这份要约，证明的是同一件事。
+         * Accept an invitation listed against the caller
+         * @description No token is required; the invitation is addressed to the email address of the current account.
          */
         post: operations["accept-invitation"];
         delete?: never;
@@ -260,14 +262,14 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * 列出我参与的项目
-         * @description 默认不含已删除的项目——那些是已经不存在了的东西，要看必须明确用 status=DELETED 点名。
+         * List the projects the caller belongs to
+         * @description Deleted projects are excluded unless `status=DELETED` asks for them by name.
          */
         get: operations["list-projects"];
         put?: never;
         /**
-         * 建一个项目
-         * @description 建的人就是所有者。项目会连带预置 OWNER、ADMIN 两个内置角色和一个空权限的 member 角色。
+         * Create a project
+         * @description The caller becomes its owner. The project is created with the built-in `OWNER` and `ADMIN` roles and a `member` role carrying no permissions.
          */
         post: operations["create-project"];
         delete?: never;
@@ -276,7 +278,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/account/v1/projects/{projectId}/token": {
+    "/account/v1/projects/{projectId}/scoped-tokens": {
         parameters: {
             query?: never;
             header?: never;
@@ -286,18 +288,18 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * 换一张项目令牌
-         * @description 选定一个项目后，用账号令牌换取该项目的令牌。
+         * Exchange the access token for a scoped token
+         * @description Once a project has been chosen, exchange the access token for a scoped token for that project.
          *
-         *     **只接受 auth.leaflow.net 签发的账号令牌，不接受项目令牌。** 项目令牌过期后，先在 auth.leaflow.net 续期账号令牌，再重新调用这个接口。
+         *     **Only an access token issued by auth.leaflow.net is accepted; a scoped token is not.** Once a scoped token has expired, obtain a fresh access token at auth.leaflow.net and call this endpoint again.
          *
-         *     换取时会确认账号可用、项目存在，且**调用者是该项目的成员**。非成员无法换取。
+         *     The exchange confirms that the account is usable, that the project exists, and that the caller is a member of it. A caller who is not a member obtains no token.
          *
-         *     令牌只表明身份（用户与项目），**不包含权限**：权限在每次请求时实时判定，所以角色调整立即生效，不必等待令牌过期。
+         *     A scoped token states identity only — the user and the project — and **carries no permissions**. Permissions are evaluated on every request, so a change of role takes effect immediately rather than at the next expiry.
          *
-         *     项目处于停用、封禁或删除中时**仍可换取令牌**：这些状态限制的是写入，不影响查看项目当前状况。
+         *     A project that is suspended, banned or being deleted still issues tokens; those states restrict writes, and the project remains readable.
          */
-        post: operations["exchange-project-token"];
+        post: operations["create-scoped-token"];
         delete?: never;
         options?: never;
         head?: never;
@@ -312,6 +314,12 @@ export interface components {
             code?: string;
             message: string;
             meta?: {
+                /**
+                 * @description Present on every response whose `code` is `VALIDATION_FAILED`, and on no
+                 *     other response.
+                 */
+                violations?: components["schemas"]["Violation"][];
+            } & {
                 [key: string]: unknown;
             };
             /** Format: int64 */
@@ -320,21 +328,21 @@ export interface components {
         SettingsResource: {
             /**
              * Format: int64
-             * @description 一个项目最多几个成员，0 表示不限
+             * @description Maximum number of members a project may hold; 0 means unlimited
              */
             max_members_per_project: number;
             /**
              * Format: int64
-             * @description 你最多能当几个项目的所有者，0 表示不限。已删除的项目不算在内
+             * @description Maximum number of projects an account may own; 0 means unlimited. Deleted projects do not count
              */
             max_projects_per_user: number;
             /**
-             * @description VERIFIED_ONLY 要求先过实名，审核中不算
+             * @description VERIFIED_ONLY requires identity verification to have completed; a submission under review does not qualify
              * @enum {string}
              */
             project_creation_mode: "OPEN" | "VERIFIED_ONLY" | "CLOSED";
             /**
-             * @description INVITE_ONLY 是只收手上有项目邀请的邮箱
+             * @description INVITE_ONLY accepts only an email address holding a project invitation
              * @enum {string}
              */
             registration_mode: "OPEN" | "INVITE_ONLY" | "CLOSED";
@@ -342,14 +350,14 @@ export interface components {
         AgreementResource: {
             /**
              * Format: date-time
-             * @description 从这一刻起注册必须同意这一版
+             * @description From this moment on, registration requires this version
              */
             effective_at: string;
             /** @enum {string} */
             type: "TERMS" | "PRIVACY" | "DPA";
-            /** @description 正文发布在哪 */
+            /** @description Where the text is published */
             url: string;
-            /** @description 同意时原样回传这个值 */
+            /** @description Send this value back unchanged when consenting */
             version: string;
         };
         AgreementListResponseBody: {
@@ -359,7 +367,7 @@ export interface components {
             /** Format: date-time */
             consented_at: string;
             /**
-             * @description OFFLINE 是线下签的，由运营录入
+             * @description OFFLINE is a consent given off the platform and recorded by an operator
              * @enum {string}
              */
             method: "CLICKWRAP" | "OFFLINE";
@@ -384,24 +392,24 @@ export interface components {
             email: string;
             /** Format: date-time */
             email_verified_at: string | null;
-            /** @description 来自登录信息，可能为空 */
+            /** @description Taken from the sign-in claims; may be empty */
             first_name: string;
-            /** @description 身份提供方签发的 subject */
+            /** @description The subject issued by the identity provider */
             id: string;
-            /** @description 来自登录信息，可能为空 */
+            /** @description Taken from the sign-in claims; may be empty */
             last_name: string;
-            /** @description ISO 3166-1 alpha-2。这两个字段是后加的，注册时才开始要求填——已经注册过的人这里 是空串，让他们在设置里补，补之前一切照常。 */
+            /** @description ISO 3166-1 alpha-2. Empty on an account that registered before this was required; such an account continues to work and can set it from the settings page */
             country?: string;
-            /** @description 为空表示没设过，那时按请求头（Accept-Language）走，两者都没有才用平台默认 */
+            /** @description Empty while never set, in which case `Accept-Language` applies, and the platform default when that is absent as well */
             locale?: string;
             pending_agreements: components["schemas"]["AgreementResource"][] | null;
             /** @enum {string} */
             status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING";
         };
         RegisterRequestBody: {
-            /** @description 当前生效的必签文件全部要在里面，版本号要和 GET /api/v1/agreements 给的一致 */
+            /** @description Must cover every agreement currently in force, at the versions returned by GET /account/v1/agreements */
             consents: components["schemas"]["ConsentBody"][] | null;
-            /** @description ISO 3166-1 alpha-2（CN、HK、US）。必须是现实世界里真实存在的国家或地区——EU、ZZ 这类在标准里有位置但不是国家的代码会被拒。存代码不存名字：名字是本地化的，存下来 的那份只会是某一种语言的。 */
+            /** @description ISO 3166-1 alpha-2 (CN, HK, US). Must denote a country or territory that exists; codes such as EU and ZZ hold a place in the standard without denoting one and are refused */
             country: string;
             locale: components["schemas"]["Locale"];
         };
@@ -410,31 +418,31 @@ export interface components {
             languages: components["schemas"]["LanguageOption"][];
         };
         CountryOption: {
-            /** @description ISO 3166-1 alpha-2，注册时原样回传 */
+            /** @description ISO 3166-1 alpha-2, sent back unchanged at registration */
             code: string;
-            /** @description 按 Accept-Language 渲染的名字 */
+            /** @description The name rendered according to `Accept-Language` */
             name: string;
         };
         LanguageOption: {
             code: components["schemas"]["Locale"];
-            /** @description 这种语言的自称，用它自己写（「简体中文」「繁體中文（香港）」「English」）。不跟着 Accept-Language 变——一个只看得懂繁体的人，在一个全简体的列表里找不到自己那一项。 */
+            /** @description The endonym of the language, written in that language itself. It does not follow `Accept-Language` */
             name: string;
         };
         /**
-         * @description 界面和邮件用哪种语言。它和 country 是两件事，不能互相推——一个在香港的人可能读简体， 一个在美国的人可能读繁体。
+         * @description The language used for the interface and for email. It is independent of `country`, and neither can be inferred from the other
          * @enum {string}
          */
         Locale: "zh-Hans" | "zh-Hant-HK" | "en";
-        /** @description 两个字段都是「不传就不动」。设置页上它们是两个独立的控件，用户可能只改其中一个；做成 整体替换的话，一次只想改语言的提交会把国家清掉，而那种丢失不报错。 */
+        /** @description Both fields are optional, and an omitted field is left unchanged */
         UpdateAccountRequestBody: {
-            /** @description 同注册时那个 country */
+            /** @description As at registration */
             country?: string;
             locale?: components["schemas"]["Locale"];
         };
         IdentityVerificationResource: {
             reject_reason: string;
             /**
-             * @description PERSONAL 和 ENTERPRISE 是两类主体而不是两个等级，别拿它们比大小
+             * @description PERSONAL and ENTERPRISE are two kinds of subject rather than two levels, and are not ordered
              * @enum {string}
              */
             status: "UNVERIFIED" | "PENDING" | "PERSONAL" | "ENTERPRISE" | "REJECTED";
@@ -444,24 +452,21 @@ export interface components {
             verified_at: string | null;
         };
         SubmitIdentityVerificationRequestBody: {
-            /** @description 证件号码。同上，而且同一个号码不能挂在两个账号上 */
+            /** @description The document number. It is returned by no endpoint, and one number cannot be attached to two accounts */
             id_number: string;
-            /** @description 真实姓名。敏感个人信息，加密入库，任何接口都不会再把它读出来 */
+            /** @description The legal name. It is returned by no endpoint */
             real_name: string;
         };
-        /**
-         * @description 一封邀请在被接受之前能给出的全部信息。
-         *     它比 InvitationResource 少两样：要约 id 和完整的收件地址。id 不给是因为持有令牌不等于 这封要约列在你名下——真正列在你名下的那些走 list-my-invitations，那条是认过身份的。
-         */
+        /** @description What an invitation states before it is accepted. It carries neither the invitation id nor the full recipient address; the invitations listed against the current account are returned by `list-my-invitations` */
         InvitationPreviewResource: {
-            /** @description 打过码的收件地址，只够收件人认出「这是发给我的」 */
+            /** @description The masked recipient address, enough for the recipient to recognise it */
             email_masked: string;
             /** Format: date-time */
             expires_at: string;
-            /** @description 邀请人的显示名，姓名都空时是他的邮箱 */
+            /** @description The display name of the sender, or their email address when no name is set */
             invited_by_name: string;
             project_name: string;
-            /** @description 接受之后会拿到的角色，显示名 */
+            /** @description The display names of the roles granted on acceptance */
             role_names: string[] | null;
         };
         InvitationResource: {
@@ -472,42 +477,40 @@ export interface components {
             expires_at: string;
             /** Format: uuid */
             id: string;
-            /** @description 发出这份要约的账号 id */
+            /** @description The id of the account that issued the invitation */
             invited_by: string;
-            /** @description 发出这份要约的人的显示名，姓名都空时是他的邮箱。它是读取那一刻的事实，不是发信时的快照 */
+            /** @description The display name of that account, or its email address when no name is set. It reflects the value at the time of reading rather than at the time the invitation was sent */
             invited_by_name: string;
             /** Format: uuid */
             project_id: string;
-            /**
-             * @description 目标项目的名字。
-             *     它在这里，而这一度是刻意不给的——理由是「没接受就不是成员，而名字只有成员能读」。 那条克制在这个场景下站不住：邀请邮件正文里就写着项目名，收件人早就知道了，而一个 只显示 uuid 的邀请列表让人没法判断该不该接受。
-             */
+            /** @description The name of the target project */
             project_name: string;
-            /** @description 兑现时会授予的角色编码 */
+            /** @description The role codes granted on acceptance */
             roles: string[] | null;
-            /** @description 上面那些编码的显示名，按同样的顺序。读者看的是「管理员」，不是 ADMIN */
+            /** @description The display names of those codes, in the same order */
             role_names: string[] | null;
         };
         LengthAwarePageInvitationResource: {
-            /** @description 这一页的内容 */
+            /** @description The items in this page */
             items: components["schemas"]["InvitationResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description Maximum number of items in this page, echoing the request
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description Number of items skipped, echoing the request
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description Total number of matches, not only this page
              */
             total: number;
         };
         AcceptInvitationByTokenRequestBody: {
+            /** @description The token carried by the invitation link */
             token: string;
         };
         ProjectResource: {
@@ -517,7 +520,7 @@ export interface components {
             created_by: string;
             /**
              * Format: date-time
-             * @description 盖上墓碑的那一刻
+             * @description When the project was deleted
              */
             deleted_at: string | null;
             description: string;
@@ -526,7 +529,7 @@ export interface components {
             name: string;
             /** @enum {string} */
             status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
-            /** @description 给人看的，不参与任何查询 */
+            /** @description Written for a reader; it takes part in no query */
             status_reason: string;
             /** Format: date-time */
             updated_at: string;
@@ -537,23 +540,23 @@ export interface components {
         GrantResource: {
             admin: boolean;
             owner: boolean;
-            /** @description 持有的角色编码，只用于展示 */
+            /** @description The role codes held, for display only */
             roles: string[] | null;
-            /** @description 他全部策略编译出来的规则。**不要自己遍历它做判定**——拿它配上自己那份权限目录交给 pkg/rbac：那里面的顺序（所有者不可被 deny、deny 优先于管理员、带资源范围的规则不 参与项目级判定）每一条都对着一种会静默放行的写法。 */
+            /** @description **Do not walk these rules to reach a decision.** They are compiled from every policy that applies to the caller, and serve to render what a user may do. Each request is decided by the service handling it */
             rules: components["schemas"]["RuleResource"][] | null;
         };
         ResourceRefResource: {
-            /** @description 是字符串而不是 uuid：dns 的 zone 标识是一个域名，而且它根本不在 IAM 的库里。匹配 语义是 glob，所以 *.example.com 能表达一批子域名；uuid 和域名都不含 glob 元字符， 对它们来说这就是精确相等。 */
+            /** @description A string rather than a UUID; a DNS zone, for one, is named by its domain. Matching is glob, so `*.example.com` covers a set of subdomains, while a value carrying no glob metacharacter matches exactly */
             id: string;
-            /** @description 形如 compute:instance、dns:zone，和权限名同一个命名空间 */
+            /** @description Of the form compute:instance or dns:zone, in the same namespace as permission names */
             type: string;
         };
         RuleResource: {
             /** @enum {string} */
             effect: "allow" | "deny";
-            /** @description 支持尾部通配（compute:instance.*），通配必须带服务前缀 */
+            /** @description A trailing wildcard is supported (compute:instance.*), and must carry the service prefix */
             permissions: string[] | null;
-            /** @description 为空表示这条规则在整个项目范围内成立；非空则表示它只在这些资源上成立，而那意味着 它回答不了项目级的问题。 */
+            /** @description Empty means the rule holds across the whole project. While it is not empty the rule holds only on those resources, and therefore answers no project-level question */
             resources: components["schemas"]["ResourceRefResource"][] | null;
         };
         ProjectAccessResource: {
@@ -561,21 +564,21 @@ export interface components {
             project: components["schemas"]["ProjectResource"];
         };
         LengthAwarePageProjectAccessResource: {
-            /** @description 这一页的内容 */
+            /** @description The items in this page */
             items: components["schemas"]["ProjectAccessResource"][];
             /**
              * Format: int64
-             * @description 这一页最多几条，回显请求里的值
+             * @description Maximum number of items in this page, echoing the request
              */
             limit: number;
             /**
              * Format: int64
-             * @description 跳过了多少条，回显请求里的值
+             * @description Number of items skipped, echoing the request
              */
             offset: number;
             /**
              * Format: int64
-             * @description 命中的总条数，不只是这一页
+             * @description Total number of matches, not only this page
              */
             total: number;
         };
@@ -583,25 +586,48 @@ export interface components {
             description?: string;
             name: string;
         };
-        ProjectTokenResponseBody: {
+        ScopedTokenResponseBody: {
             /**
              * Format: date-time
-             * @description 过期时刻。到点之前拿用户身份再换一张，别等第一个 401
+             * @description When the token expires. Exchange for a new one before then rather than waiting for the first 401
              */
             expires_at: string;
             /**
              * Format: int64
-             * @description 还能活多少秒
+             * @description Seconds remaining before expiry
              */
             expires_in: number;
-            /** @description **这一份是此刻的快照，不在令牌里，也不要缓存它。** 它只用来决定界面上画什么；真正的判定每次都要重新问 */
+            /** @description **A snapshot taken at the moment of the exchange. It is not carried in the token, and must not be cached.** It serves to render what a user may do; each request is decided again */
             grant: components["schemas"]["GrantResource"];
-            /** @description 顺带带上项目本身，省掉换完之后立刻再查一次 */
+            /** @description The project itself, so that no further lookup is needed after the exchange */
             project: components["schemas"]["ProjectResource"];
-            /** @description 项目令牌，放进 Authorization: Bearer 里用 */
+            /** @description The scoped token, to be sent as `Authorization: Bearer` */
             token: string;
-            /** @description 固定是 Bearer */
+            /** @description Always `Bearer` */
             token_type: string;
+        };
+        /**
+         * @description A single mismatch between the request and the contract.
+         *
+         *     Use `field` to locate the input, `rule` to decide what to tell the user, and
+         *     `reason` only for diagnostics.
+         */
+        Violation: {
+            /**
+             * @description Dot-separated path to the field, such as `name` or
+             *     `schedule.0.start_time_seconds`.
+             */
+            field: string;
+            /**
+             * @description The JSON Schema keyword that failed, such as `minLength`, `minimum` or
+             *     `pattern`.
+             */
+            rule: string;
+            /**
+             * @description The validator's own wording, in English. Intended for diagnostics; do not
+             *     display it to end users.
+             */
+            reason?: string;
         };
     };
     responses: never;
@@ -921,9 +947,9 @@ export interface operations {
     "list-my-invitations": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description Maximum number of items in this page */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
                 offset?: number;
             };
             header?: never;
@@ -955,7 +981,7 @@ export interface operations {
     "preview-invitation-by-token": {
         parameters: {
             query: {
-                /** @description 邀请链接里那串令牌 */
+                /** @description The token carried by the invitation link */
                 token: string;
             };
             header?: never;
@@ -1051,13 +1077,13 @@ export interface operations {
     "list-projects": {
         parameters: {
             query?: {
-                /** @description 这一页最多返回多少条 */
+                /** @description Maximum number of items in this page */
                 limit?: number;
-                /** @description 跳过多少条。要翻得更深请改用游标翻页的接口 */
+                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
                 offset?: number;
-                /** @description 按名称或描述模糊匹配 */
+                /** @description Matches against name or description */
                 keyword?: string;
-                /** @description 按对外状态过滤。不传时不返回已删除的项目 */
+                /** @description Filters by external status. Deleted projects are excluded while this is absent */
                 status?: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
             };
             header?: never;
@@ -1119,7 +1145,7 @@ export interface operations {
             };
         };
     };
-    "exchange-project-token": {
+    "create-scoped-token": {
         parameters: {
             query?: never;
             header?: never;
@@ -1136,7 +1162,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ProjectTokenResponseBody"];
+                    "application/json": components["schemas"]["ScopedTokenResponseBody"];
                 };
             };
             /** @description Error */

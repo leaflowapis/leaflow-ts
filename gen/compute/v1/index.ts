@@ -54,6 +54,10 @@ export type ListDiskTypesResult =
 export type ListDiskTypesQuery =
   operations["list-disk-types"]["parameters"]["query"];
 
+/** `GET /api/v1/disk-types/{diskTypeId}` 成功时的响应体。 */
+export type GetDiskTypeResult =
+  operations["get-disk-type"]["responses"][200]["content"]["application/json"];
+
 /** `GET /api/v1/images` 成功时的响应体。 */
 export type ListImagesResult =
   operations["list-images"]["responses"][200]["content"]["application/json"];
@@ -152,10 +156,6 @@ export type SetFloatingIpBandwidthBody = NonNullable<
   operations["set-floating-ip-bandwidth"]["requestBody"]
 >["content"]["application/json"];
 
-/** `DELETE /api/v1/floating-ips/{floatingIpId}/binding` 成功时的响应体。 */
-export type UnbindFloatingIpResult =
-  operations["unbind-floating-ip"]["responses"][200]["content"]["application/json"];
-
 /** `PUT /api/v1/floating-ips/{floatingIpId}/binding` 成功时的响应体。 */
 export type BindFloatingIpResult =
   operations["bind-floating-ip"]["responses"][200]["content"]["application/json"];
@@ -164,6 +164,10 @@ export type BindFloatingIpResult =
 export type BindFloatingIpBody = NonNullable<
   operations["bind-floating-ip"]["requestBody"]
 >["content"]["application/json"];
+
+/** `DELETE /api/v1/floating-ips/{floatingIpId}/binding` 成功时的响应体。 */
+export type UnbindFloatingIpResult =
+  operations["unbind-floating-ip"]["responses"][200]["content"]["application/json"];
 
 /** `GET /api/v1/instances` 成功时的响应体。 */
 export type ListInstancesResult =
