@@ -96,6 +96,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/disk-types/{diskTypeId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a disk type
+         * @description Retrieve capacity and performance constraints for an existing disk, including system disk types and types withdrawn from sale.
+         */
+        get: operations["get-disk-type"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/images": {
         parameters: {
             query?: never;
@@ -1292,6 +1312,12 @@ export interface components {
             code?: string;
             message: string;
             meta?: {
+                /**
+                 * @description Present on every response whose `code` is `VALIDATION_FAILED`, and on no
+                 *     other response.
+                 */
+                violations?: components["schemas"]["Violation"][];
+            } & {
                 [key: string]: unknown;
             };
             /** Format: int64 */
@@ -2414,6 +2440,29 @@ export interface components {
         RenameSnapshotRequestBody: {
             name: string;
         };
+        /**
+         * @description A single mismatch between the request and the contract.
+         *
+         *     Use `field` to locate the input, `rule` to decide what to tell the user, and
+         *     `reason` only for diagnostics.
+         */
+        Violation: {
+            /**
+             * @description Dot-separated path to the field, such as `name` or
+             *     `schedule.0.start_time_seconds`.
+             */
+            field: string;
+            /**
+             * @description The JSON Schema keyword that failed, such as `minLength`, `minimum` or
+             *     `pattern`.
+             */
+            rule: string;
+            /**
+             * @description The validator's own wording, in English. Intended for diagnostics; do not
+             *     display it to end users.
+             */
+            reason?: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -2636,6 +2685,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DiskTypeListResponseBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    "get-disk-type": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                diskTypeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiskTypeResource"];
                 };
             };
             /** @description Error */

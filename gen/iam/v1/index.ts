@@ -11,10 +11,6 @@ import type { operations } from "./schema.js";
 export type ListPermissionsResult =
   operations["list-permissions"]["responses"][200]["content"]["application/json"];
 
-/** `DELETE /api/v1/project` 成功时的响应体。 */
-export type DeleteProjectResult =
-  operations["delete-project"]["responses"][200]["content"]["application/json"];
-
 /** `GET /api/v1/project` 成功时的响应体。 */
 export type GetProjectResult =
   operations["get-project"]["responses"][200]["content"]["application/json"];
@@ -27,6 +23,10 @@ export type UpdateProjectResult =
 export type UpdateProjectBody = NonNullable<
   operations["update-project"]["requestBody"]
 >["content"]["application/json"];
+
+/** `DELETE /api/v1/project` 成功时的响应体。 */
+export type DeleteProjectResult =
+  operations["delete-project"]["responses"][200]["content"]["application/json"];
 
 /** `GET /api/v1/membership` 成功时的响应体。 */
 export type GetProjectMembershipResult =
@@ -166,10 +166,6 @@ export type CreateSshKeyBody = NonNullable<
   operations["create-ssh-key"]["requestBody"]
 >["content"]["application/json"];
 
-/** `DELETE /api/v1/ssh-keys/{keyId}` 成功时的响应体。 */
-export type RevokeSshKeyResult =
-  operations["revoke-ssh-key"]["responses"][200]["content"]["application/json"];
-
 /** `GET /api/v1/ssh-keys/{keyId}` 成功时的响应体。 */
 export type GetSshKeyResult =
   operations["get-ssh-key"]["responses"][200]["content"]["application/json"];
@@ -182,3 +178,7 @@ export type RenameSshKeyResult =
 export type RenameSshKeyBody = NonNullable<
   operations["rename-ssh-key"]["requestBody"]
 >["content"]["application/json"];
+
+/** `DELETE /api/v1/ssh-keys/{keyId}` 成功时的响应体。 */
+export type RevokeSshKeyResult =
+  operations["revoke-ssh-key"]["responses"][200]["content"]["application/json"];

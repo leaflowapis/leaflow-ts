@@ -145,15 +145,6 @@ export type ListServersQuery =
 export type GetServerResult =
   operations["get-server"]["responses"][200]["content"]["application/json"];
 
-/** `PATCH /api/v1/servers/{serverId}` 成功时的响应体。 */
-export type UpdateServerResult =
-  operations["update-server"]["responses"][200]["content"]["application/json"];
-
-/** `PATCH /api/v1/servers/{serverId}` 的请求体。 */
-export type UpdateServerBody = NonNullable<
-  operations["update-server"]["requestBody"]
->["content"]["application/json"];
-
 /** `PUT /api/v1/servers/{serverId}` 成功时的响应体。 */
 export type EnableServerMonitoringResult =
   operations["enable-server-monitoring"]["responses"][200]["content"]["application/json"];
@@ -161,6 +152,15 @@ export type EnableServerMonitoringResult =
 /** `PUT /api/v1/servers/{serverId}` 的请求体。 */
 export type EnableServerMonitoringBody = NonNullable<
   operations["enable-server-monitoring"]["requestBody"]
+>["content"]["application/json"];
+
+/** `PATCH /api/v1/servers/{serverId}` 成功时的响应体。 */
+export type UpdateServerResult =
+  operations["update-server"]["responses"][200]["content"]["application/json"];
+
+/** `PATCH /api/v1/servers/{serverId}` 的请求体。 */
+export type UpdateServerBody = NonNullable<
+  operations["update-server"]["requestBody"]
 >["content"]["application/json"];
 
 /** `POST /api/v1/servers/{serverId}/psk` 成功时的响应体。 */

@@ -138,6 +138,15 @@ export type PayInvoiceBody = NonNullable<
   operations["pay-invoice"]["requestBody"]
 >["content"]["application/json"];
 
+/** `POST /account/v1/payments` 成功时的响应体。 */
+export type PayTogetherResult =
+  operations["pay-together"]["responses"][200]["content"]["application/json"];
+
+/** `POST /account/v1/payments` 的请求体。 */
+export type PayTogetherBody = NonNullable<
+  operations["pay-together"]["requestBody"]
+>["content"]["application/json"];
+
 /** `POST /account/v1/orders/{orderId}/pay` 成功时的响应体。 */
 export type PayOrderResult =
   operations["pay-order"]["responses"][200]["content"]["application/json"];
@@ -187,6 +196,10 @@ export type ListAllocationsResult =
 export type ListAllocationsQuery =
   operations["list-allocations"]["parameters"]["query"];
 
+/** `GET /account/v1/refunds` 成功时的响应体。 */
+export type ListRefundsResult =
+  operations["list-refunds"]["responses"][200]["content"]["application/json"];
+
 /** `POST /account/v1/refunds` 成功时的响应体。 */
 export type RequestRefundResult =
   operations["request-refund"]["responses"][201]["content"]["application/json"];
@@ -195,10 +208,6 @@ export type RequestRefundResult =
 export type RequestRefundBody = NonNullable<
   operations["request-refund"]["requestBody"]
 >["content"]["application/json"];
-
-/** `GET /account/v1/refunds` 成功时的响应体。 */
-export type ListRefundsResult =
-  operations["list-refunds"]["responses"][200]["content"]["application/json"];
 
 /** `GET /account/v1/usage-charges` 成功时的响应体。 */
 export type ListUsageChargesResult =
@@ -353,6 +362,10 @@ export type ListOrdersQuery =
 /** `GET /account/v1/orders/{orderId}` 成功时的响应体。 */
 export type GetOrderResult =
   operations["get-order"]["responses"][200]["content"]["application/json"];
+
+/** `POST /account/v1/orders/{orderId}/cancel` 成功时的响应体。 */
+export type CancelScheduledChangeResult =
+  operations["cancel-scheduled-change"]["responses"][200]["content"]["application/json"];
 
 /** `GET /account/v1/orders/{orderId}/items` 成功时的响应体。 */
 export type ListOrderItemsResult =

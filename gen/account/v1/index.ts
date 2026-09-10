@@ -113,6 +113,6 @@ export type CreateProjectBody = NonNullable<
   operations["create-project"]["requestBody"]
 >["content"]["application/json"];
 
-/** `POST /account/v1/projects/{projectId}/token` 成功时的响应体。 */
-export type ExchangeProjectTokenResult =
-  operations["exchange-project-token"]["responses"][201]["content"]["application/json"];
+/** `POST /account/v1/projects/{projectId}/scoped-tokens` 成功时的响应体。 */
+export type CreateScopedTokenResult =
+  operations["create-scoped-token"]["responses"][201]["content"]["application/json"];
