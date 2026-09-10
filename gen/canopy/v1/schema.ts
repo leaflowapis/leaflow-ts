@@ -4,1102 +4,1102 @@
  */
 
 export interface paths {
-    "/api/v1/keys": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List API keys */
-        get: operations["list-api-keys"];
-        put?: never;
-        /**
-         * Issue an API key
-         * @description The `secret` in the response is the complete key and **appears in this response only**. It is returned by no other endpoint, and a key that has been lost has to be revoked and reissued.
-         *
-         *     Supply it wherever a value such as `OPENAI_API_KEY` is expected. The forwarding endpoints accept the OpenAI, Anthropic and Gemini request formats alike.
-         */
-        post: operations["create-api-key"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/api/v1/keys": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/keys/{keyId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an API key */
-        get: operations["get-api-key"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Update an API key
-         * @description Attributes only. Enabling, disabling and revoking each have their own endpoint.
-         *
-         *     A field that is not supplied is left unchanged. To remove an expiry, send `clear_expiry` as true rather than a null `expires_at`.
-         *
-         *     A revoked key accepts no modification.
-         */
-        patch: operations["update-api-key"];
-        trace?: never;
+    /** List API keys */
+    get: operations["list-api-keys"];
+    put?: never;
+    /**
+     * Issue an API key
+     * @description The `secret` in the response is the complete key and **appears in this response only**. It is returned by no other endpoint, and a key that has been lost has to be revoked and reissued.
+     *
+     *     Supply it wherever a value such as `OPENAI_API_KEY` is expected. The forwarding endpoints accept the OpenAI, Anthropic and Gemini request formats alike.
+     */
+    post: operations["create-api-key"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/keys/{keyId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/keys/{keyId}/disable": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Disable an API key
-         * @description A temporary measure; the key may be enabled again at any time. Use revocation to invalidate it permanently.
-         */
-        post: operations["disable-api-key"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get an API key */
+    get: operations["get-api-key"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Update an API key
+     * @description Attributes only. Enabling, disabling and revoking each have their own endpoint.
+     *
+     *     A field that is not supplied is left unchanged. To remove an expiry, send `clear_expiry` as true rather than a null `expires_at`.
+     *
+     *     A revoked key accepts no modification.
+     */
+    patch: operations["update-api-key"];
+    trace?: never;
+  };
+  "/api/v1/keys/{keyId}/disable": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/keys/{keyId}/enable": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Enable an API key
-         * @description Two cases cannot be enabled again. A revoked key answers `API_KEY_REVOKED`, and a key disabled because its project is suspended answers `API_KEY_PROJECT_SUSPENDED` with `suspended` set to true; the latter requires the project to be restored first.
-         */
-        post: operations["enable-api-key"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Disable an API key
+     * @description A temporary measure; the key may be enabled again at any time. Use revocation to invalidate it permanently.
+     */
+    post: operations["disable-api-key"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/keys/{keyId}/enable": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/keys/{keyId}/revoke": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Revoke an API key
-         * @description **Irreversible.** It is intended for a key that has been exposed, such as one committed to a repository.
-         *
-         *     The record is retained, so the requests the key issued before it was revoked remain readable.
-         *
-         *     Use disabling for a temporary measure.
-         */
-        post: operations["revoke-api-key"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Enable an API key
+     * @description Two cases cannot be enabled again. A revoked key answers `API_KEY_REVOKED`, and a key disabled because its project is suspended answers `API_KEY_PROJECT_SUSPENDED` with `suspended` set to true; the latter requires the project to be restored first.
+     */
+    post: operations["enable-api-key"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/keys/{keyId}/revoke": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/models": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the available models
-         * @description A model that has been retired does not appear here, while it remains readable individually.
-         *
-         *     `context_length` and `max_output_tokens` are advisory. The server does not truncate on their basis, and the request body is forwarded upstream unchanged.
-         */
-        get: operations["list-models"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Revoke an API key
+     * @description **Irreversible.** It is intended for a key that has been exposed, such as one committed to a repository.
+     *
+     *     The record is retained, so the requests the key issued before it was revoked remain readable.
+     *
+     *     Use disabling for a temporary measure.
+     */
+    post: operations["revoke-api-key"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/models": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/models/{modelId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a model
-         * @description A model that has been retired remains readable here, while forwarding to it is refused with `MODEL_RETIRED`. That is distinct from a model that does not exist.
-         */
-        get: operations["get-model"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the available models
+     * @description A model that has been retired does not appear here, while it remains readable individually.
+     *
+     *     `context_length` and `max_output_tokens` are advisory. The server does not truncate on their basis, and the request body is forwarded upstream unchanged.
+     */
+    get: operations["list-models"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/models/{modelId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/requests": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List request records
-         * @description Cursor-paged, most recent first. An empty `next_cursor` indicates the last page.
-         *
-         *     **The request and response bodies are not returned**; they are not recorded. Quote the `upstream_request_id` when reporting a problem.
-         *
-         *     A `usage_source` of `estimated` indicates that the upstream provider reported no usage for that request, and that the figures are derived from the character classes of the payload.
-         */
-        get: operations["list-requests"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get a model
+     * @description A model that has been retired remains readable here, while forwarding to it is refused with `MODEL_RETIRED`. That is distinct from a model that does not exist.
+     */
+    get: operations["get-model"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/requests": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/requests/{requestId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a single request record */
-        get: operations["get-request"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List request records
+     * @description Cursor-paged, most recent first. An empty `next_cursor` indicates the last page.
+     *
+     *     **The request and response bodies are not returned**; they are not recorded. Quote the `upstream_request_id` when reporting a problem.
+     *
+     *     A `usage_source` of `estimated` indicates that the upstream provider reported no usage for that request, and that the figures are derived from the character classes of the payload.
+     */
+    get: operations["list-requests"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/requests/{requestId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/usage/by-api-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get usage by API key
-         * @description Answers which key is consuming the budget. A key that has been revoked still appears, since the usage it accrued beforehand is part of that answer.
-         */
-        get: operations["list-usage-by-api-key"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a single request record */
+    get: operations["get-request"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/usage/by-api-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/usage/by-model": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get usage by model */
-        get: operations["list-usage-by-model"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get usage by API key
+     * @description Answers which key is consuming the budget. A key that has been revoked still appears, since the usage it accrued beforehand is part of that answer.
+     */
+    get: operations["list-usage-by-api-key"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/usage/by-model": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/usage/summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get total usage
-         * @description `from` and `to` are required and may span no more than 31 days. Both carry a timezone offset, so `2026-08-01T00:00:00+08:00` starts at that instant in UTC+8.
-         *
-         *     The five token classes are reported separately. A cache read costs an order of magnitude less than ordinary input, and a single total cannot be decomposed again.
-         */
-        get: operations["get-usage-summary"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get usage by model */
+    get: operations["list-usage-by-model"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/usage/summary": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/usage/timeline": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a usage series
-         * @description Divided into buckets of `bucket`, starting at `from`. The final bucket may be partial, and the number of buckets is limited to 100.
-         *
-         *     To divide by local day, send `from` as midnight in local time with its offset and `bucket` as `24h`. The server does not infer a timezone.
-         */
-        get: operations["get-usage-timeline"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get total usage
+     * @description `from` and `to` are required and may span no more than 31 days. Both carry a timezone offset, so `2026-08-01T00:00:00+08:00` starts at that instant in UTC+8.
+     *
+     *     The five token classes are reported separately. A cache read costs an order of magnitude less than ordinary input, and a single total cannot be decomposed again.
+     */
+    get: operations["get-usage-summary"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/usage/timeline": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /**
+     * Get a usage series
+     * @description Divided into buckets of `bucket`, starting at `from`. The final bucket may be partial, and the number of buckets is limited to 100.
+     *
+     *     To divide by local day, send `from` as midnight in local time with its offset and `bucket` as `24h`. The server does not infer a timezone.
+     */
+    get: operations["get-usage-timeline"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Error: {
-            code?: string;
-            message: string;
-            /**
-             * @description What a given `code` carries alongside the message. The keys depend on the code,
-             *     and a client that does not recognise one ignores it.
-             */
-            meta?: {
-                [key: string]: unknown;
-            };
-            /** Format: int64 */
-            status: number;
-        };
-        APIKeyResource: {
-            /** @description Carries no meaning while `restrict_models` is false */
-            allowed_models: string[];
-            /** Format: date-time */
-            created_at: string;
-            /**
-             * Format: uuid
-             * @description Who created the key
-             */
-            created_by: string;
-            /**
-             * Format: date-time
-             * @description When the key expires. Null means it never expires
-             */
-            expires_at: string | null;
-            /** Format: uuid */
-            id: string;
-            /** @description The last four characters of the plaintext */
-            last_four: string;
-            /**
-             * Format: date-time
-             * @description When the key was last used to forward a request successfully, accurate to about a minute
-             */
-            last_used_at: string | null;
-            name: string;
-            /** @description The leading characters of the plaintext, by which a key is recognised in a list */
-            prefix: string;
-            /** @description While true, only the models listed in `allowed_models` are permitted */
-            restrict_models: boolean;
-            /** @enum {string} */
-            status: "active" | "disabled" | "revoked";
-            /** @description True indicates that the key was disabled because its project is suspended, and that the project has to be restored before the key can be used again */
-            suspended: boolean;
-        };
-        LengthAwarePageAPIKeyResource: {
-            /** @description The items in this page */
-            items: components["schemas"]["APIKeyResource"][];
-            /**
-             * Format: int64
-             * @description Maximum number of items in this page, echoing the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Number of items skipped, echoing the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matches, not only this page
-             */
-            total: number;
-        };
-        CreateAPIKeyRequestBody: {
-            /** @description Ignored while `restrict_models` is false */
-            allowed_models?: string[] | null;
-            /**
-             * Format: date-time
-             * @description When the key expires. Omitted means it never expires
-             */
-            expires_at?: string | null;
-            /** @description A name for the holder's own use, such as CI or Production */
-            name: string;
-            /** @description While true, only the models listed in `allowed_models` are permitted */
-            restrict_models?: boolean;
-        };
-        IssuedAPIKeyResource: {
-            /** @description Carries no meaning while `restrict_models` is false */
-            allowed_models: string[];
-            /** Format: date-time */
-            created_at: string;
-            /**
-             * Format: uuid
-             * @description Who created the key
-             */
-            created_by: string;
-            /**
-             * Format: date-time
-             * @description When the key expires. Null means it never expires
-             */
-            expires_at: string | null;
-            /** Format: uuid */
-            id: string;
-            /** @description The last four characters of the plaintext */
-            last_four: string;
-            /**
-             * Format: date-time
-             * @description When the key was last used to forward a request successfully, accurate to about a minute
-             */
-            last_used_at: string | null;
-            name: string;
-            /** @description The leading characters of the plaintext, by which a key is recognised in a list */
-            prefix: string;
-            /** @description While true, only the models listed in `allowed_models` are permitted */
-            restrict_models: boolean;
-            /** @description The complete key, **returned in this response only**. Store it immediately */
-            secret: string;
-            /** @enum {string} */
-            status: "active" | "disabled" | "revoked";
-            /** @description True indicates that the key was disabled because its project is suspended, and that the project has to be restored before the key can be used again */
-            suspended: boolean;
-        };
-        UpdateAPIKeyRequestBody: {
-            allowed_models?: string[] | null;
-            /** @description True removes the expiry */
-            clear_expiry?: boolean;
-            /**
-             * Format: date-time
-             * @description Sets the expiry. To remove it, use `clear_expiry`
-             */
-            expires_at?: string | null;
-            name?: string | null;
-            restrict_models?: boolean | null;
-        };
-        ModelResource: {
-            /**
-             * Format: int64
-             * @description The context window. Advisory only; the server does not truncate on its basis
-             */
-            context_length: number;
-            display_name: string;
-            /** @description Groups the models of one family together, such as claude, gpt or gemini */
-            family: string;
-            /** @description The string to send in the `model` field of the request body */
-            id: string;
-            /**
-             * Format: int64
-             * @description The maximum output length. Advisory only
-             */
-            max_output_tokens: number;
-            /** @description The values accepted for `reasoning_effort`. Empty means it is not supported */
-            reasoning_tiers: string[];
-            /** @enum {string} */
-            status: "available" | "draining" | "retired";
-            supports_reasoning: boolean;
-            supports_tools: boolean;
-            supports_vision: boolean;
-        };
-        ModelListResponseBody: {
-            items: components["schemas"]["ModelResource"][];
-        };
-        RequestResource: {
-            /** Format: uuid */
-            api_key_id: string;
-            /**
-             * Format: int64
-             * @description The portion served from the upstream prefix cache, which costs an order of magnitude less than ordinary input
-             */
-            cache_read_tokens: number;
-            /** Format: int64 */
-            cache_write_tokens: number;
-            /** @description The error code on failure. Empty on success */
-            error_code: string;
-            /** Format: date-time */
-            finished_at: string | null;
-            /** Format: date-time */
-            first_token_at: string | null;
-            /** Format: uuid */
-            id: string;
-            /** Format: int64 */
-            input_tokens: number;
-            /** @description The model named in the request */
-            model_id: string;
-            /** Format: int64 */
-            output_tokens: number;
-            /** Format: int64 */
-            reasoning_tokens: number;
-            /** Format: int64 */
-            retries: number;
-            /** Format: date-time */
-            started_at: string;
-            /** @enum {string} */
-            status: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
-            stream: boolean;
-            /** @description The id of the request on the upstream side. Quote it when reporting a problem */
-            upstream_request_id: string;
-            /**
-             * Format: int64
-             * @description The HTTP status returned upstream. 0 indicates that the request never reached it
-             */
-            upstream_status: number;
-            /**
-             * @description upstream means the figures were reported by the provider; estimated means they were derived from the character classes of the payload
-             * @enum {string}
-             */
-            usage_source: "none" | "upstream" | "estimated";
-        };
-        CursorPageRequestResource: {
-            /** @description The items in this page */
-            items: components["schemas"]["RequestResource"][];
-            /** @description The cursor for the next page. Empty on the last page */
-            next_cursor: string;
-        };
-        APIKeyUsageResource: {
-            /** Format: uuid */
-            api_key_id: string;
-            /** Format: int64 */
-            cache_read_tokens: number;
-            /** Format: int64 */
-            cache_write_tokens: number;
-            /** Format: int64 */
-            input_tokens: number;
-            /** Format: int64 */
-            output_tokens: number;
-            /** Format: int64 */
-            reasoning_tokens: number;
-            /** Format: int64 */
-            requests: number;
-        };
-        APIKeyUsageListResponseBody: {
-            items: components["schemas"]["APIKeyUsageResource"][];
-        };
-        ModelUsageResource: {
-            /** Format: int64 */
-            cache_read_tokens: number;
-            /** Format: int64 */
-            cache_write_tokens: number;
-            /** Format: int64 */
-            input_tokens: number;
-            model_id: string;
-            /** Format: int64 */
-            output_tokens: number;
-            /** Format: int64 */
-            reasoning_tokens: number;
-            /** Format: int64 */
-            requests: number;
-        };
-        ModelUsageListResponseBody: {
-            items: components["schemas"]["ModelUsageResource"][];
-        };
-        TotalsResource: {
-            /** Format: int64 */
-            cache_read_tokens: number;
-            /** Format: int64 */
-            cache_write_tokens: number;
-            /** Format: int64 */
-            input_tokens: number;
-            /** Format: int64 */
-            output_tokens: number;
-            /** Format: int64 */
-            reasoning_tokens: number;
-            /** Format: int64 */
-            requests: number;
-        };
-        UsageBucketResource: {
-            /** Format: int64 */
-            cache_read_tokens: number;
-            /** Format: int64 */
-            cache_write_tokens: number;
-            /**
-             * Format: date-time
-             * @description Start of the bucket, inclusive
-             */
-            from: string;
-            /** Format: int64 */
-            input_tokens: number;
-            /** Format: int64 */
-            output_tokens: number;
-            /** Format: int64 */
-            reasoning_tokens: number;
-            /** Format: int64 */
-            requests: number;
-            /**
-             * Format: date-time
-             * @description End of the bucket, exclusive
-             */
-            to: string;
-        };
-        UsageTimelineResponseBody: {
-            items: components["schemas"]["UsageBucketResource"][];
-        };
+  schemas: {
+    Error: {
+      code?: string;
+      message: string;
+      /**
+       * @description What a given `code` carries alongside the message. The keys depend on the code,
+       *     and a client that does not recognise one ignores it.
+       */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /** Format: int64 */
+      status: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    APIKeyResource: {
+      /** @description Carries no meaning while `restrict_models` is false */
+      allowed_models: string[];
+      /** Format: date-time */
+      created_at: string;
+      /**
+       * Format: uuid
+       * @description Who created the key
+       */
+      created_by: string;
+      /**
+       * Format: date-time
+       * @description When the key expires. Null means it never expires
+       */
+      expires_at: string | null;
+      /** Format: uuid */
+      id: string;
+      /** @description The last four characters of the plaintext */
+      last_four: string;
+      /**
+       * Format: date-time
+       * @description When the key was last used to forward a request successfully, accurate to about a minute
+       */
+      last_used_at: string | null;
+      name: string;
+      /** @description The leading characters of the plaintext, by which a key is recognised in a list */
+      prefix: string;
+      /** @description While true, only the models listed in `allowed_models` are permitted */
+      restrict_models: boolean;
+      /** @enum {string} */
+      status: "active" | "disabled" | "revoked";
+      /** @description True indicates that the key was disabled because its project is suspended, and that the project has to be restored before the key can be used again */
+      suspended: boolean;
+    };
+    LengthAwarePageAPIKeyResource: {
+      /** @description The items in this page */
+      items: components["schemas"]["APIKeyResource"][];
+      /**
+       * Format: int64
+       * @description Maximum number of items in this page, echoing the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Number of items skipped, echoing the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matches, not only this page
+       */
+      total: number;
+    };
+    CreateAPIKeyRequestBody: {
+      /** @description Ignored while `restrict_models` is false */
+      allowed_models?: string[] | null;
+      /**
+       * Format: date-time
+       * @description When the key expires. Omitted means it never expires
+       */
+      expires_at?: string | null;
+      /** @description A name for the holder's own use, such as CI or Production */
+      name: string;
+      /** @description While true, only the models listed in `allowed_models` are permitted */
+      restrict_models?: boolean;
+    };
+    IssuedAPIKeyResource: {
+      /** @description Carries no meaning while `restrict_models` is false */
+      allowed_models: string[];
+      /** Format: date-time */
+      created_at: string;
+      /**
+       * Format: uuid
+       * @description Who created the key
+       */
+      created_by: string;
+      /**
+       * Format: date-time
+       * @description When the key expires. Null means it never expires
+       */
+      expires_at: string | null;
+      /** Format: uuid */
+      id: string;
+      /** @description The last four characters of the plaintext */
+      last_four: string;
+      /**
+       * Format: date-time
+       * @description When the key was last used to forward a request successfully, accurate to about a minute
+       */
+      last_used_at: string | null;
+      name: string;
+      /** @description The leading characters of the plaintext, by which a key is recognised in a list */
+      prefix: string;
+      /** @description While true, only the models listed in `allowed_models` are permitted */
+      restrict_models: boolean;
+      /** @description The complete key, **returned in this response only**. Store it immediately */
+      secret: string;
+      /** @enum {string} */
+      status: "active" | "disabled" | "revoked";
+      /** @description True indicates that the key was disabled because its project is suspended, and that the project has to be restored before the key can be used again */
+      suspended: boolean;
+    };
+    UpdateAPIKeyRequestBody: {
+      allowed_models?: string[] | null;
+      /** @description True removes the expiry */
+      clear_expiry?: boolean;
+      /**
+       * Format: date-time
+       * @description Sets the expiry. To remove it, use `clear_expiry`
+       */
+      expires_at?: string | null;
+      name?: string | null;
+      restrict_models?: boolean | null;
+    };
+    ModelResource: {
+      /**
+       * Format: int64
+       * @description The context window. Advisory only; the server does not truncate on its basis
+       */
+      context_length: number;
+      display_name: string;
+      /** @description Groups the models of one family together, such as claude, gpt or gemini */
+      family: string;
+      /** @description The string to send in the `model` field of the request body */
+      id: string;
+      /**
+       * Format: int64
+       * @description The maximum output length. Advisory only
+       */
+      max_output_tokens: number;
+      /** @description The values accepted for `reasoning_effort`. Empty means it is not supported */
+      reasoning_tiers: string[];
+      /** @enum {string} */
+      status: "available" | "draining" | "retired";
+      supports_reasoning: boolean;
+      supports_tools: boolean;
+      supports_vision: boolean;
+    };
+    ModelListResponseBody: {
+      items: components["schemas"]["ModelResource"][];
+    };
+    RequestResource: {
+      /** Format: uuid */
+      api_key_id: string;
+      /**
+       * Format: int64
+       * @description The portion served from the upstream prefix cache, which costs an order of magnitude less than ordinary input
+       */
+      cache_read_tokens: number;
+      /** Format: int64 */
+      cache_write_tokens: number;
+      /** @description The error code on failure. Empty on success */
+      error_code: string;
+      /** Format: date-time */
+      finished_at: string | null;
+      /** Format: date-time */
+      first_token_at: string | null;
+      /** Format: uuid */
+      id: string;
+      /** Format: int64 */
+      input_tokens: number;
+      /** @description The model named in the request */
+      model_id: string;
+      /** Format: int64 */
+      output_tokens: number;
+      /** Format: int64 */
+      reasoning_tokens: number;
+      /** Format: int64 */
+      retries: number;
+      /** Format: date-time */
+      started_at: string;
+      /** @enum {string} */
+      status: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
+      stream: boolean;
+      /** @description The id of the request on the upstream side. Quote it when reporting a problem */
+      upstream_request_id: string;
+      /**
+       * Format: int64
+       * @description The HTTP status returned upstream. 0 indicates that the request never reached it
+       */
+      upstream_status: number;
+      /**
+       * @description upstream means the figures were reported by the provider; estimated means they were derived from the character classes of the payload
+       * @enum {string}
+       */
+      usage_source: "none" | "upstream" | "estimated";
+    };
+    CursorPageRequestResource: {
+      /** @description The items in this page */
+      items: components["schemas"]["RequestResource"][];
+      /** @description The cursor for the next page. Empty on the last page */
+      next_cursor: string;
+    };
+    APIKeyUsageResource: {
+      /** Format: uuid */
+      api_key_id: string;
+      /** Format: int64 */
+      cache_read_tokens: number;
+      /** Format: int64 */
+      cache_write_tokens: number;
+      /** Format: int64 */
+      input_tokens: number;
+      /** Format: int64 */
+      output_tokens: number;
+      /** Format: int64 */
+      reasoning_tokens: number;
+      /** Format: int64 */
+      requests: number;
+    };
+    APIKeyUsageListResponseBody: {
+      items: components["schemas"]["APIKeyUsageResource"][];
+    };
+    ModelUsageResource: {
+      /** Format: int64 */
+      cache_read_tokens: number;
+      /** Format: int64 */
+      cache_write_tokens: number;
+      /** Format: int64 */
+      input_tokens: number;
+      model_id: string;
+      /** Format: int64 */
+      output_tokens: number;
+      /** Format: int64 */
+      reasoning_tokens: number;
+      /** Format: int64 */
+      requests: number;
+    };
+    ModelUsageListResponseBody: {
+      items: components["schemas"]["ModelUsageResource"][];
+    };
+    TotalsResource: {
+      /** Format: int64 */
+      cache_read_tokens: number;
+      /** Format: int64 */
+      cache_write_tokens: number;
+      /** Format: int64 */
+      input_tokens: number;
+      /** Format: int64 */
+      output_tokens: number;
+      /** Format: int64 */
+      reasoning_tokens: number;
+      /** Format: int64 */
+      requests: number;
+    };
+    UsageBucketResource: {
+      /** Format: int64 */
+      cache_read_tokens: number;
+      /** Format: int64 */
+      cache_write_tokens: number;
+      /**
+       * Format: date-time
+       * @description Start of the bucket, inclusive
+       */
+      from: string;
+      /** Format: int64 */
+      input_tokens: number;
+      /** Format: int64 */
+      output_tokens: number;
+      /** Format: int64 */
+      reasoning_tokens: number;
+      /** Format: int64 */
+      requests: number;
+      /**
+       * Format: date-time
+       * @description End of the bucket, exclusive
+       */
+      to: string;
+    };
+    UsageTimelineResponseBody: {
+      items: components["schemas"]["UsageBucketResource"][];
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "list-api-keys": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of items in this page */
-                limit?: number;
-                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
-                offset?: number;
-                /** @description Restricts the result to the specified status. Every status is returned while this is absent */
-                status?: "active" | "disabled" | "revoked";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageAPIKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  "list-api-keys": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of items in this page */
+        limit?: number;
+        /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
+        offset?: number;
+        /** @description Restricts the result to the specified status. Every status is returned while this is absent */
+        status?: "active" | "disabled" | "revoked";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "create-api-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateAPIKeyRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageAPIKeyResource"];
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IssuedAPIKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-api-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                keyId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["APIKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "create-api-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "update-api-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                keyId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateAPIKeyRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["APIKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateAPIKeyRequestBody"];
+      };
     };
-    "disable-api-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                keyId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["APIKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["IssuedAPIKeyResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "enable-api-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                keyId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["APIKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "get-api-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        keyId: string;
+      };
+      cookie?: never;
     };
-    "revoke-api-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                keyId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["APIKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["APIKeyResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "list-models": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ModelListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "update-api-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        keyId: string;
+      };
+      cookie?: never;
     };
-    "get-model": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                modelId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ModelResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateAPIKeyRequestBody"];
+      };
     };
-    "list-requests": {
-        parameters: {
-            query: {
-                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
-                from: string;
-                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
-                to: string;
-                /** @description Restricts the result to the specified model */
-                model_id?: string;
-                /** @description Restricts the result to the specified API key */
-                api_key_id?: string;
-                /** @description Restricts the result to the specified status */
-                status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
-                /** @description Maximum number of items in this page */
-                limit?: number;
-                /** @description The `next_cursor` returned by the previous page. Omitted on the first page */
-                cursor?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CursorPageRequestResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["APIKeyResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-request": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                requestId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RequestResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "disable-api-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        keyId: string;
+      };
+      cookie?: never;
     };
-    "list-usage-by-api-key": {
-        parameters: {
-            query: {
-                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
-                from: string;
-                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
-                to: string;
-                /** @description Restricts the result to the specified model */
-                model_id?: string;
-                /** @description Restricts the result to the specified API key */
-                api_key_id?: string;
-                /** @description Restricts the result to the specified status */
-                status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["APIKeyUsageListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["APIKeyResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "list-usage-by-model": {
-        parameters: {
-            query: {
-                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
-                from: string;
-                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
-                to: string;
-                /** @description Restricts the result to the specified model */
-                model_id?: string;
-                /** @description Restricts the result to the specified API key */
-                api_key_id?: string;
-                /** @description Restricts the result to the specified status */
-                status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ModelUsageListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "enable-api-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        keyId: string;
+      };
+      cookie?: never;
     };
-    "get-usage-summary": {
-        parameters: {
-            query: {
-                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
-                from: string;
-                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
-                to: string;
-                /** @description Restricts the result to the specified model */
-                model_id?: string;
-                /** @description Restricts the result to the specified API key */
-                api_key_id?: string;
-                /** @description Restricts the result to the specified status */
-                status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TotalsResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["APIKeyResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-usage-timeline": {
-        parameters: {
-            query: {
-                /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
-                from: string;
-                /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
-                to: string;
-                /** @description Restricts the result to the specified model */
-                model_id?: string;
-                /** @description Restricts the result to the specified API key */
-                api_key_id?: string;
-                /** @description Restricts the result to the specified status */
-                status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
-                /** @description The length of each bucket, written as a duration such as 1h or 24h. The number of buckets is limited to 100 */
-                bucket?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UsageTimelineResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "revoke-api-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        keyId: string;
+      };
+      cookie?: never;
     };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["APIKeyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-models": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModelListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-model": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        modelId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModelResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-requests": {
+    parameters: {
+      query: {
+        /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
+        from: string;
+        /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
+        to: string;
+        /** @description Restricts the result to the specified model */
+        model_id?: string;
+        /** @description Restricts the result to the specified API key */
+        api_key_id?: string;
+        /** @description Restricts the result to the specified status */
+        status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
+        /** @description Maximum number of items in this page */
+        limit?: number;
+        /** @description The `next_cursor` returned by the previous page. Omitted on the first page */
+        cursor?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CursorPageRequestResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-request": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        requestId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RequestResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-usage-by-api-key": {
+    parameters: {
+      query: {
+        /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
+        from: string;
+        /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
+        to: string;
+        /** @description Restricts the result to the specified model */
+        model_id?: string;
+        /** @description Restricts the result to the specified API key */
+        api_key_id?: string;
+        /** @description Restricts the result to the specified status */
+        status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["APIKeyUsageListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-usage-by-model": {
+    parameters: {
+      query: {
+        /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
+        from: string;
+        /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
+        to: string;
+        /** @description Restricts the result to the specified model */
+        model_id?: string;
+        /** @description Restricts the result to the specified API key */
+        api_key_id?: string;
+        /** @description Restricts the result to the specified status */
+        status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModelUsageListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-usage-summary": {
+    parameters: {
+      query: {
+        /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
+        from: string;
+        /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
+        to: string;
+        /** @description Restricts the result to the specified model */
+        model_id?: string;
+        /** @description Restricts the result to the specified API key */
+        api_key_id?: string;
+        /** @description Restricts the result to the specified status */
+        status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TotalsResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-usage-timeline": {
+    parameters: {
+      query: {
+        /** @description Start of the range, inclusive. RFC 3339, carrying a timezone offset */
+        from: string;
+        /** @description End of the range, exclusive. RFC 3339, carrying a timezone offset */
+        to: string;
+        /** @description Restricts the result to the specified model */
+        model_id?: string;
+        /** @description Restricts the result to the specified API key */
+        api_key_id?: string;
+        /** @description Restricts the result to the specified status */
+        status?: "in_flight" | "succeeded" | "refused" | "upstream_failed" | "client_aborted";
+        /** @description The length of each bucket, written as a duration such as 1h or 24h. The number of buckets is limited to 100 */
+        bucket?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UsageTimelineResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
 }

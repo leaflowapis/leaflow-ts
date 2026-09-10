@@ -4,4183 +4,4241 @@
  */
 
 export interface paths {
-    "/api/v1/incidents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List incidents
-         * @description `incident_status` reports whether monitoring considers the problem recovered; `closed` reports whether someone has finished handling it. The two are independent and can be filtered separately.
-         */
-        get: operations["list-incidents"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/api/v1/incidents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/incidents/{incidentId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an incident */
-        get: operations["get-incident"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List incidents
+     * @description `incident_status` reports whether monitoring considers the problem recovered; `closed` reports whether someone has finished handling it. The two are independent and can be filtered separately.
+     */
+    get: operations["list-incidents"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/incidents/{incidentId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/incidents/{incidentId}/acknowledge": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Acknowledge an incident
-         * @description The incident is also marked as acknowledged in the monitoring system, so that other channels can see it already has an owner.
-         */
-        post: operations["acknowledge-incident"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get an incident */
+    get: operations["get-incident"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/incidents/{incidentId}/acknowledge": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/incidents/{incidentId}/assignee": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Assign an incident, or clear its assignee
-         * @description Leave `assignee_user_id` empty to clear the assignment.
-         *
-         *     **Project membership of the assignee is not verified.** Any user identifier is accepted and recorded as given.
-         */
-        put: operations["assign-incident"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Acknowledge an incident
+     * @description The incident is also marked as acknowledged in the monitoring system, so that other channels can see it already has an owner.
+     */
+    post: operations["acknowledge-incident"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/incidents/{incidentId}/assignee": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/incidents/{incidentId}/close": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Close an incident
-         * @description Closing records **that the handling process is finished on this platform**; it does not change the state of the incident itself. An incident that has not recovered may still be closed as an accepted risk, and remains unrecovered in the monitoring system.
-         */
-        post: operations["close-incident"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /**
+     * Assign an incident, or clear its assignee
+     * @description Leave `assignee_user_id` empty to clear the assignment.
+     *
+     *     **Project membership of the assignee is not verified.** Any user identifier is accepted and recorded as given.
+     */
+    put: operations["assign-incident"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/incidents/{incidentId}/close": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/incidents/{incidentId}/comments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Add a note to the timeline */
-        post: operations["add-incident-comment"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Close an incident
+     * @description Closing records **that the handling process is finished on this platform**; it does not change the state of the incident itself. An incident that has not recovered may still be closed as an accepted risk, and remains unrecovered in the monitoring system.
+     */
+    post: operations["close-incident"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/incidents/{incidentId}/comments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/incidents/{incidentId}/following": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Follow an incident, or stop following it
-         * @description You follow **yourself**: the caller is the user added to or removed from the follower list.
-         */
-        put: operations["set-incident-following"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Add a note to the timeline */
+    post: operations["add-incident-comment"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/incidents/{incidentId}/following": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/incidents/{incidentId}/reopen": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Reopen a closed incident */
-        post: operations["reopen-incident"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /**
+     * Follow an incident, or stop following it
+     * @description You follow **yourself**: the caller is the user added to or removed from the follower list.
+     */
+    put: operations["set-incident-following"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/incidents/{incidentId}/reopen": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/incidents/{incidentId}/timeline": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the timeline of an incident
-         * @description Cursor paging rather than offset paging: the timeline is append-only, and offset paging would skip or repeat entries whenever a new one is written.
-         */
-        get: operations["list-incident-timeline"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Reopen a closed incident */
+    post: operations["reopen-incident"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/incidents/{incidentId}/timeline": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/maintenance-windows": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List maintenance windows */
-        get: operations["list-maintenance-windows"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the timeline of an incident
+     * @description Cursor paging rather than offset paging: the timeline is append-only, and offset paging would skip or repeat entries whenever a new one is written.
+     */
+    get: operations["list-incident-timeline"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/maintenance-windows": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/maintenance-windows/{windowId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a maintenance window */
-        get: operations["get-maintenance-window"];
-        /**
-         * Create a maintenance window, or replace it by the same id
-         * @description **Create or replace**: extending a window that is already running means calling this endpoint again with the same id.
-         *
-         *     While the window is open, problems on these machines do not alert and do not count against SLA availability. Leave `server_ids` empty to cover the entire project, including machines enrolled after the window opens.
-         */
-        put: operations["put-maintenance-window"];
-        post?: never;
-        /**
-         * Cancel a maintenance window
-         * @description Alerting resumes immediately, even if the window has not yet expired.
-         */
-        delete: operations["delete-maintenance-window"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** List maintenance windows */
+    get: operations["list-maintenance-windows"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/maintenance-windows/{windowId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/overview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Project overview
-         * @description A project with no machines yet returns an overview with every figure at zero rather than a 404 — an empty project is a normal state.
-         */
-        get: operations["get-project-overview"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a maintenance window */
+    get: operations["get-maintenance-window"];
+    /**
+     * Create a maintenance window, or replace it by the same id
+     * @description **Create or replace**: extending a window that is already running means calling this endpoint again with the same id.
+     *
+     *     While the window is open, problems on these machines do not alert and do not count against SLA availability. Leave `server_ids` empty to cover the entire project, including machines enrolled after the window opens.
+     */
+    put: operations["put-maintenance-window"];
+    post?: never;
+    /**
+     * Cancel a maintenance window
+     * @description Alerting resumes immediately, even if the window has not yet expired.
+     */
+    delete: operations["delete-maintenance-window"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/servers/{serverId}/items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the monitoring items of a machine
-         * @description Items are returned exactly as collected, without filtering or renaming. Which of them count as important is for the caller to decide from the tags carried by each item.
-         */
-        get: operations["list-server-items"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Project overview
+     * @description A project with no machines yet returns an overview with every figure at zero rather than a 404 — an empty project is a normal state.
+     */
+    get: operations["get-project-overview"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}/items": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/servers/{serverId}/metrics": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the time series of a monitoring item
-         * @description `item_key` is matched **by prefix**. Keys discovered per partition or per interface carry parameters (`vfs.fs.size[/var,pused]`), so a single request for `vfs.fs.size` returns one series per mount point.
-         */
-        get: operations["get-server-metric"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the monitoring items of a machine
+     * @description Items are returned exactly as collected, without filtering or renaming. Which of them count as important is for the caller to decide from the tags carried by each item.
+     */
+    get: operations["list-server-items"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}/metrics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/servers/{serverId}/resources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Hardware and interfaces of a machine */
-        get: operations["get-server-resources"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the time series of a monitoring item
+     * @description `item_key` is matched **by prefix**. Keys discovered per partition or per interface carry parameters (`vfs.fs.size[/var,pused]`), so a single request for `vfs.fs.size` returns one series per mount point.
+     */
+    get: operations["get-server-metric"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}/resources": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/servers/{serverId}/snapshot": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Current state of a machine */
-        get: operations["get-server-snapshot"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Hardware and interfaces of a machine */
+    get: operations["get-server-resources"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}/snapshot": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/top-items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Machines ranked highest by a given metric */
-        get: operations["list-project-top-items"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Current state of a machine */
+    get: operations["get-server-snapshot"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/top-items": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/templates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the monitoring templates that can be bound to a machine
-         * @description The catalog every template binding is validated against — which templates exist, which parameters each of them accepts, and what each parameter defaults to. It is identical for every project and changes only when this deployment is upgraded. Read it rather than keeping a copy. A copy drifts, and only one of the ways it drifts fails loudly — an unknown parameter name is rejected, but a stale `default` and a stale `required` both look correct on screen.
-         */
-        get: operations["list-templates"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Machines ranked highest by a given metric */
+    get: operations["list-project-top-items"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/templates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/servers": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List the machines in the project */
-        get: operations["list-servers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the monitoring templates that can be bound to a machine
+     * @description The catalog every template binding is validated against — which templates exist, which parameters each of them accepts, and what each parameter defaults to. It is identical for every project and changes only when this deployment is upgraded. Read it rather than keeping a copy. A copy drifts, and only one of the ways it drifts fails loudly — an unknown parameter name is rejected, but a stale `default` and a stale `required` both look correct on screen.
+     */
+    get: operations["list-templates"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/servers/{serverId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get the enrollment state of a machine */
-        get: operations["get-server"];
-        /**
-         * Enroll a machine into monitoring
-         * @description **Repeated calls with the same server id are idempotent**: given identical parameters, the already-enrolled machine is returned and no duplicate host is created, so a failed enrollment is safe to retry.
-         *
-         *     To change enrollment settings, use PATCH. This endpoint returns an error when the parameters differ, and does not update an existing configuration.
-         *
-         *     A failed call leaves the machine recorded with `monitoring_status: FAILED`; the reason is reported in `last_error` via `GET /servers/{serverId}`.
-         *
-         *     The `tls_psk` in the response is **returned only this once**; store it immediately. If it is lost, it must be rotated.
-         *
-         *     It is also how collection is resumed after `/disable`. On a machine that already exists, **omitting `template_bindings` keeps the bindings it already has**; it does not fall back to the default of Linux alone, which would silently drop every other template together with its parameters. Secret parameters are likewise carried over — see `parameters` on the binding.
-         */
-        put: operations["enable-server-monitoring"];
-        post?: never;
-        /**
-         * Delete a machine
-         * @description **Irreversible**: the monitored host, its history and every incident recorded against this machine are removed together. To stop collection temporarily, use `/disable` instead.
-         */
-        delete: operations["delete-server"];
-        options?: never;
-        head?: never;
-        /**
-         * Update the enrollment settings of a machine
-         * @description Only the fields present in the request body are updated. `address` and `address_kind` must be supplied together: changing one without the other produces a contradictory configuration that is not reported as an error and shows up only as an agent that cannot connect.
-         */
-        patch: operations["update-server"];
-        trace?: never;
+    /** List the machines in the project */
+    get: operations["list-servers"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/servers/{serverId}/disable": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Stop monitoring a machine
-         * @description Reversible: the monitored host is retained, only collection stops, and history is unaffected. Enrolling again resumes collection. To remove the history as well, use DELETE.
-         */
-        post: operations["disable-server-monitoring"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get the enrollment state of a machine */
+    get: operations["get-server"];
+    /**
+     * Enroll a machine into monitoring
+     * @description **Repeated calls with the same server id are idempotent**: given identical parameters, the already-enrolled machine is returned and no duplicate host is created, so a failed enrollment is safe to retry.
+     *
+     *     To change enrollment settings, use PATCH. This endpoint returns an error when the parameters differ, and does not update an existing configuration.
+     *
+     *     A failed call leaves the machine recorded with `monitoring_status: FAILED`; the reason is reported in `last_error` via `GET /servers/{serverId}`.
+     *
+     *     The `tls_psk` in the response is **returned only this once**; store it immediately. If it is lost, it must be rotated.
+     *
+     *     It is also how collection is resumed after `/disable`. On a machine that already exists, **omitting `template_bindings` keeps the bindings it already has**; it does not fall back to the default of Linux alone, which would silently drop every other template together with its parameters. Secret parameters are likewise carried over — see `parameters` on the binding.
+     */
+    put: operations["enable-server-monitoring"];
+    post?: never;
+    /**
+     * Delete a machine
+     * @description **Irreversible**: the monitored host, its history and every incident recorded against this machine are removed together. To stop collection temporarily, use `/disable` instead.
+     */
+    delete: operations["delete-server"];
+    options?: never;
+    head?: never;
+    /**
+     * Update the enrollment settings of a machine
+     * @description Only the fields present in the request body are updated. `address` and `address_kind` must be supplied together: changing one without the other produces a contradictory configuration that is not reported as an error and shows up only as an agent that cannot connect.
+     */
+    patch: operations["update-server"];
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}/disable": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/servers/{serverId}/psk": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Rotate the agent PSK
-         * @description The agent configuration must be updated to match, otherwise the machine loses contact immediately. The new key is likewise **returned in clear text only in this response**.
-         */
-        post: operations["rotate-agent-psk"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Stop monitoring a machine
+     * @description Reversible: the monitored host is retained, only collection stops, and history is unaffected. Enrolling again resumes collection. To remove the history as well, use DELETE.
+     */
+    post: operations["disable-server-monitoring"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}/psk": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/servers/{serverId}/web-checks/{checkId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a web check */
-        get: operations["get-web-check"];
-        /**
-         * Create a web check, or replace it by the same id
-         * @description **Create or replace**: to modify a check, call this endpoint again with the same id. There is no need to determine first whether it already exists.
-         */
-        put: operations["put-web-check"];
-        post?: never;
-        /**
-         * Delete a web check
-         * @description The corresponding check task and trigger are removed from the monitoring system as well, so no permanently unrecoverable alert is left behind.
-         */
-        delete: operations["delete-web-check"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Rotate the agent PSK
+     * @description The agent configuration must be updated to match, otherwise the machine loses contact immediately. The new key is likewise **returned in clear text only in this response**.
+     */
+    post: operations["rotate-agent-psk"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/servers/{serverId}/web-checks/{checkId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/web-checks": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List web checks */
-        get: operations["list-web-checks"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a web check */
+    get: operations["get-web-check"];
+    /**
+     * Create a web check, or replace it by the same id
+     * @description **Create or replace**: to modify a check, call this endpoint again with the same id. There is no need to determine first whether it already exists.
+     */
+    put: operations["put-web-check"];
+    post?: never;
+    /**
+     * Delete a web check
+     * @description The corresponding check task and trigger are removed from the monitoring system as well, so no permanently unrecoverable alert is left behind.
+     */
+    delete: operations["delete-web-check"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/web-checks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/sli-report": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get measured availability
-         * @description SLI is what was measured; SLO is what was promised — this endpoint returns the former.
-         *
-         *     The row with an empty `server_id` covers the project as a whole.
-         */
-        get: operations["get-sli-report"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** List web checks */
+    get: operations["list-web-checks"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/sli-report": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/slo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the availability target of this project
-         * @description A project that has never set one returns 404 rather than a default target: making no promise and promising 99.9% are different things.
-         */
-        get: operations["get-slo"];
-        /**
-         * Set the availability target of this project, or change it
-         * @description One SLO per project, **create or replace**.
-         *
-         *     `min_severity` must be chosen explicitly: it defines what counts as unavailable, which is half of what the target means.
-         */
-        put: operations["put-slo"];
-        post?: never;
-        /**
-         * Remove the availability target of this project
-         * @description Availability is no longer tracked from this point on.
-         */
-        delete: operations["delete-slo"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get measured availability
+     * @description SLI is what was measured; SLO is what was promised — this endpoint returns the former.
+     *
+     *     The row with an empty `server_id` covers the project as a whole.
+     */
+    get: operations["get-sli-report"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/slo": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the status page of this project
-         * @description A project has at most one status page. A project that has never created one returns 404.
-         */
-        get: operations["get-status-page"];
-        /**
-         * Create the status page, or replace its configuration
-         * @description **Create or replace**: changing the title, switching the domain, publishing and unpublishing are all done by sending the complete configuration again.
-         *
-         *     While `published` is false the public address returns 404, including any custom domain already bound. A newly created page is unpublished by default, so that a page still being configured has no address that opens.
-         *
-         *     `slug` and `custom_domain` are **globally unique**; a value already taken returns 409.
-         */
-        put: operations["put-status-page"];
-        post?: never;
-        /**
-         * Delete the status page
-         * @description Its groups, components, availability history, incident notices and scheduled maintenance are removed together, and cannot be recovered. The slug and custom domain are released.
-         */
-        delete: operations["delete-status-page"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the availability target of this project
+     * @description A project that has never set one returns 404 rather than a default target: making no promise and promising 99.9% are different things.
+     */
+    get: operations["get-slo"];
+    /**
+     * Set the availability target of this project, or change it
+     * @description One SLO per project, **create or replace**.
+     *
+     *     `min_severity` must be chosen explicitly: it defines what counts as unavailable, which is half of what the target means.
+     */
+    put: operations["put-slo"];
+    post?: never;
+    /**
+     * Remove the availability target of this project
+     * @description Availability is no longer tracked from this point on.
+     */
+    delete: operations["delete-slo"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Set the order of the top level of the page
-         * @description Submits the **entire** top-level order in one call rather than moving a single entry to a given position.
-         *
-         *     The top level interleaves groups and ungrouped components, so the order is expressed as one list covering both.
-         *
-         *     Each entry carries either `group_id` or `component_id`. Entries not listed are placed after those that are.
-         */
-        put: operations["put-status-page-order"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the status page of this project
+     * @description A project has at most one status page. A project that has never created one returns 404.
+     */
+    get: operations["get-status-page"];
+    /**
+     * Create the status page, or replace its configuration
+     * @description **Create or replace**: changing the title, switching the domain, publishing and unpublishing are all done by sending the complete configuration again.
+     *
+     *     While `published` is false the public address returns 404, including any custom domain already bound. A newly created page is unpublished by default, so that a page still being configured has no address that opens.
+     *
+     *     `slug` and `custom_domain` are **globally unique**; a value already taken returns 409.
+     */
+    put: operations["put-status-page"];
+    post?: never;
+    /**
+     * Delete the status page
+     * @description Its groups, components, availability history, incident notices and scheduled maintenance are removed together, and cannot be recovered. The slug and custom domain are released.
+     */
+    delete: operations["delete-status-page"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/order": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/groups": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List groups */
-        get: operations["list-status-page-groups"];
-        put?: never;
-        /**
-         * Create a group
-         * @description A group is one level of collapsing applied to components on the page. There is exactly one level; groups cannot be nested.
-         */
-        post: operations["create-status-page-group"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /**
+     * Set the order of the top level of the page
+     * @description Submits the **entire** top-level order in one call rather than moving a single entry to a given position.
+     *
+     *     The top level interleaves groups and ungrouped components, so the order is expressed as one list covering both.
+     *
+     *     Each entry carries either `group_id` or `component_id`. Entries not listed are placed after those that are.
+     */
+    put: operations["put-status-page-order"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/groups": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/groups/{groupId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                groupId: string;
-            };
-            cookie?: never;
-        };
-        get?: never;
-        /** Update a group */
-        put: operations["update-status-page-group"];
-        post?: never;
-        /**
-         * Delete a group
-         * @description The components in it are **not deleted**. They return to the top level as ungrouped components, keeping their availability history and the incident notices that reference them.
-         */
-        delete: operations["delete-status-page-group"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** List groups */
+    get: operations["list-status-page-groups"];
+    put?: never;
+    /**
+     * Create a group
+     * @description A group is one level of collapsing applied to components on the page. There is exactly one level; groups cannot be nested.
+     */
+    post: operations["create-status-page-group"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/groups/{groupId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupId: string;
+      };
+      cookie?: never;
     };
-    "/api/v1/status-page/groups/{groupId}/order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Set the order of components within a group */
-        put: operations["put-status-page-group-order"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /** Update a group */
+    put: operations["update-status-page-group"];
+    post?: never;
+    /**
+     * Delete a group
+     * @description The components in it are **not deleted**. They return to the top level as ungrouped components, keeping their availability history and the incident notices that reference them.
+     */
+    delete: operations["delete-status-page-group"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/groups/{groupId}/order": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/components": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List components
-         * @description A component is one row on the status page: an externally promised capability. It is not a machine — a single component may be backed by several machines and several web checks.
-         */
-        get: operations["list-status-page-components"];
-        put?: never;
-        /**
-         * Create a component
-         * @description `name` is **customer-facing copy** and appears verbatim on the public page; do not use machine names.
-         *
-         *     `auto_status_min_severity` sets how severe an alert must be before it changes the status of this row; anything below it has no effect. The default is AVERAGE. Lower settings tend to keep the page permanently off-green, at which point people stop reading it.
-         */
-        post: operations["create-status-page-component"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /** Set the order of components within a group */
+    put: operations["put-status-page-group-order"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/components": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/components/{componentId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                componentId: string;
-            };
-            cookie?: never;
-        };
-        /** Get a component */
-        get: operations["get-status-page-component"];
-        /**
-         * Update a component
-         * @description `started_on` cannot be changed: it determines where the availability bar stops showing as unmeasured, and changing it would rewrite history that has already been published.
-         */
-        put: operations["update-status-page-component"];
-        post?: never;
-        /**
-         * Delete a component
-         * @description Its availability history is removed along with it. Passages in already-published notices that refer to it are retained, since customers may already have read them.
-         */
-        delete: operations["delete-status-page-component"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List components
+     * @description A component is one row on the status page: an externally promised capability. It is not a machine — a single component may be backed by several machines and several web checks.
+     */
+    get: operations["list-status-page-components"];
+    put?: never;
+    /**
+     * Create a component
+     * @description `name` is **customer-facing copy** and appears verbatim on the public page; do not use machine names.
+     *
+     *     `auto_status_min_severity` sets how severe an alert must be before it changes the status of this row; anything below it has no effect. The default is AVERAGE. Lower settings tend to keep the page permanently off-green, at which point people stop reading it.
+     */
+    post: operations["create-status-page-component"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/components/{componentId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        componentId: string;
+      };
+      cookie?: never;
     };
-    "/api/v1/status-page/components/{componentId}/sources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                componentId: string;
-            };
-            cookie?: never;
-        };
-        /**
-         * List the monitored sources bound to a component
-         * @description Monitored sources are internal information and **never appear on the public page**.
-         */
-        get: operations["list-status-page-component-sources"];
-        /**
-         * Set the complete list of monitored sources for a component
-         * @description Submits the **complete** set of sources; anything not listed is unbound.
-         *
-         *     Once bound, alerts on these machines and web checks drive the status of the component automatically: DISASTER and HIGH are reported as a major outage, AVERAGE as a partial outage, and WARNING as degraded performance. Alerts below `auto_status_min_severity` have no effect.
-         *
-         *     `show_url` controls whether the checked address is shown on the public page. It is off by default.
-         */
-        put: operations["put-status-page-component-sources"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a component */
+    get: operations["get-status-page-component"];
+    /**
+     * Update a component
+     * @description `started_on` cannot be changed: it determines where the availability bar stops showing as unmeasured, and changing it would rewrite history that has already been published.
+     */
+    put: operations["update-status-page-component"];
+    post?: never;
+    /**
+     * Delete a component
+     * @description Its availability history is removed along with it. Passages in already-published notices that refer to it are retained, since customers may already have read them.
+     */
+    delete: operations["delete-status-page-component"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/components/{componentId}/sources": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        componentId: string;
+      };
+      cookie?: never;
     };
-    "/api/v1/status-page/incidents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the incident notices on the status page
-         * @description These are **customer-facing notices**, distinct from the monitoring incidents under `/incidents`. Nothing from the latter is carried over; the text here is written by your team.
-         */
-        get: operations["list-status-page-incidents"];
-        put?: never;
-        /**
-         * Publish an incident notice
-         * @description Publishing a notice and writing its first update are a single operation: a notice with no updates would appear as a bare title on a page that has already been delivered to readers.
-         *
-         *     `started_at` is when the **incident began**, not when the notice was published. The two are usually minutes to hours apart, and using the publication time would understate the impact window that customers can compare against their own logs. Backfilling a past incident relies on the same field.
-         *
-         *     The statuses given in `components` take effect on the public page immediately and count towards availability.
-         */
-        post: operations["publish-status-page-incident"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the monitored sources bound to a component
+     * @description Monitored sources are internal information and **never appear on the public page**.
+     */
+    get: operations["list-status-page-component-sources"];
+    /**
+     * Set the complete list of monitored sources for a component
+     * @description Submits the **complete** set of sources; anything not listed is unbound.
+     *
+     *     Once bound, alerts on these machines and web checks drive the status of the component automatically: DISASTER and HIGH are reported as a major outage, AVERAGE as a partial outage, and WARNING as degraded performance. Alerts below `auto_status_min_severity` have no effect.
+     *
+     *     `show_url` controls whether the checked address is shown on the public page. It is off by default.
+     */
+    put: operations["put-status-page-component-sources"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/incidents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/incidents/{incidentId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an incident notice */
-        get: operations["get-status-page-incident"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the incident notices on the status page
+     * @description These are **customer-facing notices**, distinct from the monitoring incidents under `/incidents`. Nothing from the latter is carried over; the text here is written by your team.
+     */
+    get: operations["list-status-page-incidents"];
+    put?: never;
+    /**
+     * Publish an incident notice
+     * @description Publishing a notice and writing its first update are a single operation: a notice with no updates would appear as a bare title on a page that has already been delivered to readers.
+     *
+     *     `started_at` is when the **incident began**, not when the notice was published. The two are usually minutes to hours apart, and using the publication time would understate the impact window that customers can compare against their own logs. Backfilling a past incident relies on the same field.
+     *
+     *     The statuses given in `components` take effect on the public page immediately and count towards availability.
+     */
+    post: operations["publish-status-page-incident"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/incidents/{incidentId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/incidents/{incidentId}/updates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Append an update to an incident notice
-         * @description Published updates are never modified; a correction is issued as a new update. Customers may already have forwarded the original, and a silent rewrite would leave the two sides with different histories.
-         *
-         *     `components` lists only the components **being changed** by this update; those not listed keep their current status. Setting `status` to `RESOLVED` returns every component this notice has affected to operational and closes the notice. A closed notice accepts no further updates.
-         */
-        post: operations["post-status-page-incident-update"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get an incident notice */
+    get: operations["get-status-page-incident"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/incidents/{incidentId}/updates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/maintenances": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List scheduled maintenance */
-        get: operations["list-status-page-maintenances"];
-        put?: never;
-        /**
-         * Schedule maintenance
-         * @description Maintenance starts and finishes automatically at the scheduled times; nobody needs to be present. While it runs, the affected components are shown as under maintenance and **availability is not reduced** — planned work should not consume the availability you promise to customers, which is the point of announcing it in advance.
-         *
-         *     This is separate from `/maintenance-windows`, which suppresses alerting for a period. This endpoint announces the work to your customers. The two are usually created together: without suppression, restarts during the maintenance raise alerts and mark the components unavailable.
-         */
-        post: operations["schedule-status-page-maintenance"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Append an update to an incident notice
+     * @description Published updates are never modified; a correction is issued as a new update. Customers may already have forwarded the original, and a silent rewrite would leave the two sides with different histories.
+     *
+     *     `components` lists only the components **being changed** by this update; those not listed keep their current status. Setting `status` to `RESOLVED` returns every component this notice has affected to operational and closes the notice. A closed notice accepts no further updates.
+     */
+    post: operations["post-status-page-incident-update"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/maintenances": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/maintenances/{maintenanceId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a scheduled maintenance */
-        get: operations["get-status-page-maintenance"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** List scheduled maintenance */
+    get: operations["list-status-page-maintenances"];
+    put?: never;
+    /**
+     * Schedule maintenance
+     * @description Maintenance starts and finishes automatically at the scheduled times; nobody needs to be present. While it runs, the affected components are shown as under maintenance and **availability is not reduced** — planned work should not consume the availability you promise to customers, which is the point of announcing it in advance.
+     *
+     *     This is separate from `/maintenance-windows`, which suppresses alerting for a period. This endpoint announces the work to your customers. The two are usually created together: without suppression, restarts during the maintenance raise alerts and mark the components unavailable.
+     */
+    post: operations["schedule-status-page-maintenance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/maintenances/{maintenanceId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/maintenances/{maintenanceId}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Cancel a maintenance that has not started
-         * @description Cancelled rather than deleted, so that readers who saw the announcement have an explanation. Maintenance that has already started cannot be cancelled; finish it early instead.
-         */
-        post: operations["cancel-status-page-maintenance"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a scheduled maintenance */
+    get: operations["get-status-page-maintenance"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/maintenances/{maintenanceId}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/status-page/maintenances/{maintenanceId}/complete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Finish a running maintenance early
-         * @description Optional: maintenance finishes on its own at the scheduled end time. Use this endpoint when the work is done ahead of schedule; the affected components return to operational immediately.
-         */
-        post: operations["complete-status-page-maintenance"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Cancel a maintenance that has not started
+     * @description Cancelled rather than deleted, so that readers who saw the announcement have an explanation. Maintenance that has already started cannot be cancelled; finish it early instead.
+     */
+    post: operations["cancel-status-page-maintenance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/maintenances/{maintenanceId}/complete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/web-checks/{checkId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                checkId: string;
-            };
-            cookie?: never;
-        };
-        /** Get a project-level web check */
-        get: operations["get-project-web-check"];
-        /**
-         * Create a web check that is not tied to a machine, or replace it by the same id
-         * @description **Create or replace**: to modify a check, call this endpoint again with the same id.
-         *
-         *     Unlike `/servers/{serverId}/web-checks/{checkId}`, this check does not belong to any machine — use it when the target is simply a URL. Nothing needs to be enrolled first.
-         *
-         *     A check bound to a machine is removed together with that machine; a project-level check is not. Where a check belongs cannot be changed afterwards: move it by deleting and recreating it.
-         */
-        put: operations["put-project-web-check"];
-        post?: never;
-        /**
-         * Delete a project-level web check
-         * @description The corresponding check task and trigger are removed from the monitoring system as well.
-         */
-        delete: operations["delete-project-web-check"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Finish a running maintenance early
+     * @description Optional: maintenance finishes on its own at the scheduled end time. Use this endpoint when the work is done ahead of schedule; the affected components return to operational immediately.
+     */
+    post: operations["complete-status-page-maintenance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/web-checks/{checkId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        checkId: string;
+      };
+      cookie?: never;
     };
-    "/api/v1/status-page/domain": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the custom domain and its certificate state
-         * @description Reports whether the domain currently resolves to the status page and where its certificate stands.
-         *
-         *     `expected_cname` is the value the domain must point at. `observed_cname` is what it currently resolves to, which is what to show the user when verification fails — "verification failed" on its own tells them nothing about what to fix.
-         */
-        get: operations["get-status-page-domain"];
-        /**
-         * Bind a custom domain to this status page
-         * @description The domain must already point at the status page by CNAME. Binding is rejected until it does, and the error carries both the expected and the observed target.
-         *
-         *     Ownership is verified before the domain is stored, and it is verified again before each certificate is issued: a domain whose CNAME is later removed stops being served.
-         *
-         *     A certificate is requested in the background — this call does not wait for it. Poll GET on this endpoint to follow its progress; until a certificate is active, the domain does not serve HTTPS while the page remains reachable at its shared address.
-         */
-        put: operations["put-status-page-domain"];
-        post?: never;
-        /**
-         * Unbind the custom domain
-         * @description The page stays reachable at its shared address. Certificate renewal for the domain stops; the certificate already issued is left to expire.
-         */
-        delete: operations["delete-status-page-domain"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a project-level web check */
+    get: operations["get-project-web-check"];
+    /**
+     * Create a web check that is not tied to a machine, or replace it by the same id
+     * @description **Create or replace**: to modify a check, call this endpoint again with the same id.
+     *
+     *     Unlike `/servers/{serverId}/web-checks/{checkId}`, this check does not belong to any machine — use it when the target is simply a URL. Nothing needs to be enrolled first.
+     *
+     *     A check bound to a machine is removed together with that machine; a project-level check is not. Where a check belongs cannot be changed afterwards: move it by deleting and recreating it.
+     */
+    put: operations["put-project-web-check"];
+    post?: never;
+    /**
+     * Delete a project-level web check
+     * @description The corresponding check task and trigger are removed from the monitoring system as well.
+     */
+    delete: operations["delete-project-web-check"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/status-page/domain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /**
+     * Get the custom domain and its certificate state
+     * @description Reports whether the domain currently resolves to the status page and where its certificate stands.
+     *
+     *     `expected_cname` is the value the domain must point at. `observed_cname` is what it currently resolves to, which is what to show the user when verification fails — "verification failed" on its own tells them nothing about what to fix.
+     */
+    get: operations["get-status-page-domain"];
+    /**
+     * Bind a custom domain to this status page
+     * @description The domain must already point at the status page by CNAME. Binding is rejected until it does, and the error carries both the expected and the observed target.
+     *
+     *     Ownership is verified before the domain is stored, and it is verified again before each certificate is issued: a domain whose CNAME is later removed stops being served.
+     *
+     *     A certificate is requested in the background — this call does not wait for it. Poll GET on this endpoint to follow its progress; until a certificate is active, the domain does not serve HTTPS while the page remains reachable at its shared address.
+     */
+    put: operations["put-status-page-domain"];
+    post?: never;
+    /**
+     * Unbind the custom domain
+     * @description The page stays reachable at its shared address. Certificate renewal for the domain stops; the certificate already issued is left to expire.
+     */
+    delete: operations["delete-status-page-domain"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Error: {
-            code?: string;
-            message: string;
-            /**
-             * @description What a given `code` carries alongside the message. The keys depend on the code,
-             *     and a client that does not recognise one ignores it.
-             */
-            meta?: {
-                [key: string]: unknown;
-            };
-            /** Format: int64 */
-            status: number;
-        };
-        IncidentFollowerResource: {
-            display_name: string;
-            /** Format: date-time */
-            followed_at: string;
-            user_id: string;
-        };
-        MonitoringItemResource: {
-            /** @description Such as last, avg, min or max */
-            aggregation_function: string;
-            /** Format: int64 */
-            evaluation_window_seconds: number;
-            item_id: string;
-            key: string;
-            name: string;
-            operator: string;
-            /**
-             * Format: double
-             * @description Present only when `threshold_status` is RESOLVED
-             */
-            threshold: number | null;
-            threshold_status: string;
-            /** @description The value at the moment of the trigger, stored as collected */
-            value: string;
-        };
-        TagResource: {
-            tag: string;
-            value: string;
-        };
-        IncidentResource: {
-            acknowledge_message: string;
-            acknowledged: boolean;
-            /** Format: date-time */
-            acknowledged_at: string | null;
-            acknowledged_by_display_name: string;
-            acknowledged_by_user_id: string;
-            /** Format: date-time */
-            assigned_at: string | null;
-            assignee_display_name: string;
-            assignee_user_id: string;
-            close_message: string;
-            close_reason: string;
-            /** Format: date-time */
-            closed_at: string | null;
-            closed_by_display_name: string;
-            closed_by_user_id: string;
-            /** Format: int64 */
-            duration_seconds: number;
-            followers: components["schemas"]["IncidentFollowerResource"][] | null;
-            host_connection: string;
-            host_display_name: string;
-            /** Format: uuid */
-            id: string;
-            /**
-             * @description Whether monitoring considers the problem recovered. Independent of whether anyone has closed the incident
-             * @enum {string}
-             */
-            incident_status: "PROBLEM" | "RESOLVED";
-            items: components["schemas"]["MonitoringItemResource"][] | null;
-            name: string;
-            /** @description The operational data line configured on the trigger */
-            operational_data: string;
-            /** Format: uuid */
-            project_id: string;
-            /** Format: date-time */
-            resolved_at: string | null;
-            resolved_trigger_expression: string;
-            /**
-             * Format: uuid
-             * @description The machine this alert is about. Null when the alert is not about a machine
-             */
-            server_id: string | null;
-            /** @description Empty when server_id is null */
-            server_name: string;
-            /** @enum {string} */
-            severity: "NOT_CLASSIFIED" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
-            /** Format: date-time */
-            started_at: string;
-            tags: components["schemas"]["TagResource"][] | null;
-            trigger_expression: string;
-            /**
-             * Format: uuid
-             * @description The web check that reported this alert. Null when the alert did not come from a web check. Both this and server_id are set when the check runs on one of your machines
-             */
-            web_check_id: string | null;
-            zabbix_event_id: string;
-        };
-        LengthAwarePageIncidentResource: {
-            /** @description The records in this page */
-            items: components["schemas"]["IncidentResource"][];
-            /**
-             * Format: int64
-             * @description Maximum records per page, echoing the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Number of records skipped, echoing the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matches, not just this page
-             */
-            total: number;
-        };
-        AcknowledgeIncidentRequestBody: {
-            /** @description Also written to the acknowledgement record in the monitoring system */
-            message?: string;
-        };
-        AssignIncidentRequestBody: {
-            /** @description Defaults to the user id. The timeline keeps a copy of the name as it was at the time */
-            assignee_display_name?: string;
-            assignee_user_id?: string;
-        };
-        CloseIncidentRequestBody: {
-            /** @description Required when `reason` is OTHER; the request is rejected otherwise */
-            message?: string;
-            /** @enum {string} */
-            reason: "RECOVERED" | "FIXED" | "FALSE_POSITIVE" | "DUPLICATE" | "NO_ACTION_REQUIRED" | "ACCEPTED_RISK" | "OTHER";
-        };
-        AddCommentRequestBody: {
-            message: string;
-        };
-        IncidentActivityResource: {
-            /** @enum {string} */
-            activity_type: "OPENED" | "RECOVERED" | "ACKNOWLEDGED" | "ASSIGNED" | "UNASSIGNED" | "FOLLOWER_ADDED" | "FOLLOWER_REMOVED" | "COMMENT" | "CLOSED" | "REOPENED";
-            actor_display_name: string;
-            /** @description The operator. Empty when the source is SYSTEM or ZABBIX */
-            actor_user_id: string;
-            close_reason: string;
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            incident_id: string;
-            message: string;
-            /** Format: date-time */
-            occurred_at: string;
-            /** @enum {string} */
-            source: "SYSTEM" | "OPERATOR" | "ZABBIX";
-            subject_display_name: string;
-            /** @description The user who was assigned, or removed from the followers */
-            subject_user_id: string;
-        };
-        SetFollowingRequestBody: {
-            following: boolean;
-        };
-        CursorPageIncidentActivityResource: {
-            /** @description The records in this page */
-            items: components["schemas"]["IncidentActivityResource"][];
-            /** @description Cursor for the next page. Empty means the end has been reached */
-            next_cursor: string;
-        };
-        MaintenancePeriodResource: {
-            /** Format: int64 */
-            duration_seconds: number;
-            /**
-             * Format: int64
-             * @description DAILY and WEEKLY: every N days or every N weeks
-             */
-            every: number;
-            /** @enum {string} */
-            kind: "ONCE" | "DAILY" | "WEEKLY";
-            /**
-             * Format: int64
-             * @description DAILY and WEEKLY: seconds from midnight, in the timezone of the window
-             */
-            start_time_seconds: number;
-            /**
-             * Format: date-time
-             * @description Present only for ONCE
-             */
-            starts_at: string | null;
-            /**
-             * Format: int64
-             * @description WEEKLY: bitmap of weekdays, **Monday is the lowest bit**
-             */
-            weekdays: number;
-        };
-        MaintenanceWindowResource: {
-            /** Format: date-time */
-            active_since: string;
-            /** Format: date-time */
-            active_till: string;
-            description: string;
-            last_error: string;
-            name: string;
-            period: components["schemas"]["MaintenancePeriodResource"];
-            /** Format: uuid */
-            project_id: string;
-            /** @description Empty covers the **entire project** */
-            server_ids: string[] | null;
-            /** @enum {string} */
-            sync_status: "PENDING" | "ACTIVE" | "FAILED" | "EXPIRED";
-            timezone: string;
-            /** Format: uuid */
-            window_id: string;
-        };
-        MaintenanceWindowListResponseBody: {
-            items: components["schemas"]["MaintenanceWindowResource"][] | null;
-        };
-        MaintenancePeriodRequest: {
-            /** Format: int64 */
-            duration_seconds?: number;
-            /**
-             * Format: int64
-             * @description DAILY and WEEKLY: every N days or every N weeks
-             */
-            every?: number;
-            /** @enum {string} */
-            kind: "ONCE" | "DAILY" | "WEEKLY";
-            /**
-             * Format: int64
-             * @description DAILY and WEEKLY: seconds from midnight, in the timezone of the window
-             */
-            start_time_seconds?: number;
-            /**
-             * Format: date-time
-             * @description Used only by ONCE
-             */
-            starts_at?: string;
-            /**
-             * Format: int64
-             * @description WEEKLY: bitmap of weekdays, **Monday is the lowest bit**
-             */
-            weekdays?: number;
-        };
-        PutMaintenanceWindowRequestBody: {
-            /**
-             * Format: date-time
-             * @description Start of the period in which the rule is effective
-             */
-            active_since: string;
-            /** Format: date-time */
-            active_till: string;
-            description?: string;
-            name: string;
-            period: components["schemas"]["MaintenancePeriodRequest"];
-            server_ids?: string[] | null;
-            /** @description IANA name such as Asia/Shanghai. Empty uses the configured default */
-            timezone?: string;
-        };
-        CountResource: {
-            /** Format: int64 */
-            count: number;
-            key: string;
-        };
-        ProjectOverviewResource: {
-            /** Format: int64 */
-            monitored_servers: number;
-            problem_counts: components["schemas"]["CountResource"][] | null;
-            reachability_counts: components["schemas"]["CountResource"][] | null;
-            /** Format: int64 */
-            total_servers: number;
-        };
-        ItemResource: {
-            item_id: string;
-            key: string;
-            /** Format: date-time */
-            last_collected_at: string | null;
-            last_value: string;
-            name: string;
-            tags: components["schemas"]["TagResource"][] | null;
-            units: string;
-            /** @enum {string} */
-            value_type: "FLOAT" | "CHARACTER" | "LOG" | "UNSIGNED" | "TEXT";
-        };
-        ItemListResponseBody: {
-            items: components["schemas"]["ItemResource"][] | null;
-        };
-        MetricPointResource: {
-            /** Format: double */
-            max_value: number;
-            /** Format: double */
-            min_value: number;
-            /** Format: date-time */
-            timestamp: string;
-            /** Format: double */
-            value: number;
-        };
-        MetricSeriesResource: {
-            item_id: string;
-            item_key: string;
-            item_name: string;
-            points: components["schemas"]["MetricPointResource"][] | null;
-            units: string;
-        };
-        ItemThresholdResource: {
-            aggregation_function: string;
-            /** Format: int64 */
-            evaluation_window_seconds: number;
-            item_id: string;
-            operator: string;
-            severity: string;
-            /** Format: double */
-            threshold: number;
-            /** @description Labels the line in the chart legend */
-            trigger_name: string;
-        };
-        MetricResponseBody: {
-            downsampled: boolean;
-            /** Format: date-time */
-            effective_from: string;
-            /** Format: date-time */
-            effective_to: string;
-            /** @description Data comes from hourly aggregates, one point per hour */
-            from_trends: boolean;
-            series: components["schemas"]["MetricSeriesResource"][] | null;
-            thresholds: components["schemas"]["ItemThresholdResource"][] | null;
-            truncated: boolean;
-        };
-        HostInterfaceResource: {
-            available: boolean;
-            dns: string;
-            ip: string;
-            /** Format: int64 */
-            port: number;
-            use_ip: boolean;
-        };
-        ServerResourcesResource: {
-            interfaces: components["schemas"]["HostInterfaceResource"][] | null;
-            /** @description Hardware and system inventory collected automatically: CPU, memory, operating system and so on */
-            inventory: {
-                [key: string]: string;
-            };
-            tags: components["schemas"]["TagResource"][] | null;
-        };
-        SnapshotResource: {
-            agent_error: string;
-            /**
-             * @description AGENT_DOWN means the agent is unreachable while the machine is still alive; UNREACHABLE means neither can be established
-             * @enum {string}
-             */
-            agent_reachability: "UNKNOWN" | "REACHABLE" | "AGENT_DOWN" | "UNREACHABLE";
-            /** Format: date-time */
-            last_collected_at: string | null;
-            monitoring_enabled: boolean;
-            problem_counts: components["schemas"]["CountResource"][] | null;
-        };
-        TopItemResource: {
-            item_key: string;
-            /** Format: uuid */
-            server_id: string;
-            units: string;
-            /** Format: double */
-            value: number;
-        };
-        TopItemListResponseBody: {
-            items: components["schemas"]["TopItemResource"][] | null;
-        };
-        TemplateCatalogParameterResource: {
-            /** @description The value that takes effect when the parameter is omitted. An empty string is a real default, not an absent one */
-            default: string;
-            /**
-             * @description The shape of the accepted value. Surrounding whitespace is trimmed before the value is checked, and an omitted or empty value is replaced by `default` and not checked at all.
-             *
-             *     - `string` — no constraint; empty is accepted
-             *     - `non_empty_string` — must not be empty once trimmed
-             *     - `percent` — a number in the **closed** interval 0 to 100; fractions are accepted
-             *     - `positive_number` — a number **strictly** greater than 0; fractions are accepted
-             *     - `port` — an integer from 1 to 65535 inclusive; `8080/tcp` is not a port
-             *     - `host` — an IP address, or a hostname of at most 255 characters whose dot-separated labels are at most 63 characters of `A-Z a-z 0-9 - _` and neither begin nor end with `-`. A single label such as `localhost` is accepted, as is a trailing dot
-             *     - `ip_or_empty` — an IP address, or empty to mean "not specified"
-             *     - `regexp` — must compile as a **Go RE2** pattern. RE2 has no backreferences and no lookaround, so a pattern that a browser's `new RegExp()` accepts may still be rejected here. Validating client-side narrows the gap but does not close it
-             * @enum {string}
-             */
-            kind: "string" | "non_empty_string" | "percent" | "positive_number" | "port" | "host" | "ip_or_empty" | "regexp";
-            /** @description The key to use in `template_bindings[].parameters`. It is not the Zabbix macro name, which is internal and changes between Zabbix versions */
-            name: string;
-            /** @description Independent of `default`. The three NGINX connection parameters carry a default and are still required, because the template's own default (localhost:80/basic_status) is almost never right */
-            required: boolean;
-            /** @description Supplied in clear text and never returned. A configured one is reported by name only, through `configured_secret_parameters` on the bound template. When updating a machine that already has one stored, omit it to keep the stored value and supply it only to replace it — a caller cannot read it back, so requiring it on every write would make resuming collection impossible */
-            secret: boolean;
-        };
-        TemplateCatalogEntryResource: {
-            /** @description Exactly one template with this set must be bound to every machine. Binding none enrolls a machine that can never alert; binding both loads the Linux and Windows items onto one machine, half of which must fail */
-            is_base: boolean;
-            /** @description False means the template collects without an agent on the machine — ICMP_PING is pinged by the Zabbix server, PROXMOX_VE is polled over the PVE API */
-            needs_agent: boolean;
-            /** @description In declaration order — connection parameters first, thresholds after — and meant to be rendered in that order. It is deliberately not alphabetical, which would split a template's connection parameters apart with thresholds between them even though they only make sense filled in together */
-            parameters: components["schemas"]["TemplateCatalogParameterResource"][] | null;
-            /** @description Templates that must be bound alongside this one. Values are `template_key`s */
-            requires: string[] | null;
-            /** @description Whether this template may be bound when `agent_mode` is ACTIVE. It already combines both reasons it may not be — no active variant exists, or this deployment does not have one installed — because the two are rejected identically and call for the same fix */
-            supports_active_mode: boolean;
-            template_key: string;
-        };
-        TemplateCatalogResponseBody: {
-            items: components["schemas"]["TemplateCatalogEntryResource"][] | null;
-        };
-        ServerTemplateResource: {
-            configured_secret_parameters: string[] | null;
-            parameters: {
-                [key: string]: string;
-            };
-            template_key: string;
-            zabbix_template_id: string;
-            zabbix_template_name: string;
-        };
-        ServerResource: {
-            address: string;
-            /** @enum {string} */
-            address_kind: "ip" | "dns";
-            /** @enum {string} */
-            agent_mode: "PASSIVE" | "ACTIVE";
-            /** Format: int64 */
-            agent_port: number;
-            /** Format: date-time */
-            created_at: string;
-            description: string;
-            /** Format: uuid */
-            id: string;
-            last_error: string;
-            /**
-             * @description Consult `last_error` when this is FAILED
-             * @enum {string}
-             */
-            monitoring_status: "PENDING" | "ACTIVE" | "DISABLED" | "FAILED";
-            name: string;
-            /** Format: uuid */
-            project_id: string;
-            templates: components["schemas"]["ServerTemplateResource"][] | null;
-            /** Format: date-time */
-            updated_at: string;
-            /** @description The Hostname in the agent configuration must match this value; active checks identify the machine by it */
-            zabbix_host_name: string;
-        };
-        LengthAwarePageServerResource: {
-            /** @description The records in this page */
-            items: components["schemas"]["ServerResource"][];
-            /**
-             * Format: int64
-             * @description Maximum records per page, echoing the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Number of records skipped, echoing the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matches, not just this page
-             */
-            total: number;
-        };
-        TemplateBindingRequest: {
-            /**
-             * @description Parameters declared by the template, keyed by `name` from `GET /templates`. This is a full replacement: a parameter that is omitted takes the `default` reported there, so send back the whole `parameters` map read from the machine rather than only the field being changed.
-             *
-             *     Secret parameters are the one exception, because they are never returned and so cannot be sent back. Omit one to keep the value already stored, and supply it only to replace it. An empty or blank value counts as omitted.
-             */
-            parameters?: {
-                [key: string]: string;
-            };
-            /** @enum {string} */
-            template_key: "LINUX" | "SYSTEMD" | "DOCKER" | "ICMP_PING" | "NGINX" | "PHP_FPM" | "WEBSITE_CERTIFICATE" | "WINDOWS" | "SMART" | "NVIDIA" | "PROXMOX_VE";
-        };
-        EnableMonitoringRequestBody: {
-            address: string;
-            /** @enum {string} */
-            address_kind: "ip" | "dns";
-            /**
-             * @description Empty selects passive mode, which requires the least agent-side configuration
-             * @enum {string}
-             */
-            agent_mode?: "PASSIVE" | "ACTIVE";
-            /**
-             * Format: int64
-             * @description 0 uses the default of 10050
-             */
-            agent_port?: number;
-            description?: string;
-            name: string;
-            template_bindings?: components["schemas"]["TemplateBindingRequest"][] | null;
-        };
-        EnrollmentResource: {
-            /** @description Includes the PSK. Like `tls_psk`, it is returned only this once */
-            install_command: string;
-            install_script_url: string;
-            /** @description **Returned only this once** */
-            tls_psk: string;
-            tls_psk_identity: string;
-            zabbix_host_name: string;
-            /** @description The Server and ServerActive values for the agent configuration */
-            zabbix_server_address: string;
-        };
-        ServerEnrollmentResponseBody: {
-            enrollment: components["schemas"]["EnrollmentResource"];
-            server: components["schemas"]["ServerResource"];
-        };
-        UpdateServerRequestBody: {
-            address?: string;
-            /**
-             * @description Must be supplied together with `address` when changing the address
-             * @enum {string}
-             */
-            address_kind?: "ip" | "dns";
-            /**
-             * @description Changing the collection mode rebinds every template to the corresponding variant
-             * @enum {string}
-             */
-            agent_mode?: "PASSIVE" | "ACTIVE";
-            /** Format: int64 */
-            agent_port?: number;
-            description?: string;
-            name?: string;
-            template_bindings?: components["schemas"]["TemplateBindingRequest"][];
-        };
-        WebCheckResultResource: {
-            /** Format: date-time */
-            checked_at: string;
-            error: string;
-            /**
-             * Format: int64
-             * @description Index of the failed step, counting from 1. 0 when healthy
-             */
-            failed_step: number;
-            healthy: boolean;
-            /** Format: int64 */
-            response_code: number;
-            /** Format: double */
-            response_time_seconds: number;
-        };
-        WebCheckStepResource: {
-            /** @description Status code expression, such as 200 or 200,301-302 */
-            expected_status_codes: string;
-            follow_redirects: boolean;
-            name: string;
-            required_pattern: string;
-            url: string;
-        };
-        WebCheckResource: {
-            /** Format: uuid */
-            check_id: string;
-            /** Format: int64 */
-            interval_seconds: number;
-            last_error: string;
-            /** Format: int64 */
-            response_time_threshold_seconds: number;
-            /** @description null means the check has not completed a round yet. A zero value would present "not yet known" as "0 seconds, status code 0" */
-            result: components["schemas"]["WebCheckResultResource"] | null;
-            /** Format: int64 */
-            retries: number;
-            /**
-             * Format: uuid
-             * @description The machine this check is attached to. Empty for a project-level check, which is not tied to any machine
-             */
-            server_id: string;
-            steps: components["schemas"]["WebCheckStepResource"][] | null;
-            /** @enum {string} */
-            sync_status: "PENDING" | "ACTIVE" | "FAILED";
-            /** Format: int64 */
-            timeout_seconds: number;
-        };
-        WebCheckStepRequest: {
-            /** @description Status code expression, such as 200 or 200,301-302. Empty disables status code checking */
-            expected_status_codes?: string;
-            follow_redirects?: boolean;
-            name: string;
-            /** @description A string that must appear in the response body */
-            required_pattern?: string;
-            url: string;
-        };
-        PutWebCheckRequestBody: {
-            /**
-             * Format: int64
-             * @description 0 uses the default
-             */
-            interval_seconds?: number;
-            /**
-             * Format: int64
-             * @description Slower than this counts as slow. 0 disables the response time check
-             */
-            response_time_threshold_seconds?: number;
-            /** Format: int64 */
-            retries?: number;
-            steps: components["schemas"]["WebCheckStepRequest"][] | null;
-            /** Format: int64 */
-            timeout_seconds?: number;
-        };
-        WebCheckListResponseBody: {
-            items: components["schemas"]["WebCheckResource"][] | null;
-        };
-        SLIReportRowResource: {
-            /** Format: int64 */
-            downtime_seconds: number;
-            /**
-             * Format: int64
-             * @description A negative value means the budget for this period is already exhausted
-             */
-            error_budget_seconds: number;
-            /**
-             * Format: int64
-             * @description The portion excluded by planned maintenance
-             */
-            excluded_downtime_seconds: number;
-            /** Format: date-time */
-            period_from: string;
-            /** Format: date-time */
-            period_to: string;
-            /** @description Empty means this row covers the project as a whole */
-            server_id: string;
-            /** Format: double */
-            sli_percent: number;
-            /** Format: int64 */
-            uptime_seconds: number;
-        };
-        SLIReportResponseBody: {
-            rows: components["schemas"]["SLIReportRowResource"][] | null;
-        };
-        ScheduleWindowResource: {
-            /** Format: int64 */
-            end_time_seconds: number;
-            /** Format: int64 */
-            start_time_seconds: number;
-            /**
-             * Format: int64
-             * @description Bitmap of weekdays, **Monday is the lowest bit**, using the same encoding as maintenance windows
-             */
-            weekdays: number;
-        };
-        SLOResource: {
-            /** Format: date-time */
-            effective_from: string;
-            last_error: string;
-            /** @enum {string} */
-            min_severity: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
-            name: string;
-            /** @enum {string} */
-            period: "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY" | "ANNUALLY";
-            /** Format: uuid */
-            project_id: string;
-            /** @description Empty means a 24x7 commitment */
-            schedule: components["schemas"]["ScheduleWindowResource"][] | null;
-            /** Format: uuid */
-            slo_id: string;
-            /**
-             * Format: double
-             * @description Target availability, such as 99.9
-             */
-            slo_percent: number;
-            /** @enum {string} */
-            sync_status: "PENDING" | "ACTIVE" | "FAILED";
-            timezone: string;
-        };
-        ScheduleWindowRequest: {
-            /** Format: int64 */
-            end_time_seconds?: number;
-            /** Format: int64 */
-            start_time_seconds?: number;
-            /**
-             * Format: int64
-             * @description Bitmap of weekdays, **Monday is the lowest bit** (1 = Monday … 64 = Sunday)
-             */
-            weekdays: number;
-        };
-        PutSLORequestBody: {
-            /** Format: date-time */
-            effective_from?: string;
-            /** @enum {string} */
-            min_severity: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
-            name: string;
-            /**
-             * @description Empty selects monthly
-             * @enum {string}
-             */
-            period?: "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY" | "ANNUALLY";
-            schedule?: components["schemas"]["ScheduleWindowRequest"][] | null;
-            /** Format: uuid */
-            slo_id: string;
-            /**
-             * Format: double
-             * @description Target availability, such as 99.9. At most four decimal places
-             */
-            slo_percent: number;
-            /** @description Determines the boundaries of each reporting period, that is, the moment each period begins */
-            timezone?: string;
-        };
-        StatusPageResource: {
-            /** @description #RRGGBB */
-            brand_color: string;
-            /** Format: date-time */
-            created_at: string;
-            /** @description The custom domain bound to this page. Empty means it is served only at /{slug} under the shared domain */
-            custom_domain: string;
-            footer_text: string;
-            headline: string;
-            logo_url: string;
-            name: string;
-            /** @description The address this page is served at: the custom domain if one is bound, otherwise the shared domain with the slug, otherwise the shared domain with the project id */
-            public_url: string;
-            published: boolean;
-            /** @description Whether search engines may index the page */
-            search_engine_index: boolean;
-            /** @description The readable address segment, empty when none is set. The page is always reachable at /<project id> regardless */
-            slug: string;
-            /** Format: uuid */
-            status_page_id: string;
-            support_url: string;
-            /** @enum {string} */
-            theme: "AUTO" | "LIGHT" | "DARK";
-            /** @description Determines where the day boundary falls on the availability bar */
-            timezone: string;
-            /** Format: date-time */
-            updated_at: string;
-            /**
-             * Format: int64
-             * @description Number of days covered by the availability bar
-             */
-            uptime_days: number;
-            /** @description The text shown on the support link. Empty means the page default is used */
-            support_label: string;
-        };
-        PutStatusPageRequestBody: {
-            /** @description #RRGGBB. Applied to the page styling; only a strict six-digit hexadecimal value is accepted */
-            brand_color?: string;
-            /** @description Read-only here. Bind a custom domain through PUT /status-page/domain, which verifies ownership first; a value sent here is ignored */
-            custom_domain?: string;
-            /** @description The line of free-form text in the page footer. Plain text */
-            footer_text?: string;
-            /** @description The line shown below the title */
-            headline?: string;
-            logo_url?: string;
-            /** @description Page title */
-            name: string;
-            /**
-             * @description While false, the public address returns 404. Unpublished by default
-             * @default false
-             */
-            published?: boolean;
-            /**
-             * @description Not indexed by default. Once a page has been crawled, switching back does not remove copies already held in third-party indexes
-             * @default false
-             */
-            search_engine_index?: boolean;
-            /** @description An optional readable address segment under the shared domain. Lowercase letters, digits and hyphens; globally unique. Leave it empty and the page is served at /<project id>, which needs no configuration and cannot be taken by anyone else */
-            slug?: string;
-            support_url?: string;
-            /**
-             * @default AUTO
-             * @enum {string}
-             */
-            theme?: "AUTO" | "LIGHT" | "DARK";
-            /** @description IANA name. Empty selects UTC */
-            timezone?: string;
-            /**
-             * Format: int64
-             * @default 90
-             */
-            uptime_days?: number;
-            /** @description The text shown on the support link. Empty uses the page default. Different products call this different things — help centre, submit a ticket, support */
-            support_label?: string;
-        };
-        PutStatusPageOrderRequestBody: {
-            items: components["schemas"]["StatusPageOrderItem"][];
-        };
-        /** @description Exactly one of the two: `group_id` marks this position as a group, `component_id` as an ungrouped component */
-        StatusPageOrderItem: {
-            /** Format: uuid */
-            component_id?: string;
-            /** Format: uuid */
-            group_id?: string;
-        };
-        PutStatusPageGroupOrderRequestBody: {
-            component_ids: string[];
-        };
-        StatusPageGroupResource: {
-            /** @description Whether the group is collapsed by default on the page */
-            collapsed: boolean;
-            /** Format: date-time */
-            created_at: string;
-            description: string;
-            /** Format: uuid */
-            group_id: string;
-            name: string;
-            /** Format: int64 */
-            position: number;
-        };
-        StatusPageGroupListResponseBody: {
-            data: components["schemas"]["StatusPageGroupResource"][];
-        };
-        PutStatusPageGroupRequestBody: {
-            /** @default true */
-            collapsed?: boolean;
-            description?: string;
-            name: string;
-        };
-        StatusPageComponentResource: {
-            /** @enum {string} */
-            auto_status_min_severity: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
-            /** Format: uuid */
-            component_id: string;
-            /** Format: date-time */
-            created_at: string;
-            /**
-             * @description The status currently shown to the public. OPERATIONAL means normal
-             * @enum {string}
-             */
-            current_status: "OPERATIONAL" | "DEGRADED_PERFORMANCE" | "PARTIAL_OUTAGE" | "MAJOR_OUTAGE" | "UNDER_MAINTENANCE";
-            description: string;
-            /** @description Empty means ungrouped, placed directly at the top level of the page */
-            group_id: string;
-            name: string;
-            /** @description Hide this row while everything is normal */
-            only_show_if_degraded: boolean;
-            /** Format: int64 */
-            position: number;
-            /** @description Whether the availability bar is shown. Components with this disabled are also excluded from the aggregate of their group */
-            show_uptime: boolean;
-            /**
-             * Format: date-time
-             * @description The moment this component started being covered. Earlier days are shown as unmeasured rather than operational
-             */
-            started_on: string;
-            /**
-             * Format: double
-             * @description Availability over the past `uptime_days` days
-             */
-            uptime_percent: number;
-        };
-        StatusPageComponentListResponseBody: {
-            data: components["schemas"]["StatusPageComponentResource"][];
-        };
-        PutStatusPageComponentRequestBody: {
-            /**
-             * @description Alerts below this severity do not change the status of this row
-             * @default AVERAGE
-             * @enum {string}
-             */
-            auto_status_min_severity?: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
-            description?: string;
-            /**
-             * Format: uuid
-             * @description Empty leaves the component ungrouped
-             */
-            group_id?: string;
-            /** @description Customer-facing copy; appears verbatim on the public page */
-            name: string;
-            /** @default false */
-            only_show_if_degraded?: boolean;
-            /** @default true */
-            show_uptime?: boolean;
-            /**
-             * Format: date-time
-             * @description Meaningful only at creation and immutable afterwards. Empty selects the current moment
-             */
-            started_on?: string;
-        };
-        StatusPageComponentSourceServer: {
-            /** Format: uuid */
-            server_id: string;
-        };
-        StatusPageComponentSourceWebCheck: {
-            /**
-             * @description Whether the checked address is shown on the public page
-             * @default false
-             */
-            show_url?: boolean;
-            /** Format: uuid */
-            web_check_id: string;
-        };
-        StatusPageComponentSourcesResource: {
-            servers: components["schemas"]["StatusPageComponentSourceServer"][];
-            web_checks: components["schemas"]["StatusPageComponentSourceWebCheck"][];
-        };
-        /** @description Submits the complete set; anything not listed is unbound */
-        PutStatusPageComponentSourcesRequestBody: {
-            servers?: components["schemas"]["StatusPageComponentSourceServer"][];
-            web_checks?: components["schemas"]["StatusPageComponentSourceWebCheck"][];
-        };
-        /** @description A status transition of one component within one update. The component name is a snapshot taken at the time */
-        StatusPageIncidentComponentResource: {
-            /** Format: uuid */
-            component_id: string;
-            component_name: string;
-            /** @enum {string} */
-            new_status: "OPERATIONAL" | "DEGRADED_PERFORMANCE" | "PARTIAL_OUTAGE" | "MAJOR_OUTAGE" | "UNDER_MAINTENANCE";
-            /** @enum {string} */
-            old_status: "OPERATIONAL" | "DEGRADED_PERFORMANCE" | "PARTIAL_OUTAGE" | "MAJOR_OUTAGE" | "UNDER_MAINTENANCE";
-        };
-        StatusPageIncidentUpdateResource: {
-            affected_components: components["schemas"]["StatusPageIncidentComponentResource"][] | null;
-            /** @description Body text. Plain text */
-            body: string;
-            /** @enum {string} */
-            incident_status: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
-            /** Format: date-time */
-            published_at: string;
-            /** Format: uuid */
-            update_id: string;
-        };
-        StatusPageIncidentResource: {
-            /** @enum {string} */
-            impact: "NONE" | "MINOR" | "MAJOR" | "CRITICAL";
-            /** Format: uuid */
-            incident_id: string;
-            /** @enum {string} */
-            incident_status: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
-            name: string;
-            /** Format: date-time */
-            published_at: string;
-            /** Format: date-time */
-            resolved_at: string | null;
-            /**
-             * Format: date-time
-             * @description When the incident began, not when the notice was published
-             */
-            started_at: string;
-            /** @description Most recently published first */
-            updates: components["schemas"]["StatusPageIncidentUpdateResource"][] | null;
-        };
-        LengthAwarePageStatusPageIncidentResource: {
-            data: components["schemas"]["StatusPageIncidentResource"][];
-            /** Format: int64 */
-            limit: number;
-            /** Format: int64 */
-            offset: number;
-            /** Format: int64 */
-            total: number;
-        };
-        StatusPageIncidentComponentRequest: {
-            /** Format: uuid */
-            component_id: string;
-            /**
-             * @description Empty returns this component to operational
-             * @enum {string}
-             */
-            status?: "OPERATIONAL" | "DEGRADED_PERFORMANCE" | "PARTIAL_OUTAGE" | "MAJOR_OUTAGE" | "UNDER_MAINTENANCE";
-        };
-        PublishStatusPageIncidentRequestBody: {
-            /** @description Body of the first update. Plain text */
-            body: string;
-            components?: components["schemas"]["StatusPageIncidentComponentRequest"][];
-            /**
-             * @description Empty derives the impact from the affected components
-             * @enum {string}
-             */
-            impact?: "NONE" | "MINOR" | "MAJOR" | "CRITICAL";
-            /**
-             * @default INVESTIGATING
-             * @enum {string}
-             */
-            incident_status?: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
-            /** @description The public title */
-            name: string;
-            /**
-             * Format: date-time
-             * @description Empty selects the current moment. Backfilling a past incident sets it in the past
-             */
-            published_at?: string;
-            /**
-             * Format: date-time
-             * @description When the incident began. Empty uses the publication time
-             */
-            started_at?: string;
-        };
-        PostStatusPageIncidentUpdateRequestBody: {
-            /** @description Body text. Plain text */
-            body: string;
-            /** @description Lists only the components being changed by this update; those not listed keep their current status */
-            components?: components["schemas"]["StatusPageIncidentComponentRequest"][];
-            /**
-             * @description Empty keeps the current stage. RESOLVED closes the notice and returns every affected component to operational
-             * @enum {string}
-             */
-            incident_status?: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
-            /** Format: date-time */
-            published_at?: string;
-        };
-        StatusPageMaintenanceComponentResource: {
-            /** Format: uuid */
-            component_id: string;
-            component_name: string;
-            /** @enum {string} */
-            component_status: "UNDER_MAINTENANCE" | "DEGRADED_PERFORMANCE";
-        };
-        StatusPageMaintenanceResource: {
-            affected_components: components["schemas"]["StatusPageMaintenanceComponentResource"][] | null;
-            /** @description Maintenance description. Plain text */
-            body: string;
-            /**
-             * Format: date-time
-             * @description When the maintenance actually finished
-             */
-            completed_at: string | null;
-            /** Format: uuid */
-            maintenance_id: string;
-            /** @enum {string} */
-            maintenance_status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
-            name: string;
-            /** Format: date-time */
-            scheduled_for: string;
-            /** Format: date-time */
-            scheduled_until: string;
-            /**
-             * Format: date-time
-             * @description When the maintenance actually started, which may differ from the scheduled time
-             */
-            started_at: string | null;
-        };
-        LengthAwarePageStatusPageMaintenanceResource: {
-            data: components["schemas"]["StatusPageMaintenanceResource"][];
-            /** Format: int64 */
-            limit: number;
-            /** Format: int64 */
-            offset: number;
-            /** Format: int64 */
-            total: number;
-        };
-        StatusPageMaintenanceComponentRequest: {
-            /** Format: uuid */
-            component_id: string;
-            /**
-             * @description How this component is shown while the maintenance runs. Neither value reduces availability
-             * @default UNDER_MAINTENANCE
-             * @enum {string}
-             */
-            component_status?: "UNDER_MAINTENANCE" | "DEGRADED_PERFORMANCE";
-        };
-        ScheduleStatusPageMaintenanceRequestBody: {
-            /** @description Maintenance description. Plain text */
-            body: string;
-            /** @description At least one. Maintenance that affects no component reads on the page as an announcement with no subject */
-            components: components["schemas"]["StatusPageMaintenanceComponentRequest"][];
-            name: string;
-            /** Format: date-time */
-            scheduled_for: string;
-            /**
-             * Format: date-time
-             * @description Must be later than `scheduled_for`
-             */
-            scheduled_until: string;
-        };
-        StatusPageDomainResource: {
-            /**
-             * Format: date-time
-             * @description When the current certificate expires
-             */
-            certificate_not_after: string | null;
-            /**
-             * @description NONE means no certificate has been requested for this domain yet
-             * @enum {string}
-             */
-            certificate_status: "NONE" | "PENDING" | "ACTIVE" | "FAILED";
-            /** @description The bound custom domain. Empty means none is bound */
-            domain: string;
-            /** @description The value the domain must point at */
-            expected_cname: string;
-            /** @description Why the most recent issuance attempt failed. Empty when it did not */
-            last_error: string;
-            /** @description What the domain currently resolves to. Empty when it resolves to nothing */
-            observed_cname: string;
-            /** @description The address this page is served at, taking the custom domain into account */
-            public_url: string;
-            /** @description Whether the domain currently points at the status page */
-            verified: boolean;
-            /**
-             * Format: date-time
-             * @description When ownership was last confirmed
-             */
-            verified_at: string | null;
-        };
-        PutStatusPageDomainRequestBody: {
-            /** @description Your own domain, such as status.acme.com. It must already point at the status page by CNAME */
-            domain: string;
-        };
+  schemas: {
+    Error: {
+      code?: string;
+      message: string;
+      /**
+       * @description What a given `code` carries alongside the message. The keys depend on the code,
+       *     and a client that does not recognise one ignores it.
+       */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /** Format: int64 */
+      status: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    IncidentFollowerResource: {
+      display_name: string;
+      /** Format: date-time */
+      followed_at: string;
+      user_id: string;
+    };
+    MonitoringItemResource: {
+      /** @description Such as last, avg, min or max */
+      aggregation_function: string;
+      /** Format: int64 */
+      evaluation_window_seconds: number;
+      item_id: string;
+      key: string;
+      name: string;
+      operator: string;
+      /**
+       * Format: double
+       * @description Present only when `threshold_status` is RESOLVED
+       */
+      threshold: number | null;
+      threshold_status: string;
+      /** @description The value at the moment of the trigger, stored as collected */
+      value: string;
+    };
+    TagResource: {
+      tag: string;
+      value: string;
+    };
+    IncidentResource: {
+      acknowledge_message: string;
+      acknowledged: boolean;
+      /** Format: date-time */
+      acknowledged_at: string | null;
+      acknowledged_by_display_name: string;
+      acknowledged_by_user_id: string;
+      /** Format: date-time */
+      assigned_at: string | null;
+      assignee_display_name: string;
+      assignee_user_id: string;
+      close_message: string;
+      close_reason: string;
+      /** Format: date-time */
+      closed_at: string | null;
+      closed_by_display_name: string;
+      closed_by_user_id: string;
+      /** Format: int64 */
+      duration_seconds: number;
+      followers: components["schemas"]["IncidentFollowerResource"][] | null;
+      host_connection: string;
+      host_display_name: string;
+      /** Format: uuid */
+      id: string;
+      /**
+       * @description Whether monitoring considers the problem recovered. Independent of whether anyone has closed the incident
+       * @enum {string}
+       */
+      incident_status: "PROBLEM" | "RESOLVED";
+      items: components["schemas"]["MonitoringItemResource"][] | null;
+      name: string;
+      /** @description The operational data line configured on the trigger */
+      operational_data: string;
+      /** Format: uuid */
+      project_id: string;
+      /** Format: date-time */
+      resolved_at: string | null;
+      resolved_trigger_expression: string;
+      /**
+       * Format: uuid
+       * @description The machine this alert is about. Null when the alert is not about a machine
+       */
+      server_id: string | null;
+      /** @description Empty when server_id is null */
+      server_name: string;
+      /** @enum {string} */
+      severity: "NOT_CLASSIFIED" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
+      /** Format: date-time */
+      started_at: string;
+      tags: components["schemas"]["TagResource"][] | null;
+      trigger_expression: string;
+      /**
+       * Format: uuid
+       * @description The web check that reported this alert. Null when the alert did not come from a web check. Both this and server_id are set when the check runs on one of your machines
+       */
+      web_check_id: string | null;
+      zabbix_event_id: string;
+    };
+    LengthAwarePageIncidentResource: {
+      /** @description The records in this page */
+      items: components["schemas"]["IncidentResource"][];
+      /**
+       * Format: int64
+       * @description Maximum records per page, echoing the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Number of records skipped, echoing the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matches, not just this page
+       */
+      total: number;
+    };
+    AcknowledgeIncidentRequestBody: {
+      /** @description Also written to the acknowledgement record in the monitoring system */
+      message?: string;
+    };
+    AssignIncidentRequestBody: {
+      /** @description Defaults to the user id. The timeline keeps a copy of the name as it was at the time */
+      assignee_display_name?: string;
+      assignee_user_id?: string;
+    };
+    CloseIncidentRequestBody: {
+      /** @description Required when `reason` is OTHER; the request is rejected otherwise */
+      message?: string;
+      /** @enum {string} */
+      reason:
+        | "RECOVERED"
+        | "FIXED"
+        | "FALSE_POSITIVE"
+        | "DUPLICATE"
+        | "NO_ACTION_REQUIRED"
+        | "ACCEPTED_RISK"
+        | "OTHER";
+    };
+    AddCommentRequestBody: {
+      message: string;
+    };
+    IncidentActivityResource: {
+      /** @enum {string} */
+      activity_type:
+        | "OPENED"
+        | "RECOVERED"
+        | "ACKNOWLEDGED"
+        | "ASSIGNED"
+        | "UNASSIGNED"
+        | "FOLLOWER_ADDED"
+        | "FOLLOWER_REMOVED"
+        | "COMMENT"
+        | "CLOSED"
+        | "REOPENED";
+      actor_display_name: string;
+      /** @description The operator. Empty when the source is SYSTEM or ZABBIX */
+      actor_user_id: string;
+      close_reason: string;
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      incident_id: string;
+      message: string;
+      /** Format: date-time */
+      occurred_at: string;
+      /** @enum {string} */
+      source: "SYSTEM" | "OPERATOR" | "ZABBIX";
+      subject_display_name: string;
+      /** @description The user who was assigned, or removed from the followers */
+      subject_user_id: string;
+    };
+    SetFollowingRequestBody: {
+      following: boolean;
+    };
+    CursorPageIncidentActivityResource: {
+      /** @description The records in this page */
+      items: components["schemas"]["IncidentActivityResource"][];
+      /** @description Cursor for the next page. Empty means the end has been reached */
+      next_cursor: string;
+    };
+    MaintenancePeriodResource: {
+      /** Format: int64 */
+      duration_seconds: number;
+      /**
+       * Format: int64
+       * @description DAILY and WEEKLY: every N days or every N weeks
+       */
+      every: number;
+      /** @enum {string} */
+      kind: "ONCE" | "DAILY" | "WEEKLY";
+      /**
+       * Format: int64
+       * @description DAILY and WEEKLY: seconds from midnight, in the timezone of the window
+       */
+      start_time_seconds: number;
+      /**
+       * Format: date-time
+       * @description Present only for ONCE
+       */
+      starts_at: string | null;
+      /**
+       * Format: int64
+       * @description WEEKLY: bitmap of weekdays, **Monday is the lowest bit**
+       */
+      weekdays: number;
+    };
+    MaintenanceWindowResource: {
+      /** Format: date-time */
+      active_since: string;
+      /** Format: date-time */
+      active_till: string;
+      description: string;
+      last_error: string;
+      name: string;
+      period: components["schemas"]["MaintenancePeriodResource"];
+      /** Format: uuid */
+      project_id: string;
+      /** @description Empty covers the **entire project** */
+      server_ids: string[] | null;
+      /** @enum {string} */
+      sync_status: "PENDING" | "ACTIVE" | "FAILED" | "EXPIRED";
+      timezone: string;
+      /** Format: uuid */
+      window_id: string;
+    };
+    MaintenanceWindowListResponseBody: {
+      items: components["schemas"]["MaintenanceWindowResource"][] | null;
+    };
+    MaintenancePeriodRequest: {
+      /** Format: int64 */
+      duration_seconds?: number;
+      /**
+       * Format: int64
+       * @description DAILY and WEEKLY: every N days or every N weeks
+       */
+      every?: number;
+      /** @enum {string} */
+      kind: "ONCE" | "DAILY" | "WEEKLY";
+      /**
+       * Format: int64
+       * @description DAILY and WEEKLY: seconds from midnight, in the timezone of the window
+       */
+      start_time_seconds?: number;
+      /**
+       * Format: date-time
+       * @description Used only by ONCE
+       */
+      starts_at?: string;
+      /**
+       * Format: int64
+       * @description WEEKLY: bitmap of weekdays, **Monday is the lowest bit**
+       */
+      weekdays?: number;
+    };
+    PutMaintenanceWindowRequestBody: {
+      /**
+       * Format: date-time
+       * @description Start of the period in which the rule is effective
+       */
+      active_since: string;
+      /** Format: date-time */
+      active_till: string;
+      description?: string;
+      name: string;
+      period: components["schemas"]["MaintenancePeriodRequest"];
+      server_ids?: string[] | null;
+      /** @description IANA name such as Asia/Shanghai. Empty uses the configured default */
+      timezone?: string;
+    };
+    CountResource: {
+      /** Format: int64 */
+      count: number;
+      key: string;
+    };
+    ProjectOverviewResource: {
+      /** Format: int64 */
+      monitored_servers: number;
+      problem_counts: components["schemas"]["CountResource"][] | null;
+      reachability_counts: components["schemas"]["CountResource"][] | null;
+      /** Format: int64 */
+      total_servers: number;
+    };
+    ItemResource: {
+      item_id: string;
+      key: string;
+      /** Format: date-time */
+      last_collected_at: string | null;
+      last_value: string;
+      name: string;
+      tags: components["schemas"]["TagResource"][] | null;
+      units: string;
+      /** @enum {string} */
+      value_type: "FLOAT" | "CHARACTER" | "LOG" | "UNSIGNED" | "TEXT";
+    };
+    ItemListResponseBody: {
+      items: components["schemas"]["ItemResource"][] | null;
+    };
+    MetricPointResource: {
+      /** Format: double */
+      max_value: number;
+      /** Format: double */
+      min_value: number;
+      /** Format: date-time */
+      timestamp: string;
+      /** Format: double */
+      value: number;
+    };
+    MetricSeriesResource: {
+      item_id: string;
+      item_key: string;
+      item_name: string;
+      points: components["schemas"]["MetricPointResource"][] | null;
+      units: string;
+    };
+    ItemThresholdResource: {
+      aggregation_function: string;
+      /** Format: int64 */
+      evaluation_window_seconds: number;
+      item_id: string;
+      operator: string;
+      severity: string;
+      /** Format: double */
+      threshold: number;
+      /** @description Labels the line in the chart legend */
+      trigger_name: string;
+    };
+    MetricResponseBody: {
+      downsampled: boolean;
+      /** Format: date-time */
+      effective_from: string;
+      /** Format: date-time */
+      effective_to: string;
+      /** @description Data comes from hourly aggregates, one point per hour */
+      from_trends: boolean;
+      series: components["schemas"]["MetricSeriesResource"][] | null;
+      thresholds: components["schemas"]["ItemThresholdResource"][] | null;
+      truncated: boolean;
+    };
+    HostInterfaceResource: {
+      available: boolean;
+      dns: string;
+      ip: string;
+      /** Format: int64 */
+      port: number;
+      use_ip: boolean;
+    };
+    ServerResourcesResource: {
+      interfaces: components["schemas"]["HostInterfaceResource"][] | null;
+      /** @description Hardware and system inventory collected automatically: CPU, memory, operating system and so on */
+      inventory: {
+        [key: string]: string;
+      };
+      tags: components["schemas"]["TagResource"][] | null;
+    };
+    SnapshotResource: {
+      agent_error: string;
+      /**
+       * @description AGENT_DOWN means the agent is unreachable while the machine is still alive; UNREACHABLE means neither can be established
+       * @enum {string}
+       */
+      agent_reachability: "UNKNOWN" | "REACHABLE" | "AGENT_DOWN" | "UNREACHABLE";
+      /** Format: date-time */
+      last_collected_at: string | null;
+      monitoring_enabled: boolean;
+      problem_counts: components["schemas"]["CountResource"][] | null;
+    };
+    TopItemResource: {
+      item_key: string;
+      /** Format: uuid */
+      server_id: string;
+      units: string;
+      /** Format: double */
+      value: number;
+    };
+    TopItemListResponseBody: {
+      items: components["schemas"]["TopItemResource"][] | null;
+    };
+    TemplateCatalogParameterResource: {
+      /** @description The value that takes effect when the parameter is omitted. An empty string is a real default, not an absent one */
+      default: string;
+      /**
+       * @description The shape of the accepted value. Surrounding whitespace is trimmed before the value is checked, and an omitted or empty value is replaced by `default` and not checked at all.
+       *
+       *     - `string` — no constraint; empty is accepted
+       *     - `non_empty_string` — must not be empty once trimmed
+       *     - `percent` — a number in the **closed** interval 0 to 100; fractions are accepted
+       *     - `positive_number` — a number **strictly** greater than 0; fractions are accepted
+       *     - `port` — an integer from 1 to 65535 inclusive; `8080/tcp` is not a port
+       *     - `host` — an IP address, or a hostname of at most 255 characters whose dot-separated labels are at most 63 characters of `A-Z a-z 0-9 - _` and neither begin nor end with `-`. A single label such as `localhost` is accepted, as is a trailing dot
+       *     - `ip_or_empty` — an IP address, or empty to mean "not specified"
+       *     - `regexp` — must compile as a **Go RE2** pattern. RE2 has no backreferences and no lookaround, so a pattern that a browser's `new RegExp()` accepts may still be rejected here. Validating client-side narrows the gap but does not close it
+       * @enum {string}
+       */
+      kind:
+        | "string"
+        | "non_empty_string"
+        | "percent"
+        | "positive_number"
+        | "port"
+        | "host"
+        | "ip_or_empty"
+        | "regexp";
+      /** @description The key to use in `template_bindings[].parameters`. It is not the Zabbix macro name, which is internal and changes between Zabbix versions */
+      name: string;
+      /** @description Independent of `default`. The three NGINX connection parameters carry a default and are still required, because the template's own default (localhost:80/basic_status) is almost never right */
+      required: boolean;
+      /** @description Supplied in clear text and never returned. A configured one is reported by name only, through `configured_secret_parameters` on the bound template. When updating a machine that already has one stored, omit it to keep the stored value and supply it only to replace it — a caller cannot read it back, so requiring it on every write would make resuming collection impossible */
+      secret: boolean;
+    };
+    TemplateCatalogEntryResource: {
+      /** @description Exactly one template with this set must be bound to every machine. Binding none enrolls a machine that can never alert; binding both loads the Linux and Windows items onto one machine, half of which must fail */
+      is_base: boolean;
+      /** @description False means the template collects without an agent on the machine — ICMP_PING is pinged by the Zabbix server, PROXMOX_VE is polled over the PVE API */
+      needs_agent: boolean;
+      /** @description In declaration order — connection parameters first, thresholds after — and meant to be rendered in that order. It is deliberately not alphabetical, which would split a template's connection parameters apart with thresholds between them even though they only make sense filled in together */
+      parameters: components["schemas"]["TemplateCatalogParameterResource"][] | null;
+      /** @description Templates that must be bound alongside this one. Values are `template_key`s */
+      requires: string[] | null;
+      /** @description Whether this template may be bound when `agent_mode` is ACTIVE. It already combines both reasons it may not be — no active variant exists, or this deployment does not have one installed — because the two are rejected identically and call for the same fix */
+      supports_active_mode: boolean;
+      template_key: string;
+    };
+    TemplateCatalogResponseBody: {
+      items: components["schemas"]["TemplateCatalogEntryResource"][] | null;
+    };
+    ServerTemplateResource: {
+      configured_secret_parameters: string[] | null;
+      parameters: {
+        [key: string]: string;
+      };
+      template_key: string;
+      zabbix_template_id: string;
+      zabbix_template_name: string;
+    };
+    ServerResource: {
+      address: string;
+      /** @enum {string} */
+      address_kind: "ip" | "dns";
+      /** @enum {string} */
+      agent_mode: "PASSIVE" | "ACTIVE";
+      /** Format: int64 */
+      agent_port: number;
+      /** Format: date-time */
+      created_at: string;
+      description: string;
+      /** Format: uuid */
+      id: string;
+      last_error: string;
+      /**
+       * @description Consult `last_error` when this is FAILED
+       * @enum {string}
+       */
+      monitoring_status: "PENDING" | "ACTIVE" | "DISABLED" | "FAILED";
+      name: string;
+      /** Format: uuid */
+      project_id: string;
+      templates: components["schemas"]["ServerTemplateResource"][] | null;
+      /** Format: date-time */
+      updated_at: string;
+      /** @description The Hostname in the agent configuration must match this value; active checks identify the machine by it */
+      zabbix_host_name: string;
+    };
+    LengthAwarePageServerResource: {
+      /** @description The records in this page */
+      items: components["schemas"]["ServerResource"][];
+      /**
+       * Format: int64
+       * @description Maximum records per page, echoing the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Number of records skipped, echoing the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matches, not just this page
+       */
+      total: number;
+    };
+    TemplateBindingRequest: {
+      /**
+       * @description Parameters declared by the template, keyed by `name` from `GET /templates`. This is a full replacement: a parameter that is omitted takes the `default` reported there, so send back the whole `parameters` map read from the machine rather than only the field being changed.
+       *
+       *     Secret parameters are the one exception, because they are never returned and so cannot be sent back. Omit one to keep the value already stored, and supply it only to replace it. An empty or blank value counts as omitted.
+       */
+      parameters?: {
+        [key: string]: string;
+      };
+      /** @enum {string} */
+      template_key:
+        | "LINUX"
+        | "SYSTEMD"
+        | "DOCKER"
+        | "ICMP_PING"
+        | "NGINX"
+        | "PHP_FPM"
+        | "WEBSITE_CERTIFICATE"
+        | "WINDOWS"
+        | "SMART"
+        | "NVIDIA"
+        | "PROXMOX_VE";
+    };
+    EnableMonitoringRequestBody: {
+      address: string;
+      /** @enum {string} */
+      address_kind: "ip" | "dns";
+      /**
+       * @description Empty selects passive mode, which requires the least agent-side configuration
+       * @enum {string}
+       */
+      agent_mode?: "PASSIVE" | "ACTIVE";
+      /**
+       * Format: int64
+       * @description 0 uses the default of 10050
+       */
+      agent_port?: number;
+      description?: string;
+      name: string;
+      template_bindings?: components["schemas"]["TemplateBindingRequest"][] | null;
+    };
+    EnrollmentResource: {
+      /** @description Includes the PSK. Like `tls_psk`, it is returned only this once */
+      install_command: string;
+      install_script_url: string;
+      /** @description **Returned only this once** */
+      tls_psk: string;
+      tls_psk_identity: string;
+      zabbix_host_name: string;
+      /** @description The Server and ServerActive values for the agent configuration */
+      zabbix_server_address: string;
+    };
+    ServerEnrollmentResponseBody: {
+      enrollment: components["schemas"]["EnrollmentResource"];
+      server: components["schemas"]["ServerResource"];
+    };
+    UpdateServerRequestBody: {
+      address?: string;
+      /**
+       * @description Must be supplied together with `address` when changing the address
+       * @enum {string}
+       */
+      address_kind?: "ip" | "dns";
+      /**
+       * @description Changing the collection mode rebinds every template to the corresponding variant
+       * @enum {string}
+       */
+      agent_mode?: "PASSIVE" | "ACTIVE";
+      /** Format: int64 */
+      agent_port?: number;
+      description?: string;
+      name?: string;
+      template_bindings?: components["schemas"]["TemplateBindingRequest"][];
+    };
+    WebCheckResultResource: {
+      /** Format: date-time */
+      checked_at: string;
+      error: string;
+      /**
+       * Format: int64
+       * @description Index of the failed step, counting from 1. 0 when healthy
+       */
+      failed_step: number;
+      healthy: boolean;
+      /** Format: int64 */
+      response_code: number;
+      /** Format: double */
+      response_time_seconds: number;
+    };
+    WebCheckStepResource: {
+      /** @description Status code expression, such as 200 or 200,301-302 */
+      expected_status_codes: string;
+      follow_redirects: boolean;
+      name: string;
+      required_pattern: string;
+      url: string;
+    };
+    WebCheckResource: {
+      /** Format: uuid */
+      check_id: string;
+      /** Format: int64 */
+      interval_seconds: number;
+      last_error: string;
+      /** Format: int64 */
+      response_time_threshold_seconds: number;
+      /** @description null means the check has not completed a round yet. A zero value would present "not yet known" as "0 seconds, status code 0" */
+      result: components["schemas"]["WebCheckResultResource"] | null;
+      /** Format: int64 */
+      retries: number;
+      /**
+       * Format: uuid
+       * @description The machine this check is attached to. Empty for a project-level check, which is not tied to any machine
+       */
+      server_id: string;
+      steps: components["schemas"]["WebCheckStepResource"][] | null;
+      /** @enum {string} */
+      sync_status: "PENDING" | "ACTIVE" | "FAILED";
+      /** Format: int64 */
+      timeout_seconds: number;
+    };
+    WebCheckStepRequest: {
+      /** @description Status code expression, such as 200 or 200,301-302. Empty disables status code checking */
+      expected_status_codes?: string;
+      follow_redirects?: boolean;
+      name: string;
+      /** @description A string that must appear in the response body */
+      required_pattern?: string;
+      url: string;
+    };
+    PutWebCheckRequestBody: {
+      /**
+       * Format: int64
+       * @description 0 uses the default
+       */
+      interval_seconds?: number;
+      /**
+       * Format: int64
+       * @description Slower than this counts as slow. 0 disables the response time check
+       */
+      response_time_threshold_seconds?: number;
+      /** Format: int64 */
+      retries?: number;
+      steps: components["schemas"]["WebCheckStepRequest"][] | null;
+      /** Format: int64 */
+      timeout_seconds?: number;
+    };
+    WebCheckListResponseBody: {
+      items: components["schemas"]["WebCheckResource"][] | null;
+    };
+    SLIReportRowResource: {
+      /** Format: int64 */
+      downtime_seconds: number;
+      /**
+       * Format: int64
+       * @description A negative value means the budget for this period is already exhausted
+       */
+      error_budget_seconds: number;
+      /**
+       * Format: int64
+       * @description The portion excluded by planned maintenance
+       */
+      excluded_downtime_seconds: number;
+      /** Format: date-time */
+      period_from: string;
+      /** Format: date-time */
+      period_to: string;
+      /** @description Empty means this row covers the project as a whole */
+      server_id: string;
+      /** Format: double */
+      sli_percent: number;
+      /** Format: int64 */
+      uptime_seconds: number;
+    };
+    SLIReportResponseBody: {
+      rows: components["schemas"]["SLIReportRowResource"][] | null;
+    };
+    ScheduleWindowResource: {
+      /** Format: int64 */
+      end_time_seconds: number;
+      /** Format: int64 */
+      start_time_seconds: number;
+      /**
+       * Format: int64
+       * @description Bitmap of weekdays, **Monday is the lowest bit**, using the same encoding as maintenance windows
+       */
+      weekdays: number;
+    };
+    SLOResource: {
+      /** Format: date-time */
+      effective_from: string;
+      last_error: string;
+      /** @enum {string} */
+      min_severity: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
+      name: string;
+      /** @enum {string} */
+      period: "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY" | "ANNUALLY";
+      /** Format: uuid */
+      project_id: string;
+      /** @description Empty means a 24x7 commitment */
+      schedule: components["schemas"]["ScheduleWindowResource"][] | null;
+      /** Format: uuid */
+      slo_id: string;
+      /**
+       * Format: double
+       * @description Target availability, such as 99.9
+       */
+      slo_percent: number;
+      /** @enum {string} */
+      sync_status: "PENDING" | "ACTIVE" | "FAILED";
+      timezone: string;
+    };
+    ScheduleWindowRequest: {
+      /** Format: int64 */
+      end_time_seconds?: number;
+      /** Format: int64 */
+      start_time_seconds?: number;
+      /**
+       * Format: int64
+       * @description Bitmap of weekdays, **Monday is the lowest bit** (1 = Monday … 64 = Sunday)
+       */
+      weekdays: number;
+    };
+    PutSLORequestBody: {
+      /** Format: date-time */
+      effective_from?: string;
+      /** @enum {string} */
+      min_severity: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
+      name: string;
+      /**
+       * @description Empty selects monthly
+       * @enum {string}
+       */
+      period?: "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY" | "ANNUALLY";
+      schedule?: components["schemas"]["ScheduleWindowRequest"][] | null;
+      /** Format: uuid */
+      slo_id: string;
+      /**
+       * Format: double
+       * @description Target availability, such as 99.9. At most four decimal places
+       */
+      slo_percent: number;
+      /** @description Determines the boundaries of each reporting period, that is, the moment each period begins */
+      timezone?: string;
+    };
+    StatusPageResource: {
+      /** @description #RRGGBB */
+      brand_color: string;
+      /** Format: date-time */
+      created_at: string;
+      /** @description The custom domain bound to this page. Empty means it is served only at /{slug} under the shared domain */
+      custom_domain: string;
+      footer_text: string;
+      headline: string;
+      logo_url: string;
+      name: string;
+      /** @description The address this page is served at: the custom domain if one is bound, otherwise the shared domain with the slug, otherwise the shared domain with the project id */
+      public_url: string;
+      published: boolean;
+      /** @description Whether search engines may index the page */
+      search_engine_index: boolean;
+      /** @description The readable address segment, empty when none is set. The page is always reachable at /<project id> regardless */
+      slug: string;
+      /** Format: uuid */
+      status_page_id: string;
+      support_url: string;
+      /** @enum {string} */
+      theme: "AUTO" | "LIGHT" | "DARK";
+      /** @description Determines where the day boundary falls on the availability bar */
+      timezone: string;
+      /** Format: date-time */
+      updated_at: string;
+      /**
+       * Format: int64
+       * @description Number of days covered by the availability bar
+       */
+      uptime_days: number;
+      /** @description The text shown on the support link. Empty means the page default is used */
+      support_label: string;
+    };
+    PutStatusPageRequestBody: {
+      /** @description #RRGGBB. Applied to the page styling; only a strict six-digit hexadecimal value is accepted */
+      brand_color?: string;
+      /** @description Read-only here. Bind a custom domain through PUT /status-page/domain, which verifies ownership first; a value sent here is ignored */
+      custom_domain?: string;
+      /** @description The line of free-form text in the page footer. Plain text */
+      footer_text?: string;
+      /** @description The line shown below the title */
+      headline?: string;
+      logo_url?: string;
+      /** @description Page title */
+      name: string;
+      /**
+       * @description While false, the public address returns 404. Unpublished by default
+       * @default false
+       */
+      published?: boolean;
+      /**
+       * @description Not indexed by default. Once a page has been crawled, switching back does not remove copies already held in third-party indexes
+       * @default false
+       */
+      search_engine_index?: boolean;
+      /** @description An optional readable address segment under the shared domain. Lowercase letters, digits and hyphens; globally unique. Leave it empty and the page is served at /<project id>, which needs no configuration and cannot be taken by anyone else */
+      slug?: string;
+      support_url?: string;
+      /**
+       * @default AUTO
+       * @enum {string}
+       */
+      theme?: "AUTO" | "LIGHT" | "DARK";
+      /** @description IANA name. Empty selects UTC */
+      timezone?: string;
+      /**
+       * Format: int64
+       * @default 90
+       */
+      uptime_days?: number;
+      /** @description The text shown on the support link. Empty uses the page default. Different products call this different things — help centre, submit a ticket, support */
+      support_label?: string;
+    };
+    PutStatusPageOrderRequestBody: {
+      items: components["schemas"]["StatusPageOrderItem"][];
+    };
+    /** @description Exactly one of the two: `group_id` marks this position as a group, `component_id` as an ungrouped component */
+    StatusPageOrderItem: {
+      /** Format: uuid */
+      component_id?: string;
+      /** Format: uuid */
+      group_id?: string;
+    };
+    PutStatusPageGroupOrderRequestBody: {
+      component_ids: string[];
+    };
+    StatusPageGroupResource: {
+      /** @description Whether the group is collapsed by default on the page */
+      collapsed: boolean;
+      /** Format: date-time */
+      created_at: string;
+      description: string;
+      /** Format: uuid */
+      group_id: string;
+      name: string;
+      /** Format: int64 */
+      position: number;
+    };
+    StatusPageGroupListResponseBody: {
+      data: components["schemas"]["StatusPageGroupResource"][];
+    };
+    PutStatusPageGroupRequestBody: {
+      /** @default true */
+      collapsed?: boolean;
+      description?: string;
+      name: string;
+    };
+    StatusPageComponentResource: {
+      /** @enum {string} */
+      auto_status_min_severity: "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
+      /** Format: uuid */
+      component_id: string;
+      /** Format: date-time */
+      created_at: string;
+      /**
+       * @description The status currently shown to the public. OPERATIONAL means normal
+       * @enum {string}
+       */
+      current_status:
+        | "OPERATIONAL"
+        | "DEGRADED_PERFORMANCE"
+        | "PARTIAL_OUTAGE"
+        | "MAJOR_OUTAGE"
+        | "UNDER_MAINTENANCE";
+      description: string;
+      /** @description Empty means ungrouped, placed directly at the top level of the page */
+      group_id: string;
+      name: string;
+      /** @description Hide this row while everything is normal */
+      only_show_if_degraded: boolean;
+      /** Format: int64 */
+      position: number;
+      /** @description Whether the availability bar is shown. Components with this disabled are also excluded from the aggregate of their group */
+      show_uptime: boolean;
+      /**
+       * Format: date-time
+       * @description The moment this component started being covered. Earlier days are shown as unmeasured rather than operational
+       */
+      started_on: string;
+      /**
+       * Format: double
+       * @description Availability over the past `uptime_days` days
+       */
+      uptime_percent: number;
+    };
+    StatusPageComponentListResponseBody: {
+      data: components["schemas"]["StatusPageComponentResource"][];
+    };
+    PutStatusPageComponentRequestBody: {
+      /**
+       * @description Alerts below this severity do not change the status of this row
+       * @default AVERAGE
+       * @enum {string}
+       */
+      auto_status_min_severity?:
+        "ANY" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
+      description?: string;
+      /**
+       * Format: uuid
+       * @description Empty leaves the component ungrouped
+       */
+      group_id?: string;
+      /** @description Customer-facing copy; appears verbatim on the public page */
+      name: string;
+      /** @default false */
+      only_show_if_degraded?: boolean;
+      /** @default true */
+      show_uptime?: boolean;
+      /**
+       * Format: date-time
+       * @description Meaningful only at creation and immutable afterwards. Empty selects the current moment
+       */
+      started_on?: string;
+    };
+    StatusPageComponentSourceServer: {
+      /** Format: uuid */
+      server_id: string;
+    };
+    StatusPageComponentSourceWebCheck: {
+      /**
+       * @description Whether the checked address is shown on the public page
+       * @default false
+       */
+      show_url?: boolean;
+      /** Format: uuid */
+      web_check_id: string;
+    };
+    StatusPageComponentSourcesResource: {
+      servers: components["schemas"]["StatusPageComponentSourceServer"][];
+      web_checks: components["schemas"]["StatusPageComponentSourceWebCheck"][];
+    };
+    /** @description Submits the complete set; anything not listed is unbound */
+    PutStatusPageComponentSourcesRequestBody: {
+      servers?: components["schemas"]["StatusPageComponentSourceServer"][];
+      web_checks?: components["schemas"]["StatusPageComponentSourceWebCheck"][];
+    };
+    /** @description A status transition of one component within one update. The component name is a snapshot taken at the time */
+    StatusPageIncidentComponentResource: {
+      /** Format: uuid */
+      component_id: string;
+      component_name: string;
+      /** @enum {string} */
+      new_status:
+        | "OPERATIONAL"
+        | "DEGRADED_PERFORMANCE"
+        | "PARTIAL_OUTAGE"
+        | "MAJOR_OUTAGE"
+        | "UNDER_MAINTENANCE";
+      /** @enum {string} */
+      old_status:
+        | "OPERATIONAL"
+        | "DEGRADED_PERFORMANCE"
+        | "PARTIAL_OUTAGE"
+        | "MAJOR_OUTAGE"
+        | "UNDER_MAINTENANCE";
+    };
+    StatusPageIncidentUpdateResource: {
+      affected_components: components["schemas"]["StatusPageIncidentComponentResource"][] | null;
+      /** @description Body text. Plain text */
+      body: string;
+      /** @enum {string} */
+      incident_status: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
+      /** Format: date-time */
+      published_at: string;
+      /** Format: uuid */
+      update_id: string;
+    };
+    StatusPageIncidentResource: {
+      /** @enum {string} */
+      impact: "NONE" | "MINOR" | "MAJOR" | "CRITICAL";
+      /** Format: uuid */
+      incident_id: string;
+      /** @enum {string} */
+      incident_status: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
+      name: string;
+      /** Format: date-time */
+      published_at: string;
+      /** Format: date-time */
+      resolved_at: string | null;
+      /**
+       * Format: date-time
+       * @description When the incident began, not when the notice was published
+       */
+      started_at: string;
+      /** @description Most recently published first */
+      updates: components["schemas"]["StatusPageIncidentUpdateResource"][] | null;
+    };
+    LengthAwarePageStatusPageIncidentResource: {
+      data: components["schemas"]["StatusPageIncidentResource"][];
+      /** Format: int64 */
+      limit: number;
+      /** Format: int64 */
+      offset: number;
+      /** Format: int64 */
+      total: number;
+    };
+    StatusPageIncidentComponentRequest: {
+      /** Format: uuid */
+      component_id: string;
+      /**
+       * @description Empty returns this component to operational
+       * @enum {string}
+       */
+      status?:
+        | "OPERATIONAL"
+        | "DEGRADED_PERFORMANCE"
+        | "PARTIAL_OUTAGE"
+        | "MAJOR_OUTAGE"
+        | "UNDER_MAINTENANCE";
+    };
+    PublishStatusPageIncidentRequestBody: {
+      /** @description Body of the first update. Plain text */
+      body: string;
+      components?: components["schemas"]["StatusPageIncidentComponentRequest"][];
+      /**
+       * @description Empty derives the impact from the affected components
+       * @enum {string}
+       */
+      impact?: "NONE" | "MINOR" | "MAJOR" | "CRITICAL";
+      /**
+       * @default INVESTIGATING
+       * @enum {string}
+       */
+      incident_status?: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
+      /** @description The public title */
+      name: string;
+      /**
+       * Format: date-time
+       * @description Empty selects the current moment. Backfilling a past incident sets it in the past
+       */
+      published_at?: string;
+      /**
+       * Format: date-time
+       * @description When the incident began. Empty uses the publication time
+       */
+      started_at?: string;
+    };
+    PostStatusPageIncidentUpdateRequestBody: {
+      /** @description Body text. Plain text */
+      body: string;
+      /** @description Lists only the components being changed by this update; those not listed keep their current status */
+      components?: components["schemas"]["StatusPageIncidentComponentRequest"][];
+      /**
+       * @description Empty keeps the current stage. RESOLVED closes the notice and returns every affected component to operational
+       * @enum {string}
+       */
+      incident_status?: "INVESTIGATING" | "IDENTIFIED" | "MONITORING" | "RESOLVED";
+      /** Format: date-time */
+      published_at?: string;
+    };
+    StatusPageMaintenanceComponentResource: {
+      /** Format: uuid */
+      component_id: string;
+      component_name: string;
+      /** @enum {string} */
+      component_status: "UNDER_MAINTENANCE" | "DEGRADED_PERFORMANCE";
+    };
+    StatusPageMaintenanceResource: {
+      affected_components: components["schemas"]["StatusPageMaintenanceComponentResource"][] | null;
+      /** @description Maintenance description. Plain text */
+      body: string;
+      /**
+       * Format: date-time
+       * @description When the maintenance actually finished
+       */
+      completed_at: string | null;
+      /** Format: uuid */
+      maintenance_id: string;
+      /** @enum {string} */
+      maintenance_status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+      name: string;
+      /** Format: date-time */
+      scheduled_for: string;
+      /** Format: date-time */
+      scheduled_until: string;
+      /**
+       * Format: date-time
+       * @description When the maintenance actually started, which may differ from the scheduled time
+       */
+      started_at: string | null;
+    };
+    LengthAwarePageStatusPageMaintenanceResource: {
+      data: components["schemas"]["StatusPageMaintenanceResource"][];
+      /** Format: int64 */
+      limit: number;
+      /** Format: int64 */
+      offset: number;
+      /** Format: int64 */
+      total: number;
+    };
+    StatusPageMaintenanceComponentRequest: {
+      /** Format: uuid */
+      component_id: string;
+      /**
+       * @description How this component is shown while the maintenance runs. Neither value reduces availability
+       * @default UNDER_MAINTENANCE
+       * @enum {string}
+       */
+      component_status?: "UNDER_MAINTENANCE" | "DEGRADED_PERFORMANCE";
+    };
+    ScheduleStatusPageMaintenanceRequestBody: {
+      /** @description Maintenance description. Plain text */
+      body: string;
+      /** @description At least one. Maintenance that affects no component reads on the page as an announcement with no subject */
+      components: components["schemas"]["StatusPageMaintenanceComponentRequest"][];
+      name: string;
+      /** Format: date-time */
+      scheduled_for: string;
+      /**
+       * Format: date-time
+       * @description Must be later than `scheduled_for`
+       */
+      scheduled_until: string;
+    };
+    StatusPageDomainResource: {
+      /**
+       * Format: date-time
+       * @description When the current certificate expires
+       */
+      certificate_not_after: string | null;
+      /**
+       * @description NONE means no certificate has been requested for this domain yet
+       * @enum {string}
+       */
+      certificate_status: "NONE" | "PENDING" | "ACTIVE" | "FAILED";
+      /** @description The bound custom domain. Empty means none is bound */
+      domain: string;
+      /** @description The value the domain must point at */
+      expected_cname: string;
+      /** @description Why the most recent issuance attempt failed. Empty when it did not */
+      last_error: string;
+      /** @description What the domain currently resolves to. Empty when it resolves to nothing */
+      observed_cname: string;
+      /** @description The address this page is served at, taking the custom domain into account */
+      public_url: string;
+      /** @description Whether the domain currently points at the status page */
+      verified: boolean;
+      /**
+       * Format: date-time
+       * @description When ownership was last confirmed
+       */
+      verified_at: string | null;
+    };
+    PutStatusPageDomainRequestBody: {
+      /** @description Your own domain, such as status.acme.com. It must already point at the status page by CNAME */
+      domain: string;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "list-incidents": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of records in this page */
-                limit?: number;
-                /** @description Number of records to skip. For deeper paging, use the cursor-paged endpoint instead */
-                offset?: number;
-                /** @description Restrict to a single machine */
-                server_id?: string;
-                /** @description Restrict to a single web check */
-                web_check_id?: string;
-                incident_status?: "PROBLEM" | "RESOLVED";
-                /** @description Matches at or above this severity, not exactly this severity */
-                min_severity?: "NOT_CLASSIFIED" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
-                started_after?: string;
-                started_before?: string;
-                /** @description Incidents that **overlap** [active_from, active_to]. This is what you want when overlaying incident bands on a metric chart */
-                active_from?: string;
-                active_to?: string;
-                /** @description Given as `key` or `key=value`, repeatable. Multiple tags are combined with AND */
-                tag?: string[] | null;
-                assignee_user_id?: string;
-                /** @description Whether someone has finished handling it here. Independent of `incident_status` */
-                closed?: "true" | "false";
-                acknowledged?: "true" | "false";
-                unassigned?: "true" | "false";
-                keyword?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageIncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-incident": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "acknowledge-incident": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AcknowledgeIncidentRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "assign-incident": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AssignIncidentRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "close-incident": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CloseIncidentRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "add-incident-comment": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AddCommentRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IncidentActivityResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "set-incident-following": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetFollowingRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "reopen-incident": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-incident-timeline": {
-        parameters: {
-            query?: {
-                limit?: number;
-                /** @description The `next_cursor` returned by the previous page. Empty starts from the beginning */
-                cursor?: string;
-            };
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CursorPageIncidentActivityResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-maintenance-windows": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MaintenanceWindowListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-maintenance-window": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                windowId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MaintenanceWindowResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "put-maintenance-window": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                windowId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutMaintenanceWindowRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MaintenanceWindowResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "delete-maintenance-window": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                windowId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-project-overview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectOverviewResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-server-items": {
-        parameters: {
-            query?: {
-                /** @description Fuzzy match on key or name */
-                keyword?: string;
-                /** @description Given as `key` or `key=value`, repeatable. The `component` tags applied by the official templates (cpu, memory, filesystem and so on) are filtered through this */
-                tag?: string[] | null;
-            };
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ItemListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-server-metric": {
-        parameters: {
-            query?: {
-                /** @description **Prefix match**: `vfs.fs.size` returns one series per mount point. Supply this or `item_id` */
-                item_key?: string;
-                item_id?: string;
-                /** @description Defaults to one hour ago */
-                from?: string;
-                to?: string;
-                /** @description Number of downsampling buckets. 0 returns the collected data points unchanged */
-                max_points?: number;
-                /** @description Also return the thresholds currently in effect for these items */
-                include_thresholds?: boolean;
-            };
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MetricResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-server-resources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ServerResourcesResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-server-snapshot": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SnapshotResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-project-top-items": {
-        parameters: {
-            query: {
-                kind: "CPU_UTILIZATION" | "MEMORY_UTILIZATION" | "ROOT_FILESYSTEM_USED";
-                /** @description 0 uses the default */
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TopItemListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-templates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TemplateCatalogResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-servers": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of records in this page */
-                limit?: number;
-                /** @description Number of records to skip. For deeper paging, use the cursor-paged endpoint instead */
-                offset?: number;
-                /** @description Fuzzy match on name or address */
-                keyword?: string;
-                monitoring_status?: "PENDING" | "ACTIVE" | "DISABLED" | "FAILED";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageServerResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-server": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ServerResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "enable-server-monitoring": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Supplied by the caller; no operation issues one. Reuse the identifier the machine already carries in the originating system — a Leaflow Compute instance id, or the caller's own inventory identifier — or allocate a UUID and persist it before the first call. It is the idempotency key of the enrollment. */
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EnableMonitoringRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ServerEnrollmentResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "delete-server": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "update-server": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateServerRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ServerResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "disable-server-monitoring": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "rotate-agent-psk": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EnrollmentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-web-check": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-                checkId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WebCheckResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "put-web-check": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-                checkId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutWebCheckRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WebCheckResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "delete-web-check": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                serverId: string;
-                checkId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-web-checks": {
-        parameters: {
-            query?: {
-                /** @description Restrict to the checks of a single machine. Omit for the whole project */
-                server_id?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WebCheckListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-sli-report": {
-        parameters: {
-            query?: {
-                from?: string;
-                to?: string;
-                /** @description Return the most recent N complete periods. Use this or from/to, not both */
-                periods?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SLIReportResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-slo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SLOResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "put-slo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutSLORequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SLOResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "delete-slo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-status-page": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "put-status-page": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutStatusPageRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "delete-status-page": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "put-status-page-order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutStatusPageOrderRequestBody"];
-            };
-        };
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-status-page-groups": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageGroupListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "create-status-page-group": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutStatusPageGroupRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageGroupResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "update-status-page-group": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                groupId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutStatusPageGroupRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageGroupResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "delete-status-page-group": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                groupId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "put-status-page-group-order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                groupId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutStatusPageGroupOrderRequestBody"];
-            };
-        };
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-status-page-components": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageComponentListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "create-status-page-component": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutStatusPageComponentRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageComponentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-status-page-component": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                componentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageComponentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "update-status-page-component": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                componentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutStatusPageComponentRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageComponentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "delete-status-page-component": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                componentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-status-page-component-sources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                componentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageComponentSourcesResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "put-status-page-component-sources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                componentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutStatusPageComponentSourcesRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageComponentSourcesResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-status-page-incidents": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of records in this page */
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageStatusPageIncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "publish-status-page-incident": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PublishStatusPageIncidentRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageIncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-status-page-incident": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageIncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "post-status-page-incident-update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                incidentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PostStatusPageIncidentUpdateRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageIncidentResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "list-status-page-maintenances": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of records in this page */
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageStatusPageMaintenanceResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "schedule-status-page-maintenance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ScheduleStatusPageMaintenanceRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageMaintenanceResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-status-page-maintenance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                maintenanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageMaintenanceResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "cancel-status-page-maintenance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                maintenanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageMaintenanceResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "complete-status-page-maintenance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                maintenanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageMaintenanceResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-project-web-check": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                checkId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WebCheckResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "put-project-web-check": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                checkId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutWebCheckRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WebCheckResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "delete-project-web-check": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                checkId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "get-status-page-domain": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageDomainResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "put-status-page-domain": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutStatusPageDomainRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StatusPageDomainResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    "delete-status-page-domain": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
+  "list-incidents": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of records in this page */
+        limit?: number;
+        /** @description Number of records to skip. For deeper paging, use the cursor-paged endpoint instead */
+        offset?: number;
+        /** @description Restrict to a single machine */
+        server_id?: string;
+        /** @description Restrict to a single web check */
+        web_check_id?: string;
+        incident_status?: "PROBLEM" | "RESOLVED";
+        /** @description Matches at or above this severity, not exactly this severity */
+        min_severity?:
+          "NOT_CLASSIFIED" | "INFORMATION" | "WARNING" | "AVERAGE" | "HIGH" | "DISASTER";
+        started_after?: string;
+        started_before?: string;
+        /** @description Incidents that **overlap** [active_from, active_to]. This is what you want when overlaying incident bands on a metric chart */
+        active_from?: string;
+        active_to?: string;
+        /** @description Given as `key` or `key=value`, repeatable. Multiple tags are combined with AND */
+        tag?: string[] | null;
+        assignee_user_id?: string;
+        /** @description Whether someone has finished handling it here. Independent of `incident_status` */
+        closed?: "true" | "false";
+        acknowledged?: "true" | "false";
+        unassigned?: "true" | "false";
+        keyword?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageIncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-incident": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "acknowledge-incident": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AcknowledgeIncidentRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "assign-incident": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AssignIncidentRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "close-incident": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CloseIncidentRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "add-incident-comment": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AddCommentRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IncidentActivityResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "set-incident-following": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetFollowingRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "reopen-incident": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-incident-timeline": {
+    parameters: {
+      query?: {
+        limit?: number;
+        /** @description The `next_cursor` returned by the previous page. Empty starts from the beginning */
+        cursor?: string;
+      };
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CursorPageIncidentActivityResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-maintenance-windows": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MaintenanceWindowListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-maintenance-window": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        windowId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MaintenanceWindowResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-maintenance-window": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        windowId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutMaintenanceWindowRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MaintenanceWindowResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-maintenance-window": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        windowId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-project-overview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectOverviewResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-server-items": {
+    parameters: {
+      query?: {
+        /** @description Fuzzy match on key or name */
+        keyword?: string;
+        /** @description Given as `key` or `key=value`, repeatable. The `component` tags applied by the official templates (cpu, memory, filesystem and so on) are filtered through this */
+        tag?: string[] | null;
+      };
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ItemListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-server-metric": {
+    parameters: {
+      query?: {
+        /** @description **Prefix match**: `vfs.fs.size` returns one series per mount point. Supply this or `item_id` */
+        item_key?: string;
+        item_id?: string;
+        /** @description Defaults to one hour ago */
+        from?: string;
+        to?: string;
+        /** @description Number of downsampling buckets. 0 returns the collected data points unchanged */
+        max_points?: number;
+        /** @description Also return the thresholds currently in effect for these items */
+        include_thresholds?: boolean;
+      };
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MetricResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-server-resources": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServerResourcesResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-server-snapshot": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SnapshotResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-project-top-items": {
+    parameters: {
+      query: {
+        kind: "CPU_UTILIZATION" | "MEMORY_UTILIZATION" | "ROOT_FILESYSTEM_USED";
+        /** @description 0 uses the default */
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TopItemListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-templates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TemplateCatalogResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-servers": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of records in this page */
+        limit?: number;
+        /** @description Number of records to skip. For deeper paging, use the cursor-paged endpoint instead */
+        offset?: number;
+        /** @description Fuzzy match on name or address */
+        keyword?: string;
+        monitoring_status?: "PENDING" | "ACTIVE" | "DISABLED" | "FAILED";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageServerResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-server": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServerResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "enable-server-monitoring": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Supplied by the caller; no operation issues one. Reuse the identifier the machine already carries in the originating system — a Leaflow Compute instance id, or the caller's own inventory identifier — or allocate a UUID and persist it before the first call. It is the idempotency key of the enrollment. */
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EnableMonitoringRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServerEnrollmentResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-server": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "update-server": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateServerRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServerResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "disable-server-monitoring": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "rotate-agent-psk": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrollmentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-web-check": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+        checkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WebCheckResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-web-check": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+        checkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutWebCheckRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WebCheckResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-web-check": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        serverId: string;
+        checkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-web-checks": {
+    parameters: {
+      query?: {
+        /** @description Restrict to the checks of a single machine. Omit for the whole project */
+        server_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WebCheckListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-sli-report": {
+    parameters: {
+      query?: {
+        from?: string;
+        to?: string;
+        /** @description Return the most recent N complete periods. Use this or from/to, not both */
+        periods?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SLIReportResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-slo": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SLOResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-slo": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutSLORequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SLOResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-slo": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-status-page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-status-page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutStatusPageRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-status-page": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-status-page-order": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutStatusPageOrderRequestBody"];
+      };
+    };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-status-page-groups": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageGroupListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-status-page-group": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutStatusPageGroupRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageGroupResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "update-status-page-group": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutStatusPageGroupRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageGroupResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-status-page-group": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-status-page-group-order": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutStatusPageGroupOrderRequestBody"];
+      };
+    };
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-status-page-components": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageComponentListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-status-page-component": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutStatusPageComponentRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageComponentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-status-page-component": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        componentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageComponentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "update-status-page-component": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        componentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutStatusPageComponentRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageComponentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-status-page-component": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        componentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-status-page-component-sources": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        componentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageComponentSourcesResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-status-page-component-sources": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        componentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutStatusPageComponentSourcesRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageComponentSourcesResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-status-page-incidents": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of records in this page */
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageStatusPageIncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "publish-status-page-incident": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PublishStatusPageIncidentRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageIncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-status-page-incident": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageIncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "post-status-page-incident-update": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        incidentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PostStatusPageIncidentUpdateRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageIncidentResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-status-page-maintenances": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of records in this page */
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageStatusPageMaintenanceResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "schedule-status-page-maintenance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ScheduleStatusPageMaintenanceRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageMaintenanceResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-status-page-maintenance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        maintenanceId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageMaintenanceResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "cancel-status-page-maintenance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        maintenanceId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageMaintenanceResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "complete-status-page-maintenance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        maintenanceId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageMaintenanceResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-project-web-check": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        checkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WebCheckResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-project-web-check": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        checkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutWebCheckRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WebCheckResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-project-web-check": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        checkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-status-page-domain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageDomainResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "put-status-page-domain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PutStatusPageDomainRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StatusPageDomainResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-status-page-domain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
 }

@@ -4,1655 +4,1655 @@
  */
 
 export interface paths {
-    "/api/v1/permissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List every permission the platform can grant
-         * @description Each service registers its own catalogue with IAM at start-up, so this is the platform-wide list rather than the permissions of IAM alone. **IAM does not decide anything with it** — each service decides using the caller's grant together with its own catalogue, and this list only serves to render the choices. A service that has never started does not appear here.
-         */
-        get: operations["list-permissions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/api/v1/permissions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/project": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a project
-         * @description Visible to any member; no further permission is required.
-         */
-        get: operations["get-project"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete a project
-         * @description Only the owner can do this, and it cannot be undone. The project enters DELETING and each service begins removing the resources under it. The project itself remains readable afterwards, answering that it is gone rather than 404.
-         */
-        delete: operations["delete-project"];
-        options?: never;
-        head?: never;
-        /** Update the name and description of a project */
-        patch: operations["update-project"];
-        trace?: never;
+    /**
+     * List every permission the platform can grant
+     * @description Each service registers its own catalogue with IAM at start-up, so this is the platform-wide list rather than the permissions of IAM alone. **IAM does not decide anything with it** — each service decides using the caller's grant together with its own catalogue, and this list only serves to render the choices. A service that has never started does not appear here.
+     */
+    get: operations["list-permissions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/project": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/membership": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the caller's standing in this project
-         * @description Facts rather than a conclusion. There is no `allowed` field here, because each service holds the catalogue mapping its operations to permissions and decides on its own.
-         */
-        get: operations["get-project-membership"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get a project
+     * @description Visible to any member; no further permission is required.
+     */
+    get: operations["get-project"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a project
+     * @description Only the owner can do this, and it cannot be undone. The project enters DELETING and each service begins removing the resources under it. The project itself remains readable afterwards, answering that it is gone rather than 404.
+     */
+    delete: operations["delete-project"];
+    options?: never;
+    head?: never;
+    /** Update the name and description of a project */
+    patch: operations["update-project"];
+    trace?: never;
+  };
+  "/api/v1/membership": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/invitations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the invitations this project is still waiting on
-         * @description Visible to any member, on the same rule as the member list. Who has been invited is part of who is in the project.
-         */
-        get: operations["list-project-invitations"];
-        put?: never;
-        /**
-         * Send an invitation
-         * @description An invitation stands for 14 days. The roles it carries are validated against the project as it stood when the invitation was sent, so it expires rather than outliving the arrangement it rests on.
-         */
-        post: operations["issue-invitation"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get the caller's standing in this project
+     * @description Facts rather than a conclusion. There is no `allowed` field here, because each service holds the catalogue mapping its operations to permissions and decides on its own.
+     */
+    get: operations["get-project-membership"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/invitations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/invitations/{invitationId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Withdraw an invitation that has not been redeemed */
-        delete: operations["revoke-invitation"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the invitations this project is still waiting on
+     * @description Visible to any member, on the same rule as the member list. Who has been invited is part of who is in the project.
+     */
+    get: operations["list-project-invitations"];
+    put?: never;
+    /**
+     * Send an invitation
+     * @description An invitation stands for 14 days. The roles it carries are validated against the project as it stood when the invitation was sent, so it expires rather than outliving the arrangement it rests on.
+     */
+    post: operations["issue-invitation"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/invitations/{invitationId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/members:batchGet": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Resolve members by id, including those who have left
-         * @description Resolves a set of account ids to the people behind them, scoped to the current project and **including members who have since left it**.
-         *
-         *     This is what turns the ids held elsewhere in the product — who created a machine, who performed a logged operation — into names. The current member list cannot answer for somebody who has left, and those rows are exactly the ones a reader most often needs explained.
-         *
-         *     Only ids that have belonged to the current project resolve; anything else is omitted, as are ids that do not resolve at all. Match the response against the request by id; the order is not significant.
-         */
-        post: operations["batch-get-members"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Withdraw an invitation that has not been redeemed */
+    delete: operations["revoke-invitation"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/members:batchGet": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/members": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List the members of a project */
-        get: operations["list-members"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Resolve members by id, including those who have left
+     * @description Resolves a set of account ids to the people behind them, scoped to the current project and **including members who have since left it**.
+     *
+     *     This is what turns the ids held elsewhere in the product — who created a machine, who performed a logged operation — into names. The current member list cannot answer for somebody who has left, and those rows are exactly the ones a reader most often needs explained.
+     *
+     *     Only ids that have belonged to the current project resolve; anything else is omitted, as are ids that do not resolve at all. Match the response against the request by id; the order is not significant.
+     */
+    post: operations["batch-get-members"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/members": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/members/{userId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Remove a member, or leave the project
-         * @description Removing someone else requires `iam:members.manage`; leaving requires only membership of the project. The owner can do neither, and has to transfer ownership first.
-         */
-        delete: operations["remove-member"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** List the members of a project */
+    get: operations["list-members"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/members/{userId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/members/{userId}/roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Set the roles a member holds
-         * @description The list is replaced in full rather than added to or removed from. The `OWNER` role of the owner is unaffected.
-         */
-        put: operations["set-member-roles"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Remove a member, or leave the project
+     * @description Removing someone else requires `iam:members.manage`; leaving requires only membership of the project. The owner can do neither, and has to transfer ownership first.
+     */
+    delete: operations["remove-member"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/members/{userId}/roles": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/members/{userId}/permissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Set the permissions attached directly to a member
-         * @description Replaces, in full, the permissions attached directly to the base policy. A direct permission grants one person something without creating a role only they hold, and it does not follow later changes to any role. Requires `iam:members.manage`.
-         */
-        put: operations["set-member-permissions"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /**
+     * Set the roles a member holds
+     * @description The list is replaced in full rather than added to or removed from. The `OWNER` role of the owner is unaffected.
+     */
+    put: operations["set-member-roles"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/members/{userId}/permissions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/policies": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the policies in this project
-         * @description Visible to any member, on the same rule as the member list. What has been granted to whom is part of who is in the project.
-         */
-        get: operations["list-policies"];
-        put?: never;
-        /**
-         * Attach a policy
-         * @description This creates an **additional** policy, which either carries a resource scope or has `deny` as its effect. An `allow` covering every resource is a base policy, of which each member holds exactly one, and it is changed with set-member-roles and set-member-permissions. `roles` cannot contain `OWNER` or `ADMIN`. Requires `iam:members.manage`.
-         */
-        post: operations["attach-policy"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /**
+     * Set the permissions attached directly to a member
+     * @description Replaces, in full, the permissions attached directly to the base policy. A direct permission grants one person something without creating a role only they hold, and it does not follow later changes to any role. Requires `iam:members.manage`.
+     */
+    put: operations["set-member-permissions"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/policies": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/policies/{policyId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get a policy
-         * @description Visible to any member, on the same rule as list-policies; no further permission is required.
-         */
-        get: operations["get-policy"];
-        /**
-         * Update a policy
-         * @description Replaced in full rather than field by field — `resources`, `roles` and `permissions` are each overwritten, and an omitted one becomes empty. The **kind** of a policy cannot change — a base policy (an `allow` covering every resource) cannot take a resource scope, and a scoped policy cannot have its scope cleared. Delete and recreate to change the kind. Requires `iam:members.manage`.
-         */
-        put: operations["update-policy"];
-        post?: never;
-        /**
-         * Detach a policy
-         * @description A base policy cannot be detached; it is where a member's roles sit. Use remove-member to take someone out of the project. Requires `iam:members.manage`.
-         */
-        delete: operations["detach-policy"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * List the policies in this project
+     * @description Visible to any member, on the same rule as the member list. What has been granted to whom is part of who is in the project.
+     */
+    get: operations["list-policies"];
+    put?: never;
+    /**
+     * Attach a policy
+     * @description This creates an **additional** policy, which either carries a resource scope or has `deny` as its effect. An `allow` covering every resource is a base policy, of which each member holds exactly one, and it is changed with set-member-roles and set-member-permissions. `roles` cannot contain `OWNER` or `ADMIN`. Requires `iam:members.manage`.
+     */
+    post: operations["attach-policy"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/policies/{policyId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/transfer-ownership": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Transfer ownership of a project
-         * @description The only way `OWNER` moves, and only the owner can initiate it.
-         */
-        post: operations["transfer-project-ownership"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Get a policy
+     * @description Visible to any member, on the same rule as list-policies; no further permission is required.
+     */
+    get: operations["get-policy"];
+    /**
+     * Update a policy
+     * @description Replaced in full rather than field by field — `resources`, `roles` and `permissions` are each overwritten, and an omitted one becomes empty. The **kind** of a policy cannot change — a base policy (an `allow` covering every resource) cannot take a resource scope, and a scoped policy cannot have its scope cleared. Delete and recreate to change the kind. Requires `iam:members.manage`.
+     */
+    put: operations["update-policy"];
+    post?: never;
+    /**
+     * Detach a policy
+     * @description A base policy cannot be detached; it is where a member's roles sit. Use remove-member to take someone out of the project. Requires `iam:members.manage`.
+     */
+    delete: operations["detach-policy"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/transfer-ownership": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List the roles in this project */
-        get: operations["list-roles"];
-        put?: never;
-        /** Create a role */
-        post: operations["create-role"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Transfer ownership of a project
+     * @description The only way `OWNER` moves, and only the owner can initiate it.
+     */
+    post: operations["transfer-project-ownership"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/roles": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/roles/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a role */
-        get: operations["get-role"];
-        /**
-         * Update a role
-         * @description The name, the description and the permissions are replaced in full. Every member holding the role is recompiled in the same transaction, so the change takes effect on the next request.
-         */
-        put: operations["update-role"];
-        post?: never;
-        /**
-         * Delete a role
-         * @description Refused while anyone still holds it. Cascading the removal would quietly demote every holder.
-         */
-        delete: operations["delete-role"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** List the roles in this project */
+    get: operations["list-roles"];
+    put?: never;
+    /** Create a role */
+    post: operations["create-role"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/roles/{code}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/ssh-keys": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List the SSH keys of this project
-         * @description Both the keys belonging to members and the keys belonging to the project are listed; the `owner_user_id` on each one tells them apart.
-         */
-        get: operations["list-ssh-keys"];
-        put?: never;
-        /**
-         * Add an SSH key
-         * @description `owner=me` adds a key of the caller's own, which any member may do. `owner=project` adds a key shared by the project, requires `iam:ssh_keys.manage`, and lands on every machine created in the project afterwards.
-         */
-        post: operations["create-ssh-key"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get a role */
+    get: operations["get-role"];
+    /**
+     * Update a role
+     * @description The name, the description and the permissions are replaced in full. Every member holding the role is recompiled in the same transaction, so the change takes effect on the next request.
+     */
+    put: operations["update-role"];
+    post?: never;
+    /**
+     * Delete a role
+     * @description Refused while anyone still holds it. Cascading the removal would quietly demote every holder.
+     */
+    delete: operations["delete-role"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/ssh-keys": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/ssh-keys/{keyId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an SSH key */
-        get: operations["get-ssh-key"];
-        put?: never;
-        post?: never;
-        /**
-         * Revoke an SSH key
-         * @description The row remains and its status becomes `REVOKED`, so it stays answerable afterwards which key was trusted at the time.
-         */
-        delete: operations["revoke-ssh-key"];
-        options?: never;
-        head?: never;
-        /**
-         * Rename an SSH key
-         * @description Only the name can change. The key, its type and its fingerprint are three statements about one thing, and changing one of them would leave the row describing a key that does not exist.
-         */
-        patch: operations["rename-ssh-key"];
-        trace?: never;
+    /**
+     * List the SSH keys of this project
+     * @description Both the keys belonging to members and the keys belonging to the project are listed; the `owner_user_id` on each one tells them apart.
+     */
+    get: operations["list-ssh-keys"];
+    put?: never;
+    /**
+     * Add an SSH key
+     * @description `owner=me` adds a key of the caller's own, which any member may do. `owner=project` adds a key shared by the project, requires `iam:ssh_keys.manage`, and lands on every machine created in the project afterwards.
+     */
+    post: operations["create-ssh-key"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/ssh-keys/{keyId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /** Get an SSH key */
+    get: operations["get-ssh-key"];
+    put?: never;
+    post?: never;
+    /**
+     * Revoke an SSH key
+     * @description The row remains and its status becomes `REVOKED`, so it stays answerable afterwards which key was trusted at the time.
+     */
+    delete: operations["revoke-ssh-key"];
+    options?: never;
+    head?: never;
+    /**
+     * Rename an SSH key
+     * @description Only the name can change. The key, its type and its fingerprint are three statements about one thing, and changing one of them would leave the row describing a key that does not exist.
+     */
+    patch: operations["rename-ssh-key"];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Error: {
-            code?: string;
-            message: string;
-            /**
-             * @description What a given `code` carries alongside the message. The keys depend on the code,
-             *     and a client that does not recognise one ignores it.
-             */
-            meta?: {
-                [key: string]: unknown;
-            };
-            /** Format: int64 */
-            status: number;
-        };
-        PermissionResource: {
-            /** @description The code of the permission, such as compute:instance.delete. **There is no display name here** — what a permission reads as is localised, and translation belongs to the layer rendering it. Until a translation catches up, the code itself is what is shown */
-            name: string;
-            /** @description Reserved for the project owner. Attaching it to a custom role has no effect */
-            owner_only: boolean;
-            /** @description The kind of resource this permission is decided against; empty means it is decided at project level. **It need not be the object being operated on** — a compute route carries no project_id and is isolated through its parent network, so compute:route.create is decided against compute:private_network. A non-empty value also means the permission can be scoped to particular instances; create and list are always empty */
-            resource_type: string;
-        };
-        ResourceTypeResource: {
-            /** @description The code of the resource type, such as dns:zone. There is no display name here either; what it reads as is decided by the layer rendering it */
-            name: string;
-        };
-        CatalogResource: {
-            permissions: components["schemas"]["PermissionResource"][] | null;
-            /** @description The resource types this service declares. A scoped rule can only land on one of them */
-            resource_types: components["schemas"]["ResourceTypeResource"][] | null;
-            service: string;
-        };
-        CatalogListResponseBody: {
-            items: components["schemas"]["CatalogResource"][] | null;
-        };
-        ResourceRefResource: {
-            /** @description A string rather than a UUID; a DNS zone is named by its domain, which IAM does not hold. Matching is glob, so `*.example.com` covers a set of subdomains, while a value carrying no glob metacharacter matches exactly */
-            id: string;
-            /** @description Of the form compute:instance or dns:zone, in the same namespace as permission names */
-            type: string;
-        };
-        RuleResource: {
-            /** @enum {string} */
-            effect: "allow" | "deny";
-            /** @description A permission name, with a trailing wildcard supported (compute:instance.*). A wildcard must carry the service prefix; a bare wildcard would also grant the operations of services that go live later */
-            permissions: string[] | null;
-            /** @description Empty means the rule holds across the whole project. A non-empty value means it holds only on those resources, and therefore answers no project-level question */
-            resources: components["schemas"]["ResourceRefResource"][] | null;
-        };
-        GrantResource: {
-            admin: boolean;
-            owner: boolean;
-            /** @description The role codes held, for display only */
-            roles: string[] | null;
-            /** @description **The rules compiled from every policy that applies. Do not walk them to reach a decision.** They are here to render what a user may do; each request is decided by the service handling it */
-            rules: components["schemas"]["RuleResource"][] | null;
-        };
-        ProjectResource: {
-            ban_reason: string;
-            /** Format: date-time */
-            created_at: string;
-            created_by: string;
-            /**
-             * Format: date-time
-             * @description When the project was deleted
-             */
-            deleted_at: string | null;
-            description: string;
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /** @enum {string} */
-            status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
-            /** @description Written for a reader; it takes part in no query */
-            status_reason: string;
-            /** Format: date-time */
-            updated_at: string;
-        };
-        ProjectAccessResource: {
-            grant: components["schemas"]["GrantResource"];
-            project: components["schemas"]["ProjectResource"];
-        };
-        UpdateProjectRequestBody: {
-            description?: string;
-            name?: string;
-        };
-        MembershipResource: {
-            grant: components["schemas"]["GrantResource"];
-            member: boolean;
-            project_status: string;
-            user_status: string;
-        };
-        InvitationResource: {
-            /** Format: date-time */
-            created_at: string;
-            email: string;
-            /** Format: date-time */
-            expires_at: string;
-            /** Format: uuid */
-            id: string;
-            invited_by: string;
-            /** Format: uuid */
-            project_id: string;
-            /** @description The role codes granted on redemption */
-            roles: string[] | null;
-        };
-        LengthAwarePageInvitationResource: {
-            /** @description The items in this page */
-            items: components["schemas"]["InvitationResource"][];
-            /**
-             * Format: int64
-             * @description Maximum number of items in this page, echoing the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Number of items skipped, echoing the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matches, not only this page
-             */
-            total: number;
-        };
-        IssueInvitationRequestBody: {
-            /** Format: email */
-            email: string;
-            /** @description The role codes granted on redemption. Each must already be defined in this project, and `OWNER` is not accepted */
-            roles: string[] | null;
-        };
-        IssuedInvitationResponseBody: {
-            invitation: components["schemas"]["InvitationResource"];
-            /** @description The token that redeems the invitation, **returned in this response only**. If it is lost, withdraw the invitation and send another */
-            token: string;
-        };
-        BatchGetMembersRequestBody: {
-            /** @description The account ids to resolve. Blank entries are ignored. */
-            ids: string[];
-        };
-        BatchGetMembersResponseBody: {
-            /** @description The people that resolved. Ids that never belonged to this project are absent, as are ids that do not resolve at all. */
-            items: components["schemas"]["ResolvedMemberResource"][];
-        };
-        /** @description A person referred to by an id held elsewhere in the project. Carries who they are, not what they may do — a member who has left holds nothing, and this shape has no grant to say so. */
-        ResolvedMemberResource: {
-            /** @description MD5 hash of the lowercased, trimmed email address, for use with Gravatar-compatible avatar services. Empty if the account has no email address. */
-            avatar_hash: string;
-            email: string;
-            first_name: string;
-            last_name: string;
-            /** @description True when this person is no longer a member of the project. */
-            left: boolean;
-            user_id: string;
-        };
-        MemberResource: {
-            /** @description MD5 hash of the lowercased, trimmed email address, for use with Gravatar-compatible avatar services. Empty if the account has no email address. */
-            avatar_hash: string;
-            /** Format: date-time */
-            created_at: string;
-            created_by: string;
-            email: string;
-            first_name: string;
-            grant: components["schemas"]["GrantResource"];
-            last_name: string;
-            user_id: string;
-        };
-        LengthAwarePageMemberResource: {
-            /** @description The items in this page */
-            items: components["schemas"]["MemberResource"][];
-            /**
-             * Format: int64
-             * @description Maximum number of items in this page, echoing the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Number of items skipped, echoing the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matches, not only this page
-             */
-            total: number;
-        };
-        SetMemberRolesRequestBody: {
-            /** @description **Every** role code this person is to hold. `OWNER` cannot appear here */
-            roles: string[] | null;
-        };
-        SetMemberPermissionsRequestBody: {
-            /** @description **Every** permission name to be attached directly to this person, replaced in full. The permissions a role grants are neither listed here nor touched by this write */
-            permissions: string[] | null;
-        };
-        PolicyResource: {
-            /** @description The base policy is the one whose effect is `allow` and which covers every resource. Each member holds exactly one, and it carries their ordinary roles. Change it with PUT /members/{userId}/roles and PUT /members/{userId}/permissions */
-            base: boolean;
-            /** Format: date-time */
-            created_at: string;
-            /** @description Why it was granted, written for a reader */
-            description: string;
-            /** @enum {string} */
-            effect: "allow" | "deny";
-            /** Format: uuid */
-            id: string;
-            /** @description Permission names attached directly to this person, without passing through a role */
-            permissions: string[] | null;
-            /** @description Empty means the whole project */
-            resources: components["schemas"]["ResourceRefResource"][] | null;
-            /** @description The role codes this policy carries */
-            roles: string[] | null;
-            /** Format: date-time */
-            updated_at: string;
-            user_id: string;
-        };
-        PolicyListResponseBody: {
-            items: components["schemas"]["PolicyResource"][] | null;
-        };
-        AttachPolicyRequestBody: {
-            /** @description Why it was granted, written for a reader */
-            description?: string;
-            /** @enum {string} */
-            effect: "allow" | "deny";
-            /** @description Permission names attached directly, which avoids creating a role only one person holds */
-            permissions?: string[] | null;
-            /** @description The policy holds only on these resources. Leaving it empty makes sense only together with `deny`, since an `allow` covering every resource is the base policy, which already exists */
-            resources?: components["schemas"]["ResourceRefResource"][] | null;
-            /** @description Each must be a role already defined in this project. `OWNER` and `ADMIN` are not accepted, being rules rather than sets of permissions */
-            roles?: string[] | null;
-            /** @description Must already be a member of this project */
-            user_id: string;
-        };
-        UpdatePolicyRequestBody: {
-            /** @description Why it was granted, written for a reader. It is replaced together with the change, so that what remains does not explain an earlier version */
-            description?: string;
-            /**
-             * @description Must match the current effect of the policy. The effect itself cannot be changed; delete the policy and create another instead. It is still required in the request because the write replaces the policy in full, and omitting it would let a caller believe an effect had been changed while the field was ignored. A mismatch answers PROJECT_POLICY_EFFECT_IMMUTABLE
-             * @enum {string}
-             */
-            effect: "allow" | "deny";
-            /** @description Permission names attached directly, replaced in full. Anything not listed is withdrawn rather than kept */
-            permissions?: string[] | null;
-            /** @description The resource scope of this policy, replaced in full. What the scope contains can change; whether the policy has one cannot. A base policy cannot take a scope, and a scoped policy cannot have its scope cleared */
-            resources?: components["schemas"]["ResourceRefResource"][] | null;
-            /** @description Each must be a role already defined in this project, replaced in full. As when attaching, `OWNER` and `ADMIN` are not accepted */
-            roles?: string[] | null;
-        };
-        TransferOwnershipRequestBody: {
-            /** @description The recipient must already be a member of this project */
-            to_user_id: string;
-        };
-        OwnershipTransferResponseBody: {
-            /** @description The former owner, who keeps every other role held. Ownership is transferred rather than the person removed */
-            from: components["schemas"]["MemberResource"];
-            to: components["schemas"]["MemberResource"];
-        };
-        RoleResource: {
-            /** @description A built-in role can be neither deleted nor have its permissions changed */
-            builtin: boolean;
-            code: string;
-            /** Format: date-time */
-            created_at: string;
-            description: string;
-            name: string;
-            permissions: string[] | null;
-            /** Format: date-time */
-            updated_at: string;
-        };
-        RoleListResponseBody: {
-            items: components["schemas"]["RoleResource"][] | null;
-        };
-        CreateRoleRequestBody: {
-            /** @description Begins with a lower-case letter and may contain digits and underscores. It cannot be changed once created, as member bindings and invitations refer to it */
-            code: string;
-            description?: string;
-            name: string;
-            /** @description A permission name. The ones reserved for the owner are refused, since attaching them would have no effect */
-            permissions?: string[] | null;
-        };
-        UpdateRoleRequestBody: {
-            description?: string;
-            name: string;
-            permissions?: string[] | null;
-        };
-        SSHKeyResource: {
-            /** Format: date-time */
-            created_at: string;
-            fingerprint: string;
-            /** @description The key the platform generates and holds. Its private key is not handed out */
-            has_private_key: boolean;
-            /** Format: uuid */
-            id: string;
-            key_type: string;
-            name: string;
-            /** @description Who the key belongs to. Absent means it belongs to the project itself */
-            owner_user_id?: string;
-            public_key: string;
-            /** @description A purpose label. The key the platform generates carries `platform` */
-            purposes: string[] | null;
-            /** @enum {string} */
-            status: "ACTIVE" | "REVOKED";
-        };
-        LengthAwarePageSSHKeyResource: {
-            /** @description The items in this page */
-            items: components["schemas"]["SSHKeyResource"][];
-            /**
-             * Format: int64
-             * @description Maximum number of items in this page, echoing the request
-             */
-            limit: number;
-            /**
-             * Format: int64
-             * @description Number of items skipped, echoing the request
-             */
-            offset: number;
-            /**
-             * Format: int64
-             * @description Total number of matches, not only this page
-             */
-            total: number;
-        };
-        CreateSSHKeyRequestBody: {
-            name: string;
-            /**
-             * @description Who this key belongs to
-             * @default me
-             * @enum {string}
-             */
-            owner?: "me" | "project";
-            /** @description The public key in OpenSSH format. The type and the fingerprint are derived from it and cannot be changed */
-            public_key: string;
-            /** @description A purpose label, such as ci or bastion */
-            purposes?: string[] | null;
-        };
-        RenameSSHKeyRequestBody: {
-            name: string;
-        };
+  schemas: {
+    Error: {
+      code?: string;
+      message: string;
+      /**
+       * @description What a given `code` carries alongside the message. The keys depend on the code,
+       *     and a client that does not recognise one ignores it.
+       */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /** Format: int64 */
+      status: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    PermissionResource: {
+      /** @description The code of the permission, such as compute:instance.delete. **There is no display name here** — what a permission reads as is localised, and translation belongs to the layer rendering it. Until a translation catches up, the code itself is what is shown */
+      name: string;
+      /** @description Reserved for the project owner. Attaching it to a custom role has no effect */
+      owner_only: boolean;
+      /** @description The kind of resource this permission is decided against; empty means it is decided at project level. **It need not be the object being operated on** — a compute route carries no project_id and is isolated through its parent network, so compute:route.create is decided against compute:private_network. A non-empty value also means the permission can be scoped to particular instances; create and list are always empty */
+      resource_type: string;
+    };
+    ResourceTypeResource: {
+      /** @description The code of the resource type, such as dns:zone. There is no display name here either; what it reads as is decided by the layer rendering it */
+      name: string;
+    };
+    CatalogResource: {
+      permissions: components["schemas"]["PermissionResource"][] | null;
+      /** @description The resource types this service declares. A scoped rule can only land on one of them */
+      resource_types: components["schemas"]["ResourceTypeResource"][] | null;
+      service: string;
+    };
+    CatalogListResponseBody: {
+      items: components["schemas"]["CatalogResource"][] | null;
+    };
+    ResourceRefResource: {
+      /** @description A string rather than a UUID; a DNS zone is named by its domain, which IAM does not hold. Matching is glob, so `*.example.com` covers a set of subdomains, while a value carrying no glob metacharacter matches exactly */
+      id: string;
+      /** @description Of the form compute:instance or dns:zone, in the same namespace as permission names */
+      type: string;
+    };
+    RuleResource: {
+      /** @enum {string} */
+      effect: "allow" | "deny";
+      /** @description A permission name, with a trailing wildcard supported (compute:instance.*). A wildcard must carry the service prefix; a bare wildcard would also grant the operations of services that go live later */
+      permissions: string[] | null;
+      /** @description Empty means the rule holds across the whole project. A non-empty value means it holds only on those resources, and therefore answers no project-level question */
+      resources: components["schemas"]["ResourceRefResource"][] | null;
+    };
+    GrantResource: {
+      admin: boolean;
+      owner: boolean;
+      /** @description The role codes held, for display only */
+      roles: string[] | null;
+      /** @description **The rules compiled from every policy that applies. Do not walk them to reach a decision.** They are here to render what a user may do; each request is decided by the service handling it */
+      rules: components["schemas"]["RuleResource"][] | null;
+    };
+    ProjectResource: {
+      ban_reason: string;
+      /** Format: date-time */
+      created_at: string;
+      created_by: string;
+      /**
+       * Format: date-time
+       * @description When the project was deleted
+       */
+      deleted_at: string | null;
+      description: string;
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** @enum {string} */
+      status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
+      /** @description Written for a reader; it takes part in no query */
+      status_reason: string;
+      /** Format: date-time */
+      updated_at: string;
+    };
+    ProjectAccessResource: {
+      grant: components["schemas"]["GrantResource"];
+      project: components["schemas"]["ProjectResource"];
+    };
+    UpdateProjectRequestBody: {
+      description?: string;
+      name?: string;
+    };
+    MembershipResource: {
+      grant: components["schemas"]["GrantResource"];
+      member: boolean;
+      project_status: string;
+      user_status: string;
+    };
+    InvitationResource: {
+      /** Format: date-time */
+      created_at: string;
+      email: string;
+      /** Format: date-time */
+      expires_at: string;
+      /** Format: uuid */
+      id: string;
+      invited_by: string;
+      /** Format: uuid */
+      project_id: string;
+      /** @description The role codes granted on redemption */
+      roles: string[] | null;
+    };
+    LengthAwarePageInvitationResource: {
+      /** @description The items in this page */
+      items: components["schemas"]["InvitationResource"][];
+      /**
+       * Format: int64
+       * @description Maximum number of items in this page, echoing the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Number of items skipped, echoing the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matches, not only this page
+       */
+      total: number;
+    };
+    IssueInvitationRequestBody: {
+      /** Format: email */
+      email: string;
+      /** @description The role codes granted on redemption. Each must already be defined in this project, and `OWNER` is not accepted */
+      roles: string[] | null;
+    };
+    IssuedInvitationResponseBody: {
+      invitation: components["schemas"]["InvitationResource"];
+      /** @description The token that redeems the invitation, **returned in this response only**. If it is lost, withdraw the invitation and send another */
+      token: string;
+    };
+    BatchGetMembersRequestBody: {
+      /** @description The account ids to resolve. Blank entries are ignored. */
+      ids: string[];
+    };
+    BatchGetMembersResponseBody: {
+      /** @description The people that resolved. Ids that never belonged to this project are absent, as are ids that do not resolve at all. */
+      items: components["schemas"]["ResolvedMemberResource"][];
+    };
+    /** @description A person referred to by an id held elsewhere in the project. Carries who they are, not what they may do — a member who has left holds nothing, and this shape has no grant to say so. */
+    ResolvedMemberResource: {
+      /** @description MD5 hash of the lowercased, trimmed email address, for use with Gravatar-compatible avatar services. Empty if the account has no email address. */
+      avatar_hash: string;
+      email: string;
+      first_name: string;
+      last_name: string;
+      /** @description True when this person is no longer a member of the project. */
+      left: boolean;
+      user_id: string;
+    };
+    MemberResource: {
+      /** @description MD5 hash of the lowercased, trimmed email address, for use with Gravatar-compatible avatar services. Empty if the account has no email address. */
+      avatar_hash: string;
+      /** Format: date-time */
+      created_at: string;
+      created_by: string;
+      email: string;
+      first_name: string;
+      grant: components["schemas"]["GrantResource"];
+      last_name: string;
+      user_id: string;
+    };
+    LengthAwarePageMemberResource: {
+      /** @description The items in this page */
+      items: components["schemas"]["MemberResource"][];
+      /**
+       * Format: int64
+       * @description Maximum number of items in this page, echoing the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Number of items skipped, echoing the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matches, not only this page
+       */
+      total: number;
+    };
+    SetMemberRolesRequestBody: {
+      /** @description **Every** role code this person is to hold. `OWNER` cannot appear here */
+      roles: string[] | null;
+    };
+    SetMemberPermissionsRequestBody: {
+      /** @description **Every** permission name to be attached directly to this person, replaced in full. The permissions a role grants are neither listed here nor touched by this write */
+      permissions: string[] | null;
+    };
+    PolicyResource: {
+      /** @description The base policy is the one whose effect is `allow` and which covers every resource. Each member holds exactly one, and it carries their ordinary roles. Change it with PUT /members/{userId}/roles and PUT /members/{userId}/permissions */
+      base: boolean;
+      /** Format: date-time */
+      created_at: string;
+      /** @description Why it was granted, written for a reader */
+      description: string;
+      /** @enum {string} */
+      effect: "allow" | "deny";
+      /** Format: uuid */
+      id: string;
+      /** @description Permission names attached directly to this person, without passing through a role */
+      permissions: string[] | null;
+      /** @description Empty means the whole project */
+      resources: components["schemas"]["ResourceRefResource"][] | null;
+      /** @description The role codes this policy carries */
+      roles: string[] | null;
+      /** Format: date-time */
+      updated_at: string;
+      user_id: string;
+    };
+    PolicyListResponseBody: {
+      items: components["schemas"]["PolicyResource"][] | null;
+    };
+    AttachPolicyRequestBody: {
+      /** @description Why it was granted, written for a reader */
+      description?: string;
+      /** @enum {string} */
+      effect: "allow" | "deny";
+      /** @description Permission names attached directly, which avoids creating a role only one person holds */
+      permissions?: string[] | null;
+      /** @description The policy holds only on these resources. Leaving it empty makes sense only together with `deny`, since an `allow` covering every resource is the base policy, which already exists */
+      resources?: components["schemas"]["ResourceRefResource"][] | null;
+      /** @description Each must be a role already defined in this project. `OWNER` and `ADMIN` are not accepted, being rules rather than sets of permissions */
+      roles?: string[] | null;
+      /** @description Must already be a member of this project */
+      user_id: string;
+    };
+    UpdatePolicyRequestBody: {
+      /** @description Why it was granted, written for a reader. It is replaced together with the change, so that what remains does not explain an earlier version */
+      description?: string;
+      /**
+       * @description Must match the current effect of the policy. The effect itself cannot be changed; delete the policy and create another instead. It is still required in the request because the write replaces the policy in full, and omitting it would let a caller believe an effect had been changed while the field was ignored. A mismatch answers PROJECT_POLICY_EFFECT_IMMUTABLE
+       * @enum {string}
+       */
+      effect: "allow" | "deny";
+      /** @description Permission names attached directly, replaced in full. Anything not listed is withdrawn rather than kept */
+      permissions?: string[] | null;
+      /** @description The resource scope of this policy, replaced in full. What the scope contains can change; whether the policy has one cannot. A base policy cannot take a scope, and a scoped policy cannot have its scope cleared */
+      resources?: components["schemas"]["ResourceRefResource"][] | null;
+      /** @description Each must be a role already defined in this project, replaced in full. As when attaching, `OWNER` and `ADMIN` are not accepted */
+      roles?: string[] | null;
+    };
+    TransferOwnershipRequestBody: {
+      /** @description The recipient must already be a member of this project */
+      to_user_id: string;
+    };
+    OwnershipTransferResponseBody: {
+      /** @description The former owner, who keeps every other role held. Ownership is transferred rather than the person removed */
+      from: components["schemas"]["MemberResource"];
+      to: components["schemas"]["MemberResource"];
+    };
+    RoleResource: {
+      /** @description A built-in role can be neither deleted nor have its permissions changed */
+      builtin: boolean;
+      code: string;
+      /** Format: date-time */
+      created_at: string;
+      description: string;
+      name: string;
+      permissions: string[] | null;
+      /** Format: date-time */
+      updated_at: string;
+    };
+    RoleListResponseBody: {
+      items: components["schemas"]["RoleResource"][] | null;
+    };
+    CreateRoleRequestBody: {
+      /** @description Begins with a lower-case letter and may contain digits and underscores. It cannot be changed once created, as member bindings and invitations refer to it */
+      code: string;
+      description?: string;
+      name: string;
+      /** @description A permission name. The ones reserved for the owner are refused, since attaching them would have no effect */
+      permissions?: string[] | null;
+    };
+    UpdateRoleRequestBody: {
+      description?: string;
+      name: string;
+      permissions?: string[] | null;
+    };
+    SSHKeyResource: {
+      /** Format: date-time */
+      created_at: string;
+      fingerprint: string;
+      /** @description The key the platform generates and holds. Its private key is not handed out */
+      has_private_key: boolean;
+      /** Format: uuid */
+      id: string;
+      key_type: string;
+      name: string;
+      /** @description Who the key belongs to. Absent means it belongs to the project itself */
+      owner_user_id?: string;
+      public_key: string;
+      /** @description A purpose label. The key the platform generates carries `platform` */
+      purposes: string[] | null;
+      /** @enum {string} */
+      status: "ACTIVE" | "REVOKED";
+    };
+    LengthAwarePageSSHKeyResource: {
+      /** @description The items in this page */
+      items: components["schemas"]["SSHKeyResource"][];
+      /**
+       * Format: int64
+       * @description Maximum number of items in this page, echoing the request
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Number of items skipped, echoing the request
+       */
+      offset: number;
+      /**
+       * Format: int64
+       * @description Total number of matches, not only this page
+       */
+      total: number;
+    };
+    CreateSSHKeyRequestBody: {
+      name: string;
+      /**
+       * @description Who this key belongs to
+       * @default me
+       * @enum {string}
+       */
+      owner?: "me" | "project";
+      /** @description The public key in OpenSSH format. The type and the fingerprint are derived from it and cannot be changed */
+      public_key: string;
+      /** @description A purpose label, such as ci or bastion */
+      purposes?: string[] | null;
+    };
+    RenameSSHKeyRequestBody: {
+      name: string;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "list-permissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CatalogListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  "list-permissions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "get-project": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectAccessResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["CatalogListResponseBody"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "delete-project": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectAccessResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "get-project": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "update-project": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateProjectRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["ProjectAccessResource"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectAccessResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-project-membership": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MembershipResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "delete-project": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "list-project-invitations": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of items in this page */
-                limit?: number;
-                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
-                offset?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageInvitationResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["ProjectAccessResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "issue-invitation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["IssueInvitationRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["IssuedInvitationResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "update-project": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "revoke-invitation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                invitationId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateProjectRequestBody"];
+      };
     };
-    "batch-get-members": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BatchGetMembersRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["ProjectAccessResource"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BatchGetMembersResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "list-members": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of items in this page */
-                limit?: number;
-                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
-                offset?: number;
-                /** @description Matches against user id, email address or name */
-                keyword?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageMemberResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "get-project-membership": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "remove-member": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["MembershipResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "set-member-roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetMemberRolesRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MemberResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "list-project-invitations": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of items in this page */
+        limit?: number;
+        /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "set-member-permissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                userId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetMemberPermissionsRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageInvitationResource"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PolicyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "list-policies": {
-        parameters: {
-            query?: {
-                /** @description Restricts the result to one person. Omitting it covers the whole project */
-                userId?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PolicyListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "issue-invitation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "attach-policy": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AttachPolicyRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PolicyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["IssueInvitationRequestBody"];
+      };
     };
-    "get-policy": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                policyId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PolicyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["IssuedInvitationResponseBody"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "update-policy": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                policyId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePolicyRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PolicyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "revoke-invitation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invitationId: string;
+      };
+      cookie?: never;
     };
-    "detach-policy": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                policyId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "transfer-project-ownership": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TransferOwnershipRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OwnershipTransferResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "batch-get-members": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "list-roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoleListResponseBody"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BatchGetMembersRequestBody"];
+      };
     };
-    "create-role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateRoleRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["BatchGetMembersResponseBody"];
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoleResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "get-role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoleResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "list-members": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of items in this page */
+        limit?: number;
+        /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
+        offset?: number;
+        /** @description Matches against user id, email address or name */
+        keyword?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "update-role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateRoleRequestBody"];
-            };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageMemberResource"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RoleResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "delete-role": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "remove-member": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: string;
+      };
+      cookie?: never;
     };
-    "list-ssh-keys": {
-        parameters: {
-            query?: {
-                /** @description Maximum number of items in this page */
-                limit?: number;
-                /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
-                offset?: number;
-                /** @description Both kinds are returned while this is absent */
-                status?: "ACTIVE" | "REVOKED";
-                /** @description Lists only the keys carrying this purpose. The key the platform generates carries `platform` */
-                purpose?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LengthAwarePageSSHKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "create-ssh-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateSSHKeyRequestBody"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SSHKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "set-member-roles": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: string;
+      };
+      cookie?: never;
     };
-    "get-ssh-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                keyId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SSHKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetMemberRolesRequestBody"];
+      };
     };
-    "revoke-ssh-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                keyId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SSHKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["MemberResource"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    "rename-ssh-key": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                keyId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RenameSSHKeyRequestBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SSHKeyResource"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  "set-member-permissions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: string;
+      };
+      cookie?: never;
     };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetMemberPermissionsRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PolicyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-policies": {
+    parameters: {
+      query?: {
+        /** @description Restricts the result to one person. Omitting it covers the whole project */
+        userId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PolicyListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "attach-policy": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AttachPolicyRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PolicyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-policy": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        policyId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PolicyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "update-policy": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        policyId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdatePolicyRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PolicyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "detach-policy": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        policyId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "transfer-project-ownership": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TransferOwnershipRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OwnershipTransferResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-roles": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RoleListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-role": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateRoleRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RoleResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-role": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RoleResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "update-role": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateRoleRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RoleResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-role": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-ssh-keys": {
+    parameters: {
+      query?: {
+        /** @description Maximum number of items in this page */
+        limit?: number;
+        /** @description Number of items to skip. Use the cursor-paged endpoint to page deeper */
+        offset?: number;
+        /** @description Both kinds are returned while this is absent */
+        status?: "ACTIVE" | "REVOKED";
+        /** @description Lists only the keys carrying this purpose. The key the platform generates carries `platform` */
+        purpose?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LengthAwarePageSSHKeyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-ssh-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateSSHKeyRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SSHKeyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-ssh-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        keyId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SSHKeyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "revoke-ssh-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        keyId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SSHKeyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "rename-ssh-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        keyId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenameSSHKeyRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SSHKeyResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
 }

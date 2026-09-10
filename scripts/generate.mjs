@@ -1,50 +1,56 @@
-// 把 bundle 出来的契约编译成 TypeScript。
+// Compile the contracts into TypeScript.
 //
-//   openapi/<服务>/<版本>/openapi.yaml
-//       → gen/<服务>/<版本>/schema.ts   openapi-typescript 的原样产出
-//       → gen/<服务>/<版本>/index.ts    好用的别名（<操作>Result / <操作>Body / <操作>Query）
-//       → gen/index.ts                  按服务分命名空间的桶
+//   openapi/<service>/<version>/openapi.yaml
+//       → gen/<service>/<version>/schema.ts   verbatim openapi-typescript output
+//       → gen/<service>/<version>/client.ts   a client bound to the contract's address
+//       → gen/<service>/<version>/index.ts    aliases (<Operation>Result / Body / Query)
+//       → gen/index.ts                        one namespace per service
 //
-// # 一个服务一个文件，没有 bundle 这一步
+// # One file per service, no bundling step
 //
-// 契约一度按 OpenAPI 的节点类型拆过：paths/<Tag>.yaml 加 schemas/<Name>.yaml，一个 schema
-// 一个文件。compute 拆出来 74 个 schema 文件，每个三十来行——形式上模块化了，实际是把「改一个
-// 接口」变成了在十几个文件之间跳。
+// The contracts were once split by OpenAPI node type: paths/<Tag>.yaml plus
+// schemas/<Name>.yaml, one schema per file. compute came out as 74 schema files of about
+// thirty lines each. That is modular in form only; in practice it turned "change one
+// endpoint" into a walk across a dozen files.
 //
-// 现在最大的一份 169 KB，一个文件装得下，IDE 搜得动，review 看得完整。哪天某个服务真的长到
-// 难受了，再单独给它加拆分和 bundle——那时候是一个服务的事，不是全部十三份的事。
+// The largest contract is now 169 KB. One file fits in an editor, greps in one pass, and
+// reviews as a whole. If a single service ever outgrows that, split that one — it is that
+// service's problem, not all thirteen contracts'.
 //
-// # 这个包里没有手写的运行时，一行都没有
+// # The only runtime this package ships is client()
 //
-// 它一度有一个 src/client.ts：包一层 openapi-fetch、塞 Authorization、把七个服务打包成一个
-// createClient({ baseUrl })。那一层是错的，而且是**具体地**错：
+// It once shipped src/client.ts: a wrapper over openapi-fetch that injected Authorization
+// and packed seven services behind one createClient({ baseUrl }). That layer was wrong in
+// two specific ways, and both still hold:
 //
-//   - 每个服务是一个自己的 host（iam.leaflow.cloud、compute.leaflow.cloud），不是一个网关
-//     加路径前缀。控制台的 lib/services.ts 写了理由：IAM 和 monitoring 都占着
-//     /api/v1/projects/{id}/...，一次调用是给谁的从路径上恢复不出来。一个 baseUrl 配七个
-//     服务，等于假设了一件不成立的事。
-//   - 客户端是**每次调用现建**的（lib/session/iam.ts 的 call()），因为「令牌属于发问的那个
-//     人，不属于这个进程」。而 createClient() 一次造七个，用一个就浪费六个。
+//   - Each service has its own host (iam.leaflow.cloud, compute.leaflow.cloud), not a
+//     gateway plus a path prefix. The console's lib/services.ts records the reason: IAM
+//     and monitoring both claim /api/v1/projects/{id}/..., so the target of a call cannot
+//     be recovered from its path. One baseUrl for seven services assumes something untrue.
+//   - Clients are built per call (call() in lib/session/iam.ts), because a token belongs
+//     to whoever is asking, not to the process. createClient() built seven at once and
+//     wasted six.
 //
-// 而 openapi-fetch 的 createClient<paths>() 本来就是泛型的——按服务的运行时代码根本不需要
-// 存在。所以调用方自己写那三行：
+// What client() does is narrower: it fills in baseUrl from the contract's servers[0], and
+// nothing else. Every service keeps its own factory, so the first point holds; the factory
+// is cheap and holds no state, so the second one does too.
 //
-//     import createClient from 'openapi-fetch';
-//     import type { paths } from '@leaflow/sdk/compute/v1';
-//     const api = createClient<paths>({ baseUrl: serviceBaseUrl('compute') });
+// Authorization stays with the caller — that is openapi-fetch middleware, and the token
+// comes from a session the caller owns:
+//
+//     import { compute } from '@leaflow/sdk';
+//     const api = compute.client();
 //     api.use({ onRequest: ({ request }) => { request.headers.set('Authorization', ...); return request; } });
 //
-// baseUrl 怎么来、令牌怎么拿、错误怎么翻、客户端活多久——四件事调用方本来就各有一套，而且
-// 比我们清楚。我们提供类型，不提供关于它们的假设。
+// # Aliases are generated, not written
 //
-// # 别名是生成的，不是手写的
-//
-// 直接用 openapi-typescript 的产出要写
+// The raw openapi-typescript output requires
 //
 //     operations['list-instances']['responses'][200]['content']['application/json']
 //
-// 而现在这个 SDK 给的是 compute.ListInstancesResult，控制台里到处在用（app/console/*/types.ts）。
-// 那层别名有价值，但它是从 operationId 机械推出来的，所以生成它，别手写。
+// where this SDK offers compute.ListInstancesResult, which the console uses throughout
+// (app/console/*/types.ts). That layer earns its keep, but it is derived mechanically from
+// operationId — so generate it.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -54,28 +60,30 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const contractsRoot = join(root, "leaflowapis");
-// leaflow/ 是命名空间层，与 googleapis 的 google/ 对应。
+// leaflow/ is the namespace directory, matching googleapis' google/.
 const contracts = join(contractsRoot, "leaflow");
 const output = join(root, "gen");
 
-// 契约由这里拉到本地，版本记在 CONTRACTS_REF 里。
+// The contracts are cloned here; the revision is pinned in CONTRACTS_REF.
 //
-// 语言仓库是契约的**产物**，产物不该反过来持有源的一个 git 指针——那正是 submodule 干的事，
-// 而它换来四类只在 CI 上出现的失败，报出的都不是「submodule 配置有误」。
+// A language repository is a product of the contracts, and a product should not hold a git
+// pointer back at its source. That is what a submodule does, and it buys four classes of
+// CI-only failure, none of which report themselves as a submodule problem.
 const ref = existsSync(join(root, "CONTRACTS_REF"))
   ? readFileSync(join(root, "CONTRACTS_REF"), "utf8").trim()
   : "main";
 rmSync(contractsRoot, { recursive: true, force: true });
-// 默认 HTTPS：CI 里没有 ssh，SSH URL 会以一句 exit status 128 失败，不提认证。
+// HTTPS by default: CI has no ssh, and an SSH URL fails with a bare exit status 128 that
+// says nothing about authentication.
 const remote = process.env.CONTRACTS_REMOTE ?? "https://github.com/leaflowapis/leaflowapis.git";
 execFileSync("git", ["clone", "--quiet", "--no-tags", remote, contractsRoot], { stdio: "inherit" });
 execFileSync("git", ["-C", contractsRoot, "checkout", "--quiet", ref], { stdio: "inherit" });
-console.log(`契约 ${ref} 已取到 leaflowapis/`);
+console.log(`contracts ${ref} → leaflowapis/`);
 
 const METHODS = ["get", "post", "put", "patch", "delete", "options", "head", "trace"];
 const JSON_MEDIA = "application/json";
 
-// openapi/<服务>/<版本>/openapi.yaml
+// openapi/<service>/<version>/openapi.yaml
 const contractList = readdirSync(contracts, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .flatMap((entry) =>
@@ -85,13 +93,14 @@ const contractList = readdirSync(contracts, { withFileTypes: true })
         service: entry.name,
         version: version.name,
         spec: join(contracts, entry.name, version.name, "openapi.yaml"),
-      })))
-  // type/ 下是共用的形状，不是一个服务，没有 openapi.yaml。
+      })),
+  )
+  // type/ holds shared shapes rather than a service, and has no openapi.yaml.
   .filter((entry) => existsSync(entry.spec))
   .sort((a, b) => a.service.localeCompare(b.service) || a.version.localeCompare(b.version));
 
 if (contractList.length === 0) {
-  console.error(`${contracts} 下一份契约都没有`);
+  console.error(`no contracts under ${contracts}`);
   process.exit(1);
 }
 
@@ -105,10 +114,11 @@ function pascal(operationId) {
 }
 
 /**
- * 这个操作成功时返回哪个状态码。
+ * The status code this operation returns on success.
  *
- * 取最小的那个 2xx：一个操作只会有一种成功形状，而 200/201/202 是同一件事的不同说法。
- * 都不带 JSON 体的（204、纯 202）返回 null——那时候没有 Result 可以起名字。
+ * The lowest 2xx wins: an operation has exactly one success shape, and 200/201/202 are
+ * three ways of saying so. Operations carrying no JSON body (204, a bare 202) return null,
+ * because there is no Result to name.
  */
 function successStatus(operation) {
   const codes = Object.keys(operation.responses ?? {})
@@ -118,13 +128,13 @@ function successStatus(operation) {
   return codes[0] ?? null;
 }
 
-// 生成前先删干净。
+// Wipe before generating.
 //
-// 覆盖式生成留得下垃圾：改一个 schema 的名字，旧那份 .ts 没人删，而它照样编译、照样发布。
-// 这不是假想——现在这个 SDK 的 clean-generated.mjs 记着 v0.1.0 → v0.2.0 那次重命名留下了
-// **584 个**没人要的文件。
+// Overwriting leaves debris: rename a schema and the old .ts stays behind, still compiling
+// and still published. This is not hypothetical — clean-generated.mjs in this SDK records
+// the 584 orphaned files left by the v0.1.0 → v0.2.0 rename.
 //
-// 删掉再生成，同一份契约永远得到同一棵树，跑多少遍都一样。
+// Deleting first means one contract always yields one tree, however many times it runs.
 rmSync(output, { recursive: true, force: true });
 
 const services = [];
@@ -133,30 +143,46 @@ for (const { service, version, spec } of contractList) {
   const destination = join(output, service, version);
   mkdirSync(destination, { recursive: true });
 
-  // --default-non-nullable false：**有 default 不等于必填**。
+  // --default-non-nullable false: a default does not make a field required.
   //
-  // 不加的话，任何带 `default` 的字段都会被生成成必填，而 Go 那边同一份契约生成的是指针
-  // （`Most *int64`）。两种语言对同一个字段给出相反的结论，而契约本身说的是「可选，服务端有
-  // 默认值」——两个契约里一共 38 个字段是这种。
+  // Without it every field carrying `default` is generated as required, while Go generates
+  // a pointer (`Most *int64`) from the same contract. Two languages reach opposite
+  // conclusions about one field, and the contract says neither — it says optional, with a
+  // server-side default. 38 fields across the contracts are like this.
   //
-  // 表现只在少数地方冒出来：绝大多数字段前端表单总会传，所以类型是不是必填看不出区别。
-  // 唯一炸出来的是「展开地址」那个按钮——它本来就不带 body，于是 `{}` 通不过类型检查。
+  // It surfaces in few places, because most fields are always sent by a form and the
+  // required-ness never shows. The one that broke was the address-expansion button, which
+  // carries no body at all, so `{}` failed to type-check.
   execFileSync(
     "npx",
-    ["openapi-typescript", spec, "--default-non-nullable", "false",
-     "-o", join(destination, "schema.ts")],
+    [
+      "openapi-typescript",
+      spec,
+      "--default-non-nullable",
+      "false",
+      "-o",
+      join(destination, "schema.ts"),
+    ],
     { stdio: "inherit" },
   );
 
-  // 别名。用 YAML 里的 operationId 而不是解析生成出来的 .ts——那份 .ts 的形状归
-  // openapi-typescript 管，跟着它的版本变；operationId 是契约自己的东西。
+  // Aliases come from the operationId in the YAML, not from parsing the generated .ts. The
+  // shape of that file belongs to openapi-typescript and moves with its version;
+  // operationId belongs to the contract.
   //
-  // 在 Node 里解析，不借 python。这里一度 spawn 一个 python3 去转 YAML，理由是「Go 那侧的
-  // 生成器也是 python，两处对同一份文件的理解得一样」——拆成两个仓库之后那个前提没了，剩下的
-  // 只是让这个仓库凭空需要一个 python 运行时，而它在精简的 node 镜像里根本不存在
-  // （spawnSync python3 ENOENT）。
+  // Parsed in Node, not python. A python3 process was once spawned to convert the YAML, on
+  // the grounds that the Go generator is python too and both should read one file the same
+  // way. Splitting the repositories removed that premise and left this repository requiring
+  // a python runtime it does not have on a slim node image (spawnSync python3 ENOENT).
   const aliases = [];
   const document = parseYaml(readFileSync(spec, "utf8"));
+
+  // The contract's servers[0]. A service that declares none gets no client(); callers can
+  // still reach it through createClient<paths>({ baseUrl }).
+  const server = document.servers?.[0]?.url;
+  if (!server) {
+    console.warn(`${service}/${version}: no servers declared, skipping client()`);
+  }
 
   for (const [path, item] of Object.entries(document.paths)) {
     for (const [method, operation] of Object.entries(item)) {
@@ -167,57 +193,109 @@ for (const { service, version, spec } of contractList) {
       const status = successStatus(operation);
       if (status) {
         aliases.push(
-          `/** \`${method.toUpperCase()} ${path}\` 成功时的响应体。 */`,
+          `/** The success response body of \`${method.toUpperCase()} ${path}\`. */`,
           `export type ${name}Result =`,
           `  operations[${key}]["responses"][${status}]["content"]["application/json"];`,
-          "");
+          "",
+        );
       }
       if ((operation.parameters ?? []).some((p) => p.in === "query")) {
         aliases.push(
-          `/** \`${method.toUpperCase()} ${path}\` 的查询参数。 */`,
+          `/** The query parameters of \`${method.toUpperCase()} ${path}\`. */`,
           `export type ${name}Query =`,
           `  operations[${key}]["parameters"]["query"];`,
-          "");
+          "",
+        );
       }
       if (operation.requestBody?.content?.[JSON_MEDIA]) {
         aliases.push(
-          `/** \`${method.toUpperCase()} ${path}\` 的请求体。 */`,
+          `/** The request body of \`${method.toUpperCase()} ${path}\`. */`,
           `export type ${name}Body = NonNullable<`,
           `  operations[${key}]["requestBody"]`,
           `>["content"]["application/json"];`,
-          "");
+          "",
+        );
       }
     }
   }
 
-  writeFileSync(join(destination, "index.ts"), `${[
-    "// 由 scripts/generate-ts.mjs 生成，不要手改。",
-    "//",
-    "// 别名把 operations[...] 那串下标换成一个名字。原始的 paths / components / operations 也",
-    "// 一并导出：paths 是给 openapi-fetch 的 createClient<paths>() 用的。",
-    "",
-    'export type { paths, components, operations, webhooks } from "./schema.js";',
-    "",
-    'import type { operations } from "./schema.js";',
-    "",
-    ...aliases,
-  ].join("\n").trimEnd()}\n`);
+  // The address is closed over by the factory rather than exported as a constant. Having
+  // the caller name it once more turns a value the contract already settled into one more
+  // parameter that can be got wrong — and a wrong one is a well-formed URL pointing
+  // somewhere else, which no type checker can catch.
+  if (server) {
+    writeFileSync(
+      join(destination, "client.ts"),
+      `${[
+        "// Code generated from the contract's servers[0]. DO NOT EDIT.",
+        "",
+        'import createClient, { type ClientOptions } from "openapi-fetch";',
+        "",
+        'import type { paths } from "./schema.js";',
+        "",
+        `const defaultBaseUrl = ${JSON.stringify(server)};`,
+        "",
+        `/** A client for the ${service} service. Pass baseUrl to override the address. */`,
+        "export function client(options: ClientOptions = {}) {",
+        "  return createClient<paths>({ baseUrl: defaultBaseUrl, ...options });",
+        "}",
+      ].join("\n")}\n`,
+    );
+  }
 
-  services.push({ service, version });
-  console.log(`${service}/${version} → gen/${service}/${version}  ` +
-    `${aliases.filter((line) => line.startsWith("export type")).length} 个别名`);
+  writeFileSync(
+    join(destination, "index.ts"),
+    `${[
+      "// Code generated by scripts/generate.mjs. DO NOT EDIT.",
+      "//",
+      "// The aliases replace the operations[...] subscript chain with a name. The raw paths /",
+      "// components / operations are exported as well: paths is what createClient<paths>() takes.",
+      "",
+      'export type { paths, components, operations, webhooks } from "./schema.js";',
+      ...(server ? ["", 'export { client } from "./client.js";'] : []),
+      "",
+      'import type { operations } from "./schema.js";',
+      "",
+      ...aliases,
+    ]
+      .join("\n")
+      .trimEnd()}\n`,
+  );
+
+  services.push({ service, version, server });
+  console.log(
+    `${service}/${version} → gen/${service}/${version}  ` +
+      `${aliases.filter((line) => line.startsWith("export type")).length} aliases`,
+  );
 }
 
-// 桶：import type { compute } from '@leaflow/sdk'，控制台现在就是这么用的。
-writeFileSync(join(output, "index.ts"), `${[
-  "// 由 scripts/generate-ts.mjs 生成，不要手改。",
-  "//",
-  "// 一个服务一个命名空间，**不摊平**：compute 和 tunnel 各有一个 OperationLogResource，",
-  "// 它们是两个不同的类型。摊平之后先声明的那个会盖掉另一个，而盖掉不报错——表现是某个接口",
-  "// 返回的字段和类型对不上，看起来像后端的 bug。",
-  "",
-  ...services.map(({ service, version }) =>
-    `export type * as ${service} from "./${service}/${version}/index.js";`),
-].join("\n")}\n`);
+// The barrel: import { compute } from '@leaflow/sdk', which is how the console uses it.
+writeFileSync(
+  join(output, "index.ts"),
+  `${[
+    "// Code generated by scripts/generate.mjs. DO NOT EDIT.",
+    "//",
+    "// One namespace per service, never flattened: compute and tunnel each declare an",
+    "// OperationLogResource, and they are different types. Flattening lets the first one",
+    "// declared shadow the other, silently — which surfaces as an endpoint whose fields do not",
+    "// match its type, and reads like a bug in the backend.",
+    "//",
+    "// A namespace carries client() as well as types, hence `export * as` rather than",
+    "// `export type * as`; sideEffects: false keeps unused services out of a bundle.",
+    "",
+    ...services.map(
+      ({ service, version }) => `export * as ${service} from "./${service}/${version}/index.js";`,
+    ),
+  ].join("\n")}\n`,
+);
 
 console.log(`gen/index.ts → ${services.map((s) => s.service).join(", ")}`);
+
+// Format the output.
+//
+// Three generators write into gen/: openapi-typescript for schema.ts, and the two template
+// literals above. They do not agree on quoting or line width, and the difference lands in
+// every review as noise. Running one formatter over the tree afterwards settles it, and
+// makes "the generated code is up to date" a diff that can be checked in CI.
+execFileSync("npx", ["prettier", "--write", "--log-level", "warn", output], { stdio: "inherit" });
+console.log("gen/ formatted");

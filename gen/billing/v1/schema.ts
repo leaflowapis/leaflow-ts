@@ -4,2853 +4,2912 @@
  */
 
 export interface paths {
-    "/catalog/v1/products": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The services the platform sells */
-        get: operations["list-catalog-products"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/catalog/v1/products": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/catalog/v1/products/{productId}/plans": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                productId: components["parameters"]["ProductId"];
-            };
-            cookie?: never;
-        };
-        /** What can be bought under one service */
-        get: operations["list-catalog-plans"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** The services the platform sells */
+    get: operations["list-catalog-products"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/catalog/v1/products/{productId}/plans": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: components["parameters"]["ProductId"];
+      };
+      cookie?: never;
     };
-    "/catalog/v1/plans/{planId}/prices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                planId: components["parameters"]["PlanId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * The ways one plan can be bought
-         * @description Public list prices only. An account holding a negotiated agreement may be charged less;
-         *     it is never charged more.
-         */
-        get: operations["list-catalog-prices"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** What can be bought under one service */
+    get: operations["list-catalog-plans"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/catalog/v1/plans/{planId}/prices": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        planId: components["parameters"]["PlanId"];
+      };
+      cookie?: never;
     };
-    "/catalog/v1/rate-cards/{rateCardId}/rules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                rateCardId: components["parameters"]["RateCardId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * The rates on a published price list
-         * @description Only public price lists are readable here. A list written for a single agreement is not,
-         *     and its identifier cannot be used to reach it.
-         */
-        get: operations["list-catalog-rates"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * The ways one plan can be bought
+     * @description Public list prices only. An account holding a negotiated agreement may be charged less;
+     *     it is never charged more.
+     */
+    get: operations["list-catalog-prices"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/catalog/v1/rate-cards/{rateCardId}/rules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        rateCardId: components["parameters"]["RateCardId"];
+      };
+      cookie?: never;
     };
-    "/catalog/v1/estimates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Estimate a purchase without signing in
-         * @description Uses public list prices. Nothing is reserved and nothing is recorded, so this may be
-         *     called as often as required.
-         *
-         *     `POST` is used because the set of items to price does not fit in a query string. There is
-         *     no corresponding `GET`, and no estimate is stored to retrieve.
-         *
-         *     An account holding a negotiated agreement may be charged less than this. Tax and
-         *     discounts are not included.
-         */
-        post: operations["create-estimate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * The rates on a published price list
+     * @description Only public price lists are readable here. A list written for a single agreement is not,
+     *     and its identifier cannot be used to reach it.
+     */
+    get: operations["list-catalog-rates"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/catalog/v1/estimates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/billing-accounts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The billing accounts you own */
-        get: operations["list-billing-accounts"];
-        put?: never;
-        /**
-         * Open a billing account
-         * @description The currency is chosen here and cannot be changed afterwards. Everything charged to the
-         *     account — prices, orders, invoices, balance — is denominated in it.
-         *
-         *     One person may hold several accounts, for example a personal one and one for a team.
-         */
-        post: operations["create-billing-account"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Estimate a purchase without signing in
+     * @description Uses public list prices. Nothing is reserved and nothing is recorded, so this may be
+     *     called as often as required.
+     *
+     *     `POST` is used because the set of items to price does not fit in a query string. There is
+     *     no corresponding `GET`, and no estimate is stored to retrieve.
+     *
+     *     An account holding a negotiated agreement may be charged less than this. Tax and
+     *     discounts are not included.
+     */
+    post: operations["create-estimate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/billing-accounts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/billing-accounts/{accountId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                accountId: components["parameters"]["AccountId"];
-            };
-            cookie?: never;
-        };
-        get: operations["get-billing-account"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Change the account's details
-         * @description The legal name, address and tax identifier are copied onto each invoice when it is
-         *     issued. Changing them here affects invoices issued afterwards, not those already sent.
-         *
-         *     The currency cannot be changed.
-         */
-        patch: operations["update-billing-account"];
-        trace?: never;
+    /** The billing accounts you own */
+    get: operations["list-billing-accounts"];
+    put?: never;
+    /**
+     * Open a billing account
+     * @description The currency is chosen here and cannot be changed afterwards. Everything charged to the
+     *     account — prices, orders, invoices, balance — is denominated in it.
+     *
+     *     One person may hold several accounts, for example a personal one and one for a team.
+     */
+    post: operations["create-billing-account"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/billing-accounts/{accountId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        accountId: components["parameters"]["AccountId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/billing-accounts/{accountId}/balance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                accountId: components["parameters"]["AccountId"];
-            };
-            cookie?: never;
-        };
-        /** What the account holds and what it can still spend */
-        get: operations["get-account-balance"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["get-billing-account"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Change the account's details
+     * @description The legal name, address and tax identifier are copied onto each invoice when it is
+     *     issued. Changing them here affects invoices issued afterwards, not those already sent.
+     *
+     *     The currency cannot be changed.
+     */
+    patch: operations["update-billing-account"];
+    trace?: never;
+  };
+  "/account/v1/billing-accounts/{accountId}/balance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        accountId: components["parameters"]["AccountId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/projects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The projects your accounts pay for */
-        get: operations["list-paid-projects"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** What the account holds and what it can still spend */
+    get: operations["get-account-balance"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/projects": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/projects/{projectId}/billing-account": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * Which account pays for a project
-         * @description Returns 404 when no account pays for it. No resources can be created until one does.
-         */
-        get: operations["find-project-payer"];
-        /**
-         * Choose which account pays for a project
-         * @description Charges already recorded remain with the account that was paying when they occurred, and
-         *     are still invoiced to it. Metered resources are settled up to the moment of the change.
-         *
-         *     Periods already paid for are unaffected; renewals are charged to the new account.
-         *
-         *     The request is refused while the current account has an unpaid invoice, and — once the
-         *     project holds subscriptions — while the new account uses a different currency.
-         */
-        put: operations["set-project-payer"];
-        post?: never;
-        /**
-         * Stop paying for a project
-         * @description Permitted only when the project has nothing left to charge: no resources accruing
-         *     charges, no subscriptions still running, no usage awaiting invoicing, and no unpaid
-         *     invoice on the account.
-         *
-         *     Usage that has not yet been invoiced is settled by calling
-         *     `POST /account/v1/projects/{projectId}/billing-account/settle` first.
-         *
-         *     After this the project cannot create resources until an account is chosen again.
-         */
-        delete: operations["unbind-project-payer"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** The projects your accounts pay for */
+    get: operations["list-paid-projects"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/projects/{projectId}/billing-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/projects/{projectId}/billing-account/settle": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Invoice a project's outstanding usage now
-         * @description Metered usage is normally invoiced at the end of the month. This issues an invoice for
-         *     everything charged to the project so far, to the account currently paying for it.
-         *
-         *     Use it before unbinding a project, or to obtain a settled figure part-way through a
-         *     month. Calling it again when nothing is outstanding has no effect.
-         */
-        post: operations["settle-project-usage"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Which account pays for a project
+     * @description Returns 404 when no account pays for it. No resources can be created until one does.
+     */
+    get: operations["find-project-payer"];
+    /**
+     * Choose which account pays for a project
+     * @description Charges already recorded remain with the account that was paying when they occurred, and
+     *     are still invoiced to it. Metered resources are settled up to the moment of the change.
+     *
+     *     Periods already paid for are unaffected; renewals are charged to the new account.
+     *
+     *     The request is refused while the current account has an unpaid invoice, and — once the
+     *     project holds subscriptions — while the new account uses a different currency.
+     */
+    put: operations["set-project-payer"];
+    post?: never;
+    /**
+     * Stop paying for a project
+     * @description Permitted only when the project has nothing left to charge: no resources accruing
+     *     charges, no subscriptions still running, no usage awaiting invoicing, and no unpaid
+     *     invoice on the account.
+     *
+     *     Usage that has not yet been invoiced is settled by calling
+     *     `POST /account/v1/projects/{projectId}/billing-account/settle` first.
+     *
+     *     After this the project cannot create resources until an account is chosen again.
+     */
+    delete: operations["unbind-project-payer"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/projects/{projectId}/billing-account/settle": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/top-ups": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["list-top-ups"];
-        put?: never;
-        /**
-         * Add funds to an account
-         * @description Returns a checkout address. The balance increases when the payment provider confirms the
-         *     payment, which may be after this call returns.
-         *
-         *     The amount is in the account's currency. A checkout page may present a local currency;
-         *     the amount credited to the account is the one requested here.
-         */
-        post: operations["create-top-up"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Invoice a project's outstanding usage now
+     * @description Metered usage is normally invoiced at the end of the month. This issues an invoice for
+     *     everything charged to the project so far, to the account currently paying for it.
+     *
+     *     Use it before unbinding a project, or to obtain a settled figure part-way through a
+     *     month. Calling it again when nothing is outstanding has no effect.
+     */
+    post: operations["settle-project-usage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/top-ups": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/top-ups/{topUpId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                topUpId: string;
-            };
-            cookie?: never;
-        };
-        /** Whether a payment has completed */
-        get: operations["get-top-up"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["list-top-ups"];
+    put?: never;
+    /**
+     * Add funds to an account
+     * @description Returns a checkout address. The balance increases when the payment provider confirms the
+     *     payment, which may be after this call returns.
+     *
+     *     The amount is in the account's currency. A checkout page may present a local currency;
+     *     the amount credited to the account is the one requested here.
+     */
+    post: operations["create-top-up"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/top-ups/{topUpId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        topUpId: string;
+      };
+      cookie?: never;
     };
-    "/account/v1/payment-methods": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["list-payment-methods"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Whether a payment has completed */
+    get: operations["get-top-up"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/payment-methods": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/payment-methods/setup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Begin adding a payment method
-         * @description Returns what is needed to hand the browser over to the payment provider's own card
-         *     form. Nothing is charged, and the method appears in the list once the provider
-         *     confirms it.
-         *
-         *     Card numbers are never sent to or stored by this service.
-         */
-        post: operations["create-payment-method-setup"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["list-payment-methods"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/payment-methods/setup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/payment-methods/{paymentMethodId}/default": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                paymentMethodId: components["parameters"]["PaymentMethodId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        /** Choose which method is used automatically */
-        put: operations["set-default-payment-method"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Begin adding a payment method
+     * @description Returns what is needed to hand the browser over to the payment provider's own card
+     *     form. Nothing is charged, and the method appears in the list once the provider
+     *     confirms it.
+     *
+     *     Card numbers are never sent to or stored by this service.
+     */
+    post: operations["create-payment-method-setup"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/payment-methods/{paymentMethodId}/default": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        paymentMethodId: components["parameters"]["PaymentMethodId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/payment-methods/{paymentMethodId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                paymentMethodId: components["parameters"]["PaymentMethodId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Remove a payment method
-         * @description Refused when it is the only method on an account that has resources billed by the hour,
-         *     as there would be nothing left to charge when the balance runs out.
-         */
-        delete: operations["delete-payment-method"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /** Choose which method is used automatically */
+    put: operations["set-default-payment-method"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/payment-methods/{paymentMethodId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        paymentMethodId: components["parameters"]["PaymentMethodId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/invoices/{invoiceId}/pay": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                invoiceId: components["parameters"]["InvoiceId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Pay an outstanding invoice
-         * @description Applies the account balance first, then charges the remainder to a payment method. Give
-         *     `payment_method_id` to choose one, or omit it to use the default.
-         *
-         *     Returns a checkout address when the provider requires the cardholder to confirm the
-         *     payment; the invoice is marked paid once the provider confirms it.
-         *
-         *     Calling this on an invoice that is already paid returns the invoice unchanged.
-         */
-        post: operations["pay-invoice"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Remove a payment method
+     * @description Refused when it is the only method on an account that has resources billed by the hour,
+     *     as there would be nothing left to charge when the balance runs out.
+     */
+    delete: operations["delete-payment-method"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/invoices/{invoiceId}/pay": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/payments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Pay several outstanding invoices and orders at once
-         * @description All of them or none. Nothing is settled unless everything named here can be, so a
-         *     partial result is not a state this can leave behind.
-         *
-         *     The balance is not split across the two cases: either it covers the whole total and
-         *     everything is settled from it, or it is left untouched and the full total is collected
-         *     through the provider. It is never partly spent against an unpaid remainder.
-         *
-         *     When the provider is needed, this returns a checkout address and settles nothing.
-         *     Call it again once the payment has landed — the balance then covers the total and the
-         *     same call settles everything.
-         *
-         *     Anything already paid is skipped rather than refused, so a repeated call after a
-         *     partial success is safe.
-         */
-        post: operations["pay-together"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Pay an outstanding invoice
+     * @description Applies the account balance first, then charges the remainder to a payment method. Give
+     *     `payment_method_id` to choose one, or omit it to use the default.
+     *
+     *     Returns a checkout address when the provider requires the cardholder to confirm the
+     *     payment; the invoice is marked paid once the provider confirms it.
+     *
+     *     Calling this on an invoice that is already paid returns the invoice unchanged.
+     */
+    post: operations["pay-invoice"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/payments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/orders/{orderId}/pay": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Complete payment for an order
-         * @description Use this to resume an order whose checkout was interrupted.
-         *
-         *     An order reserves both funds and stock for a limited time. Once that reservation expires
-         *     the order can no longer be paid and must be placed again; `reservation_expires_at` on the
-         *     order states when.
-         */
-        post: operations["pay-order"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Pay several outstanding invoices and orders at once
+     * @description All of them or none. Nothing is settled unless everything named here can be, so a
+     *     partial result is not a state this can leave behind.
+     *
+     *     The balance is not split across the two cases: either it covers the whole total and
+     *     everything is settled from it, or it is left untouched and the full total is collected
+     *     through the provider. It is never partly spent against an unpaid remainder.
+     *
+     *     When the provider is needed, this returns a checkout address and settles nothing.
+     *     Call it again once the payment has landed — the balance then covers the total and the
+     *     same call settles everything.
+     *
+     *     Anything already paid is skipped rather than refused, so a repeated call after a
+     *     partial success is safe.
+     */
+    post: operations["pay-together"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/orders/{orderId}/pay": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/invoices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["list-invoices"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Complete payment for an order
+     * @description Use this to resume an order whose checkout was interrupted.
+     *
+     *     An order reserves both funds and stock for a limited time. Once that reservation expires
+     *     the order can no longer be paid and must be placed again; `reservation_expires_at` on the
+     *     order states when.
+     */
+    post: operations["pay-order"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/invoices": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/invoices/{invoiceId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                invoiceId: components["parameters"]["InvoiceId"];
-            };
-            cookie?: never;
-        };
-        get: operations["get-invoice"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["list-invoices"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/invoices/{invoiceId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/invoices/{invoiceId}/items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                invoiceId: components["parameters"]["InvoiceId"];
-            };
-            cookie?: never;
-        };
-        /** What an invoice is made up of */
-        get: operations["list-invoice-items"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["get-invoice"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/invoices/{invoiceId}/items": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/invoices/{invoiceId}/refund-quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                invoiceId: components["parameters"]["InvoiceId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * What refunding this invoice would give back
-         * @description Show this before asking for a refund. Nothing is recorded and nothing is reserved; the
-         *     answer follows from what has been paid and what has already been returned, so it may
-         *     be read as often as required.
-         *
-         *     `refundable_amount` is `"0"` once nothing is left, which is also the answer for an
-         *     invoice already refunded in full.
-         */
-        get: operations["get-invoice-refund-quote"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** What an invoice is made up of */
+    get: operations["list-invoice-items"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/invoices/{invoiceId}/refund-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/transactions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Every movement of funds on the account */
-        get: operations["list-transactions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * What refunding this invoice would give back
+     * @description Show this before asking for a refund. Nothing is recorded and nothing is reserved; the
+     *     answer follows from what has been paid and what has already been returned, so it may
+     *     be read as often as required.
+     *
+     *     `refundable_amount` is `"0"` once nothing is left, which is also the answer for an
+     *     invoice already refunded in full.
+     */
+    get: operations["get-invoice-refund-quote"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/transactions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/credit-grants": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Credit and vouchers held on the account
-         * @description Each grant shows what remains and what it may be used for. Credit is spent before cash
-         *     and cannot be withdrawn.
-         */
-        get: operations["list-credit-grants"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Every movement of funds on the account */
+    get: operations["list-transactions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/credit-grants": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/allocations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Where each amount went
-         * @description Give `source_id` to follow one top-up or grant through to everything it paid for. Give
-         *     `target_id` to see which sources paid for one line of an invoice.
-         *
-         *     Give `source_type` on its own to separate what cash paid for from what granted credit
-         *     paid for.
-         */
-        get: operations["list-allocations"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Credit and vouchers held on the account
+     * @description Each grant shows what remains and what it may be used for. Credit is spent before cash
+     *     and cannot be withdrawn.
+     */
+    get: operations["list-credit-grants"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/allocations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/refunds": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["list-refunds"];
-        put?: never;
-        /**
-         * Ask for a refund
-         * @description Refunding ends the subscription and reclaims whatever it provisioned. That is the
-         *     difference from letting a period lapse: a lapsed period keeps the machine around
-         *     for a while so that topping up brings it back, whereas a refund returns the money
-         *     and therefore cannot leave the thing running.
-         *
-         *     What can be refunded, for how long, and how much, is decided here rather than by
-         *     the caller. A request outside those bounds is refused with the reason.
-         *
-         *     The money goes back the way it came: card charges to the card, balance to the
-         *     balance, credit to credit. A grant never turns into cash.
-         */
-        post: operations["request-refund"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Where each amount went
+     * @description Give `source_id` to follow one top-up or grant through to everything it paid for. Give
+     *     `target_id` to see which sources paid for one line of an invoice.
+     *
+     *     Give `source_type` on its own to separate what cash paid for from what granted credit
+     *     paid for.
+     */
+    get: operations["list-allocations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/refunds": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/usage-charges": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Metered charges, line by line
-         * @description Includes charges that have not been invoiced yet, which is how the current month's
-         *     spending is seen before the invoice is issued.
-         */
-        get: operations["list-usage-charges"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["list-refunds"];
+    put?: never;
+    /**
+     * Ask for a refund
+     * @description Refunding ends the subscription and reclaims whatever it provisioned. That is the
+     *     difference from letting a period lapse: a lapsed period keeps the machine around
+     *     for a while so that topping up brings it back, whereas a refund returns the money
+     *     and therefore cannot leave the thing running.
+     *
+     *     What can be refunded, for how long, and how much, is decided here rather than by
+     *     the caller. A request outside those bounds is refused with the reason.
+     *
+     *     The money goes back the way it came: card charges to the card, balance to the
+     *     balance, credit to credit. A grant never turns into cash.
+     */
+    post: operations["request-refund"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/usage-charges": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/subscriptions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["list-subscriptions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Metered charges, line by line
+     * @description Includes charges that have not been invoiced yet, which is how the current month's
+     *     spending is seen before the invoice is issued.
+     */
+    get: operations["list-usage-charges"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/subscriptions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/subscription-items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** What has been bought, and when each renews */
-        get: operations["list-subscription-items"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["list-subscriptions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/subscription-items": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/subscription-items/{itemId}/renew": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                itemId: components["parameters"]["ItemId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Renew now rather than waiting for the renewal date
-         * @description Extends the paid period from its current end, not from today, so renewing early does not
-         *     shorten what has already been paid for.
-         *
-         *     The price charged is the one in effect at the moment of renewal, which may differ from
-         *     what was paid for the current period.
-         */
-        post: operations["renew-subscription-item"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** What has been bought, and when each renews */
+    get: operations["list-subscription-items"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/subscription-items/{itemId}/renew": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        itemId: components["parameters"]["ItemId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/subscription-items/{itemId}/auto-renew": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                itemId: components["parameters"]["ItemId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Turn automatic renewal on or off
-         * @description When on, the account balance is charged at the renewal date. Turning it off lets the
-         *     current period run to its end and stops the resource afterwards.
-         */
-        put: operations["set-auto-renew"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Renew now rather than waiting for the renewal date
+     * @description Extends the paid period from its current end, not from today, so renewing early does not
+     *     shorten what has already been paid for.
+     *
+     *     The price charged is the one in effect at the moment of renewal, which may differ from
+     *     what was paid for the current period.
+     */
+    post: operations["renew-subscription-item"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/subscription-items/{itemId}/auto-renew": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        itemId: components["parameters"]["ItemId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/codes/preview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Check what a code would give you
-         * @description Nothing is recorded and the code is not consumed. Use it to show the customer the effect
-         *     before they commit.
-         */
-        post: operations["preview-code"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /**
+     * Turn automatic renewal on or off
+     * @description When on, the account balance is charged at the renewal date. Turning it off lets the
+     *     current period run to its end and stops the resource afterwards.
+     */
+    put: operations["set-auto-renew"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/codes/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/codes/redeem": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Redeem a code
-         * @description A voucher code adds credit to the account. A discount code records the entitlement, which
-         *     is then applied to the next qualifying purchase.
-         *
-         *     A code that has already been redeemed by this account is refused rather than redeemed a
-         *     second time.
-         */
-        post: operations["redeem-code"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Check what a code would give you
+     * @description Nothing is recorded and the code is not consumed. Use it to show the customer the effect
+     *     before they commit.
+     */
+    post: operations["preview-code"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/codes/redeem": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/billing-account": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * Who pays for this project, and how much is left
-         * @description A deliberately narrow view: the payer's identity, its currency, and how much can still
-         *     be spent. Cards, invoices and transaction history are not included; they belong to the
-         *     account owner and are reached through `/account/v1/`.
-         *
-         *     Returns 404 when no account pays for this project. Resources cannot be created in that
-         *     state.
-         */
-        get: operations["get-project-billing-account"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Redeem a code
+     * @description A voucher code adds credit to the account. A discount code records the entitlement, which
+     *     is then applied to the next qualifying purchase.
+     *
+     *     A code that has already been redeemed by this account is refused rather than redeemed a
+     *     second time.
+     */
+    post: operations["redeem-code"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/billing-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/spend": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * What this project spent, grouped
-         * @description Covers a closed time range. Both bounds are required: a total without a stated period
-         *     cannot be reconciled against an invoice.
-         *
-         *     Includes usage that has not been invoiced yet.
-         */
-        get: operations["list-project-spend"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Who pays for this project, and how much is left
+     * @description A deliberately narrow view: the payer's identity, its currency, and how much can still
+     *     be spent. Cards, invoices and transaction history are not included; they belong to the
+     *     account owner and are reached through `/account/v1/`.
+     *
+     *     Returns 404 when no account pays for this project. Resources cannot be created in that
+     *     state.
+     */
+    get: operations["get-project-billing-account"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/spend": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/usage-charges": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * Metered charges for this project, line by line
-         * @description The individual charges behind the figures in `/spend`. Amounts here sum to the totals
-         *     reported there over the same period.
-         */
-        get: operations["list-project-usage-charges"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * What this project spent, grouped
+     * @description Covers a closed time range. Both bounds are required: a total without a stated period
+     *     cannot be reconciled against an invoice.
+     *
+     *     Includes usage that has not been invoiced yet.
+     */
+    get: operations["list-project-spend"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/usage-charges": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/subscriptions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /** Which services this project has enabled */
-        get: operations["list-project-subscriptions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Metered charges for this project, line by line
+     * @description The individual charges behind the figures in `/spend`. Amounts here sum to the totals
+     *     reported there over the same period.
+     */
+    get: operations["list-project-usage-charges"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/subscriptions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/subscription-items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /** What this project has bought, and when each renews */
-        get: operations["list-project-subscription-items"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Which services this project has enabled */
+    get: operations["list-project-subscriptions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/subscription-items": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/subscription-items/{itemId}/auto-renew": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-                itemId: components["parameters"]["ItemId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Turn automatic renewal on or off
-         * @description Automatic renewal draws on the paying account's balance, which a project member may
-         *     commit. Paying by card requires the account owner and is done from the billing centre.
-         */
-        put: operations["set-project-auto-renew"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** What this project has bought, and when each renews */
+    get: operations["list-project-subscription-items"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/subscription-items/{itemId}/auto-renew": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        itemId: components["parameters"]["ItemId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/orders": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * Purchases made for this project
-         * @description An order awaiting payment shows what is outstanding. Paying it is done from the billing
-         *     centre by the account owner.
-         */
-        get: operations["list-project-orders"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    /**
+     * Turn automatic renewal on or off
+     * @description Automatic renewal draws on the paying account's balance, which a project member may
+     *     commit. Paying by card requires the account owner and is done from the billing centre.
+     */
+    put: operations["set-project-auto-renew"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/orders/{orderId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        get: operations["get-project-order"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Purchases made for this project
+     * @description An order awaiting payment shows what is outstanding. Paying it is done from the billing
+     *     centre by the account owner.
+     */
+    get: operations["list-project-orders"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/orders/{orderId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/active-resources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * What is accruing charges right now
-         * @description A resource that is running but does not appear here is not being charged for.
-         */
-        get: operations["list-project-active-resources"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["get-project-order"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/active-resources": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/quotes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Price a purchase before making it
-         * @description Priced in the paying account's currency, and at any rate negotiated for that account.
-         *     Nothing is reserved and nothing is recorded, so this may be called as often as required.
-         *
-         *     Prices may change between quoting and ordering. An order is charged at the price in
-         *     effect when it is placed, so a quote should be refreshed before a final confirmation is
-         *     shown.
-         *
-         *     Returns 404 when no account pays for this project.
-         */
-        post: operations["create-project-quote"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * What is accruing charges right now
+     * @description A resource that is running but does not appear here is not being charged for.
+     */
+    get: operations["list-project-active-resources"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/quotes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/allowances": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Included and purchased quantities, and what is left
-         * @description A quantity rather than an amount of money: bytes, seconds or tokens that are used before
-         *     anything is charged for.
-         *
-         *     Usage draws on these first and is only charged once they are exhausted. Where several
-         *     apply, they are drawn on in a fixed order: lower `priority` first, then whichever
-         *     expires soonest, then whichever was granted first. Included quantities therefore go
-         *     before purchased packs, and a pack that is about to expire goes before one that is not.
-         *
-         *     An unused quantity is lost when it expires; it is not refunded and does not carry over.
-         *
-         *     Quantities belong to the account and are shared by every project it pays for.
-         */
-        get: operations["list-allowances"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Price a purchase before making it
+     * @description Priced in the paying account's currency, and at any rate negotiated for that account.
+     *     Nothing is reserved and nothing is recorded, so this may be called as often as required.
+     *
+     *     Prices may change between quoting and ordering. An order is charged at the price in
+     *     effect when it is placed, so a quote should be refreshed before a final confirmation is
+     *     shown.
+     *
+     *     Returns 404 when no account pays for this project.
+     */
+    post: operations["create-project-quote"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/allowances": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/allowances/{allowanceId}/consumptions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                allowanceId: string;
-            };
-            cookie?: never;
-        };
-        /**
-         * What has been used from one quantity
-         * @description Each entry names the charge it covered, so the granted amount, what has been used and
-         *     what remains all reconcile.
-         */
-        get: operations["list-allowance-consumptions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Included and purchased quantities, and what is left
+     * @description A quantity rather than an amount of money: bytes, seconds or tokens that are used before
+     *     anything is charged for.
+     *
+     *     Usage draws on these first and is only charged once they are exhausted. Where several
+     *     apply, they are drawn on in a fixed order: lower `priority` first, then whichever
+     *     expires soonest, then whichever was granted first. Included quantities therefore go
+     *     before purchased packs, and a pack that is about to expire goes before one that is not.
+     *
+     *     An unused quantity is lost when it expires; it is not refunded and does not carry over.
+     *
+     *     Quantities belong to the account and are shared by every project it pays for.
+     */
+    get: operations["list-allowances"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/allowances/{allowanceId}/consumptions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        allowanceId: string;
+      };
+      cookie?: never;
     };
-    "/account/v1/orders": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Purchases made against your accounts
-         * @description An order in `pending` still owes money; `amount_due` states how much and
-         *     `reservation_expires_at` states how long it can still be paid.
-         */
-        get: operations["list-orders"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * What has been used from one quantity
+     * @description Each entry names the charge it covered, so the granted amount, what has been used and
+     *     what remains all reconcile.
+     */
+    get: operations["list-allowance-consumptions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/account/v1/orders/{orderId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        get: operations["get-order"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Purchases made against your accounts
+     * @description An order in `pending` still owes money; `amount_due` states how much and
+     *     `reservation_expires_at` states how long it can still be paid.
+     */
+    get: operations["list-orders"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/orders/{orderId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/orders/{orderId}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Call off a plan change that has not taken effect yet
-         * @description Only for a change scheduled for the end of the period, and only while it is still
-         *     pending. An immediate change has already happened by the time it is placed, and there is
-         *     nothing to call off.
-         *
-         *     Nothing was charged or returned when it was scheduled, so nothing moves here either. The
-         *     subscription keeps running on what it is on now, and the item is free to be changed again.
-         */
-        post: operations["cancel-scheduled-change"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get: operations["get-order"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/orders/{orderId}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/orders/{orderId}/items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * What an order is made up of
-         * @description One entry per item bought, with the price charged and the period it covers.
-         */
-        get: operations["list-order-items"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /**
+     * Call off a plan change that has not taken effect yet
+     * @description Only for a change scheduled for the end of the period, and only while it is still
+     *     pending. An immediate change has already happened by the time it is placed, and there is
+     *     nothing to call off.
+     *
+     *     Nothing was charged or returned when it was scheduled, so nothing moves here either. The
+     *     subscription keeps running on what it is on now, and the item is free to be changed again.
+     */
+    post: operations["cancel-scheduled-change"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/orders/{orderId}/items": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/orders/{orderId}/refund-quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * What refunding this order would give back
-         * @description Show this before asking for a refund. Nothing is recorded and nothing is reserved; the
-         *     answer follows from what has been paid and what has already been returned, so it may
-         *     be read as often as required.
-         *
-         *     `refundable_amount` is `"0"` once nothing is left, which is also the answer for an
-         *     order already refunded in full.
-         *
-         *     Refunding an order also ends what it bought and reclaims whatever it provisioned. That
-         *     is not reflected in the amounts here.
-         */
-        get: operations["get-order-refund-quote"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * What an order is made up of
+     * @description One entry per item bought, with the price charged and the period it covers.
+     */
+    get: operations["list-order-items"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/orders/{orderId}/refund-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/orders/{orderId}/items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        /** What an order is made up of */
-        get: operations["list-project-order-items"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * What refunding this order would give back
+     * @description Show this before asking for a refund. Nothing is recorded and nothing is reserved; the
+     *     answer follows from what has been paid and what has already been returned, so it may
+     *     be read as often as required.
+     *
+     *     `refundable_amount` is `"0"` once nothing is left, which is also the answer for an
+     *     order already refunded in full.
+     *
+     *     Refunding an order also ends what it bought and reclaims whatever it provisioned. That
+     *     is not reflected in the amounts here.
+     */
+    get: operations["get-order-refund-quote"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/orders/{orderId}/items": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/allowances": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * Quantities this project can draw on
-         * @description These belong to the paying account and are shared with every other project it pays for,
-         *     so what is left here may be consumed elsewhere.
-         */
-        get: operations["list-project-allowances"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** What an order is made up of */
+    get: operations["list-project-order-items"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/allowances": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "/account/v1/entitlements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * What your accounts can currently use
-         * @description Capabilities that come with what has been bought. A capability that is not held simply
-         *     does not appear, so that "this does not exist" and "this has not been bought" cannot be
-         *     confused.
-         *
-         *     Derived from live subscriptions rather than stored, so this always agrees with what is
-         *     being paid for. It stops being listed as soon as the subscription providing it ends.
-         */
-        get: operations["list-entitlements"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Quantities this project can draw on
+     * @description These belong to the paying account and are shared with every other project it pays for,
+     *     so what is left here may be consumed elsewhere.
+     */
+    get: operations["list-project-allowances"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/entitlements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/api/v1/projects/{projectId}/entitlements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * What this project can currently use
-         * @description Includes capabilities bought for this project and those the paying account holds at
-         *     account level.
-         *
-         *     Where a capability counts uses, `remaining_quantity` states how much is left. Whether
-         *     exceeding it refuses the request or simply continues to be charged for is decided by
-         *     the service that owns the capability.
-         */
-        get: operations["list-project-entitlements"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * What your accounts can currently use
+     * @description Capabilities that come with what has been bought. A capability that is not held simply
+     *     does not appear, so that "this does not exist" and "this has not been bought" cannot be
+     *     confused.
+     *
+     *     Derived from live subscriptions rather than stored, so this always agrees with what is
+     *     being paid for. It stops being listed as soon as the subscription providing it ends.
+     */
+    get: operations["list-entitlements"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/entitlements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
+    /**
+     * What this project can currently use
+     * @description Includes capabilities bought for this project and those the paying account holds at
+     *     account level.
+     *
+     *     Where a capability counts uses, `remaining_quantity` states how much is left. Whether
+     *     exceeding it refuses the request or simply continues to be charged for is decided by
+     *     the service that owns the capability.
+     */
+    get: operations["list-project-entitlements"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        Error: {
-            code?: string;
-            message: string;
-            /**
-             * @description What a given `code` carries alongside the message. The keys depend on the code,
-             *     and a client that does not recognise one ignores it.
-             */
-            meta?: {
-                [key: string]: unknown;
-            };
-            /** Format: int64 */
-            status: number;
-        };
-        /**
-         * @description Names in other languages, keyed by BCP 47 language tag. Where your locale is absent, use
-         *     the plain `name`; there is no fallback between related tags.
-         */
-        Translations: {
-            [key: string]: string;
-        };
-        /**
-         * @description A decimal string, in the currency stated alongside it.
-         * @example 10.2500000000
-         */
-        Money: string;
-        CatalogProduct: {
-            /** Format: uuid */
-            id: string;
-            lookup_key: string;
-            name: string;
-            name_translations?: components["schemas"]["Translations"];
-            description?: string;
-            description_translations?: components["schemas"]["Translations"];
-        };
-        CatalogProductList: {
-            items: components["schemas"]["CatalogProduct"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        CatalogPlan: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            product_id: string;
-            lookup_key: string;
-            name: string;
-            name_translations?: components["schemas"]["Translations"];
-            description?: string;
-            description_translations?: components["schemas"]["Translations"];
-        };
-        CatalogPlanList: {
-            items: components["schemas"]["CatalogPlan"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        CatalogPrice: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            plan_id: string;
-            currency: string;
-            /**
-             * @description `metered` charges for what is used, `prepaid` buys a period in advance, `one_time`
-             *     charges once.
-             * @enum {string}
-             */
-            type: "metered" | "prepaid" | "one_time";
-            /**
-             * @description How the amount is arrived at. `rated` means the rate depends on attributes such as
-             *     region or machine type, and is looked up on a price list.
-             * @enum {string}
-             */
-            billing_scheme: "per_unit" | "tiered" | "rated";
-            /** @description Present for `per_unit`. */
-            unit_amount?: components["schemas"]["Money"];
-            /**
-             * @description `none` for a price that is not tiered, which is most of them.
-             *
-             *     Otherwise `graduated` charges each band at its own rate, and `volume` charges
-             *     everything at the rate of the band the total falls in.
-             * @enum {string}
-             */
-            tiers_mode?: "none" | "graduated" | "volume";
-            /** @description Present for `tiered`, in ascending order. */
-            tiers?: components["schemas"]["Tier"][];
-            /**
-             * Format: uuid
-             * @description For `rated` prices, the price list the rates are read from.
-             */
-            rate_card_id?: string;
-            /**
-             * @description Quantities included when this price is bought — the traffic or requests that are
-             *     used before anything is charged for.
-             */
-            allowances?: components["schemas"]["IncludedAllowance"][];
-            /** @description Capabilities that buying this price makes available. */
-            features?: components["schemas"]["IncludedFeature"][];
-            /** @description For prepaid prices */
-            term?: number;
-            /** @enum {string} */
-            period?: "none" | "day" | "month" | "year";
-            setup_fee?: components["schemas"]["Money"];
-        };
-        CatalogPriceList: {
-            items: components["schemas"]["CatalogPrice"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        CatalogRate: {
-            /** @description What is being measured. */
-            meter_key: string;
-            /** @description The unit readings arrive in, such as `core-second`. */
-            unit?: string;
-            /** @description The attributes this rate applies to, such as region and machine type. */
-            dimensions: {
-                [key: string]: string;
-            };
-            /** @enum {string} */
-            pricing_model: "per_unit" | "graduated" | "volume";
-            /** @description Present for `per_unit`. Tiered rates carry their amounts on the tiers. */
-            unit_amount?: components["schemas"]["Money"];
-            /** @description Present for `graduated` and `volume`, in ascending order. */
-            tiers?: components["schemas"]["Tier"][];
-            /**
-             * @description How many measured units one amount covers. An hourly rate on a per-second meter is
-             *     `"3600"`.
-             */
-            unit_quantity?: string;
-            currency: string;
-            /** Format: date-time */
-            effective_from: string;
-            /** Format: date-time */
-            effective_to?: string | null;
-        };
-        CatalogRateList: {
-            items: components["schemas"]["CatalogRate"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        /**
-         * @description Identify what to price either by `price_id`, or by `product_key` together with
-         *     `service_product_id`. Supplying both, or neither, is refused.
-         */
-        QuoteLine: {
-            /** Format: uuid */
-            price_id?: string;
-            /** @description The service, such as `compute`. */
-            product_key?: string;
-            /** @description How the owning service identifies the item, such as a machine type. */
-            service_product_id?: string;
-            /**
-             * @description Required for a metered price whose price list covers more than one meter, so that
-             *     the intended one is unambiguous.
-             */
-            meter_key?: string;
-            /**
-             * @description The attributes the price depends on — region, instance type, token class.
-             *
-             *     Required when the price draws its rates from a price list, which is how anything
-             *     sold by region or by machine type is priced. A price that carries a single unit
-             *     amount, or a ladder, has no attributes to give and takes none.
-             *
-             *     Every attribute the meter declares must be present. A combination with no rate
-             *     covering it is refused rather than priced at zero.
-             */
-            dimensions?: {
-                [key: string]: string;
-            };
-            /**
-             * @description Which way of buying. Required when the item is sold in more than one way — the
-             *     same item may be offered metered, prepaid and as a one-off pack, and the pair
-             *     `product_key` + `service_product_id` names only the item, not the way.
-             *
-             *     Omit it when the item is sold one way only. If what is given matches no price, or
-             *     still leaves more than one candidate, the request is refused rather than resolved
-             *     by guessing.
-             * @enum {string}
-             */
-            price_type?: "metered" | "prepaid" | "one_time";
-            /**
-             * @description For prepaid items, such as `1_month` or `1_year`. Required when the item is offered
-             *     for more than one period.
-             */
-            billing_period?: string;
-            quantity: string;
-            /**
-             * Format: int64
-             * @description For metered items, how long to price for. This allows an estimate such as "about
-             *     this much per month" to be shown before anything exists.
-             */
-            duration_seconds?: number;
-        };
-        /**
-         * @description Price a change to something already running, rather than a new purchase.
-         *
-         *     The result states what is still owed for the period already paid for, what the new
-         *     configuration costs for the remainder, and the difference in either direction.
-         */
-        QuoteChange: {
-            /**
-             * Format: uuid
-             * @description What is being changed.
-             */
-            subscription_item_id: string;
-            /**
-             * Format: uuid
-             * @description The price to move to. Identify it here, or by `service_product_id` below. Supplying
-             *     both, or neither, is refused.
-             */
-            price_id?: string;
-            service_product_id?: string;
-            /** @description The new quantity. The current one is kept when omitted. */
-            quantity?: string;
-            /**
-             * Format: date-time
-             * @description When the change would take effect. Defaults to now. Charging is split at this
-             *     moment: before it at the old configuration, after it at the new one.
-             */
-            effective_at?: string;
-        };
-        /**
-         * @description Give `lines` to price new purchases, or `changes` to price alterations to what is
-         *     already running. Both may appear in one request; the total covers everything.
-         */
-        QuoteRequest: {
-            lines?: components["schemas"]["QuoteLine"][];
-            changes?: components["schemas"]["QuoteChange"][];
-        };
-        EstimateRequest: {
-            /** @description Must be one the catalogue publishes. */
-            currency: string;
-            lines: components["schemas"]["QuoteLine"][];
-        };
-        QuoteLineResult: {
-            /** @description Which line of the request this answers. */
-            index: number;
-            /**
-             * @description Whether a price was found for this line. Read this before anything else.
-             *
-             *     A single item with no price no longer fails the whole request. A catalogue
-             *     almost always has something not yet priced, and refusing the request would
-             *     leave no way to render a list in which a few entries are simply not on sale.
-             *
-             *     When false, `price_id`, `unit_amount` and `amount` are absent and
-             *     `unpriced_reason` states what is missing.
-             */
-            priced: boolean;
-            /**
-             * @description Why no price was found; `none` while `priced` is true.
-             *
-             *     The last four are told apart because their remedies differ: the price points
-             *     at no price list, the list holds no rate for that meter, that exact combination
-             *     of attributes is not configured, or it is configured but nothing is in effect
-             *     at the moment asked about.
-             * @enum {string}
-             */
-            unpriced_reason?: "none" | "no_price" | "no_rate_card" | "no_meter" | "no_dimensions" | "no_effective_rule";
-            /**
-             * Format: uuid
-             * @description The price selected. Returned whenever `priced` is true, including when the
-             *     request identified the item indirectly, so that the choice can be confirmed.
-             */
-            price_id?: string;
-            plan_name?: string;
-            unit_amount?: components["schemas"]["Money"];
-            quantity?: string;
-            /** @description Not rounded. Round only for display. */
-            amount?: components["schemas"]["Money"];
-            currency: string;
-        };
-        QuoteChangeResult: {
-            index: number;
-            /** Format: uuid */
-            subscription_item_id: string;
-            /**
-             * Format: uuid
-             * @description The price that would apply. Always returned.
-             */
-            price_id: string;
-            plan_name?: string;
-            /**
-             * @description What remains unused of the period already paid for, valued at the price it was
-             *     bought at rather than at today's price.
-             */
-            unused_credit?: components["schemas"]["Money"];
-            /** @description What the new configuration costs for the rest of that period. */
-            new_charge?: components["schemas"]["Money"];
-            /**
-             * @description What would be owed. Zero when the change reduces the price; the difference then
-             *     appears in `refundable_amount`.
-             */
-            payable_now: components["schemas"]["Money"];
-            /**
-             * @description What would be returned. It goes back to the sources that originally paid rather
-             *     than being offset against `payable_now`, so that a purchase made with credit is
-             *     refunded as credit.
-             */
-            refundable_amount: components["schemas"]["Money"];
-            /**
-             * Format: date-time
-             * @description When the current period ends. A change does not move it; the next renewal is
-             *     charged at the new price.
-             */
-            period_end?: string;
-            currency: string;
-        };
-        Quote: {
-            lines?: components["schemas"]["QuoteLineResult"][];
-            changes?: components["schemas"]["QuoteChangeResult"][];
-            /**
-             * @description What would be owed in total. Amounts to be returned are not netted off it.
-             *
-             *     Null when any line could not be priced. What would be owed is not knowable then, and a
-             *     total that silently left the unpriced lines out would read as a smaller bill rather than
-             *     an incomplete one — the per-line `priced` flag is easy to skip, a missing total is not.
-             */
-            total?: components["schemas"]["Money"] | null;
-            /** @description What would be returned in total. */
-            total_refundable?: components["schemas"]["Money"];
-            currency: string;
-        };
-        BillingAccount: {
-            /** Format: int64 */
-            id: number;
-            /** @description What you call this account. */
-            name?: string;
-            /** @description The name invoices are made out to. Copied onto each invoice when it is issued. */
-            legal_name?: string;
-            /** @description Where invoices are sent. */
-            email?: string;
-            address_line1?: string;
-            address_line2?: string;
-            address_city?: string;
-            address_state?: string;
-            address_postal_code?: string;
-            /** @description Two-letter code. */
-            address_country?: string;
-            tax_id?: string;
-            /** @description Fixed when the account was opened. */
-            currency: string;
-            /** @enum {string} */
-            status: "active" | "suspended" | "closed";
-            /**
-             * @description How far past the suspension threshold this account may go before its resources are
-             *     suspended. "0" means none: the account is suspended as soon as it crosses the threshold.
-             */
-            grace_amount?: string;
-            /**
-             * Format: int64
-             * @description How long this account has to top up after crossing the suspension threshold.
-             *     0 means none. Whichever runs out first — this or grace_amount — ends the grace.
-             */
-            grace_period_seconds?: number;
-            /** Format: date-time */
-            created_at: string;
-        };
-        BillingAccountCreate: {
-            currency: string;
-            name?: string;
-            legal_name?: string;
-            email?: string;
-        };
-        BillingAccountUpdate: {
-            name?: string;
-            legal_name?: string;
-            email?: string;
-            address_line1?: string;
-            address_line2?: string;
-            address_city?: string;
-            address_state?: string;
-            address_postal_code?: string;
-            address_country?: string;
-            tax_id?: string;
-        };
-        BillingAccountList: {
-            items: components["schemas"]["BillingAccount"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        AccountBalance: {
-            /** Format: int64 */
-            billing_account_id: number;
-            currency: string;
-            /** @description Funds paid in and not yet spent. This is the part that can be refunded. */
-            cash: components["schemas"]["Money"];
-            /** @description Reserved by orders that have not completed. */
-            held: components["schemas"]["Money"];
-            /**
-             * @description Metered usage priced this month but not yet invoiced. It is already committed even
-             *     though no invoice exists for it yet.
-             */
-            accrued: components["schemas"]["Money"];
-            /** @description Granted credit. Spendable, but not withdrawable. */
-            credit: components["schemas"]["Money"];
-            /** @description Voucher balance, spendable within each voucher's own scope. */
-            voucher: components["schemas"]["Money"];
-            /**
-             * @description `cash` less `accrued` and `held` — what is actually available at checkout. It goes
-             *     negative when usage has exceeded the balance. Credit and vouchers are shown
-             *     separately because each can only pay for what it covers.
-             */
-            spendable: components["schemas"]["Money"];
-        };
-        ProjectBinding: {
-            /** Format: uuid */
-            project_id: string;
-            /** Format: int64 */
-            billing_account_id: number;
-            account_name?: string;
-            currency: string;
-            /** Format: date-time */
-            effective_from: string;
-            /** Format: date-time */
-            effective_to?: string | null;
-        };
-        ProjectBindingList: {
-            items: components["schemas"]["ProjectBinding"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        ProjectPayerSet: {
-            /** Format: int64 */
-            billing_account_id: number;
-        };
-        /**
-         * @description A narrow view of the paying account, restricted to what a project member needs in order
-         *     to know whether the project's resources will keep running.
-         */
-        ProjectPayer: {
-            /**
-             * Format: int64
-             * @description Identifies the payer. Use it to link into the billing centre.
-             */
-            billing_account_id: number;
-            name: string;
-            /**
-             * @description Everything this project is charged is in this currency, and it cannot change while
-             *     the account exists.
-             */
-            currency: string;
-            /**
-             * @description What remains to be spent. It already accounts for this month's uninvoiced usage, so
-             *     it is what will be available at checkout rather than the cash figure shown in the
-             *     billing centre. It goes negative when usage has exceeded the balance.
-             */
-            spendable_amount: components["schemas"]["Money"];
-            /**
-             * @description `active` — nothing is owed. `past_due` — the account owes money and resources are
-             *     still running. `suspended` — resources have been stopped for non-payment.
-             * @enum {string}
-             */
-            status: "active" | "past_due" | "suspended";
-            /**
-             * Format: date-time
-             * @description When this project's resources will be stopped unless the account is topped up.
-             *     Absent while `status` is `active`.
-             */
-            suspends_at?: string | null;
-        };
-        SettleResult: {
-            /** Format: uuid */
-            invoice_id?: string | null;
-            /** @description Zero when there was nothing outstanding, in which case no invoice is created. */
-            invoiced_amount: components["schemas"]["Money"];
-            currency: string;
-        };
-        TopUp: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int64 */
-            billing_account_id: number;
-            /** @description What is credited to the account, in the account's own currency. */
-            amount: components["schemas"]["Money"];
-            currency: string;
-            /**
-             * @description How much of this top-up has not been spent yet. This is the part that can still be
-             *     returned to where it was paid from.
-             */
-            remaining_amount?: components["schemas"]["Money"];
-            /**
-             * @description `pending` until the payment provider confirms. The balance increases on `succeeded`.
-             *
-             *     A checkout the payer abandoned ends up `failed` too, with `failure_reason` saying
-             *     so. Nothing was charged in that case.
-             * @enum {string}
-             */
-            status: "pending" | "succeeded" | "failed";
-            /** @description Which payment provider collected it. */
-            provider?: string;
-            /**
-             * @description The currency the payer was actually charged in, when the checkout page collected a
-             *     local one. Absent when it was the same as the account's.
-             */
-            presentment_currency?: string;
-            /**
-             * @description What was charged, in `presentment_currency`. It will not equal `amount`, and it is
-             *     the figure that appears on the payer's card or wallet statement.
-             */
-            presentment_amount?: components["schemas"]["Money"];
-            /** @description Why it did not go through. Present with `failed`. */
-            failure_reason?: string;
-            /** @description Where the payer completes the payment. Absent once it has completed. */
-            checkout_url?: string;
-            /** Format: date-time */
-            created_at: string;
-            /**
-             * Format: date-time
-             * @description When the funds arrived. Later than `created_at` — by days for a bank transfer — so
-             *     reconciling against a statement uses this rather than the moment it was started.
-             *     Absent until the payment completes.
-             */
-            settled_at?: string | null;
-        };
-        TopUpCreate: {
-            /** Format: int64 */
-            billing_account_id: number;
-            /**
-             * @description In the account's currency, and no finer than that currency's smallest unit:
-             *     two decimals for most, none for the yen. A finer amount is refused here rather
-             *     than at the checkout page, where the payer would see the provider's own wording
-             *     instead of an explanation.
-             *
-             *     There is a minimum, which differs by currency. Below it the provider's fee
-             *     exceeds the top-up itself, so such a payment costs more to accept than it brings.
-             *     The minimum in force is returned with the rejection.
-             */
-            amount: components["schemas"]["Money"];
-            /**
-             * Format: uuid
-             * @description Charge a saved method instead of opening a checkout page.
-             */
-            payment_method_id?: string;
-            /** @description Where to send the payer after checkout. */
-            return_url?: string;
-            /**
-             * @description Retrying with the same key returns the original top-up rather than starting a
-             *     second one.
-             */
-            idempotency_key: string;
-        };
-        TopUpList: {
-            items: components["schemas"]["TopUp"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        PaymentMethod: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int64 */
-            billing_account_id: number;
-            provider: string;
-            brand?: string;
-            last4?: string;
-            exp_month?: number | null;
-            exp_year?: number | null;
-            is_default: boolean;
-            /** @enum {string} */
-            status: "active" | "expired" | "removed";
-        };
-        PaymentMethodList: {
-            items: components["schemas"]["PaymentMethod"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        PaymentMethodSetup: {
-            /** Format: int64 */
-            billing_account_id: number;
-            return_url?: string;
-        };
-        /**
-         * @description What the payment provider's browser library needs in order to collect a card. There is
-         *     no address to redirect to: the form is rendered in the page, and the card goes straight
-         *     from the browser to the provider.
-         */
-        PaymentMethodSetupResult: {
-            /**
-             * @description The provider's identifier for this attempt. Use it to tell a reloaded page apart
-             *     from a second attempt.
-             */
-            setup_id: string;
-            /**
-             * @description Authorises this one attempt with the provider, and nothing else. Pass it to the
-             *     provider's library; it is not an API credential and grants no access here.
-             */
-            client_secret: string;
-            /**
-             * @description The provider's public key to initialise its library with. It differs between test
-             *     and live, so read it from here rather than compiling it in.
-             */
-            publishable_key: string;
-            /** Format: date-time */
-            expires_at?: string;
-        };
-        /**
-         * @description Safe to call again. While an attempt is still with the payment provider, calling this
-         *     returns that attempt rather than starting a second one, so a customer who reloads the
-         *     page is not charged twice.
-         *
-         *     A new attempt is started only once the previous one has failed.
-         */
-        PayRequest: {
-            /**
-             * Format: uuid
-             * @description Which method to charge the remainder to. The default is used when omitted.
-             */
-            payment_method_id?: string;
-            /**
-             * @description Whether to apply the account balance first. Set it to `false` to charge the full
-             *     amount to a payment method.
-             * @default true
-             */
-            use_balance?: boolean;
-            return_url?: string;
-        };
-        /**
-         * @description Name at least one invoice or order. They must all belong to the same account and share
-         *     its currency; anything else is refused rather than partly paid.
-         */
-        PayTogetherRequest: {
-            invoice_ids?: string[];
-            order_ids?: string[];
-            return_url?: string;
-            /**
-             * @description Required when the provider is involved, because that is where the money moves. The
-             *     same key returns the same checkout address instead of opening a second one.
-             */
-            idempotency_key?: string;
-        };
-        /**
-         * @description Where the payment has got to.
-         *
-         *     `succeeded` — collected in full. Nothing further is owed.
-         *
-         *     `processing` — submitted to the payment provider and awaiting its answer. **Do not
-         *     submit it again**; poll the invoice or order, or wait to be notified. Some methods take
-         *     minutes and a few take days.
-         *
-         *     `requires_action` — the payer has to finish it at `checkout_url`, typically by
-         *     confirming with their bank. It becomes `processing` once they do.
-         *
-         *     `failed` — this attempt did not go through. `failure_reason` says why, and paying again
-         *     starts a fresh attempt.
-         *
-         *     The provider's own answer is what decides: an attempt is only `succeeded` once the
-         *     provider says so, never because this call returned.
-         * @enum {string}
-         */
-        PaymentStatus: "succeeded" | "processing" | "requires_action" | "failed";
-        PaymentResult: {
-            /**
-             * Format: uuid
-             * @description This attempt. The same identifier comes back while it is still in flight, which is
-             *     how a repeated call is told apart from a genuine second payment.
-             */
-            payment_attempt_id: string;
-            status: components["schemas"]["PaymentStatus"];
-            amount_paid: components["schemas"]["Money"];
-            /**
-             * @description What is still outstanding. Zero once the payment succeeds. Unchanged while
-             *     `processing`: nothing is collected until the provider confirms it.
-             */
-            amount_due: components["schemas"]["Money"];
-            currency: string;
-            /**
-             * @description How much came from the account balance. Applied immediately, and released again if
-             *     the rest of the payment fails, so a failed card does not leave part of the balance
-             *     consumed against an unpaid invoice.
-             */
-            balance_applied?: components["schemas"]["Money"];
-            /** @description Present with `requires_action`. */
-            checkout_url?: string;
-            /**
-             * @description Whether paying again is worth attempting. False for a refusal that will keep
-             *     happening — a closed account, an amount over a limit — so that a client does not
-             *     retry in a loop.
-             */
-            retriable?: boolean;
-            /**
-             * Format: date-time
-             * @description The earliest sensible moment to try again. Present when the provider asked for a
-             *     wait.
-             */
-            retry_after?: string | null;
-            /** Format: uuid */
-            invoice_id?: string | null;
-            /** Format: uuid */
-            order_id?: string | null;
-            failure_reason?: string;
-        };
-        /** @enum {string} */
-        InvoiceStatus: "draft" | "open" | "paid" | "void" | "uncollectible";
-        Invoice: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int64 */
-            billing_account_id: number;
-            /** @description Numbered per account and per month. */
-            number: string;
-            /**
-             * @description What produced it — metered usage for a period, a purchase, or a correction.
-             * @enum {string}
-             */
-            type?: "usage" | "order" | "adjustment";
-            currency: string;
-            status: components["schemas"]["InvoiceStatus"];
-            subtotal?: components["schemas"]["Money"];
-            discount_amount?: components["schemas"]["Money"];
-            tax_amount?: components["schemas"]["Money"];
-            /** @description Paid from credit or a voucher. */
-            credit_applied?: components["schemas"]["Money"];
-            /** @description Subtotal less discount, plus tax, less credit applied. */
-            total: components["schemas"]["Money"];
-            amount_paid?: components["schemas"]["Money"];
-            /** Format: date-time */
-            period_start: string;
-            /**
-             * Format: date-time
-             * @description Exclusive.
-             */
-            period_end: string;
-            /**
-             * @description Who this was billed to, as recorded when the invoice was issued. Later changes to
-             *     the account do not alter it.
-             */
-            customer_name?: string;
-            customer_email?: string;
-            customer_tax_id?: string;
-            customer_address_line1?: string;
-            customer_address_line2?: string;
-            customer_address_city?: string;
-            customer_address_state?: string;
-            customer_address_postal_code?: string;
-            customer_address_country?: string;
-            /** Format: date-time */
-            paid_at?: string | null;
-        };
-        InvoiceList: {
-            items: components["schemas"]["Invoice"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        InvoiceItem: {
-            /** Format: uuid */
-            id: string;
-            /** @enum {string} */
-            type?: "usage" | "subscription" | "one_time" | "adjustment" | "credit";
-            /** Format: uuid */
-            project_id?: string | null;
-            resource_id?: string;
-            /**
-             * @description The wording as recorded when the invoice was issued. It is not re-translated
-             *     afterwards, so that an invoice continues to read as it did when it was sent.
-             */
-            description: string;
-            unit?: string;
-            quantity?: string;
-            /** @description The part covered by an included allowance, and therefore not charged. */
-            deducted_quantity?: string;
-            unit_amount?: components["schemas"]["Money"];
-            amount: components["schemas"]["Money"];
-            currency: string;
-            /** Format: date-time */
-            period_start?: string | null;
-            /** Format: date-time */
-            period_end?: string | null;
-        };
-        InvoiceItemList: {
-            items: components["schemas"]["InvoiceItem"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        /**
-         * @description What moved the money. These are the events that change the account's cash balance.
-         *
-         *     Charges for usage and amounts reserved by orders are not here: usage appears among the
-         *     charges and on invoices, and a reservation appears as an allocation.
-         * @enum {string}
-         */
-        TransactionType: "topup" | "refund" | "payout" | "adjustment";
-        Transaction: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int64 */
-            billing_account_id?: number;
-            type: components["schemas"]["TransactionType"];
-            /** @description Signed. Positive increases the balance, negative reduces it. */
-            amount: components["schemas"]["Money"];
-            currency: string;
-            /** @description Why */
-            reason?: string;
-            /** Format: uuid */
-            invoice_id?: string | null;
-            /** Format: uuid */
-            order_id?: string | null;
-            /**
-             * @description `pending` is a payment still with the provider. Only one may be pending against any
-             *     one invoice or order.
-             *
-             *     `failed` covers a payment the provider refused and one the payer walked away from
-             *     alike; `failure_reason` says which. There is no separate cancelled state, because
-             *     what to do next is the same either way — start a new one.
-             * @enum {string}
-             */
-            status: "pending" | "succeeded" | "failed";
-            /** Format: date-time */
-            created_at: string;
-        };
-        TransactionList: {
-            items: components["schemas"]["Transaction"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        CreditGrant: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int64 */
-            billing_account_id?: number;
-            /**
-             * @description Where it came from. `voucher` was redeemed from a code and carries its own
-             *     restrictions; `manual` was issued directly, typically to put something right.
-             * @enum {string}
-             */
-            source_type?: "promotion" | "voucher" | "manual" | "membership";
-            name: string;
-            amount: components["schemas"]["Money"];
-            remaining_amount: components["schemas"]["Money"];
-            currency: string;
-            /** @description What this credit may pay for. No restrictions means anything on the account. */
-            applies_to?: components["schemas"]["Applicability"];
-            /** @description The restrictions in one sentence, ready to display. */
-            applies_to_summary?: string;
-            /** @enum {string} */
-            status: "active" | "depleted" | "expired" | "voided";
-            /** Format: date-time */
-            valid_from: string;
-            /** Format: date-time */
-            valid_until?: string | null;
-        };
-        CreditGrantList: {
-            items: components["schemas"]["CreditGrant"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        Allocation: {
-            /** Format: uuid */
-            id: string;
-            /** @enum {string} */
-            source_type: "transaction" | "credit_grant";
-            /** Format: uuid */
-            source_id: string;
-            /** @enum {string} */
-            target_type: "hold" | "order_item" | "invoice_item";
-            /** Format: uuid */
-            target_id: string;
-            amount: components["schemas"]["Money"];
-            currency: string;
-            /** Format: date-time */
-            allocated_at: string;
-            /** Format: date-time */
-            reversed_at?: string | null;
-        };
-        AllocationList: {
-            items: components["schemas"]["Allocation"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        /**
-         * @description Name exactly one of the three targets. Naming none leaves the amount undecided;
-         *     naming two leaves it ambiguous, and both would have to be resolved by guessing.
-         */
-        RefundRequest: {
-            /** Format: uuid */
-            invoice_id?: string;
-            /** Format: uuid */
-            order_id?: string;
-            /**
-             * Format: uuid
-             * @description The period to end early. Use this to give back a prepaid term that still has
-             *     time left on it.
-             */
-            subscription_period_id?: string;
-            /**
-             * @description How much to give back. Absent asks for everything still refundable on the target.
-             *
-             *     More than what remains is refused rather than reduced to the remainder: a caller
-             *     asking for more than it can have has miscounted, and quietly giving it less
-             *     hides that.
-             */
-            amount?: components["schemas"]["Money"];
-            reason: string;
-            idempotency_key: string;
-        };
-        Refund: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int64 */
-            billing_account_id?: number;
-            /** Format: uuid */
-            invoice_id?: string | null;
-            /** Format: uuid */
-            order_id?: string | null;
-            requested_amount: components["schemas"]["Money"];
-            /** @description What has actually been returned. */
-            settled_amount?: components["schemas"]["Money"];
-            /**
-             * @description Withheld from what reaches the payer. It applies only to cash returned to a payment
-             *     method, so it is zero when `destination` is `balance`, and it is never taken out of
-             *     credit or a voucher.
-             *
-             *     `settled_amount` is the amount put back against what was paid; the payer receives
-             *     that less this.
-             */
-            fee_amount?: components["schemas"]["Money"];
-            currency: string;
-            /**
-             * @description Where the cash went.
-             * @enum {string}
-             */
-            destination?: "balance" | "provider";
-            /**
-             * @description `pending` — accepted, not yet sent to the payment provider. `processing` — with the
-             *     provider and awaiting its answer, which takes days for some methods. Neither is
-             *     final, and neither means the money has moved.
-             * @enum {string}
-             */
-            status: "pending" | "processing" | "succeeded" | "failed";
-            reason?: string;
-            /** Format: date-time */
-            created_at: string;
-        };
-        RefundList: {
-            items: components["schemas"]["Refund"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        RefundSource: {
-            /**
-             * @description Where this part of the money came from, and therefore where it goes back to.
-             *     Only `cash` can reach a card or a spendable balance; credit and vouchers return
-             *     to themselves and never become cash.
-             * @enum {string}
-             */
-            type: "cash" | "credit" | "voucher";
-            amount: components["schemas"]["Money"];
-        };
-        /** @description What a full refund would return, and where each part of it would go. */
-        RefundQuote: {
-            /** @description The most that can still be returned, before any fee. */
-            refundable_amount: components["schemas"]["Money"];
-            /**
-             * @description Withheld from the cash part. Zero when `destination` is `balance`, and never taken
-             *     out of credit or a voucher.
-             */
-            fee_amount: components["schemas"]["Money"];
-            /** @description `refundable_amount` less `fee_amount`. */
-            net_amount: components["schemas"]["Money"];
-            currency: string;
-            /**
-             * @description Where the cash part would go. `provider` returns it to the method it was paid
-             *     with; `balance` credits the account instead, which is the answer whenever the cash
-             *     came from more than one place or never went through a provider at all.
-             * @enum {string}
-             */
-            destination: "balance" | "provider";
-            /**
-             * @description How `refundable_amount` splits by where the money came from. The amounts sum to it.
-             *
-             *     Show this rather than a single figure. A part returned as credit or as a voucher
-             *     does not appear on a card statement, so a customer told only the net amount will
-             *     ask why less than that arrived.
-             */
-            sources: components["schemas"]["RefundSource"][];
-            /**
-             * Format: date-time
-             * @description The last moment a refund can be asked for here. Measured from when the purchase was
-             *     paid for, not from today. Absent when this cannot be refunded without support at
-             *     all — metered usage, for one, which is never self-service.
-             */
-            self_service_until?: string | null;
-        };
-        UsageCharge: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            project_id?: string;
-            product_key: string;
-            /** @description Which resource this was charged for. Empty for charges not tied to one. */
-            resource_id?: string;
-            /** @description What was measured, such as `instance_seconds`. */
-            meter_key: string;
-            unit?: string;
-            /** @description The attributes the rate was chosen by, such as region and machine type. */
-            dimensions?: {
-                [key: string]: string;
-            };
-            /** Format: date-time */
-            window_start: string;
-            /**
-             * Format: date-time
-             * @description Exclusive.
-             */
-            window_end: string;
-            /** @description How much was used, before any included allowance. */
-            gross_quantity?: string;
-            /** @description How much of that was covered by an allowance. */
-            deducted_quantity?: string;
-            /** @description What was charged for — the gross quantity less the part covered. */
-            quantity: string;
-            unit_amount?: components["schemas"]["Money"];
-            amount?: components["schemas"]["Money"];
-            currency: string;
-            /**
-             * Format: uuid
-             * @description Absent until the period is invoiced.
-             */
-            invoice_id?: string | null;
-        };
-        UsageChargeList: {
-            items: components["schemas"]["UsageCharge"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        SpendRow: {
-            product_key?: string;
-            /** Format: uuid */
-            plan_id?: string;
-            plan_name?: string;
-            /** @description Present only when grouped by resource. */
-            resource_id?: string;
-            amount: components["schemas"]["Money"];
-            currency: string;
-        };
-        SpendRowList: {
-            items: components["schemas"]["SpendRow"][];
-            /** @description The sum over the whole period, not only the page returned. */
-            total: components["schemas"]["Money"];
-            currency: string;
-            /** Format: int64 */
-            total_count?: number;
-        };
-        Subscription: {
-            /** Format: uuid */
-            id: string;
-            /**
-             * Format: uuid
-             * @description Which project this is for. Absent when it was bought at account level, such as a
-             *     membership, which belongs to no single project.
-             */
-            project_id?: string | null;
-            /** Format: int64 */
-            billing_account_id?: number;
-            /** Format: uuid */
-            product_id: string;
-            product_key?: string;
-            /**
-             * @description `pending` is a subscription created by an order that has not completed, so it
-             *     appears in the list before anything under it is running.
-             * @enum {string}
-             */
-            status: "pending" | "active" | "suspended" | "canceled" | "terminated";
-            /** Format: int64 */
-            item_count?: number;
-        };
-        SubscriptionList: {
-            items: components["schemas"]["Subscription"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        SubscriptionItem: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            subscription_id?: string;
-            /**
-             * Format: uuid
-             * @description Which project this is for. Absent when it was bought at account level, such as a
-             *     membership, which belongs to no single project.
-             */
-            project_id?: string | null;
-            product_key?: string;
-            /** Format: uuid */
-            plan_id: string;
-            plan_name?: string;
-            /** Format: uuid */
-            price_id: string;
-            resource_id?: string;
-            quantity: string;
-            /**
-             * Format: date-time
-             * @description Present for prepaid items. Absent for metered ones, which have no end date.
-             */
-            paid_until?: string | null;
-            auto_renew?: boolean;
-            /** @enum {string} */
-            status: "pending" | "active" | "suspended" | "canceled" | "terminated";
-            /** Format: date-time */
-            started_at?: string | null;
-            /** Format: date-time */
-            ended_at?: string | null;
-        };
-        SubscriptionItemList: {
-            items: components["schemas"]["SubscriptionItem"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        RenewRequest: {
-            /**
-             * @description How many further periods to buy.
-             * @default 1
-             */
-            periods?: number;
-            /** Format: uuid */
-            payment_method_id?: string;
-            /** @default true */
-            use_balance?: boolean;
-            return_url?: string;
-            idempotency_key: string;
-        };
-        AutoRenewSet: {
-            auto_renew: boolean;
-        };
-        /** @description A resource currently accruing charges by the second. */
-        ActiveResource: {
-            resource_id: string;
-            product_key: string;
-            /** @description What it is */
-            resource_type?: string;
-            meter_key: string;
-            unit?: string;
-            /** @description How much is held — cores, MiB, cards. Not how much has been used. */
-            quantity: string;
-            dimensions?: {
-                [key: string]: string;
-            };
-            /** @enum {string} */
-            status: "active" | "suspended";
-            /** Format: date-time */
-            started_at: string;
-            /**
-             * Format: date-time
-             * @description Charges are settled up to this moment.
-             */
-            last_billed_until?: string;
-        };
-        ActiveResourceList: {
-            items: components["schemas"]["ActiveResource"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        /** @enum {string} */
-        OrderState: "pending" | "paid" | "fulfilled" | "failed" | "canceled";
-        Order: {
-            /** Format: uuid */
-            id: string;
-            /**
-             * Format: uuid
-             * @description Which project it was bought for. Absent for a purchase made at account level, such
-             *     as a membership.
-             */
-            project_id?: string | null;
-            /** Format: int64 */
-            billing_account_id?: number;
-            currency: string;
-            /** @enum {string} */
-            type: "purchase" | "renew" | "change";
-            state: components["schemas"]["OrderState"];
-            gross_amount?: components["schemas"]["Money"];
-            discount_amount?: components["schemas"]["Money"];
-            amount: components["schemas"]["Money"];
-            /** @description What is still outstanding. Zero once paid. */
-            amount_due?: components["schemas"]["Money"];
-            /** @description How much of `refundable_amount` has already gone back. */
-            refunded_amount?: components["schemas"]["Money"];
-            /**
-             * @description When a plan change takes effect. `none` on anything that is not a change.
-             *
-             *     `period_end` orders stay pending until the current paid period runs out. Renewing in
-             *     the meantime moves that moment along with it.
-             * @enum {string}
-             */
-            change_effective?: "none" | "immediate" | "period_end";
-            /**
-             * @description What a downgrade gives back. It is returned to the sources that originally paid
-             *     rather than deducted from `amount`, so paying with granted credit gives back credit.
-             *
-             *     Always "0" on a `period_end` change: nothing is left of the period at its end.
-             */
-            refundable_amount?: components["schemas"]["Money"];
-            /**
-             * Format: date-time
-             * @description When the funds and any stock held for this order are released. After this it can no
-             *     longer be paid and has to be placed again. Absent once the order is settled.
-             */
-            reservation_expires_at?: string | null;
-            /** Format: date-time */
-            created_at: string;
-            /**
-             * @description What was bought. Present on a single order and on every order in a list, so a list
-             *     can be rendered without a further request per row.
-             */
-            items?: components["schemas"]["OrderItem"][];
-        };
-        OrderList: {
-            items: components["schemas"]["Order"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        /**
-         * @description Give a purchase — `lines`, `changes` or `renewal_of` — to find out whether the code
-         *     applies to it and what it would take off. Without one the reply describes the code's
-         *     own terms but cannot say whether it applies, because most codes are restricted to
-         *     certain items or purchase actions.
-         *
-         *     The purchase action is worked out from what is given rather than taken on trust: a
-         *     change is an upgrade or a downgrade according to what it costs for the remainder of
-         *     the period.
-         */
-        CodeRequest: {
-            /** Format: int64 */
-            billing_account_id: number;
-            code: string;
-            /**
-             * Format: uuid
-             * @description The project the purchase would be for.
-             */
-            project_id?: string;
-            /** @description New purchases to test against, in the same shape as a quote. */
-            lines?: components["schemas"]["QuoteLine"][];
-            /**
-             * @description Changes to existing subscriptions to test against, in the same shape as a quote.
-             *
-             *     Give these rather than declaring an operation: whether a change counts as an
-             *     upgrade or a downgrade follows from what it costs, which cannot be determined
-             *     without the subscription item and the moment it takes effect.
-             */
-            changes?: components["schemas"]["QuoteChange"][];
-            /** @description Subscription items being renewed, when testing a renewal. */
-            renewal_of?: string[];
-        };
-        CodePreview: {
-            /**
-             * @description Whether the code itself is usable — it exists, has not expired, has not been used
-             *     up, and matches the account's currency. It says nothing about a particular
-             *     purchase; `applicable` does.
-             */
-            valid: boolean;
-            reason?: components["schemas"]["CodeRejection"];
-            /** @enum {string} */
-            type: "voucher" | "discount";
-            name?: string;
-            /** @description For a voucher, the amount it adds. */
-            amount?: components["schemas"]["Money"];
-            /** @description For a percentage discount. */
-            percent_off?: string;
-            max_discount?: components["schemas"]["Money"];
-            currency?: string;
-            /**
-             * @description What it may be used for. Present whether or not a purchase was given, so that the
-             *     terms can be shown before anything is chosen.
-             */
-            applies_to?: components["schemas"]["Applicability"];
-            /**
-             * @description The terms in one sentence, ready to display — for example "Compute, new purchases
-             *     only, from 100.00" or "No restriction on product or purchase type".
-             */
-            summary?: string;
-            /** Format: date-time */
-            valid_until?: string | null;
-            /**
-             * @description Whether it applies to the purchase given in `lines`. Absent when no purchase was
-             *     given.
-             */
-            applicable?: boolean;
-            applicable_reason?: components["schemas"]["CodeRejection"];
-            /**
-             * @description The total of the lines that match the restrictions. This is what the threshold is
-             *     measured against, not the order total.
-             */
-            qualifying_amount?: components["schemas"]["Money"];
-            /**
-             * @description How much more of a qualifying purchase is needed to reach the threshold. `"0"` once
-             *     it is met.
-             */
-            shortfall?: components["schemas"]["Money"];
-            /**
-             * @description What it would take off this purchase. An estimate: the amount is settled at the
-             *     moment the order is placed.
-             */
-            estimated_discount?: components["schemas"]["Money"];
-        };
-        /**
-         * @description Why a code cannot be used. `none` when it can.
-         *
-         *     `operation_not_covered` means the code is limited to certain purchase actions — a
-         *     first-purchase code presented for a renewal, for example.
-         *
-         *     `below_minimum` is accompanied by `shortfall`.
-         * @enum {string}
-         */
-        CodeRejection: "none" | "not_found" | "expired" | "not_yet_valid" | "exhausted" | "already_redeemed" | "currency_mismatch" | "product_not_covered" | "plan_not_covered" | "price_type_not_covered" | "operation_not_covered" | "not_first_purchase" | "below_minimum";
-        /**
-         * @description Which purchase this applies to. `upgrade` and `downgrade` are told apart by money: a change
-         *     that costs more for the remainder of the period is an upgrade, one that returns money
-         *     is a downgrade. A change that costs neither more nor less is neither.
-         *
-         *     `new` means a new purchase as opposed to a renewal or a change. It does not mean the
-         *     account's first purchase.
-         * @enum {string}
-         */
-        PurchaseOperation: "purchase" | "renew" | "upgrade" | "downgrade";
-        /**
-         * @description What something may be used for. A field that is absent places no restriction on that
-         *     dimension; all of them absent means no restriction at all.
-         *
-         *     A line qualifies when it satisfies every field that is set. `min_amount` is then
-         *     measured against **the qualifying lines only**, not the order total.
-         */
-        Applicability: {
-            product_keys?: string[];
-            plan_keys?: string[];
-            price_types?: string[];
-            operations?: components["schemas"]["PurchaseOperation"][];
-            /** @description Restricted to your first purchase of a covered product. */
-            first_purchase_only?: boolean;
-            min_amount?: components["schemas"]["Money"];
-        };
-        CodeRedeem: {
-            /** Format: int64 */
-            billing_account_id: number;
-            code: string;
-            idempotency_key: string;
-        };
-        CodeRedeemResult: {
-            /** @enum {string} */
-            type: "voucher" | "discount";
-            /**
-             * Format: uuid
-             * @description For a voucher, the credit that was added.
-             */
-            credit_grant_id?: string | null;
-            amount?: components["schemas"]["Money"];
-            currency?: string;
-            /**
-             * @description For a discount, what will happen — it is applied to the next qualifying purchase
-             *     rather than added to the balance.
-             */
-            message?: string;
-        };
-        Tier: {
-            /** @description The upper bound of this band. Null on the last band, which has no bound. */
-            up_to?: string | null;
-            unit_amount: components["schemas"]["Money"];
-            /** @description Charged once when this band is reached, in addition to the per-unit amount. */
-            flat_amount?: components["schemas"]["Money"];
-        };
-        OrderItem: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            order_id?: string;
-            /** Format: uuid */
-            price_id: string;
-            /**
-             * Format: uuid
-             * @description Which service this line belongs to.
-             */
-            product_id?: string;
-            /**
-             * Format: uuid
-             * @description Which plan was bought.
-             */
-            plan_id?: string;
-            /**
-             * @description What it was called when bought. It does not follow later catalogue renames and is
-             *     not translated.
-             */
-            plan_name?: string;
-            resource_id?: string;
-            quantity: string;
-            unit_amount?: components["schemas"]["Money"];
-            gross_amount?: components["schemas"]["Money"];
-            discount_amount?: components["schemas"]["Money"];
-            amount: components["schemas"]["Money"];
-            currency: string;
-            /** Format: date-time */
-            service_period_start?: string | null;
-            /** Format: date-time */
-            service_period_end?: string | null;
-        };
-        OrderItemList: {
-            items: components["schemas"]["OrderItem"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        Allowance: {
-            /** Format: uuid */
-            id: string;
-            /** Format: int64 */
-            billing_account_id?: number;
-            /**
-             * @description Which service it covers, such as `compute`. Read it alongside `meter_key`: a meter
-             *     name is unique only within its own service, so two allowances for `egress_bytes`
-             *     may belong to different services and cover different traffic.
-             */
-            product_key: string;
-            /** @description What it covers, such as `egress_bytes`. */
-            meter_key: string;
-            /** @description The unit it is counted in, such as `MiB`. */
-            unit?: string;
-            /**
-             * @description `included` came with a recurring purchase, `package` was bought on its own such as a
-             *     traffic pack, `promotional` was granted.
-             * @enum {string}
-             */
-            source_type: "included" | "package" | "promotional";
-            name: string;
-            /** @description How much was granted. */
-            quantity: string;
-            /** @description How much is left. */
-            remaining_quantity: string;
-            /** @description Lower is drawn on first. Included quantities sit ahead of purchased packs. */
-            priority?: number;
-            /** @enum {string} */
-            status: "active" | "depleted" | "expired" | "voided";
-            /** Format: date-time */
-            valid_from: string;
-            /**
-             * Format: date-time
-             * @description When it lapses. Anything unused at that point is lost; it is not refunded and does
-             *     not carry over. Absent when it does not expire on its own.
-             */
-            valid_until?: string | null;
-        };
-        AllowanceList: {
-            items: components["schemas"]["Allowance"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        AllowanceConsumption: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            usage_charge_id?: string;
-            meter_key?: string;
-            quantity: string;
-            /** Format: date-time */
-            consumed_at: string;
-            /** Format: date-time */
-            reversed_at?: string | null;
-        };
-        AllowanceConsumptionList: {
-            items: components["schemas"]["AllowanceConsumption"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
-        IncludedAllowance: {
-            meter_key: string;
-            unit?: string;
-            /** @description How much is included. */
-            quantity: string;
-            /**
-             * @description `period_end` lasts as long as the period it came with. `days` lasts a fixed number
-             *     of days from purchase. `never` does not lapse.
-             * @enum {string}
-             */
-            expiry: "period_end" | "days" | "never";
-            /** @description Only meaningful when `expiry` is `days`. */
-            valid_days?: number;
-        };
-        IncludedFeature: {
-            feature_key: string;
-            name: string;
-            name_translations?: components["schemas"]["Translations"];
-            description?: string;
-            /**
-             * @description Whether this price grants the capability without a cap.
-             *
-             *     **This is what says whether it is capped, not the presence of an included
-             *     quantity.** A capped capability whose quantity has run out would otherwise be
-             *     indistinguishable from one that was never capped.
-             *
-             *     `true` for a capability that is simply available or not, with nothing to count.
-             */
-            unlimited: boolean;
-            /** @description How much is included, as a decimal string. Present when `unlimited` is false. */
-            included_quantity?: string;
-            /** @description The unit that quantity is counted in, such as `request`. */
-            unit?: string;
-        };
-        Entitlement: {
-            /**
-             * @description Which service. Read it alongside `feature_key`, which is unique only within its
-             *     service.
-             */
-            product_key: string;
-            /** @description What calling code tests against. */
-            feature_key: string;
-            name?: string;
-            enabled: boolean;
-            /**
-             * @description Whether its use is counted. **`false` means no limit** — the plan providing it
-             *     grants it without a cap — and `remaining_quantity` should not be read in that case.
-             *
-             *     A capped capability whose quantity has run out keeps `metered` true with
-             *     `remaining_quantity` of `"0"`. Exhausted and uncapped are therefore always
-             *     distinguishable.
-             */
-            metered: boolean;
-            /**
-             * @description How much is left, as a decimal string. Meaningful only when `metered` is true.
-             *     `"0"` once exhausted, never negative.
-             *
-             *     This is the figure at the moment of the reply, and quantities are drawn down at
-             *     settlement rather than on each call. It is suitable for display and for a soft
-             *     warning, but it cannot enforce a strict limit: concurrent requests all see the same
-             *     figure. A hard limit has to be counted by the service that owns the capability, in
-             *     the same transaction as the operation it is limiting.
-             */
-            remaining_quantity?: string;
-            unit?: string;
-            /**
-             * Format: date-time
-             * @description When the subscription providing it ends. Absent for a metered subscription, which
-             *     has no end date.
-             */
-            expires_at?: string | null;
-        };
-        EntitlementList: {
-            items: components["schemas"]["Entitlement"][];
-            /** Format: int64 */
-            total_count?: number;
-        };
+  schemas: {
+    Error: {
+      code?: string;
+      message: string;
+      /**
+       * @description What a given `code` carries alongside the message. The keys depend on the code,
+       *     and a client that does not recognise one ignores it.
+       */
+      meta?: {
+        [key: string]: unknown;
+      };
+      /** Format: int64 */
+      status: number;
     };
-    responses: {
-        /** @description Unchanged since the `ETag` that was sent. No body. */
-        NotModified: {
-            headers: {
-                /** @description The same entity tag that was sent. */
-                ETag?: string;
-                [name: string]: unknown;
-            };
-            content?: never;
-        };
-        /** @description Error */
-        Error: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Error"];
-            };
-        };
+    /**
+     * @description Names in other languages, keyed by BCP 47 language tag. Where your locale is absent, use
+     *     the plain `name`; there is no fallback between related tags.
+     */
+    Translations: {
+      [key: string]: string;
     };
+    /**
+     * @description A decimal string, in the currency stated alongside it.
+     * @example 10.2500000000
+     */
+    Money: string;
+    CatalogProduct: {
+      /** Format: uuid */
+      id: string;
+      lookup_key: string;
+      name: string;
+      name_translations?: components["schemas"]["Translations"];
+      description?: string;
+      description_translations?: components["schemas"]["Translations"];
+    };
+    CatalogProductList: {
+      items: components["schemas"]["CatalogProduct"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    CatalogPlan: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      product_id: string;
+      lookup_key: string;
+      name: string;
+      name_translations?: components["schemas"]["Translations"];
+      description?: string;
+      description_translations?: components["schemas"]["Translations"];
+    };
+    CatalogPlanList: {
+      items: components["schemas"]["CatalogPlan"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    CatalogPrice: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      plan_id: string;
+      currency: string;
+      /**
+       * @description `metered` charges for what is used, `prepaid` buys a period in advance, `one_time`
+       *     charges once.
+       * @enum {string}
+       */
+      type: "metered" | "prepaid" | "one_time";
+      /**
+       * @description How the amount is arrived at. `rated` means the rate depends on attributes such as
+       *     region or machine type, and is looked up on a price list.
+       * @enum {string}
+       */
+      billing_scheme: "per_unit" | "tiered" | "rated";
+      /** @description Present for `per_unit`. */
+      unit_amount?: components["schemas"]["Money"];
+      /**
+       * @description `none` for a price that is not tiered, which is most of them.
+       *
+       *     Otherwise `graduated` charges each band at its own rate, and `volume` charges
+       *     everything at the rate of the band the total falls in.
+       * @enum {string}
+       */
+      tiers_mode?: "none" | "graduated" | "volume";
+      /** @description Present for `tiered`, in ascending order. */
+      tiers?: components["schemas"]["Tier"][];
+      /**
+       * Format: uuid
+       * @description For `rated` prices, the price list the rates are read from.
+       */
+      rate_card_id?: string;
+      /**
+       * @description Quantities included when this price is bought — the traffic or requests that are
+       *     used before anything is charged for.
+       */
+      allowances?: components["schemas"]["IncludedAllowance"][];
+      /** @description Capabilities that buying this price makes available. */
+      features?: components["schemas"]["IncludedFeature"][];
+      /** @description For prepaid prices */
+      term?: number;
+      /** @enum {string} */
+      period?: "none" | "day" | "month" | "year";
+      setup_fee?: components["schemas"]["Money"];
+    };
+    CatalogPriceList: {
+      items: components["schemas"]["CatalogPrice"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    CatalogRate: {
+      /** @description What is being measured. */
+      meter_key: string;
+      /** @description The unit readings arrive in, such as `core-second`. */
+      unit?: string;
+      /** @description The attributes this rate applies to, such as region and machine type. */
+      dimensions: {
+        [key: string]: string;
+      };
+      /** @enum {string} */
+      pricing_model: "per_unit" | "graduated" | "volume";
+      /** @description Present for `per_unit`. Tiered rates carry their amounts on the tiers. */
+      unit_amount?: components["schemas"]["Money"];
+      /** @description Present for `graduated` and `volume`, in ascending order. */
+      tiers?: components["schemas"]["Tier"][];
+      /**
+       * @description How many measured units one amount covers. An hourly rate on a per-second meter is
+       *     `"3600"`.
+       */
+      unit_quantity?: string;
+      currency: string;
+      /** Format: date-time */
+      effective_from: string;
+      /** Format: date-time */
+      effective_to?: string | null;
+    };
+    CatalogRateList: {
+      items: components["schemas"]["CatalogRate"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    /**
+     * @description Identify what to price either by `price_id`, or by `product_key` together with
+     *     `service_product_id`. Supplying both, or neither, is refused.
+     */
+    QuoteLine: {
+      /** Format: uuid */
+      price_id?: string;
+      /** @description The service, such as `compute`. */
+      product_key?: string;
+      /** @description How the owning service identifies the item, such as a machine type. */
+      service_product_id?: string;
+      /**
+       * @description Required for a metered price whose price list covers more than one meter, so that
+       *     the intended one is unambiguous.
+       */
+      meter_key?: string;
+      /**
+       * @description The attributes the price depends on — region, instance type, token class.
+       *
+       *     Required when the price draws its rates from a price list, which is how anything
+       *     sold by region or by machine type is priced. A price that carries a single unit
+       *     amount, or a ladder, has no attributes to give and takes none.
+       *
+       *     Every attribute the meter declares must be present. A combination with no rate
+       *     covering it is refused rather than priced at zero.
+       */
+      dimensions?: {
+        [key: string]: string;
+      };
+      /**
+       * @description Which way of buying. Required when the item is sold in more than one way — the
+       *     same item may be offered metered, prepaid and as a one-off pack, and the pair
+       *     `product_key` + `service_product_id` names only the item, not the way.
+       *
+       *     Omit it when the item is sold one way only. If what is given matches no price, or
+       *     still leaves more than one candidate, the request is refused rather than resolved
+       *     by guessing.
+       * @enum {string}
+       */
+      price_type?: "metered" | "prepaid" | "one_time";
+      /**
+       * @description For prepaid items, such as `1_month` or `1_year`. Required when the item is offered
+       *     for more than one period.
+       */
+      billing_period?: string;
+      quantity: string;
+      /**
+       * Format: int64
+       * @description For metered items, how long to price for. This allows an estimate such as "about
+       *     this much per month" to be shown before anything exists.
+       */
+      duration_seconds?: number;
+    };
+    /**
+     * @description Price a change to something already running, rather than a new purchase.
+     *
+     *     The result states what is still owed for the period already paid for, what the new
+     *     configuration costs for the remainder, and the difference in either direction.
+     */
+    QuoteChange: {
+      /**
+       * Format: uuid
+       * @description What is being changed.
+       */
+      subscription_item_id: string;
+      /**
+       * Format: uuid
+       * @description The price to move to. Identify it here, or by `service_product_id` below. Supplying
+       *     both, or neither, is refused.
+       */
+      price_id?: string;
+      service_product_id?: string;
+      /** @description The new quantity. The current one is kept when omitted. */
+      quantity?: string;
+      /**
+       * Format: date-time
+       * @description When the change would take effect. Defaults to now. Charging is split at this
+       *     moment: before it at the old configuration, after it at the new one.
+       */
+      effective_at?: string;
+    };
+    /**
+     * @description Give `lines` to price new purchases, or `changes` to price alterations to what is
+     *     already running. Both may appear in one request; the total covers everything.
+     */
+    QuoteRequest: {
+      lines?: components["schemas"]["QuoteLine"][];
+      changes?: components["schemas"]["QuoteChange"][];
+    };
+    EstimateRequest: {
+      /** @description Must be one the catalogue publishes. */
+      currency: string;
+      lines: components["schemas"]["QuoteLine"][];
+    };
+    QuoteLineResult: {
+      /** @description Which line of the request this answers. */
+      index: number;
+      /**
+       * @description Whether a price was found for this line. Read this before anything else.
+       *
+       *     A single item with no price no longer fails the whole request. A catalogue
+       *     almost always has something not yet priced, and refusing the request would
+       *     leave no way to render a list in which a few entries are simply not on sale.
+       *
+       *     When false, `price_id`, `unit_amount` and `amount` are absent and
+       *     `unpriced_reason` states what is missing.
+       */
+      priced: boolean;
+      /**
+       * @description Why no price was found; `none` while `priced` is true.
+       *
+       *     The last four are told apart because their remedies differ: the price points
+       *     at no price list, the list holds no rate for that meter, that exact combination
+       *     of attributes is not configured, or it is configured but nothing is in effect
+       *     at the moment asked about.
+       * @enum {string}
+       */
+      unpriced_reason?:
+        "none" | "no_price" | "no_rate_card" | "no_meter" | "no_dimensions" | "no_effective_rule";
+      /**
+       * Format: uuid
+       * @description The price selected. Returned whenever `priced` is true, including when the
+       *     request identified the item indirectly, so that the choice can be confirmed.
+       */
+      price_id?: string;
+      plan_name?: string;
+      unit_amount?: components["schemas"]["Money"];
+      quantity?: string;
+      /** @description Not rounded. Round only for display. */
+      amount?: components["schemas"]["Money"];
+      currency: string;
+    };
+    QuoteChangeResult: {
+      index: number;
+      /** Format: uuid */
+      subscription_item_id: string;
+      /**
+       * Format: uuid
+       * @description The price that would apply. Always returned.
+       */
+      price_id: string;
+      plan_name?: string;
+      /**
+       * @description What remains unused of the period already paid for, valued at the price it was
+       *     bought at rather than at today's price.
+       */
+      unused_credit?: components["schemas"]["Money"];
+      /** @description What the new configuration costs for the rest of that period. */
+      new_charge?: components["schemas"]["Money"];
+      /**
+       * @description What would be owed. Zero when the change reduces the price; the difference then
+       *     appears in `refundable_amount`.
+       */
+      payable_now: components["schemas"]["Money"];
+      /**
+       * @description What would be returned. It goes back to the sources that originally paid rather
+       *     than being offset against `payable_now`, so that a purchase made with credit is
+       *     refunded as credit.
+       */
+      refundable_amount: components["schemas"]["Money"];
+      /**
+       * Format: date-time
+       * @description When the current period ends. A change does not move it; the next renewal is
+       *     charged at the new price.
+       */
+      period_end?: string;
+      currency: string;
+    };
+    Quote: {
+      lines?: components["schemas"]["QuoteLineResult"][];
+      changes?: components["schemas"]["QuoteChangeResult"][];
+      /**
+       * @description What would be owed in total. Amounts to be returned are not netted off it.
+       *
+       *     Null when any line could not be priced. What would be owed is not knowable then, and a
+       *     total that silently left the unpriced lines out would read as a smaller bill rather than
+       *     an incomplete one — the per-line `priced` flag is easy to skip, a missing total is not.
+       */
+      total?: components["schemas"]["Money"] | null;
+      /** @description What would be returned in total. */
+      total_refundable?: components["schemas"]["Money"];
+      currency: string;
+    };
+    BillingAccount: {
+      /** Format: int64 */
+      id: number;
+      /** @description What you call this account. */
+      name?: string;
+      /** @description The name invoices are made out to. Copied onto each invoice when it is issued. */
+      legal_name?: string;
+      /** @description Where invoices are sent. */
+      email?: string;
+      address_line1?: string;
+      address_line2?: string;
+      address_city?: string;
+      address_state?: string;
+      address_postal_code?: string;
+      /** @description Two-letter code. */
+      address_country?: string;
+      tax_id?: string;
+      /** @description Fixed when the account was opened. */
+      currency: string;
+      /** @enum {string} */
+      status: "active" | "suspended" | "closed";
+      /**
+       * @description How far past the suspension threshold this account may go before its resources are
+       *     suspended. "0" means none: the account is suspended as soon as it crosses the threshold.
+       */
+      grace_amount?: string;
+      /**
+       * Format: int64
+       * @description How long this account has to top up after crossing the suspension threshold.
+       *     0 means none. Whichever runs out first — this or grace_amount — ends the grace.
+       */
+      grace_period_seconds?: number;
+      /** Format: date-time */
+      created_at: string;
+    };
+    BillingAccountCreate: {
+      currency: string;
+      name?: string;
+      legal_name?: string;
+      email?: string;
+    };
+    BillingAccountUpdate: {
+      name?: string;
+      legal_name?: string;
+      email?: string;
+      address_line1?: string;
+      address_line2?: string;
+      address_city?: string;
+      address_state?: string;
+      address_postal_code?: string;
+      address_country?: string;
+      tax_id?: string;
+    };
+    BillingAccountList: {
+      items: components["schemas"]["BillingAccount"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    AccountBalance: {
+      /** Format: int64 */
+      billing_account_id: number;
+      currency: string;
+      /** @description Funds paid in and not yet spent. This is the part that can be refunded. */
+      cash: components["schemas"]["Money"];
+      /** @description Reserved by orders that have not completed. */
+      held: components["schemas"]["Money"];
+      /**
+       * @description Metered usage priced this month but not yet invoiced. It is already committed even
+       *     though no invoice exists for it yet.
+       */
+      accrued: components["schemas"]["Money"];
+      /** @description Granted credit. Spendable, but not withdrawable. */
+      credit: components["schemas"]["Money"];
+      /** @description Voucher balance, spendable within each voucher's own scope. */
+      voucher: components["schemas"]["Money"];
+      /**
+       * @description `cash` less `accrued` and `held` — what is actually available at checkout. It goes
+       *     negative when usage has exceeded the balance. Credit and vouchers are shown
+       *     separately because each can only pay for what it covers.
+       */
+      spendable: components["schemas"]["Money"];
+    };
+    ProjectBinding: {
+      /** Format: uuid */
+      project_id: string;
+      /** Format: int64 */
+      billing_account_id: number;
+      account_name?: string;
+      currency: string;
+      /** Format: date-time */
+      effective_from: string;
+      /** Format: date-time */
+      effective_to?: string | null;
+    };
+    ProjectBindingList: {
+      items: components["schemas"]["ProjectBinding"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    ProjectPayerSet: {
+      /** Format: int64 */
+      billing_account_id: number;
+    };
+    /**
+     * @description A narrow view of the paying account, restricted to what a project member needs in order
+     *     to know whether the project's resources will keep running.
+     */
+    ProjectPayer: {
+      /**
+       * Format: int64
+       * @description Identifies the payer. Use it to link into the billing centre.
+       */
+      billing_account_id: number;
+      name: string;
+      /**
+       * @description Everything this project is charged is in this currency, and it cannot change while
+       *     the account exists.
+       */
+      currency: string;
+      /**
+       * @description What remains to be spent. It already accounts for this month's uninvoiced usage, so
+       *     it is what will be available at checkout rather than the cash figure shown in the
+       *     billing centre. It goes negative when usage has exceeded the balance.
+       */
+      spendable_amount: components["schemas"]["Money"];
+      /**
+       * @description `active` — nothing is owed. `past_due` — the account owes money and resources are
+       *     still running. `suspended` — resources have been stopped for non-payment.
+       * @enum {string}
+       */
+      status: "active" | "past_due" | "suspended";
+      /**
+       * Format: date-time
+       * @description When this project's resources will be stopped unless the account is topped up.
+       *     Absent while `status` is `active`.
+       */
+      suspends_at?: string | null;
+    };
+    SettleResult: {
+      /** Format: uuid */
+      invoice_id?: string | null;
+      /** @description Zero when there was nothing outstanding, in which case no invoice is created. */
+      invoiced_amount: components["schemas"]["Money"];
+      currency: string;
+    };
+    TopUp: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int64 */
+      billing_account_id: number;
+      /** @description What is credited to the account, in the account's own currency. */
+      amount: components["schemas"]["Money"];
+      currency: string;
+      /**
+       * @description How much of this top-up has not been spent yet. This is the part that can still be
+       *     returned to where it was paid from.
+       */
+      remaining_amount?: components["schemas"]["Money"];
+      /**
+       * @description `pending` until the payment provider confirms. The balance increases on `succeeded`.
+       *
+       *     A checkout the payer abandoned ends up `failed` too, with `failure_reason` saying
+       *     so. Nothing was charged in that case.
+       * @enum {string}
+       */
+      status: "pending" | "succeeded" | "failed";
+      /** @description Which payment provider collected it. */
+      provider?: string;
+      /**
+       * @description The currency the payer was actually charged in, when the checkout page collected a
+       *     local one. Absent when it was the same as the account's.
+       */
+      presentment_currency?: string;
+      /**
+       * @description What was charged, in `presentment_currency`. It will not equal `amount`, and it is
+       *     the figure that appears on the payer's card or wallet statement.
+       */
+      presentment_amount?: components["schemas"]["Money"];
+      /** @description Why it did not go through. Present with `failed`. */
+      failure_reason?: string;
+      /** @description Where the payer completes the payment. Absent once it has completed. */
+      checkout_url?: string;
+      /** Format: date-time */
+      created_at: string;
+      /**
+       * Format: date-time
+       * @description When the funds arrived. Later than `created_at` — by days for a bank transfer — so
+       *     reconciling against a statement uses this rather than the moment it was started.
+       *     Absent until the payment completes.
+       */
+      settled_at?: string | null;
+    };
+    TopUpCreate: {
+      /** Format: int64 */
+      billing_account_id: number;
+      /**
+       * @description In the account's currency, and no finer than that currency's smallest unit:
+       *     two decimals for most, none for the yen. A finer amount is refused here rather
+       *     than at the checkout page, where the payer would see the provider's own wording
+       *     instead of an explanation.
+       *
+       *     There is a minimum, which differs by currency. Below it the provider's fee
+       *     exceeds the top-up itself, so such a payment costs more to accept than it brings.
+       *     The minimum in force is returned with the rejection.
+       */
+      amount: components["schemas"]["Money"];
+      /**
+       * Format: uuid
+       * @description Charge a saved method instead of opening a checkout page.
+       */
+      payment_method_id?: string;
+      /** @description Where to send the payer after checkout. */
+      return_url?: string;
+      /**
+       * @description Retrying with the same key returns the original top-up rather than starting a
+       *     second one.
+       */
+      idempotency_key: string;
+    };
+    TopUpList: {
+      items: components["schemas"]["TopUp"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    PaymentMethod: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int64 */
+      billing_account_id: number;
+      provider: string;
+      brand?: string;
+      last4?: string;
+      exp_month?: number | null;
+      exp_year?: number | null;
+      is_default: boolean;
+      /** @enum {string} */
+      status: "active" | "expired" | "removed";
+    };
+    PaymentMethodList: {
+      items: components["schemas"]["PaymentMethod"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    PaymentMethodSetup: {
+      /** Format: int64 */
+      billing_account_id: number;
+      return_url?: string;
+    };
+    /**
+     * @description What the payment provider's browser library needs in order to collect a card. There is
+     *     no address to redirect to: the form is rendered in the page, and the card goes straight
+     *     from the browser to the provider.
+     */
+    PaymentMethodSetupResult: {
+      /**
+       * @description The provider's identifier for this attempt. Use it to tell a reloaded page apart
+       *     from a second attempt.
+       */
+      setup_id: string;
+      /**
+       * @description Authorises this one attempt with the provider, and nothing else. Pass it to the
+       *     provider's library; it is not an API credential and grants no access here.
+       */
+      client_secret: string;
+      /**
+       * @description The provider's public key to initialise its library with. It differs between test
+       *     and live, so read it from here rather than compiling it in.
+       */
+      publishable_key: string;
+      /** Format: date-time */
+      expires_at?: string;
+    };
+    /**
+     * @description Safe to call again. While an attempt is still with the payment provider, calling this
+     *     returns that attempt rather than starting a second one, so a customer who reloads the
+     *     page is not charged twice.
+     *
+     *     A new attempt is started only once the previous one has failed.
+     */
+    PayRequest: {
+      /**
+       * Format: uuid
+       * @description Which method to charge the remainder to. The default is used when omitted.
+       */
+      payment_method_id?: string;
+      /**
+       * @description Whether to apply the account balance first. Set it to `false` to charge the full
+       *     amount to a payment method.
+       * @default true
+       */
+      use_balance?: boolean;
+      return_url?: string;
+    };
+    /**
+     * @description Name at least one invoice or order. They must all belong to the same account and share
+     *     its currency; anything else is refused rather than partly paid.
+     */
+    PayTogetherRequest: {
+      invoice_ids?: string[];
+      order_ids?: string[];
+      return_url?: string;
+      /**
+       * @description Required when the provider is involved, because that is where the money moves. The
+       *     same key returns the same checkout address instead of opening a second one.
+       */
+      idempotency_key?: string;
+    };
+    /**
+     * @description Where the payment has got to.
+     *
+     *     `succeeded` — collected in full. Nothing further is owed.
+     *
+     *     `processing` — submitted to the payment provider and awaiting its answer. **Do not
+     *     submit it again**; poll the invoice or order, or wait to be notified. Some methods take
+     *     minutes and a few take days.
+     *
+     *     `requires_action` — the payer has to finish it at `checkout_url`, typically by
+     *     confirming with their bank. It becomes `processing` once they do.
+     *
+     *     `failed` — this attempt did not go through. `failure_reason` says why, and paying again
+     *     starts a fresh attempt.
+     *
+     *     The provider's own answer is what decides: an attempt is only `succeeded` once the
+     *     provider says so, never because this call returned.
+     * @enum {string}
+     */
+    PaymentStatus: "succeeded" | "processing" | "requires_action" | "failed";
+    PaymentResult: {
+      /**
+       * Format: uuid
+       * @description This attempt. The same identifier comes back while it is still in flight, which is
+       *     how a repeated call is told apart from a genuine second payment.
+       */
+      payment_attempt_id: string;
+      status: components["schemas"]["PaymentStatus"];
+      amount_paid: components["schemas"]["Money"];
+      /**
+       * @description What is still outstanding. Zero once the payment succeeds. Unchanged while
+       *     `processing`: nothing is collected until the provider confirms it.
+       */
+      amount_due: components["schemas"]["Money"];
+      currency: string;
+      /**
+       * @description How much came from the account balance. Applied immediately, and released again if
+       *     the rest of the payment fails, so a failed card does not leave part of the balance
+       *     consumed against an unpaid invoice.
+       */
+      balance_applied?: components["schemas"]["Money"];
+      /** @description Present with `requires_action`. */
+      checkout_url?: string;
+      /**
+       * @description Whether paying again is worth attempting. False for a refusal that will keep
+       *     happening — a closed account, an amount over a limit — so that a client does not
+       *     retry in a loop.
+       */
+      retriable?: boolean;
+      /**
+       * Format: date-time
+       * @description The earliest sensible moment to try again. Present when the provider asked for a
+       *     wait.
+       */
+      retry_after?: string | null;
+      /** Format: uuid */
+      invoice_id?: string | null;
+      /** Format: uuid */
+      order_id?: string | null;
+      failure_reason?: string;
+    };
+    /** @enum {string} */
+    InvoiceStatus: "draft" | "open" | "paid" | "void" | "uncollectible";
+    Invoice: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int64 */
+      billing_account_id: number;
+      /** @description Numbered per account and per month. */
+      number: string;
+      /**
+       * @description What produced it — metered usage for a period, a purchase, or a correction.
+       * @enum {string}
+       */
+      type?: "usage" | "order" | "adjustment";
+      currency: string;
+      status: components["schemas"]["InvoiceStatus"];
+      subtotal?: components["schemas"]["Money"];
+      discount_amount?: components["schemas"]["Money"];
+      tax_amount?: components["schemas"]["Money"];
+      /** @description Paid from credit or a voucher. */
+      credit_applied?: components["schemas"]["Money"];
+      /** @description Subtotal less discount, plus tax, less credit applied. */
+      total: components["schemas"]["Money"];
+      amount_paid?: components["schemas"]["Money"];
+      /** Format: date-time */
+      period_start: string;
+      /**
+       * Format: date-time
+       * @description Exclusive.
+       */
+      period_end: string;
+      /**
+       * @description Who this was billed to, as recorded when the invoice was issued. Later changes to
+       *     the account do not alter it.
+       */
+      customer_name?: string;
+      customer_email?: string;
+      customer_tax_id?: string;
+      customer_address_line1?: string;
+      customer_address_line2?: string;
+      customer_address_city?: string;
+      customer_address_state?: string;
+      customer_address_postal_code?: string;
+      customer_address_country?: string;
+      /** Format: date-time */
+      paid_at?: string | null;
+    };
+    InvoiceList: {
+      items: components["schemas"]["Invoice"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    InvoiceItem: {
+      /** Format: uuid */
+      id: string;
+      /** @enum {string} */
+      type?: "usage" | "subscription" | "one_time" | "adjustment" | "credit";
+      /** Format: uuid */
+      project_id?: string | null;
+      resource_id?: string;
+      /**
+       * @description The wording as recorded when the invoice was issued. It is not re-translated
+       *     afterwards, so that an invoice continues to read as it did when it was sent.
+       */
+      description: string;
+      unit?: string;
+      quantity?: string;
+      /** @description The part covered by an included allowance, and therefore not charged. */
+      deducted_quantity?: string;
+      unit_amount?: components["schemas"]["Money"];
+      amount: components["schemas"]["Money"];
+      currency: string;
+      /** Format: date-time */
+      period_start?: string | null;
+      /** Format: date-time */
+      period_end?: string | null;
+    };
+    InvoiceItemList: {
+      items: components["schemas"]["InvoiceItem"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    /**
+     * @description What moved the money. These are the events that change the account's cash balance.
+     *
+     *     Charges for usage and amounts reserved by orders are not here: usage appears among the
+     *     charges and on invoices, and a reservation appears as an allocation.
+     * @enum {string}
+     */
+    TransactionType: "topup" | "refund" | "payout" | "adjustment";
+    Transaction: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int64 */
+      billing_account_id?: number;
+      type: components["schemas"]["TransactionType"];
+      /** @description Signed. Positive increases the balance, negative reduces it. */
+      amount: components["schemas"]["Money"];
+      currency: string;
+      /** @description Why */
+      reason?: string;
+      /** Format: uuid */
+      invoice_id?: string | null;
+      /** Format: uuid */
+      order_id?: string | null;
+      /**
+       * @description `pending` is a payment still with the provider. Only one may be pending against any
+       *     one invoice or order.
+       *
+       *     `failed` covers a payment the provider refused and one the payer walked away from
+       *     alike; `failure_reason` says which. There is no separate cancelled state, because
+       *     what to do next is the same either way — start a new one.
+       * @enum {string}
+       */
+      status: "pending" | "succeeded" | "failed";
+      /** Format: date-time */
+      created_at: string;
+    };
+    TransactionList: {
+      items: components["schemas"]["Transaction"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    CreditGrant: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int64 */
+      billing_account_id?: number;
+      /**
+       * @description Where it came from. `voucher` was redeemed from a code and carries its own
+       *     restrictions; `manual` was issued directly, typically to put something right.
+       * @enum {string}
+       */
+      source_type?: "promotion" | "voucher" | "manual" | "membership";
+      name: string;
+      amount: components["schemas"]["Money"];
+      remaining_amount: components["schemas"]["Money"];
+      currency: string;
+      /** @description What this credit may pay for. No restrictions means anything on the account. */
+      applies_to?: components["schemas"]["Applicability"];
+      /** @description The restrictions in one sentence, ready to display. */
+      applies_to_summary?: string;
+      /** @enum {string} */
+      status: "active" | "depleted" | "expired" | "voided";
+      /** Format: date-time */
+      valid_from: string;
+      /** Format: date-time */
+      valid_until?: string | null;
+    };
+    CreditGrantList: {
+      items: components["schemas"]["CreditGrant"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    Allocation: {
+      /** Format: uuid */
+      id: string;
+      /** @enum {string} */
+      source_type: "transaction" | "credit_grant";
+      /** Format: uuid */
+      source_id: string;
+      /** @enum {string} */
+      target_type: "hold" | "order_item" | "invoice_item";
+      /** Format: uuid */
+      target_id: string;
+      amount: components["schemas"]["Money"];
+      currency: string;
+      /** Format: date-time */
+      allocated_at: string;
+      /** Format: date-time */
+      reversed_at?: string | null;
+    };
+    AllocationList: {
+      items: components["schemas"]["Allocation"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    /**
+     * @description Name exactly one of the three targets. Naming none leaves the amount undecided;
+     *     naming two leaves it ambiguous, and both would have to be resolved by guessing.
+     */
+    RefundRequest: {
+      /** Format: uuid */
+      invoice_id?: string;
+      /** Format: uuid */
+      order_id?: string;
+      /**
+       * Format: uuid
+       * @description The period to end early. Use this to give back a prepaid term that still has
+       *     time left on it.
+       */
+      subscription_period_id?: string;
+      /**
+       * @description How much to give back. Absent asks for everything still refundable on the target.
+       *
+       *     More than what remains is refused rather than reduced to the remainder: a caller
+       *     asking for more than it can have has miscounted, and quietly giving it less
+       *     hides that.
+       */
+      amount?: components["schemas"]["Money"];
+      reason: string;
+      idempotency_key: string;
+    };
+    Refund: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int64 */
+      billing_account_id?: number;
+      /** Format: uuid */
+      invoice_id?: string | null;
+      /** Format: uuid */
+      order_id?: string | null;
+      requested_amount: components["schemas"]["Money"];
+      /** @description What has actually been returned. */
+      settled_amount?: components["schemas"]["Money"];
+      /**
+       * @description Withheld from what reaches the payer. It applies only to cash returned to a payment
+       *     method, so it is zero when `destination` is `balance`, and it is never taken out of
+       *     credit or a voucher.
+       *
+       *     `settled_amount` is the amount put back against what was paid; the payer receives
+       *     that less this.
+       */
+      fee_amount?: components["schemas"]["Money"];
+      currency: string;
+      /**
+       * @description Where the cash went.
+       * @enum {string}
+       */
+      destination?: "balance" | "provider";
+      /**
+       * @description `pending` — accepted, not yet sent to the payment provider. `processing` — with the
+       *     provider and awaiting its answer, which takes days for some methods. Neither is
+       *     final, and neither means the money has moved.
+       * @enum {string}
+       */
+      status: "pending" | "processing" | "succeeded" | "failed";
+      reason?: string;
+      /** Format: date-time */
+      created_at: string;
+    };
+    RefundList: {
+      items: components["schemas"]["Refund"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    RefundSource: {
+      /**
+       * @description Where this part of the money came from, and therefore where it goes back to.
+       *     Only `cash` can reach a card or a spendable balance; credit and vouchers return
+       *     to themselves and never become cash.
+       * @enum {string}
+       */
+      type: "cash" | "credit" | "voucher";
+      amount: components["schemas"]["Money"];
+    };
+    /** @description What a full refund would return, and where each part of it would go. */
+    RefundQuote: {
+      /** @description The most that can still be returned, before any fee. */
+      refundable_amount: components["schemas"]["Money"];
+      /**
+       * @description Withheld from the cash part. Zero when `destination` is `balance`, and never taken
+       *     out of credit or a voucher.
+       */
+      fee_amount: components["schemas"]["Money"];
+      /** @description `refundable_amount` less `fee_amount`. */
+      net_amount: components["schemas"]["Money"];
+      currency: string;
+      /**
+       * @description Where the cash part would go. `provider` returns it to the method it was paid
+       *     with; `balance` credits the account instead, which is the answer whenever the cash
+       *     came from more than one place or never went through a provider at all.
+       * @enum {string}
+       */
+      destination: "balance" | "provider";
+      /**
+       * @description How `refundable_amount` splits by where the money came from. The amounts sum to it.
+       *
+       *     Show this rather than a single figure. A part returned as credit or as a voucher
+       *     does not appear on a card statement, so a customer told only the net amount will
+       *     ask why less than that arrived.
+       */
+      sources: components["schemas"]["RefundSource"][];
+      /**
+       * Format: date-time
+       * @description The last moment a refund can be asked for here. Measured from when the purchase was
+       *     paid for, not from today. Absent when this cannot be refunded without support at
+       *     all — metered usage, for one, which is never self-service.
+       */
+      self_service_until?: string | null;
+    };
+    UsageCharge: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      project_id?: string;
+      product_key: string;
+      /** @description Which resource this was charged for. Empty for charges not tied to one. */
+      resource_id?: string;
+      /** @description What was measured, such as `instance_seconds`. */
+      meter_key: string;
+      unit?: string;
+      /** @description The attributes the rate was chosen by, such as region and machine type. */
+      dimensions?: {
+        [key: string]: string;
+      };
+      /** Format: date-time */
+      window_start: string;
+      /**
+       * Format: date-time
+       * @description Exclusive.
+       */
+      window_end: string;
+      /** @description How much was used, before any included allowance. */
+      gross_quantity?: string;
+      /** @description How much of that was covered by an allowance. */
+      deducted_quantity?: string;
+      /** @description What was charged for — the gross quantity less the part covered. */
+      quantity: string;
+      unit_amount?: components["schemas"]["Money"];
+      amount?: components["schemas"]["Money"];
+      currency: string;
+      /**
+       * Format: uuid
+       * @description Absent until the period is invoiced.
+       */
+      invoice_id?: string | null;
+    };
+    UsageChargeList: {
+      items: components["schemas"]["UsageCharge"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    SpendRow: {
+      product_key?: string;
+      /** Format: uuid */
+      plan_id?: string;
+      plan_name?: string;
+      /** @description Present only when grouped by resource. */
+      resource_id?: string;
+      amount: components["schemas"]["Money"];
+      currency: string;
+    };
+    SpendRowList: {
+      items: components["schemas"]["SpendRow"][];
+      /** @description The sum over the whole period, not only the page returned. */
+      total: components["schemas"]["Money"];
+      currency: string;
+      /** Format: int64 */
+      total_count?: number;
+    };
+    Subscription: {
+      /** Format: uuid */
+      id: string;
+      /**
+       * Format: uuid
+       * @description Which project this is for. Absent when it was bought at account level, such as a
+       *     membership, which belongs to no single project.
+       */
+      project_id?: string | null;
+      /** Format: int64 */
+      billing_account_id?: number;
+      /** Format: uuid */
+      product_id: string;
+      product_key?: string;
+      /**
+       * @description `pending` is a subscription created by an order that has not completed, so it
+       *     appears in the list before anything under it is running.
+       * @enum {string}
+       */
+      status: "pending" | "active" | "suspended" | "canceled" | "terminated";
+      /** Format: int64 */
+      item_count?: number;
+    };
+    SubscriptionList: {
+      items: components["schemas"]["Subscription"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    SubscriptionItem: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      subscription_id?: string;
+      /**
+       * Format: uuid
+       * @description Which project this is for. Absent when it was bought at account level, such as a
+       *     membership, which belongs to no single project.
+       */
+      project_id?: string | null;
+      product_key?: string;
+      /** Format: uuid */
+      plan_id: string;
+      plan_name?: string;
+      /** Format: uuid */
+      price_id: string;
+      resource_id?: string;
+      quantity: string;
+      /**
+       * Format: date-time
+       * @description Present for prepaid items. Absent for metered ones, which have no end date.
+       */
+      paid_until?: string | null;
+      auto_renew?: boolean;
+      /** @enum {string} */
+      status: "pending" | "active" | "suspended" | "canceled" | "terminated";
+      /** Format: date-time */
+      started_at?: string | null;
+      /** Format: date-time */
+      ended_at?: string | null;
+    };
+    SubscriptionItemList: {
+      items: components["schemas"]["SubscriptionItem"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    RenewRequest: {
+      /**
+       * @description How many further periods to buy.
+       * @default 1
+       */
+      periods?: number;
+      /** Format: uuid */
+      payment_method_id?: string;
+      /** @default true */
+      use_balance?: boolean;
+      return_url?: string;
+      idempotency_key: string;
+    };
+    AutoRenewSet: {
+      auto_renew: boolean;
+    };
+    /** @description A resource currently accruing charges by the second. */
+    ActiveResource: {
+      resource_id: string;
+      product_key: string;
+      /** @description What it is */
+      resource_type?: string;
+      meter_key: string;
+      unit?: string;
+      /** @description How much is held — cores, MiB, cards. Not how much has been used. */
+      quantity: string;
+      dimensions?: {
+        [key: string]: string;
+      };
+      /** @enum {string} */
+      status: "active" | "suspended";
+      /** Format: date-time */
+      started_at: string;
+      /**
+       * Format: date-time
+       * @description Charges are settled up to this moment.
+       */
+      last_billed_until?: string;
+    };
+    ActiveResourceList: {
+      items: components["schemas"]["ActiveResource"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    /** @enum {string} */
+    OrderState: "pending" | "paid" | "fulfilled" | "failed" | "canceled";
+    Order: {
+      /** Format: uuid */
+      id: string;
+      /**
+       * Format: uuid
+       * @description Which project it was bought for. Absent for a purchase made at account level, such
+       *     as a membership.
+       */
+      project_id?: string | null;
+      /** Format: int64 */
+      billing_account_id?: number;
+      currency: string;
+      /** @enum {string} */
+      type: "purchase" | "renew" | "change";
+      state: components["schemas"]["OrderState"];
+      gross_amount?: components["schemas"]["Money"];
+      discount_amount?: components["schemas"]["Money"];
+      amount: components["schemas"]["Money"];
+      /** @description What is still outstanding. Zero once paid. */
+      amount_due?: components["schemas"]["Money"];
+      /** @description How much of `refundable_amount` has already gone back. */
+      refunded_amount?: components["schemas"]["Money"];
+      /**
+       * @description When a plan change takes effect. `none` on anything that is not a change.
+       *
+       *     `period_end` orders stay pending until the current paid period runs out. Renewing in
+       *     the meantime moves that moment along with it.
+       * @enum {string}
+       */
+      change_effective?: "none" | "immediate" | "period_end";
+      /**
+       * @description What a downgrade gives back. It is returned to the sources that originally paid
+       *     rather than deducted from `amount`, so paying with granted credit gives back credit.
+       *
+       *     Always "0" on a `period_end` change: nothing is left of the period at its end.
+       */
+      refundable_amount?: components["schemas"]["Money"];
+      /**
+       * Format: date-time
+       * @description When the funds and any stock held for this order are released. After this it can no
+       *     longer be paid and has to be placed again. Absent once the order is settled.
+       */
+      reservation_expires_at?: string | null;
+      /** Format: date-time */
+      created_at: string;
+      /**
+       * @description What was bought. Present on a single order and on every order in a list, so a list
+       *     can be rendered without a further request per row.
+       */
+      items?: components["schemas"]["OrderItem"][];
+    };
+    OrderList: {
+      items: components["schemas"]["Order"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    /**
+     * @description Give a purchase — `lines`, `changes` or `renewal_of` — to find out whether the code
+     *     applies to it and what it would take off. Without one the reply describes the code's
+     *     own terms but cannot say whether it applies, because most codes are restricted to
+     *     certain items or purchase actions.
+     *
+     *     The purchase action is worked out from what is given rather than taken on trust: a
+     *     change is an upgrade or a downgrade according to what it costs for the remainder of
+     *     the period.
+     */
+    CodeRequest: {
+      /** Format: int64 */
+      billing_account_id: number;
+      code: string;
+      /**
+       * Format: uuid
+       * @description The project the purchase would be for.
+       */
+      project_id?: string;
+      /** @description New purchases to test against, in the same shape as a quote. */
+      lines?: components["schemas"]["QuoteLine"][];
+      /**
+       * @description Changes to existing subscriptions to test against, in the same shape as a quote.
+       *
+       *     Give these rather than declaring an operation: whether a change counts as an
+       *     upgrade or a downgrade follows from what it costs, which cannot be determined
+       *     without the subscription item and the moment it takes effect.
+       */
+      changes?: components["schemas"]["QuoteChange"][];
+      /** @description Subscription items being renewed, when testing a renewal. */
+      renewal_of?: string[];
+    };
+    CodePreview: {
+      /**
+       * @description Whether the code itself is usable — it exists, has not expired, has not been used
+       *     up, and matches the account's currency. It says nothing about a particular
+       *     purchase; `applicable` does.
+       */
+      valid: boolean;
+      reason?: components["schemas"]["CodeRejection"];
+      /** @enum {string} */
+      type: "voucher" | "discount";
+      name?: string;
+      /** @description For a voucher, the amount it adds. */
+      amount?: components["schemas"]["Money"];
+      /** @description For a percentage discount. */
+      percent_off?: string;
+      max_discount?: components["schemas"]["Money"];
+      currency?: string;
+      /**
+       * @description What it may be used for. Present whether or not a purchase was given, so that the
+       *     terms can be shown before anything is chosen.
+       */
+      applies_to?: components["schemas"]["Applicability"];
+      /**
+       * @description The terms in one sentence, ready to display — for example "Compute, new purchases
+       *     only, from 100.00" or "No restriction on product or purchase type".
+       */
+      summary?: string;
+      /** Format: date-time */
+      valid_until?: string | null;
+      /**
+       * @description Whether it applies to the purchase given in `lines`. Absent when no purchase was
+       *     given.
+       */
+      applicable?: boolean;
+      applicable_reason?: components["schemas"]["CodeRejection"];
+      /**
+       * @description The total of the lines that match the restrictions. This is what the threshold is
+       *     measured against, not the order total.
+       */
+      qualifying_amount?: components["schemas"]["Money"];
+      /**
+       * @description How much more of a qualifying purchase is needed to reach the threshold. `"0"` once
+       *     it is met.
+       */
+      shortfall?: components["schemas"]["Money"];
+      /**
+       * @description What it would take off this purchase. An estimate: the amount is settled at the
+       *     moment the order is placed.
+       */
+      estimated_discount?: components["schemas"]["Money"];
+    };
+    /**
+     * @description Why a code cannot be used. `none` when it can.
+     *
+     *     `operation_not_covered` means the code is limited to certain purchase actions — a
+     *     first-purchase code presented for a renewal, for example.
+     *
+     *     `below_minimum` is accompanied by `shortfall`.
+     * @enum {string}
+     */
+    CodeRejection:
+      | "none"
+      | "not_found"
+      | "expired"
+      | "not_yet_valid"
+      | "exhausted"
+      | "already_redeemed"
+      | "currency_mismatch"
+      | "product_not_covered"
+      | "plan_not_covered"
+      | "price_type_not_covered"
+      | "operation_not_covered"
+      | "not_first_purchase"
+      | "below_minimum";
+    /**
+     * @description Which purchase this applies to. `upgrade` and `downgrade` are told apart by money: a change
+     *     that costs more for the remainder of the period is an upgrade, one that returns money
+     *     is a downgrade. A change that costs neither more nor less is neither.
+     *
+     *     `new` means a new purchase as opposed to a renewal or a change. It does not mean the
+     *     account's first purchase.
+     * @enum {string}
+     */
+    PurchaseOperation: "purchase" | "renew" | "upgrade" | "downgrade";
+    /**
+     * @description What something may be used for. A field that is absent places no restriction on that
+     *     dimension; all of them absent means no restriction at all.
+     *
+     *     A line qualifies when it satisfies every field that is set. `min_amount` is then
+     *     measured against **the qualifying lines only**, not the order total.
+     */
+    Applicability: {
+      product_keys?: string[];
+      plan_keys?: string[];
+      price_types?: string[];
+      operations?: components["schemas"]["PurchaseOperation"][];
+      /** @description Restricted to your first purchase of a covered product. */
+      first_purchase_only?: boolean;
+      min_amount?: components["schemas"]["Money"];
+    };
+    CodeRedeem: {
+      /** Format: int64 */
+      billing_account_id: number;
+      code: string;
+      idempotency_key: string;
+    };
+    CodeRedeemResult: {
+      /** @enum {string} */
+      type: "voucher" | "discount";
+      /**
+       * Format: uuid
+       * @description For a voucher, the credit that was added.
+       */
+      credit_grant_id?: string | null;
+      amount?: components["schemas"]["Money"];
+      currency?: string;
+      /**
+       * @description For a discount, what will happen — it is applied to the next qualifying purchase
+       *     rather than added to the balance.
+       */
+      message?: string;
+    };
+    Tier: {
+      /** @description The upper bound of this band. Null on the last band, which has no bound. */
+      up_to?: string | null;
+      unit_amount: components["schemas"]["Money"];
+      /** @description Charged once when this band is reached, in addition to the per-unit amount. */
+      flat_amount?: components["schemas"]["Money"];
+    };
+    OrderItem: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      order_id?: string;
+      /** Format: uuid */
+      price_id: string;
+      /**
+       * Format: uuid
+       * @description Which service this line belongs to.
+       */
+      product_id?: string;
+      /**
+       * Format: uuid
+       * @description Which plan was bought.
+       */
+      plan_id?: string;
+      /**
+       * @description What it was called when bought. It does not follow later catalogue renames and is
+       *     not translated.
+       */
+      plan_name?: string;
+      resource_id?: string;
+      quantity: string;
+      unit_amount?: components["schemas"]["Money"];
+      gross_amount?: components["schemas"]["Money"];
+      discount_amount?: components["schemas"]["Money"];
+      amount: components["schemas"]["Money"];
+      currency: string;
+      /** Format: date-time */
+      service_period_start?: string | null;
+      /** Format: date-time */
+      service_period_end?: string | null;
+    };
+    OrderItemList: {
+      items: components["schemas"]["OrderItem"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    Allowance: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int64 */
+      billing_account_id?: number;
+      /**
+       * @description Which service it covers, such as `compute`. Read it alongside `meter_key`: a meter
+       *     name is unique only within its own service, so two allowances for `egress_bytes`
+       *     may belong to different services and cover different traffic.
+       */
+      product_key: string;
+      /** @description What it covers, such as `egress_bytes`. */
+      meter_key: string;
+      /** @description The unit it is counted in, such as `MiB`. */
+      unit?: string;
+      /**
+       * @description `included` came with a recurring purchase, `package` was bought on its own such as a
+       *     traffic pack, `promotional` was granted.
+       * @enum {string}
+       */
+      source_type: "included" | "package" | "promotional";
+      name: string;
+      /** @description How much was granted. */
+      quantity: string;
+      /** @description How much is left. */
+      remaining_quantity: string;
+      /** @description Lower is drawn on first. Included quantities sit ahead of purchased packs. */
+      priority?: number;
+      /** @enum {string} */
+      status: "active" | "depleted" | "expired" | "voided";
+      /** Format: date-time */
+      valid_from: string;
+      /**
+       * Format: date-time
+       * @description When it lapses. Anything unused at that point is lost; it is not refunded and does
+       *     not carry over. Absent when it does not expire on its own.
+       */
+      valid_until?: string | null;
+    };
+    AllowanceList: {
+      items: components["schemas"]["Allowance"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    AllowanceConsumption: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      usage_charge_id?: string;
+      meter_key?: string;
+      quantity: string;
+      /** Format: date-time */
+      consumed_at: string;
+      /** Format: date-time */
+      reversed_at?: string | null;
+    };
+    AllowanceConsumptionList: {
+      items: components["schemas"]["AllowanceConsumption"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+    IncludedAllowance: {
+      meter_key: string;
+      unit?: string;
+      /** @description How much is included. */
+      quantity: string;
+      /**
+       * @description `period_end` lasts as long as the period it came with. `days` lasts a fixed number
+       *     of days from purchase. `never` does not lapse.
+       * @enum {string}
+       */
+      expiry: "period_end" | "days" | "never";
+      /** @description Only meaningful when `expiry` is `days`. */
+      valid_days?: number;
+    };
+    IncludedFeature: {
+      feature_key: string;
+      name: string;
+      name_translations?: components["schemas"]["Translations"];
+      description?: string;
+      /**
+       * @description Whether this price grants the capability without a cap.
+       *
+       *     **This is what says whether it is capped, not the presence of an included
+       *     quantity.** A capped capability whose quantity has run out would otherwise be
+       *     indistinguishable from one that was never capped.
+       *
+       *     `true` for a capability that is simply available or not, with nothing to count.
+       */
+      unlimited: boolean;
+      /** @description How much is included, as a decimal string. Present when `unlimited` is false. */
+      included_quantity?: string;
+      /** @description The unit that quantity is counted in, such as `request`. */
+      unit?: string;
+    };
+    Entitlement: {
+      /**
+       * @description Which service. Read it alongside `feature_key`, which is unique only within its
+       *     service.
+       */
+      product_key: string;
+      /** @description What calling code tests against. */
+      feature_key: string;
+      name?: string;
+      enabled: boolean;
+      /**
+       * @description Whether its use is counted. **`false` means no limit** — the plan providing it
+       *     grants it without a cap — and `remaining_quantity` should not be read in that case.
+       *
+       *     A capped capability whose quantity has run out keeps `metered` true with
+       *     `remaining_quantity` of `"0"`. Exhausted and uncapped are therefore always
+       *     distinguishable.
+       */
+      metered: boolean;
+      /**
+       * @description How much is left, as a decimal string. Meaningful only when `metered` is true.
+       *     `"0"` once exhausted, never negative.
+       *
+       *     This is the figure at the moment of the reply, and quantities are drawn down at
+       *     settlement rather than on each call. It is suitable for display and for a soft
+       *     warning, but it cannot enforce a strict limit: concurrent requests all see the same
+       *     figure. A hard limit has to be counted by the service that owns the capability, in
+       *     the same transaction as the operation it is limiting.
+       */
+      remaining_quantity?: string;
+      unit?: string;
+      /**
+       * Format: date-time
+       * @description When the subscription providing it ends. Absent for a metered subscription, which
+       *     has no end date.
+       */
+      expires_at?: string | null;
+    };
+    EntitlementList: {
+      items: components["schemas"]["Entitlement"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
+  };
+  responses: {
+    /** @description Unchanged since the `ETag` that was sent. No body. */
+    NotModified: {
+      headers: {
+        /** @description The same entity tag that was sent. */
+        ETag?: string;
+        [name: string]: unknown;
+      };
+      content?: never;
+    };
+    /** @description Error */
+    Error: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["Error"];
+      };
+    };
+  };
+  parameters: {
+    /**
+     * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
+     *     answer is `304` with no body.
+     *
+     *     Worth sending on every catalogue read: the listings are public, unauthenticated and
+     *     cached at the edge, so a repeat read costs one round trip and no transfer.
+     */
+    IfNoneMatch: string;
+    /** @description 1-based page number; the first page when omitted. */
+    Page: number;
+    /** @description How many per page, 100 at most. */
+    PageSize: number;
+    From: string;
+    /** @description Exclusive. */
+    To: string;
+    /** @description Restrict to one of your accounts. All of them when omitted. */
+    AccountIdQuery: number;
+    AccountId: number;
+    ProjectId: string;
+    ProductId: string;
+    PlanId: string;
+    RateCardId: string;
+    InvoiceId: string;
+    OrderId: string;
+    ItemId: string;
+    PaymentMethodId: string;
+    FromRequired: string;
+    /** @description Exclusive. One month is `[2026-09-01, 2026-10-01)`. */
+    ToRequired: string;
+  };
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
+}
+export type $defs = Record<string, never>;
+export interface operations {
+  "list-catalog-products": {
     parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: {
         /**
          * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
          *     answer is `304` with no body.
@@ -2858,1784 +2917,1739 @@ export interface components {
          *     Worth sending on every catalogue read: the listings are public, unauthenticated and
          *     cached at the edge, so a repeat read costs one round trip and no transfer.
          */
-        IfNoneMatch: string;
+        "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          /**
+           * @description Changes whenever the catalogue changes. Send it back as `If-None-Match`
+           *     to be told `304` instead of receiving the same listing again.
+           */
+          ETag?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CatalogProductList"];
+        };
+      };
+      304: components["responses"]["NotModified"];
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-catalog-plans": {
+    parameters: {
+      query?: {
         /** @description 1-based page number; the first page when omitted. */
-        Page: number;
+        page?: components["parameters"]["Page"];
         /** @description How many per page, 100 at most. */
-        PageSize: number;
-        From: string;
-        /** @description Exclusive. */
-        To: string;
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: {
+        /**
+         * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
+         *     answer is `304` with no body.
+         *
+         *     Worth sending on every catalogue read: the listings are public, unauthenticated and
+         *     cached at the edge, so a repeat read costs one round trip and no transfer.
+         */
+        "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+      };
+      path: {
+        productId: components["parameters"]["ProductId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          /**
+           * @description Changes whenever the catalogue changes. Send it back as `If-None-Match`
+           *     to be told `304` instead of receiving the same listing again.
+           */
+          ETag?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CatalogPlanList"];
+        };
+      };
+      304: components["responses"]["NotModified"];
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-catalog-prices": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        currency?: string;
+      };
+      header?: {
+        /**
+         * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
+         *     answer is `304` with no body.
+         *
+         *     Worth sending on every catalogue read: the listings are public, unauthenticated and
+         *     cached at the edge, so a repeat read costs one round trip and no transfer.
+         */
+        "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+      };
+      path: {
+        planId: components["parameters"]["PlanId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          /**
+           * @description Changes whenever the catalogue changes. Send it back as `If-None-Match`
+           *     to be told `304` instead of receiving the same listing again.
+           */
+          ETag?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CatalogPriceList"];
+        };
+      };
+      304: components["responses"]["NotModified"];
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-catalog-rates": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        meter_key?: string;
+        /** @description Return the rates in effect at this moment. Defaults to now. */
+        at?: string;
+      };
+      header?: {
+        /**
+         * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
+         *     answer is `304` with no body.
+         *
+         *     Worth sending on every catalogue read: the listings are public, unauthenticated and
+         *     cached at the edge, so a repeat read costs one round trip and no transfer.
+         */
+        "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+      };
+      path: {
+        rateCardId: components["parameters"]["RateCardId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          /**
+           * @description Changes whenever the catalogue changes. Send it back as `If-None-Match`
+           *     to be told `304` instead of receiving the same listing again.
+           */
+          ETag?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CatalogRateList"];
+        };
+      };
+      304: components["responses"]["NotModified"];
+      default: components["responses"]["Error"];
+    };
+  };
+  "create-estimate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EstimateRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-billing-accounts": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BillingAccountList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "create-billing-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BillingAccountCreate"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BillingAccount"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "get-billing-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        accountId: components["parameters"]["AccountId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BillingAccount"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "update-billing-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        accountId: components["parameters"]["AccountId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BillingAccountUpdate"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BillingAccount"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "get-account-balance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        accountId: components["parameters"]["AccountId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountBalance"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-paid-projects": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        billing_account_id?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectBindingList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "find-project-payer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectBinding"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "set-project-payer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ProjectPayerSet"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectBinding"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "unbind-project-payer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Unbound */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "settle-project-usage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SettleResult"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-top-ups": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
         /** @description Restrict to one of your accounts. All of them when omitted. */
-        AccountIdQuery: number;
-        AccountId: number;
-        ProjectId: string;
-        ProductId: string;
-        PlanId: string;
-        RateCardId: string;
-        InvoiceId: string;
-        OrderId: string;
-        ItemId: string;
-        PaymentMethodId: string;
-        FromRequired: string;
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TopUpList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "create-top-up": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TopUpCreate"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TopUp"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "get-top-up": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        topUpId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TopUp"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-payment-methods": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentMethodList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "create-payment-method-setup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PaymentMethodSetup"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentMethodSetupResult"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "set-default-payment-method": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        paymentMethodId: components["parameters"]["PaymentMethodId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentMethod"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "delete-payment-method": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        paymentMethodId: components["parameters"]["PaymentMethodId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Removed */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "pay-invoice": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PayRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentResult"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "pay-together": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PayTogetherRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentResult"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "pay-order": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["PayRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentResult"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-invoices": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        status?: components["schemas"]["InvoiceStatus"];
+        from?: components["parameters"]["From"];
+        /** @description Exclusive. */
+        to?: components["parameters"]["To"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["InvoiceList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "get-invoice": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Invoice"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-invoice-items": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["InvoiceItemList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "get-invoice-refund-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RefundQuote"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-transactions": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        from?: components["parameters"]["From"];
+        /** @description Exclusive. */
+        to?: components["parameters"]["To"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TransactionList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-credit-grants": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        status?: "active" | "depleted" | "expired" | "voided";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CreditGrantList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-allocations": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        /** @description `transaction` is money paid in, `credit_grant` is granted credit or a voucher. */
+        source_type?: "transaction" | "credit_grant";
+        source_id?: string;
+        target_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AllocationList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-refunds": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RefundList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "request-refund": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RefundRequest"];
+      };
+    };
+    responses: {
+      /** @description Accepted for processing */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Refund"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-usage-charges": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        project_id?: string;
+        /** @description Restrict to one service, such as `compute`. */
+        product_key?: string;
+        resource_id?: string;
+        from?: components["parameters"]["From"];
+        /** @description Exclusive. */
+        to?: components["parameters"]["To"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UsageChargeList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-subscriptions": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        project_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SubscriptionList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-subscription-items": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        project_id?: string;
+        expiring_before?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SubscriptionItemList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "renew-subscription-item": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        itemId: components["parameters"]["ItemId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenewRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentResult"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "set-auto-renew": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        itemId: components["parameters"]["ItemId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AutoRenewSet"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SubscriptionItem"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "preview-code": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CodeRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CodePreview"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "redeem-code": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CodeRedeem"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CodeRedeemResult"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "get-project-billing-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectPayer"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-project-spend": {
+    parameters: {
+      query: {
+        from: components["parameters"]["FromRequired"];
         /** @description Exclusive. One month is `[2026-09-01, 2026-10-01)`. */
-        ToRequired: string;
+        to: components["parameters"]["ToRequired"];
+        /**
+         * @description `resource` groups by the resource each charge names. Items billed under their own
+         *     identifier — a disk, a public address — appear as their own rows rather than under
+         *     the machine they are attached to, since the relationship between them is known to
+         *     the owning service and not here.
+         */
+        group_by?: "product" | "plan" | "resource";
+        product_key?: string;
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
-}
-export type $defs = Record<string, never>;
-export interface operations {
-    "list-catalog-products": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-            };
-            header?: {
-                /**
-                 * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
-                 *     answer is `304` with no body.
-                 *
-                 *     Worth sending on every catalogue read: the listings are public, unauthenticated and
-                 *     cached at the edge, so a repeat read costs one round trip and no transfer.
-                 */
-                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
-            };
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    /**
-                     * @description Changes whenever the catalogue changes. Send it back as `If-None-Match`
-                     *     to be told `304` instead of receiving the same listing again.
-                     */
-                    ETag?: string;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CatalogProductList"];
-                };
-            };
-            304: components["responses"]["NotModified"];
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["SpendRowList"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "list-catalog-plans": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-            };
-            header?: {
-                /**
-                 * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
-                 *     answer is `304` with no body.
-                 *
-                 *     Worth sending on every catalogue read: the listings are public, unauthenticated and
-                 *     cached at the edge, so a repeat read costs one round trip and no transfer.
-                 */
-                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
-            };
-            path: {
-                productId: components["parameters"]["ProductId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    /**
-                     * @description Changes whenever the catalogue changes. Send it back as `If-None-Match`
-                     *     to be told `304` instead of receiving the same listing again.
-                     */
-                    ETag?: string;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CatalogPlanList"];
-                };
-            };
-            304: components["responses"]["NotModified"];
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-project-usage-charges": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        resource_id?: string;
+        /**
+         * @description Restrict to one service, such as `compute`. Give it alongside `meter_key`: a meter
+         *     name is unique only within its own service, and more than one service may measure
+         *     `traffic_bytes`, so `meter_key` on its own can return charges from several.
+         */
+        product_key?: string;
+        meter_key?: string;
+        from?: components["parameters"]["From"];
+        /** @description Exclusive. */
+        to?: components["parameters"]["To"];
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "list-catalog-prices": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                currency?: string;
-            };
-            header?: {
-                /**
-                 * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
-                 *     answer is `304` with no body.
-                 *
-                 *     Worth sending on every catalogue read: the listings are public, unauthenticated and
-                 *     cached at the edge, so a repeat read costs one round trip and no transfer.
-                 */
-                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
-            };
-            path: {
-                planId: components["parameters"]["PlanId"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    /**
-                     * @description Changes whenever the catalogue changes. Send it back as `If-None-Match`
-                     *     to be told `304` instead of receiving the same listing again.
-                     */
-                    ETag?: string;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CatalogPriceList"];
-                };
-            };
-            304: components["responses"]["NotModified"];
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["UsageChargeList"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "list-catalog-rates": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                meter_key?: string;
-                /** @description Return the rates in effect at this moment. Defaults to now. */
-                at?: string;
-            };
-            header?: {
-                /**
-                 * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
-                 *     answer is `304` with no body.
-                 *
-                 *     Worth sending on every catalogue read: the listings are public, unauthenticated and
-                 *     cached at the edge, so a repeat read costs one round trip and no transfer.
-                 */
-                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
-            };
-            path: {
-                rateCardId: components["parameters"]["RateCardId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    /**
-                     * @description Changes whenever the catalogue changes. Send it back as `If-None-Match`
-                     *     to be told `304` instead of receiving the same listing again.
-                     */
-                    ETag?: string;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CatalogRateList"];
-                };
-            };
-            304: components["responses"]["NotModified"];
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-project-subscriptions": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "create-estimate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EstimateRequest"];
-            };
+        content: {
+          "application/json": components["schemas"]["SubscriptionList"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Quote"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+      };
+      default: components["responses"]["Error"];
     };
-    "list-billing-accounts": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BillingAccountList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-project-subscription-items": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        expiring_before?: string;
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "create-billing-account": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BillingAccountCreate"];
-            };
+        content: {
+          "application/json": components["schemas"]["SubscriptionItemList"];
         };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BillingAccount"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+      };
+      default: components["responses"]["Error"];
     };
-    "get-billing-account": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                accountId: components["parameters"]["AccountId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BillingAccount"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "set-project-auto-renew": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        itemId: components["parameters"]["ItemId"];
+      };
+      cookie?: never;
     };
-    "update-billing-account": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                accountId: components["parameters"]["AccountId"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BillingAccountUpdate"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BillingAccount"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AutoRenewSet"];
+      };
     };
-    "get-account-balance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                accountId: components["parameters"]["AccountId"];
-            };
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AccountBalance"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["SubscriptionItem"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "list-paid-projects": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                billing_account_id?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectBindingList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-project-orders": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        state?: components["schemas"]["OrderState"];
+        from?: components["parameters"]["From"];
+        /** @description Exclusive. */
+        to?: components["parameters"]["To"];
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "find-project-payer": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectBinding"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["OrderList"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "set-project-payer": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProjectPayerSet"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectBinding"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "get-project-order": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "unbind-project-payer": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Unbound */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["Order"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "settle-project-usage": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SettleResult"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-project-active-resources": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        resource_id?: string;
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "list-top-ups": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TopUpList"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["ActiveResourceList"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "create-top-up": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TopUpCreate"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TopUp"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "create-project-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "get-top-up": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                topUpId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TopUp"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["QuoteRequest"];
+      };
     };
-    "list-payment-methods": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentMethodList"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["Quote"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "create-payment-method-setup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PaymentMethodSetup"];
-            };
-        };
-        responses: {
-            /** @description Created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentMethodSetupResult"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-allowances": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        meter_key?: string;
+        status?: "active" | "depleted" | "expired" | "voided";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "set-default-payment-method": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                paymentMethodId: components["parameters"]["PaymentMethodId"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentMethod"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["AllowanceList"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "delete-payment-method": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                paymentMethodId: components["parameters"]["PaymentMethodId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Removed */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-allowance-consumptions": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: never;
+      path: {
+        allowanceId: string;
+      };
+      cookie?: never;
     };
-    "pay-invoice": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                invoiceId: components["parameters"]["InvoiceId"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PayRequest"];
-            };
+        content: {
+          "application/json": components["schemas"]["AllowanceConsumptionList"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentResult"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+      };
+      default: components["responses"]["Error"];
     };
-    "pay-together": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PayTogetherRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentResult"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-orders": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        project_id?: string;
+        state?: components["schemas"]["OrderState"];
+        from?: components["parameters"]["From"];
+        /** @description Exclusive. */
+        to?: components["parameters"]["To"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "pay-order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PayRequest"];
-            };
+        content: {
+          "application/json": components["schemas"]["OrderList"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentResult"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+      };
+      default: components["responses"]["Error"];
     };
-    "list-invoices": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                status?: components["schemas"]["InvoiceStatus"];
-                from?: components["parameters"]["From"];
-                /** @description Exclusive. */
-                to?: components["parameters"]["To"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["InvoiceList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "get-order": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "get-invoice": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                invoiceId: components["parameters"]["InvoiceId"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Invoice"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["Order"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "list-invoice-items": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-            };
-            header?: never;
-            path: {
-                invoiceId: components["parameters"]["InvoiceId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["InvoiceItemList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "cancel-scheduled-change": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "get-invoice-refund-quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                invoiceId: components["parameters"]["InvoiceId"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RefundQuote"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["Order"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "list-transactions": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                from?: components["parameters"]["From"];
-                /** @description Exclusive. */
-                to?: components["parameters"]["To"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TransactionList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-order-items": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "list-credit-grants": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                status?: "active" | "depleted" | "expired" | "voided";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CreditGrantList"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["OrderItemList"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "list-allocations": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                /** @description `transaction` is money paid in, `credit_grant` is granted credit or a voucher. */
-                source_type?: "transaction" | "credit_grant";
-                source_id?: string;
-                target_id?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AllocationList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "get-order-refund-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "list-refunds": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RefundList"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["RefundQuote"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "request-refund": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RefundRequest"];
-            };
-        };
-        responses: {
-            /** @description Accepted for processing */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Refund"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-project-order-items": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
     };
-    "list-usage-charges": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                project_id?: string;
-                /** @description Restrict to one service, such as `compute`. */
-                product_key?: string;
-                resource_id?: string;
-                from?: components["parameters"]["From"];
-                /** @description Exclusive. */
-                to?: components["parameters"]["To"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UsageChargeList"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["OrderItemList"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "list-subscriptions": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                project_id?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-project-allowances": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        meter_key?: string;
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "list-subscription-items": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                project_id?: string;
-                expiring_before?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionItemList"];
-                };
-            };
-            default: components["responses"]["Error"];
+        content: {
+          "application/json": components["schemas"]["AllowanceList"];
         };
+      };
+      default: components["responses"]["Error"];
     };
-    "renew-subscription-item": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                itemId: components["parameters"]["ItemId"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RenewRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentResult"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-entitlements": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Restrict to one of your accounts. All of them when omitted. */
+        billing_account_id?: components["parameters"]["AccountIdQuery"];
+        /**
+         * @description Restrict to one project. Anything bought at account level, such as a membership,
+         *     appears regardless.
+         */
+        project_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "set-auto-renew": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                itemId: components["parameters"]["ItemId"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AutoRenewSet"];
-            };
+        content: {
+          "application/json": components["schemas"]["EntitlementList"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionItem"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+      };
+      default: components["responses"]["Error"];
     };
-    "preview-code": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CodeRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CodePreview"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+  };
+  "list-project-entitlements": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        product_key?: string;
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
     };
-    "redeem-code": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CodeRedeem"];
-            };
+        content: {
+          "application/json": components["schemas"]["EntitlementList"];
         };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CodeRedeemResult"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
+      };
+      default: components["responses"]["Error"];
     };
-    "get-project-billing-account": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectPayer"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-project-spend": {
-        parameters: {
-            query: {
-                from: components["parameters"]["FromRequired"];
-                /** @description Exclusive. One month is `[2026-09-01, 2026-10-01)`. */
-                to: components["parameters"]["ToRequired"];
-                /**
-                 * @description `resource` groups by the resource each charge names. Items billed under their own
-                 *     identifier — a disk, a public address — appear as their own rows rather than under
-                 *     the machine they are attached to, since the relationship between them is known to
-                 *     the owning service and not here.
-                 */
-                group_by?: "product" | "plan" | "resource";
-                product_key?: string;
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-            };
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SpendRowList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-project-usage-charges": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                resource_id?: string;
-                /**
-                 * @description Restrict to one service, such as `compute`. Give it alongside `meter_key`: a meter
-                 *     name is unique only within its own service, and more than one service may measure
-                 *     `traffic_bytes`, so `meter_key` on its own can return charges from several.
-                 */
-                product_key?: string;
-                meter_key?: string;
-                from?: components["parameters"]["From"];
-                /** @description Exclusive. */
-                to?: components["parameters"]["To"];
-            };
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UsageChargeList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-project-subscriptions": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-            };
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-project-subscription-items": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                expiring_before?: string;
-            };
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionItemList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "set-project-auto-renew": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-                itemId: components["parameters"]["ItemId"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AutoRenewSet"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubscriptionItem"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-project-orders": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                state?: components["schemas"]["OrderState"];
-                from?: components["parameters"]["From"];
-                /** @description Exclusive. */
-                to?: components["parameters"]["To"];
-            };
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrderList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "get-project-order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Order"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-project-active-resources": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                resource_id?: string;
-            };
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ActiveResourceList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "create-project-quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["QuoteRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Quote"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-allowances": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                meter_key?: string;
-                status?: "active" | "depleted" | "expired" | "voided";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AllowanceList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-allowance-consumptions": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-            };
-            header?: never;
-            path: {
-                allowanceId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AllowanceConsumptionList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-orders": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                project_id?: string;
-                state?: components["schemas"]["OrderState"];
-                from?: components["parameters"]["From"];
-                /** @description Exclusive. */
-                to?: components["parameters"]["To"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrderList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "get-order": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Order"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "cancel-scheduled-change": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Order"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-order-items": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-            };
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrderItemList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "get-order-refund-quote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RefundQuote"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-project-order-items": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-            };
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-                orderId: components["parameters"]["OrderId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrderItemList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-project-allowances": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                meter_key?: string;
-            };
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AllowanceList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-entitlements": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                /** @description Restrict to one of your accounts. All of them when omitted. */
-                billing_account_id?: components["parameters"]["AccountIdQuery"];
-                /**
-                 * @description Restrict to one project. Anything bought at account level, such as a membership,
-                 *     appears regardless.
-                 */
-                project_id?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EntitlementList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    "list-project-entitlements": {
-        parameters: {
-            query?: {
-                /** @description 1-based page number; the first page when omitted. */
-                page?: components["parameters"]["Page"];
-                /** @description How many per page, 100 at most. */
-                page_size?: components["parameters"]["PageSize"];
-                product_key?: string;
-            };
-            header?: never;
-            path: {
-                projectId: components["parameters"]["ProjectId"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EntitlementList"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
+  };
 }
