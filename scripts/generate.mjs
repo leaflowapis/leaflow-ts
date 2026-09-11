@@ -59,7 +59,9 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const contractsRoot = join(root, "leaflowapis");
+const contractsRoot = process.env.CONTRACTS_DIR
+  ? resolve(process.env.CONTRACTS_DIR)
+  : join(root, "leaflowapis");
 // leaflow/ is the namespace directory, matching googleapis' google/.
 const contracts = join(contractsRoot, "leaflow");
 const output = join(root, "gen");
@@ -72,13 +74,19 @@ const output = join(root, "gen");
 const ref = existsSync(join(root, "CONTRACTS_REF"))
   ? readFileSync(join(root, "CONTRACTS_REF"), "utf8").trim()
   : "main";
-rmSync(contractsRoot, { recursive: true, force: true });
-// HTTPS by default: CI has no ssh, and an SSH URL fails with a bare exit status 128 that
-// says nothing about authentication.
-const remote = process.env.CONTRACTS_REMOTE ?? "https://github.com/leaflowapis/leaflowapis.git";
-execFileSync("git", ["clone", "--quiet", "--no-tags", remote, contractsRoot], { stdio: "inherit" });
-execFileSync("git", ["-C", contractsRoot, "checkout", "--quiet", ref], { stdio: "inherit" });
-console.log(`contracts ${ref} → leaflowapis/`);
+if (!process.env.CONTRACTS_DIR) {
+  rmSync(contractsRoot, { recursive: true, force: true });
+  // HTTPS by default: CI has no ssh, and an SSH URL fails with a bare exit status 128 that
+  // says nothing about authentication.
+  const remote = process.env.CONTRACTS_REMOTE ?? "https://github.com/leaflowapis/leaflowapis.git";
+  execFileSync("git", ["clone", "--quiet", "--no-tags", remote, contractsRoot], {
+    stdio: "inherit",
+  });
+  execFileSync("git", ["-C", contractsRoot, "checkout", "--quiet", ref], { stdio: "inherit" });
+  console.log(`contracts ${ref} → leaflowapis/`);
+} else {
+  console.log(`本地契约 → ${contractsRoot}`);
+}
 
 const METHODS = ["get", "post", "put", "patch", "delete", "options", "head", "trace"];
 const JSON_MEDIA = "application/json";
@@ -177,12 +185,8 @@ for (const { service, version, spec } of contractList) {
   const aliases = [];
   const document = parseYaml(readFileSync(spec, "utf8"));
 
-  // The contract's servers[0]. A service that declares none gets no client(); callers can
-  // still reach it through createClient<paths>({ baseUrl }).
+  // 有默认地址时沿用契约；没有时由调用方明确传入 baseUrl。
   const server = document.servers?.[0]?.url;
-  if (!server) {
-    console.warn(`${service}/${version}: no servers declared, skipping client()`);
-  }
 
   for (const [path, item] of Object.entries(document.paths)) {
     for (const [method, operation] of Object.entries(item)) {
@@ -223,7 +227,7 @@ for (const { service, version, spec } of contractList) {
   // the caller name it once more turns a value the contract already settled into one more
   // parameter that can be got wrong — and a wrong one is a well-formed URL pointing
   // somewhere else, which no type checker can catch.
-  if (server) {
+  {
     writeFileSync(
       join(destination, "client.ts"),
       `${[
@@ -233,11 +237,15 @@ for (const { service, version, spec } of contractList) {
         "",
         'import type { paths } from "./schema.js";',
         "",
-        `const defaultBaseUrl = ${JSON.stringify(server)};`,
+        ...(server ? [`const defaultBaseUrl = ${JSON.stringify(server)};`, ""] : []),
         "",
         `/** A client for the ${service} service. Pass baseUrl to override the address. */`,
-        "export function client(options: ClientOptions = {}) {",
-        "  return createClient<paths>({ baseUrl: defaultBaseUrl, ...options });",
+        server
+          ? "export function client(options: ClientOptions = {}) {"
+          : "export function client(options: ClientOptions & { baseUrl: string }) {",
+        server
+          ? "  return createClient<paths>({ baseUrl: defaultBaseUrl, ...options });"
+          : "  return createClient<paths>(options);",
         "}",
       ].join("\n")}\n`,
     );
@@ -252,7 +260,8 @@ for (const { service, version, spec } of contractList) {
       "// components / operations are exported as well: paths is what createClient<paths>() takes.",
       "",
       'export type { paths, components, operations, webhooks } from "./schema.js";',
-      ...(server ? ["", 'export { client } from "./client.js";'] : []),
+      "",
+      'export { client } from "./client.js";',
       "",
       'import type { operations } from "./schema.js";',
       "",
@@ -290,6 +299,23 @@ writeFileSync(
 );
 
 console.log(`gen/index.ts → ${services.map((s) => s.service).join(", ")}`);
+
+// 导出路径随契约生成，新增服务后包安装者能直接导入该服务。
+const packagePath = join(root, "package.json");
+const manifest = JSON.parse(readFileSync(packagePath, "utf8"));
+manifest.exports = {
+  ".": { types: "./dist/index.d.ts", default: "./dist/index.js" },
+  ...Object.fromEntries(
+    services.map(({ service, version }) => [
+      `./${service}/${version}`,
+      {
+        types: `./dist/${service}/${version}/index.d.ts`,
+        default: `./dist/${service}/${version}/index.js`,
+      },
+    ]),
+  ),
+};
+writeFileSync(packagePath, JSON.stringify(manifest, null, 2) + "\n");
 
 // Format the output.
 //

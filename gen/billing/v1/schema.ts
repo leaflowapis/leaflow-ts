@@ -1362,6 +1362,10 @@ export interface components {
       total_count?: number;
     };
     CatalogPrice: {
+      /** @description External lookup alias within the service. Existing references use the price ID. */
+      lookup_key?: string;
+      /** Format: uuid */
+      product_id?: string;
       /** Format: uuid */
       id: string;
       /** Format: uuid */
@@ -1426,8 +1430,7 @@ export interface components {
       total_count?: number;
     };
     CatalogRate: {
-      /** @description What is being measured. */
-      meter_key: string;
+      meter: components["schemas"]["ObjectIdentity"];
       /** @description The unit readings arrive in, such as `core-second`. */
       unit?: string;
       /** @description The attributes this rate applies to, such as region and machine type. */
@@ -1456,22 +1459,12 @@ export interface components {
       /** Format: int64 */
       total_count?: number;
     };
-    /**
-     * @description Identify what to price either by `price_id`, or by `product_key` together with
-     *     `service_product_id`. Supplying both, or neither, is refused.
-     */
+    /** @description Identify a price directly, or select a price for a plan. Lookup keys are scoped to the product. Account quotes apply applicable contract prices. */
     QuoteLine: {
-      /** Format: uuid */
-      price_id?: string;
-      /** @description The service, such as `compute`. */
-      product_key?: string;
-      /** @description How the owning service identifies the item, such as a machine type. */
-      service_product_id?: string;
-      /**
-       * @description Required for a metered price whose price list covers more than one meter, so that
-       *     the intended one is unambiguous.
-       */
-      meter_key?: string;
+      price?: components["schemas"]["ObjectReference"];
+      product?: components["schemas"]["ObjectReference"];
+      plan?: components["schemas"]["ObjectReference"];
+      meter?: components["schemas"]["ObjectReference"];
       /**
        * @description The attributes the price depends on — region, instance type, token class.
        *
@@ -1486,13 +1479,7 @@ export interface components {
         [key: string]: string;
       };
       /**
-       * @description Which way of buying. Required when the item is sold in more than one way — the
-       *     same item may be offered metered, prepaid and as a one-off pack, and the pair
-       *     `product_key` + `service_product_id` names only the item, not the way.
-       *
-       *     Omit it when the item is sold one way only. If what is given matches no price, or
-       *     still leaves more than one candidate, the request is refused rather than resolved
-       *     by guessing.
+       * @description Narrows the selection when a plan offers more than one billing type.
        * @enum {string}
        */
       price_type?: "metered" | "prepaid" | "one_time";
@@ -1509,25 +1496,15 @@ export interface components {
        */
       duration_seconds?: number;
     };
-    /**
-     * @description Price a change to something already running, rather than a new purchase.
-     *
-     *     The result states what is still owed for the period already paid for, what the new
-     *     configuration costs for the remainder, and the difference in either direction.
-     */
+    /** @description Estimate a change to a subscription item using a target plan or price. */
     QuoteChange: {
       /**
        * Format: uuid
        * @description What is being changed.
        */
       subscription_item_id: string;
-      /**
-       * Format: uuid
-       * @description The price to move to. Identify it here, or by `service_product_id` below. Supplying
-       *     both, or neither, is refused.
-       */
-      price_id?: string;
-      service_product_id?: string;
+      price?: components["schemas"]["ObjectReference"];
+      plan?: components["schemas"]["ObjectReference"];
       /** @description The new quantity. The current one is kept when omitted. */
       quantity?: string;
       /**
@@ -2303,11 +2280,10 @@ export interface components {
       id: string;
       /** Format: uuid */
       project_id?: string;
-      product_key: string;
+      product: components["schemas"]["ObjectIdentity"];
       /** @description Which resource this was charged for. Empty for charges not tied to one. */
       resource_id?: string;
-      /** @description What was measured, such as `instance_seconds`. */
-      meter_key: string;
+      meter: components["schemas"]["ObjectIdentity"];
       unit?: string;
       /** @description The attributes the rate was chosen by, such as region and machine type. */
       dimensions?: {
@@ -2341,7 +2317,7 @@ export interface components {
       total_count?: number;
     };
     SpendRow: {
-      product_key?: string;
+      product?: components["schemas"]["ObjectIdentity"];
       /** Format: uuid */
       plan_id?: string;
       plan_name?: string;
@@ -2371,7 +2347,7 @@ export interface components {
       billing_account_id?: number;
       /** Format: uuid */
       product_id: string;
-      product_key?: string;
+      product?: components["schemas"]["ObjectIdentity"];
       /**
        * @description `pending` is a subscription created by an order that has not completed, so it
        *     appears in the list before anything under it is running.
@@ -2397,7 +2373,7 @@ export interface components {
        *     membership, which belongs to no single project.
        */
       project_id?: string | null;
-      product_key?: string;
+      product?: components["schemas"]["ObjectIdentity"];
       /** Format: uuid */
       plan_id: string;
       plan_name?: string;
@@ -2442,10 +2418,10 @@ export interface components {
     /** @description A resource currently accruing charges by the second. */
     ActiveResource: {
       resource_id: string;
-      product_key: string;
+      product: components["schemas"]["ObjectIdentity"];
       /** @description What it is, as its own service names it. */
       resource_type?: string;
-      meter_key: string;
+      meter: components["schemas"]["ObjectIdentity"];
       unit?: string;
       /** @description How much is held — cores, MiB, cards. Not how much has been used. */
       quantity: string;
@@ -2653,8 +2629,8 @@ export interface components {
      *     measured against **the qualifying lines only**, not the order total.
      */
     Applicability: {
-      product_keys?: string[];
-      plan_keys?: string[];
+      product_ids?: string[];
+      plan_ids?: string[];
       price_types?: string[];
       operations?: components["schemas"]["PurchaseOperation"][];
       /** @description Restricted to your first purchase of a covered product. */
@@ -2702,11 +2678,7 @@ export interface components {
        * @description Which service this line belongs to.
        */
       product_id?: string;
-      /**
-       * @description How that service is named, such as `compute`. Read from the catalogue rather than
-       *     recorded on the line, so it always matches the service it points at.
-       */
-      product_key?: string;
+      product?: components["schemas"]["ObjectIdentity"];
       /**
        * Format: uuid
        * @description Which plan was bought.
@@ -2735,18 +2707,20 @@ export interface components {
       total_count?: number;
     };
     Allowance: {
+      /**
+       * @description Allowed values for selected meter dimensions, such as region or storage class.
+       *     Every specified dimension must match one listed value. Omitted dimensions are
+       *     unrestricted. An empty map covers all dimensions of this meter.
+       */
+      dimension_values?: {
+        [key: string]: string[];
+      };
       /** Format: uuid */
       id: string;
       /** Format: int64 */
       billing_account_id?: number;
-      /**
-       * @description Which service it covers, such as `compute`. Read it alongside `meter_key`: a meter
-       *     name is unique only within its own service, so two allowances for `egress_bytes`
-       *     may belong to different services and cover different traffic.
-       */
-      product_key: string;
-      /** @description What it covers, such as `egress_bytes`. */
-      meter_key: string;
+      product: components["schemas"]["ObjectIdentity"];
+      meter: components["schemas"]["ObjectIdentity"];
       /** @description The unit it is counted in, such as `MiB`. */
       unit?: string;
       /**
@@ -2783,7 +2757,7 @@ export interface components {
       id: string;
       /** Format: uuid */
       usage_charge_id?: string;
-      meter_key?: string;
+      meter?: components["schemas"]["ObjectIdentity"];
       quantity: string;
       /** Format: date-time */
       consumed_at: string;
@@ -2796,7 +2770,15 @@ export interface components {
       total_count?: number;
     };
     IncludedAllowance: {
-      meter_key: string;
+      /**
+       * @description Allowed values for selected meter dimensions, such as region or storage class.
+       *     Every specified dimension must match one listed value. Omitted dimensions are
+       *     unrestricted. An empty map covers all dimensions of this meter.
+       */
+      dimension_values?: {
+        [key: string]: string[];
+      };
+      meter: components["schemas"]["ObjectIdentity"];
       unit?: string;
       /** @description How much is included. */
       quantity: string;
@@ -2810,7 +2792,7 @@ export interface components {
       valid_days?: number;
     };
     IncludedFeature: {
-      feature_key: string;
+      feature: components["schemas"]["ObjectIdentity"];
       name: string;
       name_translations?: components["schemas"]["Translations"];
       description?: string;
@@ -2830,13 +2812,8 @@ export interface components {
       unit?: string;
     };
     Entitlement: {
-      /**
-       * @description Which service. Read it alongside `feature_key`, which is unique only within its
-       *     service.
-       */
-      product_key: string;
-      /** @description What calling code tests against. */
-      feature_key: string;
+      product: components["schemas"]["ObjectIdentity"];
+      feature: components["schemas"]["ObjectIdentity"];
       name?: string;
       enabled: boolean;
       /**
@@ -2871,6 +2848,17 @@ export interface components {
       items: components["schemas"]["Entitlement"][];
       /** Format: int64 */
       total_count?: number;
+    };
+    /** @description Identify an object by ID or lookup key, exactly one. A lookup key requires the owning product. */
+    ObjectReference: {
+      /** Format: uuid */
+      id?: string;
+      lookup_key?: string;
+    };
+    ObjectIdentity: {
+      /** Format: uuid */
+      id: string;
+      lookup_key?: string;
     };
   };
   responses: {
@@ -3065,7 +3053,8 @@ export interface operations {
         page?: components["parameters"]["Page"];
         /** @description How many per page, 100 at most. */
         page_size?: components["parameters"]["PageSize"];
-        meter_key?: string;
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        meter?: components["schemas"]["ObjectReference"];
         /** @description Return the rates in effect at this moment. Defaults to now. */
         at?: string;
       };
@@ -3887,8 +3876,8 @@ export interface operations {
         /** @description Restrict to one of your accounts. All of them when omitted. */
         billing_account_id?: components["parameters"]["AccountIdQuery"];
         project_id?: string;
-        /** @description Restrict to one service, such as `compute`. */
-        product_key?: string;
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        product?: components["schemas"]["ObjectReference"];
         resource_id?: string;
         from?: components["parameters"]["From"];
         /** @description Exclusive. */
@@ -4111,7 +4100,8 @@ export interface operations {
          *     the owning service and not here.
          */
         group_by?: "product" | "plan" | "resource";
-        product_key?: string;
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        product?: components["schemas"]["ObjectReference"];
         /** @description 1-based page number; the first page when omitted. */
         page?: components["parameters"]["Page"];
         /** @description How many per page, 100 at most. */
@@ -4145,13 +4135,10 @@ export interface operations {
         /** @description How many per page, 100 at most. */
         page_size?: components["parameters"]["PageSize"];
         resource_id?: string;
-        /**
-         * @description Restrict to one service, such as `compute`. Give it alongside `meter_key`: a meter
-         *     name is unique only within its own service, and more than one service may measure
-         *     `traffic_bytes`, so `meter_key` on its own can return charges from several.
-         */
-        product_key?: string;
-        meter_key?: string;
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        product?: components["schemas"]["ObjectReference"];
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        meter?: components["schemas"]["ObjectReference"];
         from?: components["parameters"]["From"];
         /** @description Exclusive. */
         to?: components["parameters"]["To"];
@@ -4382,8 +4369,11 @@ export interface operations {
         page_size?: components["parameters"]["PageSize"];
         /** @description Restrict to one of your accounts. All of them when omitted. */
         billing_account_id?: components["parameters"]["AccountIdQuery"];
-        meter_key?: string;
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        meter?: components["schemas"]["ObjectReference"];
         status?: "active" | "depleted" | "expired" | "voided";
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        product?: components["schemas"]["ObjectReference"];
       };
       header?: never;
       path?: never;
@@ -4597,7 +4587,10 @@ export interface operations {
         page?: components["parameters"]["Page"];
         /** @description How many per page, 100 at most. */
         page_size?: components["parameters"]["PageSize"];
-        meter_key?: string;
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        meter?: components["schemas"]["ObjectReference"];
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        product?: components["schemas"]["ObjectReference"];
       };
       header?: never;
       path: {
@@ -4659,7 +4652,8 @@ export interface operations {
         page?: components["parameters"]["Page"];
         /** @description How many per page, 100 at most. */
         page_size?: components["parameters"]["PageSize"];
-        product_key?: string;
+        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
+        product?: components["schemas"]["ObjectReference"];
       };
       header?: never;
       path: {

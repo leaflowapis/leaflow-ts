@@ -23,6 +23,10 @@
       "types": "./dist/assistant/v1/index.d.ts",
       "default": "./dist/assistant/v1/index.js"
     },
+    "./billing/v1": {
+      "types": "./dist/billing/v1/index.d.ts",
+      "default": "./dist/billing/v1/index.js"
+    },
     "./canopy/v1": {
       "types": "./dist/canopy/v1/index.d.ts",
       "default": "./dist/canopy/v1/index.js"
@@ -31,6 +35,14 @@
       "types": "./dist/compute/v1/index.d.ts",
       "default": "./dist/compute/v1/index.js"
     },
+    "./dns/v1": {
+      "types": "./dist/dns/v1/index.d.ts",
+      "default": "./dist/dns/v1/index.js"
+    },
+    "./fleet/v1": {
+      "types": "./dist/fleet/v1/index.d.ts",
+      "default": "./dist/fleet/v1/index.js"
+    },
     "./iam/v1": {
       "types": "./dist/iam/v1/index.d.ts",
       "default": "./dist/iam/v1/index.js"
@@ -38,6 +50,14 @@
     "./monitoring/v1": {
       "types": "./dist/monitoring/v1/index.d.ts",
       "default": "./dist/monitoring/v1/index.js"
+    },
+    "./notification/v1": {
+      "types": "./dist/notification/v1/index.d.ts",
+      "default": "./dist/notification/v1/index.js"
+    },
+    "./support/v1": {
+      "types": "./dist/support/v1/index.d.ts",
+      "default": "./dist/support/v1/index.js"
     },
     "./tunnel/v1": {
       "types": "./dist/tunnel/v1/index.d.ts",
@@ -56,7 +76,6 @@
     "format:check": "prettier --check gen scripts"
   },
   "devDependencies": {
-    "openapi-fetch": "^0.17.0",
     "openapi-typescript": "7.13.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
@@ -65,12 +84,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "peerDependencies": {
+  "dependencies": {
     "openapi-fetch": "^0.17.0"
-  },
-  "peerDependenciesMeta": {
-    "openapi-fetch": {
-      "optional": true
-    }
   }
 }
