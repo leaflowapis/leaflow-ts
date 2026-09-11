@@ -5,6 +5,8 @@
 
 export type { paths, components, operations, webhooks } from "./schema.js";
 
+export { client } from "./client.js";
+
 import type { operations } from "./schema.js";
 
 /** The success response body of `GET /catalog/v1/products`. */
