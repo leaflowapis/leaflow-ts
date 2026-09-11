@@ -1396,6 +1396,17 @@ export interface components {
        * @description For `rated` prices, the price list the rates are read from.
        */
       rate_card_id?: string;
+      /** @description The smallest quantity that can be bought. Absent means no lower bound. */
+      min_quantity?: components["schemas"]["Money"];
+      /**
+       * @description The largest quantity that can be bought. Absent means no upper bound.
+       *
+       *     An order beyond it is refused with its own code, apart from the codes for running
+       *     out of stock and for exceeding what the infrastructure allows.
+       */
+      max_quantity?: components["schemas"]["Money"];
+      /** @description Quantities must be a multiple of this. Absent means any quantity within the bounds. */
+      quantity_step?: components["schemas"]["Money"];
       /**
        * @description Quantities included when this price is bought — the traffic or requests that are
        *     used before anything is charged for.
