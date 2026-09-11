@@ -1528,6 +1528,10 @@ export interface components {
       lines: components["schemas"]["QuoteLine"][];
     };
     QuoteLineResult: {
+      /** @description Tax included in the account quote. Absent in public catalogue estimates. */
+      tax_amount?: components["schemas"]["Money"];
+      /** @description Tax already included in the displayed price. */
+      tax_included_amount?: components["schemas"]["Money"];
       /** @description Which line of the request this answers. */
       index: number;
       /**
@@ -1566,6 +1570,10 @@ export interface components {
       currency: string;
     };
     QuoteChangeResult: {
+      /** @description Tax included in the account quote. Absent in public catalogue estimates. */
+      tax_amount?: components["schemas"]["Money"];
+      /** @description Tax already included in the displayed price. */
+      tax_included_amount?: components["schemas"]["Money"];
       index: number;
       /** Format: uuid */
       subscription_item_id: string;
@@ -1987,6 +1995,11 @@ export interface components {
     /** @enum {string} */
     InvoiceStatus: "draft" | "open" | "paid" | "void" | "uncollectible";
     Invoice: {
+      /**
+       * Format: uuid
+       * @description The purchase that produced this invoice. Absent on usage invoices.
+       */
+      order_id?: string;
       /** Format: uuid */
       id: string;
       /** Format: int64 */
@@ -2037,6 +2050,17 @@ export interface components {
       total_count?: number;
     };
     InvoiceItem: {
+      /** @description Discount applied to this line before tax. */
+      discount_amount?: string;
+      /** @description Tax on the discounted line, including tax already included in the price. */
+      tax_amount?: string;
+      /** @description The part of tax_amount already included in amount. */
+      tax_included_amount?: string;
+      /**
+       * Format: uuid
+       * @description The original order line. Refunds follow that line's original payment sources.
+       */
+      order_item_id?: string;
       /** Format: uuid */
       id: string;
       /** @enum {string} */
@@ -2446,6 +2470,10 @@ export interface components {
     /** @enum {string} */
     OrderState: "pending" | "paid" | "fulfilled" | "failed" | "canceled";
     Order: {
+      /** @description Total tax after discounts, including any tax already included in the price. */
+      tax_amount?: string;
+      /** @description The part of tax_amount already included in gross_amount; it is not charged again. */
+      tax_included_amount?: string;
       /** Format: uuid */
       id: string;
       /**
@@ -2667,6 +2695,10 @@ export interface components {
       flat_amount?: components["schemas"]["Money"];
     };
     OrderItem: {
+      /** @description Total tax after discounts, including any tax already included in the price. */
+      tax_amount?: string;
+      /** @description The part of tax_amount already included in gross_amount; it is not charged again. */
+      tax_included_amount?: string;
       /** Format: uuid */
       id: string;
       /** Format: uuid */
