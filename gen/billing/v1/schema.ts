@@ -2441,6 +2441,11 @@ export interface components {
     };
     /** @description A resource currently accruing charges by the second. */
     ActiveResource: {
+      /**
+       * Format: uuid
+       * @description The metered subscription item charged for this resource; null for shared service usage.
+       */
+      subscription_item_id?: string | null;
       resource_id: string;
       product: components["schemas"]["ObjectIdentity"];
       /** @description What it is, as its own service names it. */
@@ -2695,6 +2700,11 @@ export interface components {
       flat_amount?: components["schemas"]["Money"];
     };
     OrderItem: {
+      /**
+       * @description The payment timing of the selected price.
+       * @enum {string}
+       */
+      price_type?: "metered" | "prepaid" | "one_time";
       /** @description Total tax after discounts, including any tax already included in the price. */
       tax_amount?: string;
       /** @description The part of tax_amount already included in gross_amount; it is not charged again. */
