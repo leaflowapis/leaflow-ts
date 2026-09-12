@@ -12,10 +12,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List available regions
-     * @description Lists every region currently open to new orders, in display order.
-     *
-     *     The list is the same for every caller and changes rarely.
+     * List regions
+     * @description Lists available, draining and retired regions; pending locations are visible only to operators. Filter status=available to offer new placement choices.
      */
     get: operations["list-regions"];
     put?: never;
@@ -26,22 +24,49 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/regions/{regionCode}/availability-zones": {
+  "/api/v1/regions/{regionId}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /**
-     * List the availability zones of a region
-     * @description Lists every availability zone of this region that is currently open to new orders, in display order.
-     *
-     *     Resources are generally required to share an availability zone in order to be attached to one another, so confirm the zone before creating either side.
-     *
-     *     A region that exists but is not open to new orders is reported as not found, exactly as an unknown code is: both mean that nothing can be created there.
-     */
+    /** Get region */
+    get: operations["get-region"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/regions/{regionId}/availability-zones": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List availability zones */
     get: operations["list-availability-zones"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/regions/{regionId}/availability-zones/{availabilityZoneId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get availability zone */
+    get: operations["get-availability-zone"];
     put?: never;
     post?: never;
     delete?: never;
@@ -67,23 +92,60 @@ export interface components {
       /** Format: int64 */
       status: number;
     };
-    RegionResource: {
-      /** @description Stable identifier of the region, used wherever a region has to be named */
-      code: string;
-      /** @description ISO 3166-1 alpha-2 code of the country this region is in */
+    Region: {
+      /** Format: uuid */
+      id: string;
+      lookup_key: string;
+      name: string;
+      name_translations?: {
+        [key: string]: string;
+      };
       country_code: string;
+      /** @enum {string} */
+      status: "pending" | "available" | "draining" | "retired";
+      /** Format: int64 */
+      sort: number;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: date-time */
+      updated_at: string;
+    };
+    AvailabilityZone: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      region_id: string;
+      lookup_key: string;
       name: string;
+      name_translations?: {
+        [key: string]: string;
+      };
+      /** @enum {string} */
+      status: "pending" | "available" | "draining" | "retired";
+      /** Format: int64 */
+      sort: number;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: date-time */
+      updated_at: string;
     };
-    AvailabilityZoneResource: {
-      /** @description Stable identifier of the availability zone, used wherever an availability zone has to be named */
-      code: string;
-      name: string;
+    RegionList: {
+      items: components["schemas"]["Region"][];
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
-    RegionListResponseBody: {
-      items: components["schemas"]["RegionResource"][] | null;
-    };
-    AvailabilityZoneListResponseBody: {
-      items: components["schemas"]["AvailabilityZoneResource"][] | null;
+    AvailabilityZoneList: {
+      items: components["schemas"]["AvailabilityZone"][];
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
   };
   responses: never;
@@ -96,7 +158,12 @@ export type $defs = Record<string, never>;
 export interface operations {
   "list-regions": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: number;
+        page_size?: number;
+        status?: "pending" | "available" | "draining" | "retired";
+        lookup_key?: string;
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -109,7 +176,38 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["RegionListResponseBody"];
+          "application/json": components["schemas"]["RegionList"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-region": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Region"];
         };
       };
       /** @description Error */
@@ -125,10 +223,15 @@ export interface operations {
   };
   "list-availability-zones": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: number;
+        page_size?: number;
+        status?: "pending" | "available" | "draining" | "retired";
+        lookup_key?: string;
+      };
       header?: never;
       path: {
-        regionCode: string;
+        regionId: string;
       };
       cookie?: never;
     };
@@ -140,7 +243,39 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["AvailabilityZoneListResponseBody"];
+          "application/json": components["schemas"]["AvailabilityZoneList"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-availability-zone": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+        availabilityZoneId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AvailabilityZone"];
         };
       };
       /** @description Error */

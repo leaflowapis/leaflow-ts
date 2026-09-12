@@ -13,6 +13,21 @@ import type { operations } from "./schema.js";
 export type ListRegionsResult =
   operations["list-regions"]["responses"][200]["content"]["application/json"];
 
-/** The success response body of `GET /api/v1/regions/{regionCode}/availability-zones`. */
+/** The query parameters of `GET /api/v1/regions`. */
+export type ListRegionsQuery = operations["list-regions"]["parameters"]["query"];
+
+/** The success response body of `GET /api/v1/regions/{regionId}`. */
+export type GetRegionResult =
+  operations["get-region"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `GET /api/v1/regions/{regionId}/availability-zones`. */
 export type ListAvailabilityZonesResult =
   operations["list-availability-zones"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/regions/{regionId}/availability-zones`. */
+export type ListAvailabilityZonesQuery =
+  operations["list-availability-zones"]["parameters"]["query"];
+
+/** The success response body of `GET /api/v1/regions/{regionId}/availability-zones/{availabilityZoneId}`. */
+export type GetAvailabilityZoneResult =
+  operations["get-availability-zone"]["responses"][200]["content"]["application/json"];
