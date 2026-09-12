@@ -39,6 +39,10 @@
       "types": "./dist/dns/v1/index.d.ts",
       "default": "./dist/dns/v1/index.js"
     },
+    "./fabric/v1": {
+      "types": "./dist/fabric/v1/index.d.ts",
+      "default": "./dist/fabric/v1/index.js"
+    },
     "./fleet/v1": {
       "types": "./dist/fleet/v1/index.d.ts",
       "default": "./dist/fleet/v1/index.js"
@@ -54,6 +58,10 @@
     "./notification/v1": {
       "types": "./dist/notification/v1/index.d.ts",
       "default": "./dist/notification/v1/index.js"
+    },
+    "./storage/v1": {
+      "types": "./dist/storage/v1/index.d.ts",
+      "default": "./dist/storage/v1/index.js"
     },
     "./support/v1": {
       "types": "./dist/support/v1/index.d.ts",

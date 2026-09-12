@@ -4,118 +4,6 @@
  */
 
 export interface paths {
-  "/api/v1/backups": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List backups */
-    get: operations["list-backups"];
-    put?: never;
-    /**
-     * Create a backup
-     * @description A backup is a complete copy of a disk held in separate storage: **it remains restorable after the source disk is deleted, and can be restored to another availability zone in the same region.** A snapshot offers neither capability, as it resides in the same storage as the source disk and prevents that disk from being deleted while it exists.
-     *
-     *     Disks attached to a running instance, including system disks, can be backed up.
-     *
-     *     The duration depends on the amount of data. The backup is not complete when this endpoint returns; poll the retrieve endpoint.
-     */
-    post: operations["create-backup"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/backups/{backupId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Retrieve a backup
-     * @description Queries the current state of the backup, which makes it slower but more accurate than the list endpoint. Use it to poll creation progress.
-     */
-    get: operations["get-backup"];
-    put?: never;
-    post?: never;
-    /**
-     * Delete a backup
-     * @description Independent of the source disk: deletion succeeds whether or not that disk still exists.
-     */
-    delete: operations["delete-backup"];
-    options?: never;
-    head?: never;
-    /** Rename a backup */
-    patch: operations["rename-backup"];
-    trace?: never;
-  };
-  "/api/v1/backups/{backupId}/restore": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Restore from a backup
-     * @description Restores onto a **newly created** disk. The source disk is unaffected and need not still exist.
-     *
-     *     The target disk type may belong to another availability zone of the same region, and its capacity must not be smaller than the backup. The disk cannot be attached until the restore completes; poll the disk retrieve endpoint.
-     */
-    post: operations["restore-backup"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/disk-types": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List disk types on sale
-     * @description Only disk types currently on sale are listed. A withdrawn one disappears from here and can no longer be bought, while the disks already on it keep working and can still be resized.
-     */
-    get: operations["list-disk-types"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/disk-types/{diskTypeId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get a disk type
-     * @description Retrieve capacity and performance constraints for an existing disk, including system disk types and types withdrawn from sale.
-     */
-    get: operations["get-disk-type"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/api/v1/images": {
     parameters: {
       query?: never;
@@ -158,234 +46,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/regions": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List available regions */
-    get: operations["list-regions"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/regions/{regionCode}/availability-zones": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List the availability zones of a region
-     * @description A disk and an instance must reside in the same availability zone to be attached. Confirm the zone before creating either.
-     */
-    get: operations["list-availability-zones"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/disks": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List disks
-     * @description When both `region_code` and `availability_zone` are supplied, only disks attachable to an instance at that location are returned.
-     */
-    get: operations["list-disks"];
-    put?: never;
-    /**
-     * Create a disk
-     * @description The disk is created in the availability zone of the selected disk type, and an instance must reside in the same zone to attach it. Choosing the disk type therefore determines the zone.
-     *
-     *     A disk type that has been withdrawn is rejected with `DISK_TYPE_RETIRED`, even though its identifier still resolves. Withdrawn types stop appearing in the disk type listing; disks already bought on one keep working and can still be resized.
-     */
-    post: operations["create-disk"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/disks/{diskId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Retrieve a disk
-     * @description Queries the current state of the disk, which makes it slower but more accurate than the list endpoint.
-     */
-    get: operations["get-disk"];
-    put?: never;
-    post?: never;
-    /**
-     * Delete a disk
-     * @description Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
-     */
-    delete: operations["delete-disk"];
-    options?: never;
-    head?: never;
-    /**
-     * Rename a disk
-     * @description Changes the name only. Use the resize endpoint for capacity; type and availability zone are immutable.
-     */
-    patch: operations["rename-disk"];
-    trace?: never;
-  };
-  "/api/v1/disks/{diskId}/resize": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Resize a disk
-     * @description Capacity can only be increased; shrinking is not supported. Extend the file system inside the instance once the resize completes.
-     *
-     *     **A data disk whose performance grows with its size has to be detached first.** The storage backend decides a volume's limit when the volume is attached and never revisits it, so growing one that is attached would give you the capacity immediately and leave the speed at the old size's figure — indefinitely, and stopping the instance does not help. Rather than take the money for performance that does not arrive, this is refused with `DISK_RESIZE_NEEDS_DETACH`; detach the disk, resize it, and attach it again.
-     *
-     *     It is only refused when the two sizes really would differ in speed. A disk whose type has no QoS level, or whose performance has already reached the type's ceiling, grows online as before.
-     *
-     *     **A system disk is the exception and grows online**, because a root volume cannot be detached at all. Its performance does not change with size for exactly that reason — system disk types are required to carry a level that does not scale.
-     */
-    post: operations["resize-disk"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/disks/{diskId}/revert": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Revert to a snapshot
-     * @description Restores the contents of the disk to the moment the snapshot was taken. **All data written after that moment is lost and cannot be recovered.**
-     *
-     *     Three restrictions apply: only the most recent snapshot of the disk can be reverted to; the disk must be detached from its instance first; and a disk resized since the snapshot was taken cannot be reverted. To return to an earlier point in time, or to keep the existing disk, create a new disk from the snapshot instead.
-     *
-     *     The revert is not complete when this endpoint returns; poll the retrieve endpoint.
-     */
-    post: operations["revert-disk"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/floating-ips": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List floating IPs */
-    get: operations["list-floating-ips"];
-    put?: never;
-    /**
-     * Allocate a floating IP
-     * @description If the private network is not yet connected to the internet, connectivity is established as part of this call.
-     *
-     *     IPv6 is not requested through this endpoint. IPv6 addresses are assigned to instances by the private network; enable IPv6 on that network instead.
-     */
-    post: operations["allocate-floating-ip"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/floating-ips/{floatingIpId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Retrieve a floating IP */
-    get: operations["get-floating-ip"];
-    put?: never;
-    post?: never;
-    /**
-     * Release a floating IP
-     * @description A released address enters a cooldown period before it is allocated again, so that DNS records and allow-lists still pointing at it do not break immediately. **The same address therefore cannot be re-allocated** for some time after release. Proceed with care.
-     */
-    delete: operations["release-floating-ip"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/floating-ips/{floatingIpId}/bandwidth": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /**
-     * Set the bandwidth limit
-     * @description Limits both directions at once. Limiting egress alone does not prevent ingress traffic from saturating the uplink.
-     *
-     *     While the address is bound to an instance, the ceiling has to fit that instance type's `max_bandwidth_mbps`; asking for more is refused with `INSTANCE_BANDWIDTH_CEILING`. An address bound to nothing is not checked against any type — there is none to check against — and is checked again when it is attached.
-     */
-    put: operations["set-floating-ip-bandwidth"];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/floating-ips/{floatingIpId}/binding": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** Bind a floating IP to a network interface */
-    put: operations["bind-floating-ip"];
-    post?: never;
-    /**
-     * Unbind a floating IP
-     * @description The address remains held by the project and simply no longer points at any network interface.
-     */
-    delete: operations["unbind-floating-ip"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/api/v1/instances": {
     parameters: {
       query?: never;
@@ -401,21 +61,7 @@ export interface paths {
     put?: never;
     /**
      * Create instances
-     * @description **A password must be set in the request.** The request is rejected otherwise, since the resulting instance would be unreachable. The platform can generate one, in which case it is returned only in this response.
-     *
-     *     `count` creates several instances at once, 20 at most. Names are numbered `-1`, `-2` automatically and all instances share one password. **`instances` in the response is always an array**, including for a single instance.
-     *
-     *     Instances are created one by one in order. If the sequence stops part way through, because of a quota limit for example, **the instances already created are kept** and `failure` states why it stopped. A failure on the first instance is treated as a failure of the whole request and no instance is created.
-     *
-     *     Exactly one source must be given: `image_id` for a platform image, `private_image_id` for a private image, or `boot_disk_id` to boot a disk you already have. Supplying more than one, or none, is rejected.
-     *
-     *     A platform image that has been withdrawn is rejected with `IMAGE_RETIRED`, and an instance type that has been withdrawn with `INSTANCE_TYPE_RETIRED` — in both cases the identifier still resolves. Withdrawn entries stop appearing in their listing, so an identifier held in a script, a template or an earlier order is the way this is usually hit: reread the listing and pick another. Instances already running either are unaffected, and one on a withdrawn image can still be rebuilt onto it.
-     *
-     *     `boot_disk_id` recovers an instance that can no longer be repaired from the inside. Snapshot its disk, restore that snapshot into a new disk, attach the new disk to another instance and repair it there, then create an instance from it. That disk is not deleted when the instance is released; it is detached and returned to you.
-     *
-     *     Instances are created in the availability zone of the instance type. Disks to be attached later must reside in the same zone.
-     *
-     *     Creation is not complete when this endpoint returns and `status` is `provisioning`. Poll GET to observe the outcome.
+     * @description Creates a Billing order, including for metered pricing. The price must belong to the resource’s Billing Plan; applicable contract pricing is resolved by Billing. Technical capacity is checked before sellable quota is reserved. Provisioning continues automatically after payment; do not submit a new purchase after paying. Reuse the original idempotency key after an uncertain response. Exactly one of image_id, private_image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. Image boots require boot_disk; existing disks retain their own subscription. Resource lines for Compute, Storage and Fabric remain separate subscriptions on the same order.
      */
     post: operations["launch-instance"];
     delete?: never;
@@ -667,11 +313,7 @@ export interface paths {
     put?: never;
     /**
      * Resize an instance
-     * @description Only an instance type in the same region and availability zone can be selected, as attached disks cannot follow the instance elsewhere.
-     *
-     *     A resize has two steps. This endpoint restarts the instance on the new size and the status becomes `resize_verifying`, at which point the confirm or revert endpoint **must** be called. Until confirmation the target type is recorded in `pending_instance_type_id`, while `instance_type_id` remains the type in effect and billed.
-     *
-     *     **Both sizes hold resources while the resize is unconfirmed.** Confirm promptly once the status becomes `resize_verifying`.
+     * @description Creates a Billing order, including for metered pricing. The price must belong to the resource’s Billing Plan; applicable contract pricing is resolved by Billing. Technical capacity is checked before sellable quota is reserved. Provisioning continues automatically after payment; do not submit a new purchase after paying. Reuse the original idempotency key after an uncertain response.
      */
     post: operations["resize-instance"];
     delete?: never;
@@ -731,9 +373,7 @@ export interface paths {
     put?: never;
     /**
      * Start an instance
-     * @description An instance suspended by the platform must be unsuspended first.
-     *
-     *     This endpoint returns immediately and the `status` it returns is the transient `starting`. Poll the instance until it settles at `running`.
+     * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped VM retains its Fabric and Storage claims. Inspect operation, task_state, power_state and observed_at to determine completion.
      */
     post: operations["start-instance"];
     delete?: never;
@@ -753,11 +393,7 @@ export interface paths {
     put?: never;
     /**
      * Stop an instance
-     * @description The operating system is asked to shut down and is powered off once it does, or once it stops responding for long enough. Stopping does not release the instance: it keeps its disks, its addresses and its name, and starts again where it left off.
-     *
-     *     An instance suspended by the platform must be unsuspended first.
-     *
-     *     This endpoint returns immediately and the `status` it returns is the transient `stopping`. Poll the instance until it settles at `stopped`.
+     * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped VM retains its Fabric and Storage claims. Inspect operation, task_state, power_state and observed_at to determine completion.
      */
     post: operations["stop-instance"];
     delete?: never;
@@ -818,7 +454,7 @@ export interface paths {
     put?: never;
     /**
      * Bind a floating IP to an instance
-     * @description The floating IP is bound to the primary network interface of the instance.
+     * @description Requests a binding change on the instance’s primary Fabric port. The returned Fabric usage claim identifies the port-to-address relationship; Compute does not own the address. An accepted release can still be releasing until the provider confirms removal.
      */
     post: operations["attach-instance-floating-ip"];
     delete?: never;
@@ -837,7 +473,10 @@ export interface paths {
     get?: never;
     put?: never;
     post?: never;
-    /** Unbind the floating IP of an instance */
+    /**
+     * Unbind the floating IP of an instance
+     * @description Requests a binding change on the instance’s primary Fabric port. The returned Fabric usage claim identifies the port-to-address relationship; Compute does not own the address. An accepted release can still be releasing until the provider confirms removal.
+     */
     delete: operations["detach-instance-floating-ip"];
     options?: never;
     head?: never;
@@ -906,47 +545,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/ports": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List network interfaces */
-    get: operations["list-ports"];
-    put?: never;
-    /**
-     * Create a network interface
-     * @description The new network interface is not attached to any instance. Primary network interfaces are not created here; they are created with the instance.
-     */
-    post: operations["create-port"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/ports/{portId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /**
-     * Delete a network interface
-     * @description The primary network interface cannot be deleted on its own, as it is released with the instance. A network interface still attached to an instance cannot be deleted either.
-     */
-    delete: operations["delete-port"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/api/v1/private-images": {
     parameters: {
       query?: never;
@@ -1006,118 +604,7 @@ export interface paths {
     patch: operations["rename-private-image"];
     trace?: never;
   };
-  "/api/v1/private-networks": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List private networks */
-    get: operations["list-private-networks"];
-    put?: never;
-    /**
-     * Create a private network
-     * @description Creates a network, a router and a default security group in one call. The default security group denies all inbound traffic and permits all outbound traffic.
-     */
-    post: operations["create-private-network"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/private-networks/{privateNetworkId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Retrieve a private network */
-    get: operations["get-private-network"];
-    put?: never;
-    post?: never;
-    /**
-     * Release a private network
-     * @description Release is rejected while instances or network interfaces remain in the network. IPv6, the router and the security groups are released with it.
-     */
-    delete: operations["delete-private-network"];
-    options?: never;
-    head?: never;
-    /**
-     * Rename a private network
-     * @description Changes the display name only. The CIDR, the routes and the internet gateway are immutable.
-     */
-    patch: operations["rename-private-network"];
-    trace?: never;
-  };
-  "/api/v1/private-networks/{privateNetworkId}/ipv6": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Retrieve the IPv6 configuration of a private network */
-    get: operations["get-private-network-ipv6"];
-    put?: never;
-    /**
-     * Enable IPv6 on a private network
-     * @description Allocates an IPv6 prefix to the private network. Addresses are assigned to instances by the network itself, can be neither requested nor released individually, and consume no public IPv4 address.
-     *
-     *     If the private network is not yet connected to the internet, connectivity is established as part of this call.
-     */
-    post: operations["enable-private-network-ipv6"];
-    /**
-     * Disable IPv6 on a private network
-     * @description A released prefix is not re-allocated immediately.
-     */
-    delete: operations["disable-private-network-ipv6"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/private-networks/{privateNetworkId}/routes": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List static routes */
-    get: operations["list-routes"];
-    put?: never;
-    /**
-     * Create a static route
-     * @description Three forms that would sever connectivity are rejected: a destination of `0.0.0.0/0`, which overrides the default route and takes every floating IP offline immediately; a destination equal to the CIDR of a subnet, which overrides its directly connected route; and a next hop equal to the gateway of a subnet, which points back at the router itself.
-     */
-    post: operations["create-route"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/private-networks/{privateNetworkId}/routes/{routeId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete a static route */
-    delete: operations["delete-route"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/private-networks/{privateNetworkId}/subnets": {
+  "/api/v1/instances/{instanceId}/dependencies": {
     parameters: {
       query?: never;
       header?: never;
@@ -1125,183 +612,16 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List subnets
-     * @description IPv6 subnets are included, with `ip_version` 6. They are created when IPv6 is enabled and cannot be deleted individually.
+     * List instance dependencies
+     * @description Desired dependencies recorded by Compute. usage_id resolves the corresponding claim in Fabric or Storage. These records remain present while an instance is stopped or suspended.
      */
-    get: operations["list-subnets"];
-    put?: never;
-    /** Create a subnet */
-    post: operations["create-subnet"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/private-networks/{privateNetworkId}/subnets/next-free-cidr": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Suggest the next free CIDR
-     * @description The returned value is a suggestion and is validated again when the subnet is created. It exists to avoid errors when computing the next free CIDR by hand.
-     */
-    get: operations["suggest-subnet-cidr"];
+    get: operations["list-instance-dependencies"];
     put?: never;
     post?: never;
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
-    trace?: never;
-  };
-  "/api/v1/private-networks/{privateNetworkId}/subnets/{subnetId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /**
-     * Delete a subnet
-     * @description Deletion is rejected while network interfaces remain in the subnet, or while a static route has a next hop inside its CIDR.
-     */
-    delete: operations["delete-subnet"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/security-groups": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List security groups */
-    get: operations["list-security-groups"];
-    put?: never;
-    /**
-     * Create a security group
-     * @description A new security group carries one rule, permitting ICMP fragmentation-needed messages (type 3, code 4). Without it path MTU discovery fails, which presents as connections that establish and then stall on large packets.
-     */
-    post: operations["create-security-group"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/security-groups/{securityGroupId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Retrieve a security group */
-    get: operations["get-security-group"];
-    put?: never;
-    post?: never;
-    /**
-     * Delete a security group
-     * @description The default security group cannot be deleted, as it is released with the private network. A security group still referenced by a network interface cannot be deleted either.
-     */
-    delete: operations["delete-security-group"];
-    options?: never;
-    head?: never;
-    /**
-     * Rename a security group
-     * @description Changes the name only. Use the rule endpoints to change rules.
-     */
-    patch: operations["rename-security-group"];
-    trace?: never;
-  };
-  "/api/v1/security-groups/{securityGroupId}/rules": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List security group rules */
-    get: operations["list-security-group-rules"];
-    put?: never;
-    /**
-     * Create a security group rule
-     * @description Adding an identical rule twice is rejected. For that comparison `0.0.0.0/0`, `::/0` and an omitted value are treated as equivalent.
-     */
-    post: operations["create-security-group-rule"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/security-groups/{securityGroupId}/rules/{ruleId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete a security group rule */
-    delete: operations["delete-security-group-rule"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/snapshots": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List snapshots */
-    get: operations["list-snapshots"];
-    put?: never;
-    /**
-     * Create a snapshot
-     * @description Disks attached to a running instance can be snapshotted. A snapshot records the state of the block device at a point in time and may be inconsistent at the file-system level, so run `sync` inside the instance first where the data matters.
-     *
-     *     **A snapshot of a system disk cannot be used to revert that system disk**: reverting requires the disk to be detached, and a system disk cannot be detached. It can be used to create a new data disk. To preserve and restore an entire system, use a private image; for a copy that crosses availability zones and survives deletion of the disk, use a backup.
-     */
-    post: operations["create-snapshot"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/snapshots/{snapshotId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Retrieve a snapshot */
-    get: operations["get-snapshot"];
-    put?: never;
-    post?: never;
-    /** Delete a snapshot */
-    delete: operations["delete-snapshot"];
-    options?: never;
-    head?: never;
-    /** Rename a snapshot */
-    patch: operations["rename-snapshot"];
     trace?: never;
   };
 }
@@ -1321,197 +641,6 @@ export interface components {
       /** Format: int64 */
       status: number;
     };
-    BackupResource: {
-      /** @description Availability zone of the source disk. A restore may target another zone in the same region */
-      availability_zone: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: uuid */
-      id: string;
-      name: string;
-      region_code: string;
-      /**
-       * Format: int64
-       * @description Capacity of the source disk when the backup was created. A restored disk cannot be smaller than this
-       */
-      size_gb: number;
-      /**
-       * Format: uuid
-       * @description The disk this backup was taken from. The backup remains usable after that disk is deleted
-       */
-      source_disk_id: string;
-      /** @enum {string} */
-      status: "provisioning" | "available" | "restoring" | "deleting" | "error";
-    };
-    BackupListResponseBody: {
-      items: components["schemas"]["BackupResource"][] | null;
-    };
-    CreateBackupRequestBody: {
-      /** Format: uuid */
-      disk_id: string;
-      name: string;
-    };
-    RenameBackupRequestBody: {
-      name: string;
-    };
-    RestoreBackupRequestBody: {
-      /**
-       * Format: uuid
-       * @description May differ from the availability zone of the source disk, but must be in the same region. It has to be on sale — restoring creates a new disk, so a withdrawn type is rejected here as well
-       */
-      disk_type_id: string;
-      name: string;
-      /**
-       * Format: int64
-       * @description Matches the size of the backup when omitted. When given, it must not be smaller than the backup
-       */
-      size_gb?: number;
-    };
-    DiskResource: {
-      attached_instance_id: string | null;
-      /** @description Availability zone the disk actually resides in. An instance must be in the same zone to attach it */
-      availability_zone: string;
-      /** Format: date-time */
-      created_at: string;
-      /** @description Device name assigned by the system, as seen inside the instance */
-      device: string | null;
-      /** Format: uuid */
-      disk_type_id: string;
-      /** Format: uuid */
-      id: string;
-      /** @description A system disk is released with its instance and can be neither detached nor deleted individually */
-      is_system: boolean;
-      name: string;
-      region_code: string;
-      /** Format: int64 */
-      size_gb: number;
-      /**
-       * Format: int64
-       * @description IOPS this disk is allowed. Null when its type is not rate-limited.
-       *
-       *     Computed from the disk's own capacity, so it grows when the disk is grown — but see the
-       *     note on the resize endpoint: growing a disk that is attached is refused, precisely because
-       *     the new figure would not take effect until it was attached again.
-       */
-      iops: number | null;
-      /**
-       * Format: int64
-       * @description Throughput this disk is allowed, in bytes per second. Null when its type is not rate-limited
-       */
-      throughput_bytes_per_sec: number | null;
-      /** @enum {string} */
-      status:
-        | "provisioning"
-        | "available"
-        | "attaching"
-        | "in_use"
-        | "detaching"
-        | "resizing"
-        | "reverting"
-        | "restoring"
-        | "releasing"
-        | "deleting"
-        | "error";
-      /**
-       * @description How this disk is paid for. `postpaid` is billed by the hour for as long as it exists;
-       *     `prepaid` was bought outright for a term.
-       *
-       *     **Not the term.** How long it was bought for belongs to the order, not to the disk:
-       *     renewing can change it, and a machine bought for a year and then renewed for a month is
-       *     still a prepaid machine. Ask billing for the term and the expiry — they live there, and
-       *     they are the only two values a renewal moves.
-       * @enum {string}
-       */
-      charge_type: "postpaid" | "prepaid";
-    };
-    DiskTypeResource: {
-      availability_zone_code: string;
-      /** Format: uuid */
-      id: string;
-      /**
-       * Format: int64
-       * @description IOPS a disk of `min_size_gb` gets. Null when this type is not rate-limited.
-       *
-       *     Performance grows with capacity, so this and `iops_at_max_size` are the two ends of the
-       *     range. The exact figure for the size actually bought appears on the disk itself once it
-       *     exists.
-       */
-      iops_at_min_size: number | null;
-      /**
-       * Format: int64
-       * @description IOPS a disk of `max_size_gb` gets. Null when this type is not rate-limited
-       */
-      iops_at_max_size: number | null;
-      /** Format: int64 */
-      max_size_gb: number;
-      /** @enum {string} */
-      media: "ssd" | "hdd" | "nvme";
-      /** Format: int64 */
-      min_size_gb: number;
-      name: string;
-      region_code: string;
-      /** Format: int64 */
-      step_gb: number;
-      /**
-       * Format: int64
-       * @description Throughput a disk of `min_size_gb` gets, in **bytes per second**. Null when this type is
-       *     not rate-limited.
-       *
-       *     Bytes rather than MiB so the number needs no rounding on the way out; divide by 1048576
-       *     for MiB/s at the point of display.
-       */
-      throughput_at_min_size: number | null;
-      /**
-       * Format: int64
-       * @description Throughput a disk of `max_size_gb` gets, in bytes per second. Null when this type is not rate-limited
-       */
-      throughput_at_max_size: number | null;
-      /**
-       * @description Whether any capacity is left in this type's pool.
-       *
-       *     The same shape as on an instance type, but it answers less here: a disk is sold by the
-       *     GiB, so "not sold out" does not mean the size being asked for fits. `remaining` is the
-       *     field that decides that, and this one only says whether the pool is empty outright.
-       *
-       *     It reflects a limit set by operations, not what the storage backend physically has —
-       *     raising the limit does not create capacity, and a type that is not sold out can still fail
-       *     to create if the backend is full.
-       *
-       *     Advisory: it is read when the list is built, and capacity can be taken between that read
-       *     and the order. The order is what actually refuses.
-       */
-      sold_out: boolean;
-      /**
-       * Format: int64
-       * @description How much capacity is left, **in GiB**. Absent when this type is not limited at all.
-       *
-       *     Unlike an instance type, where this is a count of machines, here it is an amount of
-       *     storage — and it is the number that bounds the size a customer may ask for. A picker that
-       *     offers sizes above it produces orders that are refused after the customer has chosen
-       *     everything else.
-       *
-       *     Absent is not zero and not "unknown": a type with no limit simply has no number to show.
-       *     Reporting it as a number would need a sentinel, and any sentinel eventually gets compared
-       *     against a real size.
-       */
-      remaining?: number;
-      /**
-       * @description What buying this type outright costs, per term. Empty means this type is only sold by the
-       *     hour.
-       *
-       *     **The amount is per GiB for the whole term**, not the price of one disk: a disk's size is
-       *     chosen by the customer, so the total is this figure times the size. That differs from an
-       *     instance type, where the same field is the price of one machine — the unit follows what
-       *     the product is sold by, and the order is priced the same way.
-       *
-       *     Advisory, like `sold_out`: it is read when the list is built. The order is what fixes the
-       *     price, and it refuses rather than falling back to hourly if the term is not sold.
-       */
-      prepaid_prices?: components["schemas"]["PrepaidPrice"][];
-    };
-    DiskTypeListResponseBody: {
-      items: components["schemas"]["DiskTypeResource"][] | null;
-    };
     ImageResource: {
       architecture: string;
       /** Format: uuid */
@@ -1525,29 +654,23 @@ export interface components {
       name: string;
       os_family: string;
       os_version: string;
-      region_code: string;
+      /** Format: uuid */
+      region_id: string;
       /** @description False means a new password can only be set by rebuilding an instance created from this image */
       supports_password_reset: boolean;
     };
     ImageListResponseBody: {
-      items: components["schemas"]["ImageResource"][] | null;
-    };
-    PrepaidPrice: {
-      /**
-       * @description An ISO 8601 duration (P1M, P1Y). A duration rather than a number of months: months are not
-       *     the same length, and storing a number leaves whoever reads it to decide what it means.
-       */
-      term: string;
-      /**
-       * @description A decimal string, not a float. Money that survives a round trip through binary floating
-       *     point is money that stops adding up.
-       */
-      amount: string;
-      currency: string;
+      items: components["schemas"]["ImageResource"][];
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
     InstanceTypeResource: {
-      /** @description Availability zone of this instance type. A disk must be in the same zone to be attached */
-      availability_zone_code: string;
+      /** Format: uuid */
+      availability_zone_id: string;
       /** Format: uuid */
       id: string;
       /**
@@ -1580,198 +703,28 @@ export interface components {
       name: string;
       /** Format: int64 */
       ram_mb: number;
-      region_code: string;
+      /** Format: uuid */
+      region_id: string;
       /** Format: int64 */
       vcpus: number;
       /**
-       * @description Whether this type can be ordered right now.
-       *
-       *     It reflects a limit set by operations, not what the cloud can physically schedule — raising
-       *     the limit does not create capacity that is not there, and a type that is not sold out can
-       *     still fail to start if the zone is full.
-       *
-       *     It is advisory: it is read when the list is built, and the last one can be taken between
-       *     that read and the order. The order is what actually refuses.
+       * Format: uuid
+       * @description The Billing Plan for this type. Read its available prices from Billing; resource capacity and sellable quota are evaluated when placing the order.
        */
-      sold_out: boolean;
-      /**
-       * Format: int64
-       * @description How many more may be created. Absent when this type is not limited at all.
-       *
-       *     Absent is not zero and not "unknown": a type with no limit simply has no number to show.
-       *     Reporting it as a number would need a sentinel, and any sentinel eventually gets compared
-       *     against a real count.
-       */
-      remaining?: number;
-      /**
-       * @description What buying this type outright costs, per term. Empty means this type is only sold by the
-       *     hour.
-       *
-       *     The hourly price is not here and is not missing: it is made of finer parts than the type
-       *     (cores and memory are priced separately, and the type itself does not appear in the rate
-       *     card at all), so there is no single number to show. A term price is one number because a
-       *     term is one purchase.
-       *
-       *     Advisory, like `sold_out`: it is read when the list is built. The order is what fixes the
-       *     price, and it refuses rather than falling back to hourly if the term is not sold.
-       */
-      prepaid_prices?: components["schemas"]["PrepaidPrice"][];
+      billing_plan_id: string;
     };
     InstanceTypeListResponseBody: {
-      items: components["schemas"]["InstanceTypeResource"][] | null;
-    };
-    RegionResource: {
-      code: string;
-      country_code: string;
-      name: string;
-    };
-    RegionListResponseBody: {
-      items: components["schemas"]["RegionResource"][] | null;
-    };
-    ZoneResource: {
-      code: string;
-      name: string;
-    };
-    ZoneListResponseBody: {
-      items: components["schemas"]["ZoneResource"][] | null;
-    };
-    DiskListResponseBody: {
-      items: components["schemas"]["DiskResource"][] | null;
-    };
-    CreateDiskRequestBody: {
-      /**
-       * @description A promotion code to apply to this order. Case and surrounding whitespace do not matter.
-       *
-       *     An unusable code is rejected outright rather than quietly ignored: somebody who typed a
-       *     code is buying at the discounted price, and letting it through silently means they pay
-       *     full price expecting the discount, with nothing anywhere saying so.
-       *
-       *     The discount applies to the lines the campaign covers, not the whole order — typically
-       *     the instance type and memory, not the system disk, the address, or traffic. Preview it
-       *     first at `POST /account/v1/billing-accounts/{accountKey}/promotion-codes/preview` to
-       *     show the customer what will actually be charged.
-       *
-       *     Metered orders reject any code: there is no amount to discount at this point.
-       */
-      promotion_code?: string;
-      /**
-       * @description "This is the same click". Generate one when the dialog opens — not when it is submitted —
-       *     and send the same one on every retry of that action.
-       *
-       *     Optional, and what happens without it is worth knowing: two identical requests inside the
-       *     same minute are treated as one, because there is nothing else to tell a double-click apart
-       *     from a deliberate second order. Sending your own key removes that guess entirely.
-       */
-      idempotency_key?: string;
-      /**
-       * Format: uuid
-       * @description A disk type currently on sale. A withdrawn one is rejected even though its identifier still resolves
-       */
-      disk_type_id: string;
-      name: string;
+      items: components["schemas"]["InstanceTypeResource"][];
       /** Format: int64 */
-      size_gb: number;
-      /**
-       * Format: uuid
-       * @description Restore from this snapshot. When given, the capacity need only be no smaller than the snapshot
-       */
-      snapshot_id?: string;
-      /**
-       * @description Buy the disk outright for this long, as an ISO 8601 duration (P1M, P1Y). Billed by the
-       *     hour when omitted.
-       *
-       *     A disk bought outright can still be expanded: the difference is prorated over the days
-       *     left in the term, and the expiry date does not move. It is stopped, not deleted, when the
-       *     term runs out — the data stays and comes back once renewed.
-       */
-      term?: string;
-      /**
-       * @description How to pay for a term bought outright. Only meaningful together with `term`.
-       *
-       *     `balance` takes it from the account balance and either succeeds or refuses on the spot.
-       *     `online` returns a `checkout_url` instead and **creates nothing** — the resource is only
-       *     created once the money arrives and the customer comes back to place it again. That last
-       *     part is deliberate: a successful payment should not silently turn into a machine, because
-       *     between paying and returning they may have changed their mind.
-       *
-       *     Online payment is not a second wallet. What arrives lands in the balance first and the
-       *     order is settled from there, so money topped up and money paid at checkout are the same
-       *     pool.
-       * @default balance
-       * @enum {string}
-       */
-      payment_method?: "balance" | "online";
-    };
-    RenameDiskRequestBody: {
-      name: string;
-    };
-    ResizeDiskRequestBody: {
-      /**
-       * Format: int64
-       * @description Must be larger than the current capacity
-       */
-      size_gb: number;
-    };
-    RevertDiskRequestBody: {
-      /**
-       * Format: uuid
-       * @description Must be the most recent snapshot of the disk
-       */
-      snapshot_id: string;
-    };
-    FloatingIPResource: {
-      address: string;
-      attached_fixed_ip: string | null;
-      attached_port_id: string | null;
+      page: number;
       /** Format: int64 */
-      bandwidth_mbps: number | null;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      detached_at: string | null;
-      /** Format: uuid */
-      id: string;
-      region_code: string;
-      /**
-       * @description `idle` means the address is not bound to a network interface
-       * @enum {string}
-       */
-      status: "idle" | "bound";
-    };
-    FloatingIPListResponseBody: {
-      items: components["schemas"]["FloatingIPResource"][] | null;
-    };
-    AllocateFloatingIPRequestBody: {
-      /** @description The address to allocate. Allocated by the platform when omitted */
-      address?: string;
-      /**
-       * Format: int64
-       * @description The bandwidth ceiling of this address, in Mbit/s, applied to both directions.
-       *
-       *     Required, and there is no "unlimited": an address with no ceiling runs at line rate and is
-       *     charged nothing for the traffic, while the address itself bills normally — so the invoice
-       *     looks correct and nothing anywhere reports it.
-       *
-       *     It is billed separately from the address, per Mbit/s-hour, and appears as its own line on
-       *     the order. Changing it later goes through the bandwidth endpoint.
-       */
-      bandwidth_mbps: number;
-      /** Format: uuid */
-      private_network_id: string;
-    };
-    SetBandwidthRequestBody: {
-      /**
-       * Format: int64
-       * @description Applied to both directions
-       */
-      mbps: number;
-    };
-    BindFloatingIPRequestBody: {
-      /** Format: uuid */
-      port_id: string;
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
     InstanceResource: {
-      availability_zone: string;
+      /** Format: uuid */
+      availability_zone_id: string;
       /** Format: date-time */
       created_at: string;
       /** @description Hostname inside the instance; equals the instance id */
@@ -1820,48 +773,31 @@ export interface components {
       private_network_id: string | null;
       /** @description Floating IPv4 addresses bound to the primary network interface; an empty array when none are bound */
       public_ips: string[] | null;
-      region_code: string;
+      /** Format: uuid */
+      region_id: string;
       /**
-       * @description Only `running` and `stopped` accept commands. Every other value means the instance is changing, and start, stop, reboot, resize, rebuild and password reset are all rejected.
-       *
-       *     `transitioning` is the fallback for a change that falls into none of the categories above. It does not indicate an error; keep polling.
-       *
-       *     `resize_verifying` is not transient: the instance is running on the new size and stays there until the resize is confirmed or reverted, with both sizes billed in the meantime.
+       * @description Observed VM lifecycle state. This does not indicate the latest requested action or whether a business restriction applies.
        * @enum {string}
        */
       status:
-        | "provisioning"
-        | "running"
+        | "pending"
+        | "building"
+        | "active"
         | "stopped"
-        | "starting"
-        | "stopping"
-        | "rebooting"
-        | "transitioning"
-        | "resizing"
-        | "resize_verifying"
-        | "error"
+        | "paused"
+        | "suspended"
+        | "shelved"
+        | "shelved_offloaded"
+        | "rescued"
+        | "resized"
         | "deleting"
-        | "suspended";
+        | "deleted"
+        | "error"
+        | "unknown";
       /** @description Subnet of the primary network interface */
       subnet_id: string | null;
-      /**
-       * Format: date-time
-       * @description Non-empty once the platform has suspended the instance, which must be lifted before any operation
-       */
-      suspended_at: string | null;
       /** Format: date-time */
       updated_at: string;
-      /**
-       * @description How this instance is paid for. `postpaid` is billed by the hour for as long as it exists;
-       *     `prepaid` was bought outright for a term.
-       *
-       *     **Not the term.** How long it was bought for belongs to the order, not to the instance:
-       *     renewing can change it, and a machine bought for a year and then renewed for a month is
-       *     still a prepaid machine. Ask billing for the term and the expiry — they live there, and
-       *     they are the only two values a renewal moves.
-       * @enum {string}
-       */
-      charge_type: "postpaid" | "prepaid";
       /**
        * @description The order this instance was bought under, in billing's own identifiers. Empty when the
        *     deployment has no billing wired in.
@@ -1871,35 +807,34 @@ export interface components {
        *     person who needs it never had.
        */
       billing_order_id: string;
+      subscription_item_ids?: string[];
+      /** @enum {string} */
+      desired_state: "running" | "stopped" | "deleted";
+      /** @enum {string} */
+      power_state:
+        "no_state" | "running" | "paused" | "shutdown" | "crashed" | "suspended" | "unknown";
+      /** @description Current provider task, such as scheduling, networking, block_device_mapping or spawning. none means no task; unknown tasks remain observable and do not imply failure. */
+      task_state: string;
+      /** Format: int64 */
+      generation: number;
+      /**
+       * Format: date-time
+       * @description Timestamp of the last successful provider observation. An unreachable provider does not erase the last observation or prove deletion.
+       */
+      observed_at?: string;
+      operation?: components["schemas"]["InstanceOperation"];
+      restrictions: components["schemas"]["InstanceRestriction"][];
     };
     InstanceListResponseBody: {
-      items: components["schemas"]["InstanceResource"][] | null;
+      items: components["schemas"]["InstanceResource"][];
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
     LaunchInstanceRequestBody: {
-      /**
-       * @description A promotion code to apply to this order. Case and surrounding whitespace do not matter.
-       *
-       *     An unusable code is rejected outright rather than quietly ignored: somebody who typed a
-       *     code is buying at the discounted price, and letting it through silently means they pay
-       *     full price expecting the discount, with nothing anywhere saying so.
-       *
-       *     The discount applies to the lines the campaign covers, not the whole order — typically
-       *     the instance type and memory, not the system disk, the address, or traffic. Preview it
-       *     first at `POST /account/v1/billing-accounts/{accountKey}/promotion-codes/preview` to
-       *     show the customer what will actually be charged.
-       *
-       *     Metered orders reject any code: there is no amount to discount at this point.
-       */
-      promotion_code?: string;
-      /**
-       * @description "This is the same click". Generate one when the dialog opens — not when it is submitted —
-       *     and send the same one on every retry of that action.
-       *
-       *     Optional, and what happens without it is worth knowing: two identical requests inside the
-       *     same minute are treated as one, because there is nothing else to tell a double-click apart
-       *     from a deliberate second order. Sending your own key removes that guess entirely.
-       */
-      idempotency_key?: string;
       /**
        * Format: uuid
        * @description Bind a floating IP you already hold, instead of allocating a new one. It must be idle and in
@@ -1917,37 +852,8 @@ export interface components {
       floating_ip_id?: string;
       /**
        * Format: int64
-       * @description Give this instance a public address with this much bandwidth, in Mbit/s. Omitted or 0 means
-       *     no public address.
-       *
-       *     Mutually exclusive with `floating_ip_id`, which binds one you already hold.
-       *
-       *     The bandwidth is what says whether an address is wanted, rather than a separate flag,
-       *     because an address with no ceiling would run at line rate and be charged nothing for the
-       *     traffic — while the address itself bills normally and the invoice looks correct.
-       *
-       *     The address and its bandwidth are two lines on the same order as the instance and its
-       *     system disk — one purchase with one total — and everything is created together or not at
-       *     all: if any step fails, the address goes back to the pool and no instance is created.
-       *     Asking for an address separately afterwards is still possible, but then they are separate
-       *     purchases, and a failure in between leaves an instance you cannot reach.
-       *
-       *     Both lines are always billed by the hour, even when the instance is bought outright for a
-       *     term: a public IPv4 is a scarce resource the platform keeps holding for as long as you have
-       *     it, so it is not something that can be paid for once.
-       *
-       *     Which address you get is not a choice here. Use the floating IP endpoints to claim a
-       *     particular address and bind it, which is what getting a known address back after a
-       *     migration needs.
-       *
-       *     Rejected together with `port_id` when that interface already has a floating IP: an
-       *     interface carries one IPv4, and one IPv4 takes one floating IP. Attach another interface to
-       *     hold a second address.
-       */
-      bandwidth_mbps?: number;
-      /**
-       * Format: int64
        * @description Number of instances to create; 1 when omitted. Names are numbered automatically for several
+       * @default 1
        */
       count?: number;
       /** @description Have the platform generate a random password, returned only in this response */
@@ -1982,49 +888,6 @@ export interface components {
        * @description A private image. Exactly one of this, `image_id` and `boot_disk_id`
        */
       private_image_id?: string;
-      /**
-       * @description How to pay for a term bought outright. Only meaningful together with `term`.
-       *
-       *     `balance` takes it from the account balance and either succeeds or refuses on the spot.
-       *     `online` returns a `checkout_url` instead and **creates nothing** — the resource is only
-       *     created once the money arrives and the customer comes back to place it again. That last
-       *     part is deliberate: a successful payment should not silently turn into a machine, because
-       *     between paying and returning they may have changed their mind.
-       *
-       *     Online payment is not a second wallet. What arrives lands in the balance first and the
-       *     order is settled from there, so money topped up and money paid at checkout are the same
-       *     pool.
-       * @default balance
-       * @enum {string}
-       */
-      payment_method?: "balance" | "online";
-      /**
-       * @description Buy the instance outright for this long, as an ISO 8601 duration (P1M, P1Y). Billed by the
-       *     hour when omitted.
-       *
-       *     The money is taken from the balance when the order is placed, at the price the catalogue
-       *     reported for this type and term. If that term is not on sale for this type the request is
-       *     refused — it is never quietly sold by the hour instead, because the customer who asked for
-       *     a year would find out only from the bill.
-       *
-       *     The system disk is bought for the same term, because it is the same purchase: an instance
-       *     bought for a year whose disk is billed hourly is a bill nobody would predict from what they
-       *     clicked. A term is therefore refused together with `boot_disk_id`, where the disk already
-       *     exists and is already billed its own way.
-       *
-       *     A public address asked for with `assign_public_ip` stays hourly regardless — it cannot be
-       *     bought outright — so one order can carry both.
-       *
-       *     When the term runs out the instance is stopped, not deleted, and starts again once it is
-       *     renewed. Renewal lives in the billing console, across every product, because what a
-       *     customer needs to see is everything expiring this month rather than one product at a time.
-       */
-      term?: string;
-      /**
-       * Format: int64
-       * @description System disk capacity in GB. Chosen automatically from the requirement of the image and the platform minimum when omitted. Ignored with `boot_disk_id`, since that disk already has its capacity
-       */
-      root_disk_gb?: number;
       /** @description Required when a primary network interface is created, at least one; the default security group is not applied automatically. Ignored together with `port_id`, as the security groups of that interface were fixed when it was created */
       security_group_ids?: string[] | null;
       /**
@@ -2032,40 +895,15 @@ export interface components {
        * @description Create the primary network interface in this subnet. Exactly one of this and `port_id`
        */
       subnet_id?: string;
+      order: components["schemas"]["OrderOptions"];
+      price: components["schemas"]["CatalogReference"];
+      boot_disk?: components["schemas"]["NewBootDisk"];
+      floating_ip?: components["schemas"]["NewFloatingIP"];
     };
     LaunchInstanceResponseBody: {
-      /**
-       * @description The orders these instances were bought under, in the same order as `instances`.
-       *
-       *     **One per instance, not one per request.** A batch of three places three orders, because
-       *     each machine is ordered as it is created — stopping halfway leaves the machines already
-       *     made, and they each have to be paid for. A caller showing "your order" for a batch has to
-       *     show all of them.
-       *
-       *     Empty when the deployment has no billing wired in, and on the `checkout_url` branch where
-       *     nothing was created yet.
-       *
-       *     Given so the caller can point at the transaction. Creating a resource takes money — by
-       *     the hour from that moment for a metered one, in full from the balance for a prepaid one —
-       *     and until now the only thing handed back was the resource itself. Somebody asking "why
-       *     was I charged" had nothing to open.
-       */
-      order_ids?: string[] | null;
-      /** @description Non-empty when only some of the instances were created, stating why the sequence stopped */
-      failure: string | null;
-      /** @description Returned in request order; an array even for a single instance */
-      instances: components["schemas"]["InstanceResource"][] | null;
-      /** @description Returned only in this response; store it immediately. All instances of a batch share it */
-      password: string;
-      /**
-       * @description Present only when `payment_method` was `online`: **nothing was created**. Send the
-       *     customer here to pay.
-       *
-       *     What comes back is not a resource but a bill to settle. Treating this response as a
-       *     success and moving on is how something gets handed over without the money arriving —
-       *     and it looks exactly like a normal creation from the outside.
-       */
-      checkout_url?: string;
+      order: components["schemas"]["PlacedOrder"];
+      /** @description Present only if generation was requested; store it securely. Idempotent retries do not generate another password. */
+      password?: string;
     };
     SetInstanceLabelsRequestBody: {
       /** @description The complete set of labels. Whatever is absent here is removed; send an empty object to clear them all. A key may not contain a colon, whitespace or control characters */
@@ -2149,6 +987,8 @@ export interface components {
        * @description Must be in the same region and availability zone as the current instance type
        */
       instance_type_id: string;
+      order: components["schemas"]["OrderOptions"];
+      price: components["schemas"]["CatalogReference"];
     };
     AttachDiskRequestBody: {
       /** Format: uuid */
@@ -2157,26 +997,6 @@ export interface components {
     AttachFloatingIPRequestBody: {
       /** Format: uuid */
       floating_ip_id: string;
-    };
-    PortResource: {
-      attached_instance_id: string | null;
-      /** Format: uuid */
-      id: string;
-      ipv6_address: string | null;
-      /** @description A primary network interface is created and released with its instance and cannot be detached individually */
-      is_primary: boolean;
-      mac: string | null;
-      name: string;
-      private_ip: string | null;
-      /** Format: uuid */
-      private_network_id: string;
-      /** @description Floating IPv4 addresses bound to this network interface; an empty array when none are bound */
-      public_ips: string[] | null;
-      /** Format: uuid */
-      subnet_id: string;
-    };
-    PortListResponseBody: {
-      items: components["schemas"]["PortResource"][] | null;
     };
     AttachPortRequestBody: {
       /** Format: uuid */
@@ -2205,25 +1025,21 @@ export interface components {
       payload: {
         [key: string]: unknown;
       };
-      region_code: string | null;
+      /** Format: uuid */
+      region_id: string | null;
       /** @description Empty for create operations: the id of the new resource is in the response, not in the request path */
       subject_id: string;
       subject_type: string;
       succeeded: boolean;
     };
     OperationLogListResponseBody: {
-      items: components["schemas"]["OperationLogResource"][] | null;
+      items: components["schemas"]["OperationLogResource"][];
       /** Format: int64 */
-      total: number;
-    };
-    CreatePortRequestBody: {
-      name?: string;
-      /** @description The private address to assign. Allocated automatically when omitted */
-      private_ip?: string;
-      /** @description At least one, and all must belong to the same private network */
-      security_group_ids: string[] | null;
-      /** Format: uuid */
-      subnet_id: string;
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
     PrivateImageResource: {
       architecture: string;
@@ -2248,8 +1064,8 @@ export interface components {
       name: string;
       os_family: string;
       os_version: string;
-      /** @description An image can only be used in the region that holds it */
-      region_code: string;
+      /** Format: uuid */
+      region_id: string;
       /**
        * Format: int64
        * @description Storage occupied by the image; 0 until the capture completes
@@ -2266,7 +1082,13 @@ export interface components {
       supports_password_reset: boolean;
     };
     PrivateImageListResponseBody: {
-      items: components["schemas"]["PrivateImageResource"][] | null;
+      items: components["schemas"]["PrivateImageResource"][];
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
     CreatePrivateImageRequestBody: {
       /**
@@ -2279,187 +1101,155 @@ export interface components {
     RenamePrivateImageRequestBody: {
       name: string;
     };
-    PrivateNetworkResource: {
-      cidr: string;
-      /** Format: date-time */
-      created_at: string;
-      has_internet_gateway: boolean;
+    /** @description Reuse the same key for retries of the same purchase. Reusing it with a different request fails. Billing selects contract pricing, applies eligible grants and promotions, and owns payment challenges and expiry. */
+    OrderOptions: {
+      idempotency_key: string;
+      payment_plan?: components["schemas"]["PaymentPlan"];
+      expected_amount?: string;
+      redemption_code?: string;
+    };
+    /** @description Specify exactly one of id or lookup_key. A lookup key is scoped to the product of the resource service. */
+    CatalogReference: {
+      /** Format: uuid */
+      id?: string;
+      lookup_key?: string;
+    };
+    /**
+     * @description A billable order has been created. Read it from the billing API to find out what is
+     *     owed and whether payment is still required.
+     *
+     *     Only the identifier is returned. Amounts and state are not repeated here; the order
+     *     itself is the single source for them.
+     */
+    PlacedOrder: {
+      /**
+       * Format: uuid
+       * @description Identifies the order. Use it to read the order and, where payment is required,
+       *     to pay it.
+       *
+       *     An order is created even when nothing is owed, such as a plan with no charge or one
+       *     covered entirely by granted credit. Such an order is already settled, and no
+       *     payment step applies.
+       */
+      order_id: string;
+    };
+    /** @description The consumer’s desired dependency. usage_id identifies the corresponding claim in the owning service; actual attachment state is read from that service. */
+    ResourceDependency: {
+      /** Format: uuid */
+      usage_id: string;
+      resource: components["schemas"]["ResourceReference"];
+      purpose: string;
+      /** @enum {string} */
+      desired_state: "present" | "absent";
+      delete_with_consumer: boolean;
+      /** Format: int64 */
+      generation: number;
+    };
+    ResourceDependencyList: {
+      items: components["schemas"]["ResourceDependency"][];
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
+    };
+    /** @description Storage creates and bills this system disk as a separate order line. Required when booting from an image; mutually exclusive with boot_disk_id. The selected disk type must be attachable in the instance location. */
+    NewBootDisk: {
+      /** Format: uuid */
+      disk_type_id: string;
+      /** Format: int64 */
+      size_gb: number;
+      price: components["schemas"]["CatalogReference"];
+      /** @default true */
+      delete_with_instance?: boolean;
+    };
+    /** @description Fabric creates an address and bandwidth subscription in the same purchase. Mutually exclusive with floating_ip_id. Fabric owns the address and its retention policy. */
+    NewFloatingIP: {
+      price: components["schemas"]["CatalogReference"];
+      bandwidth_price: components["schemas"]["CatalogReference"];
+      /** Format: int64 */
+      bandwidth_mbps: number;
+    };
+    /** @description An independent restriction on use. Removing one restriction never removes another source’s restriction or changes the user’s desired power state. */
+    InstanceRestriction: {
       /** Format: uuid */
       id: string;
-      name: string;
-      region_code: string;
       /** @enum {string} */
-      status: "available" | "error";
+      source: "billing" | "iam" | "operator";
+      source_id: string;
+      reason_code: string;
+      /** Format: date-time */
+      created_at: string;
+    };
+    /** @description The durable action currently being processed or most recently completed. Success requires observed completion; accepting a provider command is not success. */
+    InstanceOperation: {
+      /** Format: uuid */
+      id: string;
+      /** @enum {string} */
+      type:
+        | "create"
+        | "start"
+        | "stop"
+        | "reboot"
+        | "rebuild"
+        | "resize"
+        | "confirm_resize"
+        | "revert_resize"
+        | "attach_disk"
+        | "detach_disk"
+        | "attach_port"
+        | "detach_port"
+        | "delete";
+      /** @enum {string} */
+      state: "pending" | "running" | "waiting" | "succeeded" | "failed";
+      phase: string;
+      /** Format: int64 */
+      generation: number;
+      failure_code?: string;
+      /** Format: date-time */
+      created_at: string;
       /** Format: date-time */
       updated_at: string;
     };
-    PrivateNetworkListResponseBody: {
-      items: components["schemas"]["PrivateNetworkResource"][] | null;
+    PowerRequest: {
+      idempotency_key: string;
+      /** Format: int64 */
+      expected_generation?: number;
     };
-    CreatePrivateNetworkRequestBody: {
-      /** @description Must be an RFC 1918 private CIDR with a prefix length between /8 and /24, for example `10.0.0.0/16` */
-      cidr: string;
-      name: string;
-      region_code: string;
-    };
-    RenamePrivateNetworkRequestBody: {
-      name: string;
-    };
-    IPv6ResponseBody: {
-      /** @description The allocated /64 prefix; empty while IPv6 is disabled */
-      cidr: string;
-      enabled: boolean;
-      /**
-       * @description `active` means IPv6 is fully available
-       * @enum {string}
-       */
-      status: "pending" | "active" | "draining";
-    };
-    RouteResource: {
+    /** @description An authoritative claim held by the resource owner. Reserved, active and releasing claims all prevent idle reclamation. Stopped consumers retain their claims. Released claims remain readable. */
+    ResourceUsage: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      project_id: string;
+      resource: components["schemas"]["ResourceReference"];
+      consumer: components["schemas"]["ResourceReference"];
+      purpose: string;
+      /** @enum {string} */
+      state: "reserved" | "active" | "releasing" | "released";
+      /** Format: int64 */
+      generation: number;
+      /** Format: uuid */
+      operation_id: string;
       /** Format: date-time */
       created_at: string;
-      description: string;
-      destination: string;
-      /** Format: uuid */
-      id: string;
-      nexthop: string;
-    };
-    RouteListResponseBody: {
-      items: components["schemas"]["RouteResource"][] | null;
-    };
-    CreateRouteRequestBody: {
-      description?: string;
-      /** @description Destination CIDR. It cannot be `0.0.0.0/0`, nor the CIDR of a subnet of this network */
-      destination: string;
-      /** @description Private address of an instance; must fall inside a subnet of this private network */
-      nexthop: string;
-    };
-    SubnetResource: {
-      cidr: string;
-      gateway_ip: string | null;
-      /** Format: uuid */
-      id: string;
-      /**
-       * Format: int64
-       * @enum {integer}
-       */
-      ip_version: 4 | 6;
-      name: string;
-      /** Format: uuid */
-      private_network_id: string;
-    };
-    SubnetListResponseBody: {
-      items: components["schemas"]["SubnetResource"][] | null;
-    };
-    CreateSubnetRequestBody: {
-      /** @description Must fall inside the CIDR of the private network and must not overlap an existing subnet */
-      cidr: string;
-      name: string;
-    };
-    NextFreeCidrResponseBody: {
-      /** @description Empty when the private network has no free CIDR left for that prefix length */
-      cidr: string;
-    };
-    SecurityGroupResource: {
       /** Format: date-time */
-      created_at: string;
-      description: string;
-      /** Format: uuid */
-      id: string;
-      /** @description The default security group is released with its private network and cannot be deleted individually */
-      is_default: boolean;
-      name: string;
-      /** Format: uuid */
-      private_network_id: string;
-    };
-    SecurityGroupListResponseBody: {
-      items: components["schemas"]["SecurityGroupResource"][] | null;
-    };
-    CreateSecurityGroupRequestBody: {
-      description?: string;
-      name: string;
-      /** Format: uuid */
-      private_network_id: string;
-    };
-    SecurityRuleResource: {
+      updated_at: string;
       /** Format: date-time */
-      created_at: string;
-      description: string;
-      /** @enum {string} */
-      direction: "ingress" | "egress";
-      /** @enum {string} */
-      ethertype: "IPv4" | "IPv6";
+      released_at?: string;
+    };
+    /** @description Requested funding split. This does not select a card or payment provider; complete payment through Billing. */
+    PaymentPlan: {
+      balance_amount: string;
+      provider_amount: string;
+    };
+    /** @description A resource identified within its owning service. The project is taken from the containing usage or request. */
+    ResourceReference: {
+      service: string;
+      type: string;
       /** Format: uuid */
       id: string;
-      /**
-       * Format: int64
-       * @description Denotes the ICMP code rather than a port when the protocol is ICMP
-       */
-      port_range_max: number | null;
-      /**
-       * Format: int64
-       * @description Denotes the ICMP type rather than a port when the protocol is ICMP
-       */
-      port_range_min: number | null;
-      protocol: string | null;
-      remote_ip_prefix: string | null;
-    };
-    SecurityRuleListResponseBody: {
-      items: components["schemas"]["SecurityRuleResource"][] | null;
-    };
-    CreateSecurityRuleRequestBody: {
-      description?: string;
-      /** @enum {string} */
-      direction: "ingress" | "egress";
-      /** @enum {string} */
-      ethertype: "IPv4" | "IPv6";
-      /**
-       * Format: int64
-       * @description Denotes the ICMP code (0–255) rather than a port when the protocol is ICMP
-       */
-      port_range_max?: number | null;
-      /**
-       * Format: int64
-       * @description Denotes the ICMP type (0–255) rather than a port when the protocol is ICMP
-       */
-      port_range_min?: number | null;
-      /** @description For example `tcp`, `udp`, `icmp` or `ipv6-icmp`. All protocols when omitted */
-      protocol?: string;
-      /** @description Equivalent to `0.0.0.0/0` or `::/0` when omitted */
-      remote_ip_prefix?: string;
-    };
-    SnapshotResource: {
-      /** @description A disk restored from this snapshot must reside in this availability zone */
-      availability_zone: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: uuid */
-      disk_id: string;
-      /** Format: uuid */
-      id: string;
-      name: string;
-      region_code: string;
-      /**
-       * Format: int64
-       * @description Capacity of the source disk when the snapshot was created. A disk restored from it cannot be smaller
-       */
-      size_gb: number;
-      /** @enum {string} */
-      status: "provisioning" | "available" | "restoring" | "deleting" | "error";
-    };
-    SnapshotListResponseBody: {
-      items: components["schemas"]["SnapshotResource"][] | null;
-    };
-    CreateSnapshotRequestBody: {
-      /** Format: uuid */
-      disk_id: string;
-      name: string;
-    };
-    RenameSecurityGroupRequestBody: {
-      name: string;
-    };
-    RenameSnapshotRequestBody: {
-      name: string;
     };
   };
   responses: never;
@@ -2470,267 +1260,12 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  "list-backups": {
-    parameters: {
-      query?: {
-        /** @description Return only the backups of this disk */
-        disk_id?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["BackupListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-backup": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateBackupRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["BackupResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-backup": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        backupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["BackupResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-backup": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        backupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "rename-backup": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        backupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RenameBackupRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["BackupResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "restore-backup": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        backupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RestoreBackupRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DiskResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-disk-types": {
-    parameters: {
-      query: {
-        region_code: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DiskTypeListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-disk-type": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        diskTypeId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DiskTypeResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "list-images": {
     parameters: {
       query: {
-        region_code: string;
+        region_id: string;
+        page?: number;
+        page_size?: number;
       };
       header?: never;
       path?: never;
@@ -2761,7 +1296,9 @@ export interface operations {
   "list-instance-types": {
     parameters: {
       query: {
-        region_code: string;
+        region_id: string;
+        page?: number;
+        page_size?: number;
       };
       header?: never;
       path?: never;
@@ -2789,552 +1326,13 @@ export interface operations {
       };
     };
   };
-  "list-regions": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["RegionListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-availability-zones": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        regionCode: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ZoneListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-disks": {
-    parameters: {
-      query?: {
-        region_code?: string;
-        /** @description Supplied together with `region_code` to filter attachable disks */
-        availability_zone?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DiskListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-disk": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateDiskRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DiskResource"];
-        };
-      };
-      /**
-       * @description Payment required: **nothing was created.**
-       *
-       *     Returned when `payment_method` is `online`. `meta.checkout_url` is where to send the
-       *     customer; `meta.order_id` is the order waiting on it.
-       *
-       *     ## Why this is a status and not a field on a 200
-       *
-       *     A field on a success response is something a client can forget to read, and forgetting it
-       *     means treating "we created nothing and are waiting for money" as "created" — which looks
-       *     identical from the outside until the bill does not add up. A 402 fails loudly in any
-       *     client that handles errors at all.
-       *
-       *     ## What happens after they pay
-       *
-       *     The money lands in the balance and the order is settled from it. The resource is **not**
-       *     created automatically: placing it again is the customer's move, because between paying
-       *     and coming back they may have changed their mind. The balance is theirs either way.
-       */
-      402: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-disk": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        diskId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DiskResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-disk": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        diskId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "rename-disk": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        diskId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RenameDiskRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DiskResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "resize-disk": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        diskId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ResizeDiskRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DiskResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "revert-disk": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        diskId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RevertDiskRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DiskResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-floating-ips": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FloatingIPListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "allocate-floating-ip": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AllocateFloatingIPRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FloatingIPResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-floating-ip": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        floatingIpId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FloatingIPResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "release-floating-ip": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        floatingIpId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "set-floating-ip-bandwidth": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        floatingIpId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SetBandwidthRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FloatingIPResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "bind-floating-ip": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        floatingIpId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["BindFloatingIPRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FloatingIPResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "unbind-floating-ip": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        floatingIpId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FloatingIPResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "list-instances": {
     parameters: {
       query?: {
         /** @description Only instances carrying this label, written as `key:value` — for example `env:prod`. Both halves are matched exactly */
         label?: string;
+        page?: number;
+        page_size?: number;
       };
       header?: never;
       path?: never;
@@ -3375,40 +1373,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Created */
-      201: {
+      /** @description Accepted */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
           "application/json": components["schemas"]["LaunchInstanceResponseBody"];
-        };
-      };
-      /**
-       * @description Payment required: **nothing was created.**
-       *
-       *     Returned when `payment_method` is `online`. `meta.checkout_url` is where to send the
-       *     customer; `meta.order_id` is the order waiting on it.
-       *
-       *     ## Why this is a status and not a field on a 200
-       *
-       *     A field on a success response is something a client can forget to read, and forgetting it
-       *     means treating "we created nothing and are waiting for money" as "created" — which looks
-       *     identical from the outside until the bill does not add up. A 402 fails loudly in any
-       *     client that handles errors at all.
-       *
-       *     ## What happens after they pay
-       *
-       *     The money lands in the balance and the order is settled from it. The resource is **not**
-       *     created automatically: placing it again is the customer's move, because between paying
-       *     and coming back they may have changed their mind. The balance is theirs either way.
-       */
-      402: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -3807,13 +1778,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description OK */
-      200: {
+      /** @description Accepted */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["InstanceResource"];
+          "application/json": components["schemas"]["PlacedOrder"];
         };
       };
       /** @description Error */
@@ -3898,10 +1869,14 @@ export interface operations {
       };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PowerRequest"];
+      };
+    };
     responses: {
-      /** @description OK */
-      200: {
+      /** @description Accepted */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -3929,10 +1904,14 @@ export interface operations {
       };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PowerRequest"];
+      };
+    };
     responses: {
-      /** @description OK */
-      200: {
+      /** @description Accepted */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -3953,7 +1932,10 @@ export interface operations {
   };
   "list-instance-disks": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: number;
+        page_size?: number;
+      };
       header?: never;
       path: {
         instanceId: string;
@@ -3968,7 +1950,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["DiskListResponseBody"];
+          "application/json": components["schemas"]["ResourceDependencyList"];
         };
       };
       /** @description Error */
@@ -4003,7 +1985,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["DiskResource"];
+          "application/json": components["schemas"]["ResourceDependency"];
         };
       };
       /** @description Error */
@@ -4035,7 +2017,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["DiskResource"];
+          "application/json": components["schemas"]["ResourceDependency"];
         };
       };
       /** @description Error */
@@ -4064,13 +2046,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description OK */
-      200: {
+      /** @description Accepted */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["FloatingIPResource"];
+          "application/json": components["schemas"]["ResourceUsage"];
         };
       };
       /** @description Error */
@@ -4096,13 +2078,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description OK */
-      200: {
+      /** @description Accepted */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["FloatingIPResource"];
+          "application/json": components["schemas"]["ResourceUsage"];
         };
       };
       /** @description Error */
@@ -4118,7 +2100,10 @@ export interface operations {
   };
   "list-instance-ports": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: number;
+        page_size?: number;
+      };
       header?: never;
       path: {
         instanceId: string;
@@ -4133,7 +2118,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PortListResponseBody"];
+          "application/json": components["schemas"]["ResourceDependencyList"];
         };
       };
       /** @description Error */
@@ -4168,7 +2153,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PortResource"];
+          "application/json": components["schemas"]["ResourceDependency"];
         };
       };
       /** @description Error */
@@ -4200,7 +2185,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PortResource"];
+          "application/json": components["schemas"]["ResourceDependency"];
         };
       };
       /** @description Error */
@@ -4219,8 +2204,8 @@ export interface operations {
       query?: {
         /** @description Return a single kind of operation; the value matches the operation id of the endpoint */
         action?: string;
-        limit?: number;
-        offset?: number;
+        page?: number;
+        page_size?: number;
       };
       header?: never;
       path?: never;
@@ -4248,102 +2233,13 @@ export interface operations {
       };
     };
   };
-  "list-ports": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PortListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-port": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreatePortRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PortResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-port": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        portId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
   "list-private-images": {
     parameters: {
       query?: {
         /** @description Return only the images of this region. An image can only be used in the region that holds it */
-        region_code?: string;
+        region_id?: string;
+        page?: number;
+        page_size?: number;
       };
       header?: never;
       path?: never;
@@ -4499,77 +2395,15 @@ export interface operations {
       };
     };
   };
-  "list-private-networks": {
+  "list-instance-dependencies": {
     parameters: {
       query?: {
-        /** @description Returns every region when omitted */
-        region_code?: string;
+        page?: number;
+        page_size?: number;
       };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrivateNetworkListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-private-network": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreatePrivateNetworkRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrivateNetworkResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-private-network": {
-    parameters: {
-      query?: never;
       header?: never;
       path: {
-        privateNetworkId: string;
+        instanceId: string;
       };
       cookie?: never;
     };
@@ -4581,804 +2415,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PrivateNetworkResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-private-network": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "rename-private-network": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RenamePrivateNetworkRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrivateNetworkResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-private-network-ipv6": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["IPv6ResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "enable-private-network-ipv6": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["IPv6ResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "disable-private-network-ipv6": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-routes": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["RouteListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-route": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateRouteRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["RouteResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-route": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-        routeId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-subnets": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SubnetListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-subnet": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateSubnetRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SubnetResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "suggest-subnet-cidr": {
-    parameters: {
-      query?: {
-        prefix_length?: number;
-      };
-      header?: never;
-      path: {
-        privateNetworkId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["NextFreeCidrResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-subnet": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateNetworkId: string;
-        subnetId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-security-groups": {
-    parameters: {
-      query?: {
-        region_code?: string;
-        /** @description Return only the security groups of this private network */
-        private_network_id?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SecurityGroupListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-security-group": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateSecurityGroupRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SecurityGroupResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-security-group": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        securityGroupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SecurityGroupResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-security-group": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        securityGroupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "rename-security-group": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        securityGroupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RenameSecurityGroupRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SecurityGroupResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-security-group-rules": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        securityGroupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SecurityRuleListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-security-group-rule": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        securityGroupId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateSecurityRuleRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SecurityRuleResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-security-group-rule": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        securityGroupId: string;
-        ruleId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-snapshots": {
-    parameters: {
-      query?: {
-        /** @description Return only the snapshots of this disk */
-        disk_id?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SnapshotListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-snapshot": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateSnapshotRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SnapshotResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-snapshot": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        snapshotId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SnapshotResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-snapshot": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        snapshotId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description No Content */
-      204: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "rename-snapshot": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        snapshotId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RenameSnapshotRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SnapshotResource"];
+          "application/json": components["schemas"]["ResourceDependencyList"];
         };
       };
       /** @description Error */

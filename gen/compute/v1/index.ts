@@ -9,55 +9,6 @@ export { client } from "./client.js";
 
 import type { operations } from "./schema.js";
 
-/** The success response body of `GET /api/v1/backups`. */
-export type ListBackupsResult =
-  operations["list-backups"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/backups`. */
-export type ListBackupsQuery = operations["list-backups"]["parameters"]["query"];
-
-/** The success response body of `POST /api/v1/backups`. */
-export type CreateBackupResult =
-  operations["create-backup"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/backups`. */
-export type CreateBackupBody = NonNullable<
-  operations["create-backup"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/backups/{backupId}`. */
-export type GetBackupResult =
-  operations["get-backup"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PATCH /api/v1/backups/{backupId}`. */
-export type RenameBackupResult =
-  operations["rename-backup"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PATCH /api/v1/backups/{backupId}`. */
-export type RenameBackupBody = NonNullable<
-  operations["rename-backup"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/backups/{backupId}/restore`. */
-export type RestoreBackupResult =
-  operations["restore-backup"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/backups/{backupId}/restore`. */
-export type RestoreBackupBody = NonNullable<
-  operations["restore-backup"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/disk-types`. */
-export type ListDiskTypesResult =
-  operations["list-disk-types"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/disk-types`. */
-export type ListDiskTypesQuery = operations["list-disk-types"]["parameters"]["query"];
-
-/** The success response body of `GET /api/v1/disk-types/{diskTypeId}`. */
-export type GetDiskTypeResult =
-  operations["get-disk-type"]["responses"][200]["content"]["application/json"];
-
 /** The success response body of `GET /api/v1/images`. */
 export type ListImagesResult =
   operations["list-images"]["responses"][200]["content"]["application/json"];
@@ -72,99 +23,6 @@ export type ListInstanceTypesResult =
 /** The query parameters of `GET /api/v1/instance-types`. */
 export type ListInstanceTypesQuery = operations["list-instance-types"]["parameters"]["query"];
 
-/** The success response body of `GET /api/v1/regions`. */
-export type ListRegionsResult =
-  operations["list-regions"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/regions/{regionCode}/availability-zones`. */
-export type ListAvailabilityZonesResult =
-  operations["list-availability-zones"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/disks`. */
-export type ListDisksResult =
-  operations["list-disks"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/disks`. */
-export type ListDisksQuery = operations["list-disks"]["parameters"]["query"];
-
-/** The success response body of `POST /api/v1/disks`. */
-export type CreateDiskResult =
-  operations["create-disk"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/disks`. */
-export type CreateDiskBody = NonNullable<
-  operations["create-disk"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/disks/{diskId}`. */
-export type GetDiskResult = operations["get-disk"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PATCH /api/v1/disks/{diskId}`. */
-export type RenameDiskResult =
-  operations["rename-disk"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PATCH /api/v1/disks/{diskId}`. */
-export type RenameDiskBody = NonNullable<
-  operations["rename-disk"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/disks/{diskId}/resize`. */
-export type ResizeDiskResult =
-  operations["resize-disk"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/disks/{diskId}/resize`. */
-export type ResizeDiskBody = NonNullable<
-  operations["resize-disk"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/disks/{diskId}/revert`. */
-export type RevertDiskResult =
-  operations["revert-disk"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/disks/{diskId}/revert`. */
-export type RevertDiskBody = NonNullable<
-  operations["revert-disk"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/floating-ips`. */
-export type ListFloatingIpsResult =
-  operations["list-floating-ips"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/floating-ips`. */
-export type AllocateFloatingIpResult =
-  operations["allocate-floating-ip"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/floating-ips`. */
-export type AllocateFloatingIpBody = NonNullable<
-  operations["allocate-floating-ip"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/floating-ips/{floatingIpId}`. */
-export type GetFloatingIpResult =
-  operations["get-floating-ip"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PUT /api/v1/floating-ips/{floatingIpId}/bandwidth`. */
-export type SetFloatingIpBandwidthResult =
-  operations["set-floating-ip-bandwidth"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PUT /api/v1/floating-ips/{floatingIpId}/bandwidth`. */
-export type SetFloatingIpBandwidthBody = NonNullable<
-  operations["set-floating-ip-bandwidth"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `PUT /api/v1/floating-ips/{floatingIpId}/binding`. */
-export type BindFloatingIpResult =
-  operations["bind-floating-ip"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PUT /api/v1/floating-ips/{floatingIpId}/binding`. */
-export type BindFloatingIpBody = NonNullable<
-  operations["bind-floating-ip"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `DELETE /api/v1/floating-ips/{floatingIpId}/binding`. */
-export type UnbindFloatingIpResult =
-  operations["unbind-floating-ip"]["responses"][200]["content"]["application/json"];
-
 /** The success response body of `GET /api/v1/instances`. */
 export type ListInstancesResult =
   operations["list-instances"]["responses"][200]["content"]["application/json"];
@@ -174,7 +32,7 @@ export type ListInstancesQuery = operations["list-instances"]["parameters"]["que
 
 /** The success response body of `POST /api/v1/instances`. */
 export type LaunchInstanceResult =
-  operations["launch-instance"]["responses"][201]["content"]["application/json"];
+  operations["launch-instance"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/instances`. */
 export type LaunchInstanceBody = NonNullable<
@@ -262,7 +120,7 @@ export type RebuildInstanceBody = NonNullable<
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/resize`. */
 export type ResizeInstanceResult =
-  operations["resize-instance"]["responses"][200]["content"]["application/json"];
+  operations["resize-instance"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/instances/{instanceId}/resize`. */
 export type ResizeInstanceBody = NonNullable<
@@ -279,15 +137,28 @@ export type RevertInstanceResizeResult =
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/start`. */
 export type StartInstanceResult =
-  operations["start-instance"]["responses"][200]["content"]["application/json"];
+  operations["start-instance"]["responses"][202]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/instances/{instanceId}/start`. */
+export type StartInstanceBody = NonNullable<
+  operations["start-instance"]["requestBody"]
+>["content"]["application/json"];
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/stop`. */
 export type StopInstanceResult =
-  operations["stop-instance"]["responses"][200]["content"]["application/json"];
+  operations["stop-instance"]["responses"][202]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/instances/{instanceId}/stop`. */
+export type StopInstanceBody = NonNullable<
+  operations["stop-instance"]["requestBody"]
+>["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/instances/{instanceId}/disks`. */
 export type ListInstanceDisksResult =
   operations["list-instance-disks"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/instances/{instanceId}/disks`. */
+export type ListInstanceDisksQuery = operations["list-instance-disks"]["parameters"]["query"];
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/disks`. */
 export type AttachDiskResult =
@@ -304,7 +175,7 @@ export type DetachDiskResult =
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/floating-ips`. */
 export type AttachInstanceFloatingIpResult =
-  operations["attach-instance-floating-ip"]["responses"][200]["content"]["application/json"];
+  operations["attach-instance-floating-ip"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/instances/{instanceId}/floating-ips`. */
 export type AttachInstanceFloatingIpBody = NonNullable<
@@ -313,11 +184,14 @@ export type AttachInstanceFloatingIpBody = NonNullable<
 
 /** The success response body of `DELETE /api/v1/instances/{instanceId}/floating-ips/{floatingIpId}`. */
 export type DetachInstanceFloatingIpResult =
-  operations["detach-instance-floating-ip"]["responses"][200]["content"]["application/json"];
+  operations["detach-instance-floating-ip"]["responses"][202]["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/instances/{instanceId}/ports`. */
 export type ListInstancePortsResult =
   operations["list-instance-ports"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/instances/{instanceId}/ports`. */
+export type ListInstancePortsQuery = operations["list-instance-ports"]["parameters"]["query"];
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/ports`. */
 export type AttachPortResult =
@@ -338,19 +212,6 @@ export type ListOperationLogsResult =
 
 /** The query parameters of `GET /api/v1/operation-logs`. */
 export type ListOperationLogsQuery = operations["list-operation-logs"]["parameters"]["query"];
-
-/** The success response body of `GET /api/v1/ports`. */
-export type ListPortsResult =
-  operations["list-ports"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/ports`. */
-export type CreatePortResult =
-  operations["create-port"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/ports`. */
-export type CreatePortBody = NonNullable<
-  operations["create-port"]["requestBody"]
->["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/private-images`. */
 export type ListPrivateImagesResult =
@@ -381,143 +242,10 @@ export type RenamePrivateImageBody = NonNullable<
   operations["rename-private-image"]["requestBody"]
 >["content"]["application/json"];
 
-/** The success response body of `GET /api/v1/private-networks`. */
-export type ListPrivateNetworksResult =
-  operations["list-private-networks"]["responses"][200]["content"]["application/json"];
+/** The success response body of `GET /api/v1/instances/{instanceId}/dependencies`. */
+export type ListInstanceDependenciesResult =
+  operations["list-instance-dependencies"]["responses"][200]["content"]["application/json"];
 
-/** The query parameters of `GET /api/v1/private-networks`. */
-export type ListPrivateNetworksQuery = operations["list-private-networks"]["parameters"]["query"];
-
-/** The success response body of `POST /api/v1/private-networks`. */
-export type CreatePrivateNetworkResult =
-  operations["create-private-network"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/private-networks`. */
-export type CreatePrivateNetworkBody = NonNullable<
-  operations["create-private-network"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/private-networks/{privateNetworkId}`. */
-export type GetPrivateNetworkResult =
-  operations["get-private-network"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PATCH /api/v1/private-networks/{privateNetworkId}`. */
-export type RenamePrivateNetworkResult =
-  operations["rename-private-network"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PATCH /api/v1/private-networks/{privateNetworkId}`. */
-export type RenamePrivateNetworkBody = NonNullable<
-  operations["rename-private-network"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/private-networks/{privateNetworkId}/ipv6`. */
-export type GetPrivateNetworkIpv6Result =
-  operations["get-private-network-ipv6"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/private-networks/{privateNetworkId}/ipv6`. */
-export type EnablePrivateNetworkIpv6Result =
-  operations["enable-private-network-ipv6"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/private-networks/{privateNetworkId}/routes`. */
-export type ListRoutesResult =
-  operations["list-routes"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/private-networks/{privateNetworkId}/routes`. */
-export type CreateRouteResult =
-  operations["create-route"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/private-networks/{privateNetworkId}/routes`. */
-export type CreateRouteBody = NonNullable<
-  operations["create-route"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/private-networks/{privateNetworkId}/subnets`. */
-export type ListSubnetsResult =
-  operations["list-subnets"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/private-networks/{privateNetworkId}/subnets`. */
-export type CreateSubnetResult =
-  operations["create-subnet"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/private-networks/{privateNetworkId}/subnets`. */
-export type CreateSubnetBody = NonNullable<
-  operations["create-subnet"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/private-networks/{privateNetworkId}/subnets/next-free-cidr`. */
-export type SuggestSubnetCidrResult =
-  operations["suggest-subnet-cidr"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/private-networks/{privateNetworkId}/subnets/next-free-cidr`. */
-export type SuggestSubnetCidrQuery = operations["suggest-subnet-cidr"]["parameters"]["query"];
-
-/** The success response body of `GET /api/v1/security-groups`. */
-export type ListSecurityGroupsResult =
-  operations["list-security-groups"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/security-groups`. */
-export type ListSecurityGroupsQuery = operations["list-security-groups"]["parameters"]["query"];
-
-/** The success response body of `POST /api/v1/security-groups`. */
-export type CreateSecurityGroupResult =
-  operations["create-security-group"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/security-groups`. */
-export type CreateSecurityGroupBody = NonNullable<
-  operations["create-security-group"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/security-groups/{securityGroupId}`. */
-export type GetSecurityGroupResult =
-  operations["get-security-group"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PATCH /api/v1/security-groups/{securityGroupId}`. */
-export type RenameSecurityGroupResult =
-  operations["rename-security-group"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PATCH /api/v1/security-groups/{securityGroupId}`. */
-export type RenameSecurityGroupBody = NonNullable<
-  operations["rename-security-group"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/security-groups/{securityGroupId}/rules`. */
-export type ListSecurityGroupRulesResult =
-  operations["list-security-group-rules"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/security-groups/{securityGroupId}/rules`. */
-export type CreateSecurityGroupRuleResult =
-  operations["create-security-group-rule"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/security-groups/{securityGroupId}/rules`. */
-export type CreateSecurityGroupRuleBody = NonNullable<
-  operations["create-security-group-rule"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/snapshots`. */
-export type ListSnapshotsResult =
-  operations["list-snapshots"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/snapshots`. */
-export type ListSnapshotsQuery = operations["list-snapshots"]["parameters"]["query"];
-
-/** The success response body of `POST /api/v1/snapshots`. */
-export type CreateSnapshotResult =
-  operations["create-snapshot"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/snapshots`. */
-export type CreateSnapshotBody = NonNullable<
-  operations["create-snapshot"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/snapshots/{snapshotId}`. */
-export type GetSnapshotResult =
-  operations["get-snapshot"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PATCH /api/v1/snapshots/{snapshotId}`. */
-export type RenameSnapshotResult =
-  operations["rename-snapshot"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PATCH /api/v1/snapshots/{snapshotId}`. */
-export type RenameSnapshotBody = NonNullable<
-  operations["rename-snapshot"]["requestBody"]
->["content"]["application/json"];
+/** The query parameters of `GET /api/v1/instances/{instanceId}/dependencies`. */
+export type ListInstanceDependenciesQuery =
+  operations["list-instance-dependencies"]["parameters"]["query"];
