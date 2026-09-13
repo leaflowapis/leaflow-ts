@@ -345,7 +345,6 @@ export interface components {
       state: "reserved" | "active" | "releasing" | "released";
       /** Format: int64 */
       generation: number;
-      /** Format: uuid */
       operation_id: string;
       /** Format: date-time */
       created_at: string;
