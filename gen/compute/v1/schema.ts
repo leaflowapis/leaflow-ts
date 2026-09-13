@@ -1147,12 +1147,7 @@ export interface components {
     };
     ResourceDependencyList: {
       items: components["schemas"]["ResourceDependency"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description Storage creates and bills this system disk as a separate order line. Required when booting from an image; mutually exclusive with boot_disk_id. The selected disk type must be attachable in the instance location. */
     NewBootDisk: {
@@ -1250,6 +1245,15 @@ export interface components {
       type: string;
       /** Format: uuid */
       id: string;
+    };
+    /** @description Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan. */
+    OffsetPagination: {
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
   };
   responses: never;

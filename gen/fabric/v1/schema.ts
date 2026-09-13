@@ -905,12 +905,7 @@ export interface components {
     };
     ResourceUsageList: {
       items: components["schemas"]["ResourceUsage"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description Automatic reclamation is disabled by default. When enabled, retention starts after the last live claim is confirmed released. Traffic, IO and consumer heartbeats do not affect eligibility. */
     IdlePolicy: {
@@ -952,12 +947,7 @@ export interface components {
     };
     AttachmentList: {
       items: components["schemas"]["Attachment"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description Requested funding split. This does not select a card or payment provider; complete payment through Billing. */
     PaymentPlan: {
@@ -970,6 +960,15 @@ export interface components {
       type: string;
       /** Format: uuid */
       id: string;
+    };
+    /** @description Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan. */
+    OffsetPagination: {
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
   };
   responses: never;

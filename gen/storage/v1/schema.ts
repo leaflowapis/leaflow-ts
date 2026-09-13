@@ -356,12 +356,7 @@ export interface components {
     };
     ResourceUsageList: {
       items: components["schemas"]["ResourceUsage"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description Automatic reclamation is disabled by default. When enabled, retention starts after the last live claim is confirmed released. Traffic, IO and consumer heartbeats do not affect eligibility. */
     IdlePolicy: {
@@ -403,12 +398,7 @@ export interface components {
     };
     AttachmentList: {
       items: components["schemas"]["Attachment"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
   };
   responses: {
