@@ -1789,7 +1789,7 @@ export interface components {
        *     so. Nothing was charged in that case.
        * @enum {string}
        */
-      status: "pending" | "succeeded" | "failed";
+      status: "pending" | "requires_action" | "succeeded" | "failed";
       /** @description Which payment provider collected it. */
       provider?: string;
       /**
@@ -1806,6 +1806,10 @@ export interface components {
       failure_reason?: string;
       /** @description Where the payer completes the payment. Absent once it has completed. */
       checkout_url?: string;
+      /** @description Provider client secret for completing this same payment attempt in the browser. */
+      client_secret?: string;
+      /** @description Provider publishable key used with client_secret. */
+      publishable_key?: string;
       /** Format: date-time */
       created_at: string;
       /**
@@ -1974,6 +1978,10 @@ export interface components {
       balance_applied?: components["schemas"]["Money"];
       /** @description Present with `requires_action`. */
       checkout_url?: string;
+      /** @description Provider client secret for completing this same payment attempt in the browser. */
+      client_secret?: string;
+      /** @description Provider publishable key used with client_secret. */
+      publishable_key?: string;
       /**
        * @description Whether paying again is worth attempting. False for a refusal that will keep
        *     happening — a closed account, an amount over a limit — so that a client does not
