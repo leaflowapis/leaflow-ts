@@ -165,7 +165,7 @@ export interface paths {
     put?: never;
     /**
      * Create a private network
-     * @description Creates a network, a router and a default security group in one call. The default security group denies all inbound traffic and permits all outbound traffic.
+     * @description Starts creation of a network, router and default security group. The returned resource is `provisioning` until all three are ready. Reuse the same idempotency key after an uncertain response.
      */
     post: operations["create-private-network"];
     delete?: never;
@@ -675,8 +675,11 @@ export interface components {
       name: string;
       /** Format: uuid */
       region_id: string;
-      /** @enum {string} */
-      status: "available" | "error";
+      /**
+       * @description `provisioning` means provider resources are still being created.
+       * @enum {string}
+       */
+      status: "provisioning" | "available" | "error";
       /** Format: date-time */
       updated_at: string;
     };
@@ -693,6 +696,8 @@ export interface components {
       /** @description Must be an RFC 1918 private CIDR with a prefix length between /8 and /24, for example `10.0.0.0/16` */
       cidr: string;
       name: string;
+      /** @description Reuse this key only when retrying the same private network request. */
+      idempotency_key: string;
       /** Format: uuid */
       region_id: string;
     };
