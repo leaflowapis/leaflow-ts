@@ -9,50 +9,9 @@ export { client } from "./client.js";
 
 import type { operations } from "./schema.js";
 
-/** The success response body of `GET /api/v1/backups`. */
-export type ListBackupsResult =
-  operations["list-backups"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/backups`. */
-export type ListBackupsQuery = operations["list-backups"]["parameters"]["query"];
-
-/** The success response body of `POST /api/v1/backups`. */
-export type CreateBackupResult =
-  operations["create-backup"]["responses"][202]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/backups`. */
-export type CreateBackupBody = NonNullable<
-  operations["create-backup"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/backups/{backupId}`. */
-export type GetBackupResult =
-  operations["get-backup"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PATCH /api/v1/backups/{backupId}`. */
-export type RenameBackupResult =
-  operations["rename-backup"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PATCH /api/v1/backups/{backupId}`. */
-export type RenameBackupBody = NonNullable<
-  operations["rename-backup"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/backups/{backupId}/restore`. */
-export type RestoreBackupResult =
-  operations["restore-backup"]["responses"][202]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/backups/{backupId}/restore`. */
-export type RestoreBackupBody = NonNullable<
-  operations["restore-backup"]["requestBody"]
->["content"]["application/json"];
-
 /** The success response body of `GET /api/v1/disk-types`. */
 export type ListDiskTypesResult =
   operations["list-disk-types"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/disk-types`. */
-export type ListDiskTypesQuery = operations["list-disk-types"]["parameters"]["query"];
 
 /** The success response body of `GET /api/v1/disk-types/{diskTypeId}`. */
 export type GetDiskTypeResult =
@@ -61,9 +20,6 @@ export type GetDiskTypeResult =
 /** The success response body of `GET /api/v1/disks`. */
 export type ListDisksResult =
   operations["list-disks"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/disks`. */
-export type ListDisksQuery = operations["list-disks"]["parameters"]["query"];
 
 /** The success response body of `POST /api/v1/disks`. */
 export type CreateDiskResult =
@@ -86,66 +42,12 @@ export type RenameDiskBody = NonNullable<
   operations["rename-disk"]["requestBody"]
 >["content"]["application/json"];
 
-/** The success response body of `POST /api/v1/disks/{diskId}/resize`. */
-export type ResizeDiskResult =
-  operations["resize-disk"]["responses"][202]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/disks/{diskId}/resize`. */
-export type ResizeDiskBody = NonNullable<
-  operations["resize-disk"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/disks/{diskId}/revert`. */
-export type RevertDiskResult =
-  operations["revert-disk"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/disks/{diskId}/revert`. */
-export type RevertDiskBody = NonNullable<
-  operations["revert-disk"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/operation-logs`. */
-export type ListOperationLogsResult =
-  operations["list-operation-logs"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/operation-logs`. */
-export type ListOperationLogsQuery = operations["list-operation-logs"]["parameters"]["query"];
-
-/** The success response body of `GET /api/v1/snapshots`. */
-export type ListSnapshotsResult =
-  operations["list-snapshots"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/snapshots`. */
-export type ListSnapshotsQuery = operations["list-snapshots"]["parameters"]["query"];
-
-/** The success response body of `POST /api/v1/snapshots`. */
-export type CreateSnapshotResult =
-  operations["create-snapshot"]["responses"][202]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/snapshots`. */
-export type CreateSnapshotBody = NonNullable<
-  operations["create-snapshot"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/snapshots/{snapshotId}`. */
-export type GetSnapshotResult =
-  operations["get-snapshot"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PATCH /api/v1/snapshots/{snapshotId}`. */
-export type RenameSnapshotResult =
-  operations["rename-snapshot"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PATCH /api/v1/snapshots/{snapshotId}`. */
-export type RenameSnapshotBody = NonNullable<
-  operations["rename-snapshot"]["requestBody"]
->["content"]["application/json"];
+/** The query parameters of `DELETE /api/v1/disks/{diskId}`. */
+export type DeleteDiskQuery = operations["delete-disk"]["parameters"]["query"];
 
 /** The success response body of `GET /api/v1/resource-usages`. */
 export type ListResourceUsagesResult =
   operations["list-resource-usages"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/resource-usages`. */
-export type ListResourceUsagesQuery = operations["list-resource-usages"]["parameters"]["query"];
 
 /** The success response body of `GET /api/v1/resource-usages/{usageId}`. */
 export type GetResourceUsageResult =
@@ -164,12 +66,9 @@ export type SetResourceIdlePolicyBody = NonNullable<
   operations["set-resource-idle-policy"]["requestBody"]
 >["content"]["application/json"];
 
-/** The success response body of `GET /api/v1/disks/{resourceId}/attachments`. */
+/** The success response body of `GET /api/v1/disks/{diskId}/attachments`. */
 export type ListDiskAttachmentsResult =
   operations["list-disk-attachments"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/disks/{resourceId}/attachments`. */
-export type ListDiskAttachmentsQuery = operations["list-disk-attachments"]["parameters"]["query"];
 
 /** The success response body of `GET /api/v1/attachments/{attachmentId}`. */
 export type GetAttachmentResult =
