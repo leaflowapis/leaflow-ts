@@ -2685,6 +2685,11 @@ export interface components {
     /** @enum {string} */
     OrderState: "pending" | "paid" | "fulfilled" | "failed" | "canceled";
     Order: {
+      /**
+       * Format: date-time
+       * @description When fulfillment began. Funds and sellable quota remain reserved until success or confirmed failure; this order can no longer be canceled.
+       */
+      fulfillment_started_at?: string | null;
       /** @description Total tax after discounts, including any tax already included in the price. */
       tax_amount?: string;
       /** @description The part of tax_amount already included in gross_amount; it is not charged again. */
@@ -2731,8 +2736,8 @@ export interface components {
       refundable_amount?: components["schemas"]["Money"];
       /**
        * Format: date-time
-       * @description When the funds and any stock held for this order are released. After this it can no
-       *     longer be paid and has to be placed again. Absent once the order is settled.
+       * @description The deadline to pay and begin fulfillment. Absent after fulfillment starts or the order
+       *     ends. Once fulfillment starts, its reservations remain held until success or confirmed failure.
        */
       reservation_expires_at?: string | null;
       /** Format: date-time */
