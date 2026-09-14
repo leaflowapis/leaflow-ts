@@ -2696,10 +2696,7 @@ export interface operations {
   "rename-backup": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         backupId: string;
       };
@@ -3115,10 +3112,7 @@ export interface operations {
   "rename-disk": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         diskId: string;
       };
@@ -3388,10 +3382,7 @@ export interface operations {
   "bind-floating-ip": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         floatingIpId: string;
       };
@@ -3426,10 +3417,7 @@ export interface operations {
   "unbind-floating-ip": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         floatingIpId: string;
       };
@@ -3592,10 +3580,7 @@ export interface operations {
   "rename-instance": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         instanceId: string;
       };
@@ -3630,10 +3615,7 @@ export interface operations {
   "run-instance-command": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         instanceId: string;
       };
@@ -3668,10 +3650,7 @@ export interface operations {
   "open-instance-console": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         instanceId: string;
       };
@@ -3736,10 +3715,7 @@ export interface operations {
   "set-instance-labels": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         instanceId: string;
       };
@@ -3774,10 +3750,7 @@ export interface operations {
   "set-instance-notes": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         instanceId: string;
       };
@@ -3812,10 +3785,7 @@ export interface operations {
   "reset-instance-password": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         instanceId: string;
       };
@@ -3888,10 +3858,7 @@ export interface operations {
   "rebuild-instance": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         instanceId: string;
       };
@@ -4212,10 +4179,7 @@ export interface operations {
   "attach-instance-floating-ip": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         instanceId: string;
       };
@@ -4227,13 +4191,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Accepted */
-      202: {
+      /** @description The current floating IP binding */
+      200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["FloatingIPResource"];
         };
       };
       /** @description Error */
@@ -4250,10 +4214,7 @@ export interface operations {
   "detach-instance-floating-ip": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         instanceId: string;
         floatingIpId: string;
@@ -4262,13 +4223,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Accepted */
-      202: {
+      /** @description The current floating IP binding */
+      200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["FloatingIPResource"];
         };
       };
       /** @description Error */
@@ -4455,10 +4416,7 @@ export interface operations {
   "create-port": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path?: never;
       cookie?: never;
     };
@@ -4491,10 +4449,7 @@ export interface operations {
   "delete-port": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         portId: string;
       };
@@ -4655,10 +4610,7 @@ export interface operations {
   "rename-private-image": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         privateImageId: string;
       };
@@ -4725,10 +4677,7 @@ export interface operations {
   "create-private-network": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path?: never;
       cookie?: never;
     };
@@ -4792,10 +4741,7 @@ export interface operations {
   "delete-private-network": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         privateNetworkId: string;
       };
@@ -4824,10 +4770,7 @@ export interface operations {
   "rename-private-network": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         privateNetworkId: string;
       };
@@ -4893,10 +4836,7 @@ export interface operations {
   "enable-private-network-ipv6": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         privateNetworkId: string;
       };
@@ -4927,10 +4867,7 @@ export interface operations {
   "disable-private-network-ipv6": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         privateNetworkId: string;
       };
@@ -4990,10 +4927,7 @@ export interface operations {
   "create-route": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         privateNetworkId: string;
       };
@@ -5028,10 +4962,7 @@ export interface operations {
   "delete-route": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         privateNetworkId: string;
         routeId: string;
@@ -5092,10 +5023,7 @@ export interface operations {
   "create-subnet": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         privateNetworkId: string;
       };
@@ -5163,10 +5091,7 @@ export interface operations {
   "delete-subnet": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         privateNetworkId: string;
         subnetId: string;
@@ -5229,10 +5154,7 @@ export interface operations {
   "create-security-group": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path?: never;
       cookie?: never;
     };
@@ -5296,10 +5218,7 @@ export interface operations {
   "delete-security-group": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         securityGroupId: string;
       };
@@ -5328,10 +5247,7 @@ export interface operations {
   "rename-security-group": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         securityGroupId: string;
       };
@@ -5397,10 +5313,7 @@ export interface operations {
   "create-security-group-rule": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         securityGroupId: string;
       };
@@ -5435,10 +5348,7 @@ export interface operations {
   "delete-security-group-rule": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         securityGroupId: string;
         ruleId: string;
@@ -5598,10 +5508,7 @@ export interface operations {
   "rename-snapshot": {
     parameters: {
       query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
+      header?: never;
       path: {
         snapshotId: string;
       };
