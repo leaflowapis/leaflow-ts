@@ -335,7 +335,7 @@ export interface paths {
     post?: never;
     /**
      * Release a floating IP
-     * @description A released address enters a cooldown period before it is allocated again, so that DNS records and allow-lists still pointing at it do not break immediately. **The same address therefore cannot be re-allocated** for some time after release. Proceed with care.
+     * @description Releases the floating IP after unbinding it. Completion is reported by the returned task.
      */
     delete: operations["release-floating-ip"];
     options?: never;
@@ -1338,11 +1338,6 @@ export interface components {
       status: number;
     };
     BackupResource: {
-      /**
-       * Format: uuid
-       * @description Availability zone of the source disk. A restore may target another zone in the same region
-       */
-      availability_zone_id: string;
       /** Format: date-time */
       created_at: string;
       /** Format: uuid */
@@ -1363,14 +1358,23 @@ export interface components {
       /** @enum {string} */
       status: "provisioning" | "available" | "restoring" | "deleting" | "error";
       /** Format: uuid */
-      order_id?: string | null;
+      order_id: string | null;
       /** Format: uuid */
-      price_id?: string | null;
+      price_id: string | null;
       /** Format: uuid */
-      subscription_item_id?: string | null;
+      subscription_item_id: string | null;
       /** @enum {string|null} */
-      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task?: components["schemas"]["Task"] | null;
+      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task: components["schemas"]["Task"] | null;
+      /** Format: int64 */
+      generation: number;
+      /** Format: date-time */
+      observed_at: string | null;
+      /**
+       * Format: uuid
+       * @description Availability zone of the source disk. A restore may target another zone in the same region
+       */
+      source_availability_zone_id: string;
     };
     BackupListResponseBody: {
       items: components["schemas"]["BackupResource"][] | null;
@@ -1444,27 +1448,20 @@ export interface components {
         | "releasing"
         | "deleting"
         | "error";
-      /**
-       * @description How this disk is paid for. `postpaid` is billed by the hour for as long as it exists;
-       *     `prepaid` was bought outright for a term.
-       *
-       *     **Not the term.** How long it was bought for belongs to the order, not to the disk:
-       *     renewing can change it, and a machine bought for a year and then renewed for a month is
-       *     still a prepaid machine. Ask billing for the term and the expiry — they live there, and
-       *     they are the only two values a renewal moves.
-       * @enum {string}
-       */
-      charge_type: "postpaid" | "prepaid";
       /** Format: uuid */
-      order_id?: string | null;
+      order_id: string | null;
       /** Format: uuid */
-      price_id?: string | null;
+      price_id: string | null;
       /** Format: uuid */
-      subscription_item_id?: string | null;
+      subscription_item_id: string | null;
       /** @enum {string|null} */
-      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task?: components["schemas"]["Task"] | null;
+      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task: components["schemas"]["Task"] | null;
       attachment?: components["schemas"]["DiskAttachment"] | null;
+      /** Format: int64 */
+      generation: number;
+      /** Format: date-time */
+      observed_at: string | null;
     };
     DiskTypeResource: {
       /** Format: uuid */
@@ -1510,53 +1507,20 @@ export interface components {
        * @description Throughput a disk of `max_size_gb` gets, in bytes per second. Null when this type is not rate-limited
        */
       throughput_at_max_size: number | null;
-      /**
-       * @description Whether any capacity is left in this type's pool.
-       *
-       *     The same shape as on an instance type, but it answers less here: a disk is sold by the
-       *     GiB, so "not sold out" does not mean the size being asked for fits. `remaining` is the
-       *     field that decides that, and this one only says whether the pool is empty outright.
-       *
-       *     It reflects a limit set by operations, not what the storage backend physically has —
-       *     raising the limit does not create capacity, and a type that is not sold out can still fail
-       *     to create if the backend is full.
-       *
-       *     Advisory: it is read when the list is built, and capacity can be taken between that read
-       *     and the order. The order is what actually refuses.
-       */
-      sold_out: boolean;
-      /**
-       * Format: int64
-       * @description How much capacity is left, **in GiB**. Absent when this type is not limited at all.
-       *
-       *     Unlike an instance type, where this is a count of machines, here it is an amount of
-       *     storage — and it is the number that bounds the size a customer may ask for. A picker that
-       *     offers sizes above it produces orders that are refused after the customer has chosen
-       *     everything else.
-       *
-       *     Absent is not zero and not "unknown": a type with no limit simply has no number to show.
-       *     Reporting it as a number would need a sentinel, and any sentinel eventually gets compared
-       *     against a real size.
-       */
-      remaining?: number;
-      /**
-       * @description What buying this type outright costs, per term. Empty means this type is only sold by the
-       *     hour.
-       *
-       *     **The amount is per GiB for the whole term**, not the price of one disk: a disk's size is
-       *     chosen by the customer, so the total is this figure times the size. That differs from an
-       *     instance type, where the same field is the price of one machine — the unit follows what
-       *     the product is sold by, and the order is priced the same way.
-       *
-       *     Advisory, like `sold_out`: it is read when the list is built. The order is what fixes the
-       *     price, and it refuses rather than falling back to hourly if the term is not sold.
-       */
-      prepaid_prices?: components["schemas"]["PrepaidPrice"][];
       /** Format: uuid */
-      product_id?: string | null;
+      product_id: string | null;
       /** Format: uuid */
-      plan_id?: string | null;
-      lookup_key?: string;
+      plan_id: string | null;
+      lookup_key: string;
+      name_translations: {
+        [key: string]: string;
+      };
+      /** Format: uuid */
+      snapshot_plan_id: string | null;
+      /** Format: uuid */
+      backup_plan_id: string | null;
+      /** Format: uuid */
+      private_image_plan_id: string | null;
     };
     DiskTypeListResponseBody: {
       items: components["schemas"]["DiskTypeResource"][] | null;
@@ -1588,19 +1552,6 @@ export interface components {
       page_size: number;
       /** Format: int64 */
       total_count?: number;
-    };
-    PrepaidPrice: {
-      /**
-       * @description An ISO 8601 duration (P1M, P1Y). A duration rather than a number of months: months are not
-       *     the same length, and storing a number leaves whoever reads it to decide what it means.
-       */
-      term: string;
-      /**
-       * @description A decimal string, not a float. Money that survives a round trip through binary floating
-       *     point is money that stops adding up.
-       */
-      amount: string;
-      currency: string;
     };
     InstanceTypeResource: {
       /** Format: uuid */
@@ -1642,10 +1593,13 @@ export interface components {
       /** Format: int64 */
       vcpus: number;
       /** Format: uuid */
-      product_id?: string | null;
+      product_id: string | null;
       /** Format: uuid */
       plan_id: string | null;
-      lookup_key?: string;
+      lookup_key: string;
+      name_translations: {
+        [key: string]: string;
+      };
     };
     InstanceTypeListResponseBody: {
       items: components["schemas"]["InstanceTypeResource"][];
@@ -1716,14 +1670,10 @@ export interface components {
     };
     FloatingIPResource: {
       address: string;
-      attached_fixed_ip: string | null;
-      attached_port_id: string | null;
       /** Format: int64 */
       bandwidth_mbps: number | null;
       /** Format: date-time */
       created_at: string;
-      /** Format: date-time */
-      detached_at: string | null;
       /** Format: uuid */
       id: string;
       /** Format: uuid */
@@ -1731,22 +1681,27 @@ export interface components {
       /** @enum {string} */
       status: "pending" | "available" | "deleting" | "error" | "unknown";
       /** Format: uuid */
-      order_id?: string | null;
+      order_id: string | null;
       /** Format: uuid */
-      price_id?: string | null;
+      price_id: string | null;
       /** Format: uuid */
-      subscription_item_id?: string | null;
+      subscription_item_id: string | null;
       /** @enum {string|null} */
-      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task?: components["schemas"]["Task"] | null;
+      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task: components["schemas"]["Task"] | null;
       /** Format: uuid */
-      bandwidth_order_id?: string | null;
+      bandwidth_order_id: string | null;
       /** Format: uuid */
-      bandwidth_price_id?: string | null;
+      bandwidth_price_id: string | null;
       /** Format: uuid */
-      bandwidth_subscription_item_id?: string | null;
+      bandwidth_subscription_item_id: string | null;
       /** @enum {string|null} */
-      bandwidth_access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      bandwidth_access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      /** Format: int64 */
+      generation: number;
+      /** Format: date-time */
+      observed_at: string | null;
+      binding: components["schemas"]["IPv4Binding"] | null;
     };
     FloatingIPListResponseBody: {
       items: components["schemas"]["FloatingIPResource"][] | null;
@@ -1824,7 +1779,7 @@ export interface components {
       private_image_id: string | null;
       /** @description Private address of the instance */
       private_ip: string | null;
-      /** @description Private network of the primary network interface */
+      /** Format: uuid */
       private_network_id: string | null;
       /** @description Floating IPv4 addresses bound to the primary network interface; an empty array when none are bound */
       public_ips: string[] | null;
@@ -1846,7 +1801,7 @@ export interface components {
         | "deleted"
         | "error"
         | "unknown";
-      /** @description Subnet of the primary network interface */
+      /** Format: uuid */
       subnet_id: string | null;
       /** Format: date-time */
       updated_at: string;
@@ -1859,21 +1814,18 @@ export interface components {
       task_state: string;
       /** Format: int64 */
       generation: number;
-      /**
-       * Format: date-time
-       * @description Timestamp of the last successful provider observation. An unreachable provider does not erase the last observation or prove deletion.
-       */
-      observed_at?: string;
+      /** Format: date-time */
+      observed_at: string | null;
       restrictions: components["schemas"]["InstanceRestriction"][];
-      task?: components["schemas"]["Task"] | null;
+      task: components["schemas"]["Task"] | null;
       /** Format: uuid */
       order_id: string | null;
       /** Format: uuid */
-      price_id?: string | null;
+      price_id: string | null;
       /** Format: uuid */
-      subscription_item_id?: string | null;
+      subscription_item_id: string | null;
       /** @enum {string|null} */
-      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       /**
        * Format: uuid
        * @description Non-empty when the instance was created from a disk you already had, instead of from an image
@@ -2059,6 +2011,12 @@ export interface components {
       public_ips: string[] | null;
       addresses?: components["schemas"]["PortAddress"][];
       attachment?: components["schemas"]["PortAttachment"] | null;
+      /** @enum {string} */
+      status: "pending" | "available" | "deleting" | "error" | "unknown";
+      /** Format: int64 */
+      generation: number;
+      /** Format: date-time */
+      observed_at: string | null;
     };
     PortListResponseBody: {
       items: components["schemas"]["PortResource"][] | null;
@@ -2155,14 +2113,18 @@ export interface components {
       /** @description False means a new password can only be set by rebuilding an instance created from this image */
       supports_password_reset: boolean;
       /** Format: uuid */
-      order_id?: string | null;
+      order_id: string | null;
       /** Format: uuid */
-      price_id?: string | null;
+      price_id: string | null;
       /** Format: uuid */
-      subscription_item_id?: string | null;
+      subscription_item_id: string | null;
       /** @enum {string|null} */
-      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task?: components["schemas"]["Task"] | null;
+      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task: components["schemas"]["Task"] | null;
+      /** Format: int64 */
+      generation: number;
+      /** Format: date-time */
+      observed_at: string | null;
     };
     PrivateImageListResponseBody: {
       items: components["schemas"]["PrivateImageResource"][];
@@ -2360,14 +2322,18 @@ export interface components {
       /** @enum {string} */
       status: "provisioning" | "available" | "restoring" | "deleting" | "error";
       /** Format: uuid */
-      order_id?: string | null;
+      order_id: string | null;
       /** Format: uuid */
-      price_id?: string | null;
+      price_id: string | null;
       /** Format: uuid */
-      subscription_item_id?: string | null;
+      subscription_item_id: string | null;
       /** @enum {string|null} */
-      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task?: components["schemas"]["Task"] | null;
+      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task: components["schemas"]["Task"] | null;
+      /** Format: int64 */
+      generation: number;
+      /** Format: date-time */
+      observed_at: string | null;
     };
     SnapshotListResponseBody: {
       items: components["schemas"]["SnapshotResource"][] | null;
@@ -2500,6 +2466,7 @@ export interface components {
       detached_at: string | null;
       /** Format: date-time */
       released_at: string | null;
+      device: string | null;
     };
     DiskAttachmentList: {
       items: components["schemas"]["DiskAttachment"][];
@@ -2563,6 +2530,24 @@ export interface components {
       page_size: number;
       /** Format: int64 */
       total_count?: number;
+    };
+    IPv4Binding: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      ipv4_allocation_id: string;
+      /** Format: uuid */
+      port_address_id: string;
+      address: string;
+      fixed_ip: string;
+      /** @enum {string} */
+      state: "binding" | "bound" | "unbinding" | "released" | "unknown";
+      /** Format: date-time */
+      bound_at: string | null;
+      /** Format: date-time */
+      unbound_at: string | null;
+      /** Format: date-time */
+      released_at: string | null;
     };
     /** @description Requested funding split. This does not select a card or payment provider; complete payment through Billing. */
     PaymentPlan: {
@@ -3345,12 +3330,14 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description No Content */
-      204: {
+      /** @description The release has been accepted. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["Task"];
+        };
       };
       /** @description Error */
       default: {
