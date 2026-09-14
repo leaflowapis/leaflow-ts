@@ -4,6 +4,118 @@
  */
 
 export interface paths {
+  "/api/v1/backups": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List backups */
+    get: operations["list-backups"];
+    put?: never;
+    /**
+     * Create a backup
+     * @description A backup is a complete copy of a disk held in separate storage: **it remains restorable after the source disk is deleted, and can be restored to another availability zone in the same region.** A snapshot offers neither capability, as it resides in the same storage as the source disk and prevents that disk from being deleted while it exists.
+     *
+     *     Disks attached to a running instance, including system disks, can be backed up.
+     *
+     *     The duration depends on the amount of data. The backup is not complete when this endpoint returns; poll the retrieve endpoint.
+     */
+    post: operations["create-backup"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/backups/{backupId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Retrieve a backup
+     * @description Queries the current state of the backup, which makes it slower but more accurate than the list endpoint. Use it to poll creation progress.
+     */
+    get: operations["get-backup"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a backup
+     * @description Independent of the source disk: deletion succeeds whether or not that disk still exists.
+     */
+    delete: operations["delete-backup"];
+    options?: never;
+    head?: never;
+    /** Rename a backup */
+    patch: operations["rename-backup"];
+    trace?: never;
+  };
+  "/api/v1/backups/{backupId}/restore": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Restore from a backup
+     * @description Restores onto a **newly created** disk. The source disk is unaffected and need not still exist.
+     *
+     *     The target disk type may belong to another availability zone of the same region, and its capacity must not be smaller than the backup. The disk cannot be attached until the restore completes; poll the disk retrieve endpoint.
+     */
+    post: operations["restore-backup"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/disk-types": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List disk types on sale
+     * @description Only disk types currently on sale are listed. A withdrawn one disappears from here and can no longer be bought, while the disks already on it keep working and can still be resized.
+     */
+    get: operations["list-disk-types"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/disk-types/{diskTypeId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a disk type
+     * @description Retrieve capacity and performance constraints for an existing disk, including system disk types and types withdrawn from sale.
+     */
+    get: operations["get-disk-type"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/images": {
     parameters: {
       query?: never;
@@ -46,6 +158,234 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/regions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List available regions */
+    get: operations["list-regions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/regions/{regionId}/availability-zones": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List the availability zones of a region
+     * @description A disk and an instance must reside in the same availability zone to be attached. Confirm the zone before creating either.
+     */
+    get: operations["list-availability-zones"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/disks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List disks
+     * @description When both `region_code` and `availability_zone` are supplied, only disks attachable to an instance at that location are returned.
+     */
+    get: operations["list-disks"];
+    put?: never;
+    /**
+     * Create a disk
+     * @description The disk is created in the availability zone of the selected disk type, and an instance must reside in the same zone to attach it. Choosing the disk type therefore determines the zone.
+     *
+     *     A disk type that has been withdrawn is rejected with `DISK_TYPE_RETIRED`, even though its identifier still resolves. Withdrawn types stop appearing in the disk type listing; disks already bought on one keep working and can still be resized.
+     */
+    post: operations["create-disk"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/disks/{diskId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Retrieve a disk
+     * @description Queries the current state of the disk, which makes it slower but more accurate than the list endpoint.
+     */
+    get: operations["get-disk"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a disk
+     * @description Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
+     */
+    delete: operations["delete-disk"];
+    options?: never;
+    head?: never;
+    /**
+     * Rename a disk
+     * @description Changes the name only. Use the resize endpoint for capacity; type and availability zone are immutable.
+     */
+    patch: operations["rename-disk"];
+    trace?: never;
+  };
+  "/api/v1/disks/{diskId}/resize": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Resize a disk
+     * @description Capacity can only be increased; shrinking is not supported. Extend the file system inside the instance once the resize completes.
+     *
+     *     **A data disk whose performance grows with its size has to be detached first.** The storage backend decides a volume's limit when the volume is attached and never revisits it, so growing one that is attached would give you the capacity immediately and leave the speed at the old size's figure — indefinitely, and stopping the instance does not help. Rather than take the money for performance that does not arrive, this is refused with `DISK_RESIZE_NEEDS_DETACH`; detach the disk, resize it, and attach it again.
+     *
+     *     It is only refused when the two sizes really would differ in speed. A disk whose type has no QoS level, or whose performance has already reached the type's ceiling, grows online as before.
+     *
+     *     **A system disk is the exception and grows online**, because a root volume cannot be detached at all. Its performance does not change with size for exactly that reason — system disk types are required to carry a level that does not scale.
+     */
+    post: operations["resize-disk"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/disks/{diskId}/revert": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Revert to a snapshot
+     * @description Restores the contents of the disk to the moment the snapshot was taken. **All data written after that moment is lost and cannot be recovered.**
+     *
+     *     Three restrictions apply: only the most recent snapshot of the disk can be reverted to; the disk must be detached from its instance first; and a disk resized since the snapshot was taken cannot be reverted. To return to an earlier point in time, or to keep the existing disk, create a new disk from the snapshot instead.
+     *
+     *     The revert is not complete when this endpoint returns; poll the retrieve endpoint.
+     */
+    post: operations["revert-disk"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/floating-ips": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List floating IPs */
+    get: operations["list-floating-ips"];
+    put?: never;
+    /**
+     * Allocate a floating IP
+     * @description If the private network is not yet connected to the internet, connectivity is established as part of this call.
+     *
+     *     IPv6 is not requested through this endpoint. IPv6 addresses are assigned to instances by the private network; enable IPv6 on that network instead.
+     */
+    post: operations["allocate-floating-ip"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/floating-ips/{floatingIpId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Retrieve a floating IP */
+    get: operations["get-floating-ip"];
+    put?: never;
+    post?: never;
+    /**
+     * Release a floating IP
+     * @description A released address enters a cooldown period before it is allocated again, so that DNS records and allow-lists still pointing at it do not break immediately. **The same address therefore cannot be re-allocated** for some time after release. Proceed with care.
+     */
+    delete: operations["release-floating-ip"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/floating-ips/{floatingIpId}/bandwidth": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Set the bandwidth limit
+     * @description Limits both directions at once. Limiting egress alone does not prevent ingress traffic from saturating the uplink.
+     *
+     *     While the address is bound to an instance, the ceiling has to fit that instance type's `max_bandwidth_mbps`; asking for more is refused with `INSTANCE_BANDWIDTH_CEILING`. An address bound to nothing is not checked against any type — there is none to check against — and is checked again when it is attached.
+     */
+    put: operations["set-floating-ip-bandwidth"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/floating-ips/{floatingIpId}/binding": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Bind a floating IP to a network interface */
+    put: operations["bind-floating-ip"];
+    post?: never;
+    /**
+     * Unbind a floating IP
+     * @description The address remains held by the project and simply no longer points at any network interface.
+     */
+    delete: operations["unbind-floating-ip"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/instances": {
     parameters: {
       query?: never;
@@ -61,7 +401,7 @@ export interface paths {
     put?: never;
     /**
      * Create instances
-     * @description Creates a Billing order, including for metered pricing. The price must belong to the resource’s Billing Plan; applicable contract pricing is resolved by Billing. Technical capacity is checked before sellable quota is reserved. Provisioning continues automatically after payment; do not submit a new purchase after paying. Reuse the original idempotency key after an uncertain response. Exactly one of image_id, private_image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. Image boots require boot_disk; existing disks retain their own subscription. Resource lines for Compute, Storage and Fabric remain separate subscriptions on the same order.
+     * @description Creates a Billing order, including for metered pricing. The price must belong to the resource’s Billing Plan; applicable contract pricing is resolved by Billing. Technical capacity is checked before sellable quota is reserved. Provisioning continues automatically after payment; do not submit a new purchase after paying. Reuse the original idempotency key after an uncertain response. Exactly one of image_id, private_image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
      */
     post: operations["launch-instance"];
     delete?: never;
@@ -373,7 +713,7 @@ export interface paths {
     put?: never;
     /**
      * Start an instance
-     * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped VM retains its Fabric and Storage claims. Inspect operation, task_state, power_state and observed_at to determine completion.
+     * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped instance keeps its disks, network attachments and sellable quota. Inspect operation, task_state, power_state and observed_at to determine completion.
      */
     post: operations["start-instance"];
     delete?: never;
@@ -393,7 +733,7 @@ export interface paths {
     put?: never;
     /**
      * Stop an instance
-     * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped VM retains its Fabric and Storage claims. Inspect operation, task_state, power_state and observed_at to determine completion.
+     * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped instance keeps its disks, network attachments and sellable quota. Inspect operation, task_state, power_state and observed_at to determine completion.
      */
     post: operations["stop-instance"];
     delete?: never;
@@ -454,7 +794,7 @@ export interface paths {
     put?: never;
     /**
      * Bind a floating IP to an instance
-     * @description Requests a binding change on the instance’s primary Fabric port. The returned Fabric usage claim identifies the port-to-address relationship; Compute does not own the address. An accepted release can still be releasing until the provider confirms removal.
+     * @description Changes the public IP binding on the instance's primary network interface. The returned task tracks confirmation of the binding change.
      */
     post: operations["attach-instance-floating-ip"];
     delete?: never;
@@ -475,7 +815,7 @@ export interface paths {
     post?: never;
     /**
      * Unbind the floating IP of an instance
-     * @description Requests a binding change on the instance’s primary Fabric port. The returned Fabric usage claim identifies the port-to-address relationship; Compute does not own the address. An accepted release can still be releasing until the provider confirms removal.
+     * @description Changes the public IP binding on the instance's primary network interface. The returned task tracks confirmation of the binding change.
      */
     delete: operations["detach-instance-floating-ip"];
     options?: never;
@@ -545,6 +885,47 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/ports": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List network interfaces */
+    get: operations["list-ports"];
+    put?: never;
+    /**
+     * Create a network interface
+     * @description The new network interface is not attached to any instance. Primary network interfaces are not created here; they are created with the instance.
+     */
+    post: operations["create-port"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/ports/{portId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Delete a network interface
+     * @description The primary network interface cannot be deleted on its own, as it is released with the instance. A network interface still attached to an instance cannot be deleted either.
+     */
+    delete: operations["delete-port"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/private-images": {
     parameters: {
       query?: never;
@@ -604,7 +985,118 @@ export interface paths {
     patch: operations["rename-private-image"];
     trace?: never;
   };
-  "/api/v1/instances/{instanceId}/dependencies": {
+  "/api/v1/private-networks": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List private networks */
+    get: operations["list-private-networks"];
+    put?: never;
+    /**
+     * Create a private network
+     * @description Creates a network, a router and a default security group in one call. The default security group denies all inbound traffic and permits all outbound traffic.
+     */
+    post: operations["create-private-network"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/private-networks/{privateNetworkId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Retrieve a private network */
+    get: operations["get-private-network"];
+    put?: never;
+    post?: never;
+    /**
+     * Release a private network
+     * @description Release is rejected while instances or network interfaces remain in the network. IPv6, the router and the security groups are released with it.
+     */
+    delete: operations["delete-private-network"];
+    options?: never;
+    head?: never;
+    /**
+     * Rename a private network
+     * @description Changes the display name only. The CIDR, the routes and the internet gateway are immutable.
+     */
+    patch: operations["rename-private-network"];
+    trace?: never;
+  };
+  "/api/v1/private-networks/{privateNetworkId}/ipv6": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Retrieve the IPv6 configuration of a private network */
+    get: operations["get-private-network-ipv6"];
+    put?: never;
+    /**
+     * Enable IPv6 on a private network
+     * @description Allocates an IPv6 prefix to the private network. Addresses are assigned to instances by the network itself, can be neither requested nor released individually, and consume no public IPv4 address.
+     *
+     *     If the private network is not yet connected to the internet, connectivity is established as part of this call.
+     */
+    post: operations["enable-private-network-ipv6"];
+    /**
+     * Disable IPv6 on a private network
+     * @description A released prefix is not re-allocated immediately.
+     */
+    delete: operations["disable-private-network-ipv6"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/private-networks/{privateNetworkId}/routes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List static routes */
+    get: operations["list-routes"];
+    put?: never;
+    /**
+     * Create a static route
+     * @description Three forms that would sever connectivity are rejected: a destination of `0.0.0.0/0`, which overrides the default route and takes every floating IP offline immediately; a destination equal to the CIDR of a subnet, which overrides its directly connected route; and a next hop equal to the gateway of a subnet, which points back at the router itself.
+     */
+    post: operations["create-route"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/private-networks/{privateNetworkId}/routes/{routeId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete a static route */
+    delete: operations["delete-route"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/private-networks/{privateNetworkId}/subnets": {
     parameters: {
       query?: never;
       header?: never;
@@ -612,10 +1104,214 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List instance dependencies
-     * @description Desired dependencies recorded by Compute. usage_id resolves the corresponding claim in Fabric or Storage. These records remain present while an instance is stopped or suspended.
+     * List subnets
+     * @description IPv6 subnets are included, with `ip_version` 6. They are created when IPv6 is enabled and cannot be deleted individually.
      */
-    get: operations["list-instance-dependencies"];
+    get: operations["list-subnets"];
+    put?: never;
+    /** Create a subnet */
+    post: operations["create-subnet"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/private-networks/{privateNetworkId}/subnets/next-free-cidr": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Suggest the next free CIDR
+     * @description The returned value is a suggestion and is validated again when the subnet is created. It exists to avoid errors when computing the next free CIDR by hand.
+     */
+    get: operations["suggest-subnet-cidr"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/private-networks/{privateNetworkId}/subnets/{subnetId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Delete a subnet
+     * @description Deletion is rejected while network interfaces remain in the subnet, or while a static route has a next hop inside its CIDR.
+     */
+    delete: operations["delete-subnet"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/security-groups": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List security groups */
+    get: operations["list-security-groups"];
+    put?: never;
+    /**
+     * Create a security group
+     * @description A new security group carries one rule, permitting ICMP fragmentation-needed messages (type 3, code 4). Without it path MTU discovery fails, which presents as connections that establish and then stall on large packets.
+     */
+    post: operations["create-security-group"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/security-groups/{securityGroupId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Retrieve a security group */
+    get: operations["get-security-group"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a security group
+     * @description The default security group cannot be deleted, as it is released with the private network. A security group still referenced by a network interface cannot be deleted either.
+     */
+    delete: operations["delete-security-group"];
+    options?: never;
+    head?: never;
+    /**
+     * Rename a security group
+     * @description Changes the name only. Use the rule endpoints to change rules.
+     */
+    patch: operations["rename-security-group"];
+    trace?: never;
+  };
+  "/api/v1/security-groups/{securityGroupId}/rules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List security group rules */
+    get: operations["list-security-group-rules"];
+    put?: never;
+    /**
+     * Create a security group rule
+     * @description Adding an identical rule twice is rejected. For that comparison `0.0.0.0/0`, `::/0` and an omitted value are treated as equivalent.
+     */
+    post: operations["create-security-group-rule"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/security-groups/{securityGroupId}/rules/{ruleId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete a security group rule */
+    delete: operations["delete-security-group-rule"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/snapshots": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List snapshots */
+    get: operations["list-snapshots"];
+    put?: never;
+    /**
+     * Create a snapshot
+     * @description Disks attached to a running instance can be snapshotted. A snapshot records the state of the block device at a point in time and may be inconsistent at the file-system level, so run `sync` inside the instance first where the data matters.
+     *
+     *     **A snapshot of a system disk cannot be used to revert that system disk**: reverting requires the disk to be detached, and a system disk cannot be detached. It can be used to create a new data disk. To preserve and restore an entire system, use a private image; for a copy that crosses availability zones and survives deletion of the disk, use a backup.
+     */
+    post: operations["create-snapshot"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/snapshots/{snapshotId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Retrieve a snapshot */
+    get: operations["get-snapshot"];
+    put?: never;
+    post?: never;
+    /** Delete a snapshot */
+    delete: operations["delete-snapshot"];
+    options?: never;
+    head?: never;
+    /** Rename a snapshot */
+    patch: operations["rename-snapshot"];
+    trace?: never;
+  };
+  "/api/v1/tasks/{taskId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a requested action */
+    get: operations["get-task"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/ipv4-pools": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List public IP pools
+     * @description Lists the public IP pools available for new allocations in this region.
+     */
+    get: operations["list-ipv4-pools"];
     put?: never;
     post?: never;
     delete?: never;
@@ -641,6 +1337,230 @@ export interface components {
       /** Format: int64 */
       status: number;
     };
+    BackupResource: {
+      /**
+       * Format: uuid
+       * @description Availability zone of the source disk. A restore may target another zone in the same region
+       */
+      availability_zone_id: string;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** Format: uuid */
+      region_id: string;
+      /**
+       * Format: int64
+       * @description Capacity of the source disk when the backup was created. A restored disk cannot be smaller than this
+       */
+      size_gb: number;
+      /**
+       * Format: uuid
+       * @description The disk this backup was taken from. The backup remains usable after that disk is deleted
+       */
+      source_disk_id: string;
+      /** @enum {string} */
+      status: "provisioning" | "available" | "restoring" | "deleting" | "error";
+      /** Format: uuid */
+      order_id?: string | null;
+      /** Format: uuid */
+      price_id?: string | null;
+      /** Format: uuid */
+      subscription_item_id?: string | null;
+      /** @enum {string|null} */
+      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task?: components["schemas"]["Task"] | null;
+    };
+    BackupListResponseBody: {
+      items: components["schemas"]["BackupResource"][] | null;
+    };
+    CreateBackupRequestBody: {
+      /** Format: uuid */
+      disk_id: string;
+      name: string;
+      price: components["schemas"]["CatalogReference"];
+      order: components["schemas"]["OrderOptions"];
+    };
+    RenameBackupRequestBody: {
+      name: string;
+    };
+    RestoreBackupRequestBody: {
+      /**
+       * Format: uuid
+       * @description May differ from the availability zone of the source disk, but must be in the same region. It has to be on sale — restoring creates a new disk, so a withdrawn type is rejected here as well
+       */
+      disk_type_id: string;
+      name: string;
+      /**
+       * Format: int64
+       * @description Matches the size of the backup when omitted. When given, it must not be smaller than the backup
+       */
+      size_gb?: number;
+      price: components["schemas"]["CatalogReference"];
+      order: components["schemas"]["OrderOptions"];
+    };
+    DiskResource: {
+      /**
+       * Format: uuid
+       * @description Availability zone the disk actually resides in. An instance must be in the same zone to attach it
+       */
+      availability_zone_id: string;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: uuid */
+      disk_type_id: string;
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** Format: uuid */
+      region_id: string;
+      /** Format: int64 */
+      size_gb: number;
+      /**
+       * Format: int64
+       * @description IOPS this disk is allowed. Null when its type is not rate-limited.
+       *
+       *     Computed from the disk's own capacity, so it grows when the disk is grown — but see the
+       *     note on the resize endpoint: growing a disk that is attached is refused, precisely because
+       *     the new figure would not take effect until it was attached again.
+       */
+      iops: number | null;
+      /**
+       * Format: int64
+       * @description Throughput this disk is allowed, in bytes per second. Null when its type is not rate-limited
+       */
+      throughput_bytes_per_sec: number | null;
+      /** @enum {string} */
+      status:
+        | "provisioning"
+        | "available"
+        | "attaching"
+        | "in_use"
+        | "detaching"
+        | "resizing"
+        | "reverting"
+        | "restoring"
+        | "releasing"
+        | "deleting"
+        | "error";
+      /**
+       * @description How this disk is paid for. `postpaid` is billed by the hour for as long as it exists;
+       *     `prepaid` was bought outright for a term.
+       *
+       *     **Not the term.** How long it was bought for belongs to the order, not to the disk:
+       *     renewing can change it, and a machine bought for a year and then renewed for a month is
+       *     still a prepaid machine. Ask billing for the term and the expiry — they live there, and
+       *     they are the only two values a renewal moves.
+       * @enum {string}
+       */
+      charge_type: "postpaid" | "prepaid";
+      /** Format: uuid */
+      order_id?: string | null;
+      /** Format: uuid */
+      price_id?: string | null;
+      /** Format: uuid */
+      subscription_item_id?: string | null;
+      /** @enum {string|null} */
+      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task?: components["schemas"]["Task"] | null;
+      attachment?: components["schemas"]["DiskAttachment"] | null;
+    };
+    DiskTypeResource: {
+      /** Format: uuid */
+      availability_zone_id: string;
+      /** Format: uuid */
+      id: string;
+      /**
+       * Format: int64
+       * @description IOPS a disk of `min_size_gb` gets. Null when this type is not rate-limited.
+       *
+       *     Performance grows with capacity, so this and `iops_at_max_size` are the two ends of the
+       *     range. The exact figure for the size actually bought appears on the disk itself once it
+       *     exists.
+       */
+      iops_at_min_size: number | null;
+      /**
+       * Format: int64
+       * @description IOPS a disk of `max_size_gb` gets. Null when this type is not rate-limited
+       */
+      iops_at_max_size: number | null;
+      /** Format: int64 */
+      max_size_gb: number;
+      /** @enum {string} */
+      media: "ssd" | "hdd" | "nvme";
+      /** Format: int64 */
+      min_size_gb: number;
+      name: string;
+      /** Format: uuid */
+      region_id: string;
+      /** Format: int64 */
+      step_gb: number;
+      /**
+       * Format: int64
+       * @description Throughput a disk of `min_size_gb` gets, in **bytes per second**. Null when this type is
+       *     not rate-limited.
+       *
+       *     Bytes rather than MiB so the number needs no rounding on the way out; divide by 1048576
+       *     for MiB/s at the point of display.
+       */
+      throughput_at_min_size: number | null;
+      /**
+       * Format: int64
+       * @description Throughput a disk of `max_size_gb` gets, in bytes per second. Null when this type is not rate-limited
+       */
+      throughput_at_max_size: number | null;
+      /**
+       * @description Whether any capacity is left in this type's pool.
+       *
+       *     The same shape as on an instance type, but it answers less here: a disk is sold by the
+       *     GiB, so "not sold out" does not mean the size being asked for fits. `remaining` is the
+       *     field that decides that, and this one only says whether the pool is empty outright.
+       *
+       *     It reflects a limit set by operations, not what the storage backend physically has —
+       *     raising the limit does not create capacity, and a type that is not sold out can still fail
+       *     to create if the backend is full.
+       *
+       *     Advisory: it is read when the list is built, and capacity can be taken between that read
+       *     and the order. The order is what actually refuses.
+       */
+      sold_out: boolean;
+      /**
+       * Format: int64
+       * @description How much capacity is left, **in GiB**. Absent when this type is not limited at all.
+       *
+       *     Unlike an instance type, where this is a count of machines, here it is an amount of
+       *     storage — and it is the number that bounds the size a customer may ask for. A picker that
+       *     offers sizes above it produces orders that are refused after the customer has chosen
+       *     everything else.
+       *
+       *     Absent is not zero and not "unknown": a type with no limit simply has no number to show.
+       *     Reporting it as a number would need a sentinel, and any sentinel eventually gets compared
+       *     against a real size.
+       */
+      remaining?: number;
+      /**
+       * @description What buying this type outright costs, per term. Empty means this type is only sold by the
+       *     hour.
+       *
+       *     **The amount is per GiB for the whole term**, not the price of one disk: a disk's size is
+       *     chosen by the customer, so the total is this figure times the size. That differs from an
+       *     instance type, where the same field is the price of one machine — the unit follows what
+       *     the product is sold by, and the order is priced the same way.
+       *
+       *     Advisory, like `sold_out`: it is read when the list is built. The order is what fixes the
+       *     price, and it refuses rather than falling back to hourly if the term is not sold.
+       */
+      prepaid_prices?: components["schemas"]["PrepaidPrice"][];
+      /** Format: uuid */
+      product_id?: string | null;
+      /** Format: uuid */
+      plan_id?: string | null;
+      lookup_key?: string;
+    };
+    DiskTypeListResponseBody: {
+      items: components["schemas"]["DiskTypeResource"][] | null;
+    };
     ImageResource: {
       architecture: string;
       /** Format: uuid */
@@ -658,6 +1578,7 @@ export interface components {
       region_id: string;
       /** @description False means a new password can only be set by rebuilding an instance created from this image */
       supports_password_reset: boolean;
+      lookup_key?: string;
     };
     ImageListResponseBody: {
       items: components["schemas"]["ImageResource"][];
@@ -667,6 +1588,19 @@ export interface components {
       page_size: number;
       /** Format: int64 */
       total_count?: number;
+    };
+    PrepaidPrice: {
+      /**
+       * @description An ISO 8601 duration (P1M, P1Y). A duration rather than a number of months: months are not
+       *     the same length, and storing a number leaves whoever reads it to decide what it means.
+       */
+      term: string;
+      /**
+       * @description A decimal string, not a float. Money that survives a round trip through binary floating
+       *     point is money that stops adding up.
+       */
+      amount: string;
+      currency: string;
     };
     InstanceTypeResource: {
       /** Format: uuid */
@@ -707,11 +1641,11 @@ export interface components {
       region_id: string;
       /** Format: int64 */
       vcpus: number;
-      /**
-       * Format: uuid
-       * @description The Billing Plan for this type. Read its available prices from Billing; resource capacity and sellable quota are evaluated when placing the order.
-       */
-      billing_plan_id: string;
+      /** Format: uuid */
+      product_id?: string | null;
+      /** Format: uuid */
+      plan_id: string | null;
+      lookup_key?: string;
     };
     InstanceTypeListResponseBody: {
       items: components["schemas"]["InstanceTypeResource"][];
@@ -722,6 +1656,137 @@ export interface components {
       /** Format: int64 */
       total_count?: number;
     };
+    RegionResource: {
+      country_code: string;
+      name: string;
+      lookup_key: string;
+      /** Format: uuid */
+      id: string;
+    };
+    RegionListResponseBody: {
+      items: components["schemas"]["RegionResource"][] | null;
+    };
+    ZoneResource: {
+      name: string;
+      lookup_key: string;
+      /** Format: uuid */
+      id: string;
+    };
+    ZoneListResponseBody: {
+      items: components["schemas"]["ZoneResource"][] | null;
+    };
+    DiskListResponseBody: {
+      items: components["schemas"]["DiskResource"][] | null;
+    };
+    CreateDiskRequestBody: {
+      /**
+       * Format: uuid
+       * @description A disk type currently on sale. A withdrawn one is rejected even though its identifier still resolves
+       */
+      disk_type_id: string;
+      name: string;
+      /** Format: int64 */
+      size_gb: number;
+      /**
+       * Format: uuid
+       * @description Restore from this snapshot. When given, the capacity need only be no smaller than the snapshot
+       */
+      snapshot_id?: string;
+      price: components["schemas"]["CatalogReference"];
+      order: components["schemas"]["OrderOptions"];
+    };
+    RenameDiskRequestBody: {
+      name: string;
+    };
+    ResizeDiskRequestBody: {
+      /**
+       * Format: int64
+       * @description Must be larger than the current capacity
+       */
+      size_gb: number;
+      price: components["schemas"]["CatalogReference"];
+      order: components["schemas"]["OrderOptions"];
+    };
+    RevertDiskRequestBody: {
+      /**
+       * Format: uuid
+       * @description Must be the most recent snapshot of the disk
+       */
+      snapshot_id: string;
+    };
+    FloatingIPResource: {
+      address: string;
+      attached_fixed_ip: string | null;
+      attached_port_id: string | null;
+      /** Format: int64 */
+      bandwidth_mbps: number | null;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: date-time */
+      detached_at: string | null;
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      region_id: string;
+      /** @enum {string} */
+      status: "pending" | "available" | "deleting" | "error" | "unknown";
+      /** Format: uuid */
+      order_id?: string | null;
+      /** Format: uuid */
+      price_id?: string | null;
+      /** Format: uuid */
+      subscription_item_id?: string | null;
+      /** @enum {string|null} */
+      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task?: components["schemas"]["Task"] | null;
+      /** Format: uuid */
+      bandwidth_order_id?: string | null;
+      /** Format: uuid */
+      bandwidth_price_id?: string | null;
+      /** Format: uuid */
+      bandwidth_subscription_item_id?: string | null;
+      /** @enum {string|null} */
+      bandwidth_access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+    };
+    FloatingIPListResponseBody: {
+      items: components["schemas"]["FloatingIPResource"][] | null;
+    };
+    AllocateFloatingIPRequestBody: {
+      /** @description The address to allocate. Allocated by the platform when omitted */
+      address?: string;
+      /**
+       * Format: int64
+       * @description The bandwidth ceiling of this address, in Mbit/s, applied to both directions.
+       *
+       *     Required, and there is no "unlimited": an address with no ceiling runs at line rate and is
+       *     charged nothing for the traffic, while the address itself bills normally — so the invoice
+       *     looks correct and nothing anywhere reports it.
+       *
+       *     It is billed separately from the address, per Mbit/s-hour, and appears as its own line on
+       *     the order. Changing it later goes through the bandwidth endpoint.
+       */
+      bandwidth_mbps: number;
+      /** Format: uuid */
+      private_network_id: string;
+      /** Format: uuid */
+      ipv4_pool_id: string;
+      price: components["schemas"]["CatalogReference"];
+      bandwidth_price: components["schemas"]["CatalogReference"];
+      order: components["schemas"]["OrderOptions"];
+    };
+    SetBandwidthRequestBody: {
+      /**
+       * Format: int64
+       * @description Applied to both directions
+       */
+      mbps: number;
+      price: components["schemas"]["CatalogReference"];
+      order: components["schemas"]["OrderOptions"];
+    };
+    BindFloatingIPRequestBody: {
+      /** Format: uuid */
+      port_address_id: string;
+    };
     InstanceResource: {
       /** Format: uuid */
       availability_zone_id: string;
@@ -731,11 +1796,6 @@ export interface components {
       hostname: string;
       /** Format: uuid */
       id: string;
-      /**
-       * Format: uuid
-       * @description Non-empty when the instance was created from a disk you already had, instead of from an image
-       */
-      boot_disk_id: string | null;
       /**
        * Format: uuid
        * @description Non-empty when the instance was created from a platform image
@@ -759,11 +1819,6 @@ export interface components {
       notes: string;
       /**
        * Format: uuid
-       * @description Non-empty while a resize awaits confirmation. Confirming puts this type into effect, reverting discards it
-       */
-      pending_instance_type_id: string | null;
-      /**
-       * Format: uuid
        * @description Non-empty when the instance was created from a private image
        */
       private_image_id: string | null;
@@ -775,10 +1830,7 @@ export interface components {
       public_ips: string[] | null;
       /** Format: uuid */
       region_id: string;
-      /**
-       * @description Observed VM lifecycle state. This does not indicate the latest requested action or whether a business restriction applies.
-       * @enum {string}
-       */
+      /** @enum {string} */
       status:
         | "pending"
         | "building"
@@ -798,16 +1850,6 @@ export interface components {
       subnet_id: string | null;
       /** Format: date-time */
       updated_at: string;
-      /**
-       * @description The order this instance was bought under, in billing's own identifiers. Empty when the
-       *     deployment has no billing wired in.
-       *
-       *     Kept so the question can be answered later. "Why was I charged for this" is asked days
-       *     after the fact, and an order id handed back only in the launch response is one the
-       *     person who needs it never had.
-       */
-      billing_order_id: string;
-      subscription_item_ids?: string[];
       /** @enum {string} */
       desired_state: "running" | "stopped" | "deleted";
       /** @enum {string} */
@@ -822,8 +1864,21 @@ export interface components {
        * @description Timestamp of the last successful provider observation. An unreachable provider does not erase the last observation or prove deletion.
        */
       observed_at?: string;
-      operation?: components["schemas"]["InstanceOperation"];
       restrictions: components["schemas"]["InstanceRestriction"][];
+      task?: components["schemas"]["Task"] | null;
+      /** Format: uuid */
+      order_id: string | null;
+      /** Format: uuid */
+      price_id?: string | null;
+      /** Format: uuid */
+      subscription_item_id?: string | null;
+      /** @enum {string|null} */
+      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      /**
+       * Format: uuid
+       * @description Non-empty when the instance was created from a disk you already had, instead of from an image
+       */
+      source_disk_id: string | null;
     };
     InstanceListResponseBody: {
       items: components["schemas"]["InstanceResource"][];
@@ -899,11 +1954,6 @@ export interface components {
       price: components["schemas"]["CatalogReference"];
       boot_disk?: components["schemas"]["NewBootDisk"];
       floating_ip?: components["schemas"]["NewFloatingIP"];
-    };
-    LaunchInstanceResponseBody: {
-      order: components["schemas"]["PlacedOrder"];
-      /** @description Present only if generation was requested; store it securely. Idempotent retries do not generate another password. */
-      password?: string;
     };
     SetInstanceLabelsRequestBody: {
       /** @description The complete set of labels. Whatever is absent here is removed; send an empty object to clear them all. A key may not contain a colon, whitespace or control characters */
@@ -998,6 +2048,21 @@ export interface components {
       /** Format: uuid */
       floating_ip_id: string;
     };
+    PortResource: {
+      /** Format: uuid */
+      id: string;
+      mac: string | null;
+      name: string;
+      /** Format: uuid */
+      private_network_id: string;
+      /** @description Floating IPv4 addresses bound to this network interface; an empty array when none are bound */
+      public_ips: string[] | null;
+      addresses?: components["schemas"]["PortAddress"][];
+      attachment?: components["schemas"]["PortAttachment"] | null;
+    };
+    PortListResponseBody: {
+      items: components["schemas"]["PortResource"][] | null;
+    };
     AttachPortRequestBody: {
       /** Format: uuid */
       port_id: string;
@@ -1041,6 +2106,15 @@ export interface components {
       /** Format: int64 */
       total_count?: number;
     };
+    CreatePortRequestBody: {
+      name?: string;
+      /** @description At least one, and all must belong to the same private network */
+      security_group_ids: string[] | null;
+      /** Format: uuid */
+      subnet_id: string;
+      /** @description The private address to assign. Allocated automatically when omitted */
+      address?: string;
+    };
     PrivateImageResource: {
       architecture: string;
       /** Format: date-time */
@@ -1080,6 +2154,15 @@ export interface components {
       status: "provisioning" | "uploading" | "available" | "deleting" | "error";
       /** @description False means a new password can only be set by rebuilding an instance created from this image */
       supports_password_reset: boolean;
+      /** Format: uuid */
+      order_id?: string | null;
+      /** Format: uuid */
+      price_id?: string | null;
+      /** Format: uuid */
+      subscription_item_id?: string | null;
+      /** @enum {string|null} */
+      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task?: components["schemas"]["Task"] | null;
     };
     PrivateImageListResponseBody: {
       items: components["schemas"]["PrivateImageResource"][];
@@ -1097,8 +2180,209 @@ export interface components {
        */
       instance_id: string;
       name: string;
+      price: components["schemas"]["CatalogReference"];
+      order: components["schemas"]["OrderOptions"];
     };
     RenamePrivateImageRequestBody: {
+      name: string;
+    };
+    PrivateNetworkResource: {
+      cidr: string;
+      /** Format: date-time */
+      created_at: string;
+      has_internet_gateway: boolean;
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** Format: uuid */
+      region_id: string;
+      /** @enum {string} */
+      status: "pending" | "available" | "deleting" | "error" | "unknown";
+      /** Format: date-time */
+      updated_at: string;
+    };
+    PrivateNetworkListResponseBody: {
+      items: components["schemas"]["PrivateNetworkResource"][] | null;
+    };
+    CreatePrivateNetworkRequestBody: {
+      /** @description Must be an RFC 1918 private CIDR with a prefix length between /8 and /24, for example `10.0.0.0/16` */
+      cidr: string;
+      name: string;
+      /** Format: uuid */
+      region_id: string;
+    };
+    RenamePrivateNetworkRequestBody: {
+      name: string;
+    };
+    IPv6ResponseBody: {
+      /** @description The allocated /64 prefix; empty while IPv6 is disabled */
+      cidr: string;
+      enabled: boolean;
+      /**
+       * @description `active` means IPv6 is fully available
+       * @enum {string}
+       */
+      status: "pending" | "active" | "draining";
+    };
+    RouteResource: {
+      /** Format: date-time */
+      created_at: string;
+      description: string;
+      destination: string;
+      /** Format: uuid */
+      id: string;
+      nexthop: string;
+    };
+    RouteListResponseBody: {
+      items: components["schemas"]["RouteResource"][] | null;
+    };
+    CreateRouteRequestBody: {
+      description?: string;
+      /** @description Destination CIDR. It cannot be `0.0.0.0/0`, nor the CIDR of a subnet of this network */
+      destination: string;
+      /** @description Private address of an instance; must fall inside a subnet of this private network */
+      nexthop: string;
+    };
+    SubnetResource: {
+      cidr: string;
+      gateway_ip: string | null;
+      /** Format: uuid */
+      id: string;
+      /**
+       * Format: int64
+       * @enum {integer}
+       */
+      ip_version: 4 | 6;
+      name: string;
+      /** Format: uuid */
+      private_network_id: string;
+    };
+    SubnetListResponseBody: {
+      items: components["schemas"]["SubnetResource"][] | null;
+    };
+    CreateSubnetRequestBody: {
+      /** @description Must fall inside the CIDR of the private network and must not overlap an existing subnet */
+      cidr: string;
+      name: string;
+    };
+    NextFreeCidrResponseBody: {
+      /** @description Empty when the private network has no free CIDR left for that prefix length */
+      cidr: string;
+    };
+    SecurityGroupResource: {
+      /** Format: date-time */
+      created_at: string;
+      description: string;
+      /** Format: uuid */
+      id: string;
+      /** @description The default security group is released with its private network and cannot be deleted individually */
+      is_default: boolean;
+      name: string;
+      /** Format: uuid */
+      private_network_id: string;
+    };
+    SecurityGroupListResponseBody: {
+      items: components["schemas"]["SecurityGroupResource"][] | null;
+    };
+    CreateSecurityGroupRequestBody: {
+      description?: string;
+      name: string;
+      /** Format: uuid */
+      private_network_id: string;
+    };
+    SecurityRuleResource: {
+      /** Format: date-time */
+      created_at: string;
+      description: string;
+      /** @enum {string} */
+      direction: "ingress" | "egress";
+      /** @enum {string} */
+      ethertype: "IPv4" | "IPv6";
+      /** Format: uuid */
+      id: string;
+      /**
+       * Format: int64
+       * @description Denotes the ICMP code rather than a port when the protocol is ICMP
+       */
+      port_range_max: number | null;
+      /**
+       * Format: int64
+       * @description Denotes the ICMP type rather than a port when the protocol is ICMP
+       */
+      port_range_min: number | null;
+      protocol: string | null;
+      remote_ip_prefix: string | null;
+    };
+    SecurityRuleListResponseBody: {
+      items: components["schemas"]["SecurityRuleResource"][] | null;
+    };
+    CreateSecurityRuleRequestBody: {
+      description?: string;
+      /** @enum {string} */
+      direction: "ingress" | "egress";
+      /** @enum {string} */
+      ethertype: "IPv4" | "IPv6";
+      /**
+       * Format: int64
+       * @description Denotes the ICMP code (0–255) rather than a port when the protocol is ICMP
+       */
+      port_range_max?: number | null;
+      /**
+       * Format: int64
+       * @description Denotes the ICMP type (0–255) rather than a port when the protocol is ICMP
+       */
+      port_range_min?: number | null;
+      /** @description For example `tcp`, `udp`, `icmp` or `ipv6-icmp`. All protocols when omitted */
+      protocol?: string;
+      /** @description Equivalent to `0.0.0.0/0` or `::/0` when omitted */
+      remote_ip_prefix?: string;
+    };
+    SnapshotResource: {
+      /**
+       * Format: uuid
+       * @description A disk restored from this snapshot must reside in this availability zone
+       */
+      availability_zone_id: string;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: uuid */
+      disk_id: string;
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** Format: uuid */
+      region_id: string;
+      /**
+       * Format: int64
+       * @description Capacity of the source disk when the snapshot was created. A disk restored from it cannot be smaller
+       */
+      size_gb: number;
+      /** @enum {string} */
+      status: "provisioning" | "available" | "restoring" | "deleting" | "error";
+      /** Format: uuid */
+      order_id?: string | null;
+      /** Format: uuid */
+      price_id?: string | null;
+      /** Format: uuid */
+      subscription_item_id?: string | null;
+      /** @enum {string|null} */
+      access_state?: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task?: components["schemas"]["Task"] | null;
+    };
+    SnapshotListResponseBody: {
+      items: components["schemas"]["SnapshotResource"][] | null;
+    };
+    CreateSnapshotRequestBody: {
+      /** Format: uuid */
+      disk_id: string;
+      name: string;
+      price: components["schemas"]["CatalogReference"];
+      order: components["schemas"]["OrderOptions"];
+    };
+    RenameSecurityGroupRequestBody: {
+      name: string;
+    };
+    RenameSnapshotRequestBody: {
       name: string;
     };
     /** @description Reuse the same key for retries of the same purchase. Reusing it with a different request fails. Billing selects contract pricing, applies eligible grants and promotions, and owns payment challenges and expiry. */
@@ -1133,23 +2417,7 @@ export interface components {
        */
       order_id: string;
     };
-    /** @description The consumer’s desired dependency. usage_id identifies the corresponding claim in the owning service; actual attachment state is read from that service. */
-    ResourceDependency: {
-      /** Format: uuid */
-      usage_id: string;
-      resource: components["schemas"]["ResourceReference"];
-      purpose: string;
-      /** @enum {string} */
-      desired_state: "present" | "absent";
-      delete_with_consumer: boolean;
-      /** Format: int64 */
-      generation: number;
-    };
-    ResourceDependencyList: {
-      items: components["schemas"]["ResourceDependency"][];
-      pagination: components["schemas"]["OffsetPagination"];
-    };
-    /** @description Storage creates and bills this system disk as a separate order line. Required when booting from an image; mutually exclusive with boot_disk_id. The selected disk type must be attachable in the instance location. */
+    /** @description A system disk purchased in the same order. Required when booting from an image; mutually exclusive with boot_disk_id. */
     NewBootDisk: {
       /** Format: uuid */
       disk_type_id: string;
@@ -1159,12 +2427,14 @@ export interface components {
       /** @default true */
       delete_with_instance?: boolean;
     };
-    /** @description Fabric creates an address and bandwidth subscription in the same purchase. Mutually exclusive with floating_ip_id. Fabric owns the address and its retention policy. */
+    /** @description An address and bandwidth purchased in the same order. Mutually exclusive with floating_ip_id. */
     NewFloatingIP: {
       price: components["schemas"]["CatalogReference"];
       bandwidth_price: components["schemas"]["CatalogReference"];
       /** Format: int64 */
       bandwidth_mbps: number;
+      /** Format: uuid */
+      ipv4_pool_id: string;
     };
     /** @description An independent restriction on use. Removing one restriction never removes another source’s restriction or changes the user’s desired power state. */
     InstanceRestriction: {
@@ -1177,82 +2447,127 @@ export interface components {
       /** Format: date-time */
       created_at: string;
     };
-    /** @description The durable action currently being processed or most recently completed. Success requires observed completion; accepting a provider command is not success. */
-    InstanceOperation: {
-      /** Format: uuid */
-      id: string;
-      /** @enum {string} */
-      type:
-        | "create"
-        | "start"
-        | "stop"
-        | "reboot"
-        | "rebuild"
-        | "resize"
-        | "confirm_resize"
-        | "revert_resize"
-        | "attach_disk"
-        | "detach_disk"
-        | "attach_port"
-        | "detach_port"
-        | "delete";
-      /** @enum {string} */
-      state: "pending" | "running" | "waiting" | "succeeded" | "failed";
-      phase: string;
-      /** Format: int64 */
-      generation: number;
-      failure_code?: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      updated_at: string;
-    };
     PowerRequest: {
-      idempotency_key: string;
       /** Format: int64 */
       expected_generation?: number;
     };
-    /** @description An authoritative claim held by the resource owner. Reserved, active and releasing claims all prevent idle reclamation. Stopped consumers retain their claims. Released claims remain readable. */
-    ResourceUsage: {
+    /** @description A requested action and its outcome. Query it through the service that accepted the request, using the same project or administrator credentials. Only succeeded confirms completion. Stopping a wait does not cancel the action. Cancellation is available only where the action explicitly supports it. */
+    Task: {
       /** Format: uuid */
       id: string;
-      /** Format: uuid */
-      project_id: string;
-      resource: components["schemas"]["ResourceReference"];
-      consumer: components["schemas"]["ResourceReference"];
-      purpose: string;
+      /** @description Action requested from the owning service. */
+      type: string;
       /** @enum {string} */
-      state: "reserved" | "active" | "releasing" | "released";
-      /** Format: int64 */
-      generation: number;
-      operation_id: string;
+      state: "pending" | "running" | "succeeded" | "failed" | "canceled";
+      /** @description Terminal failure. Absent while work can still recover. */
+      error?: components["schemas"]["Error"];
       /** Format: date-time */
       created_at: string;
       /** Format: date-time */
-      updated_at: string;
+      started_at: string | null;
       /** Format: date-time */
-      released_at?: string;
+      completed_at: string | null;
     };
-    /** @description Requested funding split. This does not select a card or payment provider; complete payment through Billing. */
-    PaymentPlan: {
-      balance_amount: string;
-      provider_amount: string;
-    };
-    /** @description A resource identified within its owning service. The project is taken from the containing usage or request. */
-    ResourceReference: {
-      service: string;
-      type: string;
+    PortAddress: {
       /** Format: uuid */
       id: string;
+      /** Format: uuid */
+      subnet_id: string;
+      address: string;
+      is_primary: boolean;
+      /** @enum {string} */
+      state: "reserved" | "assigned" | "releasing" | "released" | "unknown";
+      /** Format: date-time */
+      assigned_at: string | null;
+      /** Format: date-time */
+      released_at: string | null;
     };
-    /** @description Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan. */
-    OffsetPagination: {
+    DiskAttachment: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      instance_id: string;
+      /** Format: uuid */
+      disk_id: string;
+      /** @enum {string} */
+      role: "boot" | "data";
+      delete_with_instance: boolean;
+      /** @enum {string} */
+      state: "reserved" | "attaching" | "attached" | "detaching" | "released" | "unknown";
+      /** Format: date-time */
+      attached_at: string | null;
+      /** Format: date-time */
+      detached_at: string | null;
+      /** Format: date-time */
+      released_at: string | null;
+    };
+    DiskAttachmentList: {
+      items: components["schemas"]["DiskAttachment"][];
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count: number;
+    };
+    PortAttachment: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      instance_id: string;
+      /** Format: uuid */
+      port_id: string;
+      /** @enum {string} */
+      role: "primary" | "additional";
+      delete_with_instance: boolean;
+      /** @enum {string} */
+      state: "reserved" | "attaching" | "attached" | "detaching" | "released" | "unknown";
+      /** Format: date-time */
+      attached_at: string | null;
+      /** Format: date-time */
+      detached_at: string | null;
+      /** Format: date-time */
+      released_at: string | null;
+    };
+    PortAttachmentList: {
+      items: components["schemas"]["PortAttachment"][];
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count: number;
+    };
+    LaunchInstanceResponseBody: {
+      order: components["schemas"]["PlacedOrder"];
+      /** @description Generated login password. Null when no password was generated. Keep it before leaving this response. */
+      password: string | null;
+    };
+    IPv4PoolResource: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      region_id: string;
+      name: string;
+      lookup_key: string;
+      /** Format: uuid */
+      plan_id: string | null;
+      /** Format: uuid */
+      bandwidth_plan_id: string | null;
+    };
+    IPv4PoolListResponseBody: {
+      items: components["schemas"]["IPv4PoolResource"][];
       /** Format: int64 */
       page: number;
       /** Format: int64 */
       page_size: number;
       /** Format: int64 */
       total_count?: number;
+    };
+    /** @description Requested funding split. This does not select a card or payment provider; complete payment through Billing. */
+    PaymentPlan: {
+      balance_amount: string;
+      provider_amount: string;
     };
   };
   responses: never;
@@ -1263,6 +2578,271 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  "list-backups": {
+    parameters: {
+      query?: {
+        /** @description Return only the backups of this disk */
+        disk_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BackupListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-backup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBackupRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacedOrder"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-backup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        backupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BackupResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-backup": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        backupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "rename-backup": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        backupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenameBackupRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BackupResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "restore-backup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        backupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RestoreBackupRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacedOrder"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-disk-types": {
+    parameters: {
+      query: {
+        region_id: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiskTypeListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-disk-type": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        diskTypeId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiskTypeResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "list-images": {
     parameters: {
       query: {
@@ -1316,6 +2896,567 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["InstanceTypeListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-regions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RegionListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-availability-zones": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ZoneListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-disks": {
+    parameters: {
+      query?: {
+        region_id?: string;
+        /** @description Supplied together with `region_code` to filter attachable disks */
+        availability_zone_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiskListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-disk": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateDiskRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacedOrder"];
+        };
+      };
+      /**
+       * @description Payment required: **nothing was created.**
+       *
+       *     Returned when `payment_method` is `online`. `meta.checkout_url` is where to send the
+       *     customer; `meta.order_id` is the order waiting on it.
+       *
+       *     ## Why this is a status and not a field on a 200
+       *
+       *     A field on a success response is something a client can forget to read, and forgetting it
+       *     means treating "we created nothing and are waiting for money" as "created" — which looks
+       *     identical from the outside until the bill does not add up. A 402 fails loudly in any
+       *     client that handles errors at all.
+       *
+       *     ## What happens after they pay
+       *
+       *     The money lands in the balance and the order is settled from it. The resource is **not**
+       *     created automatically: placing it again is the customer's move, because between paying
+       *     and coming back they may have changed their mind. The balance is theirs either way.
+       */
+      402: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-disk": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        diskId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiskResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-disk": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        diskId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "rename-disk": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        diskId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenameDiskRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DiskResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "resize-disk": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        diskId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ResizeDiskRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacedOrder"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "revert-disk": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        diskId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RevertDiskRequestBody"];
+      };
+    };
+    responses: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-floating-ips": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FloatingIPListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "allocate-floating-ip": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AllocateFloatingIPRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacedOrder"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-floating-ip": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        floatingIpId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FloatingIPResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "release-floating-ip": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        floatingIpId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "set-floating-ip-bandwidth": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        floatingIpId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetBandwidthRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacedOrder"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "bind-floating-ip": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        floatingIpId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BindFloatingIPRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FloatingIPResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "unbind-floating-ip": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        floatingIpId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FloatingIPResource"];
         };
       };
       /** @description Error */
@@ -1430,7 +3571,10 @@ export interface operations {
   "delete-instance": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1438,12 +3582,14 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description No Content */
-      204: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["Task"];
+        };
       };
       /** @description Error */
       default: {
@@ -1459,7 +3605,10 @@ export interface operations {
   "rename-instance": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1494,7 +3643,10 @@ export interface operations {
   "run-instance-command": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1529,7 +3681,10 @@ export interface operations {
   "open-instance-console": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1594,7 +3749,10 @@ export interface operations {
   "set-instance-labels": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1629,7 +3787,10 @@ export interface operations {
   "set-instance-notes": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1664,7 +3825,10 @@ export interface operations {
   "reset-instance-password": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1699,7 +3863,10 @@ export interface operations {
   "reboot-instance": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1711,13 +3878,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["InstanceResource"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -1734,7 +3901,10 @@ export interface operations {
   "rebuild-instance": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1804,7 +3974,10 @@ export interface operations {
   "confirm-instance-resize": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1812,13 +3985,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["InstanceResource"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -1835,7 +4008,10 @@ export interface operations {
   "revert-instance-resize": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1843,13 +4019,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["InstanceResource"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -1866,7 +4042,10 @@ export interface operations {
   "start-instance": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1878,13 +4057,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Accepted */
+      /** @description The action was accepted. Wait for the returned task to finish. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["InstanceResource"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -1901,7 +4080,10 @@ export interface operations {
   "stop-instance": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1913,13 +4095,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Accepted */
+      /** @description The action was accepted. Wait for the returned task to finish. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["InstanceResource"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -1953,7 +4135,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ResourceDependencyList"];
+          "application/json": components["schemas"]["DiskAttachmentList"];
         };
       };
       /** @description Error */
@@ -1970,7 +4152,10 @@ export interface operations {
   "attach-disk": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -1982,13 +4167,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ResourceDependency"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -2005,7 +4190,10 @@ export interface operations {
   "detach-disk": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
         diskId: string;
@@ -2014,13 +4202,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ResourceDependency"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -2037,7 +4225,10 @@ export interface operations {
   "attach-instance-floating-ip": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -2055,7 +4246,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ResourceUsage"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -2072,7 +4263,10 @@ export interface operations {
   "detach-instance-floating-ip": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
         floatingIpId: string;
@@ -2087,7 +4281,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ResourceUsage"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -2121,7 +4315,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ResourceDependencyList"];
+          "application/json": components["schemas"]["PortAttachmentList"];
         };
       };
       /** @description Error */
@@ -2138,7 +4332,10 @@ export interface operations {
   "attach-port": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
       };
@@ -2150,13 +4347,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ResourceDependency"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -2173,7 +4370,10 @@ export interface operations {
   "detach-port": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         instanceId: string;
         portId: string;
@@ -2182,13 +4382,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ResourceDependency"];
+          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description Error */
@@ -2224,6 +4424,103 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["OperationLogListResponseBody"];
         };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-ports": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PortListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-port": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreatePortRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PortResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-port": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        portId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Error */
       default: {
@@ -2289,7 +4586,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PrivateImageResource"];
+          "application/json": components["schemas"]["PlacedOrder"];
         };
       };
       /** @description Error */
@@ -2337,7 +4634,10 @@ export interface operations {
   "delete-private-image": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         privateImageId: string;
       };
@@ -2345,12 +4645,14 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description No Content */
-      204: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["Task"];
+        };
       };
       /** @description Error */
       default: {
@@ -2366,7 +4668,10 @@ export interface operations {
   "rename-private-image": {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
       path: {
         privateImageId: string;
       };
@@ -2398,15 +4703,80 @@ export interface operations {
       };
     };
   };
-  "list-instance-dependencies": {
+  "list-private-networks": {
     parameters: {
       query?: {
-        page?: number;
-        page_size?: number;
+        /** @description Returns every region when omitted */
+        region_id?: string;
       };
       header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PrivateNetworkListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-private-network": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreatePrivateNetworkRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PrivateNetworkResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-private-network": {
+    parameters: {
+      query?: never;
+      header?: never;
       path: {
-        instanceId: string;
+        privateNetworkId: string;
       };
       cookie?: never;
     };
@@ -2418,7 +4788,915 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ResourceDependencyList"];
+          "application/json": components["schemas"]["PrivateNetworkResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-private-network": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "rename-private-network": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenamePrivateNetworkRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PrivateNetworkResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-private-network-ipv6": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IPv6ResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "enable-private-network-ipv6": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IPv6ResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "disable-private-network-ipv6": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-routes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RouteListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-route": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateRouteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RouteResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-route": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        privateNetworkId: string;
+        routeId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-subnets": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SubnetListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-subnet": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateSubnetRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SubnetResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "suggest-subnet-cidr": {
+    parameters: {
+      query?: {
+        prefix_length?: number;
+      };
+      header?: never;
+      path: {
+        privateNetworkId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["NextFreeCidrResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-subnet": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        privateNetworkId: string;
+        subnetId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-security-groups": {
+    parameters: {
+      query?: {
+        region_id?: string;
+        /** @description Return only the security groups of this private network */
+        private_network_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SecurityGroupListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-security-group": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateSecurityGroupRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SecurityGroupResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-security-group": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        securityGroupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SecurityGroupResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-security-group": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        securityGroupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "rename-security-group": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        securityGroupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenameSecurityGroupRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SecurityGroupResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-security-group-rules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        securityGroupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SecurityRuleListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-security-group-rule": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        securityGroupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateSecurityRuleRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SecurityRuleResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-security-group-rule": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        securityGroupId: string;
+        ruleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No Content */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-snapshots": {
+    parameters: {
+      query?: {
+        /** @description Return only the snapshots of this disk */
+        disk_id?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SnapshotListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-snapshot": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateSnapshotRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PlacedOrder"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-snapshot": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        snapshotId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SnapshotResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-snapshot": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        snapshotId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "rename-snapshot": {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
+        "Idempotency-Key": string;
+      };
+      path: {
+        snapshotId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenameSnapshotRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SnapshotResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-task": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        taskId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The task. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The request could not be completed. */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-ipv4-pools": {
+    parameters: {
+      query: {
+        region_id: string;
+        page?: number;
+        page_size?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["IPv4PoolListResponseBody"];
         };
       };
       /** @description Error */
