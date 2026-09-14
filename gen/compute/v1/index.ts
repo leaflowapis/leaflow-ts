@@ -151,6 +151,10 @@ export type AllocateFloatingIpBody = NonNullable<
 export type GetFloatingIpResult =
   operations["get-floating-ip"]["responses"][200]["content"]["application/json"];
 
+/** The success response body of `DELETE /api/v1/floating-ips/{floatingIpId}`. */
+export type ReleaseFloatingIpResult =
+  operations["release-floating-ip"]["responses"][202]["content"]["application/json"];
+
 /** The success response body of `PUT /api/v1/floating-ips/{floatingIpId}/bandwidth`. */
 export type SetFloatingIpBandwidthResult =
   operations["set-floating-ip-bandwidth"]["responses"][200]["content"]["application/json"];
