@@ -333,7 +333,7 @@ export type DetachDiskResult =
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/floating-ips`. */
 export type AttachInstanceFloatingIpResult =
-  operations["attach-instance-floating-ip"]["responses"][202]["content"]["application/json"];
+  operations["attach-instance-floating-ip"]["responses"][200]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/instances/{instanceId}/floating-ips`. */
 export type AttachInstanceFloatingIpBody = NonNullable<
@@ -342,7 +342,7 @@ export type AttachInstanceFloatingIpBody = NonNullable<
 
 /** The success response body of `DELETE /api/v1/instances/{instanceId}/floating-ips/{floatingIpId}`. */
 export type DetachInstanceFloatingIpResult =
-  operations["detach-instance-floating-ip"]["responses"][202]["content"]["application/json"];
+  operations["detach-instance-floating-ip"]["responses"][200]["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/instances/{instanceId}/ports`. */
 export type ListInstancePortsResult =
