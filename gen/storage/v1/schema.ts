@@ -248,7 +248,9 @@ export interface components {
       step_gb: number;
       for_system: boolean;
       /** Format: uuid */
-      billing_plan_id: string;
+      product_id: string;
+      /** Format: uuid */
+      plan_id: string;
     };
     DiskTypeList: {
       items: components["schemas"]["DiskType"][];
