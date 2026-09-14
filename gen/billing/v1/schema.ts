@@ -4,6 +4,63 @@
  */
 
 export interface paths {
+  "/account/v1/commitments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List account commercial commitments */
+    get: operations["ListCommitments"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/closure-preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Preview project closure
+     * @description Lists outstanding orders, subscriptions, metering and unfinished operations. Reports the next action and timing for each item. This read never performs cleanup or creates a closure request. Historical invoices and account-level purchases are retained. Billing approval alone does not prove that technical resources are absent.
+     */
+    get: operations["get-project-closure-preview"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/projects/{projectId}/closure-preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Preview project closure
+     * @description Lists outstanding orders, subscriptions, metering and unfinished operations. Reports the next action and timing for each item. This read never performs cleanup or creates a closure request. Historical invoices and account-level purchases are retained. Billing approval alone does not prove that technical resources are absent.
+     */
+    get: operations["get-account-project-closure-preview"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/catalog/v1/products": {
     parameters: {
       query?: never;
@@ -1306,6 +1363,149 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    CommitmentPeriod: {
+      /** Format: uuid */
+      id: string;
+      sequence: number;
+      /** Format: date-time */
+      period_start: string;
+      /** Format: date-time */
+      period_end: string;
+      /** Format: date-time */
+      due_at: string;
+      amount: string;
+      /** Format: uuid */
+      invoice_item_id?: string;
+      /** Format: date-time */
+      finalized_at?: string;
+      eligible_amount?: string;
+      amount_due?: string;
+      /** Format: date-time */
+      waived_at?: string;
+      waiver_reason?: string;
+    };
+    /** @description Account-owned commercial obligation. Project removal does not waive payment. Minimum-spend activation requires a defined, reproducible eligibility policy; drafts do not authorize collection. */
+    Commitment: {
+      /** Format: uuid */
+      id: string;
+      billing_account_id: number;
+      currency: string;
+      /** @enum {string} */
+      type: "fixed_amount" | "minimum_spend";
+      /** @enum {string} */
+      status: "draft" | "active" | "completed" | "terminated";
+      description: string;
+      terms_reference: string;
+      /** Format: date-time */
+      effective_from: string;
+      /** Format: date-time */
+      effective_to: string;
+      /** @enum {string} */
+      release_policy: "retain_until_term" | "release_with_obligation";
+      /** Format: uuid */
+      contract_id?: string;
+      /** Format: uuid */
+      origin_order_item_id?: string;
+      /** Format: uuid */
+      origin_project_id?: string;
+      /** Format: date-time */
+      accepted_at?: string;
+      accepted_by?: string;
+      eligibility_policy_version?: string;
+      /** Format: date-time */
+      terminated_at?: string;
+      termination_reason?: string;
+      periods: components["schemas"]["CommitmentPeriod"][];
+    };
+    CommitmentList: {
+      items: components["schemas"]["Commitment"][];
+      /** Format: int64 */
+      total_count: number;
+    };
+    /**
+     * @description Whether a fulfilled purchase may end immediately or only after its paid term. Does not grant a refund. When absent, the terms are not configured and termination requires review.
+     * @enum {string}
+     */
+    TerminationPolicy: "immediate" | "period_end";
+    /**
+     * @description none preserves paid amounts when fulfilled service ends. standard applies the documented refund window and change proration rules. Releasing unpaid holds or returning funds for failed fulfillment is separate.
+     * @enum {string}
+     */
+    RefundPolicy: "none" | "standard";
+    /** @description A cancellation request for the original purchase. scheduled_for is the intended time; effective_at is the confirmed end of service. The request alone does not stop metering or issue a refund. */
+    SubscriptionCancellation: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      subscription_item_id: string;
+      /** @enum {string} */
+      status: "requested" | "scheduled" | "releasing" | "failed" | "completed" | "canceled";
+      /** @enum {string} */
+      mode: "immediate" | "period_end";
+      /** Format: date-time */
+      requested_at: string;
+      /** Format: date-time */
+      scheduled_for?: string;
+      /** Format: date-time */
+      effective_at?: string;
+      /** Format: date-time */
+      completed_at?: string;
+      /** Format: date-time */
+      release_started_at?: string;
+      /** Format: date-time */
+      canceled_at?: string;
+      forfeit_remaining_value: boolean;
+      failure_code?: string;
+      failure_reason?: string;
+    };
+    /** @description One outstanding Billing obligation. action_required identifies a supported next step, not authorization to destroy a resource. Items for the same resource must be considered together. */
+    ProjectClosureItem: {
+      /** @enum {string} */
+      type:
+        | "order"
+        | "subscription_item"
+        | "active_resource"
+        | "resource_operation"
+        | "subscription_cancellation"
+        | "usage_charge"
+        | "commitment";
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      product_id?: string;
+      resource_id?: string;
+      /** @enum {string} */
+      disposition: "action_required" | "waiting" | "blocked";
+      reason_code: string;
+      actions: (
+        | "cancel_order"
+        | "wait"
+        | "release_resource"
+        | "cancel_subscription"
+        | "disable_auto_renew"
+        | "settle_usage"
+        | "configure_terms"
+        | "resolve_failure"
+      )[];
+      /** Format: date-time */
+      earliest_termination_at?: string;
+      /** @description Known refund amount as a decimal string. Absent means a separate quote is required, not zero. */
+      refund_amount?: string;
+      currency?: string;
+      cancellation?: components["schemas"]["SubscriptionCancellation"];
+    };
+    /** @description Read-only, paginated assessment. Does not cancel orders, stop renewals, refund payments or release resources. Concurrent orders or callbacks may change the result; execution must close admission and recheck. */
+    ProjectClosurePreview: {
+      /** Format: uuid */
+      project_id: string;
+      /** Format: date-time */
+      evaluated_at: string;
+      /** @description True only when the full Billing result, across all pages, has no outstanding obligations. Technical services must independently confirm that all resources are gone. */
+      can_close: boolean;
+      items: components["schemas"]["ProjectClosureItem"][];
+      /** Format: int64 */
+      total_count: number;
+    };
     Error: {
       code?: string;
       message: string;
@@ -1362,6 +1562,8 @@ export interface components {
       total_count?: number;
     };
     CatalogPrice: {
+      termination_policy?: components["schemas"]["TerminationPolicy"];
+      refund_policy?: components["schemas"]["RefundPolicy"];
       /** @description External lookup alias within the service. Existing references use the price ID. */
       lookup_key?: string;
       /** Format: uuid */
@@ -2968,6 +3170,83 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  ListCommitments: {
+    parameters: {
+      query: {
+        billing_account_id: number;
+        page?: number;
+        page_size?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Commitments including original payment schedules. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CommitmentList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "get-project-closure-preview": {
+    parameters: {
+      query?: {
+        page?: number;
+        page_size?: number;
+      };
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Closure assessment */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectClosurePreview"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "get-account-project-closure-preview": {
+    parameters: {
+      query?: {
+        page?: number;
+        page_size?: number;
+      };
+      header?: never;
+      path: {
+        projectId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Closure assessment */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProjectClosurePreview"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
   "list-catalog-products": {
     parameters: {
       query?: {

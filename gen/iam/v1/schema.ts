@@ -436,6 +436,12 @@ export interface components {
       rules: components["schemas"]["RuleResource"][] | null;
     };
     ProjectResource: {
+      /**
+       * Format: date-time
+       * @description A read-only management lock. Running resources and billing remain unchanged. Only an operator can release it.
+       */
+      locked_at: string | null;
+      lock_reason: string;
       ban_reason: string;
       /** Format: date-time */
       created_at: string;
