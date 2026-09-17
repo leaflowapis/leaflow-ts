@@ -1608,7 +1608,9 @@ export interface components {
       total_count?: number;
     };
     RegionResource: {
+      /** @description ISO 3166-1 alpha-2 country this region sits in. Two letters, uppercase. */
       country_code: string;
+      /** @description Display name for this place, shown to tenants (Hong Kong). It is the translatable one; the stable handle is code. */
       name: string;
       /** @description The region's code, the way the outside world names this place (hk-1). Stable and human-written; it is not an identifier for addressing — every endpoint takes ids. */
       code: string;
@@ -1619,6 +1621,7 @@ export interface components {
       items: components["schemas"]["RegionResource"][] | null;
     };
     ZoneResource: {
+      /** @description Display name for this zone, shown to tenants (Hong Kong A). It is the translatable one; the stable handle is code. AWS has no equivalent — what it calls an Availability Zone name is our code. */
       name: string;
       /** @description The zone's code within its region (hk-1-a). Stable and human-written; addressing is by id. */
       code: string;
