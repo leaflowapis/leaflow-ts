@@ -1511,7 +1511,6 @@ export interface components {
       product_id: string | null;
       /** Format: uuid */
       plan_id: string | null;
-      lookup_key: string;
       name_translations: {
         [key: string]: string;
       };
@@ -1542,7 +1541,6 @@ export interface components {
       region_id: string;
       /** @description False means a new password can only be set by rebuilding an instance created from this image */
       supports_password_reset: boolean;
-      lookup_key?: string;
     };
     ImageListResponseBody: {
       items: components["schemas"]["ImageResource"][];
@@ -1596,7 +1594,6 @@ export interface components {
       product_id: string | null;
       /** Format: uuid */
       plan_id: string | null;
-      lookup_key: string;
       name_translations: {
         [key: string]: string;
       };
@@ -2516,7 +2513,6 @@ export interface components {
       /** Format: uuid */
       region_id: string;
       name: string;
-      lookup_key: string;
       /** Format: uuid */
       plan_id: string | null;
       /** Format: uuid */
