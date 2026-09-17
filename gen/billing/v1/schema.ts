@@ -337,7 +337,7 @@ export interface paths {
     put?: never;
     /**
      * Create top up
-     * @description Returns a checkout address. The balance increases when the payment provider confirms the
+     * @description Returns a checkout address. The balance increases when the payment gateway confirms the
      *     payment, which may be after this call returns.
      *
      *     The amount is in the account's currency. A checkout page may present a local currency;
@@ -397,8 +397,8 @@ export interface paths {
     put?: never;
     /**
      * Create payment method setup
-     * @description Returns what is needed to hand the browser over to the payment provider's own card
-     *     form. Nothing is charged, and the method appears in the list once the provider
+     * @description Returns what is needed to hand the browser over to the payment gateway's own card
+     *     form. Nothing is charged, and the method appears in the list once the gateway
      *     confirms it.
      *
      *     Card numbers are never sent to or stored by this service.
@@ -468,8 +468,8 @@ export interface paths {
      * @description Applies the account balance first, then charges the remainder to a payment method. Give
      *     `payment_method_id` to choose one, or omit it to use the default.
      *
-     *     Returns a checkout address when the provider requires the cardholder to confirm the
-     *     payment; the invoice is marked paid once the provider confirms it.
+     *     Returns a checkout address when the gateway requires the cardholder to confirm the
+     *     payment; the invoice is marked paid once the gateway confirms it.
      *
      *     Calling this on an invoice that is already paid returns the invoice unchanged.
      */
@@ -496,9 +496,9 @@ export interface paths {
      *
      *     The balance is not split across the two cases: either it covers the whole total and
      *     everything is settled from it, or it is left untouched and the full total is collected
-     *     through the provider. It is never partly spent against an unpaid remainder.
+     *     through the gateway. It is never partly spent against an unpaid remainder.
      *
-     *     When the provider is needed, this returns a checkout address and settles nothing.
+     *     When the gateway is needed, this returns a checkout address and settles nothing.
      *     Call it again once the payment has landed — the balance then covers the total and the
      *     same call settles everything.
      *
@@ -1973,15 +1973,15 @@ export interface components {
        */
       remaining_amount?: components["schemas"]["Money"];
       /**
-       * @description `pending` until the payment provider confirms. The balance increases on `succeeded`.
+       * @description `pending` until the payment gateway confirms. The balance increases on `succeeded`.
        *
        *     A checkout the payer abandoned ends up `failed` too, with `failure_reason` saying
        *     so. Nothing was charged in that case.
        * @enum {string}
        */
       status: "pending" | "requires_action" | "succeeded" | "failed";
-      /** @description Which payment provider collected it. */
-      provider?: string;
+      /** @description Which payment gateway collected it. */
+      payment_gateway?: string;
       /**
        * @description The currency the payer was actually charged in, when the checkout page collected a
        *     local one. Absent when it was the same as the account's.
@@ -2016,10 +2016,10 @@ export interface components {
       /**
        * @description In the account's currency, and no finer than that currency's smallest unit:
        *     two decimals for most, none for the yen. A finer amount is refused here rather
-       *     than at the checkout page, where the payer would see the provider's own wording
+       *     than at the checkout page, where the payer would see the gateway's own wording
        *     instead of an explanation.
        *
-       *     There is a minimum, which differs by currency. Below it the provider's fee
+       *     There is a minimum, which differs by currency. Below it the gateway's fee
        *     exceeds the top-up itself, so such a payment costs more to accept than it brings.
        *     The minimum in force is returned with the rejection.
        */
@@ -2047,7 +2047,7 @@ export interface components {
       id: string;
       /** Format: int64 */
       billing_account_id: number;
-      provider: string;
+      payment_gateway?: string;
       brand?: string;
       last4?: string;
       exp_month?: number | null;
@@ -2067,23 +2067,23 @@ export interface components {
       return_url?: string;
     };
     /**
-     * @description What the payment provider's browser library needs in order to collect a card. There is
+     * @description What the payment gateway's browser library needs in order to collect a card. There is
      *     no address to redirect to: the form is rendered in the page, and the card goes straight
-     *     from the browser to the provider.
+     *     from the browser to the gateway.
      */
     PaymentMethodSetupResult: {
       /**
-       * @description The provider's identifier for this attempt. Use it to tell a reloaded page apart
+       * @description The gateway's identifier for this attempt. Use it to tell a reloaded page apart
        *     from a second attempt.
        */
       setup_id: string;
       /**
-       * @description Authorises this one attempt with the provider, and nothing else. Pass it to the
-       *     provider's library; it is not an API credential and grants no access here.
+       * @description Authorises this one attempt with the gateway, and nothing else. Pass it to the
+       *     gateway's library; it is not an API credential and grants no access here.
        */
       client_secret: string;
       /**
-       * @description The provider's public key to initialise its library with. It differs between test
+       * @description The gateway's public key to initialise its library with. It differs between test
        *     and live, so read it from here rather than compiling it in.
        */
       publishable_key: string;
@@ -2091,7 +2091,7 @@ export interface components {
       expires_at?: string;
     };
     /**
-     * @description Safe to call again. While an attempt is still with the payment provider, calling this
+     * @description Safe to call again. While an attempt is still with the payment gateway, calling this
      *     returns that attempt rather than starting a second one, so a customer who reloads the
      *     page is not charged twice.
      *
@@ -2120,7 +2120,7 @@ export interface components {
       order_ids?: string[];
       return_url?: string;
       /**
-       * @description Required when the provider is involved, because that is where the money moves. The
+       * @description Required when the gateway is involved, because that is where the money moves. The
        *     same key returns the same checkout address instead of opening a second one.
        */
       idempotency_key?: string;
@@ -2130,7 +2130,7 @@ export interface components {
      *
      *     `succeeded` — collected in full. Nothing further is owed.
      *
-     *     `processing` — submitted to the payment provider and awaiting its answer. **Do not
+     *     `processing` — submitted to the payment gateway and awaiting its answer. **Do not
      *     submit it again**; poll the invoice or order, or wait to be notified. Some methods take
      *     minutes and a few take days.
      *
@@ -2140,8 +2140,8 @@ export interface components {
      *     `failed` — this attempt did not go through. `failure_reason` says why, and paying again
      *     starts a fresh attempt.
      *
-     *     The provider's own answer is what decides: an attempt is only `succeeded` once the
-     *     provider says so, never because this call returned.
+     *     The gateway's own answer is what decides: an attempt is only `succeeded` once the
+     *     gateway says so, never because this call returned.
      * @enum {string}
      */
     PaymentStatus: "succeeded" | "processing" | "requires_action" | "failed";
@@ -2156,7 +2156,7 @@ export interface components {
       amount_paid: components["schemas"]["Money"];
       /**
        * @description What is still outstanding. Zero once the payment succeeds. Unchanged while
-       *     `processing`: nothing is collected until the provider confirms it.
+       *     `processing`: nothing is collected until the gateway confirms it.
        */
       amount_due: components["schemas"]["Money"];
       currency: string;
@@ -2180,7 +2180,7 @@ export interface components {
       retriable?: boolean;
       /**
        * Format: date-time
-       * @description The earliest sensible moment to try again. Present when the provider asked for a
+       * @description The earliest sensible moment to try again. Present when the gateway asked for a
        *     wait.
        */
       retry_after?: string | null;
@@ -2312,10 +2312,10 @@ export interface components {
       /** Format: uuid */
       order_id?: string | null;
       /**
-       * @description `pending` is a payment still with the provider. Only one may be pending against any
+       * @description `pending` is a payment still with the gateway. Only one may be pending against any
        *     one invoice or order.
        *
-       *     `failed` covers a payment the provider refused and one the payer walked away from
+       *     `failed` covers a payment the gateway refused and one the payer walked away from
        *     alike; `failure_reason` says which. There is no separate cancelled state, because
        *     what to do next is the same either way — start a new one.
        * @enum {string}
@@ -2435,10 +2435,10 @@ export interface components {
        * @description Where the cash went.
        * @enum {string}
        */
-      destination?: "balance" | "provider";
+      destination?: "balance" | "gateway";
       /**
-       * @description `pending` — accepted, not yet sent to the payment provider. `processing` — with the
-       *     provider and awaiting its answer, which takes days for some methods. Neither is
+       * @description `pending` — accepted, not yet sent to the payment gateway. `processing` — with the
+       *     gateway and awaiting its answer, which takes days for some methods. Neither is
        *     final, and neither means the money has moved.
        * @enum {string}
        */
@@ -2475,12 +2475,12 @@ export interface components {
       net_amount: components["schemas"]["Money"];
       currency: string;
       /**
-       * @description Where the cash part would go. `provider` returns it to the method it was paid
+       * @description Where the cash part would go. `gateway` returns it to the method it was paid
        *     with; `balance` credits the account instead, which is the answer whenever the cash
-       *     came from more than one place or never went through a provider at all.
+       *     came from more than one place or never went through a gateway at all.
        * @enum {string}
        */
-      destination: "balance" | "provider";
+      destination: "balance" | "gateway";
       /**
        * @description How `refundable_amount` splits by where the money came from. The amounts sum to it.
        *
