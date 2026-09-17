@@ -2047,7 +2047,7 @@ export interface components {
       id: string;
       /** Format: int64 */
       billing_account_id: number;
-      payment_gateway?: string;
+      payment_gateway: string;
       brand?: string;
       last4?: string;
       exp_month?: number | null;
@@ -2421,15 +2421,6 @@ export interface components {
       requested_amount: components["schemas"]["Money"];
       /** @description What has actually been returned. */
       settled_amount?: components["schemas"]["Money"];
-      /**
-       * @description Withheld from what reaches the payer. It applies only to cash returned to a payment
-       *     method, so it is zero when `destination` is `balance`, and it is never taken out of
-       *     credit or a voucher.
-       *
-       *     `settled_amount` is the amount put back against what was paid; the payer receives
-       *     that less this.
-       */
-      fee_amount?: components["schemas"]["Money"];
       currency: string;
       /**
        * @description Where the cash went.
@@ -2466,13 +2457,6 @@ export interface components {
     RefundQuote: {
       /** @description The most that can still be returned, before any fee. */
       refundable_amount: components["schemas"]["Money"];
-      /**
-       * @description Withheld from the cash part. Zero when `destination` is `balance`, and never taken
-       *     out of credit or a voucher.
-       */
-      fee_amount: components["schemas"]["Money"];
-      /** @description `refundable_amount` less `fee_amount`. */
-      net_amount: components["schemas"]["Money"];
       currency: string;
       /**
        * @description Where the cash part would go. `gateway` returns it to the method it was paid
