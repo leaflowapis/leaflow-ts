@@ -69,7 +69,7 @@ export interface paths {
       cookie?: never;
     };
     /** List catalog products */
-    get: operations["list-catalog-products"];
+    get: operations["list-products"];
     put?: never;
     post?: never;
     delete?: never;
@@ -88,7 +88,7 @@ export interface paths {
       cookie?: never;
     };
     /** List catalog plans */
-    get: operations["list-catalog-plans"];
+    get: operations["list-plans"];
     put?: never;
     post?: never;
     delete?: never;
@@ -111,7 +111,7 @@ export interface paths {
      * @description Public list prices only. An account holding a negotiated agreement may be charged less;
      *     it is never charged more.
      */
-    get: operations["list-catalog-prices"];
+    get: operations["list-prices"];
     put?: never;
     post?: never;
     delete?: never;
@@ -134,7 +134,7 @@ export interface paths {
      * @description Only public price lists are readable here. A list written for a single agreement is not,
      *     and its identifier cannot be used to reach it.
      */
-    get: operations["list-catalog-rates"];
+    get: operations["list-rates"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1519,7 +1519,7 @@ export interface components {
       /** Format: int64 */
       status: number;
     };
-    CatalogProduct: {
+    Product: {
       /** Format: uuid */
       id: string;
       name: string;
@@ -1527,12 +1527,12 @@ export interface components {
       description?: string;
       description_translations?: components["schemas"]["Translations"];
     };
-    CatalogProductList: {
-      items: components["schemas"]["CatalogProduct"][];
+    ProductList: {
+      items: components["schemas"]["Product"][];
       /** Format: int64 */
       total_count?: number;
     };
-    CatalogPlan: {
+    Plan: {
       /** Format: uuid */
       id: string;
       /** Format: uuid */
@@ -1542,12 +1542,12 @@ export interface components {
       description?: string;
       description_translations?: components["schemas"]["Translations"];
     };
-    CatalogPlanList: {
-      items: components["schemas"]["CatalogPlan"][];
+    PlanList: {
+      items: components["schemas"]["Plan"][];
       /** Format: int64 */
       total_count?: number;
     };
-    CatalogPrice: {
+    Price: {
       termination_policy?: components["schemas"]["TerminationPolicy"];
       refund_policy?: components["schemas"]["RefundPolicy"];
       /** Format: uuid */
@@ -1610,12 +1610,12 @@ export interface components {
       period?: "none" | "day" | "month" | "year";
       setup_fee?: components["schemas"]["Money"];
     };
-    CatalogPriceList: {
-      items: components["schemas"]["CatalogPrice"][];
+    PriceList: {
+      items: components["schemas"]["Price"][];
       /** Format: int64 */
       total_count?: number;
     };
-    CatalogRate: {
+    Rate: {
       meter: components["schemas"]["ObjectIdentity"];
       /** @description The unit readings arrive in, such as `core-second`. */
       unit?: string;
@@ -1640,8 +1640,8 @@ export interface components {
       /** Format: date-time */
       effective_to?: string | null;
     };
-    CatalogRateList: {
-      items: components["schemas"]["CatalogRate"][];
+    RateList: {
+      items: components["schemas"]["Rate"][];
       /** Format: int64 */
       total_count?: number;
     };
@@ -3248,7 +3248,7 @@ export interface operations {
       default: components["responses"]["Error"];
     };
   };
-  "list-catalog-products": {
+  "list-products": {
     parameters: {
       query?: {
         /** @description 1-based page number; the first page when omitted. */
@@ -3281,14 +3281,14 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CatalogProductList"];
+          "application/json": components["schemas"]["ProductList"];
         };
       };
       304: components["responses"]["NotModified"];
       default: components["responses"]["Error"];
     };
   };
-  "list-catalog-plans": {
+  "list-plans": {
     parameters: {
       query?: {
         /** @description 1-based page number; the first page when omitted. */
@@ -3323,14 +3323,14 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CatalogPlanList"];
+          "application/json": components["schemas"]["PlanList"];
         };
       };
       304: components["responses"]["NotModified"];
       default: components["responses"]["Error"];
     };
   };
-  "list-catalog-prices": {
+  "list-prices": {
     parameters: {
       query?: {
         /** @description 1-based page number; the first page when omitted. */
@@ -3366,14 +3366,14 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CatalogPriceList"];
+          "application/json": components["schemas"]["PriceList"];
         };
       };
       304: components["responses"]["NotModified"];
       default: components["responses"]["Error"];
     };
   };
-  "list-catalog-rates": {
+  "list-rates": {
     parameters: {
       query?: {
         /** @description 1-based page number; the first page when omitted. */
@@ -3412,7 +3412,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CatalogRateList"];
+          "application/json": components["schemas"]["RateList"];
         };
       };
       304: components["responses"]["NotModified"];

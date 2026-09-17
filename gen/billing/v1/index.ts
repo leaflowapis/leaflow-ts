@@ -33,26 +33,26 @@ export type GetAccountProjectClosurePreviewQuery =
   operations["get-account-project-closure-preview"]["parameters"]["query"];
 
 /** The success response body of `GET /catalog/v1/products`. */
-export type ListCatalogProductsResult =
-  operations["list-catalog-products"]["responses"][200]["content"]["application/json"];
+export type ListProductsResult =
+  operations["list-products"]["responses"][200]["content"]["application/json"];
 
 /** The success response body of `GET /catalog/v1/products/{productId}/plans`. */
-export type ListCatalogPlansResult =
-  operations["list-catalog-plans"]["responses"][200]["content"]["application/json"];
+export type ListPlansResult =
+  operations["list-plans"]["responses"][200]["content"]["application/json"];
 
 /** The success response body of `GET /catalog/v1/plans/{planId}/prices`. */
-export type ListCatalogPricesResult =
-  operations["list-catalog-prices"]["responses"][200]["content"]["application/json"];
+export type ListPricesResult =
+  operations["list-prices"]["responses"][200]["content"]["application/json"];
 
 /** The query parameters of `GET /catalog/v1/plans/{planId}/prices`. */
-export type ListCatalogPricesQuery = operations["list-catalog-prices"]["parameters"]["query"];
+export type ListPricesQuery = operations["list-prices"]["parameters"]["query"];
 
 /** The success response body of `GET /catalog/v1/rate-cards/{rateCardId}/rules`. */
-export type ListCatalogRatesResult =
-  operations["list-catalog-rates"]["responses"][200]["content"]["application/json"];
+export type ListRatesResult =
+  operations["list-rates"]["responses"][200]["content"]["application/json"];
 
 /** The query parameters of `GET /catalog/v1/rate-cards/{rateCardId}/rules`. */
-export type ListCatalogRatesQuery = operations["list-catalog-rates"]["parameters"]["query"];
+export type ListRatesQuery = operations["list-rates"]["parameters"]["query"];
 
 /** The success response body of `POST /catalog/v1/estimates`. */
 export type CreateEstimateResult =
