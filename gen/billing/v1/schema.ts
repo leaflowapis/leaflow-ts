@@ -1519,18 +1519,6 @@ export interface components {
       /** Format: int64 */
       status: number;
     };
-    /**
-     * @description Names in other languages, keyed by BCP 47 language tag. Where your locale is absent, use
-     *     the plain `name`; there is no fallback between related tags.
-     */
-    Translations: {
-      [key: string]: string;
-    };
-    /**
-     * @description A decimal string, in the currency stated alongside it.
-     * @example 10.2500000000
-     */
-    Money: string;
     CatalogProduct: {
       /** Format: uuid */
       id: string;
@@ -3117,6 +3105,36 @@ export interface components {
       id: string;
       lookup_key?: string;
     };
+    /**
+     * @description Text in other languages, keyed by BCP 47 language tag (`zh-Hans`, `en`, `ja`).
+     *
+     *     When your locale is absent, use the plain field next to this one. **There is no fallback
+     *     chain**: a missing `zh-Hans` does not fall back to `zh`.
+     *
+     *     Resolving server-side by `Accept-Language` is deliberately not done — the public catalogue is
+     *     cached and served from a CDN, and one cache serves every language only if the response does
+     *     not depend on the request's language.
+     * @example {
+     *       "ja": "クラウドサーバー",
+     *       "fr": "Serveur cloud"
+     *     }
+     */
+    Translations: {
+      [key: string]: string;
+    };
+    /**
+     * @description A decimal string, in the currency stated alongside it.
+     *
+     *     **The currency is not part of this type.** It is carried by a `currency` field next to the
+     *     amount, or by the account the amount belongs to. Reading an amount without that field is
+     *     reading a number with no unit.
+     *
+     *     It is a string rather than a JSON number because a JSON number is a float in most parsers,
+     *     and a float loses precision on the first arithmetic. Nothing on this platform puts an amount
+     *     through a float.
+     * @example 10.2500000000
+     */
+    Money: string;
   };
   responses: {
     /** @description Unchanged since the `ETag` that was sent. No body. */
