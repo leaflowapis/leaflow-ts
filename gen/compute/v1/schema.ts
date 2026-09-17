@@ -489,7 +489,7 @@ export interface paths {
      * Open a remote console
      * @description Operates the instance directly from a browser and does not require the instance to be reachable over the network, which makes it usable when a network misconfiguration prevents login.
      *
-     *     The returned address is single-use and expires within minutes. **Do not cache it**; request a new one before each use.
+     *     The returned address is single-use and expires within minutes. Request a new one before each use.
      */
     post: operations["open-instance-console"];
     delete?: never;
@@ -1383,7 +1383,8 @@ export interface components {
       /** Format: uuid */
       disk_id: string;
       name: string;
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
     RenameBackupRequestBody: {
@@ -1401,7 +1402,8 @@ export interface components {
        * @description Matches the size of the backup when omitted. When given, it must not be smaller than the backup
        */
       size_gb?: number;
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
     DiskResource: {
@@ -1612,7 +1614,7 @@ export interface components {
       country_code: string;
       /** @description Display name for this place, shown to tenants (Hong Kong). It is the translatable one; the stable handle is code. */
       name: string;
-      /** @description The region's code, the way the outside world names this place (hk-1). Stable and human-written; it is not an identifier for addressing — every endpoint takes ids. */
+      /** @description The region's code, the way the outside world names this place (hk-1). Stable and human-written; addressing is by id. */
       code: string;
       /** Format: uuid */
       id: string;
@@ -1621,7 +1623,7 @@ export interface components {
       items: components["schemas"]["RegionResource"][] | null;
     };
     ZoneResource: {
-      /** @description Display name for this zone, shown to tenants (Hong Kong A). It is the translatable one; the stable handle is code. AWS has no equivalent — what it calls an Availability Zone name is our code. */
+      /** @description Display name for this zone, shown to tenants (Hong Kong A). It is the translatable one; the stable handle is code. */
       name: string;
       /** @description The zone's code within its region (hk-1-a). Stable and human-written; addressing is by id. */
       code: string;
@@ -1648,7 +1650,8 @@ export interface components {
        * @description Restore from this snapshot. When given, the capacity need only be no smaller than the snapshot
        */
       snapshot_id?: string;
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
     RenameDiskRequestBody: {
@@ -1660,7 +1663,8 @@ export interface components {
        * @description Must be larger than the current capacity
        */
       size_gb: number;
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
     RevertDiskRequestBody: {
@@ -1727,8 +1731,10 @@ export interface components {
       private_network_id: string;
       /** Format: uuid */
       ipv4_pool_id: string;
-      price: components["schemas"]["CatalogReference"];
-      bandwidth_price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
+      /** Format: uuid */
+      bandwidth_price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
     SetBandwidthRequestBody: {
@@ -1737,7 +1743,8 @@ export interface components {
        * @description Applied to both directions
        */
       mbps: number;
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
     BindFloatingIPRequestBody: {
@@ -1905,7 +1912,8 @@ export interface components {
        */
       subnet_id?: string;
       order: components["schemas"]["OrderOptions"];
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
       boot_disk?: components["schemas"]["NewBootDisk"];
       floating_ip?: components["schemas"]["NewFloatingIP"];
     };
@@ -1992,7 +2000,8 @@ export interface components {
        */
       instance_type_id: string;
       order: components["schemas"]["OrderOptions"];
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
     };
     AttachDiskRequestBody: {
       /** Format: uuid */
@@ -2144,7 +2153,8 @@ export interface components {
        */
       instance_id: string;
       name: string;
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
     RenamePrivateImageRequestBody: {
@@ -2344,7 +2354,8 @@ export interface components {
       /** Format: uuid */
       disk_id: string;
       name: string;
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
     RenameSecurityGroupRequestBody: {
@@ -2359,12 +2370,6 @@ export interface components {
       payment_plan?: components["schemas"]["PaymentPlan"];
       expected_amount?: string;
       redemption_code?: string;
-    };
-    /** @description Specify exactly one of id or lookup_key. A lookup key is scoped to the product of the resource service. */
-    CatalogReference: {
-      /** Format: uuid */
-      id?: string;
-      lookup_key?: string;
     };
     /**
      * @description A billable order has been created. Read it from the billing API to find out what is
@@ -2391,14 +2396,17 @@ export interface components {
       disk_type_id: string;
       /** Format: int64 */
       size_gb: number;
-      price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
       /** @default true */
       delete_with_instance?: boolean;
     };
     /** @description An address and bandwidth purchased in the same order. Mutually exclusive with floating_ip_id. */
     NewFloatingIP: {
-      price: components["schemas"]["CatalogReference"];
-      bandwidth_price: components["schemas"]["CatalogReference"];
+      /** Format: uuid */
+      price_id: string;
+      /** Format: uuid */
+      bandwidth_price_id: string;
       /** Format: int64 */
       bandwidth_mbps: number;
       /** Format: uuid */

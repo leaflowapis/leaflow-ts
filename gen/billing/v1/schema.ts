@@ -872,9 +872,9 @@ export interface paths {
     };
     /**
      * Get project billing account
-     * @description A deliberately narrow view: the payer's identity, its currency, and how much can still
-     *     be spent. Cards, invoices and transaction history are not included; they belong to the
-     *     account owner and are reached through `/account/v1/`.
+     * @description Returns the payer's identity, its currency, and how much can still be spent. Cards,
+     *     invoices and transaction history are not included; they belong to the account owner
+     *     and are reached through `/account/v1/`.
      *
      *     Returns 404 when no account pays for this project. Resources cannot be created in that
      *     state.
@@ -1522,7 +1522,6 @@ export interface components {
     CatalogProduct: {
       /** Format: uuid */
       id: string;
-      lookup_key: string;
       name: string;
       name_translations?: components["schemas"]["Translations"];
       description?: string;
@@ -1538,7 +1537,6 @@ export interface components {
       id: string;
       /** Format: uuid */
       product_id: string;
-      lookup_key: string;
       name: string;
       name_translations?: components["schemas"]["Translations"];
       description?: string;
@@ -1552,8 +1550,6 @@ export interface components {
     CatalogPrice: {
       termination_policy?: components["schemas"]["TerminationPolicy"];
       refund_policy?: components["schemas"]["RefundPolicy"];
-      /** @description External lookup alias within the service. Existing references use the price ID. */
-      lookup_key?: string;
       /** Format: uuid */
       product_id?: string;
       /** Format: uuid */
@@ -1649,12 +1645,16 @@ export interface components {
       /** Format: int64 */
       total_count?: number;
     };
-    /** @description Identify a price directly, or select a price for a plan. Lookup keys are scoped to the product. Account quotes apply applicable contract prices. */
+    /** @description Identify a price directly, or select a price for a plan. Account quotes apply applicable contract prices. */
     QuoteLine: {
-      price?: components["schemas"]["ObjectReference"];
-      product?: components["schemas"]["ObjectReference"];
-      plan?: components["schemas"]["ObjectReference"];
-      meter?: components["schemas"]["ObjectReference"];
+      /** Format: uuid */
+      price_id?: string;
+      /** Format: uuid */
+      product_id?: string;
+      /** Format: uuid */
+      plan_id?: string;
+      /** Format: uuid */
+      meter_id?: string;
       /**
        * @description The attributes the price depends on — region, instance type, token class.
        *
@@ -1693,8 +1693,10 @@ export interface components {
        * @description What is being changed.
        */
       subscription_item_id: string;
-      price?: components["schemas"]["ObjectReference"];
-      plan?: components["schemas"]["ObjectReference"];
+      /** Format: uuid */
+      price_id?: string;
+      /** Format: uuid */
+      plan_id?: string;
       /** @description The new quantity. The current one is kept when omitted. */
       quantity?: string;
       /**
@@ -3058,11 +3060,8 @@ export interface components {
        * @description How much is left, as a decimal string. Meaningful only when `metered` is true.
        *     `"0"` once exhausted, never negative.
        *
-       *     This is the figure at the moment of the reply, and quantities are drawn down at
-       *     settlement rather than on each call. It is suitable for display and for a soft
-       *     warning, but it cannot enforce a strict limit: concurrent requests all see the same
-       *     figure. A hard limit has to be counted by the service that owns the capability, in
-       *     the same transaction as the operation it is limiting.
+       *     The figure is accurate as of the reply. It is suitable for display and for a soft
+       *     warning, and must not be used to enforce a strict limit.
        */
       remaining_quantity?: string;
       unit?: string;
@@ -3078,16 +3077,12 @@ export interface components {
       /** Format: int64 */
       total_count?: number;
     };
-    /** @description Identify an object by ID or lookup key, exactly one. A lookup key requires the owning product. */
-    ObjectReference: {
-      /** Format: uuid */
-      id?: string;
-      lookup_key?: string;
-    };
+    /** @description A catalog object inlined for display. */
     ObjectIdentity: {
       /** Format: uuid */
       id: string;
-      lookup_key?: string;
+      name: string;
+      name_translations?: components["schemas"]["Translations"];
     };
     /**
      * @description Text in other languages, keyed by BCP 47 language tag (`zh-Hans`, `en`, `ja`).
@@ -3145,8 +3140,7 @@ export interface components {
      * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
      *     answer is `304` with no body.
      *
-     *     Worth sending on every catalogue read: the listings are public, unauthenticated and
-     *     cached at the edge, so a repeat read costs one round trip and no transfer.
+     *     Send it on every catalogue read. An unchanged catalogue is answered without a body.
      */
     IfNoneMatch: string;
     /** @description 1-based page number; the first page when omitted. */
@@ -3267,8 +3261,7 @@ export interface operations {
          * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
          *     answer is `304` with no body.
          *
-         *     Worth sending on every catalogue read: the listings are public, unauthenticated and
-         *     cached at the edge, so a repeat read costs one round trip and no transfer.
+         *     Send it on every catalogue read. An unchanged catalogue is answered without a body.
          */
         "If-None-Match"?: components["parameters"]["IfNoneMatch"];
       };
@@ -3308,8 +3301,7 @@ export interface operations {
          * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
          *     answer is `304` with no body.
          *
-         *     Worth sending on every catalogue read: the listings are public, unauthenticated and
-         *     cached at the edge, so a repeat read costs one round trip and no transfer.
+         *     Send it on every catalogue read. An unchanged catalogue is answered without a body.
          */
         "If-None-Match"?: components["parameters"]["IfNoneMatch"];
       };
@@ -3352,8 +3344,7 @@ export interface operations {
          * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
          *     answer is `304` with no body.
          *
-         *     Worth sending on every catalogue read: the listings are public, unauthenticated and
-         *     cached at the edge, so a repeat read costs one round trip and no transfer.
+         *     Send it on every catalogue read. An unchanged catalogue is answered without a body.
          */
         "If-None-Match"?: components["parameters"]["IfNoneMatch"];
       };
@@ -3390,7 +3381,7 @@ export interface operations {
         /** @description How many per page, 100 at most. */
         page_size?: components["parameters"]["PageSize"];
         /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        meter?: components["schemas"]["ObjectReference"];
+        meter_id?: string;
         /** @description Return the rates in effect at this moment. Defaults to now. */
         at?: string;
       };
@@ -3399,8 +3390,7 @@ export interface operations {
          * @description The `ETag` from an earlier reply. When the catalogue has not changed since, the
          *     answer is `304` with no body.
          *
-         *     Worth sending on every catalogue read: the listings are public, unauthenticated and
-         *     cached at the edge, so a repeat read costs one round trip and no transfer.
+         *     Send it on every catalogue read. An unchanged catalogue is answered without a body.
          */
         "If-None-Match"?: components["parameters"]["IfNoneMatch"];
       };
@@ -4212,8 +4202,7 @@ export interface operations {
         /** @description Restrict to one of your accounts. All of them when omitted. */
         billing_account_id?: components["parameters"]["AccountIdQuery"];
         project_id?: string;
-        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        product?: components["schemas"]["ObjectReference"];
+        product_id?: string;
         resource_id?: string;
         from?: components["parameters"]["From"];
         /** @description Exclusive. */
@@ -4437,7 +4426,7 @@ export interface operations {
          */
         group_by?: "product" | "plan" | "resource";
         /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        product?: components["schemas"]["ObjectReference"];
+        product_id?: string;
         /** @description 1-based page number; the first page when omitted. */
         page?: components["parameters"]["Page"];
         /** @description How many per page, 100 at most. */
@@ -4471,10 +4460,9 @@ export interface operations {
         /** @description How many per page, 100 at most. */
         page_size?: components["parameters"]["PageSize"];
         resource_id?: string;
+        product_id?: string;
         /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        product?: components["schemas"]["ObjectReference"];
-        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        meter?: components["schemas"]["ObjectReference"];
+        meter_id?: string;
         from?: components["parameters"]["From"];
         /** @description Exclusive. */
         to?: components["parameters"]["To"];
@@ -4706,10 +4694,9 @@ export interface operations {
         /** @description Restrict to one of your accounts. All of them when omitted. */
         billing_account_id?: components["parameters"]["AccountIdQuery"];
         /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        meter?: components["schemas"]["ObjectReference"];
+        meter_id?: string;
         status?: "active" | "depleted" | "expired" | "voided";
-        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        product?: components["schemas"]["ObjectReference"];
+        product_id?: string;
       };
       header?: never;
       path?: never;
@@ -4924,9 +4911,8 @@ export interface operations {
         /** @description How many per page, 100 at most. */
         page_size?: components["parameters"]["PageSize"];
         /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        meter?: components["schemas"]["ObjectReference"];
-        /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        product?: components["schemas"]["ObjectReference"];
+        meter_id?: string;
+        product_id?: string;
       };
       header?: never;
       path: {
@@ -4989,7 +4975,7 @@ export interface operations {
         /** @description How many per page, 100 at most. */
         page_size?: components["parameters"]["PageSize"];
         /** @description Filter by ID or lookup key. A lookup key is scoped to the product. */
-        product?: components["schemas"]["ObjectReference"];
+        product_id?: string;
       };
       header?: never;
       path: {
