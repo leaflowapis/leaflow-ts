@@ -1610,7 +1610,8 @@ export interface components {
     RegionResource: {
       country_code: string;
       name: string;
-      lookup_key: string;
+      /** @description The region's code, the way the outside world names this place (hk-1). Stable and human-written; it is not an identifier for addressing — every endpoint takes ids. */
+      code: string;
       /** Format: uuid */
       id: string;
     };
@@ -1619,7 +1620,8 @@ export interface components {
     };
     ZoneResource: {
       name: string;
-      lookup_key: string;
+      /** @description The zone's code within its region (hk-1-a). Stable and human-written; addressing is by id. */
+      code: string;
       /** Format: uuid */
       id: string;
     };
