@@ -91,7 +91,7 @@ export interface paths {
     };
     /**
      * List disk types on sale
-     * @description Only disk types currently on sale are listed. A withdrawn one disappears from here and can no longer be bought, while the disks already on it keep working and can still be resized.
+     * @description Only disk types currently on sale are listed, both system disk types and data disk types; `for_system` narrows the list to one of the two. A withdrawn one disappears from here and can no longer be bought, while the disks already on it keep working and can still be resized.
      */
     get: operations["list-disk-types"];
     put?: never;
@@ -1564,7 +1564,7 @@ export interface components {
     RestoreBackupRequestBody: {
       /**
        * Format: uuid
-       * @description May differ from the availability zone of the source disk, but must be in the same region. It has to be on sale — restoring creates a new disk, so a withdrawn type is rejected here as well
+       * @description May differ from the availability zone of the source disk, but must be in the same region. It has to be a data disk type on sale — restoring creates a new data disk, so a withdrawn type or a system disk type is rejected here as well
        */
       disk_type_id: string;
       name: string;
@@ -1641,6 +1641,8 @@ export interface components {
       availability_zone_id: string;
       /** Format: uuid */
       id: string;
+      /** @description True for a system disk type, the one chosen as `boot_disk.disk_type_id` when creating an instance from an image. A system disk type cannot be used to create a data disk, and a data disk type cannot be used for a system disk. */
+      for_system: boolean;
       /**
        * Format: int64
        * @description IOPS a disk of `min_size_gb` gets. Null when this type is not rate-limited.
@@ -1804,7 +1806,7 @@ export interface components {
     CreateDiskRequestBody: {
       /**
        * Format: uuid
-       * @description A disk type currently on sale. A withdrawn one is rejected even though its identifier still resolves
+       * @description A data disk type currently on sale, one whose `for_system` is false. A withdrawn one is rejected even though its identifier still resolves
        */
       disk_type_id: string;
       name: string;
@@ -2570,7 +2572,10 @@ export interface components {
     };
     /** @description A system disk purchased in the same order. Required when booting from an image; mutually exclusive with boot_disk_id. */
     NewBootDisk: {
-      /** Format: uuid */
+      /**
+       * Format: uuid
+       * @description A system disk type on sale in the availability zone of the instance, one whose `for_system` is true
+       */
       disk_type_id: string;
       /** Format: int64 */
       size_gb: number;
@@ -2983,6 +2988,8 @@ export interface operations {
     parameters: {
       query: {
         region_id: string;
+        /** @description `true` lists only system disk types and `false` only data disk types. Both are listed when omitted. */
+        for_system?: boolean;
       };
       header?: never;
       path?: never;
