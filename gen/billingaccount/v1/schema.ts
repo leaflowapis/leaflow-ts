@@ -207,6 +207,27 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/account/v1/currencies": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List currencies accounts can be opened in
+     * @description The currencies a new billing account can be opened in. A retired currency is not listed,
+     *     although accounts already opened in it keep working. Not paged: the set is a few rows.
+     */
+    get: operations["list-currencies"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/account/v1/billing-accounts": {
     parameters: {
       query?: never;
@@ -1321,6 +1342,22 @@ export interface components {
       grace_period_seconds?: number;
       /** Format: date-time */
       created_at: string;
+    };
+    /** @description A currency a billing account can be opened in. */
+    Currency: {
+      /** @description ISO 4217 alpha-3, uppercase. */
+      code: string;
+      /**
+       * Format: int32
+       * @description Decimal places of the currency, the ISO 4217 minor unit.
+       */
+      exponent: number;
+      name: string;
+      /** @description The smallest top-up accepted. Zero means no lower bound. */
+      minimum_top_up: components["schemas"]["Money"];
+    };
+    CurrencyList: {
+      items: components["schemas"]["Currency"][];
     };
     BillingAccountCreate: {
       currency: string;
@@ -2914,6 +2951,27 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Quote"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-currencies": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CurrencyList"];
         };
       };
       default: components["responses"]["Error"];
