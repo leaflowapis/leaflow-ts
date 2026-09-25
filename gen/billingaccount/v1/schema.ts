@@ -1271,7 +1271,16 @@ export interface components {
       /** Format: int64 */
       total_count?: number;
     };
-    /** @description Identify a price directly, or select a price for a plan. For each resource give its ID or lookup key, never both. Lookup keys require product_id. */
+    /**
+     * @description Identify a price directly, or select a price for a plan. For each resource give its ID or lookup key, never both. Lookup keys require product_id.
+     *
+     *     A line that gives a meter, `dimensions` or `duration_seconds` estimates usage and is
+     *     priced only at a postpaid price. Such a line is refused with HTTP 400
+     *     `BILLING_PURCHASE_INVALID` when `price_type` is `prepaid` or `one_time`, or when the price
+     *     it names is not postpaid; `meta.field` is `price_type`, `price_id` or `price_lookup_key`
+     *     accordingly. When the plan has no postpaid price, the line is returned unpriced with
+     *     `no_price`.
+     */
     QuoteLine: {
       price_lookup_key?: string;
       plan_lookup_key?: string;
@@ -1308,7 +1317,8 @@ export interface components {
       /**
        * Format: int64
        * @description For metered items, how long to price for. This allows an estimate such as "about
-       *     this much per month" to be shown before anything exists.
+       *     this much per month" to be shown before anything exists. The priced quantity is
+       *     `quantity` multiplied by this duration.
        */
       duration_seconds?: number;
     };
@@ -1354,6 +1364,10 @@ export interface components {
       price_id?: string;
       plan_name?: string;
       unit_amount?: components["schemas"]["Money"];
+      /**
+       * @description The quantity actually priced. When `duration_seconds` is given, it is the requested
+       *     `quantity` multiplied by that duration.
+       */
       quantity?: string;
       /** @description Not rounded. Round only for display. */
       amount?: components["schemas"]["Money"];
