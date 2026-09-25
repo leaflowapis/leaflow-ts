@@ -1468,6 +1468,12 @@ export interface components {
        */
       total: components["schemas"]["Money"];
       /**
+       * @description The part of currently valid credit that only pays for what its restrictions allow, such as a single
+       *     service, a billing type or a first purchase. The rest of the valid credit pays for anything on the account.
+       *     Included in credits and therefore in total.
+       */
+      restricted_credits: components["schemas"]["Money"];
+      /**
        * @description Currently valid, unspent credit grouped by permitted use. Restrictions and
        *     validity dates determine which charges a group can cover, so these groups are not a general
        *     spendable balance and may differ from the recorded credits total.
