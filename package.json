@@ -23,13 +23,17 @@
       "types": "./dist/assistant/v1/index.d.ts",
       "default": "./dist/assistant/v1/index.js"
     },
-    "./billing/v1": {
-      "types": "./dist/billing/v1/index.d.ts",
-      "default": "./dist/billing/v1/index.js"
+    "./billing/account/v1": {
+      "types": "./dist/billing/account/v1/index.d.ts",
+      "default": "./dist/billing/account/v1/index.js"
     },
-    "./billingaccount/v1": {
-      "types": "./dist/billingaccount/v1/index.d.ts",
-      "default": "./dist/billingaccount/v1/index.js"
+    "./billing/catalog/v1": {
+      "types": "./dist/billing/catalog/v1/index.d.ts",
+      "default": "./dist/billing/catalog/v1/index.js"
+    },
+    "./billing/project/v1": {
+      "types": "./dist/billing/project/v1/index.d.ts",
+      "default": "./dist/billing/project/v1/index.js"
     },
     "./canopy/v1": {
       "types": "./dist/canopy/v1/index.d.ts",

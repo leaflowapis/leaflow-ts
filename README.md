@@ -35,11 +35,20 @@ npm run generate
 
 ## Billing
 
-```ts
-import { client } from "@leaflow/sdk/billing/v1";
+Billing 按职能分为三个子包,三者地址相同,凭据各不相同:
 
-const billing = client({ baseUrl: billingBaseUrl, headers });
+```ts
+import { billing } from "@leaflow/sdk";
+
+// 公开目录与估价,无需凭据
+const catalog = billing.catalog.client();
+// 计费账户、充值、账单,使用 access token
+const account = billing.account.client({ headers });
+// 项目的支出与订单,使用 scoped token
+const project = billing.project.client({ headers });
 ```
+
+也可按子路径单独导入,例如 `@leaflow/sdk/billing/catalog/v1`。
 
 公共目录、账户和项目接口使用 `@leaflow/sdk`，运营管理接口使用 `@leaflow/sdk-admin`。服务间 Proto 使用独立的 `@leaflow/billing` 包。
 
