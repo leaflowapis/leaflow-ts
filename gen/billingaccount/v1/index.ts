@@ -9,14 +9,6 @@ export { client } from "./client.js";
 
 import type { operations } from "./schema.js";
 
-/** The success response body of `GET /account/v1/projects/{projectId}/closure-preview`. */
-export type GetAccountProjectClosurePreviewResult =
-  operations["get-account-project-closure-preview"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/projects/{projectId}/closure-preview`. */
-export type GetAccountProjectClosurePreviewQuery =
-  operations["get-account-project-closure-preview"]["parameters"]["query"];
-
 /** The success response body of `GET /api/v1/prices`. */
 export type ListPricesResult =
   operations["list-prices"]["responses"][200]["content"]["application/json"];

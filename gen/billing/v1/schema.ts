@@ -4,26 +4,6 @@
  */
 
 export interface paths {
-  "/api/v1/projects/{projectId}/closure-preview": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Preview project closure
-     * @description Lists outstanding orders, subscriptions, metering and unfinished operations. Reports the next action and timing for each item. This read never performs cleanup or creates a closure request. Charges already incurred remain owed by the billing account that was linked when they occurred and do not prevent closure. Historical invoices and account-level purchases are retained. Billing approval alone does not prove that technical resources are absent.
-     */
-    get: operations["get-project-closure-preview"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/api/v1/projects/{projectId}/billing-account": {
     parameters: {
       query?: never;
@@ -350,45 +330,6 @@ export interface components {
       forfeit_remaining_value: boolean;
       failure_code?: string;
       failure_reason?: string;
-    };
-    /** @description One purchase, metered resource or resource operation that has not finished. action_required identifies a supported next step, not authorization to destroy a resource. Items for the same resource must be considered together. */
-    ProjectClosureItem: {
-      /** @enum {string} */
-      type: "order" | "subscription" | "active_resource" | "job" | "cancellation_request";
-      /** Format: uuid */
-      id: string;
-      product_id?: components["schemas"]["ProductID"];
-      resource_id?: string;
-      /** @enum {string} */
-      disposition: "action_required" | "waiting" | "blocked";
-      reason_code: string;
-      actions: (
-        | "cancel_order"
-        | "wait"
-        | "release_resource"
-        | "cancel_subscription"
-        | "disable_auto_renew"
-        | "configure_terms"
-        | "resolve_failure"
-      )[];
-      /** Format: date-time */
-      earliest_termination_at?: string;
-      /** @description Known refund amount as a decimal string. Absent means a separate quote is required, not zero. */
-      refund_amount?: string;
-      currency?: string;
-      cancellation?: components["schemas"]["CancellationRequest"];
-    };
-    /** @description Read-only, paginated assessment. Does not cancel orders, stop renewals, refund payments or release resources. Concurrent orders or callbacks may change the result; execution must close admission and recheck. */
-    ProjectClosurePreview: {
-      /** Format: uuid */
-      project_id: string;
-      /** Format: date-time */
-      evaluated_at: string;
-      /** @description True only when the full Billing result, across all pages, has no outstanding items. Technical services must independently confirm that all resources are gone. */
-      can_close: boolean;
-      items: components["schemas"]["ProjectClosureItem"][];
-      /** Format: int64 */
-      total_count: number;
     };
     Error: {
       code?: string;
@@ -1091,32 +1032,6 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  "get-project-closure-preview": {
-    parameters: {
-      query?: {
-        page?: number;
-        page_size?: number;
-      };
-      header?: never;
-      path: {
-        projectId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Closure assessment */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ProjectClosurePreview"];
-        };
-      };
-      default: components["responses"]["Error"];
-    };
-  };
   "get-project-billing-account": {
     parameters: {
       query?: never;
