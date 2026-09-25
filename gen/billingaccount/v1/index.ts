@@ -92,6 +92,10 @@ export type UpdateBillingAccountBody = NonNullable<
 export type GetAccountBalanceResult =
   operations["get-account-balance"]["responses"][200]["content"]["application/json"];
 
+/** The success response body of `GET /account/v1/billing-accounts/{accountId}/payment-options`. */
+export type ListPaymentOptionsResult =
+  operations["list-payment-options"]["responses"][200]["content"]["application/json"];
+
 /** The success response body of `GET /account/v1/projects`. */
 export type ListBillingAccountProjectsResult =
   operations["list-billing-account-projects"]["responses"][200]["content"]["application/json"];
@@ -129,6 +133,10 @@ export type CreateTopUpBody = NonNullable<
 /** The success response body of `GET /account/v1/top-ups/{topUpId}`. */
 export type GetTopUpResult =
   operations["get-top-up"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `POST /account/v1/top-ups/{topUpId}/cancel`. */
+export type CancelTopUpResult =
+  operations["cancel-top-up"]["responses"][200]["content"]["application/json"];
 
 /** The success response body of `GET /account/v1/payment-methods`. */
 export type ListPaymentMethodsResult =

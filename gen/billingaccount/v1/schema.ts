@@ -297,6 +297,31 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/account/v1/billing-accounts/{accountId}/payment-options": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        accountId: components["parameters"]["AccountId"];
+      };
+      cookie?: never;
+    };
+    /**
+     * List payment options
+     * @description Lists the payment gateways and methods that currently accept payment in this account's currency, the
+     *     preferred gateway first. Top-ups and invoice payments must name a gateway and method listed here;
+     *     others are refused. An empty list means no online payment is available for this account. Not paged: the
+     *     set is a few rows.
+     */
+    get: operations["list-payment-options"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/account/v1/projects": {
     parameters: {
       query?: never;
@@ -371,7 +396,8 @@ export interface paths {
     };
     /**
      * List top ups
-     * @description Lists only the authenticated user's top-ups. Includes pending and failed attempts; no invoice is created for a top-up.
+     * @description Lists only the authenticated user's top-ups. Includes pending, failed and canceled attempts; no invoice is
+     *     created for a top-up. Items carry no `action`; read a pending top-up with get-top-up to continue its payment.
      */
     get: operations["list-top-ups"];
     put?: never;
@@ -399,11 +425,48 @@ export interface paths {
     };
     /**
      * Get top up
-     * @description Reads a top-up owned by the authenticated user, including its outcome and the part of it not yet spent. It is not an invoice.
+     * @description Reads a top-up owned by the authenticated user, including its outcome and the part of it not yet spent.
+     *     It is not an invoice.
+     *
+     *     While the top-up is pending, the answer includes the customer's next step as the payment gateway
+     *     currently reports it, so that a payment interrupted by a closed page can be continued. When the gateway
+     *     cannot be reached, the top-up is returned without `action`; read it again later.
      */
     get: operations["get-top-up"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/top-ups/{topUpId}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        topUpId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Cancel top up
+     * @description Withdraws a pending top-up owned by the authenticated user at the payment gateway. It becomes
+     *     `canceled` with `cancellation_reason` `requested_by_customer`, and no money is collected for it. Canceling a
+     *     top-up that is already canceled returns it unchanged.
+     *
+     *     If the gateway has already collected the payment, nothing is withdrawn and the top-up is returned
+     *     as `succeeded` with the balance increased. Check `status` in the answer rather than assuming the
+     *     cancellation took effect.
+     *
+     *     Fails with 409 and BILLING_TOPUP_NOT_CANCELABLE when the top-up has already succeeded or failed,
+     *     with `status` naming that outcome, and while the gateway is processing the payment and can no
+     *     longer withdraw it, with `status` set to `pending`; read the top-up again later in that case.
+     */
+    post: operations["cancel-top-up"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1453,13 +1516,19 @@ export interface components {
        */
       remaining_amount?: components["schemas"]["Money"];
       /**
-       * @description `pending` until the payment gateway confirms. The balance increases on `succeeded`.
+       * @description `pending` until the payment gateway reaches a result. The balance increases on `succeeded`.
        *
-       *     Unknown channel outcomes remain pending. Failed means the channel has confirmed that
-       *     this attempt did not collect money; a browser redirect is not proof of payment.
+       *     `failed` means the gateway declined the payment. `canceled` means the attempt was withdrawn
+       *     without collecting money; `cancellation_reason` says why. Unknown gateway outcomes remain
+       *     `pending`, and a browser redirect is not proof of payment.
+       *
+       *     `failed` and `canceled` are final. If the gateway nevertheless collects payment for such an
+       *     attempt, the amount is credited as a separate `succeeded` top-up.
        * @enum {string}
        */
-      status: "pending" | "succeeded" | "failed";
+      status: "pending" | "succeeded" | "failed" | "canceled";
+      /** @description Why the top-up was withdrawn. Present with `canceled`. */
+      cancellation_reason?: components["schemas"]["PaymentCancellationReason"];
       /** @description Which payment gateway collected it. */
       payment_gateway?: string;
       /** @description The selected payment method, such as card, wechat_pay or alipay. */
@@ -1474,9 +1543,13 @@ export interface components {
        *     the figure that appears on the customer's card or wallet statement.
        */
       presentment_amount?: components["schemas"]["Money"];
-      /** @description Why it did not go through. Present with `failed`. */
+      /** @description Why the gateway declined it. Present with `failed`. */
       failure_reason?: string;
-      /** @description Present when the original top-up still needs customer interaction. Completing it does not replace confirmation of receipt. */
+      /**
+       * @description The customer's next step while the top-up is `pending` and the gateway still awaits them. Returned
+       *     by create-top-up and get-top-up as the gateway currently reports it; absent from list-top-ups and
+       *     once the top-up has a result. Completing it does not replace confirmation of receipt.
+       */
       action?: components["schemas"]["PaymentAction"];
       /** Format: date-time */
       created_at: string;
@@ -1529,6 +1602,30 @@ export interface components {
       items: components["schemas"]["TopUp"][];
       /** Format: int64 */
       total_count?: number;
+    };
+    /**
+     * @description Why a gateway payment was withdrawn. `abandoned` means the customer did not complete it within the time
+     *     allowed for payment. `requested_by_customer` means the customer canceled it.
+     * @enum {string}
+     */
+    PaymentCancellationReason: "abandoned" | "requested_by_customer";
+    /** @description A payment gateway that accepts payment in the account's currency, with the methods it accepts. */
+    PaymentOption: {
+      /** @description The value to send as `payment_gateway`. */
+      payment_gateway: string;
+      methods: components["schemas"]["PaymentOptionMethod"][];
+    };
+    PaymentOptionMethod: {
+      /** @description The value to send as `method_type`, such as card, wechat_pay or alipay. */
+      method_type: string;
+      /**
+       * @description Whether a method of this type can be saved with create-payment-method-setup and charged later
+       *     without the customer present. Methods that are not reusable are paid anew each time.
+       */
+      reusable: boolean;
+    };
+    PaymentOptionList: {
+      items: components["schemas"]["PaymentOption"][];
     };
     PaymentMethod: {
       /** Format: uuid */
@@ -1799,10 +1896,18 @@ export interface components {
       credit_grant?: components["schemas"]["ObjectIdentity"];
       /** Format: uuid */
       refund_id?: string;
-      /** @enum {string} */
-      status?: "pending" | "succeeded" | "failed";
+      /**
+       * @description `failed` means the operation did not succeed; for a gateway payment, that the gateway declined it.
+       *     `canceled` means a gateway payment was withdrawn without collecting money; an invoice it was meant
+       *     to pay remains open for another payment.
+       * @enum {string}
+       */
+      status?: "pending" | "succeeded" | "failed" | "canceled";
+      /** @description Why the payment was withdrawn. Present with `canceled`. */
+      cancellation_reason?: components["schemas"]["PaymentCancellationReason"];
       payment_gateway?: string;
       method_type?: string;
+      /** @description Why it failed. Present with `failed`. */
       failure_reason?: string;
       /** Format: date-time */
       settled_at?: string;
@@ -3101,6 +3206,29 @@ export interface operations {
       default: components["responses"]["Error"];
     };
   };
+  "list-payment-options": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        accountId: components["parameters"]["AccountId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentOptionList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
   "list-billing-account-projects": {
     parameters: {
       query?: {
@@ -3270,6 +3398,38 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["TopUp"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "cancel-top-up": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        topUpId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The top-up after the request, canceled or succeeded. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TopUp"];
+        };
+      };
+      /** @description The top-up already has another outcome or can no longer be withdrawn. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       default: components["responses"]["Error"];
