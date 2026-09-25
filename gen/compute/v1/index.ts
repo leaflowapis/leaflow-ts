@@ -571,3 +571,35 @@ export type ListIpv4PoolsResult =
 
 /** The query parameters of `GET /api/v1/ipv4-pools`. */
 export type ListIpv4PoolsQuery = operations["list-ipv4-pools"]["parameters"]["query"];
+
+/** The success response body of `GET /api/v1/peerings`. */
+export type ListPeeringsResult =
+  operations["list-peerings"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/peerings`. */
+export type ListPeeringsQuery = operations["list-peerings"]["parameters"]["query"];
+
+/** The success response body of `POST /api/v1/peerings`. */
+export type CreatePeeringResult =
+  operations["create-peering"]["responses"][201]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/peerings`. */
+export type CreatePeeringBody = NonNullable<
+  operations["create-peering"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `GET /api/v1/peerings/{peeringId}`. */
+export type GetPeeringResult =
+  operations["get-peering"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `DELETE /api/v1/peerings/{peeringId}`. */
+export type DeletePeeringResult =
+  operations["delete-peering"]["responses"][202]["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/peerings/{peeringId}/accept`. */
+export type AcceptPeeringResult =
+  operations["accept-peering"]["responses"][202]["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/peerings/{peeringId}/reject`. */
+export type RejectPeeringResult =
+  operations["reject-peering"]["responses"][200]["content"]["application/json"];

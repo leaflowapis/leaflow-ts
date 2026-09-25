@@ -9,13 +9,6 @@ export { client } from "./client.js";
 
 import type { operations } from "./schema.js";
 
-/** The success response body of `GET /account/v1/commitments`. */
-export type ListCommitmentsResult =
-  operations["ListCommitments"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/commitments`. */
-export type ListCommitmentsQuery = operations["ListCommitments"]["parameters"]["query"];
-
 /** The success response body of `GET /api/v1/projects/{projectId}/closure-preview`. */
 export type GetProjectClosurePreviewResult =
   operations["get-project-closure-preview"]["responses"][200]["content"]["application/json"];
@@ -23,268 +16,6 @@ export type GetProjectClosurePreviewResult =
 /** The query parameters of `GET /api/v1/projects/{projectId}/closure-preview`. */
 export type GetProjectClosurePreviewQuery =
   operations["get-project-closure-preview"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/projects/{projectId}/closure-preview`. */
-export type GetAccountProjectClosurePreviewResult =
-  operations["get-account-project-closure-preview"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/projects/{projectId}/closure-preview`. */
-export type GetAccountProjectClosurePreviewQuery =
-  operations["get-account-project-closure-preview"]["parameters"]["query"];
-
-/** The success response body of `GET /catalog/v1/products`. */
-export type ListProductsResult =
-  operations["list-products"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /catalog/v1/products/{productId}/plans`. */
-export type ListPlansResult =
-  operations["list-plans"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /catalog/v1/plans/{planId}/prices`. */
-export type ListPricesResult =
-  operations["list-prices"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /catalog/v1/plans/{planId}/prices`. */
-export type ListPricesQuery = operations["list-prices"]["parameters"]["query"];
-
-/** The success response body of `GET /catalog/v1/rate-cards/{rateCardId}/rules`. */
-export type ListRatesResult =
-  operations["list-rates"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /catalog/v1/rate-cards/{rateCardId}/rules`. */
-export type ListRatesQuery = operations["list-rates"]["parameters"]["query"];
-
-/** The success response body of `POST /catalog/v1/estimates`. */
-export type CreateEstimateResult =
-  operations["create-estimate"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /catalog/v1/estimates`. */
-export type CreateEstimateBody = NonNullable<
-  operations["create-estimate"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/billing-accounts`. */
-export type ListBillingAccountsResult =
-  operations["list-billing-accounts"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/billing-accounts`. */
-export type CreateBillingAccountResult =
-  operations["create-billing-account"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/billing-accounts`. */
-export type CreateBillingAccountBody = NonNullable<
-  operations["create-billing-account"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/billing-accounts/{accountId}`. */
-export type GetBillingAccountResult =
-  operations["get-billing-account"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PATCH /account/v1/billing-accounts/{accountId}`. */
-export type UpdateBillingAccountResult =
-  operations["update-billing-account"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PATCH /account/v1/billing-accounts/{accountId}`. */
-export type UpdateBillingAccountBody = NonNullable<
-  operations["update-billing-account"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/billing-accounts/{accountId}/balance`. */
-export type GetAccountBalanceResult =
-  operations["get-account-balance"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/projects`. */
-export type ListPaidProjectsResult =
-  operations["list-paid-projects"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/projects`. */
-export type ListPaidProjectsQuery = operations["list-paid-projects"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/projects/{projectId}/billing-account`. */
-export type FindProjectPayerResult =
-  operations["find-project-payer"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PUT /account/v1/projects/{projectId}/billing-account`. */
-export type SetProjectPayerResult =
-  operations["set-project-payer"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PUT /account/v1/projects/{projectId}/billing-account`. */
-export type SetProjectPayerBody = NonNullable<
-  operations["set-project-payer"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/projects/{projectId}/billing-account/settle`. */
-export type SettleProjectUsageResult =
-  operations["settle-project-usage"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/top-ups`. */
-export type ListTopUpsResult =
-  operations["list-top-ups"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/top-ups`. */
-export type CreateTopUpResult =
-  operations["create-top-up"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/top-ups`. */
-export type CreateTopUpBody = NonNullable<
-  operations["create-top-up"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/top-ups/{topUpId}`. */
-export type GetTopUpResult =
-  operations["get-top-up"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/payment-methods`. */
-export type ListPaymentMethodsResult =
-  operations["list-payment-methods"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/payment-methods/setup`. */
-export type CreatePaymentMethodSetupResult =
-  operations["create-payment-method-setup"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/payment-methods/setup`. */
-export type CreatePaymentMethodSetupBody = NonNullable<
-  operations["create-payment-method-setup"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `PUT /account/v1/payment-methods/{paymentMethodId}/default`. */
-export type SetDefaultPaymentMethodResult =
-  operations["set-default-payment-method"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/invoices/{invoiceId}/pay`. */
-export type PayInvoiceResult =
-  operations["pay-invoice"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/invoices/{invoiceId}/pay`. */
-export type PayInvoiceBody = NonNullable<
-  operations["pay-invoice"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/payments`. */
-export type PayTogetherResult =
-  operations["pay-together"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/payments`. */
-export type PayTogetherBody = NonNullable<
-  operations["pay-together"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/orders/{orderId}/pay`. */
-export type PayOrderResult =
-  operations["pay-order"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/orders/{orderId}/pay`. */
-export type PayOrderBody = NonNullable<
-  operations["pay-order"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/invoices`. */
-export type ListInvoicesResult =
-  operations["list-invoices"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/invoices`. */
-export type ListInvoicesQuery = operations["list-invoices"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/invoices/{invoiceId}`. */
-export type GetInvoiceResult =
-  operations["get-invoice"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/invoices/{invoiceId}/items`. */
-export type ListInvoiceItemsResult =
-  operations["list-invoice-items"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/invoices/{invoiceId}/refund-quote`. */
-export type GetInvoiceRefundQuoteResult =
-  operations["get-invoice-refund-quote"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/transactions`. */
-export type ListTransactionsResult =
-  operations["list-transactions"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/credit-grants`. */
-export type ListCreditGrantsResult =
-  operations["list-credit-grants"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/credit-grants`. */
-export type ListCreditGrantsQuery = operations["list-credit-grants"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/allocations`. */
-export type ListAllocationsResult =
-  operations["list-allocations"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/allocations`. */
-export type ListAllocationsQuery = operations["list-allocations"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/refunds`. */
-export type ListRefundsResult =
-  operations["list-refunds"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/refunds`. */
-export type RequestRefundResult =
-  operations["request-refund"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/refunds`. */
-export type RequestRefundBody = NonNullable<
-  operations["request-refund"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/usage-charges`. */
-export type ListUsageChargesResult =
-  operations["list-usage-charges"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/usage-charges`. */
-export type ListUsageChargesQuery = operations["list-usage-charges"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/subscriptions`. */
-export type ListSubscriptionsResult =
-  operations["list-subscriptions"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/subscriptions`. */
-export type ListSubscriptionsQuery = operations["list-subscriptions"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/subscription-items`. */
-export type ListSubscriptionItemsResult =
-  operations["list-subscription-items"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/subscription-items`. */
-export type ListSubscriptionItemsQuery =
-  operations["list-subscription-items"]["parameters"]["query"];
-
-/** The success response body of `POST /account/v1/subscription-items/{itemId}/renew`. */
-export type RenewSubscriptionItemResult =
-  operations["renew-subscription-item"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/subscription-items/{itemId}/renew`. */
-export type RenewSubscriptionItemBody = NonNullable<
-  operations["renew-subscription-item"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `PUT /account/v1/subscription-items/{itemId}/auto-renew`. */
-export type SetAutoRenewResult =
-  operations["set-auto-renew"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PUT /account/v1/subscription-items/{itemId}/auto-renew`. */
-export type SetAutoRenewBody = NonNullable<
-  operations["set-auto-renew"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/codes/preview`. */
-export type PreviewCodeResult =
-  operations["preview-code"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/codes/preview`. */
-export type PreviewCodeBody = NonNullable<
-  operations["preview-code"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/codes/redeem`. */
-export type RedeemCodeResult =
-  operations["redeem-code"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/codes/redeem`. */
-export type RedeemCodeBody = NonNullable<
-  operations["redeem-code"]["requestBody"]
->["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/projects/{projectId}/billing-account`. */
 export type GetProjectBillingAccountResult =
@@ -309,19 +40,15 @@ export type ListProjectUsageChargesQuery =
 export type ListProjectSubscriptionsResult =
   operations["list-project-subscriptions"]["responses"][200]["content"]["application/json"];
 
-/** The success response body of `GET /api/v1/projects/{projectId}/subscription-items`. */
-export type ListProjectSubscriptionItemsResult =
-  operations["list-project-subscription-items"]["responses"][200]["content"]["application/json"];
+/** The query parameters of `GET /api/v1/projects/{projectId}/subscriptions`. */
+export type ListProjectSubscriptionsQuery =
+  operations["list-project-subscriptions"]["parameters"]["query"];
 
-/** The query parameters of `GET /api/v1/projects/{projectId}/subscription-items`. */
-export type ListProjectSubscriptionItemsQuery =
-  operations["list-project-subscription-items"]["parameters"]["query"];
-
-/** The success response body of `PUT /api/v1/projects/{projectId}/subscription-items/{itemId}/auto-renew`. */
+/** The success response body of `PUT /api/v1/projects/{projectId}/subscriptions/{subscriptionId}/auto-renew`. */
 export type SetProjectAutoRenewResult =
   operations["set-project-auto-renew"]["responses"][200]["content"]["application/json"];
 
-/** The request body of `PUT /api/v1/projects/{projectId}/subscription-items/{itemId}/auto-renew`. */
+/** The request body of `PUT /api/v1/projects/{projectId}/subscriptions/{subscriptionId}/auto-renew`. */
 export type SetProjectAutoRenewBody = NonNullable<
   operations["set-project-auto-renew"]["requestBody"]
 >["content"]["application/json"];
@@ -354,40 +81,6 @@ export type CreateProjectQuoteBody = NonNullable<
   operations["create-project-quote"]["requestBody"]
 >["content"]["application/json"];
 
-/** The success response body of `GET /account/v1/allowances`. */
-export type ListAllowancesResult =
-  operations["list-allowances"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/allowances`. */
-export type ListAllowancesQuery = operations["list-allowances"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/allowances/{allowanceId}/consumptions`. */
-export type ListAllowanceConsumptionsResult =
-  operations["list-allowance-consumptions"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/orders`. */
-export type ListOrdersResult =
-  operations["list-orders"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/orders`. */
-export type ListOrdersQuery = operations["list-orders"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/orders/{orderId}`. */
-export type GetOrderResult =
-  operations["get-order"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/orders/{orderId}/cancel`. */
-export type CancelScheduledChangeResult =
-  operations["cancel-scheduled-change"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/orders/{orderId}/items`. */
-export type ListOrderItemsResult =
-  operations["list-order-items"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/orders/{orderId}/refund-quote`. */
-export type GetOrderRefundQuoteResult =
-  operations["get-order-refund-quote"]["responses"][200]["content"]["application/json"];
-
 /** The success response body of `GET /api/v1/projects/{projectId}/orders/{orderId}/items`. */
 export type ListProjectOrderItemsResult =
   operations["list-project-order-items"]["responses"][200]["content"]["application/json"];
@@ -399,13 +92,6 @@ export type ListProjectAllowancesResult =
 /** The query parameters of `GET /api/v1/projects/{projectId}/allowances`. */
 export type ListProjectAllowancesQuery =
   operations["list-project-allowances"]["parameters"]["query"];
-
-/** The success response body of `GET /account/v1/entitlements`. */
-export type ListEntitlementsResult =
-  operations["list-entitlements"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /account/v1/entitlements`. */
-export type ListEntitlementsQuery = operations["list-entitlements"]["parameters"]["query"];
 
 /** The success response body of `GET /api/v1/projects/{projectId}/entitlements`. */
 export type ListProjectEntitlementsResult =

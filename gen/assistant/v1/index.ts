@@ -9,6 +9,10 @@ export { client } from "./client.js";
 
 import type { operations } from "./schema.js";
 
+/** The success response body of `GET /api/v1/models`. */
+export type ListModelsResult =
+  operations["list-models"]["responses"][200]["content"]["application/json"];
+
 /** The success response body of `POST /api/v1/attachments`. */
 export type UploadAttachmentResult =
   operations["upload-attachment"]["responses"][201]["content"]["application/json"];
