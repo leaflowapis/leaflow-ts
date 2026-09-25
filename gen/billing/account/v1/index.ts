@@ -9,55 +9,6 @@ export { client } from "./client.js";
 
 import type { operations } from "./schema.js";
 
-/** The success response body of `GET /api/v1/prices`. */
-export type ListPricesResult =
-  operations["list-prices"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/prices`. */
-export type ListPricesQuery = operations["list-prices"]["parameters"]["query"];
-
-/** The success response body of `GET /api/v1/products`. */
-export type ListProductsResult =
-  operations["list-products"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/products/{productId}`. */
-export type GetProductResult =
-  operations["get-product"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/plans/{planId}`. */
-export type GetPlanResult = operations["get-plan"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/prices/{priceId}`. */
-export type GetPriceResult =
-  operations["get-price"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/plans`. */
-export type ListPlansResult =
-  operations["list-plans"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/plans/{planId}/prices`. */
-export type ListPricesByPlanResult =
-  operations["list-prices-by-plan"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/plans/{planId}/prices`. */
-export type ListPricesByPlanQuery = operations["list-prices-by-plan"]["parameters"]["query"];
-
-/** The success response body of `GET /api/v1/rate-cards/{rateCardId}/rules`. */
-export type ListRatesResult =
-  operations["list-rates"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/rate-cards/{rateCardId}/rules`. */
-export type ListRatesQuery = operations["list-rates"]["parameters"]["query"];
-
-/** The success response body of `POST /api/v1/estimates`. */
-export type CreateEstimateResult =
-  operations["create-estimate"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/estimates`. */
-export type CreateEstimateBody = NonNullable<
-  operations["create-estimate"]["requestBody"]
->["content"]["application/json"];
-
 /** The success response body of `GET /account/v1/currencies`. */
 export type ListCurrenciesResult =
   operations["list-currencies"]["responses"][200]["content"]["application/json"];
