@@ -1462,6 +1462,12 @@ export interface components {
        */
       credits: components["schemas"]["Money"];
       /**
+       * @description balance plus credits, the sum shown as the account's funds. Credits count at their recorded remaining
+       *     amount, including restricted grants that only pay for what they allow, so total is an upper bound of what
+       *     the account can pay with rather than a withdrawable amount. due is reported separately and is not subtracted.
+       */
+      total: components["schemas"]["Money"];
+      /**
        * @description Currently valid, unspent credit grouped by permitted use. Restrictions and
        *     validity dates determine which charges a group can cover, so these groups are not a general
        *     spendable balance and may differ from the recorded credits total.
