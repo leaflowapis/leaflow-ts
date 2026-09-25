@@ -6,7 +6,7 @@ import type { paths } from "./schema.js";
 
 const defaultBaseUrl = "https://billing.leaflow.cloud";
 
-/** A client for the billing service. Pass baseUrl to override the address. */
+/** A client for the billingaccount service. Pass baseUrl to override the address. */
 export function client(options: ClientOptions = {}) {
   return createClient<paths>({ baseUrl: defaultBaseUrl, ...options });
 }

@@ -20,7 +20,9 @@ export interface paths {
      *
      *     Disks attached to a running instance, including system disks, can be backed up.
      *
-     *     The duration depends on the amount of data. The backup is not complete when this endpoint returns; poll the retrieve endpoint.
+     *     The duration depends on the amount of data. The backup is not complete when this endpoint returns; track the returned task.
+     *
+     *     Replays return HTTP 201 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["create-backup"];
     delete?: never;
@@ -46,6 +48,8 @@ export interface paths {
     /**
      * Delete a backup
      * @description Independent of the source disk: deletion succeeds whether or not that disk still exists.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["delete-backup"];
     options?: never;
@@ -67,7 +71,9 @@ export interface paths {
      * Restore from a backup
      * @description Restores onto a **newly created** disk. The source disk is unaffected and need not still exist.
      *
-     *     The target disk type may belong to another availability zone of the same region, and its capacity must not be smaller than the backup. The disk cannot be attached until the restore completes; poll the disk retrieve endpoint.
+     *     The target disk type may belong to another availability zone of the same region, and its capacity must not be smaller than the backup. The disk cannot be attached until the restore completes; track the returned task.
+     *
+     *     Replays return HTTP 201 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["restore-backup"];
     delete?: never;
@@ -213,6 +219,8 @@ export interface paths {
      * @description The disk is created in the availability zone of the selected disk type, and an instance must reside in the same zone to attach it. Choosing the disk type therefore determines the zone.
      *
      *     A disk type that has been withdrawn is rejected with `DISK_TYPE_RETIRED`, even though its identifier still resolves. Withdrawn types stop appearing in the disk type listing; disks already bought on one keep working and can still be resized.
+     *
+     *     Replays return HTTP 201 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["create-disk"];
     delete?: never;
@@ -238,6 +246,8 @@ export interface paths {
     /**
      * Delete a disk
      * @description Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["delete-disk"];
     options?: never;
@@ -260,13 +270,15 @@ export interface paths {
     put?: never;
     /**
      * Resize a disk
-     * @description Capacity can only be increased; shrinking is not supported. Extend the file system inside the instance once the resize completes.
+     * @description Capacity can only be increased; shrinking is not supported. The resize is not complete when this endpoint returns; track the returned task, then extend the file system inside the instance.
      *
-     *     **A data disk whose performance grows with its size has to be detached first.** The storage backend decides a volume's limit when the volume is attached and never revisits it, so growing one that is attached would give you the capacity immediately and leave the speed at the old size's figure — indefinitely, and stopping the instance does not help. Rather than take the money for performance that does not arrive, this is refused with `DISK_RESIZE_NEEDS_DETACH`; detach the disk, resize it, and attach it again.
+     *     **An attached data disk whose performance scales with its size must be detached before it is resized.** The performance of an attached disk does not change until the disk is detached and attached again, so such a request is refused with `DISK_RESIZE_NEEDS_DETACH` rather than providing the new capacity at the performance of the previous size. Detach the disk, resize it, and attach it again.
      *
-     *     It is only refused when the two sizes really would differ in speed. A disk whose type has no QoS level, or whose performance has already reached the type's ceiling, grows online as before.
+     *     The request is refused only when the new size has a different performance level. A disk whose type has no QoS level, or whose performance has already reached the maximum of its type, can be resized while attached.
      *
-     *     **A system disk is the exception and grows online**, because a root volume cannot be detached at all. Its performance does not change with size for exactly that reason — system disk types are required to carry a level that does not scale.
+     *     **A system disk can be resized while attached**, because a system disk cannot be detached. System disk types use a performance level that does not scale with size, so resizing a system disk does not change its performance.
+     *
+     *     Replays return HTTP 200 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["resize-disk"];
     delete?: never;
@@ -291,6 +303,8 @@ export interface paths {
      *     Three restrictions apply: only the most recent snapshot of the disk can be reverted to; the disk must be detached from its instance first; and a disk resized since the snapshot was taken cannot be reverted. To return to an earlier point in time, or to keep the existing disk, create a new disk from the snapshot instead.
      *
      *     The revert is not complete when this endpoint returns; poll the retrieve endpoint.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["revert-disk"];
     delete?: never;
@@ -314,6 +328,8 @@ export interface paths {
      * @description If the private network is not yet connected to the internet, connectivity is established as part of this call.
      *
      *     IPv6 is not requested through this endpoint. IPv6 addresses are assigned to instances by the private network; enable IPv6 on that network instead.
+     *
+     *     Replays return HTTP 201 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["allocate-floating-ip"];
     delete?: never;
@@ -336,6 +352,8 @@ export interface paths {
     /**
      * Release a floating IP
      * @description Releases the floating IP after unbinding it. Completion is reported by the returned task.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["release-floating-ip"];
     options?: never;
@@ -353,9 +371,11 @@ export interface paths {
     get?: never;
     /**
      * Set the bandwidth limit
-     * @description Limits both directions at once. Limiting egress alone does not prevent ingress traffic from saturating the uplink.
+     * @description The limit applies to inbound and outbound traffic alike. The new limit is not in effect when this endpoint returns; track the returned task.
      *
-     *     While the address is bound to an instance, the ceiling has to fit that instance type's `max_bandwidth_mbps`; asking for more is refused with `INSTANCE_BANDWIDTH_CEILING`. An address bound to nothing is not checked against any type — there is none to check against — and is checked again when it is attached.
+     *     While the address is bound to an instance, the limit must not exceed the `max_bandwidth_mbps` of that instance's type; a higher limit is refused with `INSTANCE_BANDWIDTH_CEILING`. The limit of an address that is not bound is checked when the address is bound to an instance.
+     *
+     *     Replays return HTTP 200 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     put: operations["set-floating-ip-bandwidth"];
     post?: never;
@@ -401,7 +421,13 @@ export interface paths {
     put?: never;
     /**
      * Create instances
-     * @description Creates a Billing order, including for metered pricing. The price must belong to the resource’s Billing Plan; applicable contract pricing is resolved by Billing. Technical capacity is checked before sellable quota is reserved. Provisioning continues automatically after payment; do not submit a new purchase after paying. Reuse the original idempotency key after an uncertain response. Exactly one of image_id, private_image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order. A request for several instances is all or nothing — if any instance cannot be created, every instance of that request is released and the order fails, so nothing is charged. Each instance is named after this request with a number appended, and each has its own task.
+     * @description Creates a Billing order, including for metered pricing. The price must belong to the resource’s Billing Plan; applicable contract pricing is resolved by Billing. The instances are created after the order's invoice is paid, or without waiting when the order has no immediate invoice. Do not submit a new purchase after paying, and reuse the original idempotency key after an uncertain response.
+     *
+     *     Exactly one of image_id, private_image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
+     *
+     *     A request for several instances is all or nothing: if any instance cannot be created, every instance of that request is released, the order fails, and any payment for it is refunded. Each instance is named after this request with a number appended, and each has its own task.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["launch-instance"];
     delete?: never;
@@ -429,6 +455,8 @@ export interface paths {
      * @description The system disk is deleted with the instance, and **snapshots created from the system disk are deleted with it**. Data disks are detached and kept, and their snapshots and backups are unaffected. The primary network interface is released with the instance.
      *
      *     An instance being captured as a private image cannot be released. Wait for the capture to finish, or delete that image first.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["delete-instance"];
     options?: never;
@@ -612,6 +640,8 @@ export interface paths {
      *     An instance suspended by the platform must be unsuspended first.
      *
      *     This endpoint returns immediately and the `status` it returns is the transient `rebooting`. Poll the instance until it settles at `running`.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["reboot-instance"];
     delete?: never;
@@ -653,7 +683,9 @@ export interface paths {
     put?: never;
     /**
      * Resize an instance
-     * @description Creates a Billing order, including for metered pricing. The price must belong to the resource’s Billing Plan; applicable contract pricing is resolved by Billing. Technical capacity is checked before sellable quota is reserved. Provisioning continues automatically after payment; do not submit a new purchase after paying. Reuse the original idempotency key after an uncertain response.
+     * @description Creates a Billing change order, including for metered pricing. The price must belong to the Billing Plan of the target instance type; applicable contract pricing is resolved by Billing. The resize is applied after the order's invoice is paid, or without waiting when the order has no immediate invoice. Do not submit a new purchase after paying, and reuse the original idempotency key after an uncertain response.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["resize-instance"];
     delete?: never;
@@ -674,6 +706,8 @@ export interface paths {
     /**
      * Confirm a resize
      * @description Releases the resources held by the previous size. `pending_instance_type_id` becomes the type in effect and is billed from then on.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["confirm-instance-resize"];
     delete?: never;
@@ -694,6 +728,8 @@ export interface paths {
     /**
      * Revert a resize
      * @description The instance returns to its previous size, `pending_instance_type_id` is discarded, and billing is unaffected by the resize.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["revert-instance-resize"];
     delete?: never;
@@ -714,6 +750,8 @@ export interface paths {
     /**
      * Start an instance
      * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped instance keeps its disks, network attachments and sellable quota. Inspect operation, task_state, power_state and observed_at to determine completion.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["start-instance"];
     delete?: never;
@@ -734,6 +772,8 @@ export interface paths {
     /**
      * Stop an instance
      * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped instance keeps its disks, network attachments and sellable quota. Inspect operation, task_state, power_state and observed_at to determine completion.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["stop-instance"];
     delete?: never;
@@ -755,6 +795,8 @@ export interface paths {
     /**
      * Attach a disk
      * @description The disk must be in the same region and availability zone as the instance. Partition it and mount the file system inside the instance once it is attached.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["attach-disk"];
     delete?: never;
@@ -776,6 +818,8 @@ export interface paths {
     /**
      * Detach a disk
      * @description Unmount the device inside the instance before calling this endpoint. Forcibly detaching a file system that is being written to corrupts data.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["detach-disk"];
     options?: never;
@@ -833,7 +877,10 @@ export interface paths {
     /** List the network interfaces of an instance */
     get: operations["list-instance-ports"];
     put?: never;
-    /** Attach a network interface */
+    /**
+     * Attach a network interface
+     * @description Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
+     */
     post: operations["attach-port"];
     delete?: never;
     options?: never;
@@ -854,6 +901,8 @@ export interface paths {
     /**
      * Detach a network interface
      * @description The primary network interface cannot be detached; the instance would lose its network address.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["detach-port"];
     options?: never;
@@ -942,7 +991,7 @@ export interface paths {
      *
      *     **The image reflects the moment the capture started. Later changes to the instance are not included.**
      *
-     *     The capture has two phases. Poll the retrieve endpoint:
+     *     The capture has two phases, reported by the status of the image:
      *
      *     - `provisioning` — the system disk is being read, usually for tens of seconds. The instance remains usable during this phase, although stopping it first is recommended for consistency.
      *     - `uploading` — no longer tied to the system disk. **The instance may be started at this point; there is no need to wait for the capture to finish.** The duration of this phase is proportional to the size of the system disk, roughly 3 minutes for 20 GB.
@@ -950,6 +999,8 @@ export interface paths {
      *     The file system of a running instance may be captured mid-write, in which case the image is equivalent to the disk contents after a power loss. Where consistency matters, stop the instance before starting the capture and start it again once the status becomes `uploading`.
      *
      *     The instance can be started, stopped and used normally during the capture, but cannot be released.
+     *
+     *     Replays return HTTP 201 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["create-private-image"];
     delete?: never;
@@ -977,6 +1028,8 @@ export interface paths {
      * @description Deletion is rejected while instances created from the image still exist, as they need it in order to be rebuilt.
      *
      *     An image whose capture has not finished can be deleted; the capture is aborted.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["delete-private-image"];
     options?: never;
@@ -1256,6 +1309,8 @@ export interface paths {
      * @description Disks attached to a running instance can be snapshotted. A snapshot records the state of the block device at a point in time and may be inconsistent at the file-system level, so run `sync` inside the instance first where the data matters.
      *
      *     **A snapshot of a system disk cannot be used to revert that system disk**: reverting requires the disk to be detached, and a system disk cannot be detached. It can be used to create a new data disk. To preserve and restore an entire system, use a private image; for a copy that crosses availability zones and survives deletion of the disk, use a backup.
+     *
+     *     Replays return HTTP 201 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["create-snapshot"];
     delete?: never;
@@ -1275,7 +1330,10 @@ export interface paths {
     get: operations["get-snapshot"];
     put?: never;
     post?: never;
-    /** Delete a snapshot */
+    /**
+     * Delete a snapshot
+     * @description Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
+     */
     delete: operations["delete-snapshot"];
     options?: never;
     head?: never;
@@ -1320,10 +1378,123 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/peerings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List peerings */
+    get: operations["list-peerings"];
+    put?: never;
+    /**
+     * Create peering
+     * @description Request IPv4 peering between non-overlapping VPCs in the same Region. The target project must accept before any connectivity is created. Does not change security groups or provide transitive routing.
+     */
+    post: operations["create-peering"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/peerings/{peeringId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get peering */
+    get: operations["get-peering"];
+    put?: never;
+    post?: never;
+    /** Delete peering */
+    delete: operations["delete-peering"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/peerings/{peeringId}/accept": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Accept peering */
+    post: operations["accept-peering"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/peerings/{peeringId}/reject": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Reject peering */
+    post: operations["reject-peering"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    PeeringResource: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      /** Format: uuid */
+      region_id: string;
+      /** Format: uuid */
+      requester_project_id: string;
+      /** Format: uuid */
+      accepter_project_id: string;
+      /** Format: uuid */
+      requester_network_id: string;
+      /** Format: uuid */
+      accepter_network_id: string;
+      /** @enum {string} */
+      status:
+        | "pending_acceptance"
+        | "provisioning"
+        | "active"
+        | "deleting"
+        | "deleted"
+        | "rejected"
+        | "error";
+      /** Format: date-time */
+      created_at: string;
+      failure_code?: string;
+    };
+    PeeringListResponseBody: {
+      items: components["schemas"]["PeeringResource"][];
+      total: number;
+    };
+    CreatePeeringRequestBody: {
+      name: string;
+      /** Format: uuid */
+      requester_network_id: string;
+      /** Format: uuid */
+      accepter_project_id: string;
+      /** Format: uuid */
+      accepter_network_id: string;
+    };
     Error: {
       code?: string;
       message: string;
@@ -1509,13 +1680,10 @@ export interface components {
        * @description Throughput a disk of `max_size_gb` gets, in bytes per second. Null when this type is not rate-limited
        */
       throughput_at_max_size: number | null;
-      /** Format: uuid */
+      /** @description Billing Product ID. Null when no Product is assigned; otherwise `compute`. */
       product_id: string | null;
       /** Format: uuid */
       plan_id: string | null;
-      name_translations: {
-        [key: string]: string;
-      };
       /** Format: uuid */
       snapshot_plan_id: string | null;
       /** Format: uuid */
@@ -1592,13 +1760,10 @@ export interface components {
       region_id: string;
       /** Format: int64 */
       vcpus: number;
-      /** Format: uuid */
+      /** @description Billing Product ID. Null when no Product is assigned; otherwise `compute`. */
       product_id: string | null;
       /** Format: uuid */
       plan_id: string | null;
-      name_translations: {
-        [key: string]: string;
-      };
     };
     InstanceTypeListResponseBody: {
       items: components["schemas"]["InstanceTypeResource"][];
@@ -1612,7 +1777,7 @@ export interface components {
     RegionResource: {
       /** @description ISO 3166-1 alpha-2 country this region sits in. Two letters, uppercase. */
       country_code: string;
-      /** @description Display name for this place, shown to tenants (Hong Kong). It is the translatable one; the stable handle is code. */
+      /** @description Display name for this place, shown to tenants (Hong Kong). The stable handle is code. */
       name: string;
       /** @description The region's code, the way the outside world names this place (hk-1). Stable and human-written; addressing is by id. */
       code: string;
@@ -1623,7 +1788,7 @@ export interface components {
       items: components["schemas"]["RegionResource"][] | null;
     };
     ZoneResource: {
-      /** @description Display name for this zone, shown to tenants (Hong Kong A). It is the translatable one; the stable handle is code. */
+      /** @description Display name for this zone, shown to tenants (Hong Kong A). The stable handle is code. */
       name: string;
       /** @description The zone's code within its region (hk-1-a). Stable and human-written; addressing is by id. */
       code: string;
@@ -2199,13 +2364,19 @@ export interface components {
       status: "pending" | "active" | "draining";
     };
     RouteResource: {
+      /**
+       * Format: uuid
+       * @description System-owned peering route. Delete the peering to remove this route.
+       */
+      peering_id?: string;
       /** Format: date-time */
       created_at: string;
       description: string;
       destination: string;
       /** Format: uuid */
       id: string;
-      nexthop: string;
+      /** @description Present for custom routes; peering routes expose peering_id instead. */
+      nexthop?: string;
     };
     RouteListResponseBody: {
       items: components["schemas"]["RouteResource"][] | null;
@@ -2364,31 +2535,38 @@ export interface components {
     RenameSnapshotRequestBody: {
       name: string;
     };
-    /** @description Reuse the same key for retries of the same purchase. Reusing it with a different request fails. Billing selects contract pricing, applies eligible grants and promotions, and owns payment challenges and expiry. */
+    /** @description Purchase options. Reuse idempotency_key for retries of the same purchase, including resource creation. Different parameters with the same key return HTTP 409. Replays identify the original purchase and do not create another order. */
     OrderOptions: {
       idempotency_key: string;
-      payment_plan?: components["schemas"]["PaymentPlan"];
+      /**
+       * @description Defaults to true. When true, the purchase is paid from available account funds and applicable grants when it is placed. If they do not cover the amount due, the request fails with HTTP 422 and code BILLING_INSUFFICIENT_FUNDS; no order is created and nothing is charged. The idempotency key remains bound to the refused request. Retrying with the same key returns HTTP 409 with code ORDER_CLOSED, and purchasing again requires a new idempotency key. When false, the order is created without payment, and its invoice, if any, is paid through Billing.
+       * @default true
+       */
+      auto_pay?: boolean;
       expected_amount?: string;
       redemption_code?: string;
     };
-    /**
-     * @description A billable order has been created. Read it from the billing API to find out what is
-     *     owed and whether payment is still required.
-     *
-     *     Only the identifier is returned. Amounts and state are not repeated here; the order
-     *     itself is the single source for them.
-     */
+    /** @description Identifies the original purchase. Replays retain these identifiers. Read the order for purchase progress and its invoice for amounts and payment status. */
     PlacedOrder: {
       /**
        * Format: uuid
-       * @description Identifies the order. Use it to read the order and, where payment is required,
-       *     to pay it.
-       *
-       *     An order is created even when nothing is owed, such as a plan with no charge or one
-       *     covered entirely by granted credit. Such an order is already settled, and no
-       *     payment step applies.
+       * @description The invoice for this purchase. Null when there is no immediate invoice. Replays retain this identifier; read the invoice for its current payment state.
+       */
+      invoice_id: string | null;
+      /**
+       * Format: uuid
+       * @description The original order, including for purchases without an immediate charge. Payment alone does not imply that the service has completed delivery.
        */
       order_id: string;
+    };
+    /** @description Identifies the Compute task and the Billing order of a purchase. Work on the purchase starts after the order's invoice is paid, or without waiting when the order has no immediate invoice. Track the task for completion. */
+    PurchaseResult: {
+      /**
+       * Format: uuid
+       * @description The original Compute task. Replays retain this identifier, including after failure or cancellation.
+       */
+      task_id: string;
+      order: components["schemas"]["PlacedOrder"];
     };
     /** @description A system disk purchased in the same order. Required when booting from an image; mutually exclusive with boot_disk_id. */
     NewBootDisk: {
@@ -2516,8 +2694,15 @@ export interface components {
       total_count: number;
     };
     LaunchInstanceResponseBody: {
+      /** @description Instances created by this operation. Empty before resource creation starts; a replay may include identifiers produced since the first response. Historical identifiers do not imply that the instances still exist. */
+      instance_ids: string[];
+      /**
+       * Format: uuid
+       * @description The original Compute task. Replays retain this identifier, including after failure or cancellation.
+       */
+      task_id: string;
       order: components["schemas"]["PlacedOrder"];
-      /** @description Generated login password. Null when no password was generated. Keep it before leaving this response. */
+      /** @description Generated login password, returned only by the initial response. Null on replay or when no password was generated. A retry never generates or resets a password. */
       password: string | null;
     };
     IPv4PoolResource: {
@@ -2557,11 +2742,6 @@ export interface components {
       unbound_at: string | null;
       /** Format: date-time */
       released_at: string | null;
-    };
-    /** @description Requested funding split. This does not select a card or payment provider; complete payment through Billing. */
-    PaymentPlan: {
-      balance_amount: string;
-      provider_amount: string;
     };
   };
   responses: never;
@@ -2623,7 +2803,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PlacedOrder"];
+          "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -2689,6 +2878,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -2758,7 +2956,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PlacedOrder"];
+          "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -3012,29 +3219,11 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PlacedOrder"];
+          "application/json": components["schemas"]["PurchaseResult"];
         };
       };
-      /**
-       * @description Payment required: **nothing was created.**
-       *
-       *     Returned when `payment_method` is `online`. `meta.checkout_url` is where to send the
-       *     customer; `meta.order_id` is the order waiting on it.
-       *
-       *     ## Why this is a status and not a field on a 200
-       *
-       *     A field on a success response is something a client can forget to read, and forgetting it
-       *     means treating "we created nothing and are waiting for money" as "created" — which looks
-       *     identical from the outside until the bill does not add up. A 402 fails loudly in any
-       *     client that handles errors at all.
-       *
-       *     ## What happens after they pay
-       *
-       *     The money lands in the balance and the order is settled from it. The resource is **not**
-       *     created automatically: placing it again is the customer's move, because between paying
-       *     and coming back they may have changed their mind. The balance is theirs either way.
-       */
-      402: {
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
         headers: {
           [name: string]: unknown;
         };
@@ -3107,6 +3296,15 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Error */
       default: {
         headers: {
@@ -3174,7 +3372,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PlacedOrder"];
+          "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -3213,6 +3420,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -3274,7 +3490,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PlacedOrder"];
+          "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -3342,6 +3567,15 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Error */
       default: {
         headers: {
@@ -3374,7 +3608,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PlacedOrder"];
+          "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -3510,6 +3753,15 @@ export interface operations {
           "application/json": components["schemas"]["LaunchInstanceResponseBody"];
         };
       };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Error */
       default: {
         headers: {
@@ -3573,6 +3825,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -3853,6 +4114,15 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Error */
       default: {
         headers: {
@@ -3920,7 +4190,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PlacedOrder"];
+          "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -3957,6 +4236,15 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Error */
       default: {
         headers: {
@@ -3989,6 +4277,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -4029,6 +4326,15 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Error */
       default: {
         headers: {
@@ -4065,6 +4371,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -4139,6 +4454,15 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Error */
       default: {
         headers: {
@@ -4172,6 +4496,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -4313,6 +4646,15 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
       /** @description Error */
       default: {
         headers: {
@@ -4346,6 +4688,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -4537,7 +4888,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PlacedOrder"];
+          "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -4603,6 +4963,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -5435,7 +5804,16 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PlacedOrder"];
+          "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -5501,6 +5879,15 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The idempotency key was already used with different parameters in this scope. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       /** @description Error */
@@ -5600,6 +5987,195 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["IPv4PoolListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-peerings": {
+    parameters: {
+      query?: {
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PeeringListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-peering": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreatePeeringRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Success */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PeeringResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-peering": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        peeringId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PeeringResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-peering": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        peeringId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PeeringResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "accept-peering": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        peeringId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PeeringResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "reject-peering": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        peeringId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PeeringResource"];
         };
       };
       /** @description Error */

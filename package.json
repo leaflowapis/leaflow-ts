@@ -27,6 +27,10 @@
       "types": "./dist/billing/v1/index.d.ts",
       "default": "./dist/billing/v1/index.js"
     },
+    "./billingaccount/v1": {
+      "types": "./dist/billingaccount/v1/index.d.ts",
+      "default": "./dist/billingaccount/v1/index.js"
+    },
     "./canopy/v1": {
       "types": "./dist/canopy/v1/index.d.ts",
       "default": "./dist/canopy/v1/index.js"
