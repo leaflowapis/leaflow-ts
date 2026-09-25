@@ -58,6 +58,10 @@ export type CreateEstimateBody = NonNullable<
   operations["create-estimate"]["requestBody"]
 >["content"]["application/json"];
 
+/** The success response body of `GET /account/v1/currencies`. */
+export type ListCurrenciesResult =
+  operations["list-currencies"]["responses"][200]["content"]["application/json"];
+
 /** The success response body of `GET /account/v1/billing-accounts`. */
 export type ListBillingAccountsResult =
   operations["list-billing-accounts"]["responses"][200]["content"]["application/json"];
