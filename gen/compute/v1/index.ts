@@ -25,6 +25,15 @@ export type CreateBackupBody = NonNullable<
   operations["create-backup"]["requestBody"]
 >["content"]["application/json"];
 
+/** The success response body of `POST /api/v1/backups/quote`. */
+export type CreateBackupQuoteResult =
+  operations["create-backup-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/backups/quote`. */
+export type CreateBackupQuoteBody = NonNullable<
+  operations["create-backup-quote"]["requestBody"]
+>["content"]["application/json"];
+
 /** The success response body of `GET /api/v1/backups/{backupId}`. */
 export type GetBackupResult =
   operations["get-backup"]["responses"][200]["content"]["application/json"];
@@ -68,6 +77,41 @@ export type ListImagesResult =
 
 /** The query parameters of `GET /api/v1/images`. */
 export type ListImagesQuery = operations["list-images"]["parameters"]["query"];
+
+/** The success response body of `POST /api/v1/images`. */
+export type CreateImageResult =
+  operations["create-image"]["responses"][201]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/images`. */
+export type CreateImageBody = NonNullable<
+  operations["create-image"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/images/quote`. */
+export type CreateImageQuoteResult =
+  operations["create-image-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/images/quote`. */
+export type CreateImageQuoteBody = NonNullable<
+  operations["create-image-quote"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `GET /api/v1/images/{imageId}`. */
+export type GetImageResult =
+  operations["get-image"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `PATCH /api/v1/images/{imageId}`. */
+export type RenameImageResult =
+  operations["rename-image"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `PATCH /api/v1/images/{imageId}`. */
+export type RenameImageBody = NonNullable<
+  operations["rename-image"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `DELETE /api/v1/images/{imageId}`. */
+export type DeleteImageResult =
+  operations["delete-image"]["responses"][202]["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/instance-types`. */
 export type ListInstanceTypesResult =
@@ -375,39 +419,6 @@ export type CreatePortResult =
 export type CreatePortBody = NonNullable<
   operations["create-port"]["requestBody"]
 >["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/private-images`. */
-export type ListPrivateImagesResult =
-  operations["list-private-images"]["responses"][200]["content"]["application/json"];
-
-/** The query parameters of `GET /api/v1/private-images`. */
-export type ListPrivateImagesQuery = operations["list-private-images"]["parameters"]["query"];
-
-/** The success response body of `POST /api/v1/private-images`. */
-export type CreatePrivateImageResult =
-  operations["create-private-image"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/private-images`. */
-export type CreatePrivateImageBody = NonNullable<
-  operations["create-private-image"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/private-images/{privateImageId}`. */
-export type GetPrivateImageResult =
-  operations["get-private-image"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `PATCH /api/v1/private-images/{privateImageId}`. */
-export type RenamePrivateImageResult =
-  operations["rename-private-image"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `PATCH /api/v1/private-images/{privateImageId}`. */
-export type RenamePrivateImageBody = NonNullable<
-  operations["rename-private-image"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `DELETE /api/v1/private-images/{privateImageId}`. */
-export type DeletePrivateImageResult =
-  operations["delete-private-image"]["responses"][202]["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/private-networks`. */
 export type ListPrivateNetworksResult =

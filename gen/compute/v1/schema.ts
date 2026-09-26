@@ -21,8 +21,34 @@ export interface paths {
      *     Disks attached to a running instance, including system disks, can be backed up.
      *
      *     The duration depends on the amount of data. The backup is not complete when this endpoint returns; track the returned task.
+     *
+     *     The backup is billed for its size, at the backup price of its region. Obtain a price with `create-backup-quote` first.
      */
     post: operations["create-backup"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/backups/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote a backup
+     * @description Prices the backup `create-backup` would order for the same disk, without ordering anything. Nothing is reserved and nothing is recorded, so this may be called as often as required.
+     *
+     *     The quantity priced is the size of the disk. When `price_id` is omitted, a price of the region's backup offering is selected; the returned line names it, and that `price_id` is the one to order with.
+     *
+     *     Prices may change between quoting and ordering. An order is charged at the price in effect when it is placed, so a quote should be refreshed before a final confirmation is shown.
+     */
+    post: operations["create-backup-quote"];
     delete?: never;
     options?: never;
     head?: never;
@@ -126,18 +152,97 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List images on sale
-     * @description An image whose `min_ram_mb` exceeds the memory of the selected instance type cannot boot. Filter the options accordingly.
+     * List images
+     * @description Lists the public images on sale together with the private images of this project. `visibility` narrows the list to one of the two.
      *
-     *     Only images currently on sale are listed. An image the platform withdraws disappears from here and can no longer install new instances, while the instances already running it keep running and can still be rebuilt onto it.
+     *     A public image is offered to every project. Only public images currently on sale are listed: one the platform withdraws disappears from here and can no longer install new instances, while the instances already running it keep running and can still be rebuilt onto it.
+     *
+     *     A private image belongs to this project, which captured it from one of its instances, and is listed in every status, including while its capture is in progress and after the capture failed.
+     *
+     *     An image can only be used in the region that holds it. An image whose `min_ram_mb` exceeds the memory of the selected instance type cannot boot; filter the options accordingly.
      */
     get: operations["list-images"];
     put?: never;
-    post?: never;
+    /**
+     * Capture an instance as a private image
+     * @description Creates a private image of this project from the system disk of the instance; data disks are not included. The resulting image can create instances and rebuild them, and remains usable after the source instance is released.
+     *
+     *     **The image reflects the moment the capture started. Later changes to the instance are not included.**
+     *
+     *     The capture has two phases, reported by the status of the image:
+     *
+     *     - `provisioning` — the system disk is being read, usually for tens of seconds. The instance remains usable during this phase, although stopping it first is recommended for consistency.
+     *     - `uploading` — no longer tied to the system disk. **The instance may be started at this point; there is no need to wait for the capture to finish.** The duration of this phase is proportional to the size of the system disk, roughly 3 minutes for 20 GB.
+     *
+     *     The file system of a running instance may be captured mid-write, in which case the image is equivalent to the disk contents after a power loss. Where consistency matters, stop the instance before starting the capture and start it again once the status becomes `uploading`.
+     *
+     *     The instance can be started, stopped and used normally during the capture, but cannot be released.
+     *
+     *     The image is billed for the storage it occupies, at the private image price of its region. Obtain a price with `create-image-quote` first.
+     */
+    post: operations["create-image"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
+    trace?: never;
+  };
+  "/api/v1/images/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote capturing an instance as a private image
+     * @description Prices the capture `create-image` would order for the same instance, without ordering anything. Nothing is reserved and nothing is recorded, so this may be called as often as required.
+     *
+     *     The quantity priced is the size of the system disk, which is the most the image can occupy. When `price_id` is omitted, a price of the region's private image offering is selected; the returned line names it, and that `price_id` is the one to order with.
+     *
+     *     Prices may change between quoting and ordering. An order is charged at the price in effect when it is placed, so a quote should be refreshed before a final confirmation is shown.
+     */
+    post: operations["create-image-quote"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/images/{imageId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Retrieve an image
+     * @description Returns a public image, or a private image of this project; any other image is reported as not found. Use this endpoint to poll capture progress. When `status` is `error`, `failure` states the reason.
+     */
+    get: operations["get-image"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a private image
+     * @description Only a private image of this project can be deleted; any other image is reported as not found.
+     *
+     *     Deletion is rejected while instances created from the image still exist, as they need it in order to be rebuilt.
+     *
+     *     An image whose capture has not finished can be deleted; the capture is aborted.
+     *
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the image, including a pay-as-you-go subscription. `meta.resource_id` names the image. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+     */
+    delete: operations["delete-image"];
+    options?: never;
+    head?: never;
+    /**
+     * Rename a private image
+     * @description Only a private image of this project can be renamed; any other image is reported as not found.
+     */
+    patch: operations["rename-image"];
     trace?: never;
   };
   "/api/v1/instance-types": {
@@ -411,7 +516,7 @@ export interface paths {
      * Create instances
      * @description Creates a Billing order, including for metered pricing. The price must belong to the resource’s Billing Plan; applicable contract pricing is resolved by Billing. The instances are created after the order's invoice is paid, or without waiting when the order has no immediate invoice. Do not submit a new purchase after paying. After an uncertain response, look the order up before submitting again.
      *
-     *     Exactly one of image_id, private_image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
+     *     Exactly one of image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
      *
      *     A request for several instances is all or nothing: if any instance cannot be created, every instance of that request is released, the order fails, and any payment for it is refunded. Each instance is named after this request with a number appended, and each has its own task.
      *
@@ -904,67 +1009,6 @@ export interface paths {
     options?: never;
     head?: never;
     patch?: never;
-    trace?: never;
-  };
-  "/api/v1/private-images": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List private images */
-    get: operations["list-private-images"];
-    put?: never;
-    /**
-     * Capture an instance as a private image
-     * @description Captured from the system disk of the instance; data disks are not included. The resulting image can create instances and rebuild them, and remains usable after the source instance is released.
-     *
-     *     **The image reflects the moment the capture started. Later changes to the instance are not included.**
-     *
-     *     The capture has two phases, reported by the status of the image:
-     *
-     *     - `provisioning` — the system disk is being read, usually for tens of seconds. The instance remains usable during this phase, although stopping it first is recommended for consistency.
-     *     - `uploading` — no longer tied to the system disk. **The instance may be started at this point; there is no need to wait for the capture to finish.** The duration of this phase is proportional to the size of the system disk, roughly 3 minutes for 20 GB.
-     *
-     *     The file system of a running instance may be captured mid-write, in which case the image is equivalent to the disk contents after a power loss. Where consistency matters, stop the instance before starting the capture and start it again once the status becomes `uploading`.
-     *
-     *     The instance can be started, stopped and used normally during the capture, but cannot be released.
-     */
-    post: operations["create-private-image"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/private-images/{privateImageId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Retrieve a private image
-     * @description Use this endpoint to poll capture progress. When `status` is `error`, `failure` states the reason.
-     */
-    get: operations["get-private-image"];
-    put?: never;
-    post?: never;
-    /**
-     * Delete a private image
-     * @description Deletion is rejected while instances created from the image still exist, as they need it in order to be rebuilt.
-     *
-     *     An image whose capture has not finished can be deleted; the capture is aborted.
-     *
-     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the image, including a pay-as-you-go subscription. `meta.resource_id` names the image. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
-     */
-    delete: operations["delete-private-image"];
-    options?: never;
-    head?: never;
-    /** Rename a private image */
-    patch: operations["rename-private-image"];
     trace?: never;
   };
   "/api/v1/private-networks": {
@@ -1489,6 +1533,19 @@ export interface components {
       price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
+    /** @description The fields of `CreateBackupRequestBody` that decide the price */
+    CreateBackupQuoteRequestBody: {
+      /**
+       * Format: uuid
+       * @description The disk that would be backed up
+       */
+      disk_id: string;
+      /**
+       * Format: uuid
+       * @description A price of the region's backup offering. One is selected when omitted
+       */
+      price_id?: string;
+    };
     RenameBackupRequestBody: {
       name: string;
     };
@@ -1623,31 +1680,76 @@ export interface components {
       plan_id: string | null;
       /** Format: uuid */
       snapshot_plan_id: string | null;
-      /** Format: uuid */
-      backup_plan_id: string | null;
-      /** Format: uuid */
-      private_image_plan_id: string | null;
     };
     DiskTypeListResponseBody: {
       items: components["schemas"]["DiskTypeResource"][] | null;
     };
+    /**
+     * @description Who can see and use an image. `public` — offered to every project by the platform. `private` — usable only by the project that owns it.
+     * @enum {string}
+     */
+    ImageVisibility: "public" | "private";
+    /** @description An image that installs the system of an instance. Fields that describe a capture or its billing apply only to private images and are null, zero or empty for public ones. */
     ImageResource: {
-      architecture: string;
       /** Format: uuid */
       id: string;
-      /** @description The account this image lets you log in as. The password set at creation belongs to this account */
-      login_username: string;
-      /** Format: int64 */
-      min_disk_gb: number;
-      /** Format: int64 */
-      min_ram_mb: number;
+      /** Format: uuid */
+      region_id: string;
+      visibility: components["schemas"]["ImageVisibility"];
       name: string;
       os_family: string;
       os_version: string;
-      /** Format: uuid */
-      region_id: string;
+      architecture: string;
+      /** @description The account this image lets you log in as. The password set at creation belongs to this account */
+      login_username: string;
+      /**
+       * Format: int64
+       * @description The system disk of an instance created from this image cannot be smaller than this
+       */
+      min_disk_gb: number;
+      /**
+       * Format: int64
+       * @description The instance type of an instance created from this image must have at least this much memory
+       */
+      min_ram_mb: number;
       /** @description False means a new password can only be set by rebuilding an instance created from this image */
       supports_password_reset: boolean;
+      /**
+       * @description Only `available` images can install instances. A public image is always `available`; a private image goes through `provisioning` and `uploading` while it is captured.
+       * @enum {string}
+       */
+      status: "provisioning" | "uploading" | "available" | "deleting" | "error";
+      /** @description Reason the capture failed; non-empty only when `status` is `error` */
+      failure: string | null;
+      /**
+       * Format: int64
+       * @description Storage occupied by a private image, which is what it is billed for; 0 until its capture completes, and 0 for public images
+       */
+      size_bytes: number;
+      /**
+       * Format: uuid
+       * @description The instance a private image was captured from. The image remains usable after that instance is released. Null for public images
+       */
+      source_instance_id: string | null;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: uuid */
+      order_id: string | null;
+      /** Format: uuid */
+      price_id: string | null;
+      /** Format: uuid */
+      subscription_item_id: string | null;
+      /** @description The subscriptions a cancellation through Billing has to cover to release this private image: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for it, and for public images. */
+      release_subscription_ids: string[];
+      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+      release_set: components["schemas"]["ReleaseSetItem"][];
+      /** @enum {string|null} */
+      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      task: components["schemas"]["Task"] | null;
+      /** Format: int64 */
+      generation: number;
+      /** Format: date-time */
+      observed_at: string | null;
     };
     ImageListResponseBody: {
       items: components["schemas"]["ImageResource"][];
@@ -1868,7 +1970,7 @@ export interface components {
       id: string;
       /**
        * Format: uuid
-       * @description Non-empty when the instance was created from a platform image
+       * @description Non-empty when the instance was created from an image, public or private
        */
       image_id: string | null;
       /**
@@ -1887,11 +1989,6 @@ export interface components {
       name: string;
       /** @description A free-text note about this instance. Empty when never set */
       notes: string;
-      /**
-       * Format: uuid
-       * @description Non-empty when the instance was created from a private image
-       */
-      private_image_id: string | null;
       /** @description Private address of the instance */
       private_ip: string | null;
       /** Format: uuid */
@@ -1985,12 +2082,12 @@ export interface components {
       generate_password?: boolean;
       /**
        * Format: uuid
-       * @description Boot a disk you already have instead of installing an image. The disk must be available, unattached, and in the same availability zone as the instance type. Exactly one of this, `image_id` and `private_image_id`
+       * @description Boot a disk you already have instead of installing an image. The disk must be available, unattached, and in the same availability zone as the instance type. Exactly one of this and `image_id`
        */
       boot_disk_id?: string;
       /**
        * Format: uuid
-       * @description A platform image, and it must be one currently on sale. Exactly one of this, `private_image_id` and `boot_disk_id`
+       * @description A public image currently on sale, or an available private image of this project. Exactly one of this and `boot_disk_id`
        */
       image_id?: string;
       /**
@@ -2008,11 +2105,6 @@ export interface components {
        * @description Use an existing network interface, which may already have a floating IP bound. Exactly one of this and `subnet_id`; only one instance can be created when it is used
        */
       port_id?: string;
-      /**
-       * Format: uuid
-       * @description A private image. Exactly one of this, `image_id` and `boot_disk_id`
-       */
-      private_image_id?: string;
       /** @description Required when a primary network interface is created, at least one; the default security group is not applied automatically. Ignored together with `port_id`, as the security groups of that interface were fixed when it was created */
       security_group_ids?: string[] | null;
       /**
@@ -2087,15 +2179,10 @@ export interface components {
       generate_password?: boolean;
       /**
        * Format: uuid
-       * @description A platform image, which must be on sale unless it is the one this instance already runs. Exactly one of this and `private_image_id`
+       * @description A public image, which must be on sale unless it is the one this instance already runs, or an available private image of this project
        */
-      image_id?: string;
+      image_id: string;
       password?: string;
-      /**
-       * Format: uuid
-       * @description A private image. Exactly one of this and `image_id`
-       */
-      private_image_id?: string;
     };
     RebuildInstanceResponseBody: {
       instance: components["schemas"]["InstanceResource"];
@@ -2193,73 +2280,7 @@ export interface components {
       /** @description The private address to assign. Allocated automatically when omitted */
       address?: string;
     };
-    PrivateImageResource: {
-      architecture: string;
-      /** Format: date-time */
-      created_at: string;
-      /** @description Reason the capture failed; non-empty only when `status` is `error` */
-      failure: string | null;
-      /** Format: uuid */
-      id: string;
-      /** @description The account this image lets you log in as. The password set at creation belongs to this account */
-      login_username: string;
-      /**
-       * Format: int64
-       * @description The system disk of an instance created from this image cannot be smaller than this
-       */
-      min_disk_gb: number;
-      /**
-       * Format: int64
-       * @description The instance type of an instance created from this image must have at least this much memory
-       */
-      min_ram_mb: number;
-      name: string;
-      os_family: string;
-      os_version: string;
-      /** Format: uuid */
-      region_id: string;
-      /**
-       * Format: int64
-       * @description Storage occupied by the image; 0 until the capture completes
-       */
-      size_bytes: number;
-      /**
-       * Format: uuid
-       * @description The instance this image was captured from. The image remains usable after that instance is released
-       */
-      source_instance_id: string | null;
-      /** @enum {string} */
-      status: "provisioning" | "uploading" | "available" | "deleting" | "error";
-      /** @description False means a new password can only be set by rebuilding an instance created from this image */
-      supports_password_reset: boolean;
-      /** Format: uuid */
-      order_id: string | null;
-      /** Format: uuid */
-      price_id: string | null;
-      /** Format: uuid */
-      subscription_item_id: string | null;
-      /** @description The subscriptions a cancellation through Billing has to cover to release this private image: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
-      release_subscription_ids: string[];
-      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
-      release_set: components["schemas"]["ReleaseSetItem"][];
-      /** @enum {string|null} */
-      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task: components["schemas"]["Task"] | null;
-      /** Format: int64 */
-      generation: number;
-      /** Format: date-time */
-      observed_at: string | null;
-    };
-    PrivateImageListResponseBody: {
-      items: components["schemas"]["PrivateImageResource"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
-    };
-    CreatePrivateImageRequestBody: {
+    CreateImageRequestBody: {
       /**
        * Format: uuid
        * @description Captured from the system disk of this instance; data disks are not included
@@ -2270,7 +2291,20 @@ export interface components {
       price_id: string;
       order: components["schemas"]["OrderOptions"];
     };
-    RenamePrivateImageRequestBody: {
+    /** @description The fields of `CreateImageRequestBody` that decide the price */
+    CreateImageQuoteRequestBody: {
+      /**
+       * Format: uuid
+       * @description The instance whose system disk would be captured
+       */
+      instance_id: string;
+      /**
+       * Format: uuid
+       * @description A price of the region's private image offering. One is selected when omitted
+       */
+      price_id?: string;
+    };
+    RenameImageRequestBody: {
       name: string;
     };
     PrivateNetworkResource: {
@@ -2513,6 +2547,14 @@ export interface components {
        */
       order_id: string;
     };
+    /** @description What a purchase would be charged, priced as a service would order it, without ordering anything. Nothing is reserved and nothing is recorded. */
+    PurchaseQuote: {
+      /** @description One line for each item the purchase would order, in the order it would order them. */
+      lines: components["schemas"]["PurchaseQuoteLine"][];
+      /** @description What would be owed for the whole purchase. Null when any line could not be priced: what would be owed is not knowable then. */
+      total: components["schemas"]["Money"] | null;
+      currency: string;
+    };
     /** @description Identifies the Compute task and the Billing order of a purchase. Work on the purchase starts after the order's invoice is paid, or without waiting when the order has no immediate invoice. Track the task for completion. */
     PurchaseResult: {
       /**
@@ -2709,11 +2751,47 @@ export interface components {
     /** @description A resource a release set releases. */
     ReleaseResource: {
       /** @enum {string} */
-      type: "instance" | "disk" | "snapshot" | "backup" | "private_image" | "floating_ip";
+      type: "instance" | "disk" | "snapshot" | "backup" | "image" | "floating_ip";
       /** Format: uuid */
       id: string;
       /** @description The resource's name. A floating IP is named by its address. */
       name: string;
+    };
+    /**
+     * @description A decimal string, in the currency stated alongside it.
+     *
+     *     **The currency is not part of this type.** It is carried by a `currency` field next to the
+     *     amount, or by the account the amount belongs to. Reading an amount without that field is
+     *     reading a number with no unit.
+     *
+     *     It is a string rather than a JSON number because a JSON number is a float in most parsers,
+     *     and a float loses precision on the first arithmetic. Nothing on this platform puts an amount
+     *     through a float.
+     * @example 10.2500000000
+     */
+    Money: string;
+    PurchaseQuoteLine: {
+      /** @description Whether a price was found for this line. When false, `price_id`, `unit_amount` and `amount` are null and `unpriced_reason` states what is missing. */
+      priced: boolean;
+      /**
+       * @description Why no price was found; `none` while `priced` is true.
+       * @enum {string}
+       */
+      unpriced_reason:
+        "none" | "no_price" | "no_rate_card" | "no_meter" | "no_dimensions" | "no_effective_rule";
+      /**
+       * Format: uuid
+       * @description The price selected, including when the request left the choice to the service. Order with this price.
+       */
+      price_id: string | null;
+      plan_name: string;
+      unit_amount: components["schemas"]["Money"] | null;
+      /** @description The quantity priced. */
+      quantity: string;
+      /** @description Not rounded. Round only for display. */
+      amount: components["schemas"]["Money"] | null;
+      tax_amount: components["schemas"]["Money"] | null;
+      currency: string;
     };
   };
   responses: never;
@@ -2776,6 +2854,39 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-backup-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBackupQuoteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PurchaseQuote"];
         };
       };
       /** @description Error */
@@ -2996,8 +3107,11 @@ export interface operations {
   };
   "list-images": {
     parameters: {
-      query: {
-        region_id: string;
+      query?: {
+        /** @description Return only the images of this region */
+        region_id?: string;
+        /** @description Return only public or only private images. Both are returned when omitted */
+        visibility?: components["schemas"]["ImageVisibility"];
         page?: number;
         page_size?: number;
       };
@@ -3014,6 +3128,178 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["ImageListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-image": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateImageRequestBody"];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PurchaseResult"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-image-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateImageQuoteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PurchaseQuote"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-image": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        imageId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ImageResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "delete-image": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        imageId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The action was accepted. Wait for the returned task to finish. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Task"];
+        };
+      };
+      /** @description The deletion was refused. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "rename-image": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        imageId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenameImageRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ImageResource"];
         };
       };
       /** @description Error */
@@ -4531,179 +4817,6 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "list-private-images": {
-    parameters: {
-      query?: {
-        /** @description Return only the images of this region. An image can only be used in the region that holds it */
-        region_id?: string;
-        page?: number;
-        page_size?: number;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrivateImageListResponseBody"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-private-image": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreatePrivateImageRequestBody"];
-      };
-    };
-    responses: {
-      /** @description Created */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PurchaseResult"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-private-image": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateImageId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrivateImageResource"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "delete-private-image": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateImageId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Task"];
-        };
-      };
-      /** @description The deletion was refused. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "rename-private-image": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        privateImageId: string;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RenamePrivateImageRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrivateImageResource"];
-        };
       };
       /** @description Error */
       default: {
