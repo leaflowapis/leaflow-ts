@@ -94,6 +94,30 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/account/v1/billing-accounts/{accountId}/metered-usage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        accountId: components["parameters"]["AccountId"];
+      };
+      cookie?: never;
+    };
+    /**
+     * Get account metered usage
+     * @description Whether the account has anything billed by usage, and what that usage has cost over the last
+     *     seven days. Usage is paid from the balance, so this tells how much of the balance it is likely
+     *     to need: the balance divided by `average_daily_amount` is roughly how many days it lasts.
+     */
+    get: operations["get-account-metered-usage"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/account/v1/billing-accounts/{accountId}/payment-options": {
     parameters: {
       query?: never;
@@ -381,6 +405,34 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/account/v1/invoices/{invoiceId}/payment-preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
+    };
+    /**
+     * Preview invoice payment
+     * @description What paying this invoice now would take from credit grants, from the balance and, for the rest,
+     *     from a payment gateway. It is computed as paying computes it, so paying with the same options
+     *     straight afterwards takes exactly these amounts unless the account's funds change in between.
+     *     Nothing is charged, reserved or created.
+     *
+     *     Refused with the same errors as paying, except that insufficient funds are not an error here:
+     *     they show as a `gateway_amount` above zero.
+     */
+    get: operations["preview-invoice-payment"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/account/v1/payments": {
     parameters: {
       query?: never;
@@ -403,6 +455,32 @@ export interface paths {
      *     deadline has passed with `BILLING_ORDER_EXPIRED`.
      */
     post: operations["pay-together"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/payments/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Preview paying together
+     * @description What paying these invoices together now would take from credit grants and from the balance,
+     *     invoice by invoice in the order they would be paid. It is computed as paying together computes
+     *     it. Nothing is charged, reserved or created.
+     *
+     *     Refused with the same errors as paying together, except that insufficient funds are not an
+     *     error here: they show as a `gateway_amount` above zero, and paying together would then be
+     *     refused with `BILLING_INSUFFICIENT_FUNDS`.
+     */
+    post: operations["preview-pay-together"];
     delete?: never;
     options?: never;
     head?: never;
@@ -727,6 +805,35 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/account/v1/subscriptions/{subscriptionId}/renewal-orders": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        subscriptionId: components["parameters"]["SubscriptionId"];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create renewal order
+     * @description Places a renewal order and issues its invoice without charging anything; pay the invoice to
+     *     renew. The periods and price are chosen as for renewing. The order can be paid until the
+     *     current paid period ends, and never after the end of the first period it renews; unpaid by
+     *     then, it is canceled. While auto-renew is on, the renewal due at the end of the period pays
+     *     this order instead of placing another.
+     *
+     *     Save `order_id` before submitting and read the order after an unknown outcome; creating it a
+     *     second time conflicts.
+     */
+    post: operations["create-renewal-order"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/account/v1/subscriptions/{subscriptionId}/auto-renew": {
     parameters: {
       query?: never;
@@ -829,6 +936,38 @@ export interface paths {
     get: operations["get-order"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/account/v1/orders/{orderId}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Cancel order
+     * @description Withdraws an order that is not paid in full, and tells the service that placed it, so that
+     *     nothing is delivered. An order with nothing paid becomes `canceled` and its invoice is voided.
+     *     What was already paid toward it, from credit grants or the balance, is returned the way it was
+     *     paid, and the order becomes `failed`. Either way `cancel_reason` is `requested_by_customer`.
+     *     Canceling an order that is already canceled or failed returns it unchanged.
+     *
+     *     Refused with 409 and `BILLING_PAID_ORDER_NOT_CANCELABLE` once the invoice is paid in full,
+     *     `BILLING_ORDER_ALREADY_ACCEPTED` once the order has been accepted,
+     *     `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online payment for it is in progress, and
+     *     `BILLING_SCHEDULED_CHANGE_NOT_CANCELABLE` for a change that takes effect at the end of the
+     *     period, which only the service that placed it can call off.
+     */
+    post: operations["cancel-order"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1124,6 +1263,32 @@ export interface components {
        */
       due: components["schemas"]["Money"];
     };
+    MeteredUsage: {
+      /** Format: int64 */
+      billing_account_id: number;
+      currency: string;
+      /** @description Resources still metered in the projects the account currently pays for. */
+      active_resource_count: number;
+      /** @description Subscriptions billed by usage that the account currently pays for and that have not ended. */
+      postpaid_subscription_count: number;
+      /**
+       * Format: date-time
+       * @description The start of the seven days the amounts cover.
+       */
+      window_start: string;
+      /**
+       * Format: date-time
+       * @description The end of those seven days, the time usage was last priced.
+       */
+      window_end: string;
+      /** @description Usage priced in the window, before tax and before credit grants. Usage not yet priced is not included. */
+      amount: components["schemas"]["Money"];
+      /**
+       * @description `amount` per day. Over the window, or over the part of it since the account's usage began
+       *     when that is shorter, counting at least one day.
+       */
+      average_daily_amount: components["schemas"]["Money"];
+    };
     CreditGroup: {
       /** @description What the credit in this group may pay for. No restrictions means anything on the account. */
       applies_to: components["schemas"]["Applicability"];
@@ -1391,6 +1556,40 @@ export interface components {
      * @enum {string}
      */
     PaymentStatus: "succeeded" | "processing" | "requires_action" | "failed";
+    /** @description A credit grant and what it would pay. */
+    AppliedCredit: {
+      /** Format: uuid */
+      credit_grant_id: string;
+      name: string;
+      amount: components["schemas"]["Money"];
+    };
+    PaymentPreviewInvoice: {
+      /** Format: uuid */
+      invoice_id: string;
+      /** Format: uuid */
+      order_id?: string | null;
+      amount_due: components["schemas"]["Money"];
+      credit_applied: components["schemas"]["Money"];
+      balance_applied: components["schemas"]["Money"];
+    };
+    /** @description What paying would take, computed as paying computes it. Nothing is charged or reserved. */
+    PaymentPreview: {
+      currency: string;
+      /** @description What is outstanding before paying. */
+      amount_due: components["schemas"]["Money"];
+      /** @description What credit grants would pay. Grants restricted to other purchases pay nothing here. */
+      credit_applied: components["schemas"]["Money"];
+      /** @description The credit grants that would pay, in the order they would be used. */
+      credit_grants: components["schemas"]["AppliedCredit"][];
+      /** @description What the balance would pay. */
+      balance_applied: components["schemas"]["Money"];
+      /** @description What would remain to be paid online. Paying without a gateway is refused with `BILLING_INSUFFICIENT_FUNDS` while this is above zero. */
+      gateway_amount: components["schemas"]["Money"];
+      /** @description The available balance after paying. */
+      balance_after: components["schemas"]["Money"];
+      /** @description Paying together only. Each invoice, in the order it would be paid. */
+      invoices?: components["schemas"]["PaymentPreviewInvoice"][];
+    };
     PaymentResult: {
       transactions: components["schemas"]["Transaction"][];
       /**
@@ -1868,9 +2067,37 @@ export interface components {
       interval?: "day" | "month" | "year";
       /** Format: uuid */
       payment_method_id?: string;
-      /** @default true */
+      /**
+       * @description Whether to pay from the balance, with or without `payment_method_id`.
+       * @default true
+       */
       use_balance?: boolean;
+      /**
+       * @description Whether to pay from eligible credit grants before the balance.
+       * @default true
+       */
+      use_credits?: boolean;
       return_url?: string;
+    };
+    /** @description The periods and price of the renewal, chosen as in renewing. */
+    RenewalOrderRequest: {
+      /**
+       * Format: uuid
+       * @description Purchase ID saved before submitting. Duplicate creation conflicts; query this order after an unknown result.
+       */
+      order_id: string;
+      /**
+       * @description As in renewing.
+       * @default 1
+       */
+      periods?: number;
+      /** @description As in renewing. */
+      interval_count?: number;
+      /**
+       * @description As in renewing.
+       * @enum {string}
+       */
+      interval?: "day" | "month" | "year";
     };
     AutoRenewSet: {
       auto_renew: boolean;
@@ -2535,6 +2762,29 @@ export interface operations {
       default: components["responses"]["Error"];
     };
   };
+  "get-account-metered-usage": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        accountId: components["parameters"]["AccountId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MeteredUsage"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
   "list-payment-options": {
     parameters: {
       query?: never;
@@ -2888,6 +3138,34 @@ export interface operations {
       default: components["responses"]["Error"];
     };
   };
+  "preview-invoice-payment": {
+    parameters: {
+      query?: {
+        /** @description As in paying. True when omitted. */
+        use_balance?: boolean;
+        /** @description As in paying. True when omitted. */
+        use_credits?: boolean;
+      };
+      header?: never;
+      path: {
+        invoiceId: components["parameters"]["InvoiceId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentPreview"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
   "pay-together": {
     parameters: {
       query?: never;
@@ -2908,6 +3186,31 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PaymentResult"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "preview-pay-together": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PayTogetherRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PaymentPreview"];
         };
       };
       default: components["responses"]["Error"];
@@ -3356,6 +3659,42 @@ export interface operations {
       default: components["responses"]["Error"];
     };
   };
+  "create-renewal-order": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        subscriptionId: components["parameters"]["SubscriptionId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RenewalOrderRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Order"];
+        };
+      };
+      /** @description The order already exists or the subscription has a conflicting renewal, change or cancellation. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
   "set-auto-renew": {
     parameters: {
       query?: never;
@@ -3491,6 +3830,38 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Order"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "cancel-order": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: components["parameters"]["OrderId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The order after the request. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Order"];
+        };
+      };
+      /** @description The order is paid in full, accepted, being paid online, or a scheduled change. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
         };
       };
       default: components["responses"]["Error"];
