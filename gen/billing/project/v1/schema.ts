@@ -122,33 +122,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/projects/{projectId}/cancellations/preview": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        projectId: components["parameters"]["ProjectId"];
-      };
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Preview a cancellation
-     * @description What canceling these subscriptions together would return, computed now under the refund terms
-     *     agreed when each was bought. This request does not create a resource: nothing is recorded or
-     *     reserved.
-     *
-     *     It is refused with the same errors as creating the cancellation, except that the amount is not
-     *     checked. Give the returned `proration_date` and `refundable_amount` when creating it.
-     */
-    post: operations["create-project-cancellation-preview"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/api/v1/projects/{projectId}/cancellations": {
     parameters: {
       query?: never;
@@ -198,9 +171,8 @@ export interface paths {
      *       (`meta.cancellation_id`) or reclaimed (`meta.job_id`);
      *     - 409 `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online payment for a renewal of one of them
      *       is in progress;
-     *     - 422 `BILLING_CANCELLATION_UNSUPPORTED` when the service cannot yet be canceled here;
      *     - 409 `BILLING_CANCELLATION_REFUND_CHANGED` when the refund is no longer
-     *       `expected_refundable_amount`; preview again.
+     *       `expected_refundable_amount`; quote again.
      *
      *     Sending the same request again, for the same subscriptions, mode and amount while that
      *     cancellation is still open, returns it with 200 rather than creating another. Renewal orders
@@ -346,8 +318,15 @@ export interface paths {
      *     A renewal is priced exactly as renewing would charge it: at the agreed amount or the price
      *     named, with the discounts the account holds, and with tax.
      *
-     *     Returns 404 when the project has no billing account, or when a subscription to be renewed
-     *     does not belong to this project.
+     *     A cancellation is quoted as creating it would compute the refund, as of now and under the refund
+     *     terms agreed when each subscription was bought. It is quoted on its own: combined with lines or
+     *     renewals the request is refused with HTTP 400 `BILLING_PURCHASE_INVALID` and `meta.field`
+     *     `cancellation`. It is refused with the same errors as creating the cancellation, except that the
+     *     amount is not checked. Give the returned `cancellation.proration_date` and
+     *     `cancellation.refundable_amount` when creating it.
+     *
+     *     Returns 404 when the project has no billing account, or when a subscription to be renewed or
+     *     canceled does not belong to this project.
      */
     post: operations["create-project-quote"];
     delete?: never;
@@ -440,13 +419,18 @@ export interface components {
      * @enum {string}
      */
     RefundPolicy: "none" | "prorated";
-    CancellationPreviewRequest: {
+    /**
+     * @description A cancellation to quote: what ending these subscriptions together would return. One mode per
+     *     request; to compare, quote `immediate` and `period_end` separately.
+     */
+    QuoteCancellation: {
       /** @description The subscriptions to end together, all of one service. Every subscription released with a resource must be included. */
       subscription_ids: string[];
       mode: components["schemas"]["TerminationPolicy"];
     };
     /**
-     * @description What the cancellation would return, subscription by subscription and in total, as of now.
+     * @description What the cancellation would return, subscription by subscription and in total, as of now. Give
+     *     `proration_date` and `refundable_amount` when creating the cancellation.
      *
      *     - `unused_amount`: before tax, the value of the paid service still unused, whatever the refund
      *       terms say.
@@ -480,7 +464,7 @@ export interface components {
       forfeited_amount: components["schemas"]["Money"];
       items: components["schemas"]["CancellationRefundPreviewItem"][];
     };
-    /** @description One subscription of the preview. The amounts mean what they mean in the preview. */
+    /** @description One subscription of the quoted cancellation. The amounts mean what they mean in the total. */
     CancellationRefundPreviewItem: {
       /** Format: uuid */
       subscription_id: string;
@@ -499,16 +483,16 @@ export interface components {
       forfeited_amount: components["schemas"]["Money"];
     };
     CancellationCreate: {
-      /** @description As in the preview. */
+      /** @description As in the quote. */
       subscription_ids: string[];
       mode: components["schemas"]["TerminationPolicy"];
       /**
        * Format: date-time
-       * @description For `immediate`, the `proration_date` of the preview: a whole second, not in the future and
+       * @description For `immediate`, the `proration_date` of the quote: a whole second, not in the future and
        *     at most ten minutes old. The refund is computed as of it. Now when omitted.
        */
       proration_date?: string;
-      /** @description The `refundable_amount` of the preview. The cancellation is refused when the refund differs. */
+      /** @description The `refundable_amount` of the quote. The cancellation is refused when the refund differs. */
       expected_refundable_amount: string;
       /** @description A note from the account holder. It is kept with the cancellation and not shown elsewhere. */
       reason?: string;
@@ -713,10 +697,14 @@ export interface components {
        */
       periods?: number;
     };
-    /** @description Specify lines for new purchases and renewals for existing subscriptions. The total includes all requested items. */
+    /**
+     * @description Specify lines for new purchases and renewals for existing subscriptions, or one cancellation on
+     *     its own. The total includes all requested lines and renewals.
+     */
     QuoteRequest: {
       lines?: components["schemas"]["QuoteLine"][];
       renewals?: components["schemas"]["QuoteRenewal"][];
+      cancellation?: components["schemas"]["QuoteCancellation"];
     };
     QuoteLineResult: {
       /** @description Tax included in the account quote. Absent in public catalogue estimates. */
@@ -804,9 +792,12 @@ export interface components {
     Quote: {
       lines?: components["schemas"]["QuoteLineResult"][];
       renewals?: components["schemas"]["QuoteRenewalResult"][];
+      /** @description What the cancellation requested would return. Present only when one was requested. */
+      cancellation?: components["schemas"]["CancellationRefundPreview"];
       /**
        * @description What would be owed in total, renewals included. Amounts to be returned are not netted
-       *     off it.
+       *     off it: a quote of a cancellation alone has a total of zero, and what it would return is
+       *     in `cancellation`.
        *
        *     Null when any line could not be priced. What would be owed is not knowable then, and a
        *     total that silently left the unpriced lines out would read as a smaller bill rather than
@@ -1528,33 +1519,6 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Subscription"];
-        };
-      };
-      default: components["responses"]["Error"];
-    };
-  };
-  "create-project-cancellation-preview": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        projectId: components["parameters"]["ProjectId"];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CancellationPreviewRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CancellationRefundPreview"];
         };
       };
       default: components["responses"]["Error"];

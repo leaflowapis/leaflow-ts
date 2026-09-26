@@ -45,15 +45,6 @@ export type SetProjectAutoRenewBody = NonNullable<
   operations["set-project-auto-renew"]["requestBody"]
 >["content"]["application/json"];
 
-/** The success response body of `POST /api/v1/projects/{projectId}/cancellations/preview`. */
-export type CreateProjectCancellationPreviewResult =
-  operations["create-project-cancellation-preview"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/projects/{projectId}/cancellations/preview`. */
-export type CreateProjectCancellationPreviewBody = NonNullable<
-  operations["create-project-cancellation-preview"]["requestBody"]
->["content"]["application/json"];
-
 /** The success response body of `POST /api/v1/projects/{projectId}/cancellations`. */
 export type CreateProjectCancellationResult =
   operations["create-project-cancellation"]["responses"][200]["content"]["application/json"];

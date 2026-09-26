@@ -221,13 +221,13 @@ export type GetCancellationRequestResult =
 export type CancelCancellationRequestResult =
   operations["cancel-cancellation-request"]["responses"][200]["content"]["application/json"];
 
-/** The success response body of `POST /account/v1/cancellations/preview`. */
-export type CreateCancellationPreviewResult =
-  operations["create-cancellation-preview"]["responses"][200]["content"]["application/json"];
+/** The success response body of `POST /account/v1/quotes`. */
+export type CreateQuoteResult =
+  operations["create-quote"]["responses"][200]["content"]["application/json"];
 
-/** The request body of `POST /account/v1/cancellations/preview`. */
-export type CreateCancellationPreviewBody = NonNullable<
-  operations["create-cancellation-preview"]["requestBody"]
+/** The request body of `POST /account/v1/quotes`. */
+export type CreateQuoteBody = NonNullable<
+  operations["create-quote"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `POST /account/v1/cancellations`. */
