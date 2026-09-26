@@ -773,7 +773,8 @@ export interface paths {
      *
      *     Sending the same request again, for the same subscriptions, mode and amount while that
      *     cancellation is still open, returns it with 200 rather than creating another. Renewal orders
-     *     still waiting for payment are canceled along with it.
+     *     still waiting for payment are canceled along with it, and automatic renewal is turned off for
+     *     every subscription in the set, for `period_end` as well as `immediate`.
      */
     post: operations["create-cancellation"];
     delete?: never;
@@ -815,8 +816,10 @@ export interface paths {
     /**
      * Withdraw a cancellation
      * @description Withdraws the whole cancellation while none of its resources has begun to be released; the
-     *     subscriptions continue as before. After that it is refused with 409
-     *     `BILLING_CANCELLATION_CONFLICT`. Withdrawing one that is already withdrawn returns it unchanged.
+     *     subscriptions continue as before, except that automatic renewal, turned off when the
+     *     cancellation was created, stays off until it is turned on again. After that it is refused with
+     *     409 `BILLING_CANCELLATION_CONFLICT`. Withdrawing one that is already withdrawn returns it
+     *     unchanged.
      */
     post: operations["withdraw-cancellation"];
     delete?: never;
@@ -920,7 +923,12 @@ export interface paths {
     get?: never;
     /**
      * Set auto renew
-     * @description Controls automatic prepaid renewal. Disabling it does not shorten paid_until and still permits manual renewal. Postpaid subscriptions do not renew and keep this false.
+     * @description Controls automatic prepaid renewal. Disabling it does not shorten paid_until and still permits
+     *     manual renewal. Postpaid subscriptions do not renew and keep this false.
+     *
+     *     While the subscription has an open cancellation, turning it on or off is refused with 409
+     *     `BILLING_SUBSCRIPTION_OPERATION_PENDING` and `meta.cancellation_id`: creating the cancellation
+     *     turned it off, and withdrawing the cancellation does not turn it back on.
      */
     put: operations["set-auto-renew"];
     post?: never;
@@ -1239,6 +1247,12 @@ export interface components {
       project?: components["schemas"]["NamedIdentity"] | null;
       /** @enum {string} */
       billing_type: "postpaid" | "prepaid" | "one_time";
+      /**
+       * @description Whether automatic renewal is on now. Creating the cancellation turns it off, and withdrawing
+       *     the cancellation does not turn it back on. Always false for a subscription that is not
+       *     `prepaid`.
+       */
+      auto_renew: boolean;
       unused_amount: components["schemas"]["Money"];
       refundable_amount: components["schemas"]["Money"];
       refund_amount: components["schemas"]["Money"];
@@ -1290,6 +1304,12 @@ export interface components {
        * @enum {string}
        */
       origin: "customer" | "operator" | "project_deletion";
+      /**
+       * Format: int64
+       * @description The billing account that paid for these subscriptions when the cancellation was created: the
+       *     account of an account-level purchase, or the account the project was linked to.
+       */
+      billing_account_id: number;
       currency: string;
       /** @description The refund confirmed when it was created. Absent when the platform created it. */
       expected_refundable_amount?: components["schemas"]["Money"];
@@ -1318,6 +1338,12 @@ export interface components {
       /** Format: uuid */
       plan_id: string;
       plan_name: string;
+      /**
+       * @description How the subscription is paid for. Only a `prepaid` subscription renews automatically; creating
+       *     the cancellation turned that off, and withdrawing the cancellation leaves it off.
+       * @enum {string}
+       */
+      billing_type: "postpaid" | "prepaid" | "one_time";
       /** @enum {string} */
       status: "requested" | "scheduled" | "releasing" | "completed" | "canceled" | "failed";
       /** Format: date-time */
