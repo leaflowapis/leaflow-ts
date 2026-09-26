@@ -122,6 +122,142 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/projects/{projectId}/cancellations/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Preview a cancellation
+     * @description What canceling these subscriptions together would return, computed now under the refund terms
+     *     agreed when each was bought. This request does not create a resource: nothing is recorded or
+     *     reserved.
+     *
+     *     It is refused with the same errors as creating the cancellation, except that the amount is not
+     *     checked. Give the returned `proration_date` and `refundable_amount` when creating it.
+     */
+    post: operations["create-project-cancellation-preview"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/cancellations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    /**
+     * List cancellations
+     * @description Newest first. Filter by `subscription_id` and `status=open` to find the cancellation now under way for a subscription.
+     */
+    get: operations["list-project-cancellations"];
+    put?: never;
+    /**
+     * Cancel subscriptions
+     * @description Ends a set of subscriptions of one service together, at one time. Deleting a resource that a
+     *     subscription pays for is an `immediate` cancellation of every subscription released with it,
+     *     such as a server with the disks deleted along with it, or an address with its bandwidth.
+     *
+     *     The service that provides the resources releases them: at once for `immediate`, or at
+     *     `scheduled_at`, the end of the paid term, for `period_end`. When release is confirmed, the
+     *     unused value is returned the way it was paid, under the refund terms agreed when each
+     *     subscription was bought. For `immediate` the refund is computed as of `proration_date`, so the
+     *     amount confirmed here is the amount returned: prepaid service used while the resources are
+     *     being released is not deducted from it. Usage of a postpaid subscription is charged until its
+     *     resources are released, as usual.
+     *
+     *     `mode` must be allowed for every subscription. Postpaid and one-time subscriptions end only
+     *     `immediate`. A prepaid subscription ends `period_end` while its paid term lasts, and
+     *     `immediate` unless its termination terms allow only the end of the paid term and that term has
+     *     not ended yet. For `period_end` the paid terms of all the subscriptions must end at the same
+     *     time.
+     *
+     *     Refused with:
+     *     - 400 `BILLING_CANCELLATION_INVALID` when `subscription_ids` or `proration_date` is not
+     *       acceptable (`meta.field`), or the subscriptions do not all belong to one service, project,
+     *       account and currency;
+     *     - 409 `BILLING_CANCELLATION_CONFLICT` when a subscription has not started or has ended;
+     *     - 422 `BILLING_CANCELLATION_MODE_FIXED` when `mode` is not allowed for a subscription, and
+     *       `BILLING_CANCELLATION_TERMS_UNSET` when a prepaid subscription has no termination terms;
+     *       both carry `meta.subscription_id`;
+     *     - 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when, for `period_end`, the paid terms end at
+     *       different times;
+     *     - 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled
+     *       (`meta.cancellation_id`) or reclaimed (`meta.job_id`);
+     *     - 409 `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online payment for a renewal of one of them
+     *       is in progress;
+     *     - 422 `BILLING_CANCELLATION_UNSUPPORTED` when the service cannot yet be canceled here;
+     *     - 409 `BILLING_CANCELLATION_REFUND_CHANGED` when the refund is no longer
+     *       `expected_refundable_amount`; preview again.
+     *
+     *     Sending the same request again, for the same subscriptions, mode and amount while that
+     *     cancellation is still open, returns it with 200 rather than creating another. Renewal orders
+     *     still waiting for payment are canceled along with it.
+     */
+    post: operations["create-project-cancellation"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/cancellations/{cancellationId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        cancellationId: components["parameters"]["CancellationId"];
+      };
+      cookie?: never;
+    };
+    /** Get a cancellation */
+    get: operations["get-project-cancellation"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/projects/{projectId}/cancellations/{cancellationId}/withdraw": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        cancellationId: components["parameters"]["CancellationId"];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Withdraw a cancellation
+     * @description Withdraws the whole cancellation while none of its resources has begun to be released; the
+     *     subscriptions continue as before. After that it is refused with 409
+     *     `BILLING_CANCELLATION_CONFLICT`. Withdrawing one that is already withdrawn returns it unchanged.
+     */
+    post: operations["withdraw-project-cancellation"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/projects/{projectId}/orders": {
     parameters: {
       query?: never;
@@ -304,9 +440,165 @@ export interface components {
      * @enum {string}
      */
     RefundPolicy: "none" | "prorated";
+    CancellationPreviewRequest: {
+      /** @description The subscriptions to end together, all of one service. Every subscription released with a resource must be included. */
+      subscription_ids: string[];
+      mode: components["schemas"]["TerminationPolicy"];
+    };
+    /**
+     * @description What the cancellation would return, subscription by subscription and in total, as of now.
+     *
+     *     - `unused_amount`: before tax, the value of the paid service still unused, whatever the refund
+     *       terms say.
+     *     - `refundable_amount`: what is returned the way it was paid, including the tax paid on it;
+     *       `refund_amount` plus `credit_amount`.
+     *     - `refund_amount`: the part returned to the balance or to the payment method.
+     *     - `credit_amount`: the part restored to the credit grants that paid.
+     *     - `tax_amount`: the tax included in `refundable_amount`.
+     *     - `forfeited_amount`: before tax, the part of `unused_amount` the refund terms do not return.
+     *
+     *     Postpaid and one-time subscriptions show zero; usage until release is charged as usual.
+     */
+    CancellationRefundPreview: {
+      mode: components["schemas"]["TerminationPolicy"];
+      /**
+       * Format: date-time
+       * @description For `period_end`, when release begins, the end of the paid terms.
+       */
+      scheduled_at?: string;
+      /**
+       * Format: date-time
+       * @description For `immediate`, the second the refund is computed as of. Give it when creating the cancellation.
+       */
+      proration_date?: string;
+      currency: string;
+      unused_amount: components["schemas"]["Money"];
+      refundable_amount: components["schemas"]["Money"];
+      refund_amount: components["schemas"]["Money"];
+      credit_amount: components["schemas"]["Money"];
+      tax_amount: components["schemas"]["Money"];
+      forfeited_amount: components["schemas"]["Money"];
+      items: components["schemas"]["CancellationRefundPreviewItem"][];
+    };
+    /** @description One subscription of the preview. The amounts mean what they mean in the preview. */
+    CancellationRefundPreviewItem: {
+      /** Format: uuid */
+      subscription_id: string;
+      /** Format: uuid */
+      plan_id: string;
+      plan_name: string;
+      /** @description The project and its current name, for display. Absent for a purchase at account level, and when the project details cannot be read at the moment. */
+      project?: components["schemas"]["NamedIdentity"] | null;
+      /** @enum {string} */
+      billing_type: "postpaid" | "prepaid" | "one_time";
+      unused_amount: components["schemas"]["Money"];
+      refundable_amount: components["schemas"]["Money"];
+      refund_amount: components["schemas"]["Money"];
+      credit_amount: components["schemas"]["Money"];
+      tax_amount: components["schemas"]["Money"];
+      forfeited_amount: components["schemas"]["Money"];
+    };
+    CancellationCreate: {
+      /** @description As in the preview. */
+      subscription_ids: string[];
+      mode: components["schemas"]["TerminationPolicy"];
+      /**
+       * Format: date-time
+       * @description For `immediate`, the `proration_date` of the preview: a whole second, not in the future and
+       *     at most ten minutes old. The refund is computed as of it. Now when omitted.
+       */
+      proration_date?: string;
+      /** @description The `refundable_amount` of the preview. The cancellation is refused when the refund differs. */
+      expected_refundable_amount: string;
+      /** @description A note from the account holder. It is kept with the cancellation and not shown elsewhere. */
+      reason?: string;
+    };
+    /**
+     * @description One cancellation of a set of subscriptions of one service, released together at one time.
+     *
+     *     - `requested`: `immediate`, release has not begun.
+     *     - `scheduled`: `period_end`, waiting for `scheduled_at`.
+     *     - `releasing`: release has begun; it can no longer be withdrawn.
+     *     - `completed`: every subscription has ended and its refund has been made.
+     *     - `canceled`: withdrawn before release began; the subscriptions continue.
+     *     - `failed`: the service could not carry it out, for the reason in `failure_code`; the
+     *       subscriptions continue and can be canceled again.
+     */
+    Cancellation: {
+      /** Format: uuid */
+      id: string;
+      /** @enum {string} */
+      status: "requested" | "scheduled" | "releasing" | "completed" | "canceled" | "failed";
+      mode: components["schemas"]["TerminationPolicy"];
+      /** Format: date-time */
+      scheduled_at?: string;
+      /**
+       * Format: date-time
+       * @description For `immediate`, the second the refund is computed as of.
+       */
+      proration_date?: string;
+      /**
+       * @description Who asked for it. `project_deletion` means the project was deleted.
+       * @enum {string}
+       */
+      origin: "customer" | "operator" | "project_deletion";
+      currency: string;
+      /** @description The refund confirmed when it was created. Absent when the platform created it. */
+      expected_refundable_amount?: components["schemas"]["Money"];
+      /**
+       * @description Present with `failed`. A code of the service that provides the resources, such as a disk
+       *     that can only be released with its server. Clients map it to their own wording.
+       */
+      failure_code?: string;
+      /** Format: date-time */
+      requested_at: string;
+      /** Format: date-time */
+      completed_at?: string;
+      /** Format: date-time */
+      canceled_at?: string;
+      items: components["schemas"]["CancellationItem"][];
+    };
+    /** @description One subscription of the cancellation. */
+    CancellationItem: {
+      /**
+       * Format: uuid
+       * @description The cancellation request of this subscription, the same as `Subscription.cancellation_request.id`.
+       */
+      id: string;
+      /** Format: uuid */
+      subscription_id: string;
+      /** Format: uuid */
+      plan_id: string;
+      plan_name: string;
+      /** @enum {string} */
+      status: "requested" | "scheduled" | "releasing" | "completed" | "canceled" | "failed";
+      /** Format: date-time */
+      release_started_at?: string;
+      /**
+       * Format: date-time
+       * @description When the service ended, as confirmed by the service that provides it.
+       */
+      effective_at?: string;
+      /** @description Present with `completed`. The part of the refund returned to the account balance. */
+      balance_amount?: components["schemas"]["Money"];
+      /** @description Present with `completed`. The part restored to the credit grants that paid. */
+      credit_amount?: components["schemas"]["Money"];
+      /** @description Present with `completed`. The part returned to the payment method it was paid with. */
+      gateway_amount?: components["schemas"]["Money"];
+    };
+    CancellationList: {
+      items: components["schemas"]["Cancellation"][];
+      /** Format: int64 */
+      total_count?: number;
+    };
     /** @description A cancellation request for the original purchase. scheduled_at is the intended time; effective_at is the confirmed end of service. The request alone does not stop metering or issue a refund. */
     CancellationRequest: {
       reason?: string;
+      /**
+       * Format: uuid
+       * @description The cancellation this request belongs to, with the other subscriptions released together.
+       */
+      cancellation_id?: string;
       /** Format: uuid */
       id: string;
       /** Format: uuid */
@@ -1065,6 +1357,7 @@ export interface components {
     };
   };
   parameters: {
+    CancellationId: string;
     /** @description 1-based page number; the first page when omitted. */
     Page: number;
     /** @description How many per page, 100 at most. */
@@ -1235,6 +1528,150 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Subscription"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "create-project-cancellation-preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CancellationPreviewRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CancellationRefundPreview"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "list-project-cancellations": {
+    parameters: {
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+        /** @description Only cancellations that include this subscription. */
+        subscription_id?: string;
+        /** @description Only cancellations in this status. `open` means requested, scheduled or releasing. */
+        status?:
+          "open" | "requested" | "scheduled" | "releasing" | "completed" | "canceled" | "failed";
+      };
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CancellationList"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "create-project-cancellation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CancellationCreate"];
+      };
+    };
+    responses: {
+      /** @description The same cancellation, already open */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Cancellation"];
+        };
+      };
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Cancellation"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "get-project-cancellation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        cancellationId: components["parameters"]["CancellationId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Cancellation"];
+        };
+      };
+      default: components["responses"]["Error"];
+    };
+  };
+  "withdraw-project-cancellation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        projectId: components["parameters"]["ProjectId"];
+        cancellationId: components["parameters"]["CancellationId"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Cancellation"];
         };
       };
       default: components["responses"]["Error"];

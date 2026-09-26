@@ -47,7 +47,7 @@ export interface paths {
      * Delete a backup
      * @description Independent of the source disk: deletion succeeds whether or not that disk still exists.
      *
-     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the backup, including a pay-as-you-go subscription. `meta.resource_id` names the backup. It is released when its subscription ends.
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the backup, including a pay-as-you-go subscription. `meta.resource_id` names the backup. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
      */
     delete: operations["delete-backup"];
     options?: never;
@@ -241,7 +241,7 @@ export interface paths {
      * Delete a disk
      * @description Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
      *
-     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the disk, including a pay-as-you-go subscription. `meta.resource_id` names the disk. It is released when its subscription ends.
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the disk, including a pay-as-you-go subscription. `meta.resource_id` names the disk. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
      */
     delete: operations["delete-disk"];
     options?: never;
@@ -343,7 +343,7 @@ export interface paths {
      * Release a floating IP
      * @description Releases the floating IP after unbinding it. Completion is reported by the returned task.
      *
-     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the address or for its bandwidth, including a pay-as-you-go subscription. `meta.resource_id` names the floating IP. It is released when its subscriptions end.
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the address or for its bandwidth, including a pay-as-you-go subscription. `meta.resource_id` names the floating IP. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
      */
     delete: operations["release-floating-ip"];
     options?: never;
@@ -444,7 +444,7 @@ export interface paths {
      *
      *     An instance being captured as a private image cannot be released. Wait for the capture to finish, or delete that image first.
      *
-     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the instance, or for a disk that is deleted with it, including a pay-as-you-go subscription. `meta.resource_id` names that resource. It is released when its subscription ends.
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the instance, or for a disk that is deleted with it, including a pay-as-you-go subscription. `meta.resource_id` names that resource. The instance is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
      */
     delete: operations["delete-instance"];
     options?: never;
@@ -956,7 +956,7 @@ export interface paths {
      *
      *     An image whose capture has not finished can be deleted; the capture is aborted.
      *
-     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the image, including a pay-as-you-go subscription. `meta.resource_id` names the image. It is released when its subscription ends.
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the image, including a pay-as-you-go subscription. `meta.resource_id` names the image. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
      */
     delete: operations["delete-private-image"];
     options?: never;
@@ -1257,7 +1257,7 @@ export interface paths {
     post?: never;
     /**
      * Delete a snapshot
-     * @description Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the snapshot, including a pay-as-you-go subscription. `meta.resource_id` names the snapshot. It is released when its subscription ends.
+     * @description Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the snapshot, including a pay-as-you-go subscription. `meta.resource_id` names the snapshot. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
      */
     delete: operations["delete-snapshot"];
     options?: never;
@@ -1459,6 +1459,8 @@ export interface components {
       price_id: string | null;
       /** Format: uuid */
       subscription_item_id: string | null;
+      /** @description The subscriptions a cancellation through Billing has to cover to release this backup: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      release_subscription_ids: string[];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;
@@ -1552,6 +1554,8 @@ export interface components {
       price_id: string | null;
       /** Format: uuid */
       subscription_item_id: string | null;
+      /** @description The subscriptions a cancellation through Billing has to cover to release this disk: its own and those of its snapshots. A system disk is released only with its instance, so for a system disk the list is that of the instance. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      release_subscription_ids: string[];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;
@@ -1784,6 +1788,8 @@ export interface components {
       price_id: string | null;
       /** Format: uuid */
       subscription_item_id: string | null;
+      /** @description The subscriptions a cancellation through Billing has to cover to release this address: the subscriptions of the address and of its bandwidth. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      release_subscription_ids: string[];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;
@@ -1924,6 +1930,8 @@ export interface components {
       price_id: string | null;
       /** Format: uuid */
       subscription_item_id: string | null;
+      /** @description The subscriptions a cancellation through Billing has to cover to release this instance: its own, those of the disks deleted with it, and those of the snapshots of those disks. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      release_subscription_ids: string[];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       /**
@@ -2220,6 +2228,8 @@ export interface components {
       price_id: string | null;
       /** Format: uuid */
       subscription_item_id: string | null;
+      /** @description The subscriptions a cancellation through Billing has to cover to release this private image: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      release_subscription_ids: string[];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;
@@ -2439,6 +2449,8 @@ export interface components {
       price_id: string | null;
       /** Format: uuid */
       subscription_item_id: string | null;
+      /** @description The subscriptions a cancellation through Billing has to cover to release this snapshot: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      release_subscription_ids: string[];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;

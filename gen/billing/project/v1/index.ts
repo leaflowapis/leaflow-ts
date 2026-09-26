@@ -45,6 +45,40 @@ export type SetProjectAutoRenewBody = NonNullable<
   operations["set-project-auto-renew"]["requestBody"]
 >["content"]["application/json"];
 
+/** The success response body of `POST /api/v1/projects/{projectId}/cancellations/preview`. */
+export type CreateProjectCancellationPreviewResult =
+  operations["create-project-cancellation-preview"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/projects/{projectId}/cancellations/preview`. */
+export type CreateProjectCancellationPreviewBody = NonNullable<
+  operations["create-project-cancellation-preview"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/projects/{projectId}/cancellations`. */
+export type CreateProjectCancellationResult =
+  operations["create-project-cancellation"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/projects/{projectId}/cancellations`. */
+export type CreateProjectCancellationBody = NonNullable<
+  operations["create-project-cancellation"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `GET /api/v1/projects/{projectId}/cancellations`. */
+export type ListProjectCancellationsResult =
+  operations["list-project-cancellations"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/projects/{projectId}/cancellations`. */
+export type ListProjectCancellationsQuery =
+  operations["list-project-cancellations"]["parameters"]["query"];
+
+/** The success response body of `GET /api/v1/projects/{projectId}/cancellations/{cancellationId}`. */
+export type GetProjectCancellationResult =
+  operations["get-project-cancellation"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/projects/{projectId}/cancellations/{cancellationId}/withdraw`. */
+export type WithdrawProjectCancellationResult =
+  operations["withdraw-project-cancellation"]["responses"][200]["content"]["application/json"];
+
 /** The success response body of `GET /api/v1/projects/{projectId}/orders`. */
 export type ListProjectOrdersResult =
   operations["list-project-orders"]["responses"][200]["content"]["application/json"];
