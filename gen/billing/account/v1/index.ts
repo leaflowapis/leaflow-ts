@@ -43,6 +43,10 @@ export type UpdateBillingAccountBody = NonNullable<
 export type GetAccountBalanceResult =
   operations["get-account-balance"]["responses"][200]["content"]["application/json"];
 
+/** The success response body of `GET /account/v1/billing-accounts/{accountId}/metered-usage`. */
+export type GetAccountMeteredUsageResult =
+  operations["get-account-metered-usage"]["responses"][200]["content"]["application/json"];
+
 /** The success response body of `GET /account/v1/billing-accounts/{accountId}/payment-options`. */
 export type ListPaymentOptionsResult =
   operations["list-payment-options"]["responses"][200]["content"]["application/json"];
@@ -115,6 +119,14 @@ export type PayInvoiceBody = NonNullable<
   operations["pay-invoice"]["requestBody"]
 >["content"]["application/json"];
 
+/** The success response body of `GET /account/v1/invoices/{invoiceId}/payment-preview`. */
+export type PreviewInvoicePaymentResult =
+  operations["preview-invoice-payment"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /account/v1/invoices/{invoiceId}/payment-preview`. */
+export type PreviewInvoicePaymentQuery =
+  operations["preview-invoice-payment"]["parameters"]["query"];
+
 /** The success response body of `POST /account/v1/payments`. */
 export type PayTogetherResult =
   operations["pay-together"]["responses"][200]["content"]["application/json"];
@@ -122,6 +134,15 @@ export type PayTogetherResult =
 /** The request body of `POST /account/v1/payments`. */
 export type PayTogetherBody = NonNullable<
   operations["pay-together"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /account/v1/payments/preview`. */
+export type PreviewPayTogetherResult =
+  operations["preview-pay-together"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /account/v1/payments/preview`. */
+export type PreviewPayTogetherBody = NonNullable<
+  operations["preview-pay-together"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `GET /account/v1/invoices`. */
@@ -210,6 +231,15 @@ export type RenewSubscriptionBody = NonNullable<
   operations["renew-subscription"]["requestBody"]
 >["content"]["application/json"];
 
+/** The success response body of `POST /account/v1/subscriptions/{subscriptionId}/renewal-orders`. */
+export type CreateRenewalOrderResult =
+  operations["create-renewal-order"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /account/v1/subscriptions/{subscriptionId}/renewal-orders`. */
+export type CreateRenewalOrderBody = NonNullable<
+  operations["create-renewal-order"]["requestBody"]
+>["content"]["application/json"];
+
 /** The success response body of `PUT /account/v1/subscriptions/{subscriptionId}/auto-renew`. */
 export type SetAutoRenewResult =
   operations["set-auto-renew"]["responses"][200]["content"]["application/json"];
@@ -245,6 +275,10 @@ export type ListOrdersQuery = operations["list-orders"]["parameters"]["query"];
 /** The success response body of `GET /account/v1/orders/{orderId}`. */
 export type GetOrderResult =
   operations["get-order"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `POST /account/v1/orders/{orderId}/cancel`. */
+export type CancelOrderResult =
+  operations["cancel-order"]["responses"][200]["content"]["application/json"];
 
 /** The success response body of `GET /account/v1/orders/{orderId}/items`. */
 export type ListOrderItemsResult =
