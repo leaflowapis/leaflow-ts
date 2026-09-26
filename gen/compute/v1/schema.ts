@@ -1461,6 +1461,8 @@ export interface components {
       subscription_item_id: string | null;
       /** @description The subscriptions a cancellation through Billing has to cover to release this backup: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
       release_subscription_ids: string[];
+      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+      release_set: components["schemas"]["ReleaseSetItem"][];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;
@@ -1556,6 +1558,8 @@ export interface components {
       subscription_item_id: string | null;
       /** @description The subscriptions a cancellation through Billing has to cover to release this disk: its own and those of its snapshots. A system disk is released only with its instance, so for a system disk the list is that of the instance. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
       release_subscription_ids: string[];
+      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+      release_set: components["schemas"]["ReleaseSetItem"][];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;
@@ -1790,6 +1794,8 @@ export interface components {
       subscription_item_id: string | null;
       /** @description The subscriptions a cancellation through Billing has to cover to release this address: the subscriptions of the address and of its bandwidth. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
       release_subscription_ids: string[];
+      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+      release_set: components["schemas"]["ReleaseSetItem"][];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;
@@ -1932,6 +1938,8 @@ export interface components {
       subscription_item_id: string | null;
       /** @description The subscriptions a cancellation through Billing has to cover to release this instance: its own, those of the disks deleted with it, and those of the snapshots of those disks. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
       release_subscription_ids: string[];
+      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+      release_set: components["schemas"]["ReleaseSetItem"][];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       /**
@@ -2230,6 +2238,8 @@ export interface components {
       subscription_item_id: string | null;
       /** @description The subscriptions a cancellation through Billing has to cover to release this private image: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
       release_subscription_ids: string[];
+      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+      release_set: components["schemas"]["ReleaseSetItem"][];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;
@@ -2451,6 +2461,8 @@ export interface components {
       subscription_item_id: string | null;
       /** @description The subscriptions a cancellation through Billing has to cover to release this snapshot: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
       release_subscription_ids: string[];
+      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+      release_set: components["schemas"]["ReleaseSetItem"][];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
       task: components["schemas"]["Task"] | null;
@@ -2685,6 +2697,21 @@ export interface components {
       unbound_at: string | null;
       /** Format: date-time */
       released_at: string | null;
+    };
+    /** @description One subscription of a release set and the resource it pays for. An address and its bandwidth are two subscriptions of the same floating IP. */
+    ReleaseSetItem: {
+      /** Format: uuid */
+      subscription_id: string;
+      resource: components["schemas"]["ReleaseResource"];
+    };
+    /** @description A resource a release set releases. */
+    ReleaseResource: {
+      /** @enum {string} */
+      type: "instance" | "disk" | "snapshot" | "backup" | "private_image" | "floating_ip";
+      /** Format: uuid */
+      id: string;
+      /** @description The resource's name. A floating IP is named by its address. */
+      name: string;
     };
   };
   responses: never;
