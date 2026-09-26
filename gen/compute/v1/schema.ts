@@ -697,53 +697,11 @@ export interface paths {
      * Resize an instance
      * @description Creates a Billing change order, including for metered pricing. The price must belong to the Billing Plan of the target instance type; applicable contract pricing is resolved by Billing. The resize is applied after the order's invoice is paid, or without waiting when the order has no immediate invoice. Do not submit a new purchase after paying, and reuse the original idempotency key after an uncertain response.
      *
+     *     The new instance type takes effect, and is billed from then on, when the returned task succeeds. A completed resize is final and cannot be reverted; to return to the previous type, submit another resize.
+     *
      *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["resize-instance"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/instances/{instanceId}/resize/confirm": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Confirm a resize
-     * @description Releases the resources held by the previous size. `pending_instance_type_id` becomes the type in effect and is billed from then on.
-     *
-     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
-     */
-    post: operations["confirm-instance-resize"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/instances/{instanceId}/resize/revert": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Revert a resize
-     * @description The instance returns to its previous size, `pending_instance_type_id` is discarded, and billing is unaffected by the resize.
-     *
-     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
-     */
-    post: operations["revert-instance-resize"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1988,7 +1946,6 @@ export interface components {
         | "shelved"
         | "shelved_offloaded"
         | "rescued"
-        | "resized"
         | "deleting"
         | "deleted"
         | "error"
@@ -4217,92 +4174,6 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["PurchaseResult"];
-        };
-      };
-      /** @description The idempotency key was already used with different parameters in this scope. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "confirm-instance-resize": {
-    parameters: {
-      query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
-      path: {
-        instanceId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Task"];
-        };
-      };
-      /** @description The idempotency key was already used with different parameters in this scope. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "revert-instance-resize": {
-    parameters: {
-      query?: never;
-      header: {
-        /** @description Reuse the same key for retries of the same action. A different request with the same key is rejected. */
-        "Idempotency-Key": string;
-      };
-      path: {
-        instanceId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
-      202: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Task"];
         };
       };
       /** @description The idempotency key was already used with different parameters in this scope. */
