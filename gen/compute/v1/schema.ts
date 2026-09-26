@@ -49,6 +49,8 @@ export interface paths {
      * Delete a backup
      * @description Independent of the source disk: deletion succeeds whether or not that disk still exists.
      *
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the backup, including a pay-as-you-go subscription. `meta.resource_id` names the backup. It is released when its subscription ends.
+     *
      *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["delete-backup"];
@@ -247,6 +249,8 @@ export interface paths {
      * Delete a disk
      * @description Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
      *
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the disk, including a pay-as-you-go subscription. `meta.resource_id` names the disk. It is released when its subscription ends.
+     *
      *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["delete-disk"];
@@ -353,6 +357,8 @@ export interface paths {
      * Release a floating IP
      * @description Releases the floating IP after unbinding it. Completion is reported by the returned task.
      *
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the address or for its bandwidth, including a pay-as-you-go subscription. `meta.resource_id` names the floating IP. It is released when its subscriptions end.
+     *
      *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["release-floating-ip"];
@@ -455,6 +461,8 @@ export interface paths {
      * @description The system disk is deleted with the instance, and **snapshots created from the system disk are deleted with it**. Data disks are detached and kept, and their snapshots and backups are unaffected. The primary network interface is released with the instance.
      *
      *     An instance being captured as a private image cannot be released. Wait for the capture to finish, or delete that image first.
+     *
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the instance, or for a disk that is deleted with it, including a pay-as-you-go subscription. `meta.resource_id` names that resource. It is released when its subscription ends.
      *
      *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
@@ -1029,6 +1037,8 @@ export interface paths {
      *
      *     An image whose capture has not finished can be deleted; the capture is aborted.
      *
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the image, including a pay-as-you-go subscription. `meta.resource_id` names the image. It is released when its subscription ends.
+     *
      *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["delete-private-image"];
@@ -1332,7 +1342,9 @@ export interface paths {
     post?: never;
     /**
      * Delete a snapshot
-     * @description Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
+     * @description Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the snapshot, including a pay-as-you-go subscription. `meta.resource_id` names the snapshot. It is released when its subscription ends.
+     *
+     *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     delete: operations["delete-snapshot"];
     options?: never;
@@ -2885,7 +2897,7 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
-      /** @description The idempotency key was already used with different parameters in this scope. */
+      /** @description The idempotency key was already used with different parameters in this scope, or the deletion was refused. */
       409: {
         headers: {
           [name: string]: unknown;
@@ -3303,7 +3315,7 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
-      /** @description The idempotency key was already used with different parameters in this scope. */
+      /** @description The idempotency key was already used with different parameters in this scope, or the deletion was refused. */
       409: {
         headers: {
           [name: string]: unknown;
@@ -3574,7 +3586,7 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
-      /** @description The idempotency key was already used with different parameters in this scope. */
+      /** @description The idempotency key was already used with different parameters in this scope, or the deletion was refused. */
       409: {
         headers: {
           [name: string]: unknown;
@@ -3834,7 +3846,7 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
-      /** @description The idempotency key was already used with different parameters in this scope. */
+      /** @description The idempotency key was already used with different parameters in this scope, or the deletion was refused. */
       409: {
         headers: {
           [name: string]: unknown;
@@ -4972,7 +4984,7 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
-      /** @description The idempotency key was already used with different parameters in this scope. */
+      /** @description The idempotency key was already used with different parameters in this scope, or the deletion was refused. */
       409: {
         headers: {
           [name: string]: unknown;
@@ -5888,7 +5900,7 @@ export interface operations {
           "application/json": components["schemas"]["Task"];
         };
       };
-      /** @description The idempotency key was already used with different parameters in this scope. */
+      /** @description The idempotency key was already used with different parameters in this scope, or the deletion was refused. */
       409: {
         headers: {
           [name: string]: unknown;
