@@ -333,6 +333,8 @@ export interface paths {
      *
      *     IPv6 is not requested through this endpoint. IPv6 addresses are assigned to instances by the private network; enable IPv6 on that network instead.
      *
+     *     Refused with `PRIVATE_NETWORK_UNAVAILABLE`, before any order is created, when the private network's `status` is not `available`. `meta.private_network_id` names it.
+     *
      *     Replays return HTTP 201 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
     post: operations["allocate-floating-ip"];
@@ -432,6 +434,8 @@ export interface paths {
      *     Exactly one of image_id, private_image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
      *
      *     A request for several instances is all or nothing: if any instance cannot be created, every instance of that request is released, the order fails, and any payment for it is refunded. Each instance is named after this request with a number appended, and each has its own task.
+     *
+     *     The network is checked before the order is created, and a request it refuses orders and charges nothing. It is refused with `PRIVATE_NETWORK_UNAVAILABLE` when the private network's `status` is not `available`, `SUBNET_UNAVAILABLE` or `SECURITY_GROUP_UNAVAILABLE` when the subnet or a security group is not ready, `SECURITY_GROUP_OTHER_PRIVATE_NETWORK` when a security group belongs to another private network, and `PORT_UNAVAILABLE` when the port's `status` is not `available`. `meta` names the resource.
      *
      *     Replays return HTTP 202 for the original operation. See the idempotency conventions for conflicts and terminal outcomes.
      */
@@ -2349,7 +2353,10 @@ export interface components {
       name: string;
       /** Format: uuid */
       region_id: string;
-      /** @enum {string} */
+      /**
+       * @description Only `available` accepts new instances, interfaces and floating IPs
+       * @enum {string}
+       */
       status: "pending" | "available" | "deleting" | "error" | "unknown";
       /** Format: date-time */
       updated_at: string;
