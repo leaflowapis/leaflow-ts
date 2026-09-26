@@ -15,6 +15,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./routes": {
+      "types": "./dist/routes.d.ts",
+      "default": "./dist/routes.js"
+    },
     "./account/v1": {
       "types": "./dist/account/v1/index.d.ts",
       "default": "./dist/account/v1/index.js"

@@ -94,6 +94,47 @@ if (!process.env.CONTRACTS_DIR) {
 
 const METHODS = ["get", "post", "put", "patch", "delete", "options", "head", "trace"];
 const JSON_MEDIA = "application/json";
+const operationRoutes = [];
+const routeSignatures = new Set();
+const securityDocuments = new Map();
+
+function credentialScheme(document, operation, spec) {
+  const requirements = operation.security ?? document.security;
+  if (!Array.isArray(requirements))
+    throw new Error(`${spec}: missing security declaration for ${operation.operationId}`);
+  if (requirements.length === 0) return null;
+  if (requirements.length !== 1 || Object.keys(requirements[0] ?? {}).length !== 1) {
+    throw new Error(`${spec}: ambiguous security declaration for ${operation.operationId}`);
+  }
+  const [name] = Object.keys(requirements[0]);
+  const schemes = document.components?.securitySchemes;
+  if (!Object.hasOwn(schemes ?? {}, name))
+    throw new Error(`${spec}: unknown security scheme ${name}`);
+  const reference = schemes[name]?.$ref;
+  if (typeof reference !== "string")
+    throw new Error(`${spec}: ${name} must reference a shared scheme`);
+  const [source, pointer] = reference.split("#");
+  if (!pointer?.startsWith("/components/securitySchemes/"))
+    throw new Error(`${spec}: invalid security reference ${reference}`);
+  const sourceFile = source ? resolve(dirname(spec), source) : spec;
+  if (!securityDocuments.has(sourceFile)) {
+    securityDocuments.set(
+      sourceFile,
+      source ? parseYaml(readFileSync(sourceFile, "utf8")) : document,
+    );
+  }
+  let scheme = securityDocuments.get(sourceFile);
+  for (const segment of pointer.split("/").slice(1)) {
+    const key = segment.replaceAll("~1", "/").replaceAll("~0", "~");
+    if (!Object.hasOwn(scheme ?? {}, key))
+      throw new Error(`${spec}: invalid security reference ${reference}`);
+    scheme = scheme[key];
+  }
+  if (scheme?.type !== "http" || scheme.scheme !== "bearer") {
+    throw new Error(`${spec}: unsupported security scheme ${reference}`);
+  }
+  return pointer.split("/").at(-1);
+}
 
 // openapi/<service>/<version>/openapi.yaml, or openapi/<service>/<subpackage>/<version>/openapi.yaml
 // for a service split by function (billing/catalog/v1). service is then "billing/catalog".
@@ -199,7 +240,23 @@ for (const { service, version, spec } of contractList) {
 
   for (const [path, item] of Object.entries(document.paths)) {
     for (const [method, operation] of Object.entries(item)) {
-      if (!METHODS.includes(method) || !operation.operationId) continue;
+      if (!METHODS.includes(method)) continue;
+      if (!operation?.operationId)
+        throw new Error(`${spec}: ${method} ${path} is missing operationId`);
+      const upstreamService = service.split("/")[0];
+      const signature = `${upstreamService} ${method} ${path.replace(/\{[^/]+\}/g, "{}")}`;
+      if (routeSignatures.has(signature))
+        throw new Error(`${spec}: duplicate operation ${signature}`);
+      routeSignatures.add(signature);
+      operationRoutes.push({
+        service: upstreamService,
+        contract: service,
+        method: method.toUpperCase(),
+        path,
+        operationId: operation.operationId,
+        securityScheme: credentialScheme(document, operation, spec),
+        upstreamUrl: document.servers?.[0]?.url ?? null,
+      });
       const name = pascal(operation.operationId);
       const key = JSON.stringify(operation.operationId);
 
@@ -350,6 +407,7 @@ const packagePath = join(root, "package.json");
 const manifest = JSON.parse(readFileSync(packagePath, "utf8"));
 manifest.exports = {
   ".": { types: "./dist/index.d.ts", default: "./dist/index.js" },
+  "./routes": { types: "./dist/routes.d.ts", default: "./dist/routes.js" },
   ...Object.fromEntries(
     services.map(({ service, version }) => [
       `./${service}/${version}`,
@@ -361,6 +419,18 @@ manifest.exports = {
   ),
 };
 writeFileSync(packagePath, JSON.stringify(manifest, null, 2) + "\n");
+
+operationRoutes.sort((left, right) =>
+  `${left.service} ${left.method} ${left.path}`.localeCompare(
+    `${right.service} ${right.method} ${right.path}`,
+  ),
+);
+writeFileSync(
+  join(output, "routes.ts"),
+  `// Generated from OpenAPI operations and security requirements. Do not edit.\n` +
+    `export const routes = ${JSON.stringify(operationRoutes, null, 2)} as const;\n` +
+    `export type Route = (typeof routes)[number];\n`,
+);
 
 // Format the output.
 //
