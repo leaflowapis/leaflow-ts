@@ -221,6 +221,39 @@ export type GetCancellationRequestResult =
 export type CancelCancellationRequestResult =
   operations["cancel-cancellation-request"]["responses"][200]["content"]["application/json"];
 
+/** The success response body of `POST /account/v1/cancellations/preview`. */
+export type CreateCancellationPreviewResult =
+  operations["create-cancellation-preview"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /account/v1/cancellations/preview`. */
+export type CreateCancellationPreviewBody = NonNullable<
+  operations["create-cancellation-preview"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /account/v1/cancellations`. */
+export type CreateCancellationResult =
+  operations["create-cancellation"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /account/v1/cancellations`. */
+export type CreateCancellationBody = NonNullable<
+  operations["create-cancellation"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `GET /account/v1/cancellations`. */
+export type ListCancellationsResult =
+  operations["list-cancellations"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /account/v1/cancellations`. */
+export type ListCancellationsQuery = operations["list-cancellations"]["parameters"]["query"];
+
+/** The success response body of `GET /account/v1/cancellations/{cancellationId}`. */
+export type GetCancellationResult =
+  operations["get-cancellation"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `POST /account/v1/cancellations/{cancellationId}/withdraw`. */
+export type WithdrawCancellationResult =
+  operations["withdraw-cancellation"]["responses"][200]["content"]["application/json"];
+
 /** The success response body of `GET /account/v1/subscriptions/{subscriptionId}/renewal-prices`. */
 export type ListRenewalPricesResult =
   operations["list-renewal-prices"]["responses"][200]["content"]["application/json"];
