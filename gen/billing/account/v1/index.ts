@@ -200,27 +200,6 @@ export type ListSubscriptionsQuery = operations["list-subscriptions"]["parameter
 export type GetSubscriptionResult =
   operations["get-subscription"]["responses"][200]["content"]["application/json"];
 
-/** The success response body of `GET /account/v1/subscriptions/{subscriptionId}/cancellation-preview`. */
-export type PreviewCancellationResult =
-  operations["preview-cancellation"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/subscriptions/{subscriptionId}/cancellation-requests`. */
-export type CreateCancellationRequestResult =
-  operations["create-cancellation-request"]["responses"][201]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/subscriptions/{subscriptionId}/cancellation-requests`. */
-export type CreateCancellationRequestBody = NonNullable<
-  operations["create-cancellation-request"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `GET /account/v1/cancellation-requests/{cancellationRequestId}`. */
-export type GetCancellationRequestResult =
-  operations["get-cancellation-request"]["responses"][200]["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/cancellation-requests/{cancellationRequestId}/cancel`. */
-export type CancelCancellationRequestResult =
-  operations["cancel-cancellation-request"]["responses"][200]["content"]["application/json"];
-
 /** The success response body of `POST /account/v1/quotes`. */
 export type CreateQuoteResult =
   operations["create-quote"]["responses"][200]["content"]["application/json"];
