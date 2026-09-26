@@ -285,14 +285,6 @@ export type ResizeInstanceBody = NonNullable<
   operations["resize-instance"]["requestBody"]
 >["content"]["application/json"];
 
-/** The success response body of `POST /api/v1/instances/{instanceId}/resize/confirm`. */
-export type ConfirmInstanceResizeResult =
-  operations["confirm-instance-resize"]["responses"][202]["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/instances/{instanceId}/resize/revert`. */
-export type RevertInstanceResizeResult =
-  operations["revert-instance-resize"]["responses"][202]["content"]["application/json"];
-
 /** The success response body of `POST /api/v1/instances/{instanceId}/start`. */
 export type StartInstanceResult =
   operations["start-instance"]["responses"][202]["content"]["application/json"];
