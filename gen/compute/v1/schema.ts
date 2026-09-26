@@ -754,6 +754,8 @@ export interface paths {
     /**
      * Detach a disk
      * @description Unmount the device inside the instance before calling this endpoint. Forcibly detaching a file system that is being written to corrupts data.
+     *
+     *     The disk the instance boots from cannot be detached, whether it is the system disk bought with the instance or a disk the instance was created from with `boot_disk_id`. Such a request is refused with `INSTANCE_BOOT_DISK_LOCKED` and creates no task; releasing the instance is what frees that disk.
      */
     delete: operations["detach-disk"];
     options?: never;

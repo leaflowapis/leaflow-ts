@@ -684,104 +684,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/account/v1/subscriptions/{subscriptionId}/cancellation-preview": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        subscriptionId: components["parameters"]["SubscriptionId"];
-      };
-      cookie?: never;
-    };
-    /**
-     * Preview cancellation
-     * @deprecated
-     * @description Reads confirmed terms and paid-period value without recording a request or locking a refund amount.
-     *
-     *     Use create-quote with a `cancellation`, which quotes the subscriptions released together.
-     */
-    get: operations["preview-cancellation"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/account/v1/subscriptions/{subscriptionId}/cancellation-requests": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        subscriptionId: components["parameters"]["SubscriptionId"];
-      };
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Request subscription cancellation
-     * @deprecated
-     * @description Ends the whole subscription under confirmed terms. The request does not itself stop service; actual end is confirmed by the owning service. Refund processing is separate.
-     *
-     *     Use create-cancellation, which ends the subscriptions released together and checks the refund.
-     */
-    post: operations["create-cancellation-request"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/account/v1/cancellation-requests/{cancellationRequestId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        cancellationRequestId: components["parameters"]["CancellationRequestId"];
-      };
-      cookie?: never;
-    };
-    /**
-     * Get cancellation request
-     * @deprecated
-     * @description Use get-cancellation.
-     */
-    get: operations["get-cancellation-request"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/account/v1/cancellation-requests/{cancellationRequestId}/cancel": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        cancellationRequestId: components["parameters"]["CancellationRequestId"];
-      };
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Cancel a cancellation request
-     * @deprecated
-     * @description Allowed only before release starts. Does not resume a previously suspended subscription.
-     *
-     *     Use withdraw-cancellation, which withdraws the whole cancellation.
-     */
-    post: operations["cancel-cancellation-request"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/account/v1/quotes": {
     parameters: {
       query?: never;
@@ -1436,21 +1338,6 @@ export interface components {
       items: components["schemas"]["Cancellation"][];
       /** Format: int64 */
       total_count?: number;
-    };
-    CancellationPreview: {
-      /** Format: uuid */
-      subscription_id: string;
-      mode: components["schemas"]["TerminationPolicy"];
-      /** Format: date-time */
-      scheduled_at?: string;
-      refundable_amount: string;
-      currency: string;
-    };
-    CancellationRequestCreate: {
-      mode?: components["schemas"]["TerminationPolicy"];
-      /** @default false */
-      forfeit_remaining_value?: boolean;
-      reason: string;
     };
     /** @description A cancellation request for the original purchase. scheduled_at is the intended time; effective_at is the confirmed end of service. The request alone does not stop metering or issue a refund. */
     CancellationRequest: {
@@ -3117,7 +3004,6 @@ export interface components {
     InvoiceId: string;
     OrderId: string;
     CancellationId: string;
-    CancellationRequestId: string;
     SubscriptionId: string;
     PaymentMethodId: string;
   };
@@ -4017,102 +3903,6 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Subscription"];
-        };
-      };
-      default: components["responses"]["Error"];
-    };
-  };
-  "preview-cancellation": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        subscriptionId: components["parameters"]["SubscriptionId"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Cancellation estimate */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CancellationPreview"];
-        };
-      };
-      default: components["responses"]["Error"];
-    };
-  };
-  "create-cancellation-request": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        subscriptionId: components["parameters"]["SubscriptionId"];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CancellationRequestCreate"];
-      };
-    };
-    responses: {
-      /** @description Cancellation requested */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CancellationRequest"];
-        };
-      };
-      default: components["responses"]["Error"];
-    };
-  };
-  "get-cancellation-request": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        cancellationRequestId: components["parameters"]["CancellationRequestId"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Request and actual end receipt */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CancellationRequest"];
-        };
-      };
-      default: components["responses"]["Error"];
-    };
-  };
-  "cancel-cancellation-request": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        cancellationRequestId: components["parameters"]["CancellationRequestId"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Canceled request */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CancellationRequest"];
         };
       };
       default: components["responses"]["Error"];
