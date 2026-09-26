@@ -608,7 +608,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** List refunds */
+    /**
+     * List refunds
+     * @description Newest first.
+     */
     get: operations["list-refunds"];
     put?: never;
     post?: never;
@@ -1772,11 +1775,23 @@ export interface components {
       invoice_id?: string;
       /** Format: uuid */
       transaction_id?: string;
-      /** Format: uuid */
+      /**
+       * Format: uuid
+       * @description The credit grant that paid, or for a refund, the credit grant restored.
+       */
       credit_grant_id?: string;
       credit_grant?: components["schemas"]["ObjectIdentity"];
       /** Format: uuid */
       refund_id?: string;
+      /**
+       * @description Present on refunds. Where this part of the refund goes.
+       *
+       *     - `balance`: back to the account balance.
+       *     - `credit`: back to the credit grant that paid, which keeps its original expiry.
+       *     - `gateway`: back to the payment method it was paid with.
+       * @enum {string}
+       */
+      refund_destination?: "balance" | "credit" | "gateway";
       /**
        * @description `failed` means the operation did not succeed; for a gateway payment, that the gateway declined
        *     it. `canceled` means a gateway payment was withdrawn without collecting money. After either,
@@ -1804,9 +1819,17 @@ export interface components {
       /** Format: int64 */
       billing_account_id?: number;
       type: components["schemas"]["TransactionType"];
-      /** @description Signed. Positive adds to the balance, negative takes from it. */
+      /**
+       * @description Signed by type: positive for `topup` and `payment`, negative for `refund` and `payout`.
+       *     An `adjustment` is positive when it adds to the balance and negative when it takes from
+       *     it. For the other types the sign does not tell the effect on the balance: a payment from
+       *     the balance lowers it, while a payment by gateway or by credit leaves it unchanged.
+       */
       amount: components["schemas"]["Money"];
-      /** @description How much of this batch has not been spent yet. Zero on negative batches. */
+      /**
+       * @description How much of this transaction is still available in the balance. Only top-ups, positive
+       *     adjustments and gateway payments later returned to the balance can be non-zero.
+       */
       remaining_amount: components["schemas"]["Money"];
       currency: string;
       reason?: string;
@@ -1855,28 +1878,82 @@ export interface components {
       billing_account_id?: number;
       /** Format: uuid */
       invoice_id?: string | null;
-      /** Format: uuid */
+      /**
+       * Format: uuid
+       * @description The order the refund belongs to: the order that caused it, such as a downgrade, otherwise
+       *     the order of the refunded invoice. Null for refunds of top-ups and of usage invoices.
+       */
       order_id?: string | null;
+      /** @description The whole refund. Equals balance_amount plus credit_amount plus gateway_amount. */
       amount: components["schemas"]["Money"];
+      /** @description The part returned to the account balance. */
+      balance_amount: components["schemas"]["Money"];
+      /** @description The part restored to the credit grants that paid for it. */
+      credit_amount: components["schemas"]["Money"];
+      /** @description The part returned to the payment method it was paid with. */
+      gateway_amount: components["schemas"]["Money"];
       /** @description What has actually been returned. */
       settled_amount?: components["schemas"]["Money"];
       currency: string;
       /**
-       * @description Where the refunded money went — back to the account balance, or back to the payment method it came from.
+       * @deprecated
+       * @description Use balance_amount, credit_amount and gateway_amount, which also show a refund split between several destinations.
        * @enum {string}
        */
       destination?: "balance" | "gateway";
       /**
-       * @description Summary of the related refund transactions. Succeeded only when every part succeeds.
-       *     Pending and processing do not mean funds have been returned. Partial success remains
-       *     visible in settled_amount and transactions, including when another part has failed.
+       * @description Summary of the parts in `transactions`.
+       *
+       *     - `pending`: nothing has been returned yet, and at least one part is in progress.
+       *     - `processing`: some parts have been returned, and at least one is still in progress.
+       *     - `succeeded`: every part has been returned.
+       *     - `failed`: no part is in progress and at least one has failed. What was returned is in
+       *       settled_amount.
+       *
+       *     Returns to the balance and to credit grants complete shortly after the refund is made; a
+       *     return to a payment method completes when the gateway confirms it.
        * @enum {string}
        */
       status: "pending" | "processing" | "succeeded" | "failed";
-      reason?: string;
+      /**
+       * Format: date-time
+       * @description When the last part was returned. Present with `succeeded`.
+       */
+      settled_at?: string;
+      reason: components["schemas"]["RefundReason"];
       /** Format: date-time */
       created_at: string;
     };
+    /**
+     * @description Why the refund was made. Clients map the code to their own wording. More codes may be added;
+     *     treat an unknown code as a refund without a stated reason.
+     *
+     *     - `provisioning_failed`: the purchase could not be delivered.
+     *     - `order_expired`: the order expired after part of it had been paid.
+     *     - `order_canceled`: the account holder canceled the order after part of it had been paid.
+     *     - `change_canceled`: a scheduled change was withdrawn after it had been paid.
+     *     - `change_expired`: a scheduled change could not take effect before its time passed.
+     *     - `subscription_canceled`: the subscription was canceled and its unused value returned under
+     *       its refund terms.
+     *     - `future_period_canceled`: a renewal that had not started yet was withdrawn.
+     *     - `downgrade_difference`: the unused value above the new price after a downgrade.
+     *     - `usage_true_up`: usage priced again over the whole month cost less than was charged.
+     *     - `payment_not_applied`: a payment arrived after its invoice could no longer be paid.
+     *     - `operator`: made by the platform operator.
+     * @enum {string}
+     */
+    RefundReason:
+      | "provisioning_failed"
+      | "order_expired"
+      | "order_canceled"
+      | "change_canceled"
+      | "change_expired"
+      | "subscription_canceled"
+      | "future_period_canceled"
+      | "downgrade_difference"
+      | "usage_true_up"
+      | "payment_not_applied"
+      | "operator";
     RefundList: {
       items: components["schemas"]["Refund"][];
       /** Format: int64 */
@@ -3396,6 +3473,14 @@ export interface operations {
         page_size?: components["parameters"]["PageSize"];
         /** @description Restrict to one of your accounts. All of them when omitted. */
         billing_account_id?: components["parameters"]["AccountIdQuery"];
+        /** @description Only the refunds of this invoice. */
+        invoice_id?: string;
+        /**
+         * @description Only the refunds that belong to this order: those of its invoice, such as the refund of a
+         *     purchase that could not be delivered, and those it caused on an earlier invoice, such as
+         *     the difference returned after a downgrade.
+         */
+        order_id?: string;
       };
       header?: never;
       path?: never;

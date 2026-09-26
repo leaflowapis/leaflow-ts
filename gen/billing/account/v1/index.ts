@@ -179,6 +179,9 @@ export type ListCreditGrantsQuery = operations["list-credit-grants"]["parameters
 export type ListRefundsResult =
   operations["list-refunds"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /account/v1/refunds`. */
+export type ListRefundsQuery = operations["list-refunds"]["parameters"]["query"];
+
 /** The success response body of `GET /account/v1/usage-charges`. */
 export type ListUsageChargesResult =
   operations["list-usage-charges"]["responses"][200]["content"]["application/json"];
