@@ -564,8 +564,12 @@ export interface components {
       name: string;
       currency: string;
     };
-    /** @enum {string} */
-    InvoiceStatus: "draft" | "open" | "paid" | "void" | "uncollectible";
+    /**
+     * @description `refunded` means the invoice was paid and has since been refunded in full; a partial refund
+     *     leaves it `paid`, with the refunded part in `amount_refunded`.
+     * @enum {string}
+     */
+    InvoiceStatus: "draft" | "open" | "paid" | "refunded" | "void" | "uncollectible";
     UsageCharge: {
       /** Format: uuid */
       subscription_id?: string;
@@ -573,6 +577,11 @@ export interface components {
       id: string;
       /** Format: uuid */
       project_id?: string;
+      /**
+       * @description The project and its current name, for display. Absent when the project no longer exists or its
+       *     details cannot be read at the moment; `project_id` still identifies it.
+       */
+      project?: components["schemas"]["NamedIdentity"] | null;
       product: components["schemas"]["Product"];
       /** @description Which resource this was charged for. Empty for charges not tied to one. */
       resource_id?: string;
@@ -679,6 +688,12 @@ export interface components {
        *     membership, which belongs to no single project.
        */
       project_id?: string | null;
+      /**
+       * @description The project and its current name, for display. Absent for a purchase at account level,
+       *     and when the project no longer exists or its details cannot be read at the moment;
+       *     `project_id` still identifies it then.
+       */
+      project?: components["schemas"]["NamedIdentity"] | null;
       product: components["schemas"]["Product"];
       /** Format: uuid */
       plan_id: string;
@@ -784,6 +799,12 @@ export interface components {
        *     as a membership.
        */
       project_id?: string | null;
+      /**
+       * @description The project and its current name, for display. Absent for a purchase at account level,
+       *     and when the project no longer exists or its details cannot be read at the moment;
+       *     `project_id` still identifies it then.
+       */
+      project?: components["schemas"]["NamedIdentity"] | null;
       /**
        * Format: int64
        * @description The billing account the order was placed with. It does not change when the project is later
@@ -1013,6 +1034,21 @@ export interface components {
      * @example 10.2500000000
      */
     Money: string;
+    /**
+     * @description Which object this is, together with what a person currently calls it.
+     *
+     *     The name is for display. It is chosen by whoever owns the object, it changes, it is not unique
+     *     between objects, and it may be empty when nobody has named it yet — so it must not be used to
+     *     address, match or deduplicate anything. Addressing is by id.
+     *
+     *     This differs from an identity carrying a lookup key: a lookup key is written once by an operator,
+     *     is unique, and can be used to fetch the object. A name cannot.
+     */
+    NamedIdentity: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+    };
   };
   responses: {
     /** @description Error */
