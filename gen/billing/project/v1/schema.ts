@@ -597,8 +597,7 @@ export interface components {
     };
     CancellationList: {
       items: components["schemas"]["Cancellation"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description A cancellation request for the original purchase. scheduled_at is the intended time; effective_at is the confirmed end of service. The request alone does not stop metering or issue a refund. */
     CancellationRequest: {
@@ -926,8 +925,7 @@ export interface components {
     };
     UsageChargeList: {
       items: components["schemas"]["UsageCharge"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     SpendRow: {
       product?: components["schemas"]["Product"];
@@ -944,13 +942,11 @@ export interface components {
       /** @description The sum over the whole period, not only the page returned. */
       total: components["schemas"]["Money"];
       currency: string;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     SubscriptionList: {
       items: components["schemas"]["Subscription"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description An independently billed purchase. Fixed renewals use the agreed recurring_amount and interval; already paid periods retain their original value. Technical state belongs to the owning service. */
     Subscription: {
@@ -1066,8 +1062,7 @@ export interface components {
     };
     ActiveResourceList: {
       items: components["schemas"]["ActiveResource"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /**
      * @description Follows the items. `pending` is not yet accepted and may be paid or unpaid. `active` is
@@ -1157,8 +1152,7 @@ export interface components {
     };
     OrderList: {
       items: components["schemas"]["Order"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /**
      * @description How it was paid, as recorded at the time. It is kept as it was: removing the card afterwards
@@ -1262,8 +1256,7 @@ export interface components {
     };
     OrderItemList: {
       items: components["schemas"]["OrderItem"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     Allowance: {
       /** @description Optional issuance key, unique within this billing account. */
@@ -1307,8 +1300,7 @@ export interface components {
     };
     AllowanceList: {
       items: components["schemas"]["Allowance"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     Entitlement: {
       product: components["schemas"]["Product"];
@@ -1324,8 +1316,7 @@ export interface components {
     };
     EntitlementList: {
       items: components["schemas"]["Entitlement"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description Purchase-related invoice amounts, without account contact details or payment methods. Absent on an order with no immediate invoice. */
     InvoiceSummary: {
@@ -1369,6 +1360,15 @@ export interface components {
      * @example 10.2500000000
      */
     Money: string;
+    /** @description Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan. */
+    OffsetPagination: {
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
+    };
     /**
      * @description Which object this is, together with what a person currently calls it.
      *

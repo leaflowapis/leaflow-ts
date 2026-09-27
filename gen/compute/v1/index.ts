@@ -124,9 +124,16 @@ export type ListInstanceTypesQuery = operations["list-instance-types"]["paramete
 export type ListRegionsResult =
   operations["list-regions"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /api/v1/regions`. */
+export type ListRegionsQuery = operations["list-regions"]["parameters"]["query"];
+
 /** The success response body of `GET /api/v1/regions/{regionId}/availability-zones`. */
 export type ListAvailabilityZonesResult =
   operations["list-availability-zones"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/regions/{regionId}/availability-zones`. */
+export type ListAvailabilityZonesQuery =
+  operations["list-availability-zones"]["parameters"]["query"];
 
 /** The success response body of `GET /api/v1/disks`. */
 export type ListDisksResult =
@@ -181,6 +188,9 @@ export type RevertDiskBody = NonNullable<
 /** The success response body of `GET /api/v1/floating-ips`. */
 export type ListFloatingIpsResult =
   operations["list-floating-ips"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/floating-ips`. */
+export type ListFloatingIpsQuery = operations["list-floating-ips"]["parameters"]["query"];
 
 /** The success response body of `POST /api/v1/floating-ips`. */
 export type AllocateFloatingIpResult =
@@ -411,6 +421,9 @@ export type ListOperationLogsQuery = operations["list-operation-logs"]["paramete
 export type ListPortsResult =
   operations["list-ports"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /api/v1/ports`. */
+export type ListPortsQuery = operations["list-ports"]["parameters"]["query"];
+
 /** The success response body of `POST /api/v1/ports`. */
 export type CreatePortResult =
   operations["create-port"]["responses"][201]["content"]["application/json"];
@@ -461,6 +474,9 @@ export type EnablePrivateNetworkIpv6Result =
 export type ListRoutesResult =
   operations["list-routes"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /api/v1/private-networks/{privateNetworkId}/routes`. */
+export type ListRoutesQuery = operations["list-routes"]["parameters"]["query"];
+
 /** The success response body of `POST /api/v1/private-networks/{privateNetworkId}/routes`. */
 export type CreateRouteResult =
   operations["create-route"]["responses"][201]["content"]["application/json"];
@@ -473,6 +489,9 @@ export type CreateRouteBody = NonNullable<
 /** The success response body of `GET /api/v1/private-networks/{privateNetworkId}/subnets`. */
 export type ListSubnetsResult =
   operations["list-subnets"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/private-networks/{privateNetworkId}/subnets`. */
+export type ListSubnetsQuery = operations["list-subnets"]["parameters"]["query"];
 
 /** The success response body of `POST /api/v1/private-networks/{privateNetworkId}/subnets`. */
 export type CreateSubnetResult =
@@ -522,6 +541,10 @@ export type RenameSecurityGroupBody = NonNullable<
 /** The success response body of `GET /api/v1/security-groups/{securityGroupId}/rules`. */
 export type ListSecurityGroupRulesResult =
   operations["list-security-group-rules"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/security-groups/{securityGroupId}/rules`. */
+export type ListSecurityGroupRulesQuery =
+  operations["list-security-group-rules"]["parameters"]["query"];
 
 /** The success response body of `POST /api/v1/security-groups/{securityGroupId}/rules`. */
 export type CreateSecurityGroupRuleResult =

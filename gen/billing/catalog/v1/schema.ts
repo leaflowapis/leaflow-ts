@@ -243,8 +243,7 @@ export interface components {
     ProductID: string;
     ProductList: {
       items: components["schemas"]["Product"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     Plan: {
       enabled: boolean;
@@ -259,8 +258,7 @@ export interface components {
     };
     PlanList: {
       items: components["schemas"]["Plan"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     Price: {
       rate_card?: components["schemas"]["ObjectIdentity"];
@@ -326,8 +324,7 @@ export interface components {
     };
     PriceList: {
       items: components["schemas"]["Price"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     Rate: {
       meter: components["schemas"]["ObjectIdentity"];
@@ -356,8 +353,7 @@ export interface components {
     };
     RateList: {
       items: components["schemas"]["Rate"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /**
      * @description Identify a price directly, or select a price for a plan. For each resource give its ID or lookup key, never both. Lookup keys require product_id.
@@ -504,6 +500,15 @@ export interface components {
      * @example 10.2500000000
      */
     Money: string;
+    /** @description Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan. */
+    OffsetPagination: {
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
+    };
   };
   responses: {
     /** @description Unchanged since the `ETag` that was sent. No body. */

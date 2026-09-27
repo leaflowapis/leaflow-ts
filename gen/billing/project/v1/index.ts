@@ -102,6 +102,10 @@ export type CreateProjectQuoteBody = NonNullable<
 export type ListProjectOrderItemsResult =
   operations["list-project-order-items"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /api/v1/projects/{projectId}/orders/{orderId}/items`. */
+export type ListProjectOrderItemsQuery =
+  operations["list-project-order-items"]["parameters"]["query"];
+
 /** The success response body of `GET /api/v1/projects/{projectId}/allowances`. */
 export type ListProjectAllowancesResult =
   operations["list-project-allowances"]["responses"][200]["content"]["application/json"];

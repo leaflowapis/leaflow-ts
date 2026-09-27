@@ -13,9 +13,15 @@ import type { operations } from "./schema.js";
 export type ListCurrenciesResult =
   operations["list-currencies"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /account/v1/currencies`. */
+export type ListCurrenciesQuery = operations["list-currencies"]["parameters"]["query"];
+
 /** The success response body of `GET /account/v1/billing-accounts`. */
 export type ListBillingAccountsResult =
   operations["list-billing-accounts"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /account/v1/billing-accounts`. */
+export type ListBillingAccountsQuery = operations["list-billing-accounts"]["parameters"]["query"];
 
 /** The success response body of `POST /account/v1/billing-accounts`. */
 export type CreateBillingAccountResult =
@@ -51,6 +57,9 @@ export type GetAccountMeteredUsageResult =
 export type ListPaymentOptionsResult =
   operations["list-payment-options"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /account/v1/billing-accounts/{accountId}/payment-options`. */
+export type ListPaymentOptionsQuery = operations["list-payment-options"]["parameters"]["query"];
+
 /** The success response body of `GET /account/v1/projects`. */
 export type ListBillingAccountProjectsResult =
   operations["list-billing-account-projects"]["responses"][200]["content"]["application/json"];
@@ -76,6 +85,9 @@ export type SetProjectBillingAccountBody = NonNullable<
 export type ListTopUpsResult =
   operations["list-top-ups"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /account/v1/top-ups`. */
+export type ListTopUpsQuery = operations["list-top-ups"]["parameters"]["query"];
+
 /** The success response body of `POST /account/v1/top-ups`. */
 export type CreateTopUpResult =
   operations["create-top-up"]["responses"][201]["content"]["application/json"];
@@ -96,6 +108,9 @@ export type CancelTopUpResult =
 /** The success response body of `GET /account/v1/payment-methods`. */
 export type ListPaymentMethodsResult =
   operations["list-payment-methods"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /account/v1/payment-methods`. */
+export type ListPaymentMethodsQuery = operations["list-payment-methods"]["parameters"]["query"];
 
 /** The success response body of `POST /account/v1/payment-methods/setup`. */
 export type CreatePaymentMethodSetupResult =
@@ -160,13 +175,22 @@ export type GetInvoiceResult =
 export type ListInvoiceItemsResult =
   operations["list-invoice-items"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /account/v1/invoices/{invoiceId}/items`. */
+export type ListInvoiceItemsQuery = operations["list-invoice-items"]["parameters"]["query"];
+
 /** The success response body of `GET /account/v1/transactions`. */
 export type ListTransactionsResult =
   operations["list-transactions"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /account/v1/transactions`. */
+export type ListTransactionsQuery = operations["list-transactions"]["parameters"]["query"];
+
 /** The success response body of `GET /account/v1/discounts`. */
 export type ListAccountDiscountsResult =
   operations["list-account-discounts"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /account/v1/discounts`. */
+export type ListAccountDiscountsQuery = operations["list-account-discounts"]["parameters"]["query"];
 
 /** The success response body of `GET /account/v1/credit-grants`. */
 export type ListCreditGrantsResult =
@@ -237,6 +261,9 @@ export type WithdrawCancellationResult =
 export type ListRenewalPricesResult =
   operations["list-renewal-prices"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /account/v1/subscriptions/{subscriptionId}/renewal-prices`. */
+export type ListRenewalPricesQuery = operations["list-renewal-prices"]["parameters"]["query"];
+
 /** The success response body of `POST /account/v1/subscriptions/{subscriptionId}/renew`. */
 export type RenewSubscriptionResult =
   operations["renew-subscription"]["responses"][200]["content"]["application/json"];
@@ -298,6 +325,9 @@ export type CancelOrderResult =
 /** The success response body of `GET /account/v1/orders/{orderId}/items`. */
 export type ListOrderItemsResult =
   operations["list-order-items"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /account/v1/orders/{orderId}/items`. */
+export type ListOrderItemsQuery = operations["list-order-items"]["parameters"]["query"];
 
 /** The success response body of `GET /account/v1/entitlements`. */
 export type ListEntitlementsResult =

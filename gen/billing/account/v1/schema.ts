@@ -14,7 +14,7 @@ export interface paths {
     /**
      * List currencies accounts can be opened in
      * @description The currencies a new billing account can be opened in. A retired currency is not listed,
-     *     although accounts already opened in it keep working. Not paged: the set is a few rows.
+     *     although accounts already opened in it keep working. Results are paginated.
      */
     get: operations["list-currencies"];
     put?: never;
@@ -131,8 +131,8 @@ export interface paths {
      * List payment options
      * @description Lists the payment gateways and methods that currently accept payment in this account's currency, the
      *     preferred gateway first. Top-ups and invoice payments must name a gateway and method listed here;
-     *     others are refused. An empty list means no online payment is available for this account. Not paged: the
-     *     set is a few rows.
+     *     others are refused. An empty result means no online payment is available for this account.
+     *     Results are paginated.
      */
     get: operations["list-payment-options"];
     put?: never;
@@ -1362,8 +1362,7 @@ export interface components {
     };
     CancellationList: {
       items: components["schemas"]["Cancellation"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description A cancellation request for the original purchase. scheduled_at is the intended time; effective_at is the confirmed end of service. The request alone does not stop metering or issue a refund. */
     CancellationRequest: {
@@ -1518,6 +1517,7 @@ export interface components {
     };
     CurrencyList: {
       items: components["schemas"]["Currency"][];
+      pagination: components["schemas"]["OffsetPagination"];
     };
     BillingAccountCreate: {
       currency: string;
@@ -1539,8 +1539,7 @@ export interface components {
     };
     BillingAccountList: {
       items: components["schemas"]["BillingAccount"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description Account balance, credits, and unpaid charges are reported separately. */
     AccountBalance: {
@@ -1633,8 +1632,7 @@ export interface components {
     };
     ProjectBillingInfoList: {
       items: components["schemas"]["ProjectBillingInfo"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     ProjectBillingInfoSet: {
       /** Format: int64 */
@@ -1748,8 +1746,7 @@ export interface components {
     };
     TopUpList: {
       items: components["schemas"]["TopUp"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /**
      * @description Why a gateway payment was withdrawn. `abandoned` means the customer did not complete it within the time
@@ -1774,6 +1771,7 @@ export interface components {
     };
     PaymentOptionList: {
       items: components["schemas"]["PaymentOption"][];
+      pagination: components["schemas"]["OffsetPagination"];
     };
     PaymentMethod: {
       /** Format: uuid */
@@ -1791,8 +1789,7 @@ export interface components {
     };
     PaymentMethodList: {
       items: components["schemas"]["PaymentMethod"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     PaymentMethodSetup: {
       /** @description The selected gateway supporting saved payment methods. */
@@ -2033,8 +2030,7 @@ export interface components {
     };
     InvoiceList: {
       items: components["schemas"]["Invoice"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     InvoiceItem: {
       recurring_amount?: string;
@@ -2082,8 +2078,7 @@ export interface components {
     };
     InvoiceItemList: {
       items: components["schemas"]["InvoiceItem"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /**
      * @description topup adds to the balance; payment settles an invoice; refund returns original funds; payout withdraws from the balance; adjustment changes the balance with an audit reason.
@@ -2159,8 +2154,7 @@ export interface components {
     };
     TransactionList: {
       items: components["schemas"]["Transaction"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreditGrant: {
       min_amount?: string;
@@ -2183,8 +2177,7 @@ export interface components {
     };
     CreditGrantList: {
       items: components["schemas"]["CreditGrant"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     Refund: {
       /** Format: uuid */
@@ -2277,8 +2270,7 @@ export interface components {
       | "operator";
     RefundList: {
       items: components["schemas"]["Refund"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     UsageCharge: {
       /** Format: uuid */
@@ -2330,13 +2322,11 @@ export interface components {
     };
     UsageChargeList: {
       items: components["schemas"]["UsageCharge"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     SubscriptionList: {
       items: components["schemas"]["Subscription"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description An independently billed purchase. Fixed renewals use the agreed recurring_amount and interval; already paid periods retain their original value. Technical state belongs to the owning service. */
     Subscription: {
@@ -2431,6 +2421,7 @@ export interface components {
     };
     RenewalPriceList: {
       items: components["schemas"]["RenewalPrice"][];
+      pagination: components["schemas"]["OffsetPagination"];
     };
     RenewRequest: {
       /**
@@ -2588,8 +2579,7 @@ export interface components {
     };
     OrderList: {
       items: components["schemas"]["Order"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /**
      * @description How it was paid, as recorded at the time. It is kept as it was: removing the card afterwards
@@ -2744,8 +2734,7 @@ export interface components {
     };
     DiscountList: {
       items: components["schemas"]["Discount"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description A price's display terms, including retired prices referenced by an applicability list. */
     PriceOption: {
@@ -2867,8 +2856,7 @@ export interface components {
     };
     OrderItemList: {
       items: components["schemas"]["OrderItem"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     Allowance: {
       /** @description Optional issuance key, unique within this billing account. */
@@ -2912,8 +2900,7 @@ export interface components {
     };
     AllowanceList: {
       items: components["schemas"]["Allowance"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     Entitlement: {
       product: components["schemas"]["Product"];
@@ -2929,8 +2916,7 @@ export interface components {
     };
     EntitlementList: {
       items: components["schemas"]["Entitlement"][];
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /** @description Purchase-related invoice amounts, without account contact details or payment methods. Absent on an order with no immediate invoice. */
     InvoiceSummary: {
@@ -2988,6 +2974,15 @@ export interface components {
      * @example 10.2500000000
      */
     Money: string;
+    /** @description Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan. */
+    OffsetPagination: {
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
+    };
     /**
      * @description Which object this is, together with what a person currently calls it.
      *
@@ -3041,7 +3036,12 @@ export type $defs = Record<string, never>;
 export interface operations {
   "list-currencies": {
     parameters: {
-      query?: never;
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -3209,7 +3209,12 @@ export interface operations {
   };
   "list-payment-options": {
     parameters: {
-      query?: never;
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path: {
         accountId: components["parameters"]["AccountId"];
@@ -4074,7 +4079,12 @@ export interface operations {
   };
   "list-renewal-prices": {
     parameters: {
-      query?: never;
+      query?: {
+        /** @description 1-based page number; the first page when omitted. */
+        page?: components["parameters"]["Page"];
+        /** @description How many per page, 100 at most. */
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path: {
         subscriptionId: string;

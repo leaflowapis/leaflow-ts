@@ -20,6 +20,9 @@ export type ListPricesQuery = operations["list-prices"]["parameters"]["query"];
 export type ListProductsResult =
   operations["list-products"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `GET /catalog/v1/products`. */
+export type ListProductsQuery = operations["list-products"]["parameters"]["query"];
+
 /** The success response body of `GET /catalog/v1/products/{productId}`. */
 export type GetProductResult =
   operations["get-product"]["responses"][200]["content"]["application/json"];
@@ -34,6 +37,9 @@ export type GetPriceResult =
 /** The success response body of `GET /catalog/v1/plans`. */
 export type ListPlansResult =
   operations["list-plans"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /catalog/v1/plans`. */
+export type ListPlansQuery = operations["list-plans"]["parameters"]["query"];
 
 /** The success response body of `GET /catalog/v1/plans/{planId}/prices`. */
 export type ListPricesByPlanResult =

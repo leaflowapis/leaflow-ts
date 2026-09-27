@@ -1456,6 +1456,7 @@ export interface components {
     PeeringListResponseBody: {
       items: components["schemas"]["PeeringResource"][];
       total: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreatePeeringRequestBody: {
       name: string;
@@ -1524,6 +1525,7 @@ export interface components {
     };
     BackupListResponseBody: {
       items: components["schemas"]["BackupResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreateBackupRequestBody: {
       /** Format: uuid */
@@ -1683,6 +1685,7 @@ export interface components {
     };
     DiskTypeListResponseBody: {
       items: components["schemas"]["DiskTypeResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     /**
      * @description Who can see and use an image. `public` — offered to every project by the platform. `private` — usable only by the project that owns it.
@@ -1753,12 +1756,7 @@ export interface components {
     };
     ImageListResponseBody: {
       items: components["schemas"]["ImageResource"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     InstanceTypeResource: {
       /** Format: uuid */
@@ -1806,12 +1804,7 @@ export interface components {
     };
     InstanceTypeListResponseBody: {
       items: components["schemas"]["InstanceTypeResource"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     RegionResource: {
       /** @description ISO 3166-1 alpha-2 country this region sits in. Two letters, uppercase. */
@@ -1825,6 +1818,7 @@ export interface components {
     };
     RegionListResponseBody: {
       items: components["schemas"]["RegionResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     ZoneResource: {
       /** @description Display name for this zone, shown to tenants (Hong Kong A). The stable handle is code. */
@@ -1836,9 +1830,11 @@ export interface components {
     };
     ZoneListResponseBody: {
       items: components["schemas"]["ZoneResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     DiskListResponseBody: {
       items: components["schemas"]["DiskResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreateDiskRequestBody: {
       /**
@@ -1919,6 +1915,7 @@ export interface components {
     };
     FloatingIPListResponseBody: {
       items: components["schemas"]["FloatingIPResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     AllocateFloatingIPRequestBody: {
       /** @description The address to allocate. Allocated by the platform when omitted */
@@ -2049,12 +2046,7 @@ export interface components {
     };
     InstanceListResponseBody: {
       items: components["schemas"]["InstanceResource"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     LaunchInstanceRequestBody: {
       /**
@@ -2227,6 +2219,7 @@ export interface components {
     };
     PortListResponseBody: {
       items: components["schemas"]["PortResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     AttachPortRequestBody: {
       /** Format: uuid */
@@ -2264,12 +2257,7 @@ export interface components {
     };
     OperationLogListResponseBody: {
       items: components["schemas"]["OperationLogResource"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreatePortRequestBody: {
       name?: string;
@@ -2327,6 +2315,7 @@ export interface components {
     };
     PrivateNetworkListResponseBody: {
       items: components["schemas"]["PrivateNetworkResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreatePrivateNetworkRequestBody: {
       /** @description Must be an RFC 1918 private CIDR with a prefix length between /8 and /24, for example `10.0.0.0/16` */
@@ -2365,6 +2354,7 @@ export interface components {
     };
     RouteListResponseBody: {
       items: components["schemas"]["RouteResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreateRouteRequestBody: {
       description?: string;
@@ -2389,6 +2379,7 @@ export interface components {
     };
     SubnetListResponseBody: {
       items: components["schemas"]["SubnetResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreateSubnetRequestBody: {
       /** @description Must fall inside the CIDR of the private network and must not overlap an existing subnet */
@@ -2413,6 +2404,7 @@ export interface components {
     };
     SecurityGroupListResponseBody: {
       items: components["schemas"]["SecurityGroupResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreateSecurityGroupRequestBody: {
       description?: string;
@@ -2445,6 +2437,7 @@ export interface components {
     };
     SecurityRuleListResponseBody: {
       items: components["schemas"]["SecurityRuleResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreateSecurityRuleRequestBody: {
       description?: string;
@@ -2509,6 +2502,7 @@ export interface components {
     };
     SnapshotListResponseBody: {
       items: components["schemas"]["SnapshotResource"][] | null;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     CreateSnapshotRequestBody: {
       /** Format: uuid */
@@ -2657,12 +2651,7 @@ export interface components {
     };
     DiskAttachmentList: {
       items: components["schemas"]["DiskAttachment"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     PortAttachment: {
       /** Format: uuid */
@@ -2685,12 +2674,7 @@ export interface components {
     };
     PortAttachmentList: {
       items: components["schemas"]["PortAttachment"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     LaunchInstanceResponseBody: {
       /** @description Instances created by this operation. Empty before resource creation starts. */
@@ -2717,12 +2701,7 @@ export interface components {
     };
     IPv4PoolListResponseBody: {
       items: components["schemas"]["IPv4PoolResource"][];
-      /** Format: int64 */
-      page: number;
-      /** Format: int64 */
-      page_size: number;
-      /** Format: int64 */
-      total_count?: number;
+      pagination: components["schemas"]["OffsetPagination"];
     };
     IPv4Binding: {
       /** Format: uuid */
@@ -2756,6 +2735,15 @@ export interface components {
       id: string;
       /** @description The resource's name. A floating IP is named by its address. */
       name: string;
+    };
+    /** @description Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan. */
+    OffsetPagination: {
+      /** Format: int64 */
+      page: number;
+      /** Format: int64 */
+      page_size: number;
+      /** Format: int64 */
+      total_count?: number;
     };
     /**
      * @description A decimal string, in the currency stated alongside it.
@@ -2795,7 +2783,10 @@ export interface components {
     };
   };
   responses: never;
-  parameters: never;
+  parameters: {
+    Page: number;
+    PageSize: number;
+  };
   requestBodies: never;
   headers: never;
   pathItems: never;
@@ -2807,6 +2798,8 @@ export interface operations {
       query?: {
         /** @description Return only the backups of this disk */
         disk_id?: string;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -3043,10 +3036,12 @@ export interface operations {
   };
   "list-disk-types": {
     parameters: {
-      query: {
-        region_id: string;
+      query?: {
+        region_id?: string;
         /** @description `true` lists only system disk types and `false` only data disk types. Both are listed when omitted. */
         for_system?: boolean;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -3112,8 +3107,8 @@ export interface operations {
         region_id?: string;
         /** @description Return only public or only private images. Both are returned when omitted */
         visibility?: components["schemas"]["ImageVisibility"];
-        page?: number;
-        page_size?: number;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -3315,10 +3310,10 @@ export interface operations {
   };
   "list-instance-types": {
     parameters: {
-      query: {
-        region_id: string;
-        page?: number;
-        page_size?: number;
+      query?: {
+        region_id?: string;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -3348,7 +3343,10 @@ export interface operations {
   };
   "list-regions": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -3377,7 +3375,10 @@ export interface operations {
   };
   "list-availability-zones": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path: {
         regionId: string;
@@ -3412,6 +3413,8 @@ export interface operations {
         region_id?: string;
         /** @description Supplied together with `region_code` to filter attachable disks */
         availability_zone_id?: string;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -3650,7 +3653,10 @@ export interface operations {
   };
   "list-floating-ips": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -3887,8 +3893,8 @@ export interface operations {
       query?: {
         /** @description Only instances carrying this label, written as `key:value` — for example `env:prod`. Both halves are matched exactly */
         label?: string;
-        page?: number;
-        page_size?: number;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -4438,8 +4444,8 @@ export interface operations {
   "list-instance-disks": {
     parameters: {
       query?: {
-        page?: number;
-        page_size?: number;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path: {
@@ -4606,8 +4612,8 @@ export interface operations {
   "list-instance-ports": {
     parameters: {
       query?: {
-        page?: number;
-        page_size?: number;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path: {
@@ -4709,8 +4715,8 @@ export interface operations {
       query?: {
         /** @description Return a single kind of operation; the value matches the operation id of the endpoint */
         action?: string;
-        page?: number;
-        page_size?: number;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -4740,7 +4746,10 @@ export interface operations {
   };
   "list-ports": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -4834,6 +4843,8 @@ export interface operations {
       query?: {
         /** @description Returns every region when omitted */
         region_id?: string;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -5082,7 +5093,10 @@ export interface operations {
   };
   "list-routes": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path: {
         privateNetworkId: string;
@@ -5178,7 +5192,10 @@ export interface operations {
   };
   "list-subnets": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path: {
         privateNetworkId: string;
@@ -5311,6 +5328,8 @@ export interface operations {
         region_id?: string;
         /** @description Return only the security groups of this private network */
         private_network_id?: string;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -5468,7 +5487,10 @@ export interface operations {
   };
   "list-security-group-rules": {
     parameters: {
-      query?: never;
+      query?: {
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
+      };
       header?: never;
       path: {
         securityGroupId: string;
@@ -5567,6 +5589,8 @@ export interface operations {
       query?: {
         /** @description Return only the snapshots of this disk */
         disk_id?: string;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -5766,10 +5790,10 @@ export interface operations {
   };
   "list-ipv4-pools": {
     parameters: {
-      query: {
-        region_id: string;
-        page?: number;
-        page_size?: number;
+      query?: {
+        region_id?: string;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;
@@ -5800,8 +5824,8 @@ export interface operations {
   "list-peerings": {
     parameters: {
       query?: {
-        limit?: number;
-        offset?: number;
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
       };
       header?: never;
       path?: never;

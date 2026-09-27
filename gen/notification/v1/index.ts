@@ -106,10 +106,16 @@ export type ListTypePreferencesQuery = operations["list-type-preferences"]["para
 export type UpdateTypePreferenceResult =
   operations["update-type-preference"]["responses"][200]["content"]["application/json"];
 
+/** The query parameters of `PUT /api/v1/preferences/types/{type}`. */
+export type UpdateTypePreferenceQuery = operations["update-type-preference"]["parameters"]["query"];
+
 /** The request body of `PUT /api/v1/preferences/types/{type}`. */
 export type UpdateTypePreferenceBody = NonNullable<
   operations["update-type-preference"]["requestBody"]
 >["content"]["application/json"];
+
+/** The query parameters of `DELETE /api/v1/preferences/types/{type}`. */
+export type DeleteTypePreferenceQuery = operations["delete-type-preference"]["parameters"]["query"];
 
 /** The success response body of `GET /api/v1/channels`. */
 export type ListUserChannelsResult =
