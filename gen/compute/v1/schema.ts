@@ -1455,7 +1455,6 @@ export interface components {
     };
     PeeringListResponseBody: {
       items: components["schemas"]["PeeringResource"][];
-      total: number;
       pagination: components["schemas"]["OffsetPagination"];
     };
     CreatePeeringRequestBody: {
