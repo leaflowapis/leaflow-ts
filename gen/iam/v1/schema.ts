@@ -435,14 +435,17 @@ export interface components {
       /** @description **The rules compiled from every policy that applies. Do not walk them to reach a decision.** They are here to render what a user may do; each request is decided by the service handling it */
       rules: components["schemas"]["RuleResource"][] | null;
     };
+    ProjectTraitResource: {
+      key: string;
+      value: string;
+      /** @enum {string} */
+      effect: "NoWrite" | "NoAccess";
+      reason: string;
+    };
     ProjectResource: {
-      /**
-       * Format: date-time
-       * @description A read-only management lock. Running resources and billing remain unchanged. Only an operator can release it.
-       */
-      locked_at: string | null;
-      lock_reason: string;
-      ban_reason: string;
+      traits: components["schemas"]["ProjectTraitResource"][];
+      /** Format: date-time */
+      deletion_requested_at: string | null;
       /** Format: date-time */
       created_at: string;
       created_by: string;
@@ -455,10 +458,6 @@ export interface components {
       /** Format: uuid */
       id: string;
       name: string;
-      /** @enum {string} */
-      status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
-      /** @description Written for a reader; it takes part in no query */
-      status_reason: string;
       /** Format: date-time */
       updated_at: string;
     };
@@ -471,9 +470,13 @@ export interface components {
       name?: string;
     };
     MembershipResource: {
+      traits: components["schemas"]["ProjectTraitResource"][];
+      /** Format: date-time */
+      deleted_at: string | null;
+      /** Format: date-time */
+      deletion_requested_at: string | null;
       grant: components["schemas"]["GrantResource"];
       member: boolean;
-      project_status: string;
       user_status: string;
     };
     InvitationResource: {
