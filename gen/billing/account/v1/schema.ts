@@ -1738,6 +1738,8 @@ export interface components {
     CreditGroup: {
       /** @description What the credit in this group may pay for. No restrictions means anything on the account. */
       applies_to: components["schemas"]["Applicability"];
+      /** @description Restricted to your first purchase of anything it applies to. */
+      first_purchase_only?: boolean;
       amount: components["schemas"]["Money"];
     };
     ProjectBillingInfo: {
@@ -2301,6 +2303,8 @@ export interface components {
       currency: string;
       /** @description What this credit may pay for. No restrictions means anything on the account. */
       applies_to: components["schemas"]["Applicability"];
+      /** @description Restricted to your first purchase of anything it applies to. */
+      first_purchase_only?: boolean;
       /** @enum {string} */
       status: "active" | "depleted" | "expired" | "voided";
       /** Format: date-time */
@@ -2840,6 +2844,8 @@ export interface components {
        *     including setup fees and traffic.
        */
       applies_to: components["schemas"]["Applicability"];
+      /** @description Restricted to your first purchase of anything it applies to. */
+      first_purchase_only?: boolean;
       /** Format: date-time */
       started_at?: string;
       /** Format: date-time */
@@ -2866,19 +2872,20 @@ export interface components {
       /** @description How many periods one purchase covers. */
       interval_count?: number;
       unit_amount?: components["schemas"]["Money"];
+      /** @description False once the price is archived. It still applies to purchases already made at this price. */
+      active: boolean;
     };
     /**
-     * @description Product, plan and price lists form a union; three empty lists permit every item.
-     *     Other conditions apply together. Entries always include their display fields.
+     * @description Anything not excluded that matches an inclusion, or anything not excluded when no inclusion is
+     *     given, subject to the billing type, operation and term conditions. Entries always include their
+     *     display fields; archived plans and prices stay listed with active set to false.
      */
     Applicability: {
       products?: components["schemas"]["Product"][];
-      plans?: components["schemas"]["ObjectIdentity"][];
+      plans?: components["schemas"]["ApplicablePlan"][];
       prices?: components["schemas"]["PriceOption"][];
       price_types?: string[];
       operations?: components["schemas"]["PurchaseOperation"][];
-      /** @description Restricted to your first purchase of a covered product. */
-      first_purchase_only?: boolean;
       /**
        * @description The shortest term a purchase may have, in months. A purchase with no term, such as
        *     metered usage, never qualifies while this is set.
@@ -2886,6 +2893,16 @@ export interface components {
       min_term_months?: number;
       /** @description The longest term a purchase may have, in months. */
       max_term_months?: number;
+      excluded_products?: components["schemas"]["Product"][];
+      excluded_plans?: components["schemas"]["ApplicablePlan"][];
+      excluded_prices?: components["schemas"]["PriceOption"][];
+    };
+    /** @description A plan it refers to. active is false once the plan is archived; it still applies to subscriptions already on this plan. */
+    ApplicablePlan: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      active: boolean;
     };
     /**
      * @description Frozen purchase terms. Monetary fields come from related invoice-line snapshots and are absent

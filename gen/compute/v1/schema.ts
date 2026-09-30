@@ -504,7 +504,7 @@ export interface paths {
      * Release a floating IP
      * @description Releases the floating IP after unbinding it. The floating IP shows the `delete` operation until it is released.
      *
-     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the address or for its bandwidth, including a pay-as-you-go subscription. `meta.resource_id` names the floating IP. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the address, including a pay-as-you-go subscription. `meta.resource_id` names the floating IP. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
      */
     delete: operations["release-floating-ip"];
     options?: never;
@@ -1795,10 +1795,10 @@ export interface components {
        */
       source_disk_id: string;
       /**
-       * @description `provisioning` while the backup is taken, then `available`. `failed` means the backup was not created.
+       * @description `provisioning` while the backup is taken, then `available`. `failed` means the backup was not created. `missing` means the backup no longer exists in the cloud.
        * @enum {string}
        */
-      status: "provisioning" | "available" | "deleted" | "failed" | "error";
+      status: "provisioning" | "available" | "deleted" | "failed" | "error" | "missing";
       /** @description The operation in progress on this backup, or null when none is. */
       readonly operation: components["schemas"]["BackupOperation"] | null;
       /** Format: int64 */
@@ -1870,10 +1870,18 @@ export interface components {
        */
       throughput_bytes_per_sec: number | null;
       /**
-       * @description `pending` until the order is accepted, with no storage allocated; `provisioning` while the disk is created; then `available`, or `in_use` once attached. `failed` means the disk was not created; `failure_reason` states why.
+       * @description `pending` until the order is accepted, with no storage allocated; `provisioning` while the disk is created; then `available`, or `in_use` once attached. `failed` means the disk was not created; `failure_reason` states why. `missing` means the disk no longer exists in the cloud.
        * @enum {string}
        */
-      status: "pending" | "provisioning" | "available" | "in_use" | "deleted" | "failed" | "error";
+      status:
+        | "pending"
+        | "provisioning"
+        | "available"
+        | "in_use"
+        | "deleted"
+        | "failed"
+        | "error"
+        | "missing";
       /** Format: uuid */
       order_id: string | null;
       /**
@@ -1991,11 +1999,18 @@ export interface components {
       /** @description False means a new password can only be set by rebuilding an instance created from this image */
       supports_password_reset: boolean;
       /**
-       * @description Only `available` images can install instances. A public image is always `available`; a private image is `pending` until its order is accepted, then goes through `provisioning` and `uploading` while it is captured. `failed` means the capture produced no image; `failure_reason` states why.
+       * @description Only `available` images can install instances. A public image is always `available`; a private image is `pending` until its order is accepted, then goes through `provisioning` and `uploading` while it is captured. `failed` means the capture produced no image; `failure_reason` states why. `missing` means a private image no longer exists in the cloud.
        * @enum {string}
        */
       status:
-        "pending" | "provisioning" | "uploading" | "available" | "deleted" | "failed" | "error";
+        | "pending"
+        | "provisioning"
+        | "uploading"
+        | "available"
+        | "deleted"
+        | "failed"
+        | "error"
+        | "missing";
       /** @description Details of why the capture failed; non-empty only when `status` is `failed` */
       failure: string | null;
       /**
@@ -2166,8 +2181,8 @@ export interface components {
     };
     /**
      * @description One purchased public IP resource, including its bandwidth configuration. Bandwidth has no
-     *     separate Compute resource ID. Billing may split fees internally; read the order for the
-     *     commercial breakdown. Changing bandwidth updates this same resource, not another allocation.
+     *     separate Compute resource ID; one subscription pays for the address and its bandwidth.
+     *     Changing bandwidth updates this same resource, not another allocation.
      */
     FloatingIPResource: {
       /** @description The allocated public address. Null until the address is allocated. */
@@ -2181,10 +2196,18 @@ export interface components {
       /** Format: uuid */
       region_id: string;
       /**
-       * @description `pending` until the order is accepted, with no address allocated; `provisioning` while the address is allocated; then `available`. `failed` means no address was allocated; `failure_reason` states why.
+       * @description `pending` until the order is accepted, with no address allocated; `provisioning` while the address is allocated; then `available`. `failed` means no address was allocated; `failure_reason` states why. `missing` means the address no longer exists in the cloud.
        * @enum {string}
        */
-      status: "pending" | "provisioning" | "available" | "deleted" | "failed" | "error" | "unknown";
+      status:
+        | "pending"
+        | "provisioning"
+        | "available"
+        | "deleted"
+        | "failed"
+        | "error"
+        | "unknown"
+        | "missing";
       /** Format: uuid */
       order_id: string | null;
       /**
@@ -2198,7 +2221,7 @@ export interface components {
        *     presence does not imply delivery or metering. Null when no subscription is associated.
        */
       subscription_id: string | null;
-      /** @description The complete subscription set a cancellation through Billing has to cover to release this floating IP, including any internal fee components. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      /** @description The subscription a cancellation through Billing has to cover to release this floating IP. A subscription that has ended is not listed, and the list is empty when no subscription pays for the floating IP. */
       release_subscription_ids: string[];
       /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
       release_set: components["schemas"]["ReleaseSetItem"][];
@@ -2305,7 +2328,7 @@ export interface components {
       /** Format: uuid */
       region_id: string;
       /**
-       * @description `pending` until the order is accepted: no virtual machine exists and addresses are null. `provisioning` while the instance is created, then `active`. `failed` means the instance was not created; `failure_reason` states why. The other values are the state last observed in the cloud; an operation in progress appears in `operation`, not here.
+       * @description `pending` until the order is accepted: no virtual machine exists and addresses are null. `provisioning` while the instance is created, then `active`. `failed` means the instance was not created; `failure_reason` states why. `missing` means the virtual machine no longer exists in the cloud. The other values are the state last observed in the cloud; an operation in progress appears in `operation`, not here.
        * @enum {string}
        */
       status:
@@ -2321,14 +2344,12 @@ export interface components {
         | "deleted"
         | "failed"
         | "error"
-        | "unknown";
+        | "unknown"
+        | "missing";
       /** Format: uuid */
       subnet_id: string | null;
       /** Format: date-time */
       updated_at: string;
-      /** @enum {string} */
-      power_state:
-        "no_state" | "running" | "paused" | "shutdown" | "crashed" | "suspended" | "unknown";
       /** Format: int64 */
       generation: number;
       /** Format: date-time */
@@ -2535,8 +2556,11 @@ export interface components {
       public_ips: string[] | null;
       addresses?: components["schemas"]["PortAddress"][];
       attachment?: components["schemas"]["PortAttachment"] | null;
-      /** @enum {string} */
-      status: "pending" | "available" | "error" | "unknown";
+      /**
+       * @description `missing` means the interface no longer exists in the cloud.
+       * @enum {string}
+       */
+      status: "pending" | "available" | "error" | "unknown" | "missing";
       /** Format: int64 */
       generation: number;
       /** Format: date-time */
@@ -2628,10 +2652,10 @@ export interface components {
       /** Format: uuid */
       region_id: string;
       /**
-       * @description Only `available` accepts new instances, interfaces and floating IPs
+       * @description Only `available` accepts new instances, interfaces and floating IPs. `missing` means the network no longer exists in the cloud.
        * @enum {string}
        */
-      status: "pending" | "available" | "error" | "unknown";
+      status: "pending" | "available" | "error" | "unknown" | "missing";
       /** Format: date-time */
       updated_at: string;
       /** @description The operation in progress on this private network, or null when none is. */
@@ -2828,6 +2852,10 @@ export interface components {
        *     until a replacement quota is activated. Null when no purchase has been recorded.
        */
       subscription_id: string | null;
+      /** @description The billing choice of the associated quota purchase, as given when it was bought. A change of an existing purchase has to give the same choice. Null when no purchase has been recorded. */
+      billing: components["schemas"]["BillingChoice"] | null;
+      /** @description The subscription a cancellation through Billing has to cover to release this snapshot quota. A subscription that has ended is not listed, and the list is empty when no subscription pays for the quota. */
+      release_subscription_ids: string[];
       /**
        * Format: int64
        * @description Target count awaiting checkout or activation; null when no purchase is pending.
@@ -2888,10 +2916,10 @@ export interface components {
        */
       size_gb: number;
       /**
-       * @description `pending` once a quota slot is reserved, `provisioning` while the snapshot is taken, then `available`. `failed` means the snapshot was not created; its slot is released once no snapshot data remains.
+       * @description `pending` once a quota slot is reserved, `provisioning` while the snapshot is taken, then `available`. `failed` means the snapshot was not created; its slot is released once no snapshot data remains. `missing` means the snapshot no longer exists in the cloud.
        * @enum {string}
        */
-      status: "pending" | "provisioning" | "available" | "deleted" | "failed" | "error";
+      status: "pending" | "provisioning" | "available" | "deleted" | "failed" | "error" | "missing";
       /** @description The operation in progress on this snapshot, or null when none is. */
       readonly operation: components["schemas"]["SnapshotOperation"] | null;
       /** Format: int64 */
@@ -2991,6 +3019,8 @@ export interface components {
        * @description The Billing subscription that backup usage is billed under; null before an activation is requested.
        */
       subscription_id: string | null;
+      /** @description The subscription a cancellation through Billing has to cover to release this backup service. A subscription that has ended is not listed, and the list is empty when no subscription pays for the service. */
+      release_subscription_ids: string[];
       /**
        * Format: int64
        * @description The total `capacity_gib` of the backups retained in this region.
@@ -3039,11 +3069,8 @@ export interface components {
        * @description The pack's Billing subscription, through which it is renewed or canceled.
        */
       subscription_id: string | null;
-      /**
-       * Format: date-time
-       * @description The end of the current paid term; null until the pack is active.
-       */
-      paid_until: string | null;
+      /** @description The subscription a cancellation through Billing has to cover to release this capacity pack. A subscription that has ended is not listed, and the list is empty when no subscription pays for the pack. */
+      release_subscription_ids: string[];
       /** Format: date-time */
       created_at: string;
     };
@@ -3441,7 +3468,7 @@ export interface components {
       name: string;
       /** @description How an address from this pool can be bought, per address. Null when the project has no billing account. */
       readonly pricing: components["schemas"]["Pricing"] | null;
-      /** @description How the bandwidth of an address from this pool is billed, per Mbit/s, with the same billing choice as the address. Null when the project has no billing account. */
+      /** @description How the bandwidth of an address from this pool is billed, per Mbit/s. It is bought in the same purchase as the address, with the same billing choice. Null when the project has no billing account. */
       readonly bandwidth_pricing: components["schemas"]["Pricing"] | null;
     };
     IPv4PoolListResponseBody: {
@@ -3466,7 +3493,7 @@ export interface components {
       /** Format: date-time */
       released_at: string | null;
     };
-    /** @description One subscription of a release set and the resource it pays for. Multiple internal billing components may refer to the same floating IP; they do not create independent bandwidth resources. */
+    /** @description One subscription of a release set and the resource it pays for. */
     ReleaseSetItem: {
       /** Format: uuid */
       subscription_id: string;
