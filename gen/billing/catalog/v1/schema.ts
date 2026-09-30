@@ -18,8 +18,8 @@ export interface paths {
      *     `currency` is required: a plan has a price in each currency it is sold in, so "what does
      *     this cost" has no answer without one.
      *
-     *     Retired prices are left out. Existing subscriptions still reference them, so this is not
-     *     the place to look up what an existing purchase is paying.
+     *     Archived prices are left out. Existing subscriptions keep the terms they were bought at, so
+     *     this is not the place to look up what an existing purchase is paying.
      */
     get: operations["list-prices"];
     put?: never;
@@ -104,7 +104,7 @@ export interface paths {
     };
     /**
      * Get a price
-     * @description Returns the catalog price, including retired prices. Fixed purchase history and renewal agreements are shown on orders and subscriptions rather than reconstructed from today's catalog.
+     * @description Returns the catalog price, including archived prices. Fixed purchase history and renewal agreements are shown on orders and subscriptions rather than reconstructed from today's catalog.
      */
     get: operations["get-price"];
     put?: never;
@@ -217,7 +217,16 @@ export interface components {
      */
     TerminationPolicy: "immediate" | "period_end";
     /**
-     * @description Prorated returns the unused value of paid service periods using integer-second duration ratios. Setup fees are excluded. Tax and funds follow the original invoice and payment sources.
+     * @description none refunds nothing. prorated refunds the amount paid for the current period minus the value of
+     *     the time used, never below zero and never more than what remains unrefunded. The time used runs
+     *     from the period start to the effective cancellation time and is valued at the plan's
+     *     shorter-period prices in the same currency, frozen at purchase as the order item's
+     *     refund_monthly_amount and refund_hourly_amount: each full calendar month at the one-month prepaid
+     *     price, the remainder at the postpaid hourly price or, without one, at the one-month price by the
+     *     second. When the plan has no prepaid period shorter than the one bought, the time used is valued
+     *     at the price paid, pro rata by the second. Discounts are not refunded, as they were never paid,
+     *     and setup fees are excluded. The refunded part returns to the payment sources it came from. Tax
+     *     paid is refunded in the same proportion as the amount it was paid on.
      * @enum {string}
      */
     RefundPolicy: "none" | "prorated";
@@ -246,7 +255,8 @@ export interface components {
       pagination: components["schemas"]["OffsetPagination"];
     };
     Plan: {
-      enabled: boolean;
+      /** @description False once archived. An archived plan cannot be bought until it is active again. */
+      active: boolean;
       lookup_key?: string;
       product: components["schemas"]["Product"];
       features: components["schemas"]["PlanFeature"][];
@@ -269,7 +279,8 @@ export interface components {
       meter_id?: string;
       meter?: components["schemas"]["ObjectIdentity"];
       unit_quantity: string;
-      enabled?: boolean;
+      /** @description False once archived. An archived price cannot be bought until it is active again. */
+      active: boolean;
       termination_policy?: components["schemas"]["TerminationPolicy"];
       refund_policy?: components["schemas"]["RefundPolicy"];
       product_id?: components["schemas"]["ProductID"];

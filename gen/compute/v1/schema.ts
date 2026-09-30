@@ -20,35 +20,11 @@ export interface paths {
      *
      *     Disks attached to a running instance, including system disks, can be backed up.
      *
-     *     The duration depends on the amount of data. The backup is not complete when this endpoint returns; track the returned task.
+     *     No order is placed. The backup is metered on the backup service of the disk's region by its `capacity_gib` for as long as it is retained, until it is deleted; see `get-backup-service`. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` and `meta.region_id` when that service is not active.
      *
-     *     The backup is billed for its size, at the backup price of its region. Obtain a price with `create-backup-quote` first.
+     *     Returns the backup while it is taken; the duration depends on the amount of data. Read the backup until it is `available` or `failed`.
      */
     post: operations["create-backup"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/backups/quote": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Quote a backup
-     * @description Prices the backup `create-backup` would order for the same disk, without ordering anything. Nothing is reserved and nothing is recorded, so this may be called as often as required.
-     *
-     *     The quantity priced is the size of the disk. When `price_id` is omitted, a price of the region's backup offering is selected; the returned line names it, and that `price_id` is the one to order with.
-     *
-     *     Prices may change between quoting and ordering. An order is charged at the price in effect when it is placed, so a quote should be refreshed before a final confirmation is shown.
-     */
-    post: operations["create-backup-quote"];
     delete?: never;
     options?: never;
     head?: never;
@@ -64,16 +40,14 @@ export interface paths {
     };
     /**
      * Retrieve a backup
-     * @description Queries the current state of the backup, which makes it slower but more accurate than the list endpoint. Use it to poll creation progress.
+     * @description Returns the stored state of the backup; it does not query the cloud. Use it to poll creation progress.
      */
     get: operations["get-backup"];
     put?: never;
     post?: never;
     /**
      * Delete a backup
-     * @description Independent of the source disk: deletion succeeds whether or not that disk still exists.
-     *
-     *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the backup, including a pay-as-you-go subscription. `meta.resource_id` names the backup. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+     * @description Independent of the source disk: deletion succeeds whether or not that disk still exists. Metering of the backup ends once it is deleted.
      */
     delete: operations["delete-backup"];
     options?: never;
@@ -95,9 +69,31 @@ export interface paths {
      * Restore from a backup
      * @description Restores onto a **newly created** disk. The source disk is unaffected and need not still exist.
      *
-     *     The target disk type may belong to another availability zone of the same region, and its capacity must not be smaller than the backup. The disk cannot be attached until the restore completes; track the returned task.
+     *     The target disk type may belong to another availability zone of the same region, and its capacity must not be smaller than the backup. Returns the new disk as `pending` with its order; it cannot be attached until it is `available`.
      */
     post: operations["restore-backup"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/backups/{backupId}/restore/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        backupId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote restoring from a backup
+     * @description Prices what `restore-backup` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-backup-restore-quote"];
     delete?: never;
     options?: never;
     head?: never;
@@ -167,9 +163,9 @@ export interface paths {
      * Capture an instance as a private image
      * @description Creates a private image of this project from the system disk of the instance; data disks are not included. The resulting image can create instances and rebuild them, and remains usable after the source instance is released.
      *
-     *     **The image reflects the moment the capture started. Later changes to the instance are not included.**
+     *     **The image reflects the moment the capture started. Later changes to the instance are not included.** The image is returned as `pending` with its order, and the capture starts only once the order is accepted.
      *
-     *     The capture has two phases, reported by the status of the image:
+     *     The capture then has two phases, reported by the status of the image:
      *
      *     - `provisioning` — the system disk is being read, usually for tens of seconds. The instance remains usable during this phase, although stopping it first is recommended for consistency.
      *     - `uploading` — no longer tied to the system disk. **The instance may be started at this point; there is no need to wait for the capture to finish.** The duration of this phase is proportional to the size of the system disk, roughly 3 minutes for 20 GB.
@@ -178,7 +174,7 @@ export interface paths {
      *
      *     The instance can be started, stopped and used normally during the capture, but cannot be released.
      *
-     *     The image is billed for the storage it occupies, at the private image price of its region. Obtain a price with `create-image-quote` first.
+     *     The image is billed for the storage it occupies, as the region's `private_image_pricing` shows. Obtain a quote with `create-image-quote` first.
      */
     post: operations["create-image"];
     delete?: never;
@@ -198,11 +194,7 @@ export interface paths {
     put?: never;
     /**
      * Quote capturing an instance as a private image
-     * @description Prices the capture `create-image` would order for the same instance, without ordering anything. Nothing is reserved and nothing is recorded, so this may be called as often as required.
-     *
-     *     The quantity priced is the size of the system disk, which is the most the image can occupy. When `price_id` is omitted, a price of the region's private image offering is selected; the returned line names it, and that `price_id` is the one to order with.
-     *
-     *     Prices may change between quoting and ordering. An order is charged at the price in effect when it is placed, so a quote should be refreshed before a final confirmation is shown.
+     * @description Prices the capture `create-image` would order for the same instance, without ordering anything; nothing is reserved or recorded. The quantity priced is the size of the system disk, which is the most the image can occupy, with the option chosen in `billing`. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. Prices may change, so quote again before final confirmation.
      */
     post: operations["create-image-quote"];
     delete?: never;
@@ -220,7 +212,7 @@ export interface paths {
     };
     /**
      * Retrieve an image
-     * @description Returns a public image, or a private image of this project; any other image is reported as not found. Use this endpoint to poll capture progress. When `status` is `error`, `failure` states the reason.
+     * @description Returns a public image, or a private image of this project; any other image is reported as not found. Use this endpoint to poll capture progress. When `status` is `failed`, `failure_reason` states why.
      */
     get: operations["get-image"];
     put?: never;
@@ -231,7 +223,7 @@ export interface paths {
      *
      *     Deletion is rejected while instances created from the image still exist, as they need it in order to be rebuilt.
      *
-     *     An image whose capture has not finished can be deleted; the capture is aborted.
+     *     An image whose capture has not finished can be deleted; the capture is aborted. This is the one operation accepted while the `create` operation is in progress.
      *
      *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the image, including a pay-as-you-go subscription. `meta.resource_id` names the image. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
      */
@@ -328,6 +320,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/disks/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote creating a disk
+     * @description Prices what `create-disk` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-disk-quote"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/disks/{diskId}": {
     parameters: {
       query?: never;
@@ -337,7 +349,7 @@ export interface paths {
     };
     /**
      * Retrieve a disk
-     * @description Queries the current state of the disk, which makes it slower but more accurate than the list endpoint.
+     * @description Returns the stored state of the disk; it does not query the cloud.
      */
     get: operations["get-disk"];
     put?: never;
@@ -369,7 +381,7 @@ export interface paths {
     put?: never;
     /**
      * Resize a disk
-     * @description Capacity can only be increased; shrinking is not supported. The resize is not complete when this endpoint returns; track the returned task, then extend the file system inside the instance.
+     * @description Capacity can only be increased; shrinking is not supported. Returns the disk with the order for the resize, which keeps the disk's billing mode and period. The disk shows the `resize` operation until the resize is applied or its order is canceled, including while the order awaits checkout, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The disk keeps its current size until the resize is applied; once `size_gb` shows the new size, extend the file system inside the instance. If the order is not accepted or the resize fails, the disk keeps its size and the order shows the outcome.
      *
      *     **An attached data disk whose performance scales with its size must be detached before it is resized.** The performance of an attached disk does not change until the disk is detached and attached again, so such a request is refused with `DISK_RESIZE_NEEDS_DETACH` rather than providing the new capacity at the performance of the previous size. Detach the disk, resize it, and attach it again.
      *
@@ -378,6 +390,28 @@ export interface paths {
      *     **A system disk can be resized while attached**, because a system disk cannot be detached. System disk types use a performance level that does not scale with size, so resizing a system disk does not change its performance.
      */
     post: operations["resize-disk"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/disks/{diskId}/resize/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        diskId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote resizing a disk
+     * @description Prices the change `resize-disk` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-disk-resize-quote"];
     delete?: never;
     options?: never;
     head?: never;
@@ -399,7 +433,7 @@ export interface paths {
      *
      *     Three restrictions apply: only the most recent snapshot of the disk can be reverted to; the disk must be detached from its instance first; and a disk resized since the snapshot was taken cannot be reverted. To return to an earlier point in time, or to keep the existing disk, create a new disk from the snapshot instead.
      *
-     *     The revert is not complete when this endpoint returns; poll the retrieve endpoint.
+     *     The disk shows the `revert` operation until the revert is complete.
      */
     post: operations["revert-disk"];
     delete?: never;
@@ -422,11 +456,33 @@ export interface paths {
      * Allocate a floating IP
      * @description If the private network is not yet connected to the internet, connectivity is established as part of this call.
      *
+     *     Returns the floating IP as `pending` with its order; `address` is null until the address is allocated after the order is accepted. A requested `address` is not held while pending; if it is no longer available then, the floating IP ends `failed` with `provisioning_failed` and its charge is refunded.
+     *
      *     IPv6 is not requested through this endpoint. IPv6 addresses are assigned to instances by the private network; enable IPv6 on that network instead.
      *
      *     Refused with `PRIVATE_NETWORK_UNAVAILABLE`, before any order is created, when the private network's `status` is not `available`. `meta.private_network_id` names it.
      */
     post: operations["allocate-floating-ip"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/floating-ips/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote allocating a floating IP
+     * @description Prices what `allocate-floating-ip` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-floating-ip-quote"];
     delete?: never;
     options?: never;
     head?: never;
@@ -446,7 +502,7 @@ export interface paths {
     post?: never;
     /**
      * Release a floating IP
-     * @description Releases the floating IP after unbinding it. Completion is reported by the returned task.
+     * @description Releases the floating IP after unbinding it. The floating IP shows the `delete` operation until it is released.
      *
      *     Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the address or for its bandwidth, including a pay-as-you-go subscription. `meta.resource_id` names the floating IP. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
      */
@@ -466,12 +522,34 @@ export interface paths {
     get?: never;
     /**
      * Set the bandwidth limit
-     * @description The limit applies to inbound and outbound traffic alike. The new limit is not in effect when this endpoint returns; track the returned task.
+     * @description Changes the bandwidth of this floating IP through an order that keeps its billing mode and period; no separate bandwidth resource is created. The limit applies to inbound and outbound traffic alike. The floating IP shows the `set_bandwidth` operation until the change is applied or its order is canceled, including while the order awaits checkout, so other operations and a second change are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The current limit stays in effect until the change is applied. If the order is not accepted or the change fails, `bandwidth_mbps` keeps its value and the order shows the outcome.
      *
      *     While the address is bound to an instance, the limit must not exceed the `max_bandwidth_mbps` of that instance's type; a higher limit is refused with `INSTANCE_BANDWIDTH_CEILING`. The limit of an address that is not bound is checked when the address is bound to an instance.
      */
     put: operations["set-floating-ip-bandwidth"];
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/floating-ips/{floatingIpId}/bandwidth/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        floatingIpId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote changing the bandwidth limit
+     * @description Prices the change `set-floating-ip-bandwidth` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-floating-ip-bandwidth-quote"];
     delete?: never;
     options?: never;
     head?: never;
@@ -486,12 +564,15 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Bind a floating IP to a network interface */
+    /**
+     * Bind a floating IP to a network interface
+     * @description The floating IP shows the `bind` operation until the binding is confirmed.
+     */
     put: operations["bind-floating-ip"];
     post?: never;
     /**
      * Unbind a floating IP
-     * @description The address remains held by the project and simply no longer points at any network interface.
+     * @description The address remains held by the project and simply no longer points at any network interface. The floating IP shows the `unbind` operation until the change is confirmed.
      */
     delete: operations["unbind-floating-ip"];
     options?: never;
@@ -508,21 +589,43 @@ export interface paths {
     };
     /**
      * List instances
-     * @description Every instance in the project, newest first. This endpoint does not query backend state; for the accurate state of one instance, use the retrieve endpoint.
+     * @description Every instance in the project, newest first, in their stored state.
      */
     get: operations["list-instances"];
     put?: never;
     /**
      * Create instances
-     * @description Creates a Billing order, including for metered pricing. The price must belong to the resource’s Billing Plan; applicable contract pricing is resolved by Billing. The instances are created after the order's invoice is paid, or without waiting when the order has no immediate invoice. Do not submit a new purchase after paying. After an uncertain response, look the order up before submitting again.
+     * @description Creates a Billing order, including for metered pricing, and returns one `pending` instance per requested instance with the order. `billing` applies to the instance, its system disk and its floating IP alike. A pending instance has no virtual machine, system disk or address, and is not metered.
      *
-     *     Exactly one of image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
+     *     Creation starts once Billing accepts the order: the instance becomes `provisioning`, then `active`. With automatic checkout, insufficient funds refuse the request and nothing is created. With deferred checkout and an amount due, the instances stay `pending` until checkout is confirmed and paid through Billing; a canceled or expired order leaves them `failed` with `order_canceled` or `order_expired`. Do not submit another creation request after paying. After an uncertain response, look the order up before submitting again.
      *
-     *     A request for several instances is all or nothing: if any instance cannot be created, every instance of that request is released, the order fails, and any payment for it is refunded. Each instance is named after this request with a number appended, and each has its own task.
+     *     Exactly one of image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. They are not held while the instance is pending; if one is no longer usable when the order is accepted, the instance ends `failed` with `provisioning_failed`. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
+     *
+     *     Instances of one request succeed or fail individually. Each instance, with its system disk, network interface and floating IP, is created or fails as a whole. Instances that were created are kept; each failed instance ends `failed` with `provisioning_failed`, its part of the order is refunded, and the order then ends `partially_completed`. Each instance is named after this request with a number appended.
      *
      *     The network is checked before the order is created, and a request it refuses orders and charges nothing. It is refused with `PRIVATE_NETWORK_UNAVAILABLE` when the private network's `status` is not `available`, `SUBNET_UNAVAILABLE` or `SECURITY_GROUP_UNAVAILABLE` when the subnet or a security group is not ready, `SECURITY_GROUP_OTHER_PRIVATE_NETWORK` when a security group belongs to another private network, and `PORT_UNAVAILABLE` when the port's `status` is not `available`. `meta` names the resource.
      */
     post: operations["launch-instance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/instances/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote creating instances
+     * @description Prices what `launch-instance` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-instance-quote"];
     delete?: never;
     options?: never;
     head?: never;
@@ -538,7 +641,7 @@ export interface paths {
     };
     /**
      * Retrieve an instance
-     * @description Queries the current state of the instance, which makes it slower but more accurate than the list endpoint. Use it to poll creation progress.
+     * @description Returns the stored state of the instance; it does not query the cloud. Use it to poll creation progress.
      */
     get: operations["get-instance"];
     put?: never;
@@ -580,7 +683,7 @@ export interface paths {
      *
      *     Three conditions must hold; the instance is unreachable otherwise:
      *
-     *     - it is `running`
+     *     - it is `active`
      *     - a floating IP is bound to it, since this endpoint connects over the public internet
      *     - its security group permits inbound TCP 22
      *
@@ -728,11 +831,11 @@ export interface paths {
      *
      *     A soft reboot has no effect once the system is unresponsive. Set `force` to reboot forcibly: a forced reboot does not wait for the operating system to shut down, so **unwritten data is lost**.
      *
-     *     A forced reboot is accepted while the instance is already `rebooting`, which is the way out of a soft reboot the instance never carried out. Every other endpoint refuses an instance in a transient state, and a second soft reboot is refused as well.
+     *     A forced reboot is accepted while a soft reboot is in progress, which is the way out of a soft reboot the instance never carried out. Any other request for an operation, including a second soft reboot, is refused with `COMPUTE_RESOURCE_BUSY` while the reboot is in progress.
      *
      *     An instance suspended by the platform must be unsuspended first.
      *
-     *     This endpoint returns immediately and the `status` it returns is the transient `rebooting`. Poll the instance until it settles at `running`.
+     *     The instance shows the `reboot` operation until the reboot has finished.
      */
     post: operations["reboot-instance"];
     delete?: never;
@@ -755,6 +858,8 @@ export interface paths {
      * @description **All data on the system disk is erased and cannot be recovered.** Attached data disks are unaffected.
      *
      *     The image this instance already runs is accepted even after the platform has withdrawn it, since rebuilding is the only way back into an instance broken from the inside. Any *other* withdrawn image is rejected with `IMAGE_RETIRED`, which is a change of image and therefore a new order.
+     *
+     *     The instance shows the `rebuild` operation until the rebuild has finished.
      */
     post: operations["rebuild-instance"];
     delete?: never;
@@ -774,11 +879,33 @@ export interface paths {
     put?: never;
     /**
      * Resize an instance
-     * @description Creates a Billing change order, including for metered pricing. The price must belong to the Billing Plan of the target instance type; applicable contract pricing is resolved by Billing. The resize is applied after the order's invoice is paid, or without waiting when the order has no immediate invoice. Do not submit a new purchase after paying. After an uncertain response, look the order up before submitting again.
+     * @description Creates a Billing change order, including for metered pricing, and returns the instance with the order. The instance keeps its billing mode and period, priced with the target type's matching option; a target type without that option is refused with 409 `BILLING_OPTION_UNAVAILABLE`. Do not submit a new purchase after paying. After an uncertain response, look the order up before submitting again.
      *
-     *     The new instance type takes effect, and is billed from then on, when the returned task succeeds. A completed resize is final and cannot be reverted; to return to the previous type, submit another resize.
+     *     The instance shows the `resize` operation until the resize is applied or its order is canceled, including while the order awaits checkout, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. It keeps its current type until the resize is applied; the new type takes effect, and is billed from then on, when `instance_type_id` shows it. If the order is not accepted or the resize fails, the instance keeps its current type and the order shows the outcome. A completed resize is final and cannot be reverted; to return to the previous type, submit another resize.
      */
     post: operations["resize-instance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/instances/{instanceId}/resize/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        instanceId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote resizing an instance
+     * @description Prices the change `resize-instance` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-instance-resize-quote"];
     delete?: never;
     options?: never;
     head?: never;
@@ -796,7 +923,7 @@ export interface paths {
     put?: never;
     /**
      * Start an instance
-     * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped instance keeps its disks, network attachments and sellable quota. Inspect operation, task_state, power_state and observed_at to determine completion.
+     * @description Outstanding restrictions can prevent starting. The instance shows the `start` operation until it is running or the start has failed.
      */
     post: operations["start-instance"];
     delete?: never;
@@ -816,7 +943,7 @@ export interface paths {
     put?: never;
     /**
      * Stop an instance
-     * @description Records the desired power state. An in-flight shutdown is allowed to finish before a subsequent start. Outstanding restrictions can prevent starting. A stopped instance keeps its disks, network attachments and sellable quota. Inspect operation, task_state, power_state and observed_at to determine completion.
+     * @description A stopped instance keeps its disks, network attachments and sellable quota. The instance shows the `stop` operation until it is stopped or the stop has failed.
      */
     post: operations["stop-instance"];
     delete?: never;
@@ -837,7 +964,7 @@ export interface paths {
     put?: never;
     /**
      * Attach a disk
-     * @description The disk must be in the same region and availability zone as the instance. Partition it and mount the file system inside the instance once it is attached.
+     * @description The disk must be in the same region and availability zone as the instance. Returns the disk; the instance shows the `attach_disk` operation and the disk the `attach` operation until the attachment is confirmed. Partition the disk and mount the file system inside the instance once it is attached.
      */
     post: operations["attach-disk"];
     delete?: never;
@@ -860,7 +987,9 @@ export interface paths {
      * Detach a disk
      * @description Unmount the device inside the instance before calling this endpoint. Forcibly detaching a file system that is being written to corrupts data.
      *
-     *     The disk the instance boots from cannot be detached, whether it is the system disk bought with the instance or a disk the instance was created from with `boot_disk_id`. Such a request is refused with `INSTANCE_BOOT_DISK_LOCKED` and creates no task; releasing the instance is what frees that disk.
+     *     The disk the instance boots from cannot be detached, whether it is the system disk bought with the instance or a disk the instance was created from with `boot_disk_id`. Such a request is refused with `INSTANCE_BOOT_DISK_LOCKED` and changes nothing; releasing the instance is what frees that disk.
+     *
+     *     Returns the disk; the instance shows the `detach_disk` operation and the disk the `detach` operation until the disk is detached.
      */
     delete: operations["detach-disk"];
     options?: never;
@@ -879,7 +1008,7 @@ export interface paths {
     put?: never;
     /**
      * Bind a floating IP to an instance
-     * @description Changes the public IP binding on the instance's primary network interface. The returned task tracks confirmation of the binding change.
+     * @description Changes the public IP binding on the instance's primary network interface. The instance shows the `bind_floating_ip` operation until the binding is confirmed.
      */
     post: operations["attach-instance-floating-ip"];
     delete?: never;
@@ -900,7 +1029,7 @@ export interface paths {
     post?: never;
     /**
      * Unbind the floating IP of an instance
-     * @description Changes the public IP binding on the instance's primary network interface. The returned task tracks confirmation of the binding change.
+     * @description Changes the public IP binding on the instance's primary network interface. The instance shows the `unbind_floating_ip` operation until the change is confirmed.
      */
     delete: operations["detach-instance-floating-ip"];
     options?: never;
@@ -918,7 +1047,10 @@ export interface paths {
     /** List the network interfaces of an instance */
     get: operations["list-instance-ports"];
     put?: never;
-    /** Attach a network interface */
+    /**
+     * Attach a network interface
+     * @description Returns the network interface; the instance shows the `attach_port` operation and the interface the `attach` operation until the attachment is confirmed.
+     */
     post: operations["attach-port"];
     delete?: never;
     options?: never;
@@ -939,6 +1071,8 @@ export interface paths {
     /**
      * Detach a network interface
      * @description The primary network interface cannot be detached; the instance would lose its network address.
+     *
+     *     Returns the network interface; the instance shows the `detach_port` operation and the interface the `detach` operation until it is detached.
      */
     delete: operations["detach-port"];
     options?: never;
@@ -1267,6 +1401,181 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/regions/{regionId}/snapshot-quota": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    /**
+     * Get regional snapshot quota
+     * @description The snapshot count quota for the authenticated project in this region. Counts simultaneous
+     *     snapshot holdings, not lifetime create calls or storage bytes. Without an active purchase,
+     *     limit and available are zero; existing holdings, if any, still appear in used.
+     *
+     *     pending and provisioning creations reserve a slot. Snapshots being deleted or whose cleanup
+     *     is uncertain retain their slots until absence or deletion is confirmed. available is
+     *     max(limit - used, 0) while active, and zero when creation is not permitted; additional
+     *     creation is refused while the quota is inactive, suspended or exhausted.
+     *
+     *     Canceling the quota's subscription through Billing is refused while any snapshot exists in
+     *     the region: the cancellation fails with SNAPSHOT_QUOTA_IN_USE. Reclaiming the quota for
+     *     non-payment deletes its snapshots, as for other reclaimed resources.
+     */
+    get: operations["get-snapshot-quota"];
+    /**
+     * Set regional snapshot quota
+     * @description Purchases or changes the maximum number of snapshots this project may hold in this region.
+     *     limit is the target total, not an additional number of slots or a consumable create allowance.
+     *     billing chooses one of the quota's pricing options; a change of an existing purchase keeps its
+     *     billing mode and period, and billing must name that option. The purchased quantity is this count.
+     *
+     *     Returns the quota with the order. pending_limit records the target while the current limit stays
+     *     in force; the new limit applies once the order is accepted and the quota is activated. Snapshots
+     *     create no further orders or subscriptions, and deleting one frees a slot without refunding the
+     *     quota purchase.
+     *
+     *     Repeating the same target and billing choice while its purchase is pending returns the same order. A
+     *     conflicting pending purchase is refused with SNAPSHOT_QUOTA_CHANGE_PENDING. An already effective
+     *     identical target and billing choice returns its existing purchase without charging again; renewing its
+     *     term is a separate Billing renewal operation. A requested limit below used is refused with
+     *     409 SNAPSHOT_QUOTA_IN_USE, with meta.used and meta.limit. A change never deletes snapshots.
+     */
+    put: operations["set-snapshot-quota"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/regions/{regionId}/snapshot-quota/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote setting the regional snapshot quota
+     * @description Prices what `set-snapshot-quota` would order, including a change of an existing purchase as of now, for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-snapshot-quota-quote"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/regions/{regionId}/backup-service": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    /**
+     * Get the backup service of a region
+     * @description The backup service of the authenticated project in this region. Backups can be created only while it is `active`. Each hour, Compute covers retained backup capacity up to the total `capacity_gib` of the capacity packs active in the region and meters only the excess on this service's subscription, per GiB-hour.
+     *
+     *     Canceling the service's subscription through Billing is refused while any backup is retained in the region: the cancellation fails with `BACKUP_SERVICE_IN_USE`. Delete the backups first. Capacity packs are canceled separately, under their own refund terms. Reclaiming the service for non-payment deletes its backups.
+     */
+    get: operations["get-backup-service"];
+    put?: never;
+    /**
+     * Activate the backup service in a region
+     * @description Purchases the backup service for this project and region. The service itself has no charge; backups are billed under it postpaid, by retained capacity. It takes no billing choice. Returns the service as `pending` with its order; it becomes `active` once the order is accepted.
+     *
+     *     Refused with 409 `BACKUP_SERVICE_EXISTS` while an activation is pending or the service is active or suspended.
+     */
+    post: operations["create-backup-service"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/regions/{regionId}/backup-service/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote activating the backup service
+     * @description Prices what `create-backup-service` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-backup-service-quote"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/regions/{regionId}/backup-capacity-packs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    /**
+     * List backup capacity packs
+     * @description The capacity packs of the authenticated project in this region, newest first, including ended ones.
+     */
+    get: operations["list-backup-capacity-packs"];
+    put?: never;
+    /**
+     * Buy a backup capacity pack
+     * @description Purchases a capacity pack, prepaid backup capacity for this project and region bought by month or year: `billing` must be prepaid with a period, as offered in the backup service's `capacity_pack_pricing`. Compute applies the coverage: each hour, retained backup capacity up to the total `capacity_gib` of the packs active in the region is covered, and Compute meters only the excess on the backup service's subscription. A pack is not a Billing allowance or credit; Billing takes its order and payment and handles its renewal and cancellation through the pack's subscription.
+     *
+     *     Returns the pack as `pending` with its order; it applies once the order is accepted. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` and `meta.region_id` when the region's backup service is not active.
+     */
+    post: operations["create-backup-capacity-pack"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/regions/{regionId}/backup-capacity-packs/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote buying a backup capacity pack
+     * @description Prices what `create-backup-capacity-pack` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
+     */
+    post: operations["create-backup-capacity-pack-quote"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/snapshots": {
     parameters: {
       query?: never;
@@ -1282,6 +1591,10 @@ export interface paths {
      * @description Disks attached to a running instance can be snapshotted. A snapshot records the state of the block device at a point in time and may be inconsistent at the file-system level, so run `sync` inside the instance first where the data matters.
      *
      *     **A snapshot of a system disk cannot be used to revert that system disk**: reverting requires the disk to be detached, and a system disk cannot be detached. It can be used to create a new data disk. To preserve and restore an entire system, use a private image; for a copy that crosses availability zones and survives deletion of the disk, use a backup.
+     *
+     *     Snapshot slots are purchased separately for this project and the source disk's region. This operation reserves one available slot and returns the snapshot as `pending`; it places no order and charges nothing. `pending` and `provisioning` snapshots occupy slots, so concurrent requests cannot exceed the purchased limit. Read the snapshot until it is `available` or `failed`.
+     *
+     *     Refused with SNAPSHOT_QUOTA_EXCEEDED when no slot is available. meta.region_id, meta.limit and meta.used identify the applicable quota. A failed creation releases its slot only after any snapshot data has been confirmed absent or removed.
      */
     post: operations["create-snapshot"];
     delete?: never;
@@ -1303,30 +1616,13 @@ export interface paths {
     post?: never;
     /**
      * Delete a snapshot
-     * @description Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the snapshot, including a pay-as-you-go subscription. `meta.resource_id` names the snapshot. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+     * @description Deletes this snapshot without canceling the project's snapshot quota purchase. A snapshot has no individual Billing subscription. Its slot stays occupied until the deletion is confirmed.
      */
     delete: operations["delete-snapshot"];
     options?: never;
     head?: never;
     /** Rename a snapshot */
     patch: operations["rename-snapshot"];
-    trace?: never;
-  };
-  "/api/v1/tasks/{taskId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a requested action */
-    get: operations["get-task"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
     trace?: never;
   };
   "/api/v1/ipv4-pools": {
@@ -1441,17 +1737,12 @@ export interface components {
       /** Format: uuid */
       accepter_network_id: string;
       /** @enum {string} */
-      status:
-        | "pending_acceptance"
-        | "provisioning"
-        | "active"
-        | "deleting"
-        | "deleted"
-        | "rejected"
-        | "error";
+      status: "pending_acceptance" | "provisioning" | "active" | "deleted" | "rejected" | "error";
       /** Format: date-time */
       created_at: string;
       failure_code?: string;
+      /** @description The operation in progress on this peering, or null when none is. */
+      readonly operation: components["schemas"]["PeeringOperation"] | null;
     };
     PeeringListResponseBody: {
       items: components["schemas"]["PeeringResource"][];
@@ -1479,6 +1770,7 @@ export interface components {
       /** Format: int64 */
       status: number;
     };
+    /** @description A copy of a disk, metered on the backup service of its region by `capacity_gib` for as long as it is retained. It has no order or subscription of its own. */
     BackupResource: {
       /** Format: date-time */
       created_at: string;
@@ -1493,25 +1785,22 @@ export interface components {
        */
       size_gb: number;
       /**
+       * Format: int64
+       * @description The capacity metered for this backup, in GiB: the size of the source disk when the backup was taken. Usage is this capacity multiplied by the time the backup is retained.
+       */
+      capacity_gib: number;
+      /**
        * Format: uuid
        * @description The disk this backup was taken from. The backup remains usable after that disk is deleted
        */
       source_disk_id: string;
-      /** @enum {string} */
-      status: "provisioning" | "available" | "restoring" | "deleting" | "error";
-      /** Format: uuid */
-      order_id: string | null;
-      /** Format: uuid */
-      price_id: string | null;
-      /** Format: uuid */
-      subscription_item_id: string | null;
-      /** @description The subscriptions a cancellation through Billing has to cover to release this backup: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
-      release_subscription_ids: string[];
-      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
-      release_set: components["schemas"]["ReleaseSetItem"][];
-      /** @enum {string|null} */
-      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task: components["schemas"]["Task"] | null;
+      /**
+       * @description `provisioning` while the backup is taken, then `available`. `failed` means the backup was not created.
+       * @enum {string}
+       */
+      status: "provisioning" | "available" | "deleted" | "failed" | "error";
+      /** @description The operation in progress on this backup, or null when none is. */
+      readonly operation: components["schemas"]["BackupOperation"] | null;
       /** Format: int64 */
       generation: number;
       /** Format: date-time */
@@ -1530,22 +1819,6 @@ export interface components {
       /** Format: uuid */
       disk_id: string;
       name: string;
-      /** Format: uuid */
-      price_id: string;
-      order: components["schemas"]["OrderOptions"];
-    };
-    /** @description The fields of `CreateBackupRequestBody` that decide the price */
-    CreateBackupQuoteRequestBody: {
-      /**
-       * Format: uuid
-       * @description The disk that would be backed up
-       */
-      disk_id: string;
-      /**
-       * Format: uuid
-       * @description A price of the region's backup offering. One is selected when omitted
-       */
-      price_id?: string;
     };
     RenameBackupRequestBody: {
       name: string;
@@ -1562,9 +1835,8 @@ export interface components {
        * @description Matches the size of the backup when omitted. When given, it must not be smaller than the backup
        */
       size_gb?: number;
-      /** Format: uuid */
-      price_id: string;
-      order: components["schemas"]["OrderOptions"];
+      billing: components["schemas"]["BillingChoice"];
+      checkout?: components["schemas"]["CheckoutOptions"];
     };
     DiskResource: {
       /**
@@ -1597,32 +1869,38 @@ export interface components {
        * @description Throughput this disk is allowed, in bytes per second. Null when its type is not rate-limited
        */
       throughput_bytes_per_sec: number | null;
-      /** @enum {string} */
-      status:
-        | "provisioning"
-        | "available"
-        | "attaching"
-        | "in_use"
-        | "detaching"
-        | "resizing"
-        | "reverting"
-        | "restoring"
-        | "releasing"
-        | "deleting"
-        | "error";
+      /**
+       * @description `pending` until the order is accepted, with no storage allocated; `provisioning` while the disk is created; then `available`, or `in_use` once attached. `failed` means the disk was not created; `failure_reason` states why.
+       * @enum {string}
+       */
+      status: "pending" | "provisioning" | "available" | "in_use" | "deleted" | "failed" | "error";
       /** Format: uuid */
       order_id: string | null;
-      /** Format: uuid */
-      price_id: string | null;
-      /** Format: uuid */
-      subscription_item_id: string | null;
-      /** @description The subscriptions a cancellation through Billing has to cover to release this disk: its own and those of its snapshots. A system disk is released only with its instance, so for a system disk the list is that of the instance. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      /**
+       * Format: uuid
+       * @description The Billing order item for this resource.
+       */
+      order_item_id: string | null;
+      /**
+       * Format: uuid
+       * @description The Billing subscription associated with this resource. It may still be pending; its
+       *     presence does not imply delivery or metering. Null when no subscription is associated.
+       */
+      subscription_id: string | null;
+      /** @description The subscriptions a cancellation through Billing has to cover to release this disk: its own. Snapshots have no individual subscriptions. A system disk is released only with its instance, so for a system disk the list is that of the instance. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
       release_subscription_ids: string[];
       /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
       release_set: components["schemas"]["ReleaseSetItem"][];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task: components["schemas"]["Task"] | null;
+      /**
+       * @description Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this disk is refunded.
+       * @enum {string|null}
+       */
+      failure_reason:
+        "order_declined" | "order_canceled" | "order_expired" | "provisioning_failed" | null;
+      /** @description The operation in progress on this disk, or null when none is. */
+      readonly operation: components["schemas"]["DiskOperation"] | null;
       attachment?: components["schemas"]["DiskAttachment"] | null;
       /** Format: int64 */
       generation: number;
@@ -1675,12 +1953,8 @@ export interface components {
        * @description Throughput a disk of `max_size_gb` gets, in bytes per second. Null when this type is not rate-limited
        */
       throughput_at_max_size: number | null;
-      /** @description Billing Product ID. Null when no Product is assigned; otherwise `compute`. */
-      product_id: string | null;
-      /** Format: uuid */
-      plan_id: string | null;
-      /** Format: uuid */
-      snapshot_plan_id: string | null;
+      /** @description How a disk of this type can be bought, per GiB. Null when the project has no billing account. */
+      readonly pricing: components["schemas"]["Pricing"] | null;
     };
     DiskTypeListResponseBody: {
       items: components["schemas"]["DiskTypeResource"][] | null;
@@ -1717,11 +1991,12 @@ export interface components {
       /** @description False means a new password can only be set by rebuilding an instance created from this image */
       supports_password_reset: boolean;
       /**
-       * @description Only `available` images can install instances. A public image is always `available`; a private image goes through `provisioning` and `uploading` while it is captured.
+       * @description Only `available` images can install instances. A public image is always `available`; a private image is `pending` until its order is accepted, then goes through `provisioning` and `uploading` while it is captured. `failed` means the capture produced no image; `failure_reason` states why.
        * @enum {string}
        */
-      status: "provisioning" | "uploading" | "available" | "deleting" | "error";
-      /** @description Reason the capture failed; non-empty only when `status` is `error` */
+      status:
+        "pending" | "provisioning" | "uploading" | "available" | "deleted" | "failed" | "error";
+      /** @description Details of why the capture failed; non-empty only when `status` is `failed` */
       failure: string | null;
       /**
        * Format: int64
@@ -1737,17 +2012,31 @@ export interface components {
       created_at: string;
       /** Format: uuid */
       order_id: string | null;
-      /** Format: uuid */
-      price_id: string | null;
-      /** Format: uuid */
-      subscription_item_id: string | null;
+      /**
+       * Format: uuid
+       * @description The Billing order item for this resource.
+       */
+      order_item_id: string | null;
+      /**
+       * Format: uuid
+       * @description The Billing subscription associated with this resource. It may still be pending; its
+       *     presence does not imply delivery or metering. Null when no subscription is associated.
+       */
+      subscription_id: string | null;
       /** @description The subscriptions a cancellation through Billing has to cover to release this private image: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for it, and for public images. */
       release_subscription_ids: string[];
       /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
       release_set: components["schemas"]["ReleaseSetItem"][];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task: components["schemas"]["Task"] | null;
+      /**
+       * @description Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
+       * @enum {string|null}
+       */
+      failure_reason:
+        "order_declined" | "order_canceled" | "order_expired" | "provisioning_failed" | null;
+      /** @description The operation in progress on this image, or null when none is. */
+      readonly operation: components["schemas"]["ImageOperation"] | null;
       /** Format: int64 */
       generation: number;
       /** Format: date-time */
@@ -1796,10 +2085,8 @@ export interface components {
       region_id: string;
       /** Format: int64 */
       vcpus: number;
-      /** @description Billing Product ID. Null when no Product is assigned; otherwise `compute`. */
-      product_id: string | null;
-      /** Format: uuid */
-      plan_id: string | null;
+      /** @description How an instance of this type can be bought, per instance. Null when the project has no billing account. */
+      readonly pricing: components["schemas"]["Pricing"] | null;
     };
     InstanceTypeListResponseBody: {
       items: components["schemas"]["InstanceTypeResource"][];
@@ -1814,6 +2101,8 @@ export interface components {
       code: string;
       /** Format: uuid */
       id: string;
+      /** @description How private image storage in this region is billed, per GiB. Null when the project has no billing account. */
+      readonly private_image_pricing: components["schemas"]["Pricing"] | null;
     };
     RegionListResponseBody: {
       items: components["schemas"]["RegionResource"][] | null;
@@ -1849,9 +2138,8 @@ export interface components {
        * @description Restore from this snapshot. When given, the capacity need only be no smaller than the snapshot
        */
       snapshot_id?: string;
-      /** Format: uuid */
-      price_id: string;
-      order: components["schemas"]["OrderOptions"];
+      billing: components["schemas"]["BillingChoice"];
+      checkout?: components["schemas"]["CheckoutOptions"];
     };
     RenameDiskRequestBody: {
       name: string;
@@ -1862,9 +2150,12 @@ export interface components {
        * @description Must be larger than the current capacity
        */
       size_gb: number;
-      /** Format: uuid */
-      price_id: string;
-      order: components["schemas"]["OrderOptions"];
+      checkout?: components["schemas"]["CheckoutOptions"];
+      /**
+       * Format: date-time
+       * @description The `proration_date` of this change's quote, so that the order is priced from the same instant. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`.
+       */
+      proration_date?: string;
     };
     RevertDiskRequestBody: {
       /**
@@ -1873,8 +2164,14 @@ export interface components {
        */
       snapshot_id: string;
     };
+    /**
+     * @description One purchased public IP resource, including its bandwidth configuration. Bandwidth has no
+     *     separate Compute resource ID. Billing may split fees internally; read the order for the
+     *     commercial breakdown. Changing bandwidth updates this same resource, not another allocation.
+     */
     FloatingIPResource: {
-      address: string;
+      /** @description The allocated public address. Null until the address is allocated. */
+      address: string | null;
       /** Format: int64 */
       bandwidth_mbps: number | null;
       /** Format: date-time */
@@ -1883,29 +2180,38 @@ export interface components {
       id: string;
       /** Format: uuid */
       region_id: string;
-      /** @enum {string} */
-      status: "pending" | "available" | "deleting" | "error" | "unknown";
+      /**
+       * @description `pending` until the order is accepted, with no address allocated; `provisioning` while the address is allocated; then `available`. `failed` means no address was allocated; `failure_reason` states why.
+       * @enum {string}
+       */
+      status: "pending" | "provisioning" | "available" | "deleted" | "failed" | "error" | "unknown";
       /** Format: uuid */
       order_id: string | null;
-      /** Format: uuid */
-      price_id: string | null;
-      /** Format: uuid */
-      subscription_item_id: string | null;
-      /** @description The subscriptions a cancellation through Billing has to cover to release this address: the subscriptions of the address and of its bandwidth. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      /**
+       * Format: uuid
+       * @description The Billing order item for this resource.
+       */
+      order_item_id: string | null;
+      /**
+       * Format: uuid
+       * @description The Billing subscription associated with this resource. It may still be pending; its
+       *     presence does not imply delivery or metering. Null when no subscription is associated.
+       */
+      subscription_id: string | null;
+      /** @description The complete subscription set a cancellation through Billing has to cover to release this floating IP, including any internal fee components. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
       release_subscription_ids: string[];
       /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
       release_set: components["schemas"]["ReleaseSetItem"][];
       /** @enum {string|null} */
       access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task: components["schemas"]["Task"] | null;
-      /** Format: uuid */
-      bandwidth_order_id: string | null;
-      /** Format: uuid */
-      bandwidth_price_id: string | null;
-      /** Format: uuid */
-      bandwidth_subscription_item_id: string | null;
-      /** @enum {string|null} */
-      bandwidth_access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
+      /**
+       * @description Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this floating IP is refunded.
+       * @enum {string|null}
+       */
+      failure_reason:
+        "order_declined" | "order_canceled" | "order_expired" | "provisioning_failed" | null;
+      /** @description The operation in progress on this floating IP, or null when none is. */
+      readonly operation: components["schemas"]["FloatingIPOperation"] | null;
       /** Format: int64 */
       generation: number;
       /** Format: date-time */
@@ -1927,29 +2233,34 @@ export interface components {
        *     charged nothing for the traffic, while the address itself bills normally — so the invoice
        *     looks correct and nothing anywhere reports it.
        *
-       *     It is billed separately from the address, per Mbit/s-hour, and appears as its own line on
-       *     the order. Changing it later goes through the bandwidth endpoint.
+       *     It is part of this floating IP purchase and is billed as the pool's `bandwidth_pricing` shows,
+       *     with the purchase's billing choice. Changing it later updates the
+       *     same floating IP through its bandwidth endpoint, not an independent bandwidth resource.
        */
       bandwidth_mbps: number;
       /** Format: uuid */
       private_network_id: string;
       /** Format: uuid */
       ipv4_pool_id: string;
-      /** Format: uuid */
-      price_id: string;
-      /** Format: uuid */
-      bandwidth_price_id: string;
-      order: components["schemas"]["OrderOptions"];
+      billing: components["schemas"]["BillingChoice"];
+      checkout?: components["schemas"]["CheckoutOptions"];
     };
-    SetBandwidthRequestBody: {
+    /**
+     * @description Change bandwidth on the floating IP identified by the path. This is a configuration change
+     *     of that purchase, not an independent bandwidth purchase. Checkout is handled by Billing.
+     */
+    SetFloatingIPBandwidthRequestBody: {
       /**
        * Format: int64
        * @description Applied to both directions
        */
-      mbps: number;
-      /** Format: uuid */
-      price_id: string;
-      order: components["schemas"]["OrderOptions"];
+      bandwidth_mbps: number;
+      checkout?: components["schemas"]["CheckoutOptions"];
+      /**
+       * Format: date-time
+       * @description The `proration_date` of this change's quote, so that the order is priced from the same instant. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`.
+       */
+      proration_date?: string;
     };
     BindFloatingIPRequestBody: {
       /** Format: uuid */
@@ -1993,10 +2304,13 @@ export interface components {
       public_ips: string[] | null;
       /** Format: uuid */
       region_id: string;
-      /** @enum {string} */
+      /**
+       * @description `pending` until the order is accepted: no virtual machine exists and addresses are null. `provisioning` while the instance is created, then `active`. `failed` means the instance was not created; `failure_reason` states why. The other values are the state last observed in the cloud; an operation in progress appears in `operation`, not here.
+       * @enum {string}
+       */
       status:
         | "pending"
-        | "building"
+        | "provisioning"
         | "active"
         | "stopped"
         | "paused"
@@ -2004,8 +2318,8 @@ export interface components {
         | "shelved"
         | "shelved_offloaded"
         | "rescued"
-        | "deleting"
         | "deleted"
+        | "failed"
         | "error"
         | "unknown";
       /** Format: uuid */
@@ -2013,25 +2327,35 @@ export interface components {
       /** Format: date-time */
       updated_at: string;
       /** @enum {string} */
-      desired_state: "running" | "stopped" | "deleted";
-      /** @enum {string} */
       power_state:
         "no_state" | "running" | "paused" | "shutdown" | "crashed" | "suspended" | "unknown";
-      /** @description Current provider task, such as scheduling, networking, block_device_mapping or spawning. none means no task; unknown tasks remain observable and do not imply failure. */
-      task_state: string;
       /** Format: int64 */
       generation: number;
       /** Format: date-time */
       observed_at: string | null;
       restrictions: components["schemas"]["InstanceRestriction"][];
-      task: components["schemas"]["Task"] | null;
+      /**
+       * @description Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this instance is refunded.
+       * @enum {string|null}
+       */
+      failure_reason:
+        "order_declined" | "order_canceled" | "order_expired" | "provisioning_failed" | null;
+      /** @description The operation in progress on this instance, or null when none is. */
+      readonly operation: components["schemas"]["InstanceOperation"] | null;
       /** Format: uuid */
       order_id: string | null;
-      /** Format: uuid */
-      price_id: string | null;
-      /** Format: uuid */
-      subscription_item_id: string | null;
-      /** @description The subscriptions a cancellation through Billing has to cover to release this instance: its own, those of the disks deleted with it, and those of the snapshots of those disks. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+      /**
+       * Format: uuid
+       * @description The Billing order item for this resource.
+       */
+      order_item_id: string | null;
+      /**
+       * Format: uuid
+       * @description The Billing subscription associated with this resource. It may still be pending; its
+       *     presence does not imply delivery or metering. Null when no subscription is associated.
+       */
+      subscription_id: string | null;
+      /** @description The subscriptions a cancellation through Billing has to cover to release this instance: its own and those of the disks deleted with it. Snapshots are cleaned up with their source disk without canceling the project's snapshot quota. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
       release_subscription_ids: string[];
       /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
       release_set: components["schemas"]["ReleaseSetItem"][];
@@ -2103,9 +2427,8 @@ export interface components {
        * @description Create the primary network interface in this subnet. Exactly one of this and `port_id`
        */
       subnet_id?: string;
-      order: components["schemas"]["OrderOptions"];
-      /** Format: uuid */
-      price_id: string;
+      checkout?: components["schemas"]["CheckoutOptions"];
+      billing: components["schemas"]["BillingChoice"];
       boot_disk?: components["schemas"]["NewBootDisk"];
       floating_ip?: components["schemas"]["NewFloatingIP"];
     };
@@ -2186,9 +2509,12 @@ export interface components {
        * @description Must be in the same region and availability zone as the current instance type
        */
       instance_type_id: string;
-      order: components["schemas"]["OrderOptions"];
-      /** Format: uuid */
-      price_id: string;
+      checkout?: components["schemas"]["CheckoutOptions"];
+      /**
+       * Format: date-time
+       * @description The `proration_date` of this change's quote, so that the order is priced from the same instant. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`.
+       */
+      proration_date?: string;
     };
     AttachDiskRequestBody: {
       /** Format: uuid */
@@ -2210,11 +2536,13 @@ export interface components {
       addresses?: components["schemas"]["PortAddress"][];
       attachment?: components["schemas"]["PortAttachment"] | null;
       /** @enum {string} */
-      status: "pending" | "available" | "deleting" | "error" | "unknown";
+      status: "pending" | "available" | "error" | "unknown";
       /** Format: int64 */
       generation: number;
       /** Format: date-time */
       observed_at: string | null;
+      /** @description The operation in progress on this network interface, or null when none is. */
+      readonly operation: components["schemas"]["PortOperation"] | null;
     };
     PortListResponseBody: {
       items: components["schemas"]["PortResource"][] | null;
@@ -2274,9 +2602,8 @@ export interface components {
        */
       instance_id: string;
       name: string;
-      /** Format: uuid */
-      price_id: string;
-      order: components["schemas"]["OrderOptions"];
+      billing: components["schemas"]["BillingChoice"];
+      checkout?: components["schemas"]["CheckoutOptions"];
     };
     /** @description The fields of `CreateImageRequestBody` that decide the price */
     CreateImageQuoteRequestBody: {
@@ -2285,11 +2612,7 @@ export interface components {
        * @description The instance whose system disk would be captured
        */
       instance_id: string;
-      /**
-       * Format: uuid
-       * @description A price of the region's private image offering. One is selected when omitted
-       */
-      price_id?: string;
+      billing: components["schemas"]["BillingChoice"];
     };
     RenameImageRequestBody: {
       name: string;
@@ -2308,9 +2631,11 @@ export interface components {
        * @description Only `available` accepts new instances, interfaces and floating IPs
        * @enum {string}
        */
-      status: "pending" | "available" | "deleting" | "error" | "unknown";
+      status: "pending" | "available" | "error" | "unknown";
       /** Format: date-time */
       updated_at: string;
+      /** @description The operation in progress on this private network, or null when none is. */
+      readonly operation: components["schemas"]["PrivateNetworkOperation"] | null;
     };
     PrivateNetworkListResponseBody: {
       items: components["schemas"]["PrivateNetworkResource"][] | null;
@@ -2459,6 +2784,89 @@ export interface components {
       /** @description Equivalent to `0.0.0.0/0` or `::/0` when omitted */
       remote_ip_prefix?: string;
     };
+    /**
+     * @description Snapshot count capacity for the authenticated project and one region, projected from its
+     *     effective quota purchase and Compute's actual holdings. This is not a Billing Allowance:
+     *     creation occupies capacity and confirmed deletion releases it rather than consuming a grant.
+     *     Pending purchases never increase effective capacity before commercial acceptance and activation.
+     */
+    SnapshotQuota: {
+      /** Format: uuid */
+      region_id: string;
+      /**
+       * @description inactive has no purchase; pending is a first purchase whose order has not been accepted;
+       *     provisioning is a first purchase being activated; active permits creation within available
+       *     capacity; suspended refuses new creation; failed means the first purchase failed, as
+       *     failure_reason states. A pending change keeps the current status and limit until it is applied.
+       * @enum {string}
+       */
+      status: "inactive" | "pending" | "provisioning" | "active" | "suspended" | "failed";
+      /**
+       * Format: int64
+       * @description Effective maximum concurrent snapshot count. Zero until the first purchase is activated.
+       */
+      limit: number;
+      /**
+       * Format: int64
+       * @description Held and reserved snapshot slots, including pending creation and unconfirmed cleanup.
+       */
+      used: number;
+      /**
+       * Format: int64
+       * @description max(limit - used, 0), or zero while creation is not permitted.
+       */
+      available: number;
+      /**
+       * Format: uuid
+       * @description The order establishing the currently associated quota purchase, including an initial pending purchase.
+       */
+      order_id: string | null;
+      /**
+       * Format: uuid
+       * @description The quota purchase's Billing subscription, not an individual snapshot subscription.
+       *     May still be pending on an initial purchase; an existing subscription remains associated
+       *     until a replacement quota is activated. Null when no purchase has been recorded.
+       */
+      subscription_id: string | null;
+      /**
+       * Format: int64
+       * @description Target count awaiting checkout or activation; null when no purchase is pending.
+       */
+      pending_limit: number | null;
+      /**
+       * Format: uuid
+       * @description Order for the pending initial purchase or change; null when none is pending.
+       */
+      pending_order_id: string | null;
+      /**
+       * @description Why the first purchase failed; null unless status is failed. A failed change leaves the current
+       *     limit in force and clears pending_limit; its order shows the outcome.
+       * @enum {string|null}
+       */
+      failure_reason:
+        "order_declined" | "order_canceled" | "order_expired" | "provisioning_failed" | null;
+      /** @description How snapshot quota in this region can be bought, per snapshot slot. Null when the project has no billing account. */
+      readonly pricing: components["schemas"]["Pricing"] | null;
+    };
+    SetSnapshotQuotaRequestBody: {
+      /**
+       * Format: int64
+       * @description Desired total concurrent snapshot count for this project and region, not additional slots.
+       */
+      limit: number;
+      billing: components["schemas"]["BillingChoice"];
+      checkout?: components["schemas"]["CheckoutOptions"];
+      /**
+       * Format: date-time
+       * @description The `proration_date` of this change's quote, so that the order is priced from the same instant. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`.
+       */
+      proration_date?: string;
+    };
+    SetSnapshotQuotaResponseBody: {
+      snapshot_quota: components["schemas"]["SnapshotQuota"];
+      order: components["schemas"]["PlacedOrder"];
+    };
+    /** @description A snapshot, created within this project's purchased regional snapshot quota. It has no order, price or Billing subscription of its own. */
     SnapshotResource: {
       /**
        * Format: uuid
@@ -2479,21 +2887,13 @@ export interface components {
        * @description Capacity of the source disk when the snapshot was created. A disk restored from it cannot be smaller
        */
       size_gb: number;
-      /** @enum {string} */
-      status: "provisioning" | "available" | "restoring" | "deleting" | "error";
-      /** Format: uuid */
-      order_id: string | null;
-      /** Format: uuid */
-      price_id: string | null;
-      /** Format: uuid */
-      subscription_item_id: string | null;
-      /** @description The subscriptions a cancellation through Billing has to cover to release this snapshot: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
-      release_subscription_ids: string[];
-      /** @description The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
-      release_set: components["schemas"]["ReleaseSetItem"][];
-      /** @enum {string|null} */
-      access_state: "pending" | "enabled" | "suspended" | "reclaimed" | null;
-      task: components["schemas"]["Task"] | null;
+      /**
+       * @description `pending` once a quota slot is reserved, `provisioning` while the snapshot is taken, then `available`. `failed` means the snapshot was not created; its slot is released once no snapshot data remains.
+       * @enum {string}
+       */
+      status: "pending" | "provisioning" | "available" | "deleted" | "failed" | "error";
+      /** @description The operation in progress on this snapshot, or null when none is. */
+      readonly operation: components["schemas"]["SnapshotOperation"] | null;
       /** Format: int64 */
       generation: number;
       /** Format: date-time */
@@ -2503,13 +2903,14 @@ export interface components {
       items: components["schemas"]["SnapshotResource"][] | null;
       pagination: components["schemas"]["OffsetPagination"];
     };
+    /**
+     * @description Create one snapshot using existing project-and-region count quota. The region is taken from
+     *     disk_id. Purchase or adjust quota separately; this request has no checkout or price selection.
+     */
     CreateSnapshotRequestBody: {
       /** Format: uuid */
       disk_id: string;
       name: string;
-      /** Format: uuid */
-      price_id: string;
-      order: components["schemas"]["OrderOptions"];
     };
     RenameSecurityGroupRequestBody: {
       name: string;
@@ -2517,15 +2918,320 @@ export interface components {
     RenameSnapshotRequestBody: {
       name: string;
     };
-    /** @description Purchase options. Every request places an order of its own. */
-    OrderOptions: {
+    /** @description How a catalog item can be bought, calculated by Billing in the currency of the project's current billing account. These are list amounts before promotion codes, not a checkout guarantee; quote a purchase for its exact total. */
+    Pricing: {
+      currency: string;
+      /** @description One entry per way the item can be bought. Empty when it cannot be bought in this currency. */
+      options: components["schemas"]["PricingOption"][];
+    };
+    /** @description One way to buy an item. Choose it by giving its `mode` and `period` as `billing`. */
+    PricingOption: {
+      /** @enum {string} */
+      mode: "prepaid" | "postpaid";
+      /** @description The term of a prepaid option; null for postpaid. */
+      period: components["schemas"]["BillingPeriod"] | null;
       /**
-       * @description Defaults to true. When true, the purchase is paid from available account funds and applicable grants when it is placed. If they do not cover the amount due, the request fails with HTTP 422 and code BILLING_INSUFFICIENT_FUNDS; no order is created and nothing is charged. When false, the order is created without payment, and its invoice, if any, is paid through Billing.
-       * @default true
+       * @description What the amounts are for: one `item`, such as an instance or an address; one `gib` of size or capacity; one `mbps` of bandwidth; or one `snapshot` slot.
+       * @enum {string}
        */
-      auto_pay?: boolean;
-      expected_amount?: string;
-      redemption_code?: string;
+      quantity_unit: "item" | "gib" | "mbps" | "snapshot";
+      /** @description Prepaid only; null for postpaid. The amount for one period, per quantity unit. */
+      amount: string | null;
+      /** @description Prepaid only; null for postpaid. `amount` spread over the months of the period. */
+      monthly_amount: string | null;
+      /** @description Prepaid only. How much lower `monthly_amount` is than that of the shortest prepaid period of the same item, as a decimal percentage. Null for that shortest period and for postpaid. */
+      saving_percent: string | null;
+      /** @description Postpaid only; null for prepaid. The amount for one `unit` of time, per quantity unit. */
+      unit_amount: string | null;
+      /**
+       * @description Postpaid only; null for prepaid. The time unit of `unit_amount`.
+       * @enum {string|null}
+       */
+      unit: "hour" | null;
+      /**
+       * @description What canceling does under this option: `immediate` ends the service at once, with any refund following the option's terms; `period_end` ends it at the end of the paid period.
+       * @enum {string}
+       */
+      termination: "immediate" | "period_end";
+    };
+    BillingPeriod: {
+      /** @enum {string} */
+      unit: "month" | "year";
+      /** Format: int64 */
+      count: number;
+    };
+    /** @description How to pay for a purchase: one of the options in the items' `pricing`. `prepaid` requires `period` and `postpaid` refuses it, with HTTP 400. The choice applies to every component of the purchase; a component without that option is refused with 409 `BILLING_OPTION_UNAVAILABLE`, and `meta.component` names it. */
+    BillingChoice: {
+      /** @enum {string} */
+      mode: "prepaid" | "postpaid";
+      period?: components["schemas"]["BillingPeriod"];
+    };
+    /** @description The backup service of a project in one region. Retained backup capacity beyond what active capacity packs cover is metered on it. */
+    BackupService: {
+      /** Format: uuid */
+      region_id: string;
+      /**
+       * @description `inactive` has never been activated or its subscription has ended; `pending` awaits acceptance of its order; `provisioning` is being activated; `active` accepts new backups; `suspended` refuses new backups and keeps existing ones; `failed` means the activation failed, as `failure_reason` states.
+       * @enum {string}
+       */
+      status: "inactive" | "pending" | "provisioning" | "active" | "suspended" | "failed";
+      /**
+       * @description Why the purchase failed; null unless `status` is `failed`. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
+       * @enum {string|null}
+       */
+      failure_reason:
+        "order_declined" | "order_canceled" | "order_expired" | "provisioning_failed" | null;
+      /**
+       * Format: uuid
+       * @description The order that activated the service; null before an activation is requested.
+       */
+      order_id: string | null;
+      /**
+       * Format: uuid
+       * @description The Billing subscription that backup usage is billed under; null before an activation is requested.
+       */
+      subscription_id: string | null;
+      /**
+       * Format: int64
+       * @description The total `capacity_gib` of the backups retained in this region.
+       */
+      retained_capacity_gib: number;
+      /**
+       * Format: int64
+       * @description The total `capacity_gib` of the active capacity packs in this region; this much retained capacity is covered each hour.
+       */
+      prepaid_capacity_gib: number;
+      /** @description The postpaid usage price of backups in this region. Null when the project has no billing account. */
+      readonly pricing: components["schemas"]["Pricing"] | null;
+      /** @description The prepaid options of capacity packs in this region, per GiB. Null when the project has no billing account. */
+      readonly capacity_pack_pricing: components["schemas"]["Pricing"] | null;
+    };
+    CreateBackupServiceRequestBody: {
+      checkout?: components["schemas"]["CheckoutOptions"];
+    };
+    CreateBackupServiceResponseBody: {
+      backup_service: components["schemas"]["BackupService"];
+      order: components["schemas"]["PlacedOrder"];
+    };
+    /** @description Prepaid backup capacity for one region, sold by Compute and bought for a term through its own Billing subscription. Compute applies its coverage to backup usage; it is not a Billing allowance or credit. */
+    BackupCapacityPack: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      region_id: string;
+      /** Format: int64 */
+      capacity_gib: number;
+      /**
+       * @description `pending` awaits acceptance of its order; `provisioning` is being applied; `active` covers backup capacity; `ended` no longer does because its subscription has ended; `failed` means the purchase failed, as `failure_reason` states.
+       * @enum {string}
+       */
+      status: "pending" | "provisioning" | "active" | "ended" | "failed";
+      /**
+       * @description Why the purchase failed; null unless `status` is `failed`. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
+       * @enum {string|null}
+       */
+      failure_reason:
+        "order_declined" | "order_canceled" | "order_expired" | "provisioning_failed" | null;
+      /** Format: uuid */
+      order_id: string;
+      /**
+       * Format: uuid
+       * @description The pack's Billing subscription, through which it is renewed or canceled.
+       */
+      subscription_id: string | null;
+      /**
+       * Format: date-time
+       * @description The end of the current paid term; null until the pack is active.
+       */
+      paid_until: string | null;
+      /** Format: date-time */
+      created_at: string;
+    };
+    BackupCapacityPackListResponseBody: {
+      items: components["schemas"]["BackupCapacityPack"][];
+      pagination: components["schemas"]["OffsetPagination"];
+    };
+    CreateBackupCapacityPackRequestBody: {
+      /** Format: int64 */
+      capacity_gib: number;
+      billing: components["schemas"]["BillingChoice"];
+      checkout?: components["schemas"]["CheckoutOptions"];
+    };
+    CreateBackupCapacityPackResponseBody: {
+      backup_capacity_pack: components["schemas"]["BackupCapacityPack"];
+      order: components["schemas"]["PlacedOrder"];
+    };
+    /** @description The request of `launch-instance`, without `checkout`. */
+    LaunchInstanceQuoteRequestBody: {
+      /**
+       * Format: uuid
+       * @description Bind a floating IP you already hold, instead of allocating a new one. It must be idle and in
+       *     the same region.
+       *
+       *     Mutually exclusive with `bandwidth_mbps`: an address you already hold has its own bandwidth
+       *     ceiling, set when it was allocated, and changing it is a separate operation.
+       *
+       *     Like `bandwidth_mbps`, this happens **inside the creation**: if binding fails, no instance is
+       *     created. Binding afterwards is still possible from the instance page, but then it is two
+       *     operations and a failure in between leaves an instance you cannot reach.
+       *
+       *     Only one instance can be created when it is used — one address binds to one interface.
+       */
+      floating_ip_id?: string;
+      /**
+       * Format: int64
+       * @description Number of instances to create; 1 when omitted. Names are numbered automatically for several
+       * @default 1
+       */
+      count?: number;
+      /** @description Have the platform generate a random password, returned only in this response */
+      generate_password?: boolean;
+      /**
+       * Format: uuid
+       * @description Boot a disk you already have instead of installing an image. The disk must be available, unattached, and in the same availability zone as the instance type. Exactly one of this and `image_id`
+       */
+      boot_disk_id?: string;
+      /**
+       * Format: uuid
+       * @description A public image currently on sale, or an available private image of this project. Exactly one of this and `boot_disk_id`
+       */
+      image_id?: string;
+      /**
+       * Format: uuid
+       * @description An instance type currently on sale. A withdrawn one is rejected even though its identifier still resolves
+       */
+      instance_type_id: string;
+      /** @description The account the disk lets you log in as. Required with `boot_disk_id`, and rejected without it since an image states its own */
+      login_username?: string;
+      name: string;
+      /** @description The password to set, on the login account and on root. Only the SSH public keys of the project are used when omitted */
+      password?: string;
+      /**
+       * Format: uuid
+       * @description Use an existing network interface, which may already have a floating IP bound. Exactly one of this and `subnet_id`; only one instance can be created when it is used
+       */
+      port_id?: string;
+      /** @description Required when a primary network interface is created, at least one; the default security group is not applied automatically. Ignored together with `port_id`, as the security groups of that interface were fixed when it was created */
+      security_group_ids?: string[] | null;
+      /**
+       * Format: uuid
+       * @description Create the primary network interface in this subnet. Exactly one of this and `port_id`
+       */
+      subnet_id?: string;
+      billing: components["schemas"]["BillingChoice"];
+      boot_disk?: components["schemas"]["NewBootDisk"];
+      floating_ip?: components["schemas"]["NewFloatingIP"];
+    };
+    /** @description The request of `create-disk`, without `checkout`. */
+    CreateDiskQuoteRequestBody: {
+      /**
+       * Format: uuid
+       * @description A data disk type currently on sale, one whose `for_system` is false. A withdrawn one is rejected even though its identifier still resolves
+       */
+      disk_type_id: string;
+      name: string;
+      /** Format: int64 */
+      size_gb: number;
+      /**
+       * Format: uuid
+       * @description Restore from this snapshot. When given, the capacity need only be no smaller than the snapshot
+       */
+      snapshot_id?: string;
+      billing: components["schemas"]["BillingChoice"];
+    };
+    /** @description The request of `restore-backup`, without `checkout`. */
+    RestoreBackupQuoteRequestBody: {
+      /**
+       * Format: uuid
+       * @description May differ from the availability zone of the source disk, but must be in the same region. It has to be a data disk type on sale — restoring creates a new data disk, so a withdrawn type or a system disk type is rejected here as well
+       */
+      disk_type_id: string;
+      name: string;
+      /**
+       * Format: int64
+       * @description Matches the size of the backup when omitted. When given, it must not be smaller than the backup
+       */
+      size_gb?: number;
+      billing: components["schemas"]["BillingChoice"];
+    };
+    /** @description The request of `allocate-floating-ip`, without `checkout`. */
+    AllocateFloatingIPQuoteRequestBody: {
+      /** @description The address to allocate. Allocated by the platform when omitted */
+      address?: string;
+      /**
+       * Format: int64
+       * @description The bandwidth ceiling of this address, in Mbit/s, applied to both directions.
+       *
+       *     Required, and there is no "unlimited": an address with no ceiling runs at line rate and is
+       *     charged nothing for the traffic, while the address itself bills normally — so the invoice
+       *     looks correct and nothing anywhere reports it.
+       *
+       *     It is part of this floating IP purchase and is billed as the pool's `bandwidth_pricing` shows,
+       *     with the purchase's billing choice. Changing it later updates the
+       *     same floating IP through its bandwidth endpoint, not an independent bandwidth resource.
+       */
+      bandwidth_mbps: number;
+      /** Format: uuid */
+      private_network_id: string;
+      /** Format: uuid */
+      ipv4_pool_id: string;
+      billing: components["schemas"]["BillingChoice"];
+    };
+    /** @description The request of `set-snapshot-quota`, without `checkout` and `proration_date`. */
+    SetSnapshotQuotaQuoteRequestBody: {
+      /**
+       * Format: int64
+       * @description Desired total concurrent snapshot count for this project and region, not additional slots.
+       */
+      limit: number;
+      billing: components["schemas"]["BillingChoice"];
+    };
+    /** @description The request of `create-backup-capacity-pack`, without `checkout`. */
+    CreateBackupCapacityPackQuoteRequestBody: {
+      /** Format: int64 */
+      capacity_gib: number;
+      billing: components["schemas"]["BillingChoice"];
+    };
+    /** @description The request of `resize-instance`, without `checkout` and `proration_date`. */
+    ResizeInstanceQuoteRequestBody: {
+      /**
+       * Format: uuid
+       * @description Must be in the same region and availability zone as the current instance type
+       */
+      instance_type_id: string;
+    };
+    /** @description The request of `resize-disk`, without `checkout` and `proration_date`. */
+    ResizeDiskQuoteRequestBody: {
+      /**
+       * Format: int64
+       * @description Must be larger than the current capacity
+       */
+      size_gb: number;
+    };
+    /** @description The request of `set-floating-ip-bandwidth`, without `checkout` and `proration_date`. */
+    SetFloatingIPBandwidthQuoteRequestBody: {
+      /**
+       * Format: int64
+       * @description Applied to both directions
+       */
+      bandwidth_mbps: number;
+    };
+    /**
+     * @description Shared checkout choices for a product purchase. Omitting this object or mode selects
+     *     automatic checkout. Each purchase creates its own order. Promotion codes are supplied only to
+     *     Billing quote and checkout operations. A service may retain a failed creation record when Billing
+     *     refuses a purchase; no infrastructure is created for that refusal.
+     */
+    CheckoutOptions: {
+      /** @default automatic */
+      mode?: components["schemas"]["CheckoutMode"];
+      /**
+       * @description Expected invoice total after discounts and tax, before applying credit grants or balance.
+       *     A different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.
+       *     Accepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred
+       *     checkout, confirm the amount through Billing.
+       */
+      expected_amount?: components["schemas"]["Money"];
     };
     /** @description Identifies the purchase. Read the order for purchase progress and its invoice for amounts and payment status. */
     PlacedOrder: {
@@ -2540,21 +3246,85 @@ export interface components {
        */
       order_id: string;
     };
-    /** @description What a purchase would be charged, priced as a service would order it, without ordering anything. Nothing is reserved and nothing is recorded. */
-    PurchaseQuote: {
+    /**
+     * @description A price preview for the purchase described by a service, calculated by Billing. Nothing is saved,
+     *     charged or reserved, and no discount redemption is consumed. Account discounts and tax are
+     *     evaluated as for automatic checkout. Promotion codes are evaluated through Billing quote operations.
+     *     All amounts use currency. This preview does not lock prices or guarantee discount availability.
+     */
+    Quote: {
       /** @description One line for each item the purchase would order, in the order it would order them. */
-      lines: components["schemas"]["PurchaseQuoteLine"][];
-      /** @description What would be owed for the whole purchase. Null when any line could not be priced: what would be owed is not knowable then. */
-      total: components["schemas"]["Money"] | null;
-      currency: string;
-    };
-    /** @description Identifies the Compute task and the Billing order of a purchase. Work on the purchase starts after the order's invoice is paid, or without waiting when the order has no immediate invoice. Track the task for completion. */
-    PurchaseResult: {
+      lines: components["schemas"]["QuotedLine"][];
       /**
-       * Format: uuid
-       * @description The Compute task that carries out the purchase.
+       * @description Sum of line amounts before discounts, less tax already included in the discounted line
+       *     amounts, as on an invoice. Null when any line cannot be priced.
        */
-      task_id: string;
+      subtotal: components["schemas"]["Money"] | null;
+      /** @description Sum of line discounts. Null when any line cannot be priced. */
+      discount_amount: components["schemas"]["Money"] | null;
+      /** @description Sum of tax on the discounted line amounts. Null when any line cannot be priced. */
+      tax_amount: components["schemas"]["Money"] | null;
+      /**
+       * @description subtotal minus discount_amount plus tax_amount: what checkout collects, before applying
+       *     credit grants or balance. Equals the sum of line totals and excludes estimated_usage_amount.
+       *     Null when any line cannot be priced.
+       */
+      total: components["schemas"]["Money"] | null;
+      /**
+       * @description Sum of the lines' estimated_usage_amount. A projection, not part of total and not collected at
+       *     checkout. Null when no line is billed for usage or when any usage cannot be priced.
+       */
+      estimated_usage_amount: components["schemas"]["Money"] | null;
+      currency: string;
+      /**
+       * Format: date-time
+       * @description Changes only; null otherwise. The instant the change is priced from. Pass it with the change so the
+       *     order is priced from the same instant.
+       */
+      proration_date: string | null;
+      /**
+       * @description Changes that lower the price only; null otherwise. What the change would return to the original
+       *     payment sources, including the tax paid on it. total is zero for such a change.
+       */
+      refundable_amount: components["schemas"]["Money"] | null;
+    };
+    /**
+     * @description The new disk, `pending` until its order is accepted, and the order. Also returned for a disk restored
+     *     from a backup.
+     */
+    CreateDiskResponseBody: {
+      disk: components["schemas"]["DiskResource"];
+      order: components["schemas"]["PlacedOrder"];
+    };
+    /** @description The new private image, `pending` until its order is accepted, and the order. */
+    CreateImageResponseBody: {
+      image: components["schemas"]["ImageResource"];
+      order: components["schemas"]["PlacedOrder"];
+    };
+    /**
+     * @description The new floating IP, `pending` until its order is accepted, and the order. `address` is null until
+     *     the address is allocated.
+     */
+    AllocateFloatingIPResponseBody: {
+      floating_ip: components["schemas"]["FloatingIPResource"];
+      order: components["schemas"]["PlacedOrder"];
+    };
+    /** @description The disk, still at its current size, and the order for the resize. */
+    ResizeDiskResponseBody: {
+      disk: components["schemas"]["DiskResource"];
+      order: components["schemas"]["PlacedOrder"];
+    };
+    /**
+     * @description The instance, still on its current type, and the order for the resize. The instance keeps its ID, and
+     *     its current subscription remains in force until the resize is applied.
+     */
+    ResizeInstanceResponseBody: {
+      instance: components["schemas"]["InstanceResource"];
+      order: components["schemas"]["PlacedOrder"];
+    };
+    /** @description The floating IP, still at its current bandwidth, and the order for the change. */
+    SetFloatingIPBandwidthResponseBody: {
+      floating_ip: components["schemas"]["FloatingIPResource"];
       order: components["schemas"]["PlacedOrder"];
     };
     /** @description A system disk purchased in the same order. Required when booting from an image; mutually exclusive with boot_disk_id. */
@@ -2566,23 +3336,17 @@ export interface components {
       disk_type_id: string;
       /** Format: int64 */
       size_gb: number;
-      /** Format: uuid */
-      price_id: string;
       /** @default true */
       delete_with_instance?: boolean;
     };
-    /** @description An address and bandwidth purchased in the same order. Mutually exclusive with floating_ip_id. */
+    /** @description One floating IP purchased with this bandwidth configuration in the instance's order. Mutually exclusive with floating_ip_id. */
     NewFloatingIP: {
-      /** Format: uuid */
-      price_id: string;
-      /** Format: uuid */
-      bandwidth_price_id: string;
       /** Format: int64 */
       bandwidth_mbps: number;
       /** Format: uuid */
       ipv4_pool_id: string;
     };
-    /** @description An independent restriction on use. Removing one restriction never removes another source’s restriction or changes the user’s desired power state. */
+    /** @description An independent restriction on use. Removing one restriction never removes another source’s restriction, and never starts an instance its user stopped. */
     InstanceRestriction: {
       /** Format: uuid */
       id: string;
@@ -2597,23 +3361,6 @@ export interface components {
       /** Format: int64 */
       expected_generation?: number;
     };
-    /** @description A requested action and its outcome. Query it through the service that accepted the request, using the same project or administrator credentials. Only succeeded confirms completion. Stopping a wait does not cancel the action. Cancellation is available only where the action explicitly supports it. */
-    Task: {
-      /** Format: uuid */
-      id: string;
-      /** @description Action requested from the owning service. */
-      type: string;
-      /** @enum {string} */
-      state: "pending" | "running" | "succeeded" | "failed" | "canceled";
-      /** @description Terminal failure. Absent while work can still recover. */
-      error?: components["schemas"]["Error"];
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      started_at: string | null;
-      /** Format: date-time */
-      completed_at: string | null;
-    };
     PortAddress: {
       /** Format: uuid */
       id: string;
@@ -2622,7 +3369,7 @@ export interface components {
       address: string;
       is_primary: boolean;
       /** @enum {string} */
-      state: "reserved" | "assigned" | "releasing" | "released" | "unknown";
+      state: "reserved" | "assigned" | "released" | "unknown";
       /** Format: date-time */
       assigned_at: string | null;
       /** Format: date-time */
@@ -2639,7 +3386,7 @@ export interface components {
       role: "boot" | "data";
       delete_with_instance: boolean;
       /** @enum {string} */
-      state: "reserved" | "attaching" | "attached" | "detaching" | "released" | "unknown";
+      state: "reserved" | "attached" | "released" | "unknown";
       /** Format: date-time */
       attached_at: string | null;
       /** Format: date-time */
@@ -2663,7 +3410,7 @@ export interface components {
       role: "primary" | "additional";
       delete_with_instance: boolean;
       /** @enum {string} */
-      state: "reserved" | "attaching" | "attached" | "detaching" | "released" | "unknown";
+      state: "reserved" | "attached" | "released" | "unknown";
       /** Format: date-time */
       attached_at: string | null;
       /** Format: date-time */
@@ -2675,14 +3422,13 @@ export interface components {
       items: components["schemas"]["PortAttachment"][];
       pagination: components["schemas"]["OffsetPagination"];
     };
+    /** @description The new instances, `pending` until their order is accepted, and the order they share. */
     LaunchInstanceResponseBody: {
-      /** @description Instances created by this operation. Empty before resource creation starts. */
-      instance_ids: string[];
       /**
-       * Format: uuid
-       * @description The Compute task that carries out the purchase.
+       * @description One instance per requested instance, in request order. Their IDs stay the same through checkout and
+       *     creation.
        */
-      task_id: string;
+      instances: components["schemas"]["InstanceResource"][];
       order: components["schemas"]["PlacedOrder"];
       /** @description Generated login password, returned only by this response. Null when no password was generated. */
       password: string | null;
@@ -2693,10 +3439,10 @@ export interface components {
       /** Format: uuid */
       region_id: string;
       name: string;
-      /** Format: uuid */
-      plan_id: string | null;
-      /** Format: uuid */
-      bandwidth_plan_id: string | null;
+      /** @description How an address from this pool can be bought, per address. Null when the project has no billing account. */
+      readonly pricing: components["schemas"]["Pricing"] | null;
+      /** @description How the bandwidth of an address from this pool is billed, per Mbit/s, with the same billing choice as the address. Null when the project has no billing account. */
+      readonly bandwidth_pricing: components["schemas"]["Pricing"] | null;
     };
     IPv4PoolListResponseBody: {
       items: components["schemas"]["IPv4PoolResource"][];
@@ -2712,7 +3458,7 @@ export interface components {
       address: string;
       fixed_ip: string;
       /** @enum {string} */
-      state: "binding" | "bound" | "unbinding" | "released" | "unknown";
+      state: "bound" | "released" | "unknown";
       /** Format: date-time */
       bound_at: string | null;
       /** Format: date-time */
@@ -2720,7 +3466,7 @@ export interface components {
       /** Format: date-time */
       released_at: string | null;
     };
-    /** @description One subscription of a release set and the resource it pays for. An address and its bandwidth are two subscriptions of the same floating IP. */
+    /** @description One subscription of a release set and the resource it pays for. Multiple internal billing components may refer to the same floating IP; they do not create independent bandwidth resources. */
     ReleaseSetItem: {
       /** Format: uuid */
       subscription_id: string;
@@ -2729,11 +3475,118 @@ export interface components {
     /** @description A resource a release set releases. */
     ReleaseResource: {
       /** @enum {string} */
-      type: "instance" | "disk" | "snapshot" | "backup" | "image" | "floating_ip";
-      /** Format: uuid */
+      type:
+        | "instance"
+        | "disk"
+        | "image"
+        | "floating_ip"
+        | "backup_service"
+        | "snapshot_quota"
+        | "backup_capacity_pack";
+      /**
+       * Format: uuid
+       * @description The resource's ID; for `backup_service` and `snapshot_quota`, the ID of their region.
+       */
       id: string;
-      /** @description The resource's name. A floating IP is named by its address. */
+      /** @description The resource's name. A floating IP is named by its address, a backup service or snapshot quota by its region, and a capacity pack by its capacity, such as 100 GiB. */
       name: string;
+    };
+    /** @description An operation still running on this instance. It is not a separate resource; once it finishes, the instance's `operation` is null again and the instance shows the result. */
+    InstanceOperation: {
+      /**
+       * @description `create` runs from acceptance of the order until the instance is `active` or `failed`. `suspend` and `resume` impose and lift a suspension by the platform or for non-payment. `delete` includes release through a Billing cancellation.
+       * @enum {string}
+       */
+      type:
+        | "create"
+        | "start"
+        | "stop"
+        | "reboot"
+        | "rebuild"
+        | "resize"
+        | "reset_password"
+        | "attach_disk"
+        | "detach_disk"
+        | "attach_port"
+        | "detach_port"
+        | "bind_floating_ip"
+        | "unbind_floating_ip"
+        | "suspend"
+        | "resume"
+        | "delete";
+      /** Format: date-time */
+      started_at: string;
+    };
+    /** @description An operation still running on this disk. It is not a separate resource; once it finishes, the disk's `operation` is null again and the disk shows the result. */
+    DiskOperation: {
+      /**
+       * @description `attach` and `detach` accompany the instance's `attach_disk` and `detach_disk`. `delete` includes release through a Billing cancellation and deletion with an instance.
+       * @enum {string}
+       */
+      type: "create" | "resize" | "revert" | "attach" | "detach" | "suspend" | "resume" | "delete";
+      /** Format: date-time */
+      started_at: string;
+    };
+    /** @description An operation still running on this snapshot. It is not a separate resource; once it finishes, the snapshot's `operation` is null again and the snapshot shows the result. */
+    SnapshotOperation: {
+      /**
+       * @description `restore`: a disk is being reverted to this snapshot or created from it.
+       * @enum {string}
+       */
+      type: "create" | "restore" | "delete";
+      /** Format: date-time */
+      started_at: string;
+    };
+    /** @description An operation still running on this backup. It is not a separate resource; once it finishes, the backup's `operation` is null again and the backup shows the result. */
+    BackupOperation: {
+      /**
+       * @description `restore`: a disk is being restored from this backup.
+       * @enum {string}
+       */
+      type: "create" | "restore" | "delete";
+      /** Format: date-time */
+      started_at: string;
+    };
+    /** @description An operation still running on this image. It is not a separate resource; once it finishes, the image's `operation` is null again and the image shows the result. */
+    ImageOperation: {
+      /**
+       * @description `create` is the capture of a private image.
+       * @enum {string}
+       */
+      type: "create" | "suspend" | "resume" | "delete";
+      /** Format: date-time */
+      started_at: string;
+    };
+    /** @description An operation still running on this floating IP. It is not a separate resource; once it finishes, the floating IP's `operation` is null again and the floating IP shows the result. */
+    FloatingIPOperation: {
+      /** @enum {string} */
+      type: "create" | "bind" | "unbind" | "set_bandwidth" | "suspend" | "resume" | "delete";
+      /** Format: date-time */
+      started_at: string;
+    };
+    /** @description An operation still running on this private network. It is not a separate resource; once it finishes, the private network's `operation` is null again and the private network shows the result. */
+    PrivateNetworkOperation: {
+      /** @enum {string} */
+      type: "create" | "enable_ipv6" | "disable_ipv6" | "delete";
+      /** Format: date-time */
+      started_at: string;
+    };
+    /** @description An operation still running on this network interface. It is not a separate resource; once it finishes, the network interface's `operation` is null again and the network interface shows the result. */
+    PortOperation: {
+      /** @enum {string} */
+      type: "create" | "attach" | "detach" | "delete";
+      /** Format: date-time */
+      started_at: string;
+    };
+    /** @description An operation still running on this peering. It is not a separate resource; once it finishes, the peering's `operation` is null again and the peering shows the result. */
+    PeeringOperation: {
+      /**
+       * @description `provision` runs after the peering is accepted, until it is `active`.
+       * @enum {string}
+       */
+      type: "provision" | "delete";
+      /** Format: date-time */
+      started_at: string;
     };
     /** @description Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan. */
     OffsetPagination: {
@@ -2744,6 +3597,16 @@ export interface components {
       /** Format: int64 */
       total_count?: number;
     };
+    /**
+     * @description automatic confirms checkout with applicable account discounts and collects payment from eligible
+     *     credit grants and available balance. Insufficient funds fail the purchase with HTTP 422
+     *     BILLING_INSUFFICIENT_FUNDS; no Billing order, charge or discount redemption is committed.
+     *     deferred creates a pending_checkout order for subsequent confirmation and payment through Billing.
+     *     No new discount redemption or payment is made when the order is created. An order whose total is
+     *     zero, with nothing to pay or discount, completes checkout at placement in either mode.
+     * @enum {string}
+     */
+    CheckoutMode: "automatic" | "deferred";
     /**
      * @description A decimal string, in the currency stated alongside it.
      *
@@ -2757,31 +3620,64 @@ export interface components {
      * @example 10.2500000000
      */
     Money: string;
-    PurchaseQuoteLine: {
-      /** @description Whether a price was found for this line. When false, `price_id`, `unit_amount` and `amount` are null and `unpriced_reason` states what is missing. */
+    /**
+     * @description One calculated purchase line. Fixed purchase amounts are rounded as checkout rounds them.
+     *     When priced is false, every monetary field is null. A priced line without an
+     *     immediate charge has zero amounts; an unavailable unit price remains null.
+     */
+    QuotedLine: {
+      /** @description Whether the line can be priced. When false, unpriced_reason states what is missing. */
       priced: boolean;
       /**
        * @description Why no price was found; `none` while `priced` is true.
        * @enum {string}
        */
-      unpriced_reason:
-        "none" | "no_price" | "no_rate_card" | "no_meter" | "no_dimensions" | "no_effective_rule";
-      /**
-       * Format: uuid
-       * @description The price selected, including when the request left the choice to the service. Order with this price.
-       */
-      price_id: string | null;
+      unpriced_reason: "none" | "no_price";
       plan_name: string;
+      /** @description Unit price before discounts, with tax included only where the price includes it. */
       unit_amount: components["schemas"]["Money"] | null;
       /** @description The quantity priced. */
       quantity: string;
-      /** @description Not rounded. Round only for display. */
+      /**
+       * @description Before discounts, including any setup charges. Contains tax only where the price includes it.
+       *     Zero for a priced order item with no immediate charge.
+       */
       amount: components["schemas"]["Money"] | null;
+      /** @description Total reduction on this line, including any committed recurring discount. */
+      discount_amount: components["schemas"]["Money"] | null;
+      /** @description Tax on the discounted amount, including any tax already contained in that amount. */
       tax_amount: components["schemas"]["Money"] | null;
+      /** @description The part of tax_amount already contained in amount minus discount_amount. */
+      tax_included_amount: components["schemas"]["Money"] | null;
+      /** @description amount minus discount_amount plus tax_amount minus tax_included_amount. */
+      total: components["schemas"]["Money"] | null;
+      /**
+       * @description Projected charge for this line's future usage over the period stated by the quoting operation,
+       *     at current rates, before discounts and tax and not rounded. Not part of amount or total and
+       *     not collected at checkout. Null when the line is not billed for usage or its usage cannot be
+       *     priced.
+       */
+      estimated_usage_amount: components["schemas"]["Money"] | null;
       currency: string;
     };
   };
-  responses: never;
+  responses: {
+    /**
+     * @description The request conflicts with the current state of a resource or offering it involves. `COMPUTE_RESOURCE_BUSY`
+     *     means a resource has an operation in progress: `meta.resource_type`, such as `instance` or `floating_ip`, and
+     *     `meta.resource_id` name it, and `meta.operation` is the type of that operation, as in its `operation` field.
+     *     Retry once it has finished. Other codes, such as `BILLING_OPTION_UNAVAILABLE`, are described where they
+     *     apply.
+     */
+    Conflict: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["Error"];
+      };
+    };
+  };
   parameters: {
     Page: number;
     PageSize: number;
@@ -2839,48 +3735,16 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Created */
-      201: {
+      /** @description The backup was accepted and is being taken. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseResult"];
+          "application/json": components["schemas"]["BackupResource"];
         };
       };
-      /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "create-backup-quote": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateBackupQuoteRequestBody"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PurchaseQuote"];
-        };
-      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -2934,24 +3798,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description Deletion was accepted. The backup shows the `delete` operation until it is deleted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["BackupResource"];
         };
       };
-      /** @description The deletion was refused. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3013,15 +3869,52 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Created */
-      201: {
+      /** @description The new disk and its order were created; restoration has not started. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseResult"];
+          "application/json": components["schemas"]["CreateDiskResponseBody"];
         };
       };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-backup-restore-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        backupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RestoreBackupQuoteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3148,15 +4041,16 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Created */
-      201: {
+      /** @description The private image and its order were created; the capture has not started. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseResult"];
+          "application/json": components["schemas"]["CreateImageResponseBody"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3187,9 +4081,10 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseQuote"];
+          "application/json": components["schemas"]["Quote"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3243,24 +4138,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description Deletion was accepted. The image shows the `delete` operation until it is deleted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["ImageResource"];
         };
       };
-      /** @description The deletion was refused. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3454,15 +4341,50 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Created */
-      201: {
+      /** @description The disk and its order were created; the disk does not exist in the cloud yet. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseResult"];
+          "application/json": components["schemas"]["CreateDiskResponseBody"];
         };
       };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-disk-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateDiskQuoteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3516,24 +4438,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description Deletion was accepted. The disk shows the `delete` operation until it is deleted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["DiskResource"];
         };
       };
-      /** @description The deletion was refused. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3595,15 +4509,52 @@ export interface operations {
       };
     };
     responses: {
+      /** @description The disk and the order for the resize; the new size is not yet in effect. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ResizeDiskResponseBody"];
+        };
+      };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-disk-resize-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        diskId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ResizeDiskQuoteRequestBody"];
+      };
+    };
+    responses: {
       /** @description OK */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseResult"];
+          "application/json": components["schemas"]["Quote"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3630,15 +4581,16 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description The revert was accepted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["DiskResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3695,15 +4647,50 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Created */
-      201: {
+      /** @description The floating IP and its order were created; no address is allocated yet. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseResult"];
+          "application/json": components["schemas"]["AllocateFloatingIPResponseBody"];
         };
       };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-floating-ip-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AllocateFloatingIPQuoteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3757,24 +4744,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description The release has been accepted. */
+      /** @description The release was accepted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["FloatingIPResource"];
         };
       };
-      /** @description The deletion was refused. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3797,7 +4776,43 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SetBandwidthRequestBody"];
+        "application/json": components["schemas"]["SetFloatingIPBandwidthRequestBody"];
+      };
+    };
+    responses: {
+      /** @description The floating IP and the order for the change; the new limit is not yet in effect. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SetFloatingIPBandwidthResponseBody"];
+        };
+      };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-floating-ip-bandwidth-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        floatingIpId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetFloatingIPBandwidthQuoteRequestBody"];
       };
     };
     responses: {
@@ -3807,9 +4822,10 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseResult"];
+          "application/json": components["schemas"]["Quote"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3836,8 +4852,8 @@ export interface operations {
       };
     };
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The binding was accepted. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -3845,6 +4861,7 @@ export interface operations {
           "application/json": components["schemas"]["FloatingIPResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3867,8 +4884,8 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The unbinding was accepted. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -3876,6 +4893,7 @@ export interface operations {
           "application/json": components["schemas"]["FloatingIPResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3934,7 +4952,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Accepted */
+      /** @description The instances and their order were created; no instance exists in the cloud yet. */
       202: {
         headers: {
           [name: string]: unknown;
@@ -3943,6 +4961,41 @@ export interface operations {
           "application/json": components["schemas"]["LaunchInstanceResponseBody"];
         };
       };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-instance-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LaunchInstanceQuoteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -3996,24 +5049,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description Release was accepted. The instance shows the `delete` operation until it is released. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["InstanceResource"];
         };
       };
-      /** @description The deletion was refused. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4254,6 +5299,7 @@ export interface operations {
           "application/json": components["schemas"]["ResetPasswordResponseBody"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4280,15 +5326,16 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description The reboot was accepted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["InstanceResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4315,8 +5362,8 @@ export interface operations {
       };
     };
     responses: {
-      /** @description OK */
-      200: {
+      /** @description The rebuild was accepted. The instance shows the `rebuild` operation until it has finished. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -4324,6 +5371,7 @@ export interface operations {
           "application/json": components["schemas"]["RebuildInstanceResponseBody"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4350,15 +5398,52 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Accepted */
+      /** @description The instance and the order for the resize; the new type is not yet in effect. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseResult"];
+          "application/json": components["schemas"]["ResizeInstanceResponseBody"];
         };
       };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-instance-resize-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        instanceId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ResizeInstanceQuoteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4385,15 +5470,16 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description The start was accepted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["InstanceResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4420,15 +5506,16 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description The stop was accepted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["InstanceResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4489,15 +5576,16 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description The attachment was accepted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["DiskResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4521,15 +5609,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description The detachment was accepted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["DiskResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4556,8 +5645,8 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The current floating IP binding */
-      200: {
+      /** @description The binding was accepted. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -4565,6 +5654,7 @@ export interface operations {
           "application/json": components["schemas"]["FloatingIPResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4588,8 +5678,8 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description The current floating IP binding */
-      200: {
+      /** @description The unbinding was accepted. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -4597,6 +5687,7 @@ export interface operations {
           "application/json": components["schemas"]["FloatingIPResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4657,15 +5748,16 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description The attachment was accepted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["PortResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4689,15 +5781,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description The detachment was accepted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["PortResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4788,8 +5881,8 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Created */
-      201: {
+      /** @description The network interface was accepted and is being created. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -4819,13 +5912,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description No Content */
-      204: {
+      /** @description Deletion was accepted. The network interface shows the `delete` operation until it is deleted. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["PortResource"];
+        };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -4884,8 +5980,8 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Created */
-      201: {
+      /** @description The private network was accepted and is being created. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -4946,13 +6042,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description No Content */
-      204: {
+      /** @description Release was accepted. The private network shows the `delete` operation until it is released. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["PrivateNetworkResource"];
+        };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -5041,8 +6140,8 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description OK */
-      200: {
+      /** @description Enabling IPv6 was accepted. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
@@ -5050,6 +6149,7 @@ export interface operations {
           "application/json": components["schemas"]["IPv6ResponseBody"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -5072,13 +6172,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description No Content */
-      204: {
+      /** @description Disabling IPv6 was accepted. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["IPv6ResponseBody"];
+        };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -5583,6 +6686,329 @@ export interface operations {
       };
     };
   };
+  "get-snapshot-quota": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Current effective quota, occupied slots and any pending purchase. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SnapshotQuota"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "set-snapshot-quota": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        /**
+         * @example {
+         *       "limit": 20,
+         *       "billing": {
+         *         "mode": "prepaid",
+         *         "period": {
+         *           "unit": "month",
+         *           "count": 1
+         *         }
+         *       },
+         *       "checkout": {
+         *         "mode": "deferred"
+         *       }
+         *     }
+         */
+        "application/json": components["schemas"]["SetSnapshotQuotaRequestBody"];
+      };
+    };
+    responses: {
+      /** @description The quota purchase was recorded; the requested limit may not yet be effective. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SetSnapshotQuotaResponseBody"];
+        };
+      };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-snapshot-quota-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetSnapshotQuotaQuoteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-backup-service": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BackupService"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-backup-service": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBackupServiceRequestBody"];
+      };
+    };
+    responses: {
+      /** @description The backup service and its order were created; the service is not active yet. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CreateBackupServiceResponseBody"];
+        };
+      };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-backup-service-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "list-backup-capacity-packs": {
+    parameters: {
+      query?: {
+        page?: components["parameters"]["Page"];
+        page_size?: components["parameters"]["PageSize"];
+      };
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BackupCapacityPackListResponseBody"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-backup-capacity-pack": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBackupCapacityPackRequestBody"];
+      };
+    };
+    responses: {
+      /** @description The pack and its order were created; the pack does not apply yet. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CreateBackupCapacityPackResponseBody"];
+        };
+      };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-backup-capacity-pack-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        regionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBackupCapacityPackQuoteRequestBody"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
   "list-snapshots": {
     parameters: {
       query?: {
@@ -5630,13 +7056,13 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Created */
-      201: {
+      /** @description The snapshot record was created within the existing quota; snapshot data may not yet exist. */
+      202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PurchaseResult"];
+          "application/json": components["schemas"]["SnapshotResource"];
         };
       };
       /** @description Error */
@@ -5692,24 +7118,16 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description The action was accepted. Wait for the returned task to finish. */
+      /** @description Deletion was accepted. The snapshot shows the `delete` operation until it is deleted. */
       202: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Task"];
+          "application/json": components["schemas"]["SnapshotResource"];
         };
       };
-      /** @description The deletion was refused. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -5746,37 +7164,6 @@ export interface operations {
         };
       };
       /** @description Error */
-      default: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Error"];
-        };
-      };
-    };
-  };
-  "get-task": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        taskId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description The task. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Task"];
-        };
-      };
-      /** @description The request could not be completed. */
       default: {
         headers: {
           [name: string]: unknown;
@@ -5936,6 +7323,7 @@ export interface operations {
           "application/json": components["schemas"]["PeeringResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {
@@ -5967,6 +7355,7 @@ export interface operations {
           "application/json": components["schemas"]["PeeringResource"];
         };
       };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {

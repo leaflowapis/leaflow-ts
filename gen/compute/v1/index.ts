@@ -18,20 +18,11 @@ export type ListBackupsQuery = operations["list-backups"]["parameters"]["query"]
 
 /** The success response body of `POST /api/v1/backups`. */
 export type CreateBackupResult =
-  operations["create-backup"]["responses"][201]["content"]["application/json"];
+  operations["create-backup"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/backups`. */
 export type CreateBackupBody = NonNullable<
   operations["create-backup"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /api/v1/backups/quote`. */
-export type CreateBackupQuoteResult =
-  operations["create-backup-quote"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /api/v1/backups/quote`. */
-export type CreateBackupQuoteBody = NonNullable<
-  operations["create-backup-quote"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/backups/{backupId}`. */
@@ -53,11 +44,20 @@ export type DeleteBackupResult =
 
 /** The success response body of `POST /api/v1/backups/{backupId}/restore`. */
 export type RestoreBackupResult =
-  operations["restore-backup"]["responses"][201]["content"]["application/json"];
+  operations["restore-backup"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/backups/{backupId}/restore`. */
 export type RestoreBackupBody = NonNullable<
   operations["restore-backup"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/backups/{backupId}/restore/quote`. */
+export type CreateBackupRestoreQuoteResult =
+  operations["create-backup-restore-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/backups/{backupId}/restore/quote`. */
+export type CreateBackupRestoreQuoteBody = NonNullable<
+  operations["create-backup-restore-quote"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/disk-types`. */
@@ -80,7 +80,7 @@ export type ListImagesQuery = operations["list-images"]["parameters"]["query"];
 
 /** The success response body of `POST /api/v1/images`. */
 export type CreateImageResult =
-  operations["create-image"]["responses"][201]["content"]["application/json"];
+  operations["create-image"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/images`. */
 export type CreateImageBody = NonNullable<
@@ -144,11 +144,20 @@ export type ListDisksQuery = operations["list-disks"]["parameters"]["query"];
 
 /** The success response body of `POST /api/v1/disks`. */
 export type CreateDiskResult =
-  operations["create-disk"]["responses"][201]["content"]["application/json"];
+  operations["create-disk"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/disks`. */
 export type CreateDiskBody = NonNullable<
   operations["create-disk"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/disks/quote`. */
+export type CreateDiskQuoteResult =
+  operations["create-disk-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/disks/quote`. */
+export type CreateDiskQuoteBody = NonNullable<
+  operations["create-disk-quote"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/disks/{diskId}`. */
@@ -169,11 +178,20 @@ export type DeleteDiskResult =
 
 /** The success response body of `POST /api/v1/disks/{diskId}/resize`. */
 export type ResizeDiskResult =
-  operations["resize-disk"]["responses"][200]["content"]["application/json"];
+  operations["resize-disk"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/disks/{diskId}/resize`. */
 export type ResizeDiskBody = NonNullable<
   operations["resize-disk"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/disks/{diskId}/resize/quote`. */
+export type CreateDiskResizeQuoteResult =
+  operations["create-disk-resize-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/disks/{diskId}/resize/quote`. */
+export type CreateDiskResizeQuoteBody = NonNullable<
+  operations["create-disk-resize-quote"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `POST /api/v1/disks/{diskId}/revert`. */
@@ -194,11 +212,20 @@ export type ListFloatingIpsQuery = operations["list-floating-ips"]["parameters"]
 
 /** The success response body of `POST /api/v1/floating-ips`. */
 export type AllocateFloatingIpResult =
-  operations["allocate-floating-ip"]["responses"][201]["content"]["application/json"];
+  operations["allocate-floating-ip"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/floating-ips`. */
 export type AllocateFloatingIpBody = NonNullable<
   operations["allocate-floating-ip"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/floating-ips/quote`. */
+export type CreateFloatingIpQuoteResult =
+  operations["create-floating-ip-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/floating-ips/quote`. */
+export type CreateFloatingIpQuoteBody = NonNullable<
+  operations["create-floating-ip-quote"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/floating-ips/{floatingIpId}`. */
@@ -211,16 +238,25 @@ export type ReleaseFloatingIpResult =
 
 /** The success response body of `PUT /api/v1/floating-ips/{floatingIpId}/bandwidth`. */
 export type SetFloatingIpBandwidthResult =
-  operations["set-floating-ip-bandwidth"]["responses"][200]["content"]["application/json"];
+  operations["set-floating-ip-bandwidth"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `PUT /api/v1/floating-ips/{floatingIpId}/bandwidth`. */
 export type SetFloatingIpBandwidthBody = NonNullable<
   operations["set-floating-ip-bandwidth"]["requestBody"]
 >["content"]["application/json"];
 
+/** The success response body of `POST /api/v1/floating-ips/{floatingIpId}/bandwidth/quote`. */
+export type CreateFloatingIpBandwidthQuoteResult =
+  operations["create-floating-ip-bandwidth-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/floating-ips/{floatingIpId}/bandwidth/quote`. */
+export type CreateFloatingIpBandwidthQuoteBody = NonNullable<
+  operations["create-floating-ip-bandwidth-quote"]["requestBody"]
+>["content"]["application/json"];
+
 /** The success response body of `PUT /api/v1/floating-ips/{floatingIpId}/binding`. */
 export type BindFloatingIpResult =
-  operations["bind-floating-ip"]["responses"][200]["content"]["application/json"];
+  operations["bind-floating-ip"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `PUT /api/v1/floating-ips/{floatingIpId}/binding`. */
 export type BindFloatingIpBody = NonNullable<
@@ -229,7 +265,7 @@ export type BindFloatingIpBody = NonNullable<
 
 /** The success response body of `DELETE /api/v1/floating-ips/{floatingIpId}/binding`. */
 export type UnbindFloatingIpResult =
-  operations["unbind-floating-ip"]["responses"][200]["content"]["application/json"];
+  operations["unbind-floating-ip"]["responses"][202]["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/instances`. */
 export type ListInstancesResult =
@@ -245,6 +281,15 @@ export type LaunchInstanceResult =
 /** The request body of `POST /api/v1/instances`. */
 export type LaunchInstanceBody = NonNullable<
   operations["launch-instance"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/instances/quote`. */
+export type CreateInstanceQuoteResult =
+  operations["create-instance-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/instances/quote`. */
+export type CreateInstanceQuoteBody = NonNullable<
+  operations["create-instance-quote"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/instances/{instanceId}`. */
@@ -323,7 +368,7 @@ export type RebootInstanceBody = NonNullable<
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/rebuild`. */
 export type RebuildInstanceResult =
-  operations["rebuild-instance"]["responses"][200]["content"]["application/json"];
+  operations["rebuild-instance"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/instances/{instanceId}/rebuild`. */
 export type RebuildInstanceBody = NonNullable<
@@ -337,6 +382,15 @@ export type ResizeInstanceResult =
 /** The request body of `POST /api/v1/instances/{instanceId}/resize`. */
 export type ResizeInstanceBody = NonNullable<
   operations["resize-instance"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/instances/{instanceId}/resize/quote`. */
+export type CreateInstanceResizeQuoteResult =
+  operations["create-instance-resize-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/instances/{instanceId}/resize/quote`. */
+export type CreateInstanceResizeQuoteBody = NonNullable<
+  operations["create-instance-resize-quote"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/start`. */
@@ -379,7 +433,7 @@ export type DetachDiskResult =
 
 /** The success response body of `POST /api/v1/instances/{instanceId}/floating-ips`. */
 export type AttachInstanceFloatingIpResult =
-  operations["attach-instance-floating-ip"]["responses"][200]["content"]["application/json"];
+  operations["attach-instance-floating-ip"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/instances/{instanceId}/floating-ips`. */
 export type AttachInstanceFloatingIpBody = NonNullable<
@@ -388,7 +442,7 @@ export type AttachInstanceFloatingIpBody = NonNullable<
 
 /** The success response body of `DELETE /api/v1/instances/{instanceId}/floating-ips/{floatingIpId}`. */
 export type DetachInstanceFloatingIpResult =
-  operations["detach-instance-floating-ip"]["responses"][200]["content"]["application/json"];
+  operations["detach-instance-floating-ip"]["responses"][202]["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/instances/{instanceId}/ports`. */
 export type ListInstancePortsResult =
@@ -426,12 +480,16 @@ export type ListPortsQuery = operations["list-ports"]["parameters"]["query"];
 
 /** The success response body of `POST /api/v1/ports`. */
 export type CreatePortResult =
-  operations["create-port"]["responses"][201]["content"]["application/json"];
+  operations["create-port"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/ports`. */
 export type CreatePortBody = NonNullable<
   operations["create-port"]["requestBody"]
 >["content"]["application/json"];
+
+/** The success response body of `DELETE /api/v1/ports/{portId}`. */
+export type DeletePortResult =
+  operations["delete-port"]["responses"][202]["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/private-networks`. */
 export type ListPrivateNetworksResult =
@@ -442,7 +500,7 @@ export type ListPrivateNetworksQuery = operations["list-private-networks"]["para
 
 /** The success response body of `POST /api/v1/private-networks`. */
 export type CreatePrivateNetworkResult =
-  operations["create-private-network"]["responses"][201]["content"]["application/json"];
+  operations["create-private-network"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/private-networks`. */
 export type CreatePrivateNetworkBody = NonNullable<
@@ -462,13 +520,21 @@ export type RenamePrivateNetworkBody = NonNullable<
   operations["rename-private-network"]["requestBody"]
 >["content"]["application/json"];
 
+/** The success response body of `DELETE /api/v1/private-networks/{privateNetworkId}`. */
+export type DeletePrivateNetworkResult =
+  operations["delete-private-network"]["responses"][202]["content"]["application/json"];
+
 /** The success response body of `GET /api/v1/private-networks/{privateNetworkId}/ipv6`. */
 export type GetPrivateNetworkIpv6Result =
   operations["get-private-network-ipv6"]["responses"][200]["content"]["application/json"];
 
 /** The success response body of `POST /api/v1/private-networks/{privateNetworkId}/ipv6`. */
 export type EnablePrivateNetworkIpv6Result =
-  operations["enable-private-network-ipv6"]["responses"][200]["content"]["application/json"];
+  operations["enable-private-network-ipv6"]["responses"][202]["content"]["application/json"];
+
+/** The success response body of `DELETE /api/v1/private-networks/{privateNetworkId}/ipv6`. */
+export type DisablePrivateNetworkIpv6Result =
+  operations["disable-private-network-ipv6"]["responses"][202]["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/private-networks/{privateNetworkId}/routes`. */
 export type ListRoutesResult =
@@ -555,6 +621,71 @@ export type CreateSecurityGroupRuleBody = NonNullable<
   operations["create-security-group-rule"]["requestBody"]
 >["content"]["application/json"];
 
+/** The success response body of `GET /api/v1/regions/{regionId}/snapshot-quota`. */
+export type GetSnapshotQuotaResult =
+  operations["get-snapshot-quota"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `PUT /api/v1/regions/{regionId}/snapshot-quota`. */
+export type SetSnapshotQuotaResult =
+  operations["set-snapshot-quota"]["responses"][202]["content"]["application/json"];
+
+/** The request body of `PUT /api/v1/regions/{regionId}/snapshot-quota`. */
+export type SetSnapshotQuotaBody = NonNullable<
+  operations["set-snapshot-quota"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/regions/{regionId}/snapshot-quota/quote`. */
+export type CreateSnapshotQuotaQuoteResult =
+  operations["create-snapshot-quota-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/regions/{regionId}/snapshot-quota/quote`. */
+export type CreateSnapshotQuotaQuoteBody = NonNullable<
+  operations["create-snapshot-quota-quote"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `GET /api/v1/regions/{regionId}/backup-service`. */
+export type GetBackupServiceResult =
+  operations["get-backup-service"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/regions/{regionId}/backup-service`. */
+export type CreateBackupServiceResult =
+  operations["create-backup-service"]["responses"][202]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/regions/{regionId}/backup-service`. */
+export type CreateBackupServiceBody = NonNullable<
+  operations["create-backup-service"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/regions/{regionId}/backup-service/quote`. */
+export type CreateBackupServiceQuoteResult =
+  operations["create-backup-service-quote"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `GET /api/v1/regions/{regionId}/backup-capacity-packs`. */
+export type ListBackupCapacityPacksResult =
+  operations["list-backup-capacity-packs"]["responses"][200]["content"]["application/json"];
+
+/** The query parameters of `GET /api/v1/regions/{regionId}/backup-capacity-packs`. */
+export type ListBackupCapacityPacksQuery =
+  operations["list-backup-capacity-packs"]["parameters"]["query"];
+
+/** The success response body of `POST /api/v1/regions/{regionId}/backup-capacity-packs`. */
+export type CreateBackupCapacityPackResult =
+  operations["create-backup-capacity-pack"]["responses"][202]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/regions/{regionId}/backup-capacity-packs`. */
+export type CreateBackupCapacityPackBody = NonNullable<
+  operations["create-backup-capacity-pack"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/regions/{regionId}/backup-capacity-packs/quote`. */
+export type CreateBackupCapacityPackQuoteResult =
+  operations["create-backup-capacity-pack-quote"]["responses"][200]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/regions/{regionId}/backup-capacity-packs/quote`. */
+export type CreateBackupCapacityPackQuoteBody = NonNullable<
+  operations["create-backup-capacity-pack-quote"]["requestBody"]
+>["content"]["application/json"];
+
 /** The success response body of `GET /api/v1/snapshots`. */
 export type ListSnapshotsResult =
   operations["list-snapshots"]["responses"][200]["content"]["application/json"];
@@ -564,7 +695,7 @@ export type ListSnapshotsQuery = operations["list-snapshots"]["parameters"]["que
 
 /** The success response body of `POST /api/v1/snapshots`. */
 export type CreateSnapshotResult =
-  operations["create-snapshot"]["responses"][201]["content"]["application/json"];
+  operations["create-snapshot"]["responses"][202]["content"]["application/json"];
 
 /** The request body of `POST /api/v1/snapshots`. */
 export type CreateSnapshotBody = NonNullable<
@@ -587,9 +718,6 @@ export type RenameSnapshotBody = NonNullable<
 /** The success response body of `DELETE /api/v1/snapshots/{snapshotId}`. */
 export type DeleteSnapshotResult =
   operations["delete-snapshot"]["responses"][202]["content"]["application/json"];
-
-/** The success response body of `GET /api/v1/tasks/{taskId}`. */
-export type GetTaskResult = operations["get-task"]["responses"][200]["content"]["application/json"];
 
 /** The success response body of `GET /api/v1/ipv4-pools`. */
 export type ListIpv4PoolsResult =

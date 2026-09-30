@@ -125,13 +125,13 @@ export type CreatePaymentMethodSetupBody = NonNullable<
 export type SetDefaultPaymentMethodResult =
   operations["set-default-payment-method"]["responses"][200]["content"]["application/json"];
 
-/** The success response body of `POST /account/v1/invoices/{invoiceId}/collect-payment`. */
-export type CollectInvoicePaymentResult =
-  operations["collect-invoice-payment"]["responses"][200]["content"]["application/json"];
+/** The success response body of `POST /account/v1/invoices/{invoiceId}/pay`. */
+export type PayInvoiceResult =
+  operations["pay-invoice"]["responses"][200]["content"]["application/json"];
 
-/** The request body of `POST /account/v1/invoices/{invoiceId}/collect-payment`. */
-export type CollectInvoicePaymentBody = NonNullable<
-  operations["collect-invoice-payment"]["requestBody"]
+/** The request body of `POST /account/v1/invoices/{invoiceId}/pay`. */
+export type PayInvoiceBody = NonNullable<
+  operations["pay-invoice"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `GET /account/v1/invoices/{invoiceId}/payment-preview`. */
@@ -289,15 +289,6 @@ export type SetAutoRenewResult =
 /** The request body of `PUT /account/v1/subscriptions/{subscriptionId}/auto-renew`. */
 export type SetAutoRenewBody = NonNullable<
   operations["set-auto-renew"]["requestBody"]
->["content"]["application/json"];
-
-/** The success response body of `POST /account/v1/promotion-codes/preview`. */
-export type PreviewPromotionCodeResult =
-  operations["preview-promotion-code"]["responses"][200]["content"]["application/json"];
-
-/** The request body of `POST /account/v1/promotion-codes/preview`. */
-export type PreviewPromotionCodeBody = NonNullable<
-  operations["preview-promotion-code"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `GET /account/v1/allowances`. */

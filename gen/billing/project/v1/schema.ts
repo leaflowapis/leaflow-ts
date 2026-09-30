@@ -172,7 +172,7 @@ export interface paths {
      *     - 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when, for `period_end`, the paid terms end at
      *       different times;
      *     - 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled
-     *       (`meta.cancellation_id`) or reclaimed (`meta.job_id`);
+     *       (`meta.cancellation_id`) or reclaimed (`meta.action_id`);
      *     - 409 `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online payment for a renewal of one of them
      *       is in progress;
      *     - 409 `BILLING_CANCELLATION_REFUND_CHANGED` when the refund is no longer
@@ -434,7 +434,16 @@ export interface components {
      */
     TerminationPolicy: "immediate" | "period_end";
     /**
-     * @description Prorated returns the unused value of paid service periods using integer-second duration ratios. Setup fees are excluded. Tax and funds follow the original invoice and payment sources.
+     * @description none refunds nothing. prorated refunds the amount paid for the current period minus the value of
+     *     the time used, never below zero and never more than what remains unrefunded. The time used runs
+     *     from the period start to the effective cancellation time and is valued at the plan's
+     *     shorter-period prices in the same currency, frozen at purchase as the order item's
+     *     refund_monthly_amount and refund_hourly_amount: each full calendar month at the one-month prepaid
+     *     price, the remainder at the postpaid hourly price or, without one, at the one-month price by the
+     *     second. When the plan has no prepaid period shorter than the one bought, the time used is valued
+     *     at the price paid, pro rata by the second. Discounts are not refunded, as they were never paid,
+     *     and setup fees are excluded. The refunded part returns to the payment sources it came from. Tax
+     *     paid is refunded in the same proportion as the amount it was paid on.
      * @enum {string}
      */
     RefundPolicy: "none" | "prorated";
@@ -451,8 +460,8 @@ export interface components {
      * @description What the cancellation would return, subscription by subscription and in total, as of now. Give
      *     `proration_date` and `refundable_amount` when creating the cancellation.
      *
-     *     - `unused_amount`: before tax, the value of the paid service still unused, whatever the refund
-     *       terms say.
+     *     - `unused_amount`: before tax, the amount paid for the current periods minus the value of the
+     *       time used, valued as refund policy `prorated` describes, whatever the refund terms say.
      *     - `refundable_amount`: what is returned the way it was paid, including the tax paid on it;
      *       `refund_amount` plus `credit_amount`.
      *     - `refund_amount`: the part returned to the balance or to the payment method.
@@ -690,7 +699,9 @@ export interface components {
     /**
      * @description Price renewing a prepaid subscription. Give `price_id`, or `interval` with
      *     `interval_count`, to renew for another term at the price currently sold for it. Naming
-     *     the current term, or giving neither, renews at the agreed amount.
+     *     the current term, or giving neither, renews at the agreed amount. A term sold at several
+     *     prices that differ in termination policy is refused with 409
+     *     `BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `termination_policy` or `price_id` is given.
      */
     QuoteRenewal: {
       /** Format: uuid */
@@ -700,49 +711,40 @@ export interface components {
       /** @enum {string} */
       interval?: "day" | "month" | "year";
       interval_count?: number;
+      /** @description With `interval` and `interval_count`, chooses among prices of that term that differ in termination policy. */
+      termination_policy?: components["schemas"]["TerminationPolicy"];
       /**
        * @description How many consecutive periods to renew for.
        * @default 1
        */
       periods?: number;
     };
-    /** @description Quote exactly one target. Purchase lines, an existing order, a renewal list and a cancellation are mutually exclusive. */
-    QuoteRequest:
-      | components["schemas"]["PurchaseQuoteRequest"]
-      | components["schemas"]["OrderQuoteRequest"]
-      | components["schemas"]["RenewalQuoteRequest"]
-      | components["schemas"]["CancellationQuoteRequest"];
     /**
-     * @description Preview one proposed purchase using the project's current billing account. Without a code,
-     *     an applicable account discount is selected. An explicit code is evaluated without reserving or
+     * @description Quote exactly one target: purchase `lines`, an existing `order_id`, `renewals` or a `cancellation`. Giving none or
+     *     more than one, or a `promotion_code` with `renewals` or a `cancellation`, fails with HTTP 400
+     *     `BILLING_PURCHASE_INVALID` and `meta.field` naming the offending field. Without a code, an
+     *     applicable account discount is selected. An explicit code is evaluated without reserving or
      *     consuming a redemption and must be supplied again when confirming checkout through Billing.
-     *     Future usage estimates cannot be combined with a promotion code or used as a checkout amount.
      */
-    PurchaseQuoteRequest: {
-      lines: components["schemas"]["QuoteLine"][];
+    QuoteRequest: {
+      /**
+       * @description A proposed purchase, priced with the project's current billing account. Future usage
+       *     estimates cannot be combined with a promotion code or used as a checkout amount.
+       */
+      lines?: components["schemas"]["QuoteLine"][];
+      /**
+       * Format: uuid
+       * @description Preview checkout of this existing order. Its recorded purchase terms supply every line, and a
+       *     confirmed order returns its recorded amounts. A preview does not change the order.
+       */
+      order_id?: string;
+      /**
+       * @description Preview renewing these subscriptions, each at most once. Each entry represents a separate
+       *     renewal order. To preview a new promotion code, create a renewal order and quote it by order_id.
+       */
+      renewals?: components["schemas"]["QuoteRenewal"][];
+      cancellation?: components["schemas"]["QuoteCancellation"];
       promotion_code?: string;
-    };
-    /**
-     * @description Preview checkout of one existing order. Its recorded purchase terms supply every line.
-     *     Without a code, an applicable account discount is selected. A preview neither changes the
-     *     order nor reserves or consumes a redemption. A confirmed order returns its recorded amounts.
-     */
-    OrderQuoteRequest: {
-      /** Format: uuid */
-      order_id: string;
-      /** @description Code to evaluate for this order. Must be supplied again when confirming checkout. */
-      promotion_code?: string;
-    };
-    /**
-     * @description Preview renewing subscriptions, each at most once. Each entry represents a separate renewal
-     *     order. To preview a new promotion code, create a renewal order and quote it by order_id.
-     */
-    RenewalQuoteRequest: {
-      renewals: components["schemas"]["QuoteRenewal"][];
-    };
-    /** @description Preview one cancellation without combining it with a purchase, renewal or promotion code. */
-    CancellationQuoteRequest: {
-      cancellation: components["schemas"]["QuoteCancellation"];
     };
     /**
      * @description A purchase quote line or one recorded order item. Monetary fields use the account currency.
@@ -1014,14 +1016,15 @@ export interface components {
      *     through checkout and delivery. One order may create several subscriptions, such as an instance,
      *     its system disk and its address; it has no single subscription ID.
      *
-     *     Pending does not grant service or accrue usage. Payment confirmation and order acceptance do
-     *     not activate a service-owned subscription. It becomes active when the owning service confirms
-     *     delivery, with started_at set to the confirmed effective time. Prepaid service periods start
+     *     Pending and provisioning do not grant service or accrue usage. A service-owned subscription
+     *     becomes provisioning when the owning service accepts the order, and active when the service
+     *     confirms delivery, with started_at set to the confirmed effective time; payment changes neither. Prepaid service periods start
      *     then; postpaid usage starts only when the service reports actual delivery and metering.
      *
      *     One-time delivery may omit a subscription. Renewals reference and extend existing subscriptions
-     *     rather than creating another; changes may create pending replacements. Canceling or failing an
-     *     unfulfilled purchase closes its pending subscriptions without starting a service period.
+     *     rather than creating another; a change keeps the subscription ID and switches its terms when it
+     *     takes effect. Canceling or failing an
+     *     unfulfilled purchase closes its pending or provisioning subscriptions without starting a service period.
      *     Fixed renewals use the agreed recurring_amount and interval; already paid periods retain their
      *     original value. Technical state belongs to the owning service.
      *
@@ -1047,7 +1050,10 @@ export interface components {
       refund_policy?: components["schemas"]["RefundPolicy"];
       /** Format: uuid */
       order_item_id?: string;
-      /** Format: uuid */
+      /**
+       * Format: uuid
+       * @description Present only on subscriptions created by an earlier change that replaced the subscription. A change now keeps the subscription ID.
+       */
       replaces_subscription_id?: string;
       /** Format: uuid */
       coupon_id?: string;
@@ -1095,20 +1101,21 @@ export interface components {
       quantity: string;
       /**
        * Format: date-time
-       * @description End of the prepaid service already activated. Null for a new pending subscription, even
-       *     when its purchase has been paid, and for postpaid subscriptions with no prepaid end date.
+       * @description End of the prepaid service already activated. Null until a new subscription becomes active,
+       *     even when its purchase has been paid, and for postpaid subscriptions with no prepaid end date.
        */
       paid_until?: string | null;
       auto_renew: boolean;
       /**
-       * @description pending means the purchase relationship exists but service has not started. For a
-       *     service-owned purchase, only confirmed delivery moves it to active; paying alone does not.
+       * @description pending means the purchase relationship exists but its order has not been accepted.
+       *     provisioning means the service accepted the order and is delivering. For a service-owned
+       *     purchase, only confirmed delivery moves it to active; paying alone does not.
        * @enum {string}
        */
-      status: "pending" | "active" | "suspended" | "canceled" | "terminated";
+      status: "pending" | "provisioning" | "active" | "suspended" | "canceled" | "terminated";
       /**
        * Format: date-time
-       * @description Confirmed start of service. Null for a new pending subscription, including after payment.
+       * @description Confirmed start of service. Null until a new subscription becomes active, including after payment.
        */
       started_at?: string | null;
       /** Format: date-time */
@@ -1158,8 +1165,9 @@ export interface components {
       pagination: components["schemas"]["OffsetPagination"];
     };
     /**
-     * @description pending_checkout has recorded purchase terms but no confirmed checkout. An absent invoice
-     *     or zero total does not permit acceptance. Confirmation moves it to pending. Both pending_checkout
+     * @description pending_checkout has recorded purchase terms but no confirmed checkout; only a deferred order
+     *     with an amount due reaches it, since a zero-total order completes checkout at placement.
+     *     Confirmation moves it to pending. Both pending_checkout
      *     and pending can expire or be canceled; neither establishes service delivery.
      *
      *     Follows the items. `pending` has confirmed checkout, is not yet accepted and may be paid or unpaid. `active` is
@@ -1297,8 +1305,8 @@ export interface components {
       /**
        * Format: uuid
        * @description Stable Billing subscription ID. A new prepaid or postpaid service purchase returns the
-       *     pending subscription here; renewals reference the existing subscription and changes the
-       *     replacement. Absent for delivery without a subscription. This is not a business resource ID.
+       *     pending subscription here; renewals and changes reference the existing subscription, which
+       *     keeps its ID. Absent for delivery without a subscription. This is not a business resource ID.
        */
       subscription_id?: string;
       /** @enum {string} */
@@ -1306,6 +1314,17 @@ export interface components {
       interval_count?: number;
       termination_policy?: components["schemas"]["TerminationPolicy"];
       refund_policy?: components["schemas"]["RefundPolicy"];
+      /**
+       * @description Prepaid items only: the plan's one-month prepaid price for this item's quantity before tax, frozen
+       *     at purchase, used to value time used under a prorated refund or a downgrade. Null when the plan has
+       *     no prepaid period shorter than the one bought.
+       */
+      refund_monthly_amount?: string | null;
+      /**
+       * @description Prepaid items only: the plan's postpaid hourly price for this item's quantity before tax, frozen at
+       *     purchase, used for time used short of a full month. Null when the plan has no postpaid price.
+       */
+      refund_hourly_amount?: string | null;
       completes_on_payment: boolean;
       recurring_amount?: string;
       setup_amount?: string;
@@ -1340,14 +1359,16 @@ export interface components {
       quantity: string;
       /**
        * @description The unit amount of the price this line is charged under. Absent for a tiered price, which has no
-       *     single unit amount, and for a change that takes effect at once, which is charged the prorated
-       *     difference.
+       *     single unit amount, and for a change that takes effect at once, which is charged as `gross_amount`
+       *     describes.
        */
       unit_amount?: components["schemas"]["Money"];
       /**
        * @description Before discounts: the price applied to the quantity, which for a per-unit price is `unit_amount`
-       *     times `quantity`; a minimum charge can make it higher. For a change that takes effect at once it is
-       *     the prorated difference. The setup fee is not part of it; see `setup_amount`.
+       *     times `quantity`; a minimum charge can make it higher. For an upgrade that takes effect at once it is
+       *     the new price minus the old price for the time left in the paid period, both at the subscription's
+       *     own period price, and the period end does not move; a downgrade charges nothing and may refund the
+       *     difference instead. A change between equal period prices charges and refunds nothing. The setup fee is not part of it; see `setup_amount`.
        *
        *     Under an inclusive tax rate it includes tax, as the price does, and the included part is
        *     `tax_included_amount`. A renewal at the agreed terms is the exception: the agreed amount excludes
@@ -1459,6 +1480,8 @@ export interface components {
       tax_amount: string;
       total: string;
       amount_paid: string;
+      /** @description What is still collectible after applied credits and successful payments; never below zero. */
+      amount_due: string;
       amount_refunded: string;
       /** Format: date-time */
       due_at?: string;
