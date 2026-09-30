@@ -511,14 +511,17 @@ export interface components {
       /** @description The token carried by the invitation link */
       token: string;
     };
+    ProjectTraitResource: {
+      key: string;
+      value: string;
+      /** @enum {string} */
+      effect: "NoWrite" | "NoAccess";
+      reason: string;
+    };
     ProjectResource: {
-      /**
-       * Format: date-time
-       * @description A read-only management lock. Running resources and billing remain unchanged. Only an operator can release it.
-       */
-      locked_at: string | null;
-      lock_reason: string;
-      ban_reason: string;
+      traits: components["schemas"]["ProjectTraitResource"][];
+      /** Format: date-time */
+      deletion_requested_at: string | null;
       /** Format: date-time */
       created_at: string;
       created_by: string;
@@ -531,10 +534,6 @@ export interface components {
       /** Format: uuid */
       id: string;
       name: string;
-      /** @enum {string} */
-      status: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
-      /** @description Written for a reader; it takes part in no query */
-      status_reason: string;
       /** Format: date-time */
       updated_at: string;
     };
@@ -1064,8 +1063,7 @@ export interface operations {
         offset?: number;
         /** @description Matches against name or description */
         keyword?: string;
-        /** @description Filters by external status. Deleted projects are excluded while this is absent */
-        status?: "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETING" | "DELETED";
+        include_deleted?: boolean;
       };
       header?: never;
       path?: never;
