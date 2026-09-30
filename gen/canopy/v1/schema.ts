@@ -128,6 +128,8 @@ export interface paths {
      * @description A model that has been retired does not appear here, while it remains readable individually.
      *
      *     `context_length` and `max_output_tokens` are advisory. The server does not truncate on their basis, and the request body is forwarded upstream unchanged.
+     *
+     *     `pricing` states what requests to each model cost in the currency of the project's current billing account.
      */
     get: operations["list-models"];
     put?: never;
@@ -193,6 +195,56 @@ export interface paths {
     get: operations["get-request"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/service": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get the model platform service
+     * @description The model platform service of the authenticated project. The forwarding endpoints accept its requests only while `status` is `active`; each request is then billed under `subscription_id`, per token, at the rates stated in each model's `pricing`.
+     *
+     *     When the project is deleted, its API keys are revoked and the subscription is canceled; the service then reads `inactive` with `ended_at` set.
+     */
+    get: operations["get-service"];
+    put?: never;
+    /**
+     * Enable the model platform service
+     * @description Purchases the model platform service for this project. The service itself has no charge; requests are billed under it postpaid, by the tokens they use. It takes no billing choice. Returns the service as `pending` with its order; it becomes `active` once the order is accepted, which for an order with nothing to pay happens without further action.
+     *
+     *     Refused with 409 `SERVICE_ALREADY_ENABLED` while an enablement is pending or the service is active. A refusal of the order by Billing is returned with Billing's code, such as `BILLING_PRICE_UNAVAILABLE` when the service has no price in the currency of the project's billing account.
+     */
+    post: operations["create-service"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/service/quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Quote enabling the model platform service
+     * @description Prices what `create-service` would order, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount.
+     *
+     *     Token usage is priced per model, as each model's `pricing` states, and is neither part of `total` nor projected: `estimated_usage_amount` is null. A request the purchase would refuse is refused the same way.
+     */
+    post: operations["create-service-quote"];
     delete?: never;
     options?: never;
     head?: never;
@@ -427,6 +479,8 @@ export interface components {
        * @description The maximum output length. Advisory only
        */
       max_output_tokens: number;
+      /** @description What requests to this model cost. Null when the project has no billing account. */
+      pricing: components["schemas"]["ModelPricing"] | null;
       /** @description The values accepted for `reasoning_effort`. Empty means it is not supported */
       reasoning_tiers: string[];
       /** @enum {string} */
@@ -434,6 +488,24 @@ export interface components {
       supports_reasoning: boolean;
       supports_tools: boolean;
       supports_vision: boolean;
+    };
+    /**
+     * @description What requests to a model cost, as Billing prices them in the currency of the project's current billing account. These are list amounts before promotion codes, not a checkout guarantee; usage is billed afterwards under the service's subscription.
+     *
+     *     Each token kind is priced on its own. `input` excludes cached input, which is `cache_read`, and `output` excludes reasoning the provider reports separately, which is `reasoning`; a request is billed for each kind it used.
+     */
+    ModelPricing: {
+      currency: string;
+      /** @description One entry for each of the five token kinds, in the order input, output, cache_read, cache_write, reasoning. */
+      token_kinds: components["schemas"]["TokenPrice"][];
+    };
+    TokenPrice: {
+      /** @enum {string} */
+      token_kind: "input" | "output" | "cache_read" | "cache_write" | "reasoning";
+      /** @description The charge for `unit_quantity` tokens of this kind. Null when the kind has no rate in the currency, in which case the model cannot be billed for it. */
+      unit_amount: components["schemas"]["Money"] | null;
+      /** @description How many tokens `unit_amount` is for, such as `1000000`. Null when `unit_amount` is null. */
+      unit_quantity: string | null;
     };
     ModelListResponseBody: {
       items: components["schemas"]["ModelResource"][];
@@ -568,8 +640,194 @@ export interface components {
     UsageTimelineResponseBody: {
       items: components["schemas"]["UsageBucketResource"][];
     };
+    /** @description The model platform service of a project. */
+    ServiceResource: {
+      /**
+       * @description `inactive` has never been enabled or its subscription has ended; `pending` awaits acceptance of its order; `active` accepts requests on the forwarding endpoints; `failed` means the enablement failed, as `failure_reason` states. An `inactive` or `failed` service can be enabled again.
+       * @enum {string}
+       */
+      status: "inactive" | "pending" | "active" | "failed";
+      /**
+       * @description Why the enablement failed; null unless `status` is `failed`. `order_declined` means Billing did not accept the order, for example because the billing account is suspended; `order_canceled` means the order was withdrawn; `order_expired` means its checkout was not confirmed in time.
+       * @enum {string|null}
+       */
+      failure_reason: "order_declined" | "order_canceled" | "order_expired" | null;
+      /**
+       * Format: uuid
+       * @description The order that enabled the service, or that the latest enablement placed; null before any enablement.
+       */
+      order_id: string | null;
+      /**
+       * Format: uuid
+       * @description The Billing subscription that requests are billed under; null before any enablement.
+       */
+      subscription_id: string | null;
+      /**
+       * Format: date-time
+       * @description When the service became active and billing began; null until then.
+       */
+      activated_at: string | null;
+      /**
+       * Format: date-time
+       * @description When the subscription ended; null unless it has.
+       */
+      ended_at: string | null;
+    };
+    CreateServiceRequestBody: {
+      checkout?: components["schemas"]["CheckoutOptions"];
+    };
+    /** @description The service, `pending` until its order is accepted, and the order. */
+    CreateServiceResponseBody: {
+      service: components["schemas"]["ServiceResource"];
+      order: components["schemas"]["PlacedOrder"];
+    };
+    /**
+     * @description Shared checkout choices for a product purchase. Omitting this object or mode selects
+     *     automatic checkout. Each purchase creates its own order. Promotion codes are supplied only to
+     *     Billing quote and checkout operations. A service may retain a failed creation record when Billing
+     *     refuses a purchase; no infrastructure is created for that refusal.
+     */
+    CheckoutOptions: {
+      /** @default automatic */
+      mode?: components["schemas"]["CheckoutMode"];
+      /**
+       * @description Expected invoice total after discounts and tax, before applying credit grants or balance.
+       *     A different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.
+       *     Accepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred
+       *     checkout, confirm the amount through Billing.
+       */
+      expected_amount?: components["schemas"]["Money"];
+    };
+    /** @description Identifies the purchase. Read the order for purchase progress and its invoice for amounts and payment status. */
+    PlacedOrder: {
+      /**
+       * Format: uuid
+       * @description The invoice for this purchase, which may still be a draft awaiting checkout. Null when no invoice has been created. Its presence or absence does not establish whether delivery may begin.
+       */
+      invoice_id: string | null;
+      /**
+       * Format: uuid
+       * @description The order, including for purchases without an immediate charge. Payment alone does not imply that the service has completed delivery.
+       */
+      order_id: string;
+    };
+    /**
+     * @description A price preview for the purchase described by a service, calculated by Billing. Nothing is saved,
+     *     charged or reserved, and no discount redemption is consumed. Account discounts and tax are
+     *     evaluated as for automatic checkout. Promotion codes are evaluated through Billing quote operations.
+     *     All amounts use currency. This preview does not lock prices or guarantee discount availability.
+     */
+    Quote: {
+      /** @description One line for each item the purchase would order, in the order it would order them. */
+      lines: components["schemas"]["QuotedLine"][];
+      /**
+       * @description Sum of line amounts before discounts, less tax already included in the discounted line
+       *     amounts, as on an invoice. Null when any line cannot be priced.
+       */
+      subtotal: components["schemas"]["Money"] | null;
+      /** @description Sum of line discounts. Null when any line cannot be priced. */
+      discount_amount: components["schemas"]["Money"] | null;
+      /** @description Sum of tax on the discounted line amounts. Null when any line cannot be priced. */
+      tax_amount: components["schemas"]["Money"] | null;
+      /**
+       * @description subtotal minus discount_amount plus tax_amount: what checkout collects, before applying
+       *     credit grants or balance. Equals the sum of line totals and excludes estimated_usage_amount.
+       *     Null when any line cannot be priced.
+       */
+      total: components["schemas"]["Money"] | null;
+      /**
+       * @description Sum of the lines' estimated_usage_amount. A projection, not part of total and not collected at
+       *     checkout. Null when no line is billed for usage or when any usage cannot be priced.
+       */
+      estimated_usage_amount: components["schemas"]["Money"] | null;
+      currency: string;
+      /**
+       * Format: date-time
+       * @description Changes only; null otherwise. The instant the change is priced from. Pass it with the change so the
+       *     order is priced from the same instant.
+       */
+      proration_date: string | null;
+      /**
+       * @description Changes that lower the price only; null otherwise. What the change would return to the original
+       *     payment sources, including the tax paid on it. total is zero for such a change.
+       */
+      refundable_amount: components["schemas"]["Money"] | null;
+    };
+    /**
+     * @description A decimal string, in the currency stated alongside it.
+     *
+     *     **The currency is not part of this type.** It is carried by a `currency` field next to the
+     *     amount, or by the account the amount belongs to. Reading an amount without that field is
+     *     reading a number with no unit.
+     *
+     *     It is a string rather than a JSON number because a JSON number is a float in most parsers,
+     *     and a float loses precision on the first arithmetic. Nothing on this platform puts an amount
+     *     through a float.
+     * @example 10.2500000000
+     */
+    Money: string;
+    /**
+     * @description automatic confirms checkout with applicable account discounts and collects payment from eligible
+     *     credit grants and available balance. Insufficient funds fail the purchase with HTTP 422
+     *     BILLING_INSUFFICIENT_FUNDS; no Billing order, charge or discount redemption is committed.
+     *     deferred creates a pending_checkout order for subsequent confirmation and payment through Billing.
+     *     No new discount redemption or payment is made when the order is created. An order whose total is
+     *     zero, with nothing to pay or discount, completes checkout at placement in either mode.
+     * @enum {string}
+     */
+    CheckoutMode: "automatic" | "deferred";
+    /**
+     * @description One calculated purchase line. Fixed purchase amounts are rounded as checkout rounds them.
+     *     When priced is false, every monetary field is null. A priced line without an
+     *     immediate charge has zero amounts; an unavailable unit price remains null.
+     */
+    QuotedLine: {
+      /** @description Whether the line can be priced. When false, unpriced_reason states what is missing. */
+      priced: boolean;
+      /**
+       * @description Why no price was found; `none` while `priced` is true.
+       * @enum {string}
+       */
+      unpriced_reason: "none" | "no_price";
+      plan_name: string;
+      /** @description Unit price before discounts, with tax included only where the price includes it. */
+      unit_amount: components["schemas"]["Money"] | null;
+      /** @description The quantity priced. */
+      quantity: string;
+      /**
+       * @description Before discounts, including any setup charges. Contains tax only where the price includes it.
+       *     Zero for a priced order item with no immediate charge.
+       */
+      amount: components["schemas"]["Money"] | null;
+      /** @description Total reduction on this line, including any committed recurring discount. */
+      discount_amount: components["schemas"]["Money"] | null;
+      /** @description Tax on the discounted amount, including any tax already contained in that amount. */
+      tax_amount: components["schemas"]["Money"] | null;
+      /** @description The part of tax_amount already contained in amount minus discount_amount. */
+      tax_included_amount: components["schemas"]["Money"] | null;
+      /** @description amount minus discount_amount plus tax_amount minus tax_included_amount. */
+      total: components["schemas"]["Money"] | null;
+      /**
+       * @description Projected charge for this line's future usage over the period stated by the quoting operation,
+       *     at current rates, before discounts and tax and not rounded. Not part of amount or total and
+       *     not collected at checkout. Null when the line is not billed for usage or its usage cannot be
+       *     priced.
+       */
+      estimated_usage_amount: components["schemas"]["Money"] | null;
+      currency: string;
+    };
   };
-  responses: never;
+  responses: {
+    /** @description The request conflicts with the current state of the service. The codes are described where they apply. */
+    Conflict: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["Error"];
+      };
+    };
+  };
   parameters: never;
   requestBodies: never;
   headers: never;
@@ -929,6 +1187,99 @@ export interface operations {
           "application/json": components["schemas"]["RequestResource"];
         };
       };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "get-service": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ServiceResource"];
+        };
+      };
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-service": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateServiceRequestBody"];
+      };
+    };
+    responses: {
+      /** @description The service and its order were created; the service is not active yet. */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CreateServiceResponseBody"];
+        };
+      };
+      409: components["responses"]["Conflict"];
+      /** @description Error */
+      default: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "create-service-quote": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Quote"];
+        };
+      };
+      409: components["responses"]["Conflict"];
       /** @description Error */
       default: {
         headers: {

@@ -69,6 +69,23 @@ export type ListRequestsQuery = operations["list-requests"]["parameters"]["query
 export type GetRequestResult =
   operations["get-request"]["responses"][200]["content"]["application/json"];
 
+/** The success response body of `GET /api/v1/service`. */
+export type GetServiceResult =
+  operations["get-service"]["responses"][200]["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/service`. */
+export type CreateServiceResult =
+  operations["create-service"]["responses"][202]["content"]["application/json"];
+
+/** The request body of `POST /api/v1/service`. */
+export type CreateServiceBody = NonNullable<
+  operations["create-service"]["requestBody"]
+>["content"]["application/json"];
+
+/** The success response body of `POST /api/v1/service/quote`. */
+export type CreateServiceQuoteResult =
+  operations["create-service-quote"]["responses"][200]["content"]["application/json"];
+
 /** The success response body of `GET /api/v1/usage/by-api-key`. */
 export type ListUsageByApiKeyResult =
   operations["list-usage-by-api-key"]["responses"][200]["content"]["application/json"];
