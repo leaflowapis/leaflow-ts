@@ -248,8 +248,8 @@ export interface paths {
     };
     /**
      * List project orders
-     * @description An order awaiting payment shows what is outstanding. Paying it is done from the billing
-     *     centre by the account owner.
+     * @description A draft order invoice shows base amounts awaiting checkout. A confirmed invoice shows what
+     *     is outstanding. Checkout and payment are performed in the billing centre by the account owner.
      */
     get: operations["list-project-orders"];
     put?: never;
@@ -315,15 +315,27 @@ export interface paths {
     put?: never;
     /**
      * Quote for a project
-     * @description Priced in the project billing account's currency, and at any rate negotiated for that account.
-     *     Nothing is reserved and nothing is recorded, so this may be called as often as required.
+     * @description Computes a price preview without creating a resource or saving a quote. Nothing is charged,
+     *     reserved or applied to an order, and no discount redemption is consumed. The response has no
+     *     quote ID and does not guarantee a price or reserve a promotion code.
      *
-     *     Prices may change between quoting and ordering. An order is charged at the price in
-     *     effect when it is placed, so a quote should be refreshed before a final confirmation is
-     *     shown.
+     *     New purchases use the project's current billing account and currency. With order_id, the order
+     *     must belong to this project; its recorded purchase terms, billing account and currency are used.
+     *     An optional promotion_code previews one code for the purchase or order. Without it, Billing
+     *     selects an applicable account discount. An invalid or inapplicable explicit code is refused
+     *     rather than silently replaced. Give total as expected_amount when confirming checkout through
+     *     Billing; eligibility and availability are checked again. An order already checked out returns
+     *     its confirmed amounts without reapplying its discount; a different code is refused with
+     *     BILLING_ORDER_CHECKOUT_CONFLICT.
+     *
+     *     Prices may change before an order is created; confirmed purchase terms are not repriced from
+     *     today's catalog. Usage estimates describe future usage and are not checkout amounts. They do
+     *     not accept a promotion code, including when mixed with fixed purchase lines.
      *
      *     A renewal is priced exactly as renewing would charge it: at the agreed amount or the price
-     *     named, with the discounts the account holds, and with tax.
+     *     named, with the discounts the account holds, and with tax. A renewal list does not accept a
+     *     promotion code because its entries create separate orders. To use a new code on a renewal,
+     *     first create a renewal order and quote its checkout by order_id.
      *
      *     A cancellation is quoted as creating it would compute the refund, as of now and under the refund
      *     terms agreed when each subscription was bought. It is quoted on its own: combined with lines or
@@ -332,8 +344,8 @@ export interface paths {
      *     amount is not checked. Give the returned `cancellation.proration_date` and
      *     `cancellation.refundable_amount` when creating it.
      *
-     *     Returns 404 when the project has no billing account, or when a subscription to be renewed or
-     *     canceled does not belong to this project.
+     *     Returns 404 when the project has no billing account for a new purchase quote, or when the order
+     *     or a subscription to be renewed or canceled does not belong to this project.
      */
     post: operations["create-project-quote"];
     delete?: never;
@@ -654,37 +666,17 @@ export interface components {
     /**
      * @description Identify a price directly, or select a price for a plan. For each resource give its ID or lookup key, never both. Lookup keys require product_id.
      *
-     *     A line that gives a meter, `dimensions` or `duration_seconds` estimates usage and is
-     *     priced only at a postpaid price. Such a line is refused with HTTP 400
-     *     `BILLING_PURCHASE_INVALID` when `price_type` is `prepaid` or `one_time`, or when the price
-     *     it names is not postpaid; `meta.field` is `price_type`, `price_id` or `price_lookup_key`
-     *     accordingly. When the plan has no postpaid price, the line is returned unpriced with
-     *     `no_price`.
+     *     Charges for future usage are not estimated here; the service that sells the product quotes
+     *     them with its purchase.
      */
     QuoteLine: {
       price_lookup_key?: string;
       plan_lookup_key?: string;
-      meter_lookup_key?: string;
       /** Format: uuid */
       price_id?: string;
       product_id?: components["schemas"]["ProductID"];
       /** Format: uuid */
       plan_id?: string;
-      /** Format: uuid */
-      meter_id?: string;
-      /**
-       * @description The attributes the price depends on — region, instance type, token class.
-       *
-       *     Required when the price draws its rates from a price list, which is how anything
-       *     sold by region or by machine type is priced. A price that carries a single unit
-       *     amount, or a ladder, has no attributes to give and takes none.
-       *
-       *     Every attribute the meter declares must be present. A combination with no rate
-       *     covering it is refused rather than priced at zero.
-       */
-      dimensions?: {
-        [key: string]: string;
-      };
       /**
        * @description Narrows the selection when a plan offers more than one billing type.
        * @enum {string}
@@ -694,13 +686,6 @@ export interface components {
       interval?: "none" | "day" | "month" | "year";
       interval_count?: number;
       quantity: string;
-      /**
-       * Format: int64
-       * @description For metered items, how long to price for. This allows an estimate such as "about
-       *     this much per month" to be shown before anything exists. The priced quantity is
-       *     `quantity` multiplied by this duration.
-       */
-      duration_seconds?: number;
     };
     /**
      * @description Price renewing a prepaid subscription. Give `price_id`, or `interval` with
@@ -721,22 +706,61 @@ export interface components {
        */
       periods?: number;
     };
+    /** @description Quote exactly one target. Purchase lines, an existing order, a renewal list and a cancellation are mutually exclusive. */
+    QuoteRequest:
+      | components["schemas"]["PurchaseQuoteRequest"]
+      | components["schemas"]["OrderQuoteRequest"]
+      | components["schemas"]["RenewalQuoteRequest"]
+      | components["schemas"]["CancellationQuoteRequest"];
     /**
-     * @description Specify lines for new purchases and renewals for existing subscriptions, or one cancellation on
-     *     its own. The total includes all requested lines and renewals.
+     * @description Preview one proposed purchase using the project's current billing account. Without a code,
+     *     an applicable account discount is selected. An explicit code is evaluated without reserving or
+     *     consuming a redemption and must be supplied again when confirming checkout through Billing.
+     *     Future usage estimates cannot be combined with a promotion code or used as a checkout amount.
      */
-    QuoteRequest: {
-      lines?: components["schemas"]["QuoteLine"][];
-      renewals?: components["schemas"]["QuoteRenewal"][];
-      cancellation?: components["schemas"]["QuoteCancellation"];
+    PurchaseQuoteRequest: {
+      lines: components["schemas"]["QuoteLine"][];
+      promotion_code?: string;
     };
-    QuoteLineResult: {
-      /** @description Tax included in the account quote. Absent in public catalogue estimates. */
+    /**
+     * @description Preview checkout of one existing order. Its recorded purchase terms supply every line.
+     *     Without a code, an applicable account discount is selected. A preview neither changes the
+     *     order nor reserves or consumes a redemption. A confirmed order returns its recorded amounts.
+     */
+    OrderQuoteRequest: {
+      /** Format: uuid */
+      order_id: string;
+      /** @description Code to evaluate for this order. Must be supplied again when confirming checkout. */
+      promotion_code?: string;
+    };
+    /**
+     * @description Preview renewing subscriptions, each at most once. Each entry represents a separate renewal
+     *     order. To preview a new promotion code, create a renewal order and quote it by order_id.
+     */
+    RenewalQuoteRequest: {
+      renewals: components["schemas"]["QuoteRenewal"][];
+    };
+    /** @description Preview one cancellation without combining it with a purchase, renewal or promotion code. */
+    CancellationQuoteRequest: {
+      cancellation: components["schemas"]["QuoteCancellation"];
+    };
+    /**
+     * @description A purchase quote line or one recorded order item. Monetary fields use the account currency.
+     *     Fixed purchase amounts are rounded as checkout rounds them. Usage estimates are not amounts
+     *     collectible at checkout. When priced is false, monetary fields and price_id are absent.
+     */
+    QuotedLine: {
+      /** @description Tax on the discounted amount, including any tax already contained in that amount. */
       tax_amount?: components["schemas"]["Money"];
-      /** @description Tax already included in the displayed price. */
+      /** @description The part of tax_amount already contained in amount minus discount_amount. */
       tax_included_amount?: components["schemas"]["Money"];
-      /** @description Which line of the request this answers. */
+      /** @description Zero-based request line index, or the recorded order item's position for an order quote. */
       index: number;
+      /**
+       * Format: uuid
+       * @description Present for an existing order quote; identifies the recorded item being priced.
+       */
+      order_item_id?: string;
       /**
        * @description Whether a price was found for this line. Read this before anything else.
        *
@@ -750,15 +774,9 @@ export interface components {
       priced: boolean;
       /**
        * @description Why no price was found; `none` while `priced` is true.
-       *
-       *     The last four are told apart because their remedies differ: the price points
-       *     at no price list, the list holds no rate for that meter, that exact combination
-       *     of attributes is not configured, or it is configured but nothing is in effect
-       *     at the moment asked about.
        * @enum {string}
        */
-      unpriced_reason?:
-        "none" | "no_price" | "no_rate_card" | "no_meter" | "no_dimensions" | "no_effective_rule";
+      unpriced_reason?: "none" | "no_price";
       /**
        * Format: uuid
        * @description The price selected. Returned whenever `priced` is true, including when the
@@ -766,14 +784,19 @@ export interface components {
        */
       price_id?: string;
       plan_name?: string;
+      /** @description Unit price before discounts, with tax included only where the price includes it. */
       unit_amount?: components["schemas"]["Money"];
-      /**
-       * @description The quantity actually priced. When `duration_seconds` is given, it is the requested
-       *     `quantity` multiplied by that duration.
-       */
+      /** @description The quantity priced. */
       quantity?: string;
-      /** @description Not rounded. Round only for display. */
+      /**
+       * @description Before discounts, including any setup charges. Contains tax only where the price includes it.
+       *     Zero for a priced order item with no immediate charge.
+       */
       amount?: components["schemas"]["Money"];
+      /** @description Total reduction on this line, including any committed recurring discount. */
+      discount_amount?: components["schemas"]["Money"];
+      /** @description amount minus discount_amount plus tax_amount minus tax_included_amount. */
+      total?: components["schemas"]["Money"];
       currency: string;
     };
     /**
@@ -813,22 +836,54 @@ export interface components {
        */
       total: components["schemas"]["Money"];
     };
+    /**
+     * @description A computed price preview, without a saved quote or a price guarantee. No funds or discount
+     *     redemptions are reserved. Amounts use currency and exclude payment from credit grants or balance.
+     */
     Quote: {
-      lines?: components["schemas"]["QuoteLineResult"][];
+      /**
+       * @description Sum before discounts, less tax already included in the discounted line amounts, as on an
+       *     invoice. Null when any line cannot be priced. Zero for a cancellation-only quote.
+       */
+      subtotal: components["schemas"]["Money"] | null;
+      /** @description Total line discounts. Null when any line cannot be priced; zero for a cancellation-only quote. */
+      discount_amount: components["schemas"]["Money"] | null;
+      /** @description Total tax on the discounted amounts. Null when any line cannot be priced; zero for a cancellation-only quote. */
+      tax_amount: components["schemas"]["Money"] | null;
+      /**
+       * @description The one new discount evaluated for a purchase or order, without applying it. Null when
+       *     none is selected, pricing is incomplete, or the quote targets a renewal list or cancellation.
+       *     A confirmed order instead reports its recorded discount.
+       */
+      discount: components["schemas"]["QuotedDiscount"] | null;
+      lines?: components["schemas"]["QuotedLine"][];
       renewals?: components["schemas"]["QuoteRenewalResult"][];
       /** @description What the cancellation requested would return. Present only when one was requested. */
       cancellation?: components["schemas"]["CancellationRefundPreview"];
       /**
-       * @description What would be owed in total, renewals included. Amounts to be returned are not netted
-       *     off it: a quote of a cancellation alone has a total of zero, and what it would return is
-       *     in `cancellation`.
+       * @description subtotal minus discount_amount plus tax_amount, before applying credit grants or balance.
+       *     For a purchase or order with no usage estimates, pass this as expected_amount at checkout.
+       *     A renewal list sums separate orders; use each renewal's total when confirming that order.
+       *     Refunds are not netted off: a cancellation-only quote has zero totals and its refund is in
+       *     cancellation. Usage estimates are projections, not checkout amounts.
        *
        *     Null when any line could not be priced. What would be owed is not knowable then, and a
        *     total that silently left the unpriced lines out would read as a smaller bill rather than
        *     an incomplete one — the per-line `priced` flag is easy to skip, a missing total is not.
        */
-      total?: components["schemas"]["Money"] | null;
+      total: components["schemas"]["Money"] | null;
       currency: string;
+    };
+    /**
+     * @description The discount selected for this calculation. Its presence in a quote does not apply it or
+     *     reserve a redemption. Discount amounts are reported on the quote and its lines.
+     */
+    QuotedDiscount: {
+      /** @enum {string} */
+      type: "promotion_code" | "account_discount";
+      name: string;
+      /** @description Code text for a promotion_code discount; null for an account_discount. */
+      promotion_code: string | null;
     };
     /**
      * @description A narrow view of the project's billing account, restricted to what a project member needs in order
@@ -872,7 +927,11 @@ export interface components {
       currency: string;
     };
     /**
-     * @description `refunded` means the invoice was paid and has since been refunded in full; a partial refund
+     * @description An order invoice stays `draft` until checkout confirms its discount and final amounts. It
+     *     cannot be collected while draft. Confirmation makes it `open`, or `paid` when its total is zero
+     *     without creating a payment transaction. A quote never changes this status.
+     *
+     *     `refunded` means the invoice was paid and has since been refunded in full; a partial refund
      *     leaves it `paid`, with the refunded part in `amount_refunded`.
      *
      *     `void` means the invoice will not be paid and holds no money: nothing was paid, or its order
@@ -948,7 +1007,29 @@ export interface components {
       items: components["schemas"]["Subscription"][];
       pagination: components["schemas"]["OffsetPagination"];
     };
-    /** @description An independently billed purchase. Fixed renewals use the agreed recurring_amount and interval; already paid periods retain their original value. Technical state belongs to the owning service. */
+    /**
+     * @description An independently billed purchase relationship, separate from the owning service's resource.
+     *     Placing a new prepaid or postpaid service order creates a pending subscription for each line
+     *     in the same purchase transaction. Its ID is returned on the order item and remains stable
+     *     through checkout and delivery. One order may create several subscriptions, such as an instance,
+     *     its system disk and its address; it has no single subscription ID.
+     *
+     *     Pending does not grant service or accrue usage. Payment confirmation and order acceptance do
+     *     not activate a service-owned subscription. It becomes active when the owning service confirms
+     *     delivery, with started_at set to the confirmed effective time. Prepaid service periods start
+     *     then; postpaid usage starts only when the service reports actual delivery and metering.
+     *
+     *     One-time delivery may omit a subscription. Renewals reference and extend existing subscriptions
+     *     rather than creating another; changes may create pending replacements. Canceling or failing an
+     *     unfulfilled purchase closes its pending subscriptions without starting a service period.
+     *     Fixed renewals use the agreed recurring_amount and interval; already paid periods retain their
+     *     original value. Technical state belongs to the owning service.
+     *
+     *     A purchased shared capacity limit, such as a regional snapshot count quota, can have its own
+     *     subscription. Activating that capacity confirms delivery of the quota, not individual snapshots.
+     *     Creating or deleting snapshots within it does not create, activate or terminate more subscriptions;
+     *     the owning service enforces current holdings against the purchased count.
+     */
     Subscription: {
       currency: string;
       /** @enum {string} */
@@ -956,7 +1037,11 @@ export interface components {
       /** @enum {string} */
       interval: "none" | "day" | "month" | "year";
       interval_count?: number;
-      /** @description Whole-subscription prepaid renewal amount, after continuing discounts and before tax. Absent for other billing types. */
+      /**
+       * @description Whole-subscription prepaid renewal amount, after continuing discounts and before tax.
+       *     Pending subscriptions show base terms until checkout confirms any new continuing discount.
+       *     Absent for other billing types.
+       */
       recurring_amount?: string;
       termination_policy?: components["schemas"]["TerminationPolicy"];
       refund_policy?: components["schemas"]["RefundPolicy"];
@@ -1010,13 +1095,21 @@ export interface components {
       quantity: string;
       /**
        * Format: date-time
-       * @description Present for prepaid items. Absent for metered ones, which have no end date.
+       * @description End of the prepaid service already activated. Null for a new pending subscription, even
+       *     when its purchase has been paid, and for postpaid subscriptions with no prepaid end date.
        */
       paid_until?: string | null;
       auto_renew: boolean;
-      /** @enum {string} */
+      /**
+       * @description pending means the purchase relationship exists but service has not started. For a
+       *     service-owned purchase, only confirmed delivery moves it to active; paying alone does not.
+       * @enum {string}
+       */
       status: "pending" | "active" | "suspended" | "canceled" | "terminated";
-      /** Format: date-time */
+      /**
+       * Format: date-time
+       * @description Confirmed start of service. Null for a new pending subscription, including after payment.
+       */
       started_at?: string | null;
       /** Format: date-time */
       ended_at?: string | null;
@@ -1065,7 +1158,11 @@ export interface components {
       pagination: components["schemas"]["OffsetPagination"];
     };
     /**
-     * @description Follows the items. `pending` is not yet accepted and may be paid or unpaid. `active` is
+     * @description pending_checkout has recorded purchase terms but no confirmed checkout. An absent invoice
+     *     or zero total does not permit acceptance. Confirmation moves it to pending. Both pending_checkout
+     *     and pending can expire or be canceled; neither establishes service delivery.
+     *
+     *     Follows the items. `pending` has confirmed checkout, is not yet accepted and may be paid or unpaid. `active` is
      *     accepted with items still being set up. `completed` means every item was set up.
      *     `partially_completed` means some items were set up and the others failed and were
      *     refunded to their original payment sources. `failed` means every item failed and the
@@ -1073,7 +1170,14 @@ export interface components {
      *     nothing was charged.
      * @enum {string}
      */
-    OrderStatus: "pending" | "active" | "completed" | "partially_completed" | "failed" | "canceled";
+    OrderStatus:
+      | "pending_checkout"
+      | "pending"
+      | "active"
+      | "completed"
+      | "partially_completed"
+      | "failed"
+      | "canceled";
     /**
      * @description `pending` is waiting to be set up. `completed` was confirmed by the service.
      *     `failed` was not set up and its amount was refunded to the original payment sources.
@@ -1082,13 +1186,19 @@ export interface components {
      * @enum {string}
      */
     OrderItemStatus: "pending" | "completed" | "failed" | "canceled";
+    /**
+     * @description A recorded purchase. pending_checkout requires explicit Billing confirmation before collection
+     *     or acceptance, even without an invoice. Coupon fields describe a discount confirmed at checkout and are absent
+     *     before confirmation; a quote never populates them. A draft invoice contains base purchase
+     *     amounts awaiting checkout. Payment and acceptance remain separate from resource delivery.
+     */
     Order: {
       /** Format: uuid */
       coupon_id?: string;
       coupon?: components["schemas"]["ObjectIdentity"];
       /** Format: uuid */
       promotion_code_id?: string;
-      /** @description Code text frozen when this order applied the coupon. */
+      /** @description Code text frozen when checkout applied the coupon. Absent for an account discount. */
       promotion_code?: string;
       invoice?: components["schemas"]["InvoiceSummary"];
       /** @description How the order was paid. Absent until it is paid. */
@@ -1139,7 +1249,7 @@ export interface components {
       change_effective?: "none" | "immediate" | "period_end";
       /**
        * Format: date-time
-       * @description Acceptance deadline. Only pending orders expire automatically.
+       * @description Acceptance deadline. pending_checkout and pending orders can expire automatically.
        */
       expires_at?: string | null;
       /** Format: date-time */
@@ -1174,13 +1284,22 @@ export interface components {
       brand?: string;
       last4?: string;
     };
-    /** @description Frozen purchase terms. Monetary fields come from related invoice-line snapshots and are absent when there is no immediate invoice. Later catalog changes do not reprice this line. */
+    /**
+     * @description Frozen purchase terms. Monetary fields come from related invoice-line snapshots and are absent
+     *     when there is no immediate invoice. Later catalog changes do not reprice this line. A new service
+     *     purchase creates its pending subscription when this item is recorded, not when payment succeeds.
+     */
     OrderItem: {
       position?: number;
       configuration?: {
         [key: string]: unknown;
       };
-      /** Format: uuid */
+      /**
+       * Format: uuid
+       * @description Stable Billing subscription ID. A new prepaid or postpaid service purchase returns the
+       *     pending subscription here; renewals reference the existing subscription and changes the
+       *     replacement. Absent for delivery without a subscription. This is not a business resource ID.
+       */
       subscription_id?: string;
       /** @enum {string} */
       interval: "none" | "day" | "month" | "year";
@@ -1318,7 +1437,11 @@ export interface components {
       items: components["schemas"]["Entitlement"][];
       pagination: components["schemas"]["OffsetPagination"];
     };
-    /** @description Purchase-related invoice amounts, without account contact details or payment methods. Absent on an order with no immediate invoice. */
+    /**
+     * @description Purchase-related invoice amounts, without account contact details or payment methods. A draft
+     *     order invoice shows base amounts awaiting checkout, not a confirmed discount or collectible total.
+     *     Absent when no invoice has been created; absence does not establish acceptance or delivery.
+     */
     InvoiceSummary: {
       /** Format: uuid */
       id: string;

@@ -411,10 +411,14 @@ export interface components {
       currency: string;
       lines: components["schemas"]["QuoteLine"][];
     };
-    QuoteLineResult: {
+    /**
+     * @description One public catalog estimate. Prices are used as listed, before account discounts; tax is not
+     *     evaluated. Monetary fields are absent when the line cannot be priced.
+     */
+    QuotedLine: {
       /** @description Tax included in the account quote. Absent in public catalogue estimates. */
       tax_amount?: components["schemas"]["Money"];
-      /** @description Tax already included in the displayed price. */
+      /** @description Tax already included in the displayed price. Absent in public catalogue estimates. */
       tax_included_amount?: components["schemas"]["Money"];
       /** @description Which line of the request this answers. */
       index: number;
@@ -453,14 +457,18 @@ export interface components {
        *     `quantity` multiplied by that duration.
        */
       quantity?: string;
-      /** @description Not rounded. Round only for display. */
+      /** @description Public list-price amount including any setup charges, before account discounts. Not rounded; round only for display. */
       amount?: components["schemas"]["Money"];
       currency: string;
     };
+    /**
+     * @description A public catalog estimate. No account discounts or tax are evaluated. Its total is a list-price
+     *     estimate, not an expected checkout amount. Nothing is saved, charged or reserved.
+     */
     Quote: {
-      lines?: components["schemas"]["QuoteLineResult"][];
+      lines?: components["schemas"]["QuotedLine"][];
       /**
-       * @description What would be owed in total. Amounts to be returned are not netted off it.
+       * @description Sum of the public list-price line amounts, without evaluating account discounts or tax.
        *
        *     Null when any line could not be priced. What would be owed is not knowable then, and a
        *     total that silently left the unpriced lines out would read as a smaller bill rather than

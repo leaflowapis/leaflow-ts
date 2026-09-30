@@ -2531,7 +2531,7 @@ export interface components {
     PlacedOrder: {
       /**
        * Format: uuid
-       * @description The invoice for this purchase. Null when there is no immediate invoice. Read the invoice for its current payment state.
+       * @description The invoice for this purchase, which may still be a draft awaiting checkout. Null when no invoice has been created. Its presence or absence does not establish whether delivery may begin.
        */
       invoice_id: string | null;
       /**
