@@ -599,7 +599,7 @@ export interface paths {
      *
      *     Creation starts once Billing accepts the order: the instance becomes `provisioning`, then `active`. With automatic checkout, insufficient funds refuse the request and nothing is created. With deferred checkout and an amount due, the instances stay `pending` until checkout is confirmed and paid through Billing; a canceled or expired order leaves them `failed` with `order_canceled` or `order_expired`. Do not submit another creation request after paying. After an uncertain response, look the order up before submitting again.
      *
-     *     Exactly one of image_id or boot_disk_id is required, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. They are not held while the instance is pending; if one is no longer usable when the order is accepted, the instance ends `failed` with `provisioning_failed`. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
+     *     Choose an image or existing disk through boot_disk, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. They are not held while the instance is pending; if one is no longer usable when the order is accepted, the instance ends `failed` with `provisioning_failed`. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
      *
      *     Instances of one request succeed or fail individually. Each instance, with its system disk, network interface and floating IP, is created or fails as a whole. Instances that were created are kept; each failed instance ends `failed` with `provisioning_failed`, its part of the order is refunded, and the order then ends `partially_completed`. Each instance is named after this request with a number appended.
      *
@@ -987,7 +987,7 @@ export interface paths {
      * Detach a disk
      * @description Unmount the device inside the instance before calling this endpoint. Forcibly detaching a file system that is being written to corrupts data.
      *
-     *     The disk the instance boots from cannot be detached, whether it is the system disk bought with the instance or a disk the instance was created from with `boot_disk_id`. Such a request is refused with `INSTANCE_BOOT_DISK_LOCKED` and changes nothing; releasing the instance is what frees that disk.
+     *     The disk the instance boots from cannot be detached, whether it is the system disk bought with the instance or a disk supplied as the existing boot_disk at launch. Such a request is refused with `INSTANCE_BOOT_DISK_LOCKED` and changes nothing; releasing the instance is what frees that disk.
      *
      *     Returns the disk; the instance shows the `detach_disk` operation and the disk the `detach` operation until the disk is detached.
      */
@@ -2420,23 +2420,7 @@ export interface components {
       count?: number;
       /** @description Have the platform generate a random password, returned only in this response */
       generate_password?: boolean;
-      /**
-       * Format: uuid
-       * @description Boot a disk you already have instead of installing an image. The disk must be available, unattached, and in the same availability zone as the instance type. Exactly one of this and `image_id`
-       */
-      boot_disk_id?: string;
-      /**
-       * Format: uuid
-       * @description A public image currently on sale, or an available private image of this project. Exactly one of this and `boot_disk_id`
-       */
-      image_id?: string;
-      /**
-       * Format: uuid
-       * @description An instance type currently on sale. A withdrawn one is rejected even though its identifier still resolves
-       */
-      instance_type_id: string;
-      /** @description The account the disk lets you log in as. Required with `boot_disk_id`, and rejected without it since an image states its own */
-      login_username?: string;
+      compute: components["schemas"]["NewCompute"];
       name: string;
       /** @description The password to set, on the login account and on root. Only the SSH public keys of the project are used when omitted */
       password?: string;
@@ -2453,8 +2437,7 @@ export interface components {
        */
       subnet_id?: string;
       checkout?: components["schemas"]["CheckoutOptions"];
-      billing: components["schemas"]["BillingChoice"];
-      boot_disk?: components["schemas"]["NewBootDisk"];
+      boot_disk: components["schemas"]["BootDisk"];
       floating_ip?: components["schemas"]["NewFloatingIP"];
     };
     SetInstanceLabelsRequestBody: {
@@ -2956,7 +2939,7 @@ export interface components {
       /** @description One entry per way the item can be bought. Empty when it cannot be bought in this currency. */
       options: components["schemas"]["PricingOption"][];
     };
-    /** @description One way to buy an item. Choose it by giving its `mode` and `period` as `billing`. */
+    /** @description One way to buy an item. Choose it by giving its mode, period and explicit prepaid termination_policy as billing. */
     PricingOption: {
       /** @enum {string} */
       mode: "prepaid" | "postpaid";
@@ -2981,22 +2964,53 @@ export interface components {
        */
       unit: "hour" | null;
       /**
-       * @description What canceling does under this option: `immediate` ends the service at once, with any refund following the option's terms; `period_end` ends it at the end of the paid period.
-       * @enum {string}
+       * @description What canceling does under this option: `immediate` ends the service at once, with any refund following the option's terms; `period_end` ends it at the end of the paid period. Null means no explicit policy was recorded; it must not be interpreted as immediate.
+       * @enum {string|null}
        */
-      termination: "immediate" | "period_end";
+      termination_policy: "immediate" | "period_end" | null;
     };
     BillingPeriod: {
       /** @enum {string} */
       unit: "month" | "year";
-      /** Format: int64 */
+      /** Format: int32 */
       count: number;
     };
-    /** @description How to pay for a purchase: one of the options in the items' `pricing`. `prepaid` requires `period` and `postpaid` refuses it, with HTTP 400. The choice applies to every component of the purchase; a component without that option is refused with 409 `BILLING_OPTION_UNAVAILABLE`, and `meta.component` names it. */
+    /** @description The commercial terms for one newly purchased component. Prepaid requires period and termination_policy; postpaid refuses both. Components in one instance order must use the same mode and period, while their termination policies may differ. */
     BillingChoice: {
       /** @enum {string} */
       mode: "prepaid" | "postpaid";
       period?: components["schemas"]["BillingPeriod"];
+      termination_policy?: components["schemas"]["TerminationPolicy"];
+    };
+    /**
+     * @description Immediate ends service when cancellation takes effect, with refunds governed by the purchased terms. Period-end keeps service until the paid period ends.
+     * @enum {string}
+     */
+    TerminationPolicy: "immediate" | "period_end";
+    /** @description The compute capacity purchased for each instance in this order. */
+    NewCompute: {
+      /**
+       * Format: uuid
+       * @description An instance type currently on sale.
+       */
+      instance_type_id: string;
+      billing: components["schemas"]["BillingChoice"];
+    };
+    /** @description Create a boot disk from an image, or use a prepared disk already held by this project. Using an existing disk does not buy it again and always keeps it when the instance is released. */
+    BootDisk: components["schemas"]["NewBootDisk"] | components["schemas"]["ExistingBootDisk"];
+    ExistingBootDisk: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "disk";
+      /**
+       * Format: uuid
+       * @description A prepared boot disk owned by this project, available and unattached in the same availability zone as the instance type. Only one instance may be created when used.
+       */
+      disk_id: string;
+      /** @description The existing account used to log in to this disk's operating system. */
+      login_username: string;
     };
     /** @description The backup service of a project in one region. Retained backup capacity beyond what active capacity packs cover is metered on it. */
     BackupService: {
@@ -3117,23 +3131,7 @@ export interface components {
       count?: number;
       /** @description Have the platform generate a random password, returned only in this response */
       generate_password?: boolean;
-      /**
-       * Format: uuid
-       * @description Boot a disk you already have instead of installing an image. The disk must be available, unattached, and in the same availability zone as the instance type. Exactly one of this and `image_id`
-       */
-      boot_disk_id?: string;
-      /**
-       * Format: uuid
-       * @description A public image currently on sale, or an available private image of this project. Exactly one of this and `boot_disk_id`
-       */
-      image_id?: string;
-      /**
-       * Format: uuid
-       * @description An instance type currently on sale. A withdrawn one is rejected even though its identifier still resolves
-       */
-      instance_type_id: string;
-      /** @description The account the disk lets you log in as. Required with `boot_disk_id`, and rejected without it since an image states its own */
-      login_username?: string;
+      compute: components["schemas"]["NewCompute"];
       name: string;
       /** @description The password to set, on the login account and on root. Only the SSH public keys of the project are used when omitted */
       password?: string;
@@ -3149,8 +3147,7 @@ export interface components {
        * @description Create the primary network interface in this subnet. Exactly one of this and `port_id`
        */
       subnet_id?: string;
-      billing: components["schemas"]["BillingChoice"];
-      boot_disk?: components["schemas"]["NewBootDisk"];
+      boot_disk: components["schemas"]["BootDisk"];
       floating_ip?: components["schemas"]["NewFloatingIP"];
     };
     /** @description The request of `create-disk`, without `checkout`. */
@@ -3358,8 +3355,18 @@ export interface components {
       floating_ip: components["schemas"]["FloatingIPResource"];
       order: components["schemas"]["PlacedOrder"];
     };
-    /** @description A system disk purchased in the same order. Required when booting from an image; mutually exclusive with boot_disk_id. */
+    /** @description A system disk created from an image and purchased in the instance order. Its commercial terms are explicit and its release policy does not override them. */
     NewBootDisk: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "image";
+      /**
+       * Format: uuid
+       * @description A public image on sale, or an available private image of this project.
+       */
+      image_id: string;
       /**
        * Format: uuid
        * @description A system disk type on sale in the availability zone of the instance, one whose `purpose` is `system`
@@ -3369,6 +3376,7 @@ export interface components {
       size_gb: number;
       /** @default true */
       delete_with_instance?: boolean;
+      billing: components["schemas"]["BillingChoice"];
     };
     /** @description One floating IP purchased with this bandwidth configuration in the instance's order. Mutually exclusive with floating_ip_id. */
     NewFloatingIP: {
@@ -3376,6 +3384,7 @@ export interface components {
       bandwidth_mbps: number;
       /** Format: uuid */
       ipv4_pool_id: string;
+      billing: components["schemas"]["BillingChoice"];
     };
     /** @description An independent restriction on use. Removing one restriction never removes another source’s restriction, and never starts an instance its user stopped. */
     InstanceRestriction: {
