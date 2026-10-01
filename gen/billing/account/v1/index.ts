@@ -61,24 +61,24 @@ export type ListPaymentOptionsResult =
 export type ListPaymentOptionsQuery = operations["list-payment-options"]["parameters"]["query"];
 
 /** The success response body of `GET /account/v1/projects`. */
-export type ListBillingAccountProjectsResult =
-  operations["list-billing-account-projects"]["responses"][200]["content"]["application/json"];
+export type ListProjectAssignmentsResult =
+  operations["list-project-assignments"]["responses"][200]["content"]["application/json"];
 
 /** The query parameters of `GET /account/v1/projects`. */
-export type ListBillingAccountProjectsQuery =
-  operations["list-billing-account-projects"]["parameters"]["query"];
+export type ListProjectAssignmentsQuery =
+  operations["list-project-assignments"]["parameters"]["query"];
 
 /** The success response body of `GET /account/v1/projects/{projectId}/billing-account`. */
-export type GetProjectBillingAccountResult =
-  operations["get-project-billing-account"]["responses"][200]["content"]["application/json"];
+export type GetProjectAssignmentResult =
+  operations["get-project-assignment"]["responses"][200]["content"]["application/json"];
 
 /** The success response body of `PUT /account/v1/projects/{projectId}/billing-account`. */
-export type SetProjectBillingAccountResult =
-  operations["set-project-billing-account"]["responses"][200]["content"]["application/json"];
+export type SetProjectAssignmentResult =
+  operations["set-project-assignment"]["responses"][200]["content"]["application/json"];
 
 /** The request body of `PUT /account/v1/projects/{projectId}/billing-account`. */
-export type SetProjectBillingAccountBody = NonNullable<
-  operations["set-project-billing-account"]["requestBody"]
+export type SetProjectAssignmentBody = NonNullable<
+  operations["set-project-assignment"]["requestBody"]
 >["content"]["application/json"];
 
 /** The success response body of `GET /account/v1/top-ups`. */

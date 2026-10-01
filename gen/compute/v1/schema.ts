@@ -109,7 +109,7 @@ export interface paths {
     };
     /**
      * List disk types on sale
-     * @description Only disk types currently on sale are listed, both system disk types and data disk types; `for_system` narrows the list to one of the two. A withdrawn one disappears from here and can no longer be bought, while the disks already on it keep working and can still be resized.
+     * @description Only disk types currently on sale are listed, both system disk types and data disk types; `purpose` narrows the list to one of the two. A withdrawn one disappears from here and can no longer be bought, while the disks already on it keep working and can still be resized.
      */
     get: operations["list-disk-types"];
     put?: never;
@@ -1915,13 +1915,17 @@ export interface components {
       /** Format: date-time */
       observed_at: string | null;
     };
+    /**
+     * @description The intended purchase use of a disk type, not the current boot role or deletion policy of an individual disk.
+     * @enum {string}
+     */
+    DiskTypePurpose: "system" | "data";
     DiskTypeResource: {
       /** Format: uuid */
       availability_zone_id: string;
       /** Format: uuid */
       id: string;
-      /** @description True for a system disk type, the one chosen as `boot_disk.disk_type_id` when creating an instance from an image. A system disk type cannot be used to create a data disk, and a data disk type cannot be used for a system disk. */
-      for_system: boolean;
+      purpose: components["schemas"]["DiskTypePurpose"];
       /**
        * Format: int64
        * @description IOPS a disk of `min_size_gb` gets. Null when this type is not rate-limited.
@@ -2142,7 +2146,7 @@ export interface components {
     CreateDiskRequestBody: {
       /**
        * Format: uuid
-       * @description A data disk type currently on sale, one whose `for_system` is false. A withdrawn one is rejected even though its identifier still resolves
+       * @description A data disk type currently on sale, one whose `purpose` is `data`. A withdrawn one is rejected even though its identifier still resolves
        */
       disk_type_id: string;
       name: string;
@@ -3153,7 +3157,7 @@ export interface components {
     CreateDiskQuoteRequestBody: {
       /**
        * Format: uuid
-       * @description A data disk type currently on sale, one whose `for_system` is false. A withdrawn one is rejected even though its identifier still resolves
+       * @description A data disk type currently on sale, one whose `purpose` is `data`. A withdrawn one is rejected even though its identifier still resolves
        */
       disk_type_id: string;
       name: string;
@@ -3358,7 +3362,7 @@ export interface components {
     NewBootDisk: {
       /**
        * Format: uuid
-       * @description A system disk type on sale in the availability zone of the instance, one whose `for_system` is true
+       * @description A system disk type on sale in the availability zone of the instance, one whose `purpose` is `system`
        */
       disk_type_id: string;
       /** Format: int64 */
@@ -3957,8 +3961,8 @@ export interface operations {
     parameters: {
       query?: {
         region_id?: string;
-        /** @description `true` lists only system disk types and `false` only data disk types. Both are listed when omitted. */
-        for_system?: boolean;
+        /** @description Filter by intended purchase use. Omit to include both system and data disk types. */
+        purpose?: components["schemas"]["DiskTypePurpose"];
         page?: components["parameters"]["Page"];
         page_size?: components["parameters"]["PageSize"];
       };

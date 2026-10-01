@@ -150,8 +150,8 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** List projects linked to billing accounts */
-    get: operations["list-billing-account-projects"];
+    /** List project assignments */
+    get: operations["list-project-assignments"];
     put?: never;
     post?: never;
     delete?: never;
@@ -170,12 +170,12 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get project billing account
+     * Get project assignment
      * @description Returns 404 when the project has no billing account. No resources can be created until one is linked.
      */
-    get: operations["get-project-billing-account"];
+    get: operations["get-project-assignment"];
     /**
-     * Set project billing account
+     * Set project assignment
      * @description Charges already incurred remain with the billing account that was linked when they
      *     occurred, and are still invoiced to it. Metered resources are settled up to the moment of
      *     the change. Amounts owed by the previous billing account remain owed by it and do not
@@ -188,7 +188,7 @@ export interface paths {
      *     deleted, and while a subscription or an order in progress in the project uses a currency
      *     other than that of the new billing account.
      */
-    put: operations["set-project-billing-account"];
+    put: operations["set-project-assignment"];
     post?: never;
     /**
      * Unlink project billing account
@@ -1201,9 +1201,11 @@ export interface components {
       promotion_code?: string;
       /**
        * @description Quote.total in the order's currency, after discounts and tax but before applying credit
-       *     grants or balance. A different total fails with BILLING_AMOUNT_CHANGED.
+       *     grants or balance. Omit to skip the amount comparison; an explicit zero is compared.
+       *     A different total fails with BILLING_AMOUNT_CHANGED. Must be a non-negative decimal
+       *     string; empty strings, null, JSON numbers, signs and exponent notation are rejected.
        */
-      expected_amount: components["schemas"]["Money"];
+      expected_amount?: components["schemas"]["Money"];
     };
     /**
      * @description Price renewing a prepaid subscription. Give `price_id`, or `interval` with
@@ -1742,7 +1744,8 @@ export interface components {
       first_purchase_only?: boolean;
       amount: components["schemas"]["Money"];
     };
-    ProjectBillingInfo: {
+    /** @description A project's assignment to a billing account for the interval from effective_from to effective_to. An open-ended assignment has no end time. */
+    ProjectAssignment: {
       /** Format: uuid */
       project_id: string;
       /**
@@ -1759,11 +1762,11 @@ export interface components {
       /** Format: date-time */
       effective_to?: string | null;
     };
-    ProjectBillingInfoList: {
-      items: components["schemas"]["ProjectBillingInfo"][];
+    ProjectAssignmentList: {
+      items: components["schemas"]["ProjectAssignment"][];
       pagination: components["schemas"]["OffsetPagination"];
     };
-    ProjectBillingInfoSet: {
+    SetProjectAssignmentRequest: {
       /** Format: int64 */
       billing_account_id: number;
     };
@@ -3393,7 +3396,7 @@ export interface operations {
       default: components["responses"]["Error"];
     };
   };
-  "list-billing-account-projects": {
+  "list-project-assignments": {
     parameters: {
       query?: {
         /** @description 1-based page number; the first page when omitted. */
@@ -3414,13 +3417,13 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ProjectBillingInfoList"];
+          "application/json": components["schemas"]["ProjectAssignmentList"];
         };
       };
       default: components["responses"]["Error"];
     };
   };
-  "get-project-billing-account": {
+  "get-project-assignment": {
     parameters: {
       query?: never;
       header?: never;
@@ -3437,13 +3440,13 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ProjectBillingInfo"];
+          "application/json": components["schemas"]["ProjectAssignment"];
         };
       };
       default: components["responses"]["Error"];
     };
   };
-  "set-project-billing-account": {
+  "set-project-assignment": {
     parameters: {
       query?: never;
       header?: never;
@@ -3454,7 +3457,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["ProjectBillingInfoSet"];
+        "application/json": components["schemas"]["SetProjectAssignmentRequest"];
       };
     };
     responses: {
@@ -3464,7 +3467,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ProjectBillingInfo"];
+          "application/json": components["schemas"]["ProjectAssignment"];
         };
       };
       default: components["responses"]["Error"];
