@@ -3,19 +3,14 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": [
-      "ES2022",
-      "DOM"
-    ],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "declaration": true,
     "verbatimModuleSyntax": true,
     "outDir": "dist",
-    "rootDir": "gen"
+    "rootDir": "."
   },
-  "include": [
-    "gen"
-  ]
+  "include": ["gen", "src"]
 }
