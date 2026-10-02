@@ -123,7 +123,7 @@ export type getProjectBillingAccountResponse =
   | getProjectBillingAccountResponseError;
 
 export const getGetProjectBillingAccountUrl = (projectId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/projects/${projectId}/billing-account`;
+  return `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/billing-account`;
 };
 
 /**
@@ -184,8 +184,8 @@ export const getListProjectSpendUrl = (projectId: string, params: ListProjectSpe
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/projects/${projectId}/spend?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/projects/${projectId}/spend`;
+    ? `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/spend?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/spend`;
 };
 
 /**
@@ -248,8 +248,8 @@ export const getListProjectUsageChargesUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/projects/${projectId}/usage-charges?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/projects/${projectId}/usage-charges`;
+    ? `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/usage-charges?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/usage-charges`;
 };
 
 /**
@@ -310,8 +310,8 @@ export const getListProjectSubscriptionsUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/projects/${projectId}/subscriptions?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/projects/${projectId}/subscriptions`;
+    ? `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/subscriptions?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/subscriptions`;
 };
 
 /**
@@ -356,7 +356,7 @@ export type setProjectAutoRenewResponse =
   | setProjectAutoRenewResponseError;
 
 export const getSetProjectAutoRenewUrl = (projectId: string, subscriptionId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/projects/${projectId}/subscriptions/${subscriptionId}/auto-renew`;
+  return `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/subscriptions/${encodeURIComponent(String(subscriptionId))}/auto-renew`;
 };
 
 /**
@@ -437,7 +437,7 @@ export type createProjectCancellationResponse =
   | createProjectCancellationResponseError;
 
 export const getCreateProjectCancellationUrl = (projectId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/projects/${projectId}/cancellations`;
+  return `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/cancellations`;
 };
 
 /**
@@ -556,8 +556,8 @@ export const getListProjectCancellationsUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/projects/${projectId}/cancellations?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/projects/${projectId}/cancellations`;
+    ? `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/cancellations?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/cancellations`;
 };
 
 /**
@@ -603,7 +603,7 @@ export type getProjectCancellationResponse =
   | getProjectCancellationResponseError;
 
 export const getGetProjectCancellationUrl = (projectId: string, cancellationId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/projects/${projectId}/cancellations/${cancellationId}`;
+  return `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/cancellations/${encodeURIComponent(String(cancellationId))}`;
 };
 
 /**
@@ -649,7 +649,7 @@ export type withdrawProjectCancellationResponse =
   | withdrawProjectCancellationResponseError;
 
 export const getWithdrawProjectCancellationUrl = (projectId: string, cancellationId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/projects/${projectId}/cancellations/${cancellationId}/withdraw`;
+  return `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/cancellations/${encodeURIComponent(String(cancellationId))}/withdraw`;
 };
 
 /**
@@ -713,8 +713,8 @@ export const getListProjectOrdersUrl = (projectId: string, params?: ListProjectO
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/projects/${projectId}/orders?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/projects/${projectId}/orders`;
+    ? `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/orders?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/orders`;
 };
 
 /**
@@ -759,7 +759,7 @@ export type getProjectOrderResponseError = getProjectOrderResponseDefault & {
 export type getProjectOrderResponse = getProjectOrderResponseSuccess | getProjectOrderResponseError;
 
 export const getGetProjectOrderUrl = (projectId: string, orderId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/projects/${projectId}/orders/${orderId}`;
+  return `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/orders/${encodeURIComponent(String(orderId))}`;
 };
 
 /**
@@ -818,8 +818,8 @@ export const getListProjectActiveResourcesUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/projects/${projectId}/active-resources?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/projects/${projectId}/active-resources`;
+    ? `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/active-resources?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/active-resources`;
 };
 
 /**
@@ -865,7 +865,7 @@ export type createProjectQuoteResponse =
   | createProjectQuoteResponseError;
 
 export const getCreateProjectQuoteUrl = (projectId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/projects/${projectId}/quotes`;
+  return `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/quotes`;
 };
 
 /**
@@ -977,8 +977,8 @@ export const getListProjectOrderItemsUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/projects/${projectId}/orders/${orderId}/items?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/projects/${projectId}/orders/${orderId}/items`;
+    ? `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/orders/${encodeURIComponent(String(orderId))}/items?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/orders/${encodeURIComponent(String(orderId))}/items`;
 };
 
 /**
@@ -1038,8 +1038,8 @@ export const getListProjectAllowancesUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/projects/${projectId}/allowances?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/projects/${projectId}/allowances`;
+    ? `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/allowances?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/allowances`;
 };
 
 /**
@@ -1100,8 +1100,8 @@ export const getListProjectEntitlementsUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/projects/${projectId}/entitlements?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/projects/${projectId}/entitlements`;
+    ? `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/entitlements?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/projects/${encodeURIComponent(String(projectId))}/entitlements`;
 };
 
 /**

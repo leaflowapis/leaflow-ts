@@ -290,7 +290,7 @@ export type getProductResponseError = (getProductResponse304 | getProductRespons
 export type getProductResponse = getProductResponseSuccess | getProductResponseError;
 
 export const getGetProductUrl = (productId: ProductID) => {
-  return `https://billing.leaflow.cloud/catalog/v1/products/${productId}`;
+  return `https://billing.leaflow.cloud/catalog/v1/products/${encodeURIComponent(String(productId))}`;
 };
 
 /**
@@ -360,7 +360,7 @@ export type getPlanResponseError = (getPlanResponse304 | getPlanResponseDefault)
 export type getPlanResponse = getPlanResponseSuccess | getPlanResponseError;
 
 export const getGetPlanUrl = (planId: string) => {
-  return `https://billing.leaflow.cloud/catalog/v1/plans/${planId}`;
+  return `https://billing.leaflow.cloud/catalog/v1/plans/${encodeURIComponent(String(planId))}`;
 };
 
 /**
@@ -430,7 +430,7 @@ export type getPriceResponseError = (getPriceResponse304 | getPriceResponseDefau
 export type getPriceResponse = getPriceResponseSuccess | getPriceResponseError;
 
 export const getGetPriceUrl = (priceId: string) => {
-  return `https://billing.leaflow.cloud/catalog/v1/prices/${priceId}`;
+  return `https://billing.leaflow.cloud/catalog/v1/prices/${encodeURIComponent(String(priceId))}`;
 };
 
 /**
@@ -595,8 +595,8 @@ export const getListPricesByPlanUrl = (planId: string, params?: ListPricesByPlan
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/catalog/v1/plans/${planId}/prices?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/catalog/v1/plans/${planId}/prices`;
+    ? `https://billing.leaflow.cloud/catalog/v1/plans/${encodeURIComponent(String(planId))}/prices?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/catalog/v1/plans/${encodeURIComponent(String(planId))}/prices`;
 };
 
 /**
@@ -678,8 +678,8 @@ export const getListRatesUrl = (rateCardId: string, params?: ListRatesParams) =>
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/catalog/v1/rate-cards/${rateCardId}/rules?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/catalog/v1/rate-cards/${rateCardId}/rules`;
+    ? `https://billing.leaflow.cloud/catalog/v1/rate-cards/${encodeURIComponent(String(rateCardId))}/rules?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/catalog/v1/rate-cards/${encodeURIComponent(String(rateCardId))}/rules`;
 };
 
 /**

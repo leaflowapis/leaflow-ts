@@ -333,7 +333,7 @@ export type downloadAttachmentResponse =
   | downloadAttachmentResponseError;
 
 export const getDownloadAttachmentUrl = (attachment: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/attachments/${attachment}`;
+  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}`;
 };
 
 /**
@@ -432,7 +432,7 @@ export type getBindingResponseError = getBindingResponseDefault & {
 export type getBindingResponse = getBindingResponseSuccess | getBindingResponseError;
 
 export const getGetBindingUrl = (binding: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/bindings/${binding}`;
+  return `https://assistant.leaflow.cloud/api/v1/bindings/${encodeURIComponent(String(binding))}`;
 };
 
 /**
@@ -474,7 +474,7 @@ export type deleteBindingResponseError = deleteBindingResponseDefault & {
 export type deleteBindingResponse = deleteBindingResponseSuccess | deleteBindingResponseError;
 
 export const getDeleteBindingUrl = (binding: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/bindings/${binding}`;
+  return `https://assistant.leaflow.cloud/api/v1/bindings/${encodeURIComponent(String(binding))}`;
 };
 
 /**
@@ -634,7 +634,7 @@ export type getChannelResponseError = getChannelResponseDefault & {
 export type getChannelResponse = getChannelResponseSuccess | getChannelResponseError;
 
 export const getGetChannelUrl = (channel: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/channels/${channel}`;
+  return `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}`;
 };
 
 /**
@@ -676,7 +676,7 @@ export type updateChannelResponseError = updateChannelResponseDefault & {
 export type updateChannelResponse = updateChannelResponseSuccess | updateChannelResponseError;
 
 export const getUpdateChannelUrl = (channel: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/channels/${channel}`;
+  return `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}`;
 };
 
 /**
@@ -741,7 +741,7 @@ export type deleteChannelResponseError = deleteChannelResponseDefault & {
 export type deleteChannelResponse = deleteChannelResponseSuccess | deleteChannelResponseError;
 
 export const getDeleteChannelUrl = (channel: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/channels/${channel}`;
+  return `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}`;
 };
 
 /**
@@ -786,7 +786,7 @@ export type createBindingCodeResponse =
   | createBindingCodeResponseError;
 
 export const getCreateBindingCodeUrl = (channel: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/channels/${channel}/binding-codes`;
+  return `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}/binding-codes`;
 };
 
 /**
@@ -845,8 +845,8 @@ export const getListChannelRejectionsUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://assistant.leaflow.cloud/api/v1/channels/${channel}/rejections?${stringifiedParams}`
-    : `https://assistant.leaflow.cloud/api/v1/channels/${channel}/rejections`;
+    ? `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}/rejections?${stringifiedParams}`
+    : `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}/rejections`;
 };
 
 /**
@@ -892,7 +892,7 @@ export type rotateChannelSecretResponse =
   | rotateChannelSecretResponseError;
 
 export const getRotateChannelSecretUrl = (channel: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/channels/${channel}/secret`;
+  return `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}/secret`;
 };
 
 /**
@@ -968,8 +968,8 @@ export const getCheckSenderUrl = (channel: string, params: CheckSenderParams) =>
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://assistant.leaflow.cloud/api/v1/channels/${channel}/sender-check?${stringifiedParams}`
-    : `https://assistant.leaflow.cloud/api/v1/channels/${channel}/sender-check`;
+    ? `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}/sender-check?${stringifiedParams}`
+    : `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}/sender-check`;
 };
 
 /**
@@ -1015,7 +1015,7 @@ export type beginWeixinLoginResponse =
   | beginWeixinLoginResponseError;
 
 export const getBeginWeixinLoginUrl = (channel: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/channels/${channel}/weixin-logins`;
+  return `https://assistant.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channel))}/weixin-logins`;
 };
 
 /**
@@ -1100,7 +1100,7 @@ export type getWeixinLoginResponseError = getWeixinLoginResponseDefault & {
 export type getWeixinLoginResponse = getWeixinLoginResponseSuccess | getWeixinLoginResponseError;
 
 export const getGetWeixinLoginUrl = (login: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/weixin-logins/${login}`;
+  return `https://assistant.leaflow.cloud/api/v1/weixin-logins/${encodeURIComponent(String(login))}`;
 };
 
 /**
@@ -1145,7 +1145,7 @@ export type submitWeixinVerifyCodeResponse =
   | submitWeixinVerifyCodeResponseError;
 
 export const getSubmitWeixinVerifyCodeUrl = (login: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/weixin-logins/${login}/verify-code`;
+  return `https://assistant.leaflow.cloud/api/v1/weixin-logins/${encodeURIComponent(String(login))}/verify-code`;
 };
 
 /**
@@ -1212,7 +1212,7 @@ export type submitDynamicCallResultResponse =
   | submitDynamicCallResultResponseError;
 
 export const getSubmitDynamicCallResultUrl = (call: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/dynamic-calls/${call}/result`;
+  return `https://assistant.leaflow.cloud/api/v1/dynamic-calls/${encodeURIComponent(String(call))}/result`;
 };
 
 /**
@@ -1389,7 +1389,7 @@ export type getFolderResponseError = getFolderResponseDefault & {
 export type getFolderResponse = getFolderResponseSuccess | getFolderResponseError;
 
 export const getGetFolderUrl = (folder: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/folders/${folder}`;
+  return `https://assistant.leaflow.cloud/api/v1/folders/${encodeURIComponent(String(folder))}`;
 };
 
 /**
@@ -1432,7 +1432,7 @@ export type updateFolderResponseError = updateFolderResponseDefault & {
 export type updateFolderResponse = updateFolderResponseSuccess | updateFolderResponseError;
 
 export const getUpdateFolderUrl = (folder: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/folders/${folder}`;
+  return `https://assistant.leaflow.cloud/api/v1/folders/${encodeURIComponent(String(folder))}`;
 };
 
 /**
@@ -1497,7 +1497,7 @@ export type deleteFolderResponseError = deleteFolderResponseDefault & {
 export type deleteFolderResponse = deleteFolderResponseSuccess | deleteFolderResponseError;
 
 export const getDeleteFolderUrl = (folder: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/folders/${folder}`;
+  return `https://assistant.leaflow.cloud/api/v1/folders/${encodeURIComponent(String(folder))}`;
 };
 
 /**
@@ -1584,7 +1584,7 @@ export type deleteMemoryResponseError = deleteMemoryResponseDefault & {
 export type deleteMemoryResponse = deleteMemoryResponseSuccess | deleteMemoryResponseError;
 
 export const getDeleteMemoryUrl = (memory: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/memories/${memory}`;
+  return `https://assistant.leaflow.cloud/api/v1/memories/${encodeURIComponent(String(memory))}`;
 };
 
 /**
@@ -1742,7 +1742,7 @@ export type getSkillResponseError = getSkillResponseDefault & {
 export type getSkillResponse = getSkillResponseSuccess | getSkillResponseError;
 
 export const getGetSkillUrl = (skill: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/skills/${skill}`;
+  return `https://assistant.leaflow.cloud/api/v1/skills/${encodeURIComponent(String(skill))}`;
 };
 
 /**
@@ -1785,7 +1785,7 @@ export type setSkillEnabledResponseError = setSkillEnabledResponseDefault & {
 export type setSkillEnabledResponse = setSkillEnabledResponseSuccess | setSkillEnabledResponseError;
 
 export const getSetSkillEnabledUrl = (skill: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/skills/${skill}`;
+  return `https://assistant.leaflow.cloud/api/v1/skills/${encodeURIComponent(String(skill))}`;
 };
 
 /**
@@ -1854,7 +1854,7 @@ export type deleteSkillResponseError = deleteSkillResponseDefault & {
 export type deleteSkillResponse = deleteSkillResponseSuccess | deleteSkillResponseError;
 
 export const getDeleteSkillUrl = (skill: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/skills/${skill}`;
+  return `https://assistant.leaflow.cloud/api/v1/skills/${encodeURIComponent(String(skill))}`;
 };
 
 /**
@@ -2018,7 +2018,7 @@ export type getThreadResponseError = getThreadResponseDefault & {
 export type getThreadResponse = getThreadResponseSuccess | getThreadResponseError;
 
 export const getGetThreadUrl = (thread: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${thread}`;
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}`;
 };
 
 /**
@@ -2061,7 +2061,7 @@ export type updateThreadResponseError = updateThreadResponseDefault & {
 export type updateThreadResponse = updateThreadResponseSuccess | updateThreadResponseError;
 
 export const getUpdateThreadUrl = (thread: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${thread}`;
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}`;
 };
 
 /**
@@ -2134,7 +2134,7 @@ export type deleteThreadResponseError = deleteThreadResponseDefault & {
 export type deleteThreadResponse = deleteThreadResponseSuccess | deleteThreadResponseError;
 
 export const getDeleteThreadUrl = (thread: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${thread}`;
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}`;
 };
 
 /**
@@ -2183,7 +2183,7 @@ export type decideApprovalResponseError = decideApprovalResponseDefault & {
 export type decideApprovalResponse = decideApprovalResponseSuccess | decideApprovalResponseError;
 
 export const getDecideApprovalUrl = (thread: string, batch: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${thread}/approvals/${batch}`;
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/approvals/${encodeURIComponent(String(batch))}`;
 };
 
 /**
@@ -2262,8 +2262,8 @@ export const getListEarlierItemsUrl = (thread: string, params: ListEarlierItemsP
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://assistant.leaflow.cloud/api/v1/threads/${thread}/earlier?${stringifiedParams}`
-    : `https://assistant.leaflow.cloud/api/v1/threads/${thread}/earlier`;
+    ? `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/earlier?${stringifiedParams}`
+    : `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/earlier`;
 };
 
 /**
@@ -2307,7 +2307,7 @@ export type interruptThreadResponseError = interruptThreadResponseDefault & {
 export type interruptThreadResponse = interruptThreadResponseSuccess | interruptThreadResponseError;
 
 export const getInterruptThreadUrl = (thread: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${thread}/interrupt`;
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/interrupt`;
 };
 
 /**
@@ -2350,7 +2350,7 @@ export type sendMessageResponseError = sendMessageResponseDefault & {
 export type sendMessageResponse = sendMessageResponseSuccess | sendMessageResponseError;
 
 export const getSendMessageUrl = (thread: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${thread}/messages`;
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/messages`;
 };
 
 /**
@@ -2415,7 +2415,7 @@ export type answerQuestionResponseError = answerQuestionResponseDefault & {
 export type answerQuestionResponse = answerQuestionResponseSuccess | answerQuestionResponseError;
 
 export const getAnswerQuestionUrl = (thread: string, item: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${thread}/questions/${item}`;
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/questions/${encodeURIComponent(String(item))}`;
 };
 
 /**
@@ -2481,7 +2481,7 @@ export type markThreadReadResponseError = markThreadReadResponseDefault & {
 export type markThreadReadResponse = markThreadReadResponseSuccess | markThreadReadResponseError;
 
 export const getMarkThreadReadUrl = (thread: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${thread}/read`;
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/read`;
 };
 
 /**
@@ -2523,7 +2523,7 @@ export type revertThreadResponseError = revertThreadResponseDefault & {
 export type revertThreadResponse = revertThreadResponseSuccess | revertThreadResponseError;
 
 export const getRevertThreadUrl = (thread: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${thread}/revert`;
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/revert`;
 };
 
 /**

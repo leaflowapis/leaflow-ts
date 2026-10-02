@@ -5,6 +5,7 @@
  * What one project has spent and bought, and the billing account linked to it.
  * OpenAPI spec version: 1.0.0
  */
+import type { Money } from "./money.js";
 import type { TerminationPolicy } from "./terminationPolicy.js";
 
 export interface CancellationCreate {
@@ -21,7 +22,7 @@ export interface CancellationCreate {
    */
   proration_date?: string;
   /** The `refundable_amount` of the quote. The cancellation is refused when the refund differs. */
-  expected_refundable_amount: string;
+  expected_refundable_amount: Money & string;
   /**
    * A note from the account holder. It is kept with the cancellation and not shown elsewhere.
    * @maxLength 1024

@@ -14,6 +14,10 @@ export const topUpCreatePaymentGatewayMax = 32;
 
 export const topUpCreateMethodTypeMax = 64;
 
+export const topUpCreateAmountTwoRegExp = new RegExp(
+  "^(?:(?:[1-9][0-9]{0,14}|0(?:[1-9][0-9]{0,13}|0(?:[1-9][0-9]{0,12}|0(?:[1-9][0-9]{0,11}|0(?:[1-9][0-9]{0,10}|0(?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))))))([.][0-9]{1,10})?|0{1,15}[.](?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))$",
+);
+
 export const TopUpCreate = zod.strictObject({
   payment_gateway: zod
     .string()
@@ -31,7 +35,7 @@ export const TopUpCreate = zod.strictObject({
       "The ID of this top-up attempt. Keep it before submitting and query it after an uncertain response.",
     ),
   billing_account_id: zod.int(),
-  amount: Money.describe(
+  amount: Money.and(zod.string().regex(topUpCreateAmountTwoRegExp)).describe(
     "In the account's currency, and no finer than that currency's smallest unit:\ntwo decimals for most, none for the yen. A finer amount is refused here rather\nthan at the checkout page, where the customer would see the gateway's own wording\ninstead of an explanation.\n\nThere is a minimum, which differs by currency. Below it the gateway's fee\nexceeds the top-up itself, so such a payment costs more to accept than it brings.\nThe minimum in force is returned with the rejection.",
   ),
   payment_method_id: zod

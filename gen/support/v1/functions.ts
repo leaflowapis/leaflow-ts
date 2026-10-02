@@ -330,7 +330,7 @@ export type getTicketResponseError = getTicketResponseDefault & {
 export type getTicketResponse = getTicketResponseSuccess | getTicketResponseError;
 
 export const getGetTicketUrl = (ticketId: string) => {
-  return `https://support.leaflow.cloud/api/v1/tickets/${ticketId}`;
+  return `https://support.leaflow.cloud/api/v1/tickets/${encodeURIComponent(String(ticketId))}`;
 };
 
 /**
@@ -373,7 +373,7 @@ export type closeTicketResponseError = closeTicketResponseDefault & {
 export type closeTicketResponse = closeTicketResponseSuccess | closeTicketResponseError;
 
 export const getCloseTicketUrl = (ticketId: string) => {
-  return `https://support.leaflow.cloud/api/v1/tickets/${ticketId}/close`;
+  return `https://support.leaflow.cloud/api/v1/tickets/${encodeURIComponent(String(ticketId))}/close`;
 };
 
 /**
@@ -432,8 +432,8 @@ export const getListTicketMessagesUrl = (ticketId: string, params?: ListTicketMe
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://support.leaflow.cloud/api/v1/tickets/${ticketId}/messages?${stringifiedParams}`
-    : `https://support.leaflow.cloud/api/v1/tickets/${ticketId}/messages`;
+    ? `https://support.leaflow.cloud/api/v1/tickets/${encodeURIComponent(String(ticketId))}/messages?${stringifiedParams}`
+    : `https://support.leaflow.cloud/api/v1/tickets/${encodeURIComponent(String(ticketId))}/messages`;
 };
 
 /**
@@ -479,7 +479,7 @@ export type createTicketMessageResponse =
   | createTicketMessageResponseError;
 
 export const getCreateTicketMessageUrl = (ticketId: string) => {
-  return `https://support.leaflow.cloud/api/v1/tickets/${ticketId}/messages`;
+  return `https://support.leaflow.cloud/api/v1/tickets/${encodeURIComponent(String(ticketId))}/messages`;
 };
 
 /**
@@ -550,7 +550,7 @@ export type getTicketSatisfactionResponse =
   | getTicketSatisfactionResponseError;
 
 export const getGetTicketSatisfactionUrl = (ticketId: string) => {
-  return `https://support.leaflow.cloud/api/v1/tickets/${ticketId}/satisfaction`;
+  return `https://support.leaflow.cloud/api/v1/tickets/${encodeURIComponent(String(ticketId))}/satisfaction`;
 };
 
 /**
@@ -594,7 +594,7 @@ export type createTicketSatisfactionResponse =
   | createTicketSatisfactionResponseError;
 
 export const getCreateTicketSatisfactionUrl = (ticketId: string) => {
-  return `https://support.leaflow.cloud/api/v1/tickets/${ticketId}/satisfaction`;
+  return `https://support.leaflow.cloud/api/v1/tickets/${encodeURIComponent(String(ticketId))}/satisfaction`;
 };
 
 /**
@@ -819,8 +819,8 @@ export const getDownloadAttachmentUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://support.leaflow.cloud/api/v1/attachments/${attachmentId}/content?${stringifiedParams}`
-    : `https://support.leaflow.cloud/api/v1/attachments/${attachmentId}/content`;
+    ? `https://support.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachmentId))}/content?${stringifiedParams}`
+    : `https://support.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachmentId))}/content`;
 };
 
 /**
@@ -929,7 +929,7 @@ export type getMaintenanceResponseError = getMaintenanceResponseDefault & {
 export type getMaintenanceResponse = getMaintenanceResponseSuccess | getMaintenanceResponseError;
 
 export const getGetMaintenanceUrl = (maintenanceId: string) => {
-  return `https://support.leaflow.cloud/api/v1/maintenances/${maintenanceId}`;
+  return `https://support.leaflow.cloud/api/v1/maintenances/${encodeURIComponent(String(maintenanceId))}`;
 };
 
 /**
@@ -988,8 +988,8 @@ export const getListMaintenanceTimelineUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://support.leaflow.cloud/api/v1/maintenances/${maintenanceId}/timeline?${stringifiedParams}`
-    : `https://support.leaflow.cloud/api/v1/maintenances/${maintenanceId}/timeline`;
+    ? `https://support.leaflow.cloud/api/v1/maintenances/${encodeURIComponent(String(maintenanceId))}/timeline?${stringifiedParams}`
+    : `https://support.leaflow.cloud/api/v1/maintenances/${encodeURIComponent(String(maintenanceId))}/timeline`;
 };
 
 /**

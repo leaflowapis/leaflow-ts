@@ -8,10 +8,14 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { Money } from "./money.zod.js";
 import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
 export const cancellationCreateSubscriptionIdsMax = 50;
 
+export const cancellationCreateExpectedRefundableAmountTwoRegExp = new RegExp(
+  "^-?[0-9]{1,15}([.][0-9]{1,10})?$",
+);
 export const cancellationCreateReasonMax = 1024;
 
 export const CancellationCreate = zod.strictObject({
@@ -27,11 +31,11 @@ export const CancellationCreate = zod.strictObject({
     .describe(
       "For `immediate`, the `proration_date` of the quote: a whole second, not in the future and\nat most ten minutes old. The refund is computed as of it. Now when omitted.",
     ),
-  expected_refundable_amount: zod
-    .string()
-    .describe(
-      "The `refundable_amount` of the quote. The cancellation is refused when the refund differs.",
-    ),
+  expected_refundable_amount: Money.and(
+    zod.string().regex(cancellationCreateExpectedRefundableAmountTwoRegExp),
+  ).describe(
+    "The `refundable_amount` of the quote. The cancellation is refused when the refund differs.",
+  ),
   reason: zod
     .string()
     .max(cancellationCreateReasonMax)

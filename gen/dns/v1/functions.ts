@@ -275,7 +275,7 @@ export type getCredentialResponseError = getCredentialResponseDefault & {
 export type getCredentialResponse = getCredentialResponseSuccess | getCredentialResponseError;
 
 export const getGetCredentialUrl = (credentialId: string) => {
-  return `https://dns.leaflow.cloud/api/v1/credentials/${credentialId}`;
+  return `https://dns.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(credentialId))}`;
 };
 
 /**
@@ -319,7 +319,7 @@ export type renameCredentialResponse =
   | renameCredentialResponseError;
 
 export const getRenameCredentialUrl = (credentialId: string) => {
-  return `https://dns.leaflow.cloud/api/v1/credentials/${credentialId}`;
+  return `https://dns.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(credentialId))}`;
 };
 
 /**
@@ -388,7 +388,7 @@ export type deleteCredentialResponse =
   | deleteCredentialResponseError;
 
 export const getDeleteCredentialUrl = (credentialId: string) => {
-  return `https://dns.leaflow.cloud/api/v1/credentials/${credentialId}`;
+  return `https://dns.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(credentialId))}`;
 };
 
 /**
@@ -437,7 +437,7 @@ export type verifyCredentialResponse =
   | verifyCredentialResponseError;
 
 export const getVerifyCredentialUrl = (credentialId: string) => {
-  return `https://dns.leaflow.cloud/api/v1/credentials/${credentialId}/verification`;
+  return `https://dns.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(credentialId))}/verification`;
 };
 
 /**
@@ -573,8 +573,8 @@ export const getListRecordsUrl = (zone: string, params?: ListRecordsParams) => {
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://dns.leaflow.cloud/api/v1/zones/${zone}/records?${stringifiedParams}`
-    : `https://dns.leaflow.cloud/api/v1/zones/${zone}/records`;
+    ? `https://dns.leaflow.cloud/api/v1/zones/${encodeURIComponent(String(zone))}/records?${stringifiedParams}`
+    : `https://dns.leaflow.cloud/api/v1/zones/${encodeURIComponent(String(zone))}/records`;
 };
 
 /**
@@ -622,7 +622,7 @@ export type getRecordSetResponseError = getRecordSetResponseDefault & {
 export type getRecordSetResponse = getRecordSetResponseSuccess | getRecordSetResponseError;
 
 export const getGetRecordSetUrl = (zone: string, name: string, type: RecordType) => {
-  return `https://dns.leaflow.cloud/api/v1/zones/${zone}/records/${name}/${type}`;
+  return `https://dns.leaflow.cloud/api/v1/zones/${encodeURIComponent(String(zone))}/records/${encodeURIComponent(String(name))}/${encodeURIComponent(String(type))}`;
 };
 
 /**
@@ -683,8 +683,8 @@ export const getSetRecordSetUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://dns.leaflow.cloud/api/v1/zones/${zone}/records/${name}/${type}?${stringifiedParams}`
-    : `https://dns.leaflow.cloud/api/v1/zones/${zone}/records/${name}/${type}`;
+    ? `https://dns.leaflow.cloud/api/v1/zones/${encodeURIComponent(String(zone))}/records/${encodeURIComponent(String(name))}/${encodeURIComponent(String(type))}?${stringifiedParams}`
+    : `https://dns.leaflow.cloud/api/v1/zones/${encodeURIComponent(String(zone))}/records/${encodeURIComponent(String(name))}/${encodeURIComponent(String(type))}`;
 };
 
 /**
@@ -780,8 +780,8 @@ export const getModifyRecordSetUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://dns.leaflow.cloud/api/v1/zones/${zone}/records/${name}/${type}?${stringifiedParams}`
-    : `https://dns.leaflow.cloud/api/v1/zones/${zone}/records/${name}/${type}`;
+    ? `https://dns.leaflow.cloud/api/v1/zones/${encodeURIComponent(String(zone))}/records/${encodeURIComponent(String(name))}/${encodeURIComponent(String(type))}?${stringifiedParams}`
+    : `https://dns.leaflow.cloud/api/v1/zones/${encodeURIComponent(String(zone))}/records/${encodeURIComponent(String(name))}/${encodeURIComponent(String(type))}`;
 };
 
 /**
@@ -887,8 +887,8 @@ export const getDeleteRecordSetUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://dns.leaflow.cloud/api/v1/zones/${zone}/records/${name}/${type}?${stringifiedParams}`
-    : `https://dns.leaflow.cloud/api/v1/zones/${zone}/records/${name}/${type}`;
+    ? `https://dns.leaflow.cloud/api/v1/zones/${encodeURIComponent(String(zone))}/records/${encodeURIComponent(String(name))}/${encodeURIComponent(String(type))}?${stringifiedParams}`
+    : `https://dns.leaflow.cloud/api/v1/zones/${encodeURIComponent(String(zone))}/records/${encodeURIComponent(String(name))}/${encodeURIComponent(String(type))}`;
 };
 
 /**

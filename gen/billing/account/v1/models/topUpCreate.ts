@@ -35,7 +35,7 @@ export interface TopUpCreate {
    * exceeds the top-up itself, so such a payment costs more to accept than it brings.
    * The minimum in force is returned with the rejection.
    */
-  amount: Money;
+  amount: Money & string;
   /** Charge a saved method instead of opening a checkout page. */
   payment_method_id?: string;
   /** Where to send the customer after checkout. */

@@ -371,7 +371,7 @@ export type getNotificationResponseError = getNotificationResponseDefault & {
 export type getNotificationResponse = getNotificationResponseSuccess | getNotificationResponseError;
 
 export const getGetNotificationUrl = (notificationId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/${notificationId}`;
+  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}`;
 };
 
 /**
@@ -417,7 +417,7 @@ export type markNotificationReadResponse =
   | markNotificationReadResponseError;
 
 export const getMarkNotificationReadUrl = (notificationId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/${notificationId}/read`;
+  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}/read`;
 };
 
 /**
@@ -462,7 +462,7 @@ export type markNotificationUnreadResponse =
   | markNotificationUnreadResponseError;
 
 export const getMarkNotificationUnreadUrl = (notificationId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/${notificationId}/read`;
+  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}/read`;
 };
 
 /**
@@ -510,7 +510,7 @@ export type archiveNotificationResponse =
   | archiveNotificationResponseError;
 
 export const getArchiveNotificationUrl = (notificationId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/${notificationId}/archive`;
+  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}/archive`;
 };
 
 /**
@@ -556,7 +556,7 @@ export type unarchiveNotificationResponse =
   | unarchiveNotificationResponseError;
 
 export const getUnarchiveNotificationUrl = (notificationId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/${notificationId}/archive`;
+  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}/archive`;
 };
 
 /**
@@ -709,7 +709,7 @@ export type readAnnouncementResponse =
   | readAnnouncementResponseError;
 
 export const getReadAnnouncementUrl = (announcementId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/announcements/${announcementId}/read`;
+  return `https://notification.leaflow.cloud/api/v1/announcements/${encodeURIComponent(String(announcementId))}/read`;
 };
 
 /**
@@ -1176,8 +1176,8 @@ export const getUpdateTypePreferenceUrl = (type: string, params?: UpdateTypePref
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://notification.leaflow.cloud/api/v1/preferences/types/${type}?${stringifiedParams}`
-    : `https://notification.leaflow.cloud/api/v1/preferences/types/${type}`;
+    ? `https://notification.leaflow.cloud/api/v1/preferences/types/${encodeURIComponent(String(type))}?${stringifiedParams}`
+    : `https://notification.leaflow.cloud/api/v1/preferences/types/${encodeURIComponent(String(type))}`;
 };
 
 /**
@@ -1266,8 +1266,8 @@ export const getDeleteTypePreferenceUrl = (type: string, params?: DeleteTypePref
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://notification.leaflow.cloud/api/v1/preferences/types/${type}?${stringifiedParams}`
-    : `https://notification.leaflow.cloud/api/v1/preferences/types/${type}`;
+    ? `https://notification.leaflow.cloud/api/v1/preferences/types/${encodeURIComponent(String(type))}?${stringifiedParams}`
+    : `https://notification.leaflow.cloud/api/v1/preferences/types/${encodeURIComponent(String(type))}`;
 };
 
 /**
@@ -1452,7 +1452,7 @@ export type updateUserChannelResponse =
   | updateUserChannelResponseError;
 
 export const getUpdateUserChannelUrl = (channelId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/channels/${channelId}`;
+  return `https://notification.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channelId))}`;
 };
 
 /**
@@ -1525,7 +1525,7 @@ export type deleteUserChannelResponse =
   | deleteUserChannelResponseError;
 
 export const getDeleteUserChannelUrl = (channelId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/channels/${channelId}`;
+  return `https://notification.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channelId))}`;
 };
 
 /**
@@ -1571,7 +1571,7 @@ export type verifyUserChannelResponse =
   | verifyUserChannelResponseError;
 
 export const getVerifyUserChannelUrl = (channelId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/channels/${channelId}/verify`;
+  return `https://notification.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channelId))}/verify`;
 };
 
 /**
@@ -1623,7 +1623,7 @@ export type describeCredentialTicketResponse =
   | describeCredentialTicketResponseError;
 
 export const getDescribeCredentialTicketUrl = (ticketId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/credentials/${ticketId}`;
+  return `https://notification.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(ticketId))}`;
 };
 
 /**
@@ -1672,7 +1672,7 @@ export type revealCredentialResponse =
   | revealCredentialResponseError;
 
 export const getRevealCredentialUrl = (ticketId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/credentials/${ticketId}/reveal`;
+  return `https://notification.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(ticketId))}/reveal`;
 };
 
 /**

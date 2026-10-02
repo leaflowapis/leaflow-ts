@@ -494,7 +494,7 @@ export type revokeInvitationResponse =
   | revokeInvitationResponseError;
 
 export const getRevokeInvitationUrl = (invitationId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/invitations/${invitationId}`;
+  return `https://iam.leaflow.cloud/api/v1/invitations/${encodeURIComponent(String(invitationId))}`;
 };
 
 /**
@@ -658,7 +658,7 @@ export type removeMemberResponseError = removeMemberResponseDefault & {
 export type removeMemberResponse = removeMemberResponseSuccess | removeMemberResponseError;
 
 export const getRemoveMemberUrl = (userId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/members/${userId}`;
+  return `https://iam.leaflow.cloud/api/v1/members/${encodeURIComponent(String(userId))}`;
 };
 
 /**
@@ -701,7 +701,7 @@ export type setMemberRolesResponseError = setMemberRolesResponseDefault & {
 export type setMemberRolesResponse = setMemberRolesResponseSuccess | setMemberRolesResponseError;
 
 export const getSetMemberRolesUrl = (userId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/members/${userId}/roles`;
+  return `https://iam.leaflow.cloud/api/v1/members/${encodeURIComponent(String(userId))}/roles`;
 };
 
 /**
@@ -768,7 +768,7 @@ export type setMemberPermissionsResponse =
   | setMemberPermissionsResponseError;
 
 export const getSetMemberPermissionsUrl = (userId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/members/${userId}/permissions`;
+  return `https://iam.leaflow.cloud/api/v1/members/${encodeURIComponent(String(userId))}/permissions`;
 };
 
 /**
@@ -952,7 +952,7 @@ export type getPolicyResponseError = getPolicyResponseDefault & {
 export type getPolicyResponse = getPolicyResponseSuccess | getPolicyResponseError;
 
 export const getGetPolicyUrl = (policyId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/policies/${policyId}`;
+  return `https://iam.leaflow.cloud/api/v1/policies/${encodeURIComponent(String(policyId))}`;
 };
 
 /**
@@ -995,7 +995,7 @@ export type updatePolicyResponseError = updatePolicyResponseDefault & {
 export type updatePolicyResponse = updatePolicyResponseSuccess | updatePolicyResponseError;
 
 export const getUpdatePolicyUrl = (policyId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/policies/${policyId}`;
+  return `https://iam.leaflow.cloud/api/v1/policies/${encodeURIComponent(String(policyId))}`;
 };
 
 /**
@@ -1060,7 +1060,7 @@ export type detachPolicyResponseError = detachPolicyResponseDefault & {
 export type detachPolicyResponse = detachPolicyResponseSuccess | detachPolicyResponseError;
 
 export const getDetachPolicyUrl = (policyId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/policies/${policyId}`;
+  return `https://iam.leaflow.cloud/api/v1/policies/${encodeURIComponent(String(policyId))}`;
 };
 
 /**
@@ -1273,7 +1273,7 @@ export type getRoleResponseError = getRoleResponseDefault & {
 export type getRoleResponse = getRoleResponseSuccess | getRoleResponseError;
 
 export const getGetRoleUrl = (code: string) => {
-  return `https://iam.leaflow.cloud/api/v1/roles/${code}`;
+  return `https://iam.leaflow.cloud/api/v1/roles/${encodeURIComponent(String(code))}`;
 };
 
 /**
@@ -1315,7 +1315,7 @@ export type updateRoleResponseError = updateRoleResponseDefault & {
 export type updateRoleResponse = updateRoleResponseSuccess | updateRoleResponseError;
 
 export const getUpdateRoleUrl = (code: string) => {
-  return `https://iam.leaflow.cloud/api/v1/roles/${code}`;
+  return `https://iam.leaflow.cloud/api/v1/roles/${encodeURIComponent(String(code))}`;
 };
 
 /**
@@ -1380,7 +1380,7 @@ export type deleteRoleResponseError = deleteRoleResponseDefault & {
 export type deleteRoleResponse = deleteRoleResponseSuccess | deleteRoleResponseError;
 
 export const getDeleteRoleUrl = (code: string) => {
-  return `https://iam.leaflow.cloud/api/v1/roles/${code}`;
+  return `https://iam.leaflow.cloud/api/v1/roles/${encodeURIComponent(String(code))}`;
 };
 
 /**
@@ -1542,7 +1542,7 @@ export type getSshKeyResponseError = getSshKeyResponseDefault & {
 export type getSshKeyResponse = getSshKeyResponseSuccess | getSshKeyResponseError;
 
 export const getGetSshKeyUrl = (keyId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/ssh-keys/${keyId}`;
+  return `https://iam.leaflow.cloud/api/v1/ssh-keys/${encodeURIComponent(String(keyId))}`;
 };
 
 /**
@@ -1584,7 +1584,7 @@ export type renameSshKeyResponseError = renameSshKeyResponseDefault & {
 export type renameSshKeyResponse = renameSshKeyResponseSuccess | renameSshKeyResponseError;
 
 export const getRenameSshKeyUrl = (keyId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/ssh-keys/${keyId}`;
+  return `https://iam.leaflow.cloud/api/v1/ssh-keys/${encodeURIComponent(String(keyId))}`;
 };
 
 /**
@@ -1649,7 +1649,7 @@ export type revokeSshKeyResponseError = revokeSshKeyResponseDefault & {
 export type revokeSshKeyResponse = revokeSshKeyResponseSuccess | revokeSshKeyResponseError;
 
 export const getRevokeSshKeyUrl = (keyId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/ssh-keys/${keyId}`;
+  return `https://iam.leaflow.cloud/api/v1/ssh-keys/${encodeURIComponent(String(keyId))}`;
 };
 
 /**

@@ -474,7 +474,7 @@ export type getBackupResponseError = getBackupResponseDefault & {
 export type getBackupResponse = getBackupResponseSuccess | getBackupResponseError;
 
 export const getGetBackupUrl = (backupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/backups/${backupId}`;
+  return `https://compute.leaflow.cloud/api/v1/backups/${encodeURIComponent(String(backupId))}`;
 };
 
 /**
@@ -517,7 +517,7 @@ export type renameBackupResponseError = renameBackupResponseDefault & {
 export type renameBackupResponse = renameBackupResponseSuccess | renameBackupResponseError;
 
 export const getRenameBackupUrl = (backupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/backups/${backupId}`;
+  return `https://compute.leaflow.cloud/api/v1/backups/${encodeURIComponent(String(backupId))}`;
 };
 
 /**
@@ -586,7 +586,7 @@ export type deleteBackupResponseError = (deleteBackupResponse409 | deleteBackupR
 export type deleteBackupResponse = deleteBackupResponseSuccess | deleteBackupResponseError;
 
 export const getDeleteBackupUrl = (backupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/backups/${backupId}`;
+  return `https://compute.leaflow.cloud/api/v1/backups/${encodeURIComponent(String(backupId))}`;
 };
 
 /**
@@ -637,7 +637,7 @@ export type restoreBackupResponseError = (
 export type restoreBackupResponse = restoreBackupResponseSuccess | restoreBackupResponseError;
 
 export const getRestoreBackupUrl = (backupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/backups/${backupId}/restore`;
+  return `https://compute.leaflow.cloud/api/v1/backups/${encodeURIComponent(String(backupId))}/restore`;
 };
 
 /**
@@ -714,7 +714,7 @@ export type createBackupRestoreQuoteResponse =
   | createBackupRestoreQuoteResponseError;
 
 export const getCreateBackupRestoreQuoteUrl = (backupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/backups/${backupId}/restore/quote`;
+  return `https://compute.leaflow.cloud/api/v1/backups/${encodeURIComponent(String(backupId))}/restore/quote`;
 };
 
 /**
@@ -834,7 +834,7 @@ export type getDiskTypeResponseError = getDiskTypeResponseDefault & {
 export type getDiskTypeResponse = getDiskTypeResponseSuccess | getDiskTypeResponseError;
 
 export const getGetDiskTypeUrl = (diskTypeId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disk-types/${diskTypeId}`;
+  return `https://compute.leaflow.cloud/api/v1/disk-types/${encodeURIComponent(String(diskTypeId))}`;
 };
 
 /**
@@ -1094,7 +1094,7 @@ export type getImageResponseError = getImageResponseDefault & {
 export type getImageResponse = getImageResponseSuccess | getImageResponseError;
 
 export const getGetImageUrl = (imageId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/images/${imageId}`;
+  return `https://compute.leaflow.cloud/api/v1/images/${encodeURIComponent(String(imageId))}`;
 };
 
 /**
@@ -1137,7 +1137,7 @@ export type renameImageResponseError = renameImageResponseDefault & {
 export type renameImageResponse = renameImageResponseSuccess | renameImageResponseError;
 
 export const getRenameImageUrl = (imageId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/images/${imageId}`;
+  return `https://compute.leaflow.cloud/api/v1/images/${encodeURIComponent(String(imageId))}`;
 };
 
 /**
@@ -1207,7 +1207,7 @@ export type deleteImageResponseError = (deleteImageResponse409 | deleteImageResp
 export type deleteImageResponse = deleteImageResponseSuccess | deleteImageResponseError;
 
 export const getDeleteImageUrl = (imageId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/images/${imageId}`;
+  return `https://compute.leaflow.cloud/api/v1/images/${encodeURIComponent(String(imageId))}`;
 };
 
 /**
@@ -1383,8 +1383,8 @@ export const getListAvailabilityZonesUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://compute.leaflow.cloud/api/v1/regions/${regionId}/availability-zones?${stringifiedParams}`
-    : `https://compute.leaflow.cloud/api/v1/regions/${regionId}/availability-zones`;
+    ? `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/availability-zones?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/availability-zones`;
 };
 
 /**
@@ -1626,7 +1626,7 @@ export type getDiskResponseError = getDiskResponseDefault & {
 export type getDiskResponse = getDiskResponseSuccess | getDiskResponseError;
 
 export const getGetDiskUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${diskId}`;
+  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}`;
 };
 
 /**
@@ -1669,7 +1669,7 @@ export type renameDiskResponseError = renameDiskResponseDefault & {
 export type renameDiskResponse = renameDiskResponseSuccess | renameDiskResponseError;
 
 export const getRenameDiskUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${diskId}`;
+  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}`;
 };
 
 /**
@@ -1739,7 +1739,7 @@ export type deleteDiskResponseError = (deleteDiskResponse409 | deleteDiskRespons
 export type deleteDiskResponse = deleteDiskResponseSuccess | deleteDiskResponseError;
 
 export const getDeleteDiskUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${diskId}`;
+  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}`;
 };
 
 /**
@@ -1789,7 +1789,7 @@ export type resizeDiskResponseError = (resizeDiskResponse409 | resizeDiskRespons
 export type resizeDiskResponse = resizeDiskResponseSuccess | resizeDiskResponseError;
 
 export const getResizeDiskUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${diskId}/resize`;
+  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}/resize`;
 };
 
 /**
@@ -1870,7 +1870,7 @@ export type createDiskResizeQuoteResponse =
   | createDiskResizeQuoteResponseError;
 
 export const getCreateDiskResizeQuoteUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${diskId}/resize/quote`;
+  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}/resize/quote`;
 };
 
 /**
@@ -1940,7 +1940,7 @@ export type revertDiskResponseError = (revertDiskResponse409 | revertDiskRespons
 export type revertDiskResponse = revertDiskResponseSuccess | revertDiskResponseError;
 
 export const getRevertDiskUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${diskId}/revert`;
+  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}/revert`;
 };
 
 /**
@@ -2217,7 +2217,7 @@ export type getFloatingIpResponseError = getFloatingIpResponseDefault & {
 export type getFloatingIpResponse = getFloatingIpResponseSuccess | getFloatingIpResponseError;
 
 export const getGetFloatingIpUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${floatingIpId}`;
+  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}`;
 };
 
 /**
@@ -2269,7 +2269,7 @@ export type releaseFloatingIpResponse =
   | releaseFloatingIpResponseError;
 
 export const getReleaseFloatingIpUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${floatingIpId}`;
+  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}`;
 };
 
 /**
@@ -2324,7 +2324,7 @@ export type setFloatingIpBandwidthResponse =
   | setFloatingIpBandwidthResponseError;
 
 export const getSetFloatingIpBandwidthUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${floatingIpId}/bandwidth`;
+  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}/bandwidth`;
 };
 
 /**
@@ -2402,7 +2402,7 @@ export type createFloatingIpBandwidthQuoteResponse =
   | createFloatingIpBandwidthQuoteResponseError;
 
 export const getCreateFloatingIpBandwidthQuoteUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${floatingIpId}/bandwidth/quote`;
+  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}/bandwidth/quote`;
 };
 
 /**
@@ -2479,7 +2479,7 @@ export type bindFloatingIpResponseError = (
 export type bindFloatingIpResponse = bindFloatingIpResponseSuccess | bindFloatingIpResponseError;
 
 export const getBindFloatingIpUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${floatingIpId}/binding`;
+  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}/binding`;
 };
 
 /**
@@ -2554,7 +2554,7 @@ export type unbindFloatingIpResponse =
   | unbindFloatingIpResponseError;
 
 export const getUnbindFloatingIpUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${floatingIpId}/binding`;
+  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}/binding`;
 };
 
 /**
@@ -2806,7 +2806,7 @@ export type getInstanceResponseError = getInstanceResponseDefault & {
 export type getInstanceResponse = getInstanceResponseSuccess | getInstanceResponseError;
 
 export const getGetInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}`;
 };
 
 /**
@@ -2849,7 +2849,7 @@ export type renameInstanceResponseError = renameInstanceResponseDefault & {
 export type renameInstanceResponse = renameInstanceResponseSuccess | renameInstanceResponseError;
 
 export const getRenameInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}`;
 };
 
 /**
@@ -2922,7 +2922,7 @@ export type deleteInstanceResponseError = (
 export type deleteInstanceResponse = deleteInstanceResponseSuccess | deleteInstanceResponseError;
 
 export const getDeleteInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}`;
 };
 
 /**
@@ -2971,7 +2971,7 @@ export type runInstanceCommandResponse =
   | runInstanceCommandResponseError;
 
 export const getRunInstanceCommandUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/commands`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/commands`;
 };
 
 /**
@@ -3054,7 +3054,7 @@ export type openInstanceConsoleResponse =
   | openInstanceConsoleResponseError;
 
 export const getOpenInstanceConsoleUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/console`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/console`;
 };
 
 /**
@@ -3115,8 +3115,8 @@ export const getGetInstanceConsoleOutputUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/console-output?${stringifiedParams}`
-    : `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/console-output`;
+    ? `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/console-output?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/console-output`;
 };
 
 /**
@@ -3164,7 +3164,7 @@ export type setInstanceLabelsResponse =
   | setInstanceLabelsResponseError;
 
 export const getSetInstanceLabelsUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/labels`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/labels`;
 };
 
 /**
@@ -3235,7 +3235,7 @@ export type setInstanceNotesResponse =
   | setInstanceNotesResponseError;
 
 export const getSetInstanceNotesUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/notes`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/notes`;
 };
 
 /**
@@ -3314,7 +3314,7 @@ export type resetInstancePasswordResponse =
   | resetInstancePasswordResponseError;
 
 export const getResetInstancePasswordUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/password`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/password`;
 };
 
 /**
@@ -3391,7 +3391,7 @@ export type rebootInstanceResponseError = (
 export type rebootInstanceResponse = rebootInstanceResponseSuccess | rebootInstanceResponseError;
 
 export const getRebootInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/reboot`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/reboot`;
 };
 
 /**
@@ -3472,7 +3472,7 @@ export type rebuildInstanceResponseError = (
 export type rebuildInstanceResponse = rebuildInstanceResponseSuccess | rebuildInstanceResponseError;
 
 export const getRebuildInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/rebuild`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/rebuild`;
 };
 
 /**
@@ -3549,7 +3549,7 @@ export type resizeInstanceResponseError = (
 export type resizeInstanceResponse = resizeInstanceResponseSuccess | resizeInstanceResponseError;
 
 export const getResizeInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/resize`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/resize`;
 };
 
 /**
@@ -3626,7 +3626,7 @@ export type createInstanceResizeQuoteResponse =
   | createInstanceResizeQuoteResponseError;
 
 export const getCreateInstanceResizeQuoteUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/resize/quote`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/resize/quote`;
 };
 
 /**
@@ -3699,7 +3699,7 @@ export type startInstanceResponseError = (
 export type startInstanceResponse = startInstanceResponseSuccess | startInstanceResponseError;
 
 export const getStartInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/start`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/start`;
 };
 
 /**
@@ -3769,7 +3769,7 @@ export type stopInstanceResponseError = (stopInstanceResponse409 | stopInstanceR
 export type stopInstanceResponse = stopInstanceResponseSuccess | stopInstanceResponseError;
 
 export const getStopInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/stop`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/stop`;
 };
 
 /**
@@ -3847,8 +3847,8 @@ export const getListInstanceDisksUrl = (instanceId: string, params?: ListInstanc
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/disks?${stringifiedParams}`
-    : `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/disks`;
+    ? `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/disks?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/disks`;
 };
 
 /**
@@ -3896,7 +3896,7 @@ export type attachDiskResponseError = (attachDiskResponse409 | attachDiskRespons
 export type attachDiskResponse = attachDiskResponseSuccess | attachDiskResponseError;
 
 export const getAttachDiskUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/disks`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/disks`;
 };
 
 /**
@@ -3966,7 +3966,7 @@ export type detachDiskResponseError = (detachDiskResponse409 | detachDiskRespons
 export type detachDiskResponse = detachDiskResponseSuccess | detachDiskResponseError;
 
 export const getDetachDiskUrl = (instanceId: string, diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/disks/${diskId}`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/disks/${encodeURIComponent(String(diskId))}`;
 };
 
 /**
@@ -4024,7 +4024,7 @@ export type attachInstanceFloatingIpResponse =
   | attachInstanceFloatingIpResponseError;
 
 export const getAttachInstanceFloatingIpUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/floating-ips`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/floating-ips`;
 };
 
 /**
@@ -4099,7 +4099,7 @@ export type detachInstanceFloatingIpResponse =
   | detachInstanceFloatingIpResponseError;
 
 export const getDetachInstanceFloatingIpUrl = (instanceId: string, floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/floating-ips/${floatingIpId}`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/floating-ips/${encodeURIComponent(String(floatingIpId))}`;
 };
 
 /**
@@ -4156,8 +4156,8 @@ export const getListInstancePortsUrl = (instanceId: string, params?: ListInstanc
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/ports?${stringifiedParams}`
-    : `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/ports`;
+    ? `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/ports?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/ports`;
 };
 
 /**
@@ -4205,7 +4205,7 @@ export type attachPortResponseError = (attachPortResponse409 | attachPortRespons
 export type attachPortResponse = attachPortResponseSuccess | attachPortResponseError;
 
 export const getAttachPortUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/ports`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/ports`;
 };
 
 /**
@@ -4275,7 +4275,7 @@ export type detachPortResponseError = (detachPortResponse409 | detachPortRespons
 export type detachPortResponse = detachPortResponseSuccess | detachPortResponseError;
 
 export const getDetachPortUrl = (instanceId: string, portId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${instanceId}/ports/${portId}`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/ports/${encodeURIComponent(String(portId))}`;
 };
 
 /**
@@ -4505,7 +4505,7 @@ export type deletePortResponseError = (deletePortResponse409 | deletePortRespons
 export type deletePortResponse = deletePortResponseSuccess | deletePortResponseError;
 
 export const getDeletePortUrl = (portId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/ports/${portId}`;
+  return `https://compute.leaflow.cloud/api/v1/ports/${encodeURIComponent(String(portId))}`;
 };
 
 /**
@@ -4672,7 +4672,7 @@ export type getPrivateNetworkResponse =
   | getPrivateNetworkResponseError;
 
 export const getGetPrivateNetworkUrl = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}`;
 };
 
 /**
@@ -4716,7 +4716,7 @@ export type renamePrivateNetworkResponse =
   | renamePrivateNetworkResponseError;
 
 export const getRenamePrivateNetworkUrl = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}`;
 };
 
 /**
@@ -4791,7 +4791,7 @@ export type deletePrivateNetworkResponse =
   | deletePrivateNetworkResponseError;
 
 export const getDeletePrivateNetworkUrl = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}`;
 };
 
 /**
@@ -4836,7 +4836,7 @@ export type getPrivateNetworkIpv6Response =
   | getPrivateNetworkIpv6ResponseError;
 
 export const getGetPrivateNetworkIpv6Url = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/ipv6`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/ipv6`;
 };
 
 /**
@@ -4888,7 +4888,7 @@ export type enablePrivateNetworkIpv6Response =
   | enablePrivateNetworkIpv6ResponseError;
 
 export const getEnablePrivateNetworkIpv6Url = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/ipv6`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/ipv6`;
 };
 
 /**
@@ -4943,7 +4943,7 @@ export type disablePrivateNetworkIpv6Response =
   | disablePrivateNetworkIpv6ResponseError;
 
 export const getDisablePrivateNetworkIpv6Url = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/ipv6`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/ipv6`;
 };
 
 /**
@@ -4997,8 +4997,8 @@ export const getListRoutesUrl = (privateNetworkId: string, params?: ListRoutesPa
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/routes?${stringifiedParams}`
-    : `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/routes`;
+    ? `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/routes?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/routes`;
 };
 
 /**
@@ -5041,7 +5041,7 @@ export type createRouteResponseError = createRouteResponseDefault & {
 export type createRouteResponse = createRouteResponseSuccess | createRouteResponseError;
 
 export const getCreateRouteUrl = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/routes`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/routes`;
 };
 
 /**
@@ -5106,7 +5106,7 @@ export type deleteRouteResponseError = deleteRouteResponseDefault & {
 export type deleteRouteResponse = deleteRouteResponseSuccess | deleteRouteResponseError;
 
 export const getDeleteRouteUrl = (privateNetworkId: string, routeId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/routes/${routeId}`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/routes/${encodeURIComponent(String(routeId))}`;
 };
 
 /**
@@ -5160,8 +5160,8 @@ export const getListSubnetsUrl = (privateNetworkId: string, params?: ListSubnets
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/subnets?${stringifiedParams}`
-    : `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/subnets`;
+    ? `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/subnets?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/subnets`;
 };
 
 /**
@@ -5205,7 +5205,7 @@ export type createSubnetResponseError = createSubnetResponseDefault & {
 export type createSubnetResponse = createSubnetResponseSuccess | createSubnetResponseError;
 
 export const getCreateSubnetUrl = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/subnets`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/subnets`;
 };
 
 /**
@@ -5285,8 +5285,8 @@ export const getSuggestSubnetCidrUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/subnets/next-free-cidr?${stringifiedParams}`
-    : `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/subnets/next-free-cidr`;
+    ? `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/subnets/next-free-cidr?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/subnets/next-free-cidr`;
 };
 
 /**
@@ -5330,7 +5330,7 @@ export type deleteSubnetResponseError = deleteSubnetResponseDefault & {
 export type deleteSubnetResponse = deleteSubnetResponseSuccess | deleteSubnetResponseError;
 
 export const getDeleteSubnetUrl = (privateNetworkId: string, subnetId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${privateNetworkId}/subnets/${subnetId}`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/subnets/${encodeURIComponent(String(subnetId))}`;
 };
 
 /**
@@ -5498,7 +5498,7 @@ export type getSecurityGroupResponse =
   | getSecurityGroupResponseError;
 
 export const getGetSecurityGroupUrl = (securityGroupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/security-groups/${securityGroupId}`;
+  return `https://compute.leaflow.cloud/api/v1/security-groups/${encodeURIComponent(String(securityGroupId))}`;
 };
 
 /**
@@ -5542,7 +5542,7 @@ export type renameSecurityGroupResponse =
   | renameSecurityGroupResponseError;
 
 export const getRenameSecurityGroupUrl = (securityGroupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/security-groups/${securityGroupId}`;
+  return `https://compute.leaflow.cloud/api/v1/security-groups/${encodeURIComponent(String(securityGroupId))}`;
 };
 
 /**
@@ -5609,7 +5609,7 @@ export type deleteSecurityGroupResponse =
   | deleteSecurityGroupResponseError;
 
 export const getDeleteSecurityGroupUrl = (securityGroupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/security-groups/${securityGroupId}`;
+  return `https://compute.leaflow.cloud/api/v1/security-groups/${encodeURIComponent(String(securityGroupId))}`;
 };
 
 /**
@@ -5668,8 +5668,8 @@ export const getListSecurityGroupRulesUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://compute.leaflow.cloud/api/v1/security-groups/${securityGroupId}/rules?${stringifiedParams}`
-    : `https://compute.leaflow.cloud/api/v1/security-groups/${securityGroupId}/rules`;
+    ? `https://compute.leaflow.cloud/api/v1/security-groups/${encodeURIComponent(String(securityGroupId))}/rules?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/security-groups/${encodeURIComponent(String(securityGroupId))}/rules`;
 };
 
 /**
@@ -5714,7 +5714,7 @@ export type createSecurityGroupRuleResponse =
   | createSecurityGroupRuleResponseError;
 
 export const getCreateSecurityGroupRuleUrl = (securityGroupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/security-groups/${securityGroupId}/rules`;
+  return `https://compute.leaflow.cloud/api/v1/security-groups/${encodeURIComponent(String(securityGroupId))}/rules`;
 };
 
 /**
@@ -5781,7 +5781,7 @@ export type deleteSecurityGroupRuleResponse =
   | deleteSecurityGroupRuleResponseError;
 
 export const getDeleteSecurityGroupRuleUrl = (securityGroupId: string, ruleId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/security-groups/${securityGroupId}/rules/${ruleId}`;
+  return `https://compute.leaflow.cloud/api/v1/security-groups/${encodeURIComponent(String(securityGroupId))}/rules/${encodeURIComponent(String(ruleId))}`;
 };
 
 /**
@@ -5826,7 +5826,7 @@ export type getSnapshotQuotaResponse =
   | getSnapshotQuotaResponseError;
 
 export const getGetSnapshotQuotaUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${regionId}/snapshot-quota`;
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/snapshot-quota`;
 };
 
 /**
@@ -5890,7 +5890,7 @@ export type setSnapshotQuotaResponse =
   | setSnapshotQuotaResponseError;
 
 export const getSetSnapshotQuotaUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${regionId}/snapshot-quota`;
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/snapshot-quota`;
 };
 
 /**
@@ -5979,7 +5979,7 @@ export type createSnapshotQuotaQuoteResponse =
   | createSnapshotQuotaQuoteResponseError;
 
 export const getCreateSnapshotQuotaQuoteUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${regionId}/snapshot-quota/quote`;
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/snapshot-quota/quote`;
 };
 
 /**
@@ -6046,7 +6046,7 @@ export type getBackupServiceResponse =
   | getBackupServiceResponseError;
 
 export const getGetBackupServiceUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${regionId}/backup-service`;
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-service`;
 };
 
 /**
@@ -6101,7 +6101,7 @@ export type createBackupServiceResponse =
   | createBackupServiceResponseError;
 
 export const getCreateBackupServiceUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${regionId}/backup-service`;
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-service`;
 };
 
 /**
@@ -6178,7 +6178,7 @@ export type createBackupServiceQuoteResponse =
   | createBackupServiceQuoteResponseError;
 
 export const getCreateBackupServiceQuoteUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${regionId}/backup-service/quote`;
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-service/quote`;
 };
 
 /**
@@ -6237,8 +6237,8 @@ export const getListBackupCapacityPacksUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://compute.leaflow.cloud/api/v1/regions/${regionId}/backup-capacity-packs?${stringifiedParams}`
-    : `https://compute.leaflow.cloud/api/v1/regions/${regionId}/backup-capacity-packs`;
+    ? `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-capacity-packs?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-capacity-packs`;
 };
 
 /**
@@ -6292,7 +6292,7 @@ export type createBackupCapacityPackResponse =
   | createBackupCapacityPackResponseError;
 
 export const getCreateBackupCapacityPackUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${regionId}/backup-capacity-packs`;
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-capacity-packs`;
 };
 
 /**
@@ -6370,7 +6370,7 @@ export type createBackupCapacityPackQuoteResponse =
   | createBackupCapacityPackQuoteResponseError;
 
 export const getCreateBackupCapacityPackQuoteUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${regionId}/backup-capacity-packs/quote`;
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-capacity-packs/quote`;
 };
 
 /**
@@ -6563,7 +6563,7 @@ export type getSnapshotResponseError = getSnapshotResponseDefault & {
 export type getSnapshotResponse = getSnapshotResponseSuccess | getSnapshotResponseError;
 
 export const getGetSnapshotUrl = (snapshotId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/snapshots/${snapshotId}`;
+  return `https://compute.leaflow.cloud/api/v1/snapshots/${encodeURIComponent(String(snapshotId))}`;
 };
 
 /**
@@ -6605,7 +6605,7 @@ export type renameSnapshotResponseError = renameSnapshotResponseDefault & {
 export type renameSnapshotResponse = renameSnapshotResponseSuccess | renameSnapshotResponseError;
 
 export const getRenameSnapshotUrl = (snapshotId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/snapshots/${snapshotId}`;
+  return `https://compute.leaflow.cloud/api/v1/snapshots/${encodeURIComponent(String(snapshotId))}`;
 };
 
 /**
@@ -6677,7 +6677,7 @@ export type deleteSnapshotResponseError = (
 export type deleteSnapshotResponse = deleteSnapshotResponseSuccess | deleteSnapshotResponseError;
 
 export const getDeleteSnapshotUrl = (snapshotId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/snapshots/${snapshotId}`;
+  return `https://compute.leaflow.cloud/api/v1/snapshots/${encodeURIComponent(String(snapshotId))}`;
 };
 
 /**
@@ -6893,7 +6893,7 @@ export type getPeeringResponseError = getPeeringResponseDefault & {
 export type getPeeringResponse = getPeeringResponseSuccess | getPeeringResponseError;
 
 export const getGetPeeringUrl = (peeringId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/peerings/${peeringId}`;
+  return `https://compute.leaflow.cloud/api/v1/peerings/${encodeURIComponent(String(peeringId))}`;
 };
 
 /**
@@ -6943,7 +6943,7 @@ export type deletePeeringResponseError = (
 export type deletePeeringResponse = deletePeeringResponseSuccess | deletePeeringResponseError;
 
 export const getDeletePeeringUrl = (peeringId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/peerings/${peeringId}`;
+  return `https://compute.leaflow.cloud/api/v1/peerings/${encodeURIComponent(String(peeringId))}`;
 };
 
 /**
@@ -6993,7 +6993,7 @@ export type acceptPeeringResponseError = (
 export type acceptPeeringResponse = acceptPeeringResponseSuccess | acceptPeeringResponseError;
 
 export const getAcceptPeeringUrl = (peeringId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/peerings/${peeringId}/accept`;
+  return `https://compute.leaflow.cloud/api/v1/peerings/${encodeURIComponent(String(peeringId))}/accept`;
 };
 
 /**
@@ -7035,7 +7035,7 @@ export type rejectPeeringResponseError = rejectPeeringResponseDefault & {
 export type rejectPeeringResponse = rejectPeeringResponseSuccess | rejectPeeringResponseError;
 
 export const getRejectPeeringUrl = (peeringId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/peerings/${peeringId}/reject`;
+  return `https://compute.leaflow.cloud/api/v1/peerings/${encodeURIComponent(String(peeringId))}/reject`;
 };
 
 /**

@@ -837,7 +837,7 @@ export type acceptInvitationResponse =
   | acceptInvitationResponseError;
 
 export const getAcceptInvitationUrl = (invitationId: string) => {
-  return `https://account.leaflow.cloud/account/v1/me/invitations/${invitationId}/accept`;
+  return `https://account.leaflow.cloud/account/v1/me/invitations/${encodeURIComponent(String(invitationId))}/accept`;
 };
 
 /**
@@ -1001,7 +1001,7 @@ export type createScopedTokenResponse =
   | createScopedTokenResponseError;
 
 export const getCreateScopedTokenUrl = (projectId: string) => {
-  return `https://account.leaflow.cloud/account/v1/projects/${projectId}/scoped-tokens`;
+  return `https://account.leaflow.cloud/account/v1/projects/${encodeURIComponent(String(projectId))}/scoped-tokens`;
 };
 
 /**

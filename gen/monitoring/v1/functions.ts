@@ -261,7 +261,7 @@ export type getIncidentResponseError = getIncidentResponseDefault & {
 export type getIncidentResponse = getIncidentResponseSuccess | getIncidentResponseError;
 
 export const getGetIncidentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${incidentId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}`;
 };
 
 /**
@@ -305,7 +305,7 @@ export type acknowledgeIncidentResponse =
   | acknowledgeIncidentResponseError;
 
 export const getAcknowledgeIncidentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${incidentId}/acknowledge`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/acknowledge`;
 };
 
 /**
@@ -370,7 +370,7 @@ export type assignIncidentResponseError = assignIncidentResponseDefault & {
 export type assignIncidentResponse = assignIncidentResponseSuccess | assignIncidentResponseError;
 
 export const getAssignIncidentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${incidentId}/assignee`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/assignee`;
 };
 
 /**
@@ -437,7 +437,7 @@ export type closeIncidentResponseError = closeIncidentResponseDefault & {
 export type closeIncidentResponse = closeIncidentResponseSuccess | closeIncidentResponseError;
 
 export const getCloseIncidentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${incidentId}/close`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/close`;
 };
 
 /**
@@ -504,7 +504,7 @@ export type addIncidentCommentResponse =
   | addIncidentCommentResponseError;
 
 export const getAddIncidentCommentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${incidentId}/comments`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/comments`;
 };
 
 /**
@@ -570,7 +570,7 @@ export type setIncidentFollowingResponse =
   | setIncidentFollowingResponseError;
 
 export const getSetIncidentFollowingUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${incidentId}/following`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/following`;
 };
 
 /**
@@ -635,7 +635,7 @@ export type reopenIncidentResponseError = reopenIncidentResponseDefault & {
 export type reopenIncidentResponse = reopenIncidentResponseSuccess | reopenIncidentResponseError;
 
 export const getReopenIncidentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${incidentId}/reopen`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/reopen`;
 };
 
 /**
@@ -693,8 +693,8 @@ export const getListIncidentTimelineUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://monitoring.leaflow.cloud/api/v1/incidents/${incidentId}/timeline?${stringifiedParams}`
-    : `https://monitoring.leaflow.cloud/api/v1/incidents/${incidentId}/timeline`;
+    ? `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/timeline?${stringifiedParams}`
+    : `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/timeline`;
 };
 
 /**
@@ -783,7 +783,7 @@ export type getMaintenanceWindowResponse =
   | getMaintenanceWindowResponseError;
 
 export const getGetMaintenanceWindowUrl = (windowId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/maintenance-windows/${windowId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/maintenance-windows/${encodeURIComponent(String(windowId))}`;
 };
 
 /**
@@ -827,7 +827,7 @@ export type putMaintenanceWindowResponse =
   | putMaintenanceWindowResponseError;
 
 export const getPutMaintenanceWindowUrl = (windowId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/maintenance-windows/${windowId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/maintenance-windows/${encodeURIComponent(String(windowId))}`;
 };
 
 /**
@@ -896,7 +896,7 @@ export type deleteMaintenanceWindowResponse =
   | deleteMaintenanceWindowResponseError;
 
 export const getDeleteMaintenanceWindowUrl = (windowId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/maintenance-windows/${windowId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/maintenance-windows/${encodeURIComponent(String(windowId))}`;
 };
 
 /**
@@ -994,8 +994,8 @@ export const getListServerItemsUrl = (serverId: string, params?: ListServerItems
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/items?${stringifiedParams}`
-    : `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/items`;
+    ? `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/items?${stringifiedParams}`
+    : `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/items`;
 };
 
 /**
@@ -1050,8 +1050,8 @@ export const getGetServerMetricUrl = (serverId: string, params?: GetServerMetric
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/metrics?${stringifiedParams}`
-    : `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/metrics`;
+    ? `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/metrics?${stringifiedParams}`
+    : `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/metrics`;
 };
 
 /**
@@ -1097,7 +1097,7 @@ export type getServerResourcesResponse =
   | getServerResourcesResponseError;
 
 export const getGetServerResourcesUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/resources`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/resources`;
 };
 
 /**
@@ -1141,7 +1141,7 @@ export type getServerSnapshotResponse =
   | getServerSnapshotResponseError;
 
 export const getGetServerSnapshotUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/snapshot`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/snapshot`;
 };
 
 /**
@@ -1335,7 +1335,7 @@ export type getServerResponseError = getServerResponseDefault & {
 export type getServerResponse = getServerResponseSuccess | getServerResponseError;
 
 export const getGetServerUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}`;
 };
 
 /**
@@ -1379,7 +1379,7 @@ export type enableServerMonitoringResponse =
   | enableServerMonitoringResponseError;
 
 export const getEnableServerMonitoringUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}`;
 };
 
 /**
@@ -1452,7 +1452,7 @@ export type updateServerResponseError = updateServerResponseDefault & {
 export type updateServerResponse = updateServerResponseSuccess | updateServerResponseError;
 
 export const getUpdateServerUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}`;
 };
 
 /**
@@ -1517,7 +1517,7 @@ export type deleteServerResponseError = deleteServerResponseDefault & {
 export type deleteServerResponse = deleteServerResponseSuccess | deleteServerResponseError;
 
 export const getDeleteServerUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}`;
 };
 
 /**
@@ -1562,7 +1562,7 @@ export type disableServerMonitoringResponse =
   | disableServerMonitoringResponseError;
 
 export const getDisableServerMonitoringUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/disable`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/disable`;
 };
 
 /**
@@ -1605,7 +1605,7 @@ export type rotateAgentPskResponseError = rotateAgentPskResponseDefault & {
 export type rotateAgentPskResponse = rotateAgentPskResponseSuccess | rotateAgentPskResponseError;
 
 export const getRotateAgentPskUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/psk`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/psk`;
 };
 
 /**
@@ -1648,7 +1648,7 @@ export type getWebCheckResponseError = getWebCheckResponseDefault & {
 export type getWebCheckResponse = getWebCheckResponseSuccess | getWebCheckResponseError;
 
 export const getGetWebCheckUrl = (serverId: string, checkId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/web-checks/${checkId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/web-checks/${encodeURIComponent(String(checkId))}`;
 };
 
 /**
@@ -1691,7 +1691,7 @@ export type putWebCheckResponseError = putWebCheckResponseDefault & {
 export type putWebCheckResponse = putWebCheckResponseSuccess | putWebCheckResponseError;
 
 export const getPutWebCheckUrl = (serverId: string, checkId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/web-checks/${checkId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/web-checks/${encodeURIComponent(String(checkId))}`;
 };
 
 /**
@@ -1757,7 +1757,7 @@ export type deleteWebCheckResponseError = deleteWebCheckResponseDefault & {
 export type deleteWebCheckResponse = deleteWebCheckResponseSuccess | deleteWebCheckResponseError;
 
 export const getDeleteWebCheckUrl = (serverId: string, checkId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${serverId}/web-checks/${checkId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/web-checks/${encodeURIComponent(String(checkId))}`;
 };
 
 /**
@@ -2397,7 +2397,7 @@ export type updateStatusPageGroupResponse =
   | updateStatusPageGroupResponseError;
 
 export const getUpdateStatusPageGroupUrl = (groupId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/groups/${groupId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/groups/${encodeURIComponent(String(groupId))}`;
 };
 
 /**
@@ -2463,7 +2463,7 @@ export type deleteStatusPageGroupResponse =
   | deleteStatusPageGroupResponseError;
 
 export const getDeleteStatusPageGroupUrl = (groupId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/groups/${groupId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/groups/${encodeURIComponent(String(groupId))}`;
 };
 
 /**
@@ -2508,7 +2508,7 @@ export type putStatusPageGroupOrderResponse =
   | putStatusPageGroupOrderResponseError;
 
 export const getPutStatusPageGroupOrderUrl = (groupId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/groups/${groupId}/order`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/groups/${encodeURIComponent(String(groupId))}/order`;
 };
 
 /**
@@ -2686,7 +2686,7 @@ export type getStatusPageComponentResponse =
   | getStatusPageComponentResponseError;
 
 export const getGetStatusPageComponentUrl = (componentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${componentId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${encodeURIComponent(String(componentId))}`;
 };
 
 /**
@@ -2730,7 +2730,7 @@ export type updateStatusPageComponentResponse =
   | updateStatusPageComponentResponseError;
 
 export const getUpdateStatusPageComponentUrl = (componentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${componentId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${encodeURIComponent(String(componentId))}`;
 };
 
 /**
@@ -2797,7 +2797,7 @@ export type deleteStatusPageComponentResponse =
   | deleteStatusPageComponentResponseError;
 
 export const getDeleteStatusPageComponentUrl = (componentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${componentId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${encodeURIComponent(String(componentId))}`;
 };
 
 /**
@@ -2844,7 +2844,7 @@ export type listStatusPageComponentSourcesResponse =
   | listStatusPageComponentSourcesResponseError;
 
 export const getListStatusPageComponentSourcesUrl = (componentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${componentId}/sources`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${encodeURIComponent(String(componentId))}/sources`;
 };
 
 /**
@@ -2895,7 +2895,7 @@ export type putStatusPageComponentSourcesResponse =
   | putStatusPageComponentSourcesResponseError;
 
 export const getPutStatusPageComponentSourcesUrl = (componentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${componentId}/sources`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/components/${encodeURIComponent(String(componentId))}/sources`;
 };
 
 /**
@@ -3097,7 +3097,7 @@ export type getStatusPageIncidentResponse =
   | getStatusPageIncidentResponseError;
 
 export const getGetStatusPageIncidentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/incidents/${incidentId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/incidents/${encodeURIComponent(String(incidentId))}`;
 };
 
 /**
@@ -3143,7 +3143,7 @@ export type postStatusPageIncidentUpdateResponse =
   | postStatusPageIncidentUpdateResponseError;
 
 export const getPostStatusPageIncidentUpdateUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/incidents/${incidentId}/updates`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/incidents/${encodeURIComponent(String(incidentId))}/updates`;
 };
 
 /**
@@ -3342,7 +3342,7 @@ export type getStatusPageMaintenanceResponse =
   | getStatusPageMaintenanceResponseError;
 
 export const getGetStatusPageMaintenanceUrl = (maintenanceId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${maintenanceId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${encodeURIComponent(String(maintenanceId))}`;
 };
 
 /**
@@ -3387,7 +3387,7 @@ export type cancelStatusPageMaintenanceResponse =
   | cancelStatusPageMaintenanceResponseError;
 
 export const getCancelStatusPageMaintenanceUrl = (maintenanceId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${maintenanceId}/cancel`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${encodeURIComponent(String(maintenanceId))}/cancel`;
 };
 
 /**
@@ -3434,7 +3434,7 @@ export type completeStatusPageMaintenanceResponse =
   | completeStatusPageMaintenanceResponseError;
 
 export const getCompleteStatusPageMaintenanceUrl = (maintenanceId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${maintenanceId}/complete`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${encodeURIComponent(String(maintenanceId))}/complete`;
 };
 
 /**
@@ -3483,7 +3483,7 @@ export type getProjectWebCheckResponse =
   | getProjectWebCheckResponseError;
 
 export const getGetProjectWebCheckUrl = (checkId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/web-checks/${checkId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/web-checks/${encodeURIComponent(String(checkId))}`;
 };
 
 /**
@@ -3527,7 +3527,7 @@ export type putProjectWebCheckResponse =
   | putProjectWebCheckResponseError;
 
 export const getPutProjectWebCheckUrl = (checkId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/web-checks/${checkId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/web-checks/${encodeURIComponent(String(checkId))}`;
 };
 
 /**
@@ -3598,7 +3598,7 @@ export type deleteProjectWebCheckResponse =
   | deleteProjectWebCheckResponseError;
 
 export const getDeleteProjectWebCheckUrl = (checkId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/web-checks/${checkId}`;
+  return `https://monitoring.leaflow.cloud/api/v1/web-checks/${encodeURIComponent(String(checkId))}`;
 };
 
 /**

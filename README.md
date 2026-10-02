@@ -49,16 +49,30 @@ npm run build
 All DTOs, functions and Zod schemas are Orval output. `scripts/generate.mjs` only discovers inputs,
 invokes the official tool, builds normal package barrels and records routing/authentication facts.
 `output.tsconfig` uses the actual NodeNext configuration; `indexFiles:false` makes native imports
-explicit `.js` files rather than invalid directory imports. No generated imports are rewritten.
+explicit `.js` files rather than invalid directory imports. No generated imports are rewritten. Official `urlEncodeParameters:true` protects native path helpers
+for string keys containing `/`, `#`, spaces or `%`; no URL helper is hand-edited.
 
 `CONTRACTS_REF` currently names a **local unpublished contract candidate**. The local generation is
 an exercise; after review the parent must first publish contracts, set the published remote SHA and
 regenerate using the default remote path. Package version stays `0.0.0`; existing CI injects snapshot
 or tag versions. This candidate is not a published SDK release.
 
-See `evidence/orval/` for input manifests, checks, native signatures and schema limitations. The generic
-pre-send fixture's four failures are retained. The actual 314 closed-object schemas, disjoint BootDisk
-union and corrected int32 bounds are tested separately. Seven known-property request schemas omit
-additionalProperties and need strict-policy review; this candidate must not be presented as a complete
-universal JSON Schema validator. Frontend/BFF call sites and service authorization remain owned by
-their respective agents and are not modified here.
+See `evidence/orval/READINESS.md` for the fixed final contract SHA, package checksums, checks and
+native signatures. Generic pre-send fixture failures and earlier 59/0e results remain separate evidence.
+The actual 314 closed-object components, disjoint BootDisk, corrected int32 bounds and final checkout
+zero-HTTP rejections are checked; this does not establish every full request or frontend call site.
+
+**Release gate: native open-object semantics remain unresolved.** Seven known-property request
+components allow extensions because additionalProperties is omitted. Native global strict rejects
+those legal extensions. Independent copies using `additionalProperties:true` or `{}` behave the same;
+no product contract was narrowed. Exact refs and affected operations are in
+`evidence/orval/open-unspecified-review.json` and the public candidate's
+`fixtures/orval-open-properties/`. Final financial source also adds four object constraint branches;
+actual full coupon requests pass native Zod intersection tests, so a branch inventory alone is not a
+composition failure. Einstein owns further native-configuration/source-equivalence review.
+
+The native Zod target does not emit a request body schema for the octet-stream Blob upload.
+Source contracts also do not encode every BillingChoice business condition. These are explicit
+coverage limits, not proof of complete request validation. Frontend/BFF call-site wiring, authentication
+and release approval remain with their owners. Do not publish this candidate before the open-object
+release gate is resolved.

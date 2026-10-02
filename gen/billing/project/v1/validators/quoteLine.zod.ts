@@ -12,6 +12,10 @@ export const quoteLinePriceLookupKeyMax = 128;
 
 export const quoteLinePlanLookupKeyMax = 128;
 
+export const quoteLineQuantityRegExp = new RegExp(
+  "^(?:(?:[1-9][0-9]{0,27}|0(?:[1-9][0-9]{0,26}|0(?:[1-9][0-9]{0,25}|0(?:[1-9][0-9]{0,24}|0(?:[1-9][0-9]{0,23}|0(?:[1-9][0-9]{0,22}|0(?:[1-9][0-9]{0,21}|0(?:[1-9][0-9]{0,20}|0(?:[1-9][0-9]{0,19}|0(?:[1-9][0-9]{0,18}|0(?:[1-9][0-9]{0,17}|0(?:[1-9][0-9]{0,16}|0(?:[1-9][0-9]{0,15}|0(?:[1-9][0-9]{0,14}|0(?:[1-9][0-9]{0,13}|0(?:[1-9][0-9]{0,12}|0(?:[1-9][0-9]{0,11}|0(?:[1-9][0-9]{0,10}|0(?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9])))))))))))))))))))))))))))([.][0-9]{1,10})?|0{1,28}[.](?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))$",
+);
+
 export const QuoteLine = zod
   .strictObject({
     price_lookup_key: zod.string().min(1).max(quoteLinePriceLookupKeyMax).optional(),
@@ -25,7 +29,7 @@ export const QuoteLine = zod
       .describe("Narrows the selection when a plan offers more than one billing type."),
     interval: zod.enum(["none", "day", "month", "year"]).optional(),
     interval_count: zod.int().min(1).optional(),
-    quantity: zod.string(),
+    quantity: zod.string().regex(quoteLineQuantityRegExp),
   })
   .describe(
     "Identify a price directly, or select a price for a plan. For each resource give its ID or lookup key, never both. Lookup keys require product_id.\n\nCharges for future usage are not estimated here; the service that sells the product quotes\nthem with its purchase.",

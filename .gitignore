@@ -1,4 +1,7 @@
 node_modules/
+fixtures/orval-open-properties/inputs/
+fixtures/orval-open-properties/gen/
+fixtures/orval-open-properties/compiled/
 dist/
 leaflowapis/
 

@@ -22,7 +22,6 @@ export interface CheckoutOrderRequest {
    * grants or balance. Omit to skip the amount comparison; an explicit zero is compared.
    * A different total fails with BILLING_AMOUNT_CHANGED. Must be a non-negative decimal
    * string; empty strings, null, JSON numbers, signs and exponent notation are rejected.
-   * @pattern ^\d+(\.\d{1,10})?$
    */
-  expected_amount?: Money;
+  expected_amount?: Money & string;
 }

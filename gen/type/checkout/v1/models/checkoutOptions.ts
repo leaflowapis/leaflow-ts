@@ -21,7 +21,6 @@ export interface CheckoutOptions {
    * A different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.
    * Accepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred
    * checkout, confirm the amount through Billing.
-   * @pattern ^\d+(\.\d{1,10})?$
    */
-  expected_amount?: Money;
+  expected_amount?: Money & string;
 }
