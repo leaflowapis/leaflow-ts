@@ -61,45 +61,13 @@
  */
 import * as zod from "zod";
 
-import { AnnouncementListResource } from "./validators/announcementListResource.zod.js";
-
-import { AnnouncementReadResultResource } from "./validators/announcementReadResultResource.zod.js";
-
 import { AuthorizeRealtimeChannelRequestBody } from "./validators/authorizeRealtimeChannelRequestBody.zod.js";
-
-import { ChannelListResponseBody } from "./validators/channelListResponseBody.zod.js";
-
-import { ChannelResource } from "./validators/channelResource.zod.js";
 
 import { ConfirmEmailOverrideRequestBody } from "./validators/confirmEmailOverrideRequestBody.zod.js";
 
 import { CreateChannelRequestBody } from "./validators/createChannelRequestBody.zod.js";
 
-import { CredentialTicketResource } from "./validators/credentialTicketResource.zod.js";
-
-import { EmailOverrideCodeResource } from "./validators/emailOverrideCodeResource.zod.js";
-
-import { LengthAwarePageNotificationResource } from "./validators/lengthAwarePageNotificationResource.zod.js";
-
 import { MarkNotificationsReadRequestBody } from "./validators/markNotificationsReadRequestBody.zod.js";
-
-import { NotificationResource } from "./validators/notificationResource.zod.js";
-
-import { NotificationTypeListResponseBody } from "./validators/notificationTypeListResponseBody.zod.js";
-
-import { PreferencesResource } from "./validators/preferencesResource.zod.js";
-
-import { RealtimeAuthResource } from "./validators/realtimeAuthResource.zod.js";
-
-import { RealtimeConnectionResource } from "./validators/realtimeConnectionResource.zod.js";
-
-import { RevealedCredentialResource } from "./validators/revealedCredentialResource.zod.js";
-
-import { TypePreferenceListResponseBody } from "./validators/typePreferenceListResponseBody.zod.js";
-
-import { TypePreferenceResource } from "./validators/typePreferenceResource.zod.js";
-
-import { UnreadCountResource } from "./validators/unreadCountResource.zod.js";
 
 import { UpdateChannelRequestBody } from "./validators/updateChannelRequestBody.zod.js";
 
@@ -162,8 +130,6 @@ export const ListNotificationsQueryParams = zod.strictObject({
     .describe("Include archived notifications; they are excluded by default"),
 });
 
-export const ListNotificationsResponse = LengthAwarePageNotificationResource;
-
 /**
  * Marks every listed notification as read. Notifications already read are left alone, and the
  * operation succeeds whether or not any of them changed.
@@ -172,8 +138,6 @@ export const ListNotificationsResponse = LengthAwarePageNotificationResource;
  * @summary Mark several notifications as read
  */
 export const MarkNotificationsReadBody = MarkNotificationsReadRequestBody;
-
-export const MarkNotificationsReadResponse = UnreadCountResource;
 
 /**
  * Returns the number of unread notifications. This is the value behind the badge in the
@@ -188,8 +152,6 @@ export const CountUnreadNotificationsQueryParams = zod.strictObject({
     .describe("Which projects to include; defaults to every project"),
 });
 
-export const CountUnreadNotificationsResponse = UnreadCountResource;
-
 /**
  * A notification addressed to someone else returns `NOTIFICATION_NOT_FOUND`, the same answer
  * as one that does not exist.
@@ -201,8 +163,6 @@ export const GetNotificationParams = zod.strictObject({
     .describe("The notification, or the announcement when kind is announcement"),
 });
 
-export const GetNotificationResponse = NotificationResource;
-
 /**
  * Marking a notification that is already read succeeds and changes nothing.
  * @summary Mark one notification as read
@@ -212,8 +172,6 @@ export const MarkNotificationReadParams = zod.strictObject({
     .uuid()
     .describe("The notification, or the announcement when kind is announcement"),
 });
-
-export const MarkNotificationReadResponse = NotificationResource;
 
 /**
  * Puts it back in the unread count, which is what somebody wants after opening a thing by
@@ -228,8 +186,6 @@ export const MarkNotificationUnreadParams = zod.strictObject({
     .describe("The notification, or the announcement when kind is announcement"),
 });
 
-export const MarkNotificationUnreadResponse = NotificationResource;
-
 /**
  * Archiving removes a notification from the default listing without deleting it; pass
  * `include_archived` to see it again. Archiving also marks it read.
@@ -240,8 +196,6 @@ export const ArchiveNotificationParams = zod.strictObject({
     .uuid()
     .describe("The notification, or the announcement when kind is announcement"),
 });
-
-export const ArchiveNotificationResponse = NotificationResource;
 
 /**
  * Returns it to the default listing. Archiving is one click away from anything in the list,
@@ -260,33 +214,6 @@ export const UnarchiveNotificationParams = zod.strictObject({
     .describe("The notification, or the announcement when kind is announcement"),
 });
 
-export const UnarchiveNotificationResponse = NotificationResource;
-
-/**
- * Announcements the platform published for everyone, filtered to the ones you can still see:
- * published, not expired, and targeted at you.
- *
- * They are not part of `GET /api/v1/notifications`. A notification is addressed to you and has
- * a row per recipient; an announcement is one row for the whole platform and never fans out —
- * a hundred thousand users would be a hundred thousand rows, and almost none of them would
- * ever be read. Whether you have read one is recorded separately, so unread means "no such
- * record" rather than "a record with a null timestamp".
- *
- * The list is short by design: expired announcements drop out of it. There is no paging.
- *
- * Text comes back in the language on your preferences. An announcement that has no text in
- * that language falls back to the platform default — a readable announcement in the wrong
- * language beats a blank title.
- * @summary List platform announcements
- */
-export const ListAnnouncementsResponse = AnnouncementListResource;
-
-/**
- * Idempotent. Announcements you had already read stay read, and the count only covers the ones this call changed.
- * @summary Mark every visible announcement as read
- */
-export const ReadAllAnnouncementsResponse = AnnouncementReadResultResource;
-
 /**
  * Idempotent: marking one twice is the same as marking it once. There is no way to mark it
  * unread — having read something is a fact, not a state.
@@ -295,27 +222,6 @@ export const ReadAllAnnouncementsResponse = AnnouncementReadResultResource;
 export const ReadAnnouncementParams = zod.strictObject({
   announcementId: zod.uuid(),
 });
-
-export const ReadAnnouncementResponse = zod.void();
-
-/**
- * The catalogue of everything this platform can notify about, with the default delivery for
- * each type and whether it can be configured. It is the source for a settings interface.
- *
- * This operation does not require authentication: the catalogue is the same for everyone and
- * describes the product rather than any account.
- * @summary List every notification type
- */
-export const ListNotificationTypesResponse = NotificationTypeListResponseBody;
-
-/**
- * Returns the account-wide settings: the language notifications are written in, the time zone
- * times are stated in, and the address email is delivered to.
- *
- * A person who has never configured anything receives the defaults rather than an error.
- * @summary Get your delivery preferences
- */
-export const GetNotificationPreferencesResponse = PreferencesResource;
 
 /**
  * Fields that are omitted are left alone.
@@ -332,33 +238,6 @@ export const GetNotificationPreferencesResponse = PreferencesResource;
  */
 export const UpdateNotificationPreferencesBody = UpdatePreferencesRequestBody;
 
-export const UpdateNotificationPreferencesResponse = PreferencesResource;
-
-/**
- * Emails a short code to the address waiting to be confirmed. That address receives this and
- * nothing else; every other notification keeps going where it went before.
- *
- * The code stops working after a few minutes, and a wrong one can only be tried a handful of
- * times before it is thrown away and a new one has to be sent. Both limits exist for the same
- * reason: a six digit code is guessable if it lives forever and can be tried forever.
- *
- * Sending is rate limited per account and per destination address. The second limit is the one
- * that matters to somebody who never asked to be involved: without it, this operation is a way
- * to make the platform mail a stranger repeatedly.
- * @summary Send a code to the pending address
- */
-export const SendEmailOverrideCodeResponse = EmailOverrideCodeResource;
-
-/**
- * Drops the pending address and the code that was sent to it. Nothing else changes: an address
- * that was already confirmed keeps receiving email.
- *
- * It exists because starting this and then changing your mind is ordinary, and the alternative
- * is a settings page that shows an address waiting to be confirmed forever.
- * @summary Give up on the pending address
- */
-export const CancelEmailOverrideResponse = PreferencesResource;
-
 /**
  * A correct code moves the pending address into use: email starts going there instead of the
  * account address, and the pending slot is emptied.
@@ -369,8 +248,6 @@ export const CancelEmailOverrideResponse = PreferencesResource;
  * @summary Confirm the pending address with its code
  */
 export const ConfirmEmailOverrideBody = ConfirmEmailOverrideRequestBody;
-
-export const ConfirmEmailOverrideResponse = PreferencesResource;
 
 /**
  * Returns one entry per notification type, whether or not it has been configured. Entries
@@ -389,8 +266,6 @@ export const ListTypePreferencesQueryParams = zod.strictObject({
       "Return preferences for this project in addition to the account-wide ones; omit for the account-wide ones only",
     ),
 });
-
-export const ListTypePreferencesResponse = TypePreferenceListResponseBody;
 
 /**
  * States how this type should be delivered, replacing whatever was configured before.
@@ -431,8 +306,6 @@ export const UpdateTypePreferenceQueryParams = zod.strictObject({
 
 export const UpdateTypePreferenceBody = UpdateTypePreferenceRequestBody;
 
-export const UpdateTypePreferenceResponse = TypePreferenceResource;
-
 /**
  * Removes the configured preference so the type follows the default in the catalogue again.
  *
@@ -463,8 +336,6 @@ export const DeleteTypePreferenceQueryParams = zod.strictObject({
     .describe("Apply to this project alone; omit to apply to every project"),
 });
 
-export const DeleteTypePreferenceResponse = zod.void();
-
 /**
  * Returns the channels you have registered, and the channels registered for the project in
  * the token. The address of each is not included.
@@ -480,8 +351,6 @@ export const ListUserChannelsQueryParams = zod.strictObject({
     .optional()
     .describe("Return only channels of this kind; omit for all kinds"),
 });
-
-export const ListUserChannelsResponse = ChannelListResponseBody;
 
 /**
  * Registering a channel does not contact it and does not make it deliver anything: a new
@@ -501,8 +370,6 @@ export const ListUserChannelsResponse = ChannelListResponseBody;
  */
 export const CreateUserChannelBody = CreateChannelRequestBody;
 
-export const CreateUserChannelResponse = ChannelResource;
-
 /**
  * Fields that are omitted are left alone.
  *
@@ -519,8 +386,6 @@ export const UpdateUserChannelParams = zod.strictObject({
 
 export const UpdateUserChannelBody = UpdateChannelRequestBody;
 
-export const UpdateUserChannelResponse = ChannelResource;
-
 /**
  * Deleting a channel stops delivery to it and destroys the stored endpoint. Deliveries
  * already queued for it are abandoned.
@@ -529,8 +394,6 @@ export const UpdateUserChannelResponse = ChannelResource;
 export const DeleteUserChannelParams = zod.strictObject({
   channelId: zod.uuid().describe("The outbound channel"),
 });
-
-export const DeleteUserChannelResponse = zod.void();
 
 /**
  * Sends one message to the channel and marks it verified if the endpoint accepted it.
@@ -547,8 +410,6 @@ export const VerifyUserChannelParams = zod.strictObject({
   channelId: zod.uuid().describe("The outbound channel"),
 });
 
-export const VerifyUserChannelResponse = ChannelResource;
-
 /**
  * Reports whether the credential is still available without consuming it. It never contains
  * the credential itself.
@@ -560,8 +421,6 @@ export const VerifyUserChannelResponse = ChannelResource;
 export const DescribeCredentialTicketParams = zod.strictObject({
   ticketId: zod.uuid().describe("The one-time credential"),
 });
-
-export const DescribeCredentialTicketResponse = CredentialTicketResource;
 
 /**
  * Returns the credential and destroys it in the same step. **This is the only operation that
@@ -584,20 +443,6 @@ export const RevealCredentialParams = zod.strictObject({
   ticketId: zod.uuid().describe("The one-time credential"),
 });
 
-export const RevealCredentialResponse = RevealedCredentialResource;
-
-/**
- * Returns everything needed to open a realtime connection, and the names of the channels to
- * subscribe to. The parameters are not constants: they differ between environments, so they
- * must be requested rather than compiled in.
- *
- * Realtime delivery is an optimisation. Everything it announces is also readable through the
- * listing operations, so a client that cannot connect stays correct by polling or by
- * refreshing.
- * @summary Describe the realtime connection
- */
-export const DescribeRealtimeConnectionResponse = RealtimeConnectionResource;
-
 /**
  * Authorizes one subscription. Realtime clients call this on their own while subscribing; it
  * is not normally called directly.
@@ -611,5 +456,3 @@ export const DescribeRealtimeConnectionResponse = RealtimeConnectionResource;
  * @summary Authorize a realtime channel subscription
  */
 export const AuthorizeRealtimeChannelBody = AuthorizeRealtimeChannelRequestBody;
-
-export const AuthorizeRealtimeChannelResponse = RealtimeAuthResource;

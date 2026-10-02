@@ -28,35 +28,9 @@ import { AssignIncidentRequestBody } from "./validators/assignIncidentRequestBod
 
 import { CloseIncidentRequestBody } from "./validators/closeIncidentRequestBody.zod.js";
 
-import { CursorPageIncidentActivityResource } from "./validators/cursorPageIncidentActivityResource.zod.js";
-
 import { EnableMonitoringRequestBody } from "./validators/enableMonitoringRequestBody.zod.js";
 
-import { EnrollmentResource } from "./validators/enrollmentResource.zod.js";
-
-import { IncidentActivityResource } from "./validators/incidentActivityResource.zod.js";
-
-import { IncidentResource } from "./validators/incidentResource.zod.js";
-
-import { ItemListResponseBody } from "./validators/itemListResponseBody.zod.js";
-
-import { LengthAwarePageIncidentResource } from "./validators/lengthAwarePageIncidentResource.zod.js";
-
-import { LengthAwarePageServerResource } from "./validators/lengthAwarePageServerResource.zod.js";
-
-import { LengthAwarePageStatusPageIncidentResource } from "./validators/lengthAwarePageStatusPageIncidentResource.zod.js";
-
-import { LengthAwarePageStatusPageMaintenanceResource } from "./validators/lengthAwarePageStatusPageMaintenanceResource.zod.js";
-
-import { MaintenanceWindowListResponseBody } from "./validators/maintenanceWindowListResponseBody.zod.js";
-
-import { MaintenanceWindowResource } from "./validators/maintenanceWindowResource.zod.js";
-
-import { MetricResponseBody } from "./validators/metricResponseBody.zod.js";
-
 import { PostStatusPageIncidentUpdateRequestBody } from "./validators/postStatusPageIncidentUpdateRequestBody.zod.js";
-
-import { ProjectOverviewResource } from "./validators/projectOverviewResource.zod.js";
 
 import { PublishStatusPageIncidentRequestBody } from "./validators/publishStatusPageIncidentRequestBody.zod.js";
 
@@ -80,49 +54,11 @@ import { PutStatusPageRequestBody } from "./validators/putStatusPageRequestBody.
 
 import { PutWebCheckRequestBody } from "./validators/putWebCheckRequestBody.zod.js";
 
-import { SLIReportResponseBody } from "./validators/sLIReportResponseBody.zod.js";
-
-import { SLOResource } from "./validators/sLOResource.zod.js";
-
 import { ScheduleStatusPageMaintenanceRequestBody } from "./validators/scheduleStatusPageMaintenanceRequestBody.zod.js";
-
-import { ServerEnrollmentResponseBody } from "./validators/serverEnrollmentResponseBody.zod.js";
-
-import { ServerResource } from "./validators/serverResource.zod.js";
-
-import { ServerResourcesResource } from "./validators/serverResourcesResource.zod.js";
 
 import { SetFollowingRequestBody } from "./validators/setFollowingRequestBody.zod.js";
 
-import { SnapshotResource } from "./validators/snapshotResource.zod.js";
-
-import { StatusPageComponentListResponseBody } from "./validators/statusPageComponentListResponseBody.zod.js";
-
-import { StatusPageComponentResource } from "./validators/statusPageComponentResource.zod.js";
-
-import { StatusPageComponentSourcesResource } from "./validators/statusPageComponentSourcesResource.zod.js";
-
-import { StatusPageDomainResource } from "./validators/statusPageDomainResource.zod.js";
-
-import { StatusPageGroupListResponseBody } from "./validators/statusPageGroupListResponseBody.zod.js";
-
-import { StatusPageGroupResource } from "./validators/statusPageGroupResource.zod.js";
-
-import { StatusPageIncidentResource } from "./validators/statusPageIncidentResource.zod.js";
-
-import { StatusPageMaintenanceResource } from "./validators/statusPageMaintenanceResource.zod.js";
-
-import { StatusPageResource } from "./validators/statusPageResource.zod.js";
-
-import { TemplateCatalogResponseBody } from "./validators/templateCatalogResponseBody.zod.js";
-
-import { TopItemListResponseBody } from "./validators/topItemListResponseBody.zod.js";
-
 import { UpdateServerRequestBody } from "./validators/updateServerRequestBody.zod.js";
-
-import { WebCheckListResponseBody } from "./validators/webCheckListResponseBody.zod.js";
-
-import { WebCheckResource } from "./validators/webCheckResource.zod.js";
 
 /**
  * `incident_status` reports whether monitoring considers the problem recovered; `closed` reports whether someone has finished handling it. The two are independent and can be filtered separately.
@@ -181,16 +117,12 @@ export const ListIncidentsQueryParams = zod.strictObject({
   keyword: zod.string().max(listIncidentsQueryKeywordMax).optional(),
 });
 
-export const ListIncidentsResponse = LengthAwarePageIncidentResource;
-
 /**
  * @summary Get an incident
  */
 export const GetIncidentParams = zod.strictObject({
   incidentId: zod.uuid(),
 });
-
-export const GetIncidentResponse = IncidentResource;
 
 /**
  * The incident is also marked as acknowledged in the monitoring system, so that other channels can see it already has an owner.
@@ -201,8 +133,6 @@ export const AcknowledgeIncidentParams = zod.strictObject({
 });
 
 export const AcknowledgeIncidentBody = AcknowledgeIncidentRequestBody;
-
-export const AcknowledgeIncidentResponse = IncidentResource;
 
 /**
  * Leave `assignee_user_id` empty to clear the assignment.
@@ -216,8 +146,6 @@ export const AssignIncidentParams = zod.strictObject({
 
 export const AssignIncidentBody = AssignIncidentRequestBody;
 
-export const AssignIncidentResponse = IncidentResource;
-
 /**
  * Closing records **that the handling process is finished on this platform**; it does not change the state of the incident itself. An incident that has not recovered may still be closed as an accepted risk, and remains unrecovered in the monitoring system.
  * @summary Close an incident
@@ -228,8 +156,6 @@ export const CloseIncidentParams = zod.strictObject({
 
 export const CloseIncidentBody = CloseIncidentRequestBody;
 
-export const CloseIncidentResponse = IncidentResource;
-
 /**
  * @summary Add a note to the timeline
  */
@@ -238,8 +164,6 @@ export const AddIncidentCommentParams = zod.strictObject({
 });
 
 export const AddIncidentCommentBody = AddCommentRequestBody;
-
-export const AddIncidentCommentResponse = IncidentActivityResource;
 
 /**
  * You follow **yourself**: the caller is the user added to or removed from the follower list.
@@ -251,16 +175,12 @@ export const SetIncidentFollowingParams = zod.strictObject({
 
 export const SetIncidentFollowingBody = SetFollowingRequestBody;
 
-export const SetIncidentFollowingResponse = IncidentResource;
-
 /**
  * @summary Reopen a closed incident
  */
 export const ReopenIncidentParams = zod.strictObject({
   incidentId: zod.uuid(),
 });
-
-export const ReopenIncidentResponse = IncidentResource;
 
 /**
  * Cursor paging rather than offset paging: the timeline is append-only, and offset paging would skip or repeat entries whenever a new one is written.
@@ -286,21 +206,12 @@ export const ListIncidentTimelineQueryParams = zod.strictObject({
     .describe("The `next_cursor` returned by the previous page. Empty starts from the beginning"),
 });
 
-export const ListIncidentTimelineResponse = CursorPageIncidentActivityResource;
-
-/**
- * @summary List maintenance windows
- */
-export const ListMaintenanceWindowsResponse = MaintenanceWindowListResponseBody;
-
 /**
  * @summary Get a maintenance window
  */
 export const GetMaintenanceWindowParams = zod.strictObject({
   windowId: zod.uuid(),
 });
-
-export const GetMaintenanceWindowResponse = MaintenanceWindowResource;
 
 /**
  * **Create or replace**: extending a window that is already running means calling this endpoint again with the same id.
@@ -314,8 +225,6 @@ export const PutMaintenanceWindowParams = zod.strictObject({
 
 export const PutMaintenanceWindowBody = PutMaintenanceWindowRequestBody;
 
-export const PutMaintenanceWindowResponse = MaintenanceWindowResource;
-
 /**
  * Alerting resumes immediately, even if the window has not yet expired.
  * @summary Cancel a maintenance window
@@ -323,14 +232,6 @@ export const PutMaintenanceWindowResponse = MaintenanceWindowResource;
 export const DeleteMaintenanceWindowParams = zod.strictObject({
   windowId: zod.uuid(),
 });
-
-export const DeleteMaintenanceWindowResponse = zod.void();
-
-/**
- * A project with no machines yet returns an overview with every figure at zero rather than a 404 — an empty project is a normal state.
- * @summary Project overview
- */
-export const GetProjectOverviewResponse = ProjectOverviewResource;
 
 /**
  * Items are returned exactly as collected, without filtering or renaming. Which of them count as important is for the caller to decide from the tags carried by each item.
@@ -355,8 +256,6 @@ export const ListServerItemsQueryParams = zod.strictObject({
       "Given as `key` or `key=value`, repeatable. The `component` tags applied by the official templates (cpu, memory, filesystem and so on) are filtered through this",
     ),
 });
-
-export const ListServerItemsResponse = ItemListResponseBody;
 
 /**
  * `item_key` is matched **by prefix**. Keys discovered per partition or per interface carry parameters (`vfs.fs.size[/var,pused]`), so a single request for `vfs.fs.size` returns one series per mount point.
@@ -389,8 +288,6 @@ export const GetServerMetricQueryParams = zod.strictObject({
     .describe("Also return the thresholds currently in effect for these items"),
 });
 
-export const GetServerMetricResponse = MetricResponseBody;
-
 /**
  * @summary Hardware and interfaces of a machine
  */
@@ -398,16 +295,12 @@ export const GetServerResourcesParams = zod.strictObject({
   serverId: zod.uuid(),
 });
 
-export const GetServerResourcesResponse = ServerResourcesResource;
-
 /**
  * @summary Current state of a machine
  */
 export const GetServerSnapshotParams = zod.strictObject({
   serverId: zod.uuid(),
 });
-
-export const GetServerSnapshotResponse = SnapshotResource;
 
 /**
  * @summary Machines ranked highest by a given metric
@@ -424,14 +317,6 @@ export const ListProjectTopItemsQueryParams = zod.strictObject({
     .optional()
     .describe("0 uses the default"),
 });
-
-export const ListProjectTopItemsResponse = TopItemListResponseBody;
-
-/**
- * The catalog every template binding is validated against — which templates exist, which parameters each of them accepts, and what each parameter defaults to. It is identical for every project and changes only when this deployment is upgraded. Read it rather than keeping a copy. A copy drifts, and only one of the ways it drifts fails loudly — an unknown parameter name is rejected, but a stale `default` and a stale `required` both look correct on screen.
- * @summary List the monitoring templates that can be bound to a machine
- */
-export const ListTemplatesResponse = TemplateCatalogResponseBody;
 
 /**
  * @summary List the machines in the project
@@ -467,16 +352,12 @@ export const ListServersQueryParams = zod.strictObject({
   monitoring_status: zod.enum(["PENDING", "ACTIVE", "DISABLED", "FAILED"]).optional(),
 });
 
-export const ListServersResponse = LengthAwarePageServerResource;
-
 /**
  * @summary Get the enrollment state of a machine
  */
 export const GetServerParams = zod.strictObject({
   serverId: zod.uuid(),
 });
-
-export const GetServerResponse = ServerResource;
 
 /**
  * **Repeated calls with the same server id are idempotent**: given identical parameters, the already-enrolled machine is returned and no duplicate host is created, so a failed enrollment is safe to retry.
@@ -500,8 +381,6 @@ export const EnableServerMonitoringParams = zod.strictObject({
 
 export const EnableServerMonitoringBody = EnableMonitoringRequestBody;
 
-export const EnableServerMonitoringResponse = ServerEnrollmentResponseBody;
-
 /**
  * Only the fields present in the request body are updated. `address` and `address_kind` must be supplied together: changing one without the other produces a contradictory configuration that is not reported as an error and shows up only as an agent that cannot connect.
  * @summary Update the enrollment settings of a machine
@@ -512,8 +391,6 @@ export const UpdateServerParams = zod.strictObject({
 
 export const UpdateServerBody = UpdateServerRequestBody;
 
-export const UpdateServerResponse = ServerResource;
-
 /**
  * **Irreversible**: the monitored host, its history and every incident recorded against this machine are removed together. To stop collection temporarily, use `/disable` instead.
  * @summary Delete a machine
@@ -521,8 +398,6 @@ export const UpdateServerResponse = ServerResource;
 export const DeleteServerParams = zod.strictObject({
   serverId: zod.uuid(),
 });
-
-export const DeleteServerResponse = zod.void();
 
 /**
  * Reversible: the monitored host is retained, only collection stops, and history is unaffected. Enrolling again resumes collection. To remove the history as well, use DELETE.
@@ -532,8 +407,6 @@ export const DisableServerMonitoringParams = zod.strictObject({
   serverId: zod.uuid(),
 });
 
-export const DisableServerMonitoringResponse = zod.void();
-
 /**
  * The agent configuration must be updated to match, otherwise the machine loses contact immediately. The new key is likewise **returned in clear text only in this response**.
  * @summary Rotate the agent PSK
@@ -542,8 +415,6 @@ export const RotateAgentPskParams = zod.strictObject({
   serverId: zod.uuid(),
 });
 
-export const RotateAgentPskResponse = EnrollmentResource;
-
 /**
  * @summary Get a web check
  */
@@ -551,8 +422,6 @@ export const GetWebCheckParams = zod.strictObject({
   serverId: zod.uuid(),
   checkId: zod.uuid(),
 });
-
-export const GetWebCheckResponse = WebCheckResource;
 
 /**
  * **Create or replace**: to modify a check, call this endpoint again with the same id. There is no need to determine first whether it already exists.
@@ -565,8 +434,6 @@ export const PutWebCheckParams = zod.strictObject({
 
 export const PutWebCheckBody = PutWebCheckRequestBody;
 
-export const PutWebCheckResponse = WebCheckResource;
-
 /**
  * The corresponding check task and trigger are removed from the monitoring system as well, so no permanently unrecoverable alert is left behind.
  * @summary Delete a web check
@@ -575,8 +442,6 @@ export const DeleteWebCheckParams = zod.strictObject({
   serverId: zod.uuid(),
   checkId: zod.uuid(),
 });
-
-export const DeleteWebCheckResponse = zod.void();
 
 /**
  * @summary List web checks
@@ -587,8 +452,6 @@ export const ListWebChecksQueryParams = zod.strictObject({
     .optional()
     .describe("Restrict to the checks of a single machine. Omit for the whole project"),
 });
-
-export const ListWebChecksResponse = WebCheckListResponseBody;
 
 /**
  * SLI is what was measured; SLO is what was promised — this endpoint returns the former.
@@ -610,14 +473,6 @@ export const GetSliReportQueryParams = zod.strictObject({
     .describe("Return the most recent N complete periods. Use this or from/to, not both"),
 });
 
-export const GetSliReportResponse = SLIReportResponseBody;
-
-/**
- * A project that has never set one returns 404 rather than a default target: making no promise and promising 99.9% are different things.
- * @summary Get the availability target of this project
- */
-export const GetSloResponse = SLOResource;
-
 /**
  * One SLO per project, **create or replace**.
  *
@@ -625,20 +480,6 @@ export const GetSloResponse = SLOResource;
  * @summary Set the availability target of this project, or change it
  */
 export const PutSloBody = PutSLORequestBody;
-
-export const PutSloResponse = SLOResource;
-
-/**
- * Availability is no longer tracked from this point on.
- * @summary Remove the availability target of this project
- */
-export const DeleteSloResponse = zod.void();
-
-/**
- * A project has at most one status page. A project that has never created one returns 404.
- * @summary Get the status page of this project
- */
-export const GetStatusPageResponse = StatusPageResource;
 
 /**
  * **Create or replace**: changing the title, switching the domain, publishing and unpublishing are all done by sending the complete configuration again.
@@ -650,14 +491,6 @@ export const GetStatusPageResponse = StatusPageResource;
  */
 export const PutStatusPageBody = PutStatusPageRequestBody;
 
-export const PutStatusPageResponse = StatusPageResource;
-
-/**
- * Its groups, components, availability history, incident notices and scheduled maintenance are removed together, and cannot be recovered. The slug and custom domain are released.
- * @summary Delete the status page
- */
-export const DeleteStatusPageResponse = zod.void();
-
 /**
  * Submits the **entire** top-level order in one call rather than moving a single entry to a given position.
  *
@@ -668,20 +501,11 @@ export const DeleteStatusPageResponse = zod.void();
  */
 export const PutStatusPageOrderBody = PutStatusPageOrderRequestBody;
 
-export const PutStatusPageOrderResponse = zod.void();
-
-/**
- * @summary List groups
- */
-export const ListStatusPageGroupsResponse = StatusPageGroupListResponseBody;
-
 /**
  * A group is one level of collapsing applied to components on the page. There is exactly one level; groups cannot be nested.
  * @summary Create a group
  */
 export const CreateStatusPageGroupBody = PutStatusPageGroupRequestBody;
-
-export const CreateStatusPageGroupResponse = StatusPageGroupResource;
 
 /**
  * @summary Update a group
@@ -692,8 +516,6 @@ export const UpdateStatusPageGroupParams = zod.strictObject({
 
 export const UpdateStatusPageGroupBody = PutStatusPageGroupRequestBody;
 
-export const UpdateStatusPageGroupResponse = StatusPageGroupResource;
-
 /**
  * The components in it are **not deleted**. They return to the top level as ungrouped components, keeping their availability history and the incident notices that reference them.
  * @summary Delete a group
@@ -701,8 +523,6 @@ export const UpdateStatusPageGroupResponse = StatusPageGroupResource;
 export const DeleteStatusPageGroupParams = zod.strictObject({
   groupId: zod.uuid(),
 });
-
-export const DeleteStatusPageGroupResponse = zod.void();
 
 /**
  * @summary Set the order of components within a group
@@ -713,14 +533,6 @@ export const PutStatusPageGroupOrderParams = zod.strictObject({
 
 export const PutStatusPageGroupOrderBody = PutStatusPageGroupOrderRequestBody;
 
-export const PutStatusPageGroupOrderResponse = zod.void();
-
-/**
- * A component is one row on the status page: an externally promised capability. It is not a machine — a single component may be backed by several machines and several web checks.
- * @summary List components
- */
-export const ListStatusPageComponentsResponse = StatusPageComponentListResponseBody;
-
 /**
  * `name` is **customer-facing copy** and appears verbatim on the public page; do not use machine names.
  *
@@ -729,16 +541,12 @@ export const ListStatusPageComponentsResponse = StatusPageComponentListResponseB
  */
 export const CreateStatusPageComponentBody = PutStatusPageComponentRequestBody;
 
-export const CreateStatusPageComponentResponse = StatusPageComponentResource;
-
 /**
  * @summary Get a component
  */
 export const GetStatusPageComponentParams = zod.strictObject({
   componentId: zod.uuid(),
 });
-
-export const GetStatusPageComponentResponse = StatusPageComponentResource;
 
 /**
  * `started_on` cannot be changed: it determines where the availability bar stops showing as unmeasured, and changing it would rewrite history that has already been published.
@@ -750,8 +558,6 @@ export const UpdateStatusPageComponentParams = zod.strictObject({
 
 export const UpdateStatusPageComponentBody = PutStatusPageComponentRequestBody;
 
-export const UpdateStatusPageComponentResponse = StatusPageComponentResource;
-
 /**
  * Its availability history is removed along with it. Passages in already-published notices that refer to it are retained, since customers may already have read them.
  * @summary Delete a component
@@ -760,8 +566,6 @@ export const DeleteStatusPageComponentParams = zod.strictObject({
   componentId: zod.uuid(),
 });
 
-export const DeleteStatusPageComponentResponse = zod.void();
-
 /**
  * Monitored sources are internal information and **never appear on the public page**.
  * @summary List the monitored sources bound to a component
@@ -769,8 +573,6 @@ export const DeleteStatusPageComponentResponse = zod.void();
 export const ListStatusPageComponentSourcesParams = zod.strictObject({
   componentId: zod.uuid(),
 });
-
-export const ListStatusPageComponentSourcesResponse = StatusPageComponentSourcesResource;
 
 /**
  * Submits the **complete** set of sources; anything not listed is unbound.
@@ -785,8 +587,6 @@ export const PutStatusPageComponentSourcesParams = zod.strictObject({
 });
 
 export const PutStatusPageComponentSourcesBody = PutStatusPageComponentSourcesRequestBody;
-
-export const PutStatusPageComponentSourcesResponse = StatusPageComponentSourcesResource;
 
 /**
  * These are **customer-facing notices**, distinct from the monitoring incidents under `/incidents`. Nothing from the latter is carried over; the text here is written by your team.
@@ -812,8 +612,6 @@ export const ListStatusPageIncidentsQueryParams = zod.strictObject({
     .optional(),
 });
 
-export const ListStatusPageIncidentsResponse = LengthAwarePageStatusPageIncidentResource;
-
 /**
  * Publishing a notice and writing its first update are a single operation: a notice with no updates would appear as a bare title on a page that has already been delivered to readers.
  *
@@ -824,16 +622,12 @@ export const ListStatusPageIncidentsResponse = LengthAwarePageStatusPageIncident
  */
 export const PublishStatusPageIncidentBody = PublishStatusPageIncidentRequestBody;
 
-export const PublishStatusPageIncidentResponse = StatusPageIncidentResource;
-
 /**
  * @summary Get an incident notice
  */
 export const GetStatusPageIncidentParams = zod.strictObject({
   incidentId: zod.uuid(),
 });
-
-export const GetStatusPageIncidentResponse = StatusPageIncidentResource;
 
 /**
  * Published updates are never modified; a correction is issued as a new update. Customers may already have forwarded the original, and a silent rewrite would leave the two sides with different histories.
@@ -846,8 +640,6 @@ export const PostStatusPageIncidentUpdateParams = zod.strictObject({
 });
 
 export const PostStatusPageIncidentUpdateBody = PostStatusPageIncidentUpdateRequestBody;
-
-export const PostStatusPageIncidentUpdateResponse = StatusPageIncidentResource;
 
 /**
  * @summary List scheduled maintenance
@@ -872,8 +664,6 @@ export const ListStatusPageMaintenancesQueryParams = zod.strictObject({
     .optional(),
 });
 
-export const ListStatusPageMaintenancesResponse = LengthAwarePageStatusPageMaintenanceResource;
-
 /**
  * Maintenance starts and finishes automatically at the scheduled times; nobody needs to be present. While it runs, the affected components are shown as under maintenance and **availability is not reduced** — planned work should not consume the availability you promise to customers, which is the point of announcing it in advance.
  *
@@ -882,16 +672,12 @@ export const ListStatusPageMaintenancesResponse = LengthAwarePageStatusPageMaint
  */
 export const ScheduleStatusPageMaintenanceBody = ScheduleStatusPageMaintenanceRequestBody;
 
-export const ScheduleStatusPageMaintenanceResponse = StatusPageMaintenanceResource;
-
 /**
  * @summary Get a scheduled maintenance
  */
 export const GetStatusPageMaintenanceParams = zod.strictObject({
   maintenanceId: zod.uuid(),
 });
-
-export const GetStatusPageMaintenanceResponse = StatusPageMaintenanceResource;
 
 /**
  * Cancelled rather than deleted, so that readers who saw the announcement have an explanation. Maintenance that has already started cannot be cancelled; finish it early instead.
@@ -901,8 +687,6 @@ export const CancelStatusPageMaintenanceParams = zod.strictObject({
   maintenanceId: zod.uuid(),
 });
 
-export const CancelStatusPageMaintenanceResponse = StatusPageMaintenanceResource;
-
 /**
  * Optional: maintenance finishes on its own at the scheduled end time. Use this endpoint when the work is done ahead of schedule; the affected components return to operational immediately.
  * @summary Finish a running maintenance early
@@ -911,16 +695,12 @@ export const CompleteStatusPageMaintenanceParams = zod.strictObject({
   maintenanceId: zod.uuid(),
 });
 
-export const CompleteStatusPageMaintenanceResponse = StatusPageMaintenanceResource;
-
 /**
  * @summary Get a project-level web check
  */
 export const GetProjectWebCheckParams = zod.strictObject({
   checkId: zod.uuid(),
 });
-
-export const GetProjectWebCheckResponse = WebCheckResource;
 
 /**
  * **Create or replace**: to modify a check, call this endpoint again with the same id.
@@ -936,8 +716,6 @@ export const PutProjectWebCheckParams = zod.strictObject({
 
 export const PutProjectWebCheckBody = PutWebCheckRequestBody;
 
-export const PutProjectWebCheckResponse = WebCheckResource;
-
 /**
  * The corresponding check task and trigger are removed from the monitoring system as well.
  * @summary Delete a project-level web check
@@ -945,16 +723,6 @@ export const PutProjectWebCheckResponse = WebCheckResource;
 export const DeleteProjectWebCheckParams = zod.strictObject({
   checkId: zod.uuid(),
 });
-
-export const DeleteProjectWebCheckResponse = zod.void();
-
-/**
- * Reports whether the domain currently resolves to the status page and where its certificate stands.
- *
- * `expected_cname` is the value the domain must point at. `observed_cname` is what it currently resolves to, which is what to show the user when verification fails — "verification failed" on its own tells them nothing about what to fix.
- * @summary Get the custom domain and its certificate state
- */
-export const GetStatusPageDomainResponse = StatusPageDomainResource;
 
 /**
  * The domain must already point at the status page by CNAME. Binding is rejected until it does, and the error carries both the expected and the observed target.
@@ -965,11 +733,3 @@ export const GetStatusPageDomainResponse = StatusPageDomainResource;
  * @summary Bind a custom domain to this status page
  */
 export const PutStatusPageDomainBody = PutStatusPageDomainRequestBody;
-
-export const PutStatusPageDomainResponse = StatusPageDomainResource;
-
-/**
- * The page stays reachable at its shared address. Certificate renewal for the domain stops; the certificate already issued is left to expire.
- * @summary Unbind the custom domain
- */
-export const DeleteStatusPageDomainResponse = zod.void();

@@ -23,71 +23,13 @@ import { AcceptConsentsRequestBody } from "./validators/acceptConsentsRequestBod
 
 import { AcceptInvitationByTokenRequestBody } from "./validators/acceptInvitationByTokenRequestBody.zod.js";
 
-import { AcceptedInvitationResponseBody } from "./validators/acceptedInvitationResponseBody.zod.js";
-
-import { AccountResource } from "./validators/accountResource.zod.js";
-
-import { AgreementListResponseBody } from "./validators/agreementListResponseBody.zod.js";
-
-import { ConsentListResponseBody } from "./validators/consentListResponseBody.zod.js";
-
 import { CreateProjectRequestBody } from "./validators/createProjectRequestBody.zod.js";
 
-import { IdentityVerificationResource } from "./validators/identityVerificationResource.zod.js";
-
-import { InvitationPreviewResource } from "./validators/invitationPreviewResource.zod.js";
-
-import { LengthAwarePageInvitationResource } from "./validators/lengthAwarePageInvitationResource.zod.js";
-
-import { LengthAwarePageProjectAccessResource } from "./validators/lengthAwarePageProjectAccessResource.zod.js";
-
-import { LocaleOptionsResource } from "./validators/localeOptionsResource.zod.js";
-
-import { ProjectAccessResource } from "./validators/projectAccessResource.zod.js";
-
 import { RegisterRequestBody } from "./validators/registerRequestBody.zod.js";
-
-import { ScopedTokenResponseBody } from "./validators/scopedTokenResponseBody.zod.js";
-
-import { SettingsResource } from "./validators/settingsResource.zod.js";
 
 import { SubmitIdentityVerificationRequestBody } from "./validators/submitIdentityVerificationRequestBody.zod.js";
 
 import { UpdateAccountRequestBody } from "./validators/updateAccountRequestBody.zod.js";
-
-/**
- * No token required.
- *
- * While `registration_mode` is not `OPEN`, `POST /account/v1/register` answers 403: `CLOSED` refuses everyone, and `INVITE_ONLY` accepts only an email address holding a project invitation. `project_creation_mode` behaves the same way, and `VERIFIED_ONLY` requires identity verification to have completed.
- *
- * Both quotas are `0` when unlimited. The decision itself is made at the moment of writing.
- * @summary Get registration and project creation settings
- */
-export const GetSettingsResponse = SettingsResource;
-
-/**
- * No token required: the registration page renders both lists before an account exists.
- *
- * Country names and their order follow `Accept-Language`. A name is rendered in the requested language and the list is ordered by the rules of that language rather than by code point. Simplified Chinese applies when the header is absent.
- *
- * Retired codes such as the Soviet Union and Yugoslavia, and codes that denote no country such as the European Union, are not listed.
- * @summary List countries and languages for registration
- */
-export const ListLocalesResponse = LocaleOptionsResource;
-
-/**
- * No token required. Send the `type` and `version` of each one back unchanged to `POST /account/v1/register`.
- *
- * The array is empty while no agreement is in force, and registration then takes no `consents`.
- * @summary List the agreements registration requires
- */
-export const ListAgreementsResponse = AgreementListResponseBody;
-
-/**
- * Every record, most recent first, including versions that are no longer current.
- * @summary List the agreements the caller has consented to
- */
-export const ListConsentsResponse = ConsentListResponseBody;
 
 /**
  * Call this once a new version is published, which is whenever `pending_agreements` on `GET /account/v1/me` is not empty.
@@ -97,8 +39,6 @@ export const ListConsentsResponse = ConsentListResponseBody;
  */
 export const AcceptAgreementsBody = AcceptConsentsRequestBody;
 
-export const AcceptAgreementsResponse = AccountResource;
-
 /**
  * Call this after signing in at auth.leaflow.net, carrying the access token. The name and email address are taken from the sign-in claims and are not read from the request body.
  *
@@ -107,35 +47,17 @@ export const AcceptAgreementsResponse = AccountResource;
  */
 export const RegisterBody = RegisterRequestBody;
 
-export const RegisterResponse = AccountResource;
-
-/**
- * `pending_agreements` holds the agreements not yet consented to. While it is not empty, obtain consent and call `POST /account/v1/me/consents`.
- * @summary Get the current account
- */
-export const GetAccountResponse = AccountResource;
-
 /**
  * The name and email address cannot be changed here. They come from the identity provider, and a change would be overwritten at the next sign-in.
  * @summary Update the country and language of the current account
  */
 export const UpdateAccountBody = UpdateAccountRequestBody;
 
-export const UpdateAccountResponse = AccountResource;
-
-/**
- * The status is `UNVERIFIED` rather than 404 when nothing has been submitted. The legal name and the document number appear in no response.
- * @summary Get identity verification status
- */
-export const GetIdentityVerificationResponse = IdentityVerificationResource;
-
 /**
  * A submission awaiting review, and an account already verified, are both refused. A rejected submission may be corrected and sent again.
  * @summary Submit identity verification
  */
 export const SubmitIdentityVerificationBody = SubmitIdentityVerificationRequestBody;
-
-export const SubmitIdentityVerificationResponse = IdentityVerificationResource;
 
 /**
  * Matched against the email address of the current account.
@@ -162,8 +84,6 @@ export const ListMyInvitationsQueryParams = zod.strictObject({
     .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
 });
 
-export const ListMyInvitationsResponse = LengthAwarePageInvitationResource;
-
 /**
  * No token required: whoever follows the link in an invitation email has usually not signed in, and may hold no account at all.
  *
@@ -182,15 +102,11 @@ export const PreviewInvitationByTokenQueryParams = zod.strictObject({
     .describe("The token carried by the invitation link"),
 });
 
-export const PreviewInvitationByTokenResponse = InvitationPreviewResource;
-
 /**
  * A token that does not match, and an invitation that no longer stands, answer the same way.
  * @summary Accept an invitation by its token
  */
 export const AcceptInvitationByTokenBody = AcceptInvitationByTokenRequestBody;
-
-export const AcceptInvitationByTokenResponse = AcceptedInvitationResponseBody;
 
 /**
  * No token is required; the invitation is addressed to the email address of the current account.
@@ -199,8 +115,6 @@ export const AcceptInvitationByTokenResponse = AcceptedInvitationResponseBody;
 export const AcceptInvitationParams = zod.strictObject({
   invitationId: zod.uuid(),
 });
-
-export const AcceptInvitationResponse = AcceptedInvitationResponseBody;
 
 /**
  * Deleted projects are excluded unless `status=DELETED` asks for them by name.
@@ -237,15 +151,11 @@ export const ListProjectsQueryParams = zod.strictObject({
   include_deleted: zod.boolean().default(listProjectsQueryIncludeDeletedDefault),
 });
 
-export const ListProjectsResponse = LengthAwarePageProjectAccessResource;
-
 /**
  * The caller becomes its owner. The project is created with the built-in `OWNER` and `ADMIN` roles and a `member` role carrying no permissions.
  * @summary Create a project
  */
 export const CreateProjectBody = CreateProjectRequestBody;
-
-export const CreateProjectResponse = ProjectAccessResource;
 
 /**
  * Once a project has been chosen, exchange the access token for a scoped token for that project.
@@ -262,5 +172,3 @@ export const CreateProjectResponse = ProjectAccessResource;
 export const CreateScopedTokenParams = zod.strictObject({
   projectId: zod.uuid(),
 });
-
-export const CreateScopedTokenResponse = ScopedTokenResponseBody;

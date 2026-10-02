@@ -52,21 +52,11 @@ import * as zod from "zod";
 
 import { CreateCredentialRequestBody } from "./validators/createCredentialRequestBody.zod.js";
 
-import { CredentialResource } from "./validators/credentialResource.zod.js";
-
-import { LengthAwarePageCredentialResource } from "./validators/lengthAwarePageCredentialResource.zod.js";
-
-import { LengthAwarePageRecordSetResource } from "./validators/lengthAwarePageRecordSetResource.zod.js";
-
 import { ModifyRecordSetRequestBody } from "./validators/modifyRecordSetRequestBody.zod.js";
-
-import { RecordSetResource } from "./validators/recordSetResource.zod.js";
 
 import { RenameCredentialRequestBody } from "./validators/renameCredentialRequestBody.zod.js";
 
 import { SetRecordSetRequestBody } from "./validators/setRecordSetRequestBody.zod.js";
-
-import { ZoneListResponseBody } from "./validators/zoneListResponseBody.zod.js";
 
 /**
  * @summary List provider credentials
@@ -96,8 +86,6 @@ export const ListCredentialsQueryParams = zod.strictObject({
     .describe("Return only credentials for this provider; omit for all providers"),
 });
 
-export const ListCredentialsResponse = LengthAwarePageCredentialResource;
-
 /**
  * The credential is validated against the provider before it is accepted. A credential that
  * cannot list domains is rejected with `CREDENTIAL_REJECTED_UPSTREAM` and is not stored.
@@ -115,16 +103,12 @@ export const ListCredentialsResponse = LengthAwarePageCredentialResource;
  */
 export const CreateCredentialBody = CreateCredentialRequestBody;
 
-export const CreateCredentialResponse = CredentialResource;
-
 /**
  * @summary Get a provider credential
  */
 export const GetCredentialParams = zod.strictObject({
   credentialId: zod.uuid(),
 });
-
-export const GetCredentialResponse = CredentialResource;
 
 /**
  * Only the display name can be changed. To use different credential material, delete this
@@ -138,8 +122,6 @@ export const RenameCredentialParams = zod.strictObject({
 
 export const RenameCredentialBody = RenameCredentialRequestBody;
 
-export const RenameCredentialResponse = CredentialResource;
-
 /**
  * Domains reachable only through this credential stop appearing in `GET /zones` and can no
  * longer be read or written through this API.
@@ -151,8 +133,6 @@ export const RenameCredentialResponse = CredentialResource;
 export const DeleteCredentialParams = zod.strictObject({
   credentialId: zod.uuid(),
 });
-
-export const DeleteCredentialResponse = zod.void();
 
 /**
  * Checks the credential against the provider and records the outcome in `last_verified_at`
@@ -170,8 +150,6 @@ export const DeleteCredentialResponse = zod.void();
 export const VerifyCredentialParams = zod.strictObject({
   credentialId: zod.uuid(),
 });
-
-export const VerifyCredentialResponse = CredentialResource;
 
 /**
  * Lists every domain reachable through the credentials registered by this project.
@@ -209,8 +187,6 @@ export const ListZonesQueryParams = zod.strictObject({
       "Return the current set of domains rather than a possibly slightly stale one. Slower, and consumes provider API quota",
     ),
 });
-
-export const ListZonesResponse = ZoneListResponseBody;
 
 /**
  * Returns the domain's records grouped into record sets: all records sharing a name and a type
@@ -270,8 +246,6 @@ export const ListRecordsQueryParams = zod.strictObject({
     .describe("Number of items to skip"),
 });
 
-export const ListRecordsResponse = LengthAwarePageRecordSetResource;
-
 /**
  * Returns `RECORD_SET_NOT_FOUND` when no record of this type exists under this name.
  * @summary Get a record set
@@ -299,8 +273,6 @@ export const GetRecordSetParams = zod.strictObject({
       "A DNS record type.\n\nThe listed types are those this API supports uniformly across every provider. HTTPS and\nSVCB are not yet available.",
     ),
 });
-
-export const GetRecordSetResponse = RecordSetResource;
 
 /**
  * **This replaces the entire record set.** After this request, the only records under this
@@ -352,8 +324,6 @@ export const SetRecordSetQueryParams = zod.strictObject({
 });
 
 export const SetRecordSetBody = SetRecordSetRequestBody;
-
-export const SetRecordSetResponse = RecordSetResource;
 
 /**
  * **Names values to add and remove; anything not named is left in place.** Nothing is read
@@ -416,8 +386,6 @@ export const ModifyRecordSetQueryParams = zod.strictObject({
 
 export const ModifyRecordSetBody = ModifyRecordSetRequestBody;
 
-export const ModifyRecordSetResponse = RecordSetResource;
-
 /**
  * Removes every record under this name and type. **To remove part of a set, use `PATCH`**,
  * which is safe to issue concurrently; this operation and `PUT` are not.
@@ -458,5 +426,3 @@ export const DeleteRecordSetQueryParams = zod.strictObject({
       "Which credential to use. When omitted, the credential is determined from the domain; see ZONE_AMBIGUOUS",
     ),
 });
-
-export const DeleteRecordSetResponse = zod.void();

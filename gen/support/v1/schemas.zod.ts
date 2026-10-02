@@ -56,41 +56,6 @@ import { CreateTicketRequestBody } from "./validators/createTicketRequestBody.zo
 
 import { CreateTicketSatisfactionRequestBody } from "./validators/createTicketSatisfactionRequestBody.zod.js";
 
-import { LengthAwarePageMaintenanceResource } from "./validators/lengthAwarePageMaintenanceResource.zod.js";
-
-import { LengthAwarePageMaintenanceTimelineEntryResource } from "./validators/lengthAwarePageMaintenanceTimelineEntryResource.zod.js";
-
-import { LengthAwarePageTicketCategoryResource } from "./validators/lengthAwarePageTicketCategoryResource.zod.js";
-
-import { LengthAwarePageTicketMessageResource } from "./validators/lengthAwarePageTicketMessageResource.zod.js";
-
-import { LengthAwarePageTicketResource } from "./validators/lengthAwarePageTicketResource.zod.js";
-
-import { MaintenanceResource } from "./validators/maintenanceResource.zod.js";
-
-import { NoticeResource } from "./validators/noticeResource.zod.js";
-
-import { TicketAttachmentResource } from "./validators/ticketAttachmentResource.zod.js";
-
-import { TicketMessageResource } from "./validators/ticketMessageResource.zod.js";
-
-import { TicketResource } from "./validators/ticketResource.zod.js";
-
-import { TicketSatisfactionResource } from "./validators/ticketSatisfactionResource.zod.js";
-
-/**
- * Returns the maintenance windows that have not finished yet.
- *
- * **This operation requires no credentials.** It is intended for sign-in pages and status
- * pages, which are reached before a project has been selected. It returns a narrower shape
- * than the authenticated operations and is not paginated.
- *
- * Platform announcements are not part of this API. They are served by the notification
- * service, which owns platform-wide announcements.
- * @summary List the maintenance in effect right now
- */
-export const ListNoticesResponse = NoticeResource;
-
 /**
  * Ordered by most recent activity first, which is not the same as most recently opened.
  * @summary List tickets in the current project
@@ -135,8 +100,6 @@ export const ListTicketsQueryParams = zod.strictObject({
     .describe("Match against the subject and the ticket number, case-insensitively"),
 });
 
-export const ListTicketsResponse = LengthAwarePageTicketResource;
-
 /**
  * Opens a ticket and posts its first message in one request. A ticket always has at least one
  * message.
@@ -151,8 +114,6 @@ export const ListTicketsResponse = LengthAwarePageTicketResource;
  */
 export const CreateTicketBody = CreateTicketRequestBody;
 
-export const CreateTicketResponse = TicketResource;
-
 /**
  * Returns 404 for a ticket that belongs to another project.
  * @summary Get a ticket
@@ -160,8 +121,6 @@ export const CreateTicketResponse = TicketResource;
 export const GetTicketParams = zod.strictObject({
   ticketId: zod.uuid(),
 });
-
-export const GetTicketResponse = TicketResource;
 
 /**
  * Closing a ticket that is already closed succeeds and changes nothing.
@@ -173,8 +132,6 @@ export const GetTicketResponse = TicketResource;
 export const CloseTicketParams = zod.strictObject({
   ticketId: zod.uuid(),
 });
-
-export const CloseTicketResponse = TicketResource;
 
 /**
  * Ordered oldest first, because a ticket is a conversation.
@@ -205,8 +162,6 @@ export const ListTicketMessagesQueryParams = zod.strictObject({
     .describe("Number of items to skip"),
 });
 
-export const ListTicketMessagesResponse = LengthAwarePageTicketMessageResource;
-
 /**
  * Moves the ticket to `OPEN`. Posting on a closed ticket reopens it.
  *
@@ -221,16 +176,12 @@ export const CreateTicketMessageParams = zod.strictObject({
 
 export const CreateTicketMessageBody = CreateTicketMessageRequestBody;
 
-export const CreateTicketMessageResponse = TicketMessageResource;
-
 /**
  * @summary Get the rating submitted for a ticket
  */
 export const GetTicketSatisfactionParams = zod.strictObject({
   ticketId: zod.uuid(),
 });
-
-export const GetTicketSatisfactionResponse = TicketSatisfactionResource;
 
 /**
  * The ticket must be closed; otherwise the request returns `TICKET_NOT_CLOSED`.
@@ -245,8 +196,6 @@ export const CreateTicketSatisfactionParams = zod.strictObject({
 });
 
 export const CreateTicketSatisfactionBody = CreateTicketSatisfactionRequestBody;
-
-export const CreateTicketSatisfactionResponse = TicketSatisfactionResource;
 
 /**
  * Ordered for presentation. Categories no longer accepting new tickets are omitted, including those still attached to existing tickets.
@@ -273,8 +222,6 @@ export const ListTicketCategoriesQueryParams = zod.strictObject({
     .describe("Number of items to skip"),
 });
 
-export const ListTicketCategoriesResponse = LengthAwarePageTicketCategoryResource;
-
 /**
  * The body is the file bytes themselves, not multipart, one file per request. The content type
  * is determined from the content, not from the `Content-Type` header.
@@ -292,8 +239,6 @@ export const UploadAttachmentQueryParams = zod.strictObject({
     .max(uploadAttachmentQueryFilenameMax)
     .describe("The file name to record, and the name the file is served under when downloaded"),
 });
-
-export const UploadAttachmentResponse = TicketAttachmentResource;
 
 /**
  * Serves the file itself. The bytes are proxied by this API; the object store is not reachable
@@ -315,8 +260,6 @@ export const DownloadAttachmentQueryParams = zod.strictObject({
     .optional()
     .describe("Render in the browser instead of downloading, where the content type allows it"),
 });
-
-export const DownloadAttachmentResponse = zod.unknown();
 
 /**
  * Ordered by scheduled start, most recent first. Cancelled maintenance is omitted.
@@ -357,8 +300,6 @@ export const ListMaintenancesQueryParams = zod.strictObject({
     .describe("Return only maintenance affecting this component; omit for all components"),
 });
 
-export const ListMaintenancesResponse = LengthAwarePageMaintenanceResource;
-
 /**
  * Returns 404 for cancelled maintenance.
  * @summary Get a maintenance notice
@@ -366,8 +307,6 @@ export const ListMaintenancesResponse = LengthAwarePageMaintenanceResource;
 export const GetMaintenanceParams = zod.strictObject({
   maintenanceId: zod.uuid(),
 });
-
-export const GetMaintenanceResponse = MaintenanceResource;
 
 /**
  * Ordered oldest first, because it is an account of what happened.
@@ -397,5 +336,3 @@ export const ListMaintenanceTimelineQueryParams = zod.strictObject({
     .optional()
     .describe("Number of items to skip"),
 });
-
-export const ListMaintenanceTimelineResponse = LengthAwarePageMaintenanceTimelineEntryResource;

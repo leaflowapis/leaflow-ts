@@ -7,39 +7,11 @@
  */
 import * as zod from "zod";
 
-import { ActiveResourceList } from "./validators/activeResourceList.zod.js";
-
-import { AllowanceList } from "./validators/allowanceList.zod.js";
-
 import { AutoRenewSet } from "./validators/autoRenewSet.zod.js";
-
-import { Cancellation } from "./validators/cancellation.zod.js";
 
 import { CancellationCreate } from "./validators/cancellationCreate.zod.js";
 
-import { CancellationList } from "./validators/cancellationList.zod.js";
-
-import { EntitlementList } from "./validators/entitlementList.zod.js";
-
-import { Order } from "./validators/order.zod.js";
-
-import { OrderItemList } from "./validators/orderItemList.zod.js";
-
-import { OrderList } from "./validators/orderList.zod.js";
-
-import { ProjectBillingAccount } from "./validators/projectBillingAccount.zod.js";
-
-import { Quote } from "./validators/quote.zod.js";
-
 import { QuoteRequest } from "./validators/quoteRequest.zod.js";
-
-import { SpendRowList } from "./validators/spendRowList.zod.js";
-
-import { Subscription } from "./validators/subscription.zod.js";
-
-import { SubscriptionList } from "./validators/subscriptionList.zod.js";
-
-import { UsageChargeList } from "./validators/usageChargeList.zod.js";
 
 /**
  * Returns the billing account's identity, its currency, and how much can still be spent. Cards,
@@ -53,8 +25,6 @@ import { UsageChargeList } from "./validators/usageChargeList.zod.js";
 export const GetProjectBillingAccountParams = zod.strictObject({
   projectId: zod.uuid(),
 });
-
-export const GetProjectBillingAccountResponse = ProjectBillingAccount;
 
 /**
  * Covers a closed time range. Both bounds are required: a total without a stated period
@@ -107,8 +77,6 @@ export const ListProjectSpendQueryParams = zod.strictObject({
     .describe("How many per page, 100 at most."),
 });
 
-export const ListProjectSpendResponse = SpendRowList;
-
 /**
  * The individual charges behind the figures in `/spend`. Amounts here sum to the totals
  * reported there over the same period.
@@ -154,8 +122,6 @@ export const ListProjectUsageChargesQueryParams = zod.strictObject({
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
 });
 
-export const ListProjectUsageChargesResponse = UsageChargeList;
-
 /**
  * @summary List project subscriptions
  */
@@ -183,8 +149,6 @@ export const ListProjectSubscriptionsQueryParams = zod.strictObject({
     .describe("How many per page, 100 at most."),
 });
 
-export const ListProjectSubscriptionsResponse = SubscriptionList;
-
 /**
  * Automatic renewal draws on the project billing account's balance, which a project member may
  * commit. Paying by card requires the account owner and is done from the billing centre.
@@ -200,8 +164,6 @@ export const SetProjectAutoRenewParams = zod.strictObject({
 });
 
 export const SetProjectAutoRenewBody = AutoRenewSet;
-
-export const SetProjectAutoRenewResponse = Subscription;
 
 /**
  * Ends a set of subscriptions of one service together, at one time. Deleting a resource that a
@@ -251,8 +213,6 @@ export const CreateProjectCancellationParams = zod.strictObject({
 
 export const CreateProjectCancellationBody = CancellationCreate;
 
-export const CreateProjectCancellationResponse = Cancellation;
-
 /**
  * Newest first. Filter by `subscription_id` and `status=open` to find the cancellation now under way for a subscription.
  * @summary List cancellations
@@ -288,8 +248,6 @@ export const ListProjectCancellationsQueryParams = zod.strictObject({
     .describe("Only cancellations in this status. `open` means requested, scheduled or releasing."),
 });
 
-export const ListProjectCancellationsResponse = CancellationList;
-
 /**
  * @summary Get a cancellation
  */
@@ -297,8 +255,6 @@ export const GetProjectCancellationParams = zod.strictObject({
   projectId: zod.uuid(),
   cancellationId: zod.uuid(),
 });
-
-export const GetProjectCancellationResponse = Cancellation;
 
 /**
  * Withdraws the whole cancellation while none of its resources has begun to be released; the
@@ -312,8 +268,6 @@ export const WithdrawProjectCancellationParams = zod.strictObject({
   projectId: zod.uuid(),
   cancellationId: zod.uuid(),
 });
-
-export const WithdrawProjectCancellationResponse = Cancellation;
 
 /**
  * A draft order invoice shows base amounts awaiting checkout. A confirmed invoice shows what
@@ -359,8 +313,6 @@ export const ListProjectOrdersQueryParams = zod.strictObject({
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
 });
 
-export const ListProjectOrdersResponse = OrderList;
-
 /**
  * @summary Get project order
  */
@@ -368,8 +320,6 @@ export const GetProjectOrderParams = zod.strictObject({
   projectId: zod.uuid(),
   orderId: zod.uuid(),
 });
-
-export const GetProjectOrderResponse = Order;
 
 /**
  * A resource that is running but does not appear here is not being charged for.
@@ -398,8 +348,6 @@ export const ListProjectActiveResourcesQueryParams = zod.strictObject({
     .describe("How many per page, 100 at most."),
   resource_id: zod.string().optional(),
 });
-
-export const ListProjectActiveResourcesResponse = ActiveResourceList;
 
 /**
  * Computes a price preview without creating a resource or saving a quote. Nothing is charged,
@@ -441,8 +389,6 @@ export const CreateProjectQuoteParams = zod.strictObject({
 
 export const CreateProjectQuoteBody = QuoteRequest;
 
-export const CreateProjectQuoteResponse = Quote;
-
 /**
  * @summary List project order items
  */
@@ -469,8 +415,6 @@ export const ListProjectOrderItemsQueryParams = zod.strictObject({
     .optional()
     .describe("How many per page, 100 at most."),
 });
-
-export const ListProjectOrderItemsResponse = OrderItemList;
 
 /**
  * These belong to the project's billing account and are shared with every other project linked to it,
@@ -517,8 +461,6 @@ export const ListProjectAllowancesQueryParams = zod.strictObject({
     .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
 });
 
-export const ListProjectAllowancesResponse = AllowanceList;
-
 /**
  * Includes capabilities bought for this project and those the project's billing account holds at
  * account level.
@@ -563,5 +505,3 @@ export const ListProjectEntitlementsQueryParams = zod.strictObject({
     .optional()
     .describe("Filter by ID or lookup key. A lookup key is scoped to the product."),
 });
-
-export const ListProjectEntitlementsResponse = EntitlementList;

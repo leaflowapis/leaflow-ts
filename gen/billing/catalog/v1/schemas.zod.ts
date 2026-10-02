@@ -10,22 +10,6 @@ import * as zod from "zod";
 
 import { EstimateRequest } from "./validators/estimateRequest.zod.js";
 
-import { Plan } from "./validators/plan.zod.js";
-
-import { PlanList } from "./validators/planList.zod.js";
-
-import { Price } from "./validators/price.zod.js";
-
-import { PriceList } from "./validators/priceList.zod.js";
-
-import { Product } from "./validators/product.zod.js";
-
-import { ProductList } from "./validators/productList.zod.js";
-
-import { Quote } from "./validators/quote.zod.js";
-
-import { RateList } from "./validators/rateList.zod.js";
-
 /**
  * Every sellable thing and what it costs, in one request. A plan appears once per price.
  *
@@ -87,8 +71,6 @@ export const ListPricesHeader = zod.strictObject({
     ),
 });
 
-export const ListPricesResponse = PriceList;
-
 /**
  * @summary List catalog products
  */
@@ -120,8 +102,6 @@ export const ListProductsHeader = zod.strictObject({
     ),
 });
 
-export const ListProductsResponse = ProductList;
-
 /**
  * Resolves an identifier that was stored elsewhere — on an order line, an invoice line, or
  * the terms of a credit — into something that can be displayed.
@@ -149,8 +129,6 @@ export const GetProductHeader = zod.strictObject({
     ),
 });
 
-export const GetProductResponse = Product;
-
 /**
  * Resolves a stored identifier into something that can be displayed. Returns items that are
  * no longer on sale: an existing purchase still refers to one.
@@ -169,8 +147,6 @@ export const GetPlanHeader = zod.strictObject({
     ),
 });
 
-export const GetPlanResponse = Plan;
-
 /**
  * Returns the catalog price, including archived prices. Fixed purchase history and renewal agreements are shown on orders and subscriptions rather than reconstructed from today's catalog.
  * @summary Get a price
@@ -187,8 +163,6 @@ export const GetPriceHeader = zod.strictObject({
       "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
     ),
 });
-
-export const GetPriceResponse = Price;
 
 /**
  * @summary List catalog plans
@@ -230,8 +204,6 @@ export const ListPlansHeader = zod.strictObject({
     ),
 });
 
-export const ListPlansResponse = PlanList;
-
 /**
  * Public list prices only. An account holding a negotiated agreement may be charged less;
  * it is never charged more.
@@ -269,8 +241,6 @@ export const ListPricesByPlanHeader = zod.strictObject({
       "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
     ),
 });
-
-export const ListPricesByPlanResponse = PriceList;
 
 /**
  * Only public price lists are readable here. A list written for a single agreement is not,
@@ -314,8 +284,6 @@ export const ListRatesHeader = zod.strictObject({
     ),
 });
 
-export const ListRatesResponse = RateList;
-
 /**
  * Uses public list prices. Nothing is reserved and nothing is recorded, so this may be
  * called as often as required.
@@ -328,5 +296,3 @@ export const ListRatesResponse = RateList;
  * @summary Estimate a basket
  */
 export const CreateEstimateBody = EstimateRequest;
-
-export const CreateEstimateResponse = Quote;

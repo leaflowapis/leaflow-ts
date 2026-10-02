@@ -9,99 +9,31 @@
  */
 import * as zod from "zod";
 
-import { AccountBalance } from "./validators/accountBalance.zod.js";
-
-import { AllowanceList } from "./validators/allowanceList.zod.js";
-
 import { AutoRenewSet } from "./validators/autoRenewSet.zod.js";
-
-import { BillingAccount } from "./validators/billingAccount.zod.js";
 
 import { BillingAccountCreate } from "./validators/billingAccountCreate.zod.js";
 
-import { BillingAccountList } from "./validators/billingAccountList.zod.js";
-
 import { BillingAccountUpdate } from "./validators/billingAccountUpdate.zod.js";
-
-import { Cancellation } from "./validators/cancellation.zod.js";
 
 import { CancellationCreate } from "./validators/cancellationCreate.zod.js";
 
-import { CancellationList } from "./validators/cancellationList.zod.js";
-
 import { CheckoutOrderRequest } from "./validators/checkoutOrderRequest.zod.js";
-
-import { CreditGrantList } from "./validators/creditGrantList.zod.js";
-
-import { CurrencyList } from "./validators/currencyList.zod.js";
-
-import { DiscountList } from "./validators/discountList.zod.js";
-
-import { EntitlementList } from "./validators/entitlementList.zod.js";
-
-import { Invoice } from "./validators/invoice.zod.js";
-
-import { InvoiceItemList } from "./validators/invoiceItemList.zod.js";
-
-import { InvoiceList } from "./validators/invoiceList.zod.js";
-
-import { MeteredUsage } from "./validators/meteredUsage.zod.js";
-
-import { Order } from "./validators/order.zod.js";
-
-import { OrderItemList } from "./validators/orderItemList.zod.js";
-
-import { OrderList } from "./validators/orderList.zod.js";
 
 import { PayInvoiceRequest } from "./validators/payInvoiceRequest.zod.js";
 
 import { PayTogetherRequest } from "./validators/payTogetherRequest.zod.js";
 
-import { PaymentMethod } from "./validators/paymentMethod.zod.js";
-
-import { PaymentMethodList } from "./validators/paymentMethodList.zod.js";
-
 import { PaymentMethodSetup } from "./validators/paymentMethodSetup.zod.js";
 
-import { PaymentMethodSetupResult } from "./validators/paymentMethodSetupResult.zod.js";
-
-import { PaymentOptionList } from "./validators/paymentOptionList.zod.js";
-
-import { PaymentPreview } from "./validators/paymentPreview.zod.js";
-
-import { PaymentResult } from "./validators/paymentResult.zod.js";
-
-import { ProjectAssignment } from "./validators/projectAssignment.zod.js";
-
-import { ProjectAssignmentList } from "./validators/projectAssignmentList.zod.js";
-
-import { Quote } from "./validators/quote.zod.js";
-
 import { QuoteRequest } from "./validators/quoteRequest.zod.js";
-
-import { RefundList } from "./validators/refundList.zod.js";
 
 import { RenewRequest } from "./validators/renewRequest.zod.js";
 
 import { RenewalOrderRequest } from "./validators/renewalOrderRequest.zod.js";
 
-import { RenewalPriceList } from "./validators/renewalPriceList.zod.js";
-
 import { SetProjectAssignmentRequest } from "./validators/setProjectAssignmentRequest.zod.js";
 
-import { Subscription } from "./validators/subscription.zod.js";
-
-import { SubscriptionList } from "./validators/subscriptionList.zod.js";
-
-import { TopUp } from "./validators/topUp.zod.js";
-
 import { TopUpCreate } from "./validators/topUpCreate.zod.js";
-
-import { TopUpList } from "./validators/topUpList.zod.js";
-
-import { TransactionList } from "./validators/transactionList.zod.js";
-
-import { UsageChargeList } from "./validators/usageChargeList.zod.js";
 
 /**
  * The currencies a new billing account can be opened in. A retired currency is not listed,
@@ -127,8 +59,6 @@ export const ListCurrenciesQueryParams = zod.strictObject({
     .describe("How many per page, 100 at most."),
 });
 
-export const ListCurrenciesResponse = CurrencyList;
-
 /**
  * @summary List billing accounts
  */
@@ -151,8 +81,6 @@ export const ListBillingAccountsQueryParams = zod.strictObject({
     .describe("How many per page, 100 at most."),
 });
 
-export const ListBillingAccountsResponse = BillingAccountList;
-
 /**
  * The currency is chosen here and cannot be changed afterwards. Everything charged to the
  * account — prices, orders, invoices, balance — is denominated in it.
@@ -162,16 +90,12 @@ export const ListBillingAccountsResponse = BillingAccountList;
  */
 export const CreateBillingAccountBody = BillingAccountCreate;
 
-export const CreateBillingAccountResponse = BillingAccount;
-
 /**
  * @summary Get billing account
  */
 export const GetBillingAccountParams = zod.strictObject({
   accountId: zod.int(),
 });
-
-export const GetBillingAccountResponse = BillingAccount;
 
 /**
  * The legal name, address and tax identifier are copied onto each invoice when it is
@@ -186,16 +110,12 @@ export const UpdateBillingAccountParams = zod.strictObject({
 
 export const UpdateBillingAccountBody = BillingAccountUpdate;
 
-export const UpdateBillingAccountResponse = BillingAccount;
-
 /**
  * @summary Get account balance
  */
 export const GetAccountBalanceParams = zod.strictObject({
   accountId: zod.int(),
 });
-
-export const GetAccountBalanceResponse = AccountBalance;
 
 /**
  * Whether the account has anything billed by usage, and what that usage has cost over the last
@@ -206,8 +126,6 @@ export const GetAccountBalanceResponse = AccountBalance;
 export const GetAccountMeteredUsageParams = zod.strictObject({
   accountId: zod.int(),
 });
-
-export const GetAccountMeteredUsageResponse = MeteredUsage;
 
 /**
  * Lists the payment gateways and methods that currently accept payment in this account's currency, the
@@ -239,8 +157,6 @@ export const ListPaymentOptionsQueryParams = zod.strictObject({
     .describe("How many per page, 100 at most."),
 });
 
-export const ListPaymentOptionsResponse = PaymentOptionList;
-
 /**
  * @summary List project assignments
  */
@@ -264,8 +180,6 @@ export const ListProjectAssignmentsQueryParams = zod.strictObject({
   billing_account_id: zod.int().optional(),
 });
 
-export const ListProjectAssignmentsResponse = ProjectAssignmentList;
-
 /**
  * Returns 404 when the project has no billing account. No resources can be created until one is linked.
  * @summary Get project assignment
@@ -273,8 +187,6 @@ export const ListProjectAssignmentsResponse = ProjectAssignmentList;
 export const GetProjectAssignmentParams = zod.strictObject({
   projectId: zod.uuid(),
 });
-
-export const GetProjectAssignmentResponse = ProjectAssignment;
 
 /**
  * Charges already incurred remain with the billing account that was linked when they
@@ -296,8 +208,6 @@ export const SetProjectAssignmentParams = zod.strictObject({
 
 export const SetProjectAssignmentBody = SetProjectAssignmentRequest;
 
-export const SetProjectAssignmentResponse = ProjectAssignment;
-
 /**
  * Permitted only when nothing in the project is still running or in progress: no metered
  * resources, no subscriptions that have not ended, and no orders in progress, including
@@ -313,8 +223,6 @@ export const SetProjectAssignmentResponse = ProjectAssignment;
 export const UnlinkProjectBillingAccountParams = zod.strictObject({
   projectId: zod.uuid(),
 });
-
-export const UnlinkProjectBillingAccountResponse = zod.void();
 
 /**
  * Lists only the authenticated user's top-ups. Includes pending, failed and canceled attempts; no invoice is
@@ -344,8 +252,6 @@ export const ListTopUpsQueryParams = zod.strictObject({
     .describe("Restrict to one of your accounts. All of them when omitted."),
 });
 
-export const ListTopUpsResponse = TopUpList;
-
 /**
  * Creates a top-up for an account owned by the authenticated user and returns its payment information.
  * The balance increases only after the payment gateway confirms receipt. A top-up has no invoice.
@@ -353,8 +259,6 @@ export const ListTopUpsResponse = TopUpList;
  * @summary Create top up
  */
 export const CreateTopUpBody = TopUpCreate;
-
-export const CreateTopUpResponse = TopUp;
 
 /**
  * Reads a top-up owned by the authenticated user, including its outcome and the part of it not yet spent.
@@ -368,8 +272,6 @@ export const CreateTopUpResponse = TopUp;
 export const GetTopUpParams = zod.strictObject({
   topUpId: zod.uuid(),
 });
-
-export const GetTopUpResponse = TopUp;
 
 /**
  * Withdraws a pending top-up owned by the authenticated user at the payment gateway. It becomes
@@ -388,8 +290,6 @@ export const GetTopUpResponse = TopUp;
 export const CancelTopUpParams = zod.strictObject({
   topUpId: zod.uuid(),
 });
-
-export const CancelTopUpResponse = TopUp;
 
 /**
  * @summary List payment methods
@@ -417,8 +317,6 @@ export const ListPaymentMethodsQueryParams = zod.strictObject({
     .describe("Restrict to one of your accounts. All of them when omitted."),
 });
 
-export const ListPaymentMethodsResponse = PaymentMethodList;
-
 /**
  * Returns what is needed to hand the browser over to the payment gateway's own card
  * form. Nothing is charged, and the method appears in the list once the gateway
@@ -429,16 +327,12 @@ export const ListPaymentMethodsResponse = PaymentMethodList;
  */
 export const CreatePaymentMethodSetupBody = PaymentMethodSetup;
 
-export const CreatePaymentMethodSetupResponse = PaymentMethodSetupResult;
-
 /**
  * @summary Set default payment method
  */
 export const SetDefaultPaymentMethodParams = zod.strictObject({
   paymentMethodId: zod.uuid(),
 });
-
-export const SetDefaultPaymentMethodResponse = PaymentMethod;
 
 /**
  * Refused when it is the only method on an account that has resources billed by the hour,
@@ -448,8 +342,6 @@ export const SetDefaultPaymentMethodResponse = PaymentMethod;
 export const DeletePaymentMethodParams = zod.strictObject({
   paymentMethodId: zod.uuid(),
 });
-
-export const DeletePaymentMethodResponse = zod.void();
 
 /**
  * Applies eligible credit grants and available balance as requested, then collects the remainder
@@ -473,8 +365,6 @@ export const PayInvoiceParams = zod.strictObject({
 });
 
 export const PayInvoiceBody = PayInvoiceRequest;
-
-export const PayInvoiceResponse = PaymentResult;
 
 /**
  * What paying this invoice now would take from credit grants, from the balance and, for the rest,
@@ -504,8 +394,6 @@ export const PreviewInvoicePaymentQueryParams = zod.strictObject({
     .describe("As in paying. True when omitted."),
 });
 
-export const PreviewInvoicePaymentResponse = PaymentPreview;
-
 /**
  * Pays outstanding invoices, including the invoices of the listed orders, from the account's
  * eligible credit grants and then its balance. No payment gateway is used; an invoice to be
@@ -522,8 +410,6 @@ export const PreviewInvoicePaymentResponse = PaymentPreview;
  */
 export const PayTogetherBody = PayTogetherRequest;
 
-export const PayTogetherResponse = PaymentResult;
-
 /**
  * What paying these invoices together now would take from credit grants and from the balance,
  * invoice by invoice in the order they would be paid. It is computed as paying together computes
@@ -535,8 +421,6 @@ export const PayTogetherResponse = PaymentResult;
  * @summary Preview paying together
  */
 export const PreviewPayTogetherBody = PayTogetherRequest;
-
-export const PreviewPayTogetherResponse = PaymentPreview;
 
 /**
  * @summary List invoices
@@ -572,16 +456,12 @@ export const ListInvoicesQueryParams = zod.strictObject({
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
 });
 
-export const ListInvoicesResponse = InvoiceList;
-
 /**
  * @summary Get invoice
  */
 export const GetInvoiceParams = zod.strictObject({
   invoiceId: zod.uuid(),
 });
-
-export const GetInvoiceResponse = Invoice;
 
 /**
  * @summary List invoice items
@@ -608,8 +488,6 @@ export const ListInvoiceItemsQueryParams = zod.strictObject({
     .optional()
     .describe("How many per page, 100 at most."),
 });
-
-export const ListInvoiceItemsResponse = InvoiceItemList;
 
 /**
  * @summary List transactions
@@ -639,8 +517,6 @@ export const ListTransactionsQueryParams = zod.strictObject({
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
 });
 
-export const ListTransactionsResponse = TransactionList;
-
 /**
  * Coupons placed on the account directly, which apply at checkout without a code being
  * entered. A coupon reached through a code is not listed here.
@@ -668,8 +544,6 @@ export const ListAccountDiscountsQueryParams = zod.strictObject({
     .optional()
     .describe("Restrict to one of your accounts. All of them when omitted."),
 });
-
-export const ListAccountDiscountsResponse = DiscountList;
 
 /**
  * Each grant shows what remains and what it may be used for. Credit is spent before the balance
@@ -699,8 +573,6 @@ export const ListCreditGrantsQueryParams = zod.strictObject({
     .describe("Restrict to one of your accounts. All of them when omitted."),
   status: zod.enum(["active", "depleted", "expired", "voided"]).optional(),
 });
-
-export const ListCreditGrantsResponse = CreditGrantList;
 
 /**
  * Newest first.
@@ -735,8 +607,6 @@ export const ListRefundsQueryParams = zod.strictObject({
       "Only the refunds that belong to this order: those of its invoice, such as the refund of a\npurchase that could not be delivered, and those it caused on an earlier invoice, such as\nthe difference returned after a downgrade.",
     ),
 });
-
-export const ListRefundsResponse = RefundList;
 
 /**
  * Each charge is added to the month's usage invoice as it is priced, summed into one line per
@@ -786,8 +656,6 @@ export const ListUsageChargesQueryParams = zod.strictObject({
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
 });
 
-export const ListUsageChargesResponse = UsageChargeList;
-
 /**
  * @summary List subscriptions
  */
@@ -816,16 +684,12 @@ export const ListSubscriptionsQueryParams = zod.strictObject({
   project_id: zod.uuid().optional(),
 });
 
-export const ListSubscriptionsResponse = SubscriptionList;
-
 /**
  * @summary Get subscription
  */
 export const GetSubscriptionParams = zod.strictObject({
   subscriptionId: zod.uuid(),
 });
-
-export const GetSubscriptionResponse = Subscription;
 
 /**
  * Computes a price preview without creating a resource or saving a quote. Nothing is charged,
@@ -859,8 +723,6 @@ export const GetSubscriptionResponse = Subscription;
  * @summary Quote order checkout, renewals or a cancellation
  */
 export const CreateQuoteBody = QuoteRequest;
-
-export const CreateQuoteResponse = Quote;
 
 /**
  * Ends a set of subscriptions of one service together, at one time. Deleting a resource that a
@@ -906,8 +768,6 @@ export const CreateQuoteResponse = Quote;
  */
 export const CreateCancellationBody = CancellationCreate;
 
-export const CreateCancellationResponse = Cancellation;
-
 /**
  * Newest first. Filter by `subscription_id` and `status=open` to find the cancellation now under way for a subscription.
  * @summary List cancellations
@@ -943,16 +803,12 @@ export const ListCancellationsQueryParams = zod.strictObject({
     .describe("Only cancellations in this status. `open` means requested, scheduled or releasing."),
 });
 
-export const ListCancellationsResponse = CancellationList;
-
 /**
  * @summary Get a cancellation
  */
 export const GetCancellationParams = zod.strictObject({
   cancellationId: zod.uuid(),
 });
-
-export const GetCancellationResponse = Cancellation;
 
 /**
  * Withdraws the whole cancellation while none of its resources has begun to be released; the
@@ -965,8 +821,6 @@ export const GetCancellationResponse = Cancellation;
 export const WithdrawCancellationParams = zod.strictObject({
   cancellationId: zod.uuid(),
 });
-
-export const WithdrawCancellationResponse = Cancellation;
 
 /**
  * Lists the current renewal agreement and available intervals. The current option preserves recurring_amount; other options use current prices. Amounts cover the whole subscription quantity and exclude tax.
@@ -995,8 +849,6 @@ export const ListRenewalPricesQueryParams = zod.strictObject({
     .describe("How many per page, 100 at most."),
 });
 
-export const ListRenewalPricesResponse = RenewalPriceList;
-
 /**
  * Purchases prepaid periods from paid_until using the agreed recurring amount, and pays for them at
  * once. A changed interval selects a current price and freezes new terms on the order, applied
@@ -1017,8 +869,6 @@ export const RenewSubscriptionParams = zod.strictObject({
 
 export const RenewSubscriptionBody = RenewRequest;
 
-export const RenewSubscriptionResponse = PaymentResult;
-
 /**
  * Places a renewal order with a draft invoice, without applying a new discount or charging anything.
  * Quote and confirm its checkout before collecting payment to renew. Existing subscription
@@ -1038,8 +888,6 @@ export const CreateRenewalOrderParams = zod.strictObject({
 
 export const CreateRenewalOrderBody = RenewalOrderRequest;
 
-export const CreateRenewalOrderResponse = Order;
-
 /**
  * Controls automatic prepaid renewal. Disabling it does not shorten paid_until and still permits
  * manual renewal. Postpaid subscriptions do not renew and keep this false.
@@ -1054,8 +902,6 @@ export const SetAutoRenewParams = zod.strictObject({
 });
 
 export const SetAutoRenewBody = AutoRenewSet;
-
-export const SetAutoRenewResponse = Subscription;
 
 /**
  * Lists remaining usage quantities, such as bytes, seconds or tokens. Applicable allowances are
@@ -1103,8 +949,6 @@ export const ListAllowancesQueryParams = zod.strictObject({
     .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
 });
 
-export const ListAllowancesResponse = AllowanceList;
-
 /**
  * Lists acceptance status and associated invoice amounts. pending_checkout awaits confirmation; pending has confirmed checkout and may be unpaid or paid. active means accepted, not delivered. pending_checkout and pending orders can expire at expires_at.
  * @summary List orders
@@ -1149,16 +993,12 @@ export const ListOrdersQueryParams = zod.strictObject({
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
 });
 
-export const ListOrdersResponse = OrderList;
-
 /**
  * @summary Get order
  */
 export const GetOrderParams = zod.strictObject({
   orderId: zod.uuid(),
 });
-
-export const GetOrderResponse = Order;
 
 /**
  * Confirms the purchase's final amount and discount. Supply the same promotion_code used for the
@@ -1197,8 +1037,6 @@ export const CheckoutOrderParams = zod.strictObject({
 
 export const CheckoutOrderBody = CheckoutOrderRequest;
 
-export const CheckoutOrderResponse = Order;
-
 /**
  * Withdraws an order that is not paid in full, and tells the service that placed it, so that
  * nothing is delivered. An order with nothing paid becomes `canceled` and its invoice is voided.
@@ -1217,8 +1055,6 @@ export const CheckoutOrderResponse = Order;
 export const CancelOrderParams = zod.strictObject({
   orderId: zod.uuid(),
 });
-
-export const CancelOrderResponse = Order;
 
 /**
  * One entry per item bought, with the price charged and the period it covers.
@@ -1246,8 +1082,6 @@ export const ListOrderItemsQueryParams = zod.strictObject({
     .optional()
     .describe("How many per page, 100 at most."),
 });
-
-export const ListOrderItemsResponse = OrderItemList;
 
 /**
  * Capabilities that come with what has been bought. A capability that is not held simply
@@ -1286,5 +1120,3 @@ export const ListEntitlementsQueryParams = zod.strictObject({
       "Restrict to one project. Anything bought at account level, such as a membership,\nappears regardless.",
     ),
 });
-
-export const ListEntitlementsResponse = EntitlementList;

@@ -27,53 +27,29 @@ import { AllocateFloatingIPQuoteRequestBody } from "./validators/allocateFloatin
 
 import { AllocateFloatingIPRequestBody } from "./validators/allocateFloatingIPRequestBody.zod.js";
 
-import { AllocateFloatingIPResponseBody } from "./validators/allocateFloatingIPResponseBody.zod.js";
-
 import { AttachDiskRequestBody } from "./validators/attachDiskRequestBody.zod.js";
 
 import { AttachFloatingIPRequestBody } from "./validators/attachFloatingIPRequestBody.zod.js";
 
 import { AttachPortRequestBody } from "./validators/attachPortRequestBody.zod.js";
 
-import { BackupCapacityPackListResponseBody } from "./validators/backupCapacityPackListResponseBody.zod.js";
-
-import { BackupListResponseBody } from "./validators/backupListResponseBody.zod.js";
-
-import { BackupResource } from "./validators/backupResource.zod.js";
-
-import { BackupService } from "./validators/backupService.zod.js";
-
 import { BindFloatingIPRequestBody } from "./validators/bindFloatingIPRequestBody.zod.js";
-
-import { CommandResultResponseBody } from "./validators/commandResultResponseBody.zod.js";
-
-import { ConsoleOutputResponseBody } from "./validators/consoleOutputResponseBody.zod.js";
-
-import { ConsoleResponseBody } from "./validators/consoleResponseBody.zod.js";
 
 import { CreateBackupCapacityPackQuoteRequestBody } from "./validators/createBackupCapacityPackQuoteRequestBody.zod.js";
 
 import { CreateBackupCapacityPackRequestBody } from "./validators/createBackupCapacityPackRequestBody.zod.js";
 
-import { CreateBackupCapacityPackResponseBody } from "./validators/createBackupCapacityPackResponseBody.zod.js";
-
 import { CreateBackupRequestBody } from "./validators/createBackupRequestBody.zod.js";
 
 import { CreateBackupServiceRequestBody } from "./validators/createBackupServiceRequestBody.zod.js";
-
-import { CreateBackupServiceResponseBody } from "./validators/createBackupServiceResponseBody.zod.js";
 
 import { CreateDiskQuoteRequestBody } from "./validators/createDiskQuoteRequestBody.zod.js";
 
 import { CreateDiskRequestBody } from "./validators/createDiskRequestBody.zod.js";
 
-import { CreateDiskResponseBody } from "./validators/createDiskResponseBody.zod.js";
-
 import { CreateImageQuoteRequestBody } from "./validators/createImageQuoteRequestBody.zod.js";
 
 import { CreateImageRequestBody } from "./validators/createImageRequestBody.zod.js";
-
-import { CreateImageResponseBody } from "./validators/createImageResponseBody.zod.js";
 
 import { CreatePeeringRequestBody } from "./validators/createPeeringRequestBody.zod.js";
 
@@ -91,69 +67,15 @@ import { CreateSnapshotRequestBody } from "./validators/createSnapshotRequestBod
 
 import { CreateSubnetRequestBody } from "./validators/createSubnetRequestBody.zod.js";
 
-import { DiskAttachmentList } from "./validators/diskAttachmentList.zod.js";
-
-import { DiskListResponseBody } from "./validators/diskListResponseBody.zod.js";
-
-import { DiskResource } from "./validators/diskResource.zod.js";
-
-import { DiskTypeListResponseBody } from "./validators/diskTypeListResponseBody.zod.js";
-
-import { DiskTypeResource } from "./validators/diskTypeResource.zod.js";
-
-import { FloatingIPListResponseBody } from "./validators/floatingIPListResponseBody.zod.js";
-
-import { FloatingIPResource } from "./validators/floatingIPResource.zod.js";
-
-import { IPv4PoolListResponseBody } from "./validators/iPv4PoolListResponseBody.zod.js";
-
-import { IPv6ResponseBody } from "./validators/iPv6ResponseBody.zod.js";
-
-import { ImageListResponseBody } from "./validators/imageListResponseBody.zod.js";
-
-import { ImageResource } from "./validators/imageResource.zod.js";
-
-import { InstanceListResponseBody } from "./validators/instanceListResponseBody.zod.js";
-
-import { InstanceResource } from "./validators/instanceResource.zod.js";
-
-import { InstanceTypeListResponseBody } from "./validators/instanceTypeListResponseBody.zod.js";
-
 import { LaunchInstanceQuoteRequestBody } from "./validators/launchInstanceQuoteRequestBody.zod.js";
 
 import { LaunchInstanceRequestBody } from "./validators/launchInstanceRequestBody.zod.js";
 
-import { LaunchInstanceResponseBody } from "./validators/launchInstanceResponseBody.zod.js";
-
-import { NextFreeCidrResponseBody } from "./validators/nextFreeCidrResponseBody.zod.js";
-
-import { OperationLogListResponseBody } from "./validators/operationLogListResponseBody.zod.js";
-
-import { PeeringListResponseBody } from "./validators/peeringListResponseBody.zod.js";
-
-import { PeeringResource } from "./validators/peeringResource.zod.js";
-
-import { PortAttachmentList } from "./validators/portAttachmentList.zod.js";
-
-import { PortListResponseBody } from "./validators/portListResponseBody.zod.js";
-
-import { PortResource } from "./validators/portResource.zod.js";
-
 import { PowerRequest } from "./validators/powerRequest.zod.js";
-
-import { PrivateNetworkListResponseBody } from "./validators/privateNetworkListResponseBody.zod.js";
-
-import { PrivateNetworkResource } from "./validators/privateNetworkResource.zod.js";
-
-import { Quote } from "./validators/quote.zod.js";
 
 import { RebootInstanceRequestBody } from "./validators/rebootInstanceRequestBody.zod.js";
 
 import { RebuildInstanceRequestBody } from "./validators/rebuildInstanceRequestBody.zod.js";
-
-import { RebuildInstanceResponseBody } from "./validators/rebuildInstanceResponseBody.zod.js";
-
-import { RegionListResponseBody } from "./validators/regionListResponseBody.zod.js";
 
 import { RenameBackupRequestBody } from "./validators/renameBackupRequestBody.zod.js";
 
@@ -171,19 +93,13 @@ import { RenameSnapshotRequestBody } from "./validators/renameSnapshotRequestBod
 
 import { ResetPasswordRequestBody } from "./validators/resetPasswordRequestBody.zod.js";
 
-import { ResetPasswordResponseBody } from "./validators/resetPasswordResponseBody.zod.js";
-
 import { ResizeDiskQuoteRequestBody } from "./validators/resizeDiskQuoteRequestBody.zod.js";
 
 import { ResizeDiskRequestBody } from "./validators/resizeDiskRequestBody.zod.js";
 
-import { ResizeDiskResponseBody } from "./validators/resizeDiskResponseBody.zod.js";
-
 import { ResizeInstanceQuoteRequestBody } from "./validators/resizeInstanceQuoteRequestBody.zod.js";
 
 import { ResizeInstanceRequestBody } from "./validators/resizeInstanceRequestBody.zod.js";
-
-import { ResizeInstanceResponseBody } from "./validators/resizeInstanceResponseBody.zod.js";
 
 import { RestoreBackupQuoteRequestBody } from "./validators/restoreBackupQuoteRequestBody.zod.js";
 
@@ -191,25 +107,11 @@ import { RestoreBackupRequestBody } from "./validators/restoreBackupRequestBody.
 
 import { RevertDiskRequestBody } from "./validators/revertDiskRequestBody.zod.js";
 
-import { RouteListResponseBody } from "./validators/routeListResponseBody.zod.js";
-
-import { RouteResource } from "./validators/routeResource.zod.js";
-
 import { RunCommandRequestBody } from "./validators/runCommandRequestBody.zod.js";
-
-import { SecurityGroupListResponseBody } from "./validators/securityGroupListResponseBody.zod.js";
-
-import { SecurityGroupResource } from "./validators/securityGroupResource.zod.js";
-
-import { SecurityRuleListResponseBody } from "./validators/securityRuleListResponseBody.zod.js";
-
-import { SecurityRuleResource } from "./validators/securityRuleResource.zod.js";
 
 import { SetFloatingIPBandwidthQuoteRequestBody } from "./validators/setFloatingIPBandwidthQuoteRequestBody.zod.js";
 
 import { SetFloatingIPBandwidthRequestBody } from "./validators/setFloatingIPBandwidthRequestBody.zod.js";
-
-import { SetFloatingIPBandwidthResponseBody } from "./validators/setFloatingIPBandwidthResponseBody.zod.js";
 
 import { SetInstanceLabelsRequestBody } from "./validators/setInstanceLabelsRequestBody.zod.js";
 
@@ -218,20 +120,6 @@ import { SetInstanceNotesRequestBody } from "./validators/setInstanceNotesReques
 import { SetSnapshotQuotaQuoteRequestBody } from "./validators/setSnapshotQuotaQuoteRequestBody.zod.js";
 
 import { SetSnapshotQuotaRequestBody } from "./validators/setSnapshotQuotaRequestBody.zod.js";
-
-import { SetSnapshotQuotaResponseBody } from "./validators/setSnapshotQuotaResponseBody.zod.js";
-
-import { SnapshotListResponseBody } from "./validators/snapshotListResponseBody.zod.js";
-
-import { SnapshotQuota } from "./validators/snapshotQuota.zod.js";
-
-import { SnapshotResource } from "./validators/snapshotResource.zod.js";
-
-import { SubnetListResponseBody } from "./validators/subnetListResponseBody.zod.js";
-
-import { SubnetResource } from "./validators/subnetResource.zod.js";
-
-import { ZoneListResponseBody } from "./validators/zoneListResponseBody.zod.js";
 
 /**
  * @summary List backups
@@ -251,8 +139,6 @@ export const ListBackupsQueryParams = zod.strictObject({
     .default(listBackupsQueryPageSizeDefault),
 });
 
-export const ListBackupsResponse = BackupListResponseBody;
-
 /**
  * A backup is a complete copy of a disk held in separate storage: **it remains restorable after the source disk is deleted, and can be restored to another availability zone in the same region.** A snapshot offers neither capability, as it resides in the same storage as the source disk and prevents that disk from being deleted while it exists.
  *
@@ -265,8 +151,6 @@ export const ListBackupsResponse = BackupListResponseBody;
  */
 export const CreateBackupBody = CreateBackupRequestBody;
 
-export const CreateBackupResponse = BackupResource;
-
 /**
  * Returns the stored state of the backup; it does not query the cloud. Use it to poll creation progress.
  * @summary Retrieve a backup
@@ -274,8 +158,6 @@ export const CreateBackupResponse = BackupResource;
 export const GetBackupParams = zod.strictObject({
   backupId: zod.uuid(),
 });
-
-export const GetBackupResponse = BackupResource;
 
 /**
  * @summary Rename a backup
@@ -286,8 +168,6 @@ export const RenameBackupParams = zod.strictObject({
 
 export const RenameBackupBody = RenameBackupRequestBody;
 
-export const RenameBackupResponse = BackupResource;
-
 /**
  * Independent of the source disk: deletion succeeds whether or not that disk still exists. Metering of the backup ends once it is deleted.
  * @summary Delete a backup
@@ -295,8 +175,6 @@ export const RenameBackupResponse = BackupResource;
 export const DeleteBackupParams = zod.strictObject({
   backupId: zod.uuid(),
 });
-
-export const DeleteBackupResponse = BackupResource;
 
 /**
  * Restores onto a **newly created** disk. The source disk is unaffected and need not still exist.
@@ -310,8 +188,6 @@ export const RestoreBackupParams = zod.strictObject({
 
 export const RestoreBackupBody = RestoreBackupRequestBody;
 
-export const RestoreBackupResponse = CreateDiskResponseBody;
-
 /**
  * Prices what `restore-backup` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote restoring from a backup
@@ -321,8 +197,6 @@ export const CreateBackupRestoreQuoteParams = zod.strictObject({
 });
 
 export const CreateBackupRestoreQuoteBody = RestoreBackupQuoteRequestBody;
-
-export const CreateBackupRestoreQuoteResponse = Quote;
 
 /**
  * Only disk types currently on sale are listed, both system disk types and data disk types; `purpose` narrows the list to one of the two. A withdrawn one disappears from here and can no longer be bought, while the disks already on it keep working and can still be resized.
@@ -347,8 +221,6 @@ export const ListDiskTypesQueryParams = zod.strictObject({
     .default(listDiskTypesQueryPageSizeDefault),
 });
 
-export const ListDiskTypesResponse = DiskTypeListResponseBody;
-
 /**
  * Retrieve capacity and performance constraints for an existing disk, including system disk types and types withdrawn from sale.
  * @summary Get a disk type
@@ -356,8 +228,6 @@ export const ListDiskTypesResponse = DiskTypeListResponseBody;
 export const GetDiskTypeParams = zod.strictObject({
   diskTypeId: zod.uuid(),
 });
-
-export const GetDiskTypeResponse = DiskTypeResource;
 
 /**
  * Lists the public images on sale together with the private images of this project. `visibility` narrows the list to one of the two.
@@ -388,8 +258,6 @@ export const ListImagesQueryParams = zod.strictObject({
     .default(listImagesQueryPageSizeDefault),
 });
 
-export const ListImagesResponse = ImageListResponseBody;
-
 /**
  * Creates a private image of this project from the system disk of the instance; data disks are not included. The resulting image can create instances and rebuild them, and remains usable after the source instance is released.
  *
@@ -409,15 +277,11 @@ export const ListImagesResponse = ImageListResponseBody;
  */
 export const CreateImageBody = CreateImageRequestBody;
 
-export const CreateImageResponse = CreateImageResponseBody;
-
 /**
  * Prices the capture `create-image` would order for the same instance, without ordering anything; nothing is reserved or recorded. The quantity priced is the size of the system disk, which is the most the image can occupy, with the option chosen in `billing`. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. Prices may change, so quote again before final confirmation.
  * @summary Quote capturing an instance as a private image
  */
 export const CreateImageQuoteBody = CreateImageQuoteRequestBody;
-
-export const CreateImageQuoteResponse = Quote;
 
 /**
  * Returns a public image, or a private image of this project; any other image is reported as not found. Use this endpoint to poll capture progress. When `status` is `failed`, `failure_reason` states why.
@@ -426,8 +290,6 @@ export const CreateImageQuoteResponse = Quote;
 export const GetImageParams = zod.strictObject({
   imageId: zod.uuid(),
 });
-
-export const GetImageResponse = ImageResource;
 
 /**
  * Only a private image of this project can be renamed; any other image is reported as not found.
@@ -438,8 +300,6 @@ export const RenameImageParams = zod.strictObject({
 });
 
 export const RenameImageBody = RenameImageRequestBody;
-
-export const RenameImageResponse = ImageResource;
 
 /**
  * Only a private image of this project can be deleted; any other image is reported as not found.
@@ -454,8 +314,6 @@ export const RenameImageResponse = ImageResource;
 export const DeleteImageParams = zod.strictObject({
   imageId: zod.uuid(),
 });
-
-export const DeleteImageResponse = ImageResource;
 
 /**
  * Only instance types currently on sale are listed. A withdrawn one disappears from here and can no longer be ordered, while the instances already running it keep running.
@@ -476,8 +334,6 @@ export const ListInstanceTypesQueryParams = zod.strictObject({
     .default(listInstanceTypesQueryPageSizeDefault),
 });
 
-export const ListInstanceTypesResponse = InstanceTypeListResponseBody;
-
 /**
  * @summary List available regions
  */
@@ -494,8 +350,6 @@ export const ListRegionsQueryParams = zod.strictObject({
     .max(listRegionsQueryPageSizeMax)
     .default(listRegionsQueryPageSizeDefault),
 });
-
-export const ListRegionsResponse = RegionListResponseBody;
 
 /**
  * A disk and an instance must reside in the same availability zone to be attached. Confirm the zone before creating either.
@@ -519,8 +373,6 @@ export const ListAvailabilityZonesQueryParams = zod.strictObject({
     .default(listAvailabilityZonesQueryPageSizeDefault),
 });
 
-export const ListAvailabilityZonesResponse = ZoneListResponseBody;
-
 /**
  * When both `region_code` and `availability_zone` are supplied, only disks attachable to an instance at that location are returned.
  * @summary List disks
@@ -540,8 +392,6 @@ export const ListDisksQueryParams = zod.strictObject({
   page_size: zod.int().min(1).max(listDisksQueryPageSizeMax).default(listDisksQueryPageSizeDefault),
 });
 
-export const ListDisksResponse = DiskListResponseBody;
-
 /**
  * The disk is created in the availability zone of the selected disk type, and an instance must reside in the same zone to attach it. Choosing the disk type therefore determines the zone.
  *
@@ -550,15 +400,11 @@ export const ListDisksResponse = DiskListResponseBody;
  */
 export const CreateDiskBody = CreateDiskRequestBody;
 
-export const CreateDiskResponse = CreateDiskResponseBody;
-
 /**
  * Prices what `create-disk` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote creating a disk
  */
 export const CreateDiskQuoteBody = CreateDiskQuoteRequestBody;
-
-export const CreateDiskQuoteResponse = Quote;
 
 /**
  * Returns the stored state of the disk; it does not query the cloud.
@@ -567,8 +413,6 @@ export const CreateDiskQuoteResponse = Quote;
 export const GetDiskParams = zod.strictObject({
   diskId: zod.uuid(),
 });
-
-export const GetDiskResponse = DiskResource;
 
 /**
  * Changes the name only. Use the resize endpoint for capacity; type and availability zone are immutable.
@@ -580,8 +424,6 @@ export const RenameDiskParams = zod.strictObject({
 
 export const RenameDiskBody = RenameDiskRequestBody;
 
-export const RenameDiskResponse = DiskResource;
-
 /**
  * Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
  *
@@ -591,8 +433,6 @@ export const RenameDiskResponse = DiskResource;
 export const DeleteDiskParams = zod.strictObject({
   diskId: zod.uuid(),
 });
-
-export const DeleteDiskResponse = DiskResource;
 
 /**
  * Capacity can only be increased; shrinking is not supported. Returns the disk with the order for the resize, which keeps the disk's billing mode and period. The disk shows the `resize` operation until the resize is applied or its order is canceled, including while the order awaits checkout, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The disk keeps its current size until the resize is applied; once `size_gb` shows the new size, extend the file system inside the instance. If the order is not accepted or the resize fails, the disk keeps its size and the order shows the outcome.
@@ -610,8 +450,6 @@ export const ResizeDiskParams = zod.strictObject({
 
 export const ResizeDiskBody = ResizeDiskRequestBody;
 
-export const ResizeDiskResponse = ResizeDiskResponseBody;
-
 /**
  * Prices the change `resize-disk` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote resizing a disk
@@ -621,8 +459,6 @@ export const CreateDiskResizeQuoteParams = zod.strictObject({
 });
 
 export const CreateDiskResizeQuoteBody = ResizeDiskQuoteRequestBody;
-
-export const CreateDiskResizeQuoteResponse = Quote;
 
 /**
  * Restores the contents of the disk to the moment the snapshot was taken. **All data written after that moment is lost and cannot be recovered.**
@@ -637,8 +473,6 @@ export const RevertDiskParams = zod.strictObject({
 });
 
 export const RevertDiskBody = RevertDiskRequestBody;
-
-export const RevertDiskResponse = DiskResource;
 
 /**
  * @summary List floating IPs
@@ -657,8 +491,6 @@ export const ListFloatingIpsQueryParams = zod.strictObject({
     .default(listFloatingIpsQueryPageSizeDefault),
 });
 
-export const ListFloatingIpsResponse = FloatingIPListResponseBody;
-
 /**
  * If the private network is not yet connected to the internet, connectivity is established as part of this call.
  *
@@ -671,15 +503,11 @@ export const ListFloatingIpsResponse = FloatingIPListResponseBody;
  */
 export const AllocateFloatingIpBody = AllocateFloatingIPRequestBody;
 
-export const AllocateFloatingIpResponse = AllocateFloatingIPResponseBody;
-
 /**
  * Prices what `allocate-floating-ip` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote allocating a floating IP
  */
 export const CreateFloatingIpQuoteBody = AllocateFloatingIPQuoteRequestBody;
-
-export const CreateFloatingIpQuoteResponse = Quote;
 
 /**
  * @summary Retrieve a floating IP
@@ -687,8 +515,6 @@ export const CreateFloatingIpQuoteResponse = Quote;
 export const GetFloatingIpParams = zod.strictObject({
   floatingIpId: zod.uuid(),
 });
-
-export const GetFloatingIpResponse = FloatingIPResource;
 
 /**
  * Releases the floating IP after unbinding it. The floating IP shows the `delete` operation until it is released.
@@ -699,8 +525,6 @@ export const GetFloatingIpResponse = FloatingIPResource;
 export const ReleaseFloatingIpParams = zod.strictObject({
   floatingIpId: zod.uuid(),
 });
-
-export const ReleaseFloatingIpResponse = FloatingIPResource;
 
 /**
  * Changes the bandwidth of this floating IP through an order that keeps its billing mode and period; no separate bandwidth resource is created. The limit applies to inbound and outbound traffic alike. The floating IP shows the `set_bandwidth` operation until the change is applied or its order is canceled, including while the order awaits checkout, so other operations and a second change are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The current limit stays in effect until the change is applied. If the order is not accepted or the change fails, `bandwidth_mbps` keeps its value and the order shows the outcome.
@@ -714,8 +538,6 @@ export const SetFloatingIpBandwidthParams = zod.strictObject({
 
 export const SetFloatingIpBandwidthBody = SetFloatingIPBandwidthRequestBody;
 
-export const SetFloatingIpBandwidthResponse = SetFloatingIPBandwidthResponseBody;
-
 /**
  * Prices the change `set-floating-ip-bandwidth` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote changing the bandwidth limit
@@ -725,8 +547,6 @@ export const CreateFloatingIpBandwidthQuoteParams = zod.strictObject({
 });
 
 export const CreateFloatingIpBandwidthQuoteBody = SetFloatingIPBandwidthQuoteRequestBody;
-
-export const CreateFloatingIpBandwidthQuoteResponse = Quote;
 
 /**
  * The floating IP shows the `bind` operation until the binding is confirmed.
@@ -738,8 +558,6 @@ export const BindFloatingIpParams = zod.strictObject({
 
 export const BindFloatingIpBody = BindFloatingIPRequestBody;
 
-export const BindFloatingIpResponse = FloatingIPResource;
-
 /**
  * The address remains held by the project and simply no longer points at any network interface. The floating IP shows the `unbind` operation until the change is confirmed.
  * @summary Unbind a floating IP
@@ -747,8 +565,6 @@ export const BindFloatingIpResponse = FloatingIPResource;
 export const UnbindFloatingIpParams = zod.strictObject({
   floatingIpId: zod.uuid(),
 });
-
-export const UnbindFloatingIpResponse = FloatingIPResource;
 
 /**
  * Every instance in the project, newest first, in their stored state.
@@ -777,8 +593,6 @@ export const ListInstancesQueryParams = zod.strictObject({
     .default(listInstancesQueryPageSizeDefault),
 });
 
-export const ListInstancesResponse = InstanceListResponseBody;
-
 /**
  * Creates a Billing order, including for metered pricing, and returns one `pending` instance per requested instance with the order. `billing` applies to the instance, its system disk and its floating IP alike. A pending instance has no virtual machine, system disk or address, and is not metered.
  *
@@ -793,15 +607,11 @@ export const ListInstancesResponse = InstanceListResponseBody;
  */
 export const LaunchInstanceBody = LaunchInstanceRequestBody;
 
-export const LaunchInstanceResponse = LaunchInstanceResponseBody;
-
 /**
  * Prices what `launch-instance` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote creating instances
  */
 export const CreateInstanceQuoteBody = LaunchInstanceQuoteRequestBody;
-
-export const CreateInstanceQuoteResponse = Quote;
 
 /**
  * Returns the stored state of the instance; it does not query the cloud. Use it to poll creation progress.
@@ -810,8 +620,6 @@ export const CreateInstanceQuoteResponse = Quote;
 export const GetInstanceParams = zod.strictObject({
   instanceId: zod.uuid(),
 });
-
-export const GetInstanceResponse = InstanceResource;
 
 /**
  * Changes the display name only. The hostname inside the instance is unchanged; it equals the instance id.
@@ -822,8 +630,6 @@ export const RenameInstanceParams = zod.strictObject({
 });
 
 export const RenameInstanceBody = RenameInstanceRequestBody;
-
-export const RenameInstanceResponse = InstanceResource;
 
 /**
  * The system disk is deleted with the instance, and **snapshots created from the system disk are deleted with it**. Data disks are detached and kept, and their snapshots and backups are unaffected. The primary network interface is released with the instance.
@@ -836,8 +642,6 @@ export const RenameInstanceResponse = InstanceResource;
 export const DeleteInstanceParams = zod.strictObject({
   instanceId: zod.uuid(),
 });
-
-export const DeleteInstanceResponse = InstanceResource;
 
 /**
  * Runs one command over SSH and returns what it wrote. **This is not a shell.** There is no terminal, no standard input and no way to answer a prompt: a command that waits for input produces nothing and is killed at the timeout. Chain steps with `&&`, or write a script and run that.
@@ -865,8 +669,6 @@ export const RunInstanceCommandParams = zod.strictObject({
 
 export const RunInstanceCommandBody = RunCommandRequestBody;
 
-export const RunInstanceCommandResponse = CommandResultResponseBody;
-
 /**
  * Operates the instance directly from a browser and does not require the instance to be reachable over the network, which makes it usable when a network misconfiguration prevents login.
  *
@@ -876,8 +678,6 @@ export const RunInstanceCommandResponse = CommandResultResponseBody;
 export const OpenInstanceConsoleParams = zod.strictObject({
   instanceId: zod.uuid(),
 });
-
-export const OpenInstanceConsoleResponse = ConsoleResponseBody;
 
 /**
  * The raw text produced by the instance during boot and by the kernel. Consult it first when login fails or the remote console shows no output: it reveals where boot stopped, whether the system disk was mounted, and whether initialisation reported errors.
@@ -902,8 +702,6 @@ export const GetInstanceConsoleOutputQueryParams = zod.strictObject({
     .describe("Number of trailing lines to return; 0 returns the entire output"),
 });
 
-export const GetInstanceConsoleOutputResponse = ConsoleOutputResponseBody;
-
 /**
  * Records what this instance is for, as key-value pairs. Nothing on the platform reads them.
  *
@@ -917,8 +715,6 @@ export const SetInstanceLabelsParams = zod.strictObject({
 });
 
 export const SetInstanceLabelsBody = SetInstanceLabelsRequestBody;
-
-export const SetInstanceLabelsResponse = InstanceResource;
 
 /**
  * A free-text note about this instance — what it runs, and what to be careful about before touching it.
@@ -934,8 +730,6 @@ export const SetInstanceNotesParams = zod.strictObject({
 
 export const SetInstanceNotesBody = SetInstanceNotesRequestBody;
 
-export const SetInstanceNotesResponse = InstanceResource;
-
 /**
  * Changes the root password without a reboot. The instance must be running.
  *
@@ -949,8 +743,6 @@ export const ResetInstancePasswordParams = zod.strictObject({
 });
 
 export const ResetInstancePasswordBody = ResetPasswordRequestBody;
-
-export const ResetInstancePasswordResponse = ResetPasswordResponseBody;
 
 /**
  * A reboot defaults to soft, in which the operating system shuts down normally before starting again.
@@ -970,8 +762,6 @@ export const RebootInstanceParams = zod.strictObject({
 
 export const RebootInstanceBody = RebootInstanceRequestBody;
 
-export const RebootInstanceResponse = InstanceResource;
-
 /**
  * **All data on the system disk is erased and cannot be recovered.** Attached data disks are unaffected.
  *
@@ -986,8 +776,6 @@ export const RebuildInstanceParams = zod.strictObject({
 
 export const RebuildInstanceBody = RebuildInstanceRequestBody;
 
-export const RebuildInstanceResponse = RebuildInstanceResponseBody;
-
 /**
  * Creates a Billing change order, including for metered pricing, and returns the instance with the order. The instance keeps its billing mode and period, priced with the target type's matching option; a target type without that option is refused with 409 `BILLING_OPTION_UNAVAILABLE`. Do not submit a new purchase after paying. After an uncertain response, look the order up before submitting again.
  *
@@ -1000,8 +788,6 @@ export const ResizeInstanceParams = zod.strictObject({
 
 export const ResizeInstanceBody = ResizeInstanceRequestBody;
 
-export const ResizeInstanceResponse = ResizeInstanceResponseBody;
-
 /**
  * Prices the change `resize-instance` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote resizing an instance
@@ -1011,8 +797,6 @@ export const CreateInstanceResizeQuoteParams = zod.strictObject({
 });
 
 export const CreateInstanceResizeQuoteBody = ResizeInstanceQuoteRequestBody;
-
-export const CreateInstanceResizeQuoteResponse = Quote;
 
 /**
  * Outstanding restrictions can prevent starting. The instance shows the `start` operation until it is running or the start has failed.
@@ -1024,8 +808,6 @@ export const StartInstanceParams = zod.strictObject({
 
 export const StartInstanceBody = PowerRequest;
 
-export const StartInstanceResponse = InstanceResource;
-
 /**
  * A stopped instance keeps its disks, network attachments and sellable quota. The instance shows the `stop` operation until it is stopped or the stop has failed.
  * @summary Stop an instance
@@ -1035,8 +817,6 @@ export const StopInstanceParams = zod.strictObject({
 });
 
 export const StopInstanceBody = PowerRequest;
-
-export const StopInstanceResponse = InstanceResource;
 
 /**
  * @summary List the disks attached to an instance
@@ -1059,8 +839,6 @@ export const ListInstanceDisksQueryParams = zod.strictObject({
     .default(listInstanceDisksQueryPageSizeDefault),
 });
 
-export const ListInstanceDisksResponse = DiskAttachmentList;
-
 /**
  * The disk must be in the same region and availability zone as the instance. Returns the disk; the instance shows the `attach_disk` operation and the disk the `attach` operation until the attachment is confirmed. Partition the disk and mount the file system inside the instance once it is attached.
  * @summary Attach a disk
@@ -1070,8 +848,6 @@ export const AttachDiskParams = zod.strictObject({
 });
 
 export const AttachDiskBody = AttachDiskRequestBody;
-
-export const AttachDiskResponse = DiskResource;
 
 /**
  * Unmount the device inside the instance before calling this endpoint. Forcibly detaching a file system that is being written to corrupts data.
@@ -1086,8 +862,6 @@ export const DetachDiskParams = zod.strictObject({
   diskId: zod.uuid(),
 });
 
-export const DetachDiskResponse = DiskResource;
-
 /**
  * Changes the public IP binding on the instance's primary network interface. The instance shows the `bind_floating_ip` operation until the binding is confirmed.
  * @summary Bind a floating IP to an instance
@@ -1098,8 +872,6 @@ export const AttachInstanceFloatingIpParams = zod.strictObject({
 
 export const AttachInstanceFloatingIpBody = AttachFloatingIPRequestBody;
 
-export const AttachInstanceFloatingIpResponse = FloatingIPResource;
-
 /**
  * Changes the public IP binding on the instance's primary network interface. The instance shows the `unbind_floating_ip` operation until the change is confirmed.
  * @summary Unbind the floating IP of an instance
@@ -1108,8 +880,6 @@ export const DetachInstanceFloatingIpParams = zod.strictObject({
   instanceId: zod.uuid(),
   floatingIpId: zod.uuid(),
 });
-
-export const DetachInstanceFloatingIpResponse = FloatingIPResource;
 
 /**
  * @summary List the network interfaces of an instance
@@ -1132,8 +902,6 @@ export const ListInstancePortsQueryParams = zod.strictObject({
     .default(listInstancePortsQueryPageSizeDefault),
 });
 
-export const ListInstancePortsResponse = PortAttachmentList;
-
 /**
  * Returns the network interface; the instance shows the `attach_port` operation and the interface the `attach` operation until the attachment is confirmed.
  * @summary Attach a network interface
@@ -1143,8 +911,6 @@ export const AttachPortParams = zod.strictObject({
 });
 
 export const AttachPortBody = AttachPortRequestBody;
-
-export const AttachPortResponse = PortResource;
 
 /**
  * The primary network interface cannot be detached; the instance would lose its network address.
@@ -1156,8 +922,6 @@ export const DetachPortParams = zod.strictObject({
   instanceId: zod.uuid(),
   portId: zod.uuid(),
 });
-
-export const DetachPortResponse = PortResource;
 
 /**
  * Records every write operation in the project: who performed it, when, on what, and whether it succeeded. Read operations are not recorded.
@@ -1190,8 +954,6 @@ export const ListOperationLogsQueryParams = zod.strictObject({
     .default(listOperationLogsQueryPageSizeDefault),
 });
 
-export const ListOperationLogsResponse = OperationLogListResponseBody;
-
 /**
  * @summary List network interfaces
  */
@@ -1205,15 +967,11 @@ export const ListPortsQueryParams = zod.strictObject({
   page_size: zod.int().min(1).max(listPortsQueryPageSizeMax).default(listPortsQueryPageSizeDefault),
 });
 
-export const ListPortsResponse = PortListResponseBody;
-
 /**
  * The new network interface is not attached to any instance. Primary network interfaces are not created here; they are created with the instance.
  * @summary Create a network interface
  */
 export const CreatePortBody = CreatePortRequestBody;
-
-export const CreatePortResponse = PortResource;
 
 /**
  * The primary network interface cannot be deleted on its own, as it is released with the instance. A network interface still attached to an instance cannot be deleted either.
@@ -1222,8 +980,6 @@ export const CreatePortResponse = PortResource;
 export const DeletePortParams = zod.strictObject({
   portId: zod.uuid(),
 });
-
-export const DeletePortResponse = PortResource;
 
 /**
  * @summary List private networks
@@ -1243,15 +999,11 @@ export const ListPrivateNetworksQueryParams = zod.strictObject({
     .default(listPrivateNetworksQueryPageSizeDefault),
 });
 
-export const ListPrivateNetworksResponse = PrivateNetworkListResponseBody;
-
 /**
  * Creates a network, a router and a default security group in one call. The default security group denies all inbound traffic and permits all outbound traffic.
  * @summary Create a private network
  */
 export const CreatePrivateNetworkBody = CreatePrivateNetworkRequestBody;
-
-export const CreatePrivateNetworkResponse = PrivateNetworkResource;
 
 /**
  * @summary Retrieve a private network
@@ -1259,8 +1011,6 @@ export const CreatePrivateNetworkResponse = PrivateNetworkResource;
 export const GetPrivateNetworkParams = zod.strictObject({
   privateNetworkId: zod.uuid(),
 });
-
-export const GetPrivateNetworkResponse = PrivateNetworkResource;
 
 /**
  * Changes the display name only. The CIDR, the routes and the internet gateway are immutable.
@@ -1272,8 +1022,6 @@ export const RenamePrivateNetworkParams = zod.strictObject({
 
 export const RenamePrivateNetworkBody = RenamePrivateNetworkRequestBody;
 
-export const RenamePrivateNetworkResponse = PrivateNetworkResource;
-
 /**
  * Release is rejected while instances or network interfaces remain in the network. IPv6, the router and the security groups are released with it.
  * @summary Release a private network
@@ -1282,16 +1030,12 @@ export const DeletePrivateNetworkParams = zod.strictObject({
   privateNetworkId: zod.uuid(),
 });
 
-export const DeletePrivateNetworkResponse = PrivateNetworkResource;
-
 /**
  * @summary Retrieve the IPv6 configuration of a private network
  */
 export const GetPrivateNetworkIpv6Params = zod.strictObject({
   privateNetworkId: zod.uuid(),
 });
-
-export const GetPrivateNetworkIpv6Response = IPv6ResponseBody;
 
 /**
  * Allocates an IPv6 prefix to the private network. Addresses are assigned to instances by the network itself, can be neither requested nor released individually, and consume no public IPv4 address.
@@ -1303,8 +1047,6 @@ export const EnablePrivateNetworkIpv6Params = zod.strictObject({
   privateNetworkId: zod.uuid(),
 });
 
-export const EnablePrivateNetworkIpv6Response = IPv6ResponseBody;
-
 /**
  * A released prefix is not re-allocated immediately.
  * @summary Disable IPv6 on a private network
@@ -1312,8 +1054,6 @@ export const EnablePrivateNetworkIpv6Response = IPv6ResponseBody;
 export const DisablePrivateNetworkIpv6Params = zod.strictObject({
   privateNetworkId: zod.uuid(),
 });
-
-export const DisablePrivateNetworkIpv6Response = IPv6ResponseBody;
 
 /**
  * @summary List static routes
@@ -1336,8 +1076,6 @@ export const ListRoutesQueryParams = zod.strictObject({
     .default(listRoutesQueryPageSizeDefault),
 });
 
-export const ListRoutesResponse = RouteListResponseBody;
-
 /**
  * Three forms that would sever connectivity are rejected: a destination of `0.0.0.0/0`, which overrides the default route and takes every floating IP offline immediately; a destination equal to the CIDR of a subnet, which overrides its directly connected route; and a next hop equal to the gateway of a subnet, which points back at the router itself.
  * @summary Create a static route
@@ -1348,8 +1086,6 @@ export const CreateRouteParams = zod.strictObject({
 
 export const CreateRouteBody = CreateRouteRequestBody;
 
-export const CreateRouteResponse = RouteResource;
-
 /**
  * @summary Delete a static route
  */
@@ -1357,8 +1093,6 @@ export const DeleteRouteParams = zod.strictObject({
   privateNetworkId: zod.uuid(),
   routeId: zod.uuid(),
 });
-
-export const DeleteRouteResponse = zod.void();
 
 /**
  * IPv6 subnets are included, with `ip_version` 6. They are created when IPv6 is enabled and cannot be deleted individually.
@@ -1382,8 +1116,6 @@ export const ListSubnetsQueryParams = zod.strictObject({
     .default(listSubnetsQueryPageSizeDefault),
 });
 
-export const ListSubnetsResponse = SubnetListResponseBody;
-
 /**
  * @summary Create a subnet
  */
@@ -1392,8 +1124,6 @@ export const CreateSubnetParams = zod.strictObject({
 });
 
 export const CreateSubnetBody = CreateSubnetRequestBody;
-
-export const CreateSubnetResponse = SubnetResource;
 
 /**
  * The returned value is a suggestion and is validated again when the subnet is created. It exists to avoid errors when computing the next free CIDR by hand.
@@ -1415,8 +1145,6 @@ export const SuggestSubnetCidrQueryParams = zod.strictObject({
     .default(suggestSubnetCidrQueryPrefixLengthDefault),
 });
 
-export const SuggestSubnetCidrResponse = NextFreeCidrResponseBody;
-
 /**
  * Deletion is rejected while network interfaces remain in the subnet, or while a static route has a next hop inside its CIDR.
  * @summary Delete a subnet
@@ -1425,8 +1153,6 @@ export const DeleteSubnetParams = zod.strictObject({
   privateNetworkId: zod.uuid(),
   subnetId: zod.uuid(),
 });
-
-export const DeleteSubnetResponse = zod.void();
 
 /**
  * @summary List security groups
@@ -1450,15 +1176,11 @@ export const ListSecurityGroupsQueryParams = zod.strictObject({
     .default(listSecurityGroupsQueryPageSizeDefault),
 });
 
-export const ListSecurityGroupsResponse = SecurityGroupListResponseBody;
-
 /**
  * A new security group carries one rule, permitting ICMP fragmentation-needed messages (type 3, code 4). Without it path MTU discovery fails, which presents as connections that establish and then stall on large packets.
  * @summary Create a security group
  */
 export const CreateSecurityGroupBody = CreateSecurityGroupRequestBody;
-
-export const CreateSecurityGroupResponse = SecurityGroupResource;
 
 /**
  * @summary Retrieve a security group
@@ -1466,8 +1188,6 @@ export const CreateSecurityGroupResponse = SecurityGroupResource;
 export const GetSecurityGroupParams = zod.strictObject({
   securityGroupId: zod.uuid(),
 });
-
-export const GetSecurityGroupResponse = SecurityGroupResource;
 
 /**
  * Changes the name only. Use the rule endpoints to change rules.
@@ -1479,8 +1199,6 @@ export const RenameSecurityGroupParams = zod.strictObject({
 
 export const RenameSecurityGroupBody = RenameSecurityGroupRequestBody;
 
-export const RenameSecurityGroupResponse = SecurityGroupResource;
-
 /**
  * The default security group cannot be deleted, as it is released with the private network. A security group still referenced by a network interface cannot be deleted either.
  * @summary Delete a security group
@@ -1488,8 +1206,6 @@ export const RenameSecurityGroupResponse = SecurityGroupResource;
 export const DeleteSecurityGroupParams = zod.strictObject({
   securityGroupId: zod.uuid(),
 });
-
-export const DeleteSecurityGroupResponse = zod.void();
 
 /**
  * @summary List security group rules
@@ -1512,8 +1228,6 @@ export const ListSecurityGroupRulesQueryParams = zod.strictObject({
     .default(listSecurityGroupRulesQueryPageSizeDefault),
 });
 
-export const ListSecurityGroupRulesResponse = SecurityRuleListResponseBody;
-
 /**
  * Adding an identical rule twice is rejected. For that comparison `0.0.0.0/0`, `::/0` and an omitted value are treated as equivalent.
  * @summary Create a security group rule
@@ -1524,8 +1238,6 @@ export const CreateSecurityGroupRuleParams = zod.strictObject({
 
 export const CreateSecurityGroupRuleBody = CreateSecurityRuleRequestBody;
 
-export const CreateSecurityGroupRuleResponse = SecurityRuleResource;
-
 /**
  * @summary Delete a security group rule
  */
@@ -1533,8 +1245,6 @@ export const DeleteSecurityGroupRuleParams = zod.strictObject({
   securityGroupId: zod.uuid(),
   ruleId: zod.uuid(),
 });
-
-export const DeleteSecurityGroupRuleResponse = zod.void();
 
 /**
  * The snapshot count quota for the authenticated project in this region. Counts simultaneous
@@ -1554,8 +1264,6 @@ export const DeleteSecurityGroupRuleResponse = zod.void();
 export const GetSnapshotQuotaParams = zod.strictObject({
   regionId: zod.uuid(),
 });
-
-export const GetSnapshotQuotaResponse = SnapshotQuota;
 
 /**
  * Purchases or changes the maximum number of snapshots this project may hold in this region.
@@ -1581,8 +1289,6 @@ export const SetSnapshotQuotaParams = zod.strictObject({
 
 export const SetSnapshotQuotaBody = SetSnapshotQuotaRequestBody;
 
-export const SetSnapshotQuotaResponse = SetSnapshotQuotaResponseBody;
-
 /**
  * Prices what `set-snapshot-quota` would order, including a change of an existing purchase as of now, for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote setting the regional snapshot quota
@@ -1593,8 +1299,6 @@ export const CreateSnapshotQuotaQuoteParams = zod.strictObject({
 
 export const CreateSnapshotQuotaQuoteBody = SetSnapshotQuotaQuoteRequestBody;
 
-export const CreateSnapshotQuotaQuoteResponse = Quote;
-
 /**
  * The backup service of the authenticated project in this region. Backups can be created only while it is `active`. Each hour, Compute covers retained backup capacity up to the total `capacity_gib` of the capacity packs active in the region and meters only the excess on this service's subscription, per GiB-hour.
  *
@@ -1604,8 +1308,6 @@ export const CreateSnapshotQuotaQuoteResponse = Quote;
 export const GetBackupServiceParams = zod.strictObject({
   regionId: zod.uuid(),
 });
-
-export const GetBackupServiceResponse = BackupService;
 
 /**
  * Purchases the backup service for this project and region. The service itself has no charge; backups are billed under it postpaid, by retained capacity. It takes no billing choice. Returns the service as `pending` with its order; it becomes `active` once the order is accepted.
@@ -1619,8 +1321,6 @@ export const CreateBackupServiceParams = zod.strictObject({
 
 export const CreateBackupServiceBody = CreateBackupServiceRequestBody;
 
-export const CreateBackupServiceResponse = CreateBackupServiceResponseBody;
-
 /**
  * Prices what `create-backup-service` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote activating the backup service
@@ -1628,8 +1328,6 @@ export const CreateBackupServiceResponse = CreateBackupServiceResponseBody;
 export const CreateBackupServiceQuoteParams = zod.strictObject({
   regionId: zod.uuid(),
 });
-
-export const CreateBackupServiceQuoteResponse = Quote;
 
 /**
  * The capacity packs of the authenticated project in this region, newest first, including ended ones.
@@ -1653,8 +1351,6 @@ export const ListBackupCapacityPacksQueryParams = zod.strictObject({
     .default(listBackupCapacityPacksQueryPageSizeDefault),
 });
 
-export const ListBackupCapacityPacksResponse = BackupCapacityPackListResponseBody;
-
 /**
  * Purchases a capacity pack, prepaid backup capacity for this project and region bought by month or year: `billing` must be prepaid with a period, as offered in the backup service's `capacity_pack_pricing`. Compute applies the coverage: each hour, retained backup capacity up to the total `capacity_gib` of the packs active in the region is covered, and Compute meters only the excess on the backup service's subscription. A pack is not a Billing allowance or credit; Billing takes its order and payment and handles its renewal and cancellation through the pack's subscription.
  *
@@ -1667,8 +1363,6 @@ export const CreateBackupCapacityPackParams = zod.strictObject({
 
 export const CreateBackupCapacityPackBody = CreateBackupCapacityPackRequestBody;
 
-export const CreateBackupCapacityPackResponse = CreateBackupCapacityPackResponseBody;
-
 /**
  * Prices what `create-backup-capacity-pack` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects postpaid usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
  * @summary Quote buying a backup capacity pack
@@ -1678,8 +1372,6 @@ export const CreateBackupCapacityPackQuoteParams = zod.strictObject({
 });
 
 export const CreateBackupCapacityPackQuoteBody = CreateBackupCapacityPackQuoteRequestBody;
-
-export const CreateBackupCapacityPackQuoteResponse = Quote;
 
 /**
  * @summary List snapshots
@@ -1699,8 +1391,6 @@ export const ListSnapshotsQueryParams = zod.strictObject({
     .default(listSnapshotsQueryPageSizeDefault),
 });
 
-export const ListSnapshotsResponse = SnapshotListResponseBody;
-
 /**
  * Disks attached to a running instance can be snapshotted. A snapshot records the state of the block device at a point in time and may be inconsistent at the file-system level, so run `sync` inside the instance first where the data matters.
  *
@@ -1713,16 +1403,12 @@ export const ListSnapshotsResponse = SnapshotListResponseBody;
  */
 export const CreateSnapshotBody = CreateSnapshotRequestBody;
 
-export const CreateSnapshotResponse = SnapshotResource;
-
 /**
  * @summary Retrieve a snapshot
  */
 export const GetSnapshotParams = zod.strictObject({
   snapshotId: zod.uuid(),
 });
-
-export const GetSnapshotResponse = SnapshotResource;
 
 /**
  * @summary Rename a snapshot
@@ -1733,8 +1419,6 @@ export const RenameSnapshotParams = zod.strictObject({
 
 export const RenameSnapshotBody = RenameSnapshotRequestBody;
 
-export const RenameSnapshotResponse = SnapshotResource;
-
 /**
  * Deletes this snapshot without canceling the project's snapshot quota purchase. A snapshot has no individual Billing subscription. Its slot stays occupied until the deletion is confirmed.
  * @summary Delete a snapshot
@@ -1742,8 +1426,6 @@ export const RenameSnapshotResponse = SnapshotResource;
 export const DeleteSnapshotParams = zod.strictObject({
   snapshotId: zod.uuid(),
 });
-
-export const DeleteSnapshotResponse = SnapshotResource;
 
 /**
  * Lists the public IP pools available for new allocations in this region.
@@ -1764,8 +1446,6 @@ export const ListIpv4PoolsQueryParams = zod.strictObject({
     .default(listIpv4PoolsQueryPageSizeDefault),
 });
 
-export const ListIpv4PoolsResponse = IPv4PoolListResponseBody;
-
 /**
  * @summary List peerings
  */
@@ -1783,15 +1463,11 @@ export const ListPeeringsQueryParams = zod.strictObject({
     .default(listPeeringsQueryPageSizeDefault),
 });
 
-export const ListPeeringsResponse = PeeringListResponseBody;
-
 /**
  * Request IPv4 peering between non-overlapping VPCs in the same Region. The target project must accept before any connectivity is created. Does not change security groups or provide transitive routing.
  * @summary Create peering
  */
 export const CreatePeeringBody = CreatePeeringRequestBody;
-
-export const CreatePeeringResponse = PeeringResource;
 
 /**
  * @summary Get peering
@@ -1800,16 +1476,12 @@ export const GetPeeringParams = zod.strictObject({
   peeringId: zod.uuid(),
 });
 
-export const GetPeeringResponse = PeeringResource;
-
 /**
  * @summary Delete peering
  */
 export const DeletePeeringParams = zod.strictObject({
   peeringId: zod.uuid(),
 });
-
-export const DeletePeeringResponse = PeeringResource;
 
 /**
  * @summary Accept peering
@@ -1818,13 +1490,9 @@ export const AcceptPeeringParams = zod.strictObject({
   peeringId: zod.uuid(),
 });
 
-export const AcceptPeeringResponse = PeeringResource;
-
 /**
  * @summary Reject peering
  */
 export const RejectPeeringParams = zod.strictObject({
   peeringId: zod.uuid(),
 });
-
-export const RejectPeeringResponse = PeeringResource;

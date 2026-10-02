@@ -30,39 +30,11 @@
  */
 import * as zod from "zod";
 
-import { APIKeyResource } from "./validators/aPIKeyResource.zod.js";
-
-import { APIKeyUsageListResponseBody } from "./validators/aPIKeyUsageListResponseBody.zod.js";
-
 import { CreateAPIKeyRequestBody } from "./validators/createAPIKeyRequestBody.zod.js";
 
 import { CreateServiceRequestBody } from "./validators/createServiceRequestBody.zod.js";
 
-import { CreateServiceResponseBody } from "./validators/createServiceResponseBody.zod.js";
-
-import { CursorPageRequestResource } from "./validators/cursorPageRequestResource.zod.js";
-
-import { IssuedAPIKeyResource } from "./validators/issuedAPIKeyResource.zod.js";
-
-import { LengthAwarePageAPIKeyResource } from "./validators/lengthAwarePageAPIKeyResource.zod.js";
-
-import { ModelListResponseBody } from "./validators/modelListResponseBody.zod.js";
-
-import { ModelResource } from "./validators/modelResource.zod.js";
-
-import { ModelUsageListResponseBody } from "./validators/modelUsageListResponseBody.zod.js";
-
-import { Quote } from "./validators/quote.zod.js";
-
-import { RequestResource } from "./validators/requestResource.zod.js";
-
-import { ServiceResource } from "./validators/serviceResource.zod.js";
-
-import { TotalsResource } from "./validators/totalsResource.zod.js";
-
 import { UpdateAPIKeyRequestBody } from "./validators/updateAPIKeyRequestBody.zod.js";
-
-import { UsageTimelineResponseBody } from "./validators/usageTimelineResponseBody.zod.js";
 
 /**
  * @summary List API keys
@@ -94,8 +66,6 @@ export const ListApiKeysQueryParams = zod.strictObject({
     ),
 });
 
-export const ListApiKeysResponse = LengthAwarePageAPIKeyResource;
-
 /**
  * The `secret` in the response is the complete key and **appears in this response only**. It is returned by no other endpoint, and a key that has been lost has to be revoked and reissued.
  *
@@ -104,16 +74,12 @@ export const ListApiKeysResponse = LengthAwarePageAPIKeyResource;
  */
 export const CreateApiKeyBody = CreateAPIKeyRequestBody;
 
-export const CreateApiKeyResponse = IssuedAPIKeyResource;
-
 /**
  * @summary Get an API key
  */
 export const GetApiKeyParams = zod.strictObject({
   keyId: zod.uuid(),
 });
-
-export const GetApiKeyResponse = APIKeyResource;
 
 /**
  * Attributes only. Enabling, disabling and revoking each have their own endpoint.
@@ -129,8 +95,6 @@ export const UpdateApiKeyParams = zod.strictObject({
 
 export const UpdateApiKeyBody = UpdateAPIKeyRequestBody;
 
-export const UpdateApiKeyResponse = APIKeyResource;
-
 /**
  * A temporary measure; the key may be enabled again at any time. Use revocation to invalidate it permanently.
  * @summary Disable an API key
@@ -139,8 +103,6 @@ export const DisableApiKeyParams = zod.strictObject({
   keyId: zod.uuid(),
 });
 
-export const DisableApiKeyResponse = APIKeyResource;
-
 /**
  * Two cases cannot be enabled again. A revoked key answers `API_KEY_REVOKED`, and a key disabled because its project is suspended answers `API_KEY_PROJECT_SUSPENDED` with `suspended` set to true; the latter requires the project to be restored first.
  * @summary Enable an API key
@@ -148,8 +110,6 @@ export const DisableApiKeyResponse = APIKeyResource;
 export const EnableApiKeyParams = zod.strictObject({
   keyId: zod.uuid(),
 });
-
-export const EnableApiKeyResponse = APIKeyResource;
 
 /**
  * **Irreversible.** It is intended for a key that has been exposed, such as one committed to a repository.
@@ -163,18 +123,6 @@ export const RevokeApiKeyParams = zod.strictObject({
   keyId: zod.uuid(),
 });
 
-export const RevokeApiKeyResponse = APIKeyResource;
-
-/**
- * A model that has been retired does not appear here, while it remains readable individually.
- *
- * `context_length` and `max_output_tokens` are advisory. The server does not truncate on their basis, and the request body is forwarded upstream unchanged.
- *
- * `pricing` states what requests to each model cost in the currency of the project's current billing account.
- * @summary List the available models
- */
-export const ListModelsResponse = ModelListResponseBody;
-
 /**
  * A model that has been retired remains readable here, while forwarding to it is refused with `MODEL_RETIRED`. That is distinct from a model that does not exist.
  * @summary Get a model
@@ -184,8 +132,6 @@ export const getModelPathModelIdMax = 128;
 export const GetModelParams = zod.strictObject({
   modelId: zod.string().max(getModelPathModelIdMax),
 });
-
-export const GetModelResponse = ModelResource;
 
 /**
  * Cursor-paged, most recent first. An empty `next_cursor` indicates the last page.
@@ -232,24 +178,12 @@ export const ListRequestsQueryParams = zod.strictObject({
     .describe("The `next_cursor` returned by the previous page. Omitted on the first page"),
 });
 
-export const ListRequestsResponse = CursorPageRequestResource;
-
 /**
  * @summary Get a single request record
  */
 export const GetRequestParams = zod.strictObject({
   requestId: zod.uuid(),
 });
-
-export const GetRequestResponse = RequestResource;
-
-/**
- * The model platform service of the authenticated project. The forwarding endpoints accept its requests only while `status` is `active`; each request is then billed under `subscription_id`, per token, at the rates stated in each model's `pricing`.
- *
- * When the project is deleted, its API keys are revoked and the subscription is canceled; the service then reads `inactive` with `ended_at` set.
- * @summary Get the model platform service
- */
-export const GetServiceResponse = ServiceResource;
 
 /**
  * Purchases the model platform service for this project. The service itself has no charge; requests are billed under it postpaid, by the tokens they use. It takes no billing choice. Returns the service as `pending` with its order; it becomes `active` once the order is accepted, which for an order with nothing to pay happens without further action.
@@ -258,16 +192,6 @@ export const GetServiceResponse = ServiceResource;
  * @summary Enable the model platform service
  */
 export const CreateServiceBody = CreateServiceRequestBody;
-
-export const CreateServiceResponse = CreateServiceResponseBody;
-
-/**
- * Prices what `create-service` would order, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount.
- *
- * Token usage is priced per model, as each model's `pricing` states, and is neither part of `total` nor projected: `estimated_usage_amount` is null. A request the purchase would refuse is refused the same way.
- * @summary Quote enabling the model platform service
- */
-export const CreateServiceQuoteResponse = Quote;
 
 /**
  * Answers which key is consuming the budget. A key that has been revoked still appears, since the usage it accrued beforehand is part of that answer.
@@ -294,8 +218,6 @@ export const ListUsageByApiKeyQueryParams = zod.strictObject({
     .describe("Restricts the result to the specified status"),
 });
 
-export const ListUsageByApiKeyResponse = APIKeyUsageListResponseBody;
-
 /**
  * @summary Get usage by model
  */
@@ -319,8 +241,6 @@ export const ListUsageByModelQueryParams = zod.strictObject({
     .optional()
     .describe("Restricts the result to the specified status"),
 });
-
-export const ListUsageByModelResponse = ModelUsageListResponseBody;
 
 /**
  * `from` and `to` are required and may span no more than 31 days. Both carry a timezone offset, so `2026-08-01T00:00:00+08:00` starts at that instant in UTC+8.
@@ -348,8 +268,6 @@ export const GetUsageSummaryQueryParams = zod.strictObject({
     .optional()
     .describe("Restricts the result to the specified status"),
 });
-
-export const GetUsageSummaryResponse = TotalsResource;
 
 /**
  * Divided into buckets of `bucket`, starting at `from`. The final bucket may be partial, and the number of buckets is limited to 100.
@@ -387,5 +305,3 @@ export const GetUsageTimelineQueryParams = zod.strictObject({
       "The length of each bucket, written as a duration such as 1h or 24h. The number of buckets is limited to 100",
     ),
 });
-
-export const GetUsageTimelineResponse = UsageTimelineResponseBody;

@@ -50,14 +50,6 @@ import * as zod from "zod";
 
 import { AnswerRequestBody } from "./validators/answerRequestBody.zod.js";
 
-import { BindingCodeResponseBody } from "./validators/bindingCodeResponseBody.zod.js";
-
-import { BindingResource } from "./validators/bindingResource.zod.js";
-
-import { ChannelResource } from "./validators/channelResource.zod.js";
-
-import { ChannelWithSecretResponseBody } from "./validators/channelWithSecretResponseBody.zod.js";
-
 import { CreateChannelRequestBody } from "./validators/createChannelRequestBody.zod.js";
 
 import { CreateFolderRequestBody } from "./validators/createFolderRequestBody.zod.js";
@@ -66,53 +58,17 @@ import { CreateThreadRequestBody } from "./validators/createThreadRequestBody.zo
 
 import { DecideRequestBody } from "./validators/decideRequestBody.zod.js";
 
-import { DocumentResource } from "./validators/documentResource.zod.js";
-
 import { DynamicCallResultRequestBody } from "./validators/dynamicCallResultRequestBody.zod.js";
 
-import { EarlierResponseBody } from "./validators/earlierResponseBody.zod.js";
-
-import { FolderListResponseBody } from "./validators/folderListResponseBody.zod.js";
-
-import { FolderResource } from "./validators/folderResource.zod.js";
-
-import { LengthAwarePageBindingResource } from "./validators/lengthAwarePageBindingResource.zod.js";
-
-import { LengthAwarePageChannelResource } from "./validators/lengthAwarePageChannelResource.zod.js";
-
-import { LoginResource } from "./validators/loginResource.zod.js";
-
-import { MemoryListResponseBody } from "./validators/memoryListResponseBody.zod.js";
-
-import { ModelListResponseBody } from "./validators/modelListResponseBody.zod.js";
-
-import { PlatformListResponseBody } from "./validators/platformListResponseBody.zod.js";
-
-import { RejectionListResponseBody } from "./validators/rejectionListResponseBody.zod.js";
-
 import { RevertRequestBody } from "./validators/revertRequestBody.zod.js";
-
-import { RevertedCountResponseBody } from "./validators/revertedCountResponseBody.zod.js";
 
 import { RotateSecretRequestBody } from "./validators/rotateSecretRequestBody.zod.js";
 
 import { SendMessageRequestBody } from "./validators/sendMessageRequestBody.zod.js";
 
-import { SenderCheckResource } from "./validators/senderCheckResource.zod.js";
-
 import { SkillEnabledRequestBody } from "./validators/skillEnabledRequestBody.zod.js";
 
-import { SkillListResponseBody } from "./validators/skillListResponseBody.zod.js";
-
 import { SkillRequestBody } from "./validators/skillRequestBody.zod.js";
-
-import { SkillResource } from "./validators/skillResource.zod.js";
-
-import { ThreadListResponseBody } from "./validators/threadListResponseBody.zod.js";
-
-import { ThreadSummaryResource } from "./validators/threadSummaryResource.zod.js";
-
-import { TurnIDResponseBody } from "./validators/turnIDResponseBody.zod.js";
 
 import { UpdateChannelRequestBody } from "./validators/updateChannelRequestBody.zod.js";
 
@@ -120,21 +76,7 @@ import { UpdateFolderRequestBody } from "./validators/updateFolderRequestBody.zo
 
 import { UpdateThreadRequestBody } from "./validators/updateThreadRequestBody.zod.js";
 
-import { UploadedResource } from "./validators/uploadedResource.zod.js";
-
 import { VerifyCodeRequestBody } from "./validators/verifyCodeRequestBody.zod.js";
-
-import { WebhookSecretResponseBody } from "./validators/webhookSecretResponseBody.zod.js";
-
-/**
- * Returns Canopy's models filtered by Assistant's saved allowlist and selection policy. There is no separately maintained assistant catalogue. The complete list is not paginated and is ordered by displayName, then id.
- *
- * When allowModelSelection is true, models contains allowed Canopy models that remain callable, support tools and have positive context and output limits. When false, only the default is returned if it meets those conditions. defaultModelId is null if no usable default is known. Disallowed, retired and incompatible models are omitted, while saved preferences may still reference them.
- *
- * This operation reads capabilities without making an inference request. It does not check live provider health or the inference key's model restrictions. If Canopy cannot be read and no usable cached snapshot exists, it returns 503 with code MODEL_CATALOG_UNAVAILABLE; a failed read is not an empty catalogue. An empty allowlist returns an empty list without needing Canopy. Supplier connection details and credentials are not returned.
- * @summary List assistant model choices
- */
-export const ListModelsResponse = ModelListResponseBody;
 
 /**
  * The body is the file bytes themselves, not multipart, one file per request. The kind is determined from the content, not from Content-Type or from the name. Put the returned id in attachmentIds when sending a message.
@@ -156,8 +98,6 @@ export const UploadAttachmentQueryParams = zod.strictObject({
     ),
 });
 
-export const UploadAttachmentResponse = UploadedResource;
-
 /**
  * Returns the original bytes for an attachment id. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
  *
@@ -167,8 +107,6 @@ export const UploadAttachmentResponse = UploadedResource;
 export const DownloadAttachmentParams = zod.strictObject({
   attachment: zod.string(),
 });
-
-export const DownloadAttachmentResponse = zod.unknown();
 
 /**
  * Filter by channelId to show, per channel, who is bound to it.
@@ -198,8 +136,6 @@ export const ListBindingsQueryParams = zod.strictObject({
   active: zod.boolean().optional().describe("Return only bindings that are active"),
 });
 
-export const ListBindingsResponse = LengthAwarePageBindingResource;
-
 /**
  * @summary Get a binding
  */
@@ -207,16 +143,12 @@ export const GetBindingParams = zod.strictObject({
   binding: zod.uuid(),
 });
 
-export const GetBindingResponse = BindingResource;
-
 /**
  * @summary Remove a binding
  */
 export const DeleteBindingParams = zod.strictObject({
   binding: zod.uuid(),
 });
-
-export const DeleteBindingResponse = zod.void();
 
 /**
  * @summary List channels
@@ -244,15 +176,11 @@ export const ListChannelsQueryParams = zod.strictObject({
   active: zod.boolean().optional().describe("Return only channels that are enabled"),
 });
 
-export const ListChannelsResponse = LengthAwarePageChannelResource;
-
 /**
  * Which side owns the webhook secret is decided by the platform; see secretSource on list-platforms. For a `generated` platform, do not send webhookSecret — the one we generate is returned exactly once in this response and cannot be retrieved again; miss it and the only way forward is rotating to a new one. For a `supplied` platform you must pass the secret from that platform's own console, and webhookSecret in the response is null.
  * @summary Create a channel
  */
 export const CreateChannelBody = CreateChannelRequestBody;
-
-export const CreateChannelResponse = ChannelWithSecretResponseBody;
 
 /**
  * @summary Get a channel
@@ -260,8 +188,6 @@ export const CreateChannelResponse = ChannelWithSecretResponseBody;
 export const GetChannelParams = zod.strictObject({
   channel: zod.uuid(),
 });
-
-export const GetChannelResponse = ChannelResource;
 
 /**
  * Only the fields present are changed. senderPolicy and allowFrom go together, and senderPolicy decides whether they are replaced. For platforms held open by a long-lived connection the change applies once that connection is rebuilt; for webhook platforms it applies at once.
@@ -273,8 +199,6 @@ export const UpdateChannelParams = zod.strictObject({
 
 export const UpdateChannelBody = UpdateChannelRequestBody;
 
-export const UpdateChannelResponse = ChannelResource;
-
 /**
  * The channel stops accepting inbound messages and every binding on it stops working. This operation remains available while the project is suspended or being cleaned up.
  * @summary Delete a channel
@@ -283,8 +207,6 @@ export const DeleteChannelParams = zod.strictObject({
   channel: zod.uuid(),
 });
 
-export const DeleteChannelResponse = zod.void();
-
 /**
  * Produces a single-use code to hand to the person being bound. They send that code to the assistant from their own account on that platform, which completes the binding. A binding can only be established this way, by the person themselves — a platform account cannot be named directly. Codes expire and have to be reissued.
  * @summary Issue a binding code
@@ -292,8 +214,6 @@ export const DeleteChannelResponse = zod.void();
 export const CreateBindingCodeParams = zod.strictObject({
   channel: zod.uuid(),
 });
-
-export const CreateBindingCodeResponse = BindingCodeResponseBody;
 
 /**
  * For diagnosing "I sent a message and the assistant never answered". Returns the inbound messages this channel rejected most recently, newest first, each with its reason. The most common reason is that the sender is not bound yet.
@@ -315,8 +235,6 @@ export const ListChannelRejectionsQueryParams = zod.strictObject({
     .default(listChannelRejectionsQueryLimitDefault),
 });
 
-export const ListChannelRejectionsResponse = RejectionListResponseBody;
-
 /**
  * Replaces the webhook secret. The old one stops working immediately and the channel drops back to awaiting confirmation from the platform. Which side owns the secret is decided by the platform; see secretSource on list-platforms. For a `generated` platform, send no body — the new secret is returned in this response only and cannot be retrieved again. For a `supplied` platform you must pass the new secret from that platform's own console.
  * @summary Rotate the webhook secret
@@ -326,8 +244,6 @@ export const RotateChannelSecretParams = zod.strictObject({
 });
 
 export const RotateChannelSecretBody = RotateSecretRequestBody;
-
-export const RotateChannelSecretResponse = WebhookSecretResponseBody;
 
 /**
  * For checking a sender policy after changing it. Sends nothing and changes nothing: it runs exactly the same decision a real inbound message goes through, and says which rule produced the answer. The binding-code rule cannot be tested this way — whether something is a binding code depends on what the sender actually wrote.
@@ -351,8 +267,6 @@ export const CheckSenderQueryParams = zod.strictObject({
     ),
 });
 
-export const CheckSenderResponse = SenderCheckResource;
-
 /**
  * A personal WeChat channel can only send and receive once its owner has signed in by scanning a QR code. This returns that code; poll `GET /v1/weixin-logins/{login}` for progress, and when the status asks for a verification code, submit it with `POST /v1/weixin-logins/{login}/verify-code`.
  * @summary Begin a WeChat QR login
@@ -361,14 +275,6 @@ export const BeginWeixinLoginParams = zod.strictObject({
   channel: zod.uuid(),
 });
 
-export const BeginWeixinLoginResponse = LoginResource;
-
-/**
- * The instant messaging platforms that can currently be connected, along with the flow and the credential fields each one needs. The create-channel form is driven entirely by this response: setupMethod decides between a credential form and a QR flow, credentialFields is what to ask for, and secretSource decides whether there is a webhook secret field at all.
- * @summary List platforms that can be connected
- */
-export const ListPlatformsResponse = PlatformListResponseBody;
-
 /**
  * Poll this until the status is success or failure. When the status asks for a verification code, submit it with the verification-code operation.
  * @summary Get the state of a QR login
@@ -376,8 +282,6 @@ export const ListPlatformsResponse = PlatformListResponseBody;
 export const GetWeixinLoginParams = zod.strictObject({
   login: zod.uuid(),
 });
-
-export const GetWeixinLoginResponse = LoginResource;
 
 /**
  * For when WeChat asks for an SMS or device code after the scan. The person who started the login gets that code on their own phone.
@@ -388,8 +292,6 @@ export const SubmitWeixinVerifyCodeParams = zod.strictObject({
 });
 
 export const SubmitWeixinVerifyCodeBody = VerifyCodeRequestBody;
-
-export const SubmitWeixinVerifyCodeResponse = LoginResource;
 
 /**
  * The assistant asks the client to run an action by adding a tool call to the conversation
@@ -405,14 +307,6 @@ export const SubmitDynamicCallResultParams = zod.strictObject({
 
 export const SubmitDynamicCallResultBody = DynamicCallResultRequestBody;
 
-export const SubmitDynamicCallResultResponse = zod.void();
-
-/**
- * The current account's folders in this project, oldest first. That order is fixed and does not react to what happens inside a folder: a folder is a place on the screen, and a place that moves whenever something is put into it is not one anybody can aim at. Not paginated — there is a cap on how many there can be, and all of them come back at once.
- * @summary List folders
- */
-export const ListFoldersResponse = FolderListResponseBody;
-
 /**
  * A folder groups conversations in the sidebar and does nothing else. The assistant is never told which folder a conversation is in, and a conversation behaves exactly the same inside one as outside: no shared instructions, no shared files, no shared memory.
  *
@@ -421,8 +315,6 @@ export const ListFoldersResponse = FolderListResponseBody;
  */
 export const CreateFolderBody = CreateFolderRequestBody;
 
-export const CreateFolderResponse = FolderResource;
-
 /**
  * The list returns every folder at once, so this is for the case the list does not cover: a page opened straight at a folder, holding nothing but the id from the address bar. Its conversations are a separate request — `GET /api/v1/threads?folder=<id>`.
  * @summary Fetch one folder
@@ -430,8 +322,6 @@ export const CreateFolderResponse = FolderResource;
 export const GetFolderParams = zod.strictObject({
   folder: zod.string(),
 });
-
-export const GetFolderResponse = FolderResource;
 
 /**
  * The conversations in it are untouched, and none of them move in the list — a folder's name is not part of what any conversation is about.
@@ -443,8 +333,6 @@ export const UpdateFolderParams = zod.strictObject({
 
 export const UpdateFolderBody = UpdateFolderRequestBody;
 
-export const UpdateFolderResponse = FolderResource;
-
 /**
  * The conversations inside are **not** deleted. They leave the folder and go back to the ungrouped list, where they can be filed again. Emptying a shelf is not the same as throwing out what was on it, and deleting a conversation is a different request.
  *
@@ -455,14 +343,6 @@ export const DeleteFolderParams = zod.strictObject({
   folder: zod.string(),
 });
 
-export const DeleteFolderResponse = zod.void();
-
-/**
- * Facts the assistant has written down for the current account in this project. They appear at the start of every later conversation. Members of the same project each have their own, and this returns only the current account's. Not paginated: there is a cap on how many there can be, and all of them come back at once.
- * @summary List what the assistant remembers
- */
-export const ListMemoriesResponse = MemoryListResponseBody;
-
 /**
  * The assistant stops remembering this. It takes effect at once, so the next conversation will not carry it. The assistant may well learn the same thing again.
  * @summary Delete one memory
@@ -470,18 +350,6 @@ export const ListMemoriesResponse = MemoryListResponseBody;
 export const DeleteMemoryParams = zod.strictObject({
   memory: zod.string(),
 });
-
-export const DeleteMemoryResponse = zod.void();
-
-/**
- * Everything the assistant can reach in this project, including the ones that are turned off —
- * an entry that disappeared once it was switched off could not be switched back on.
- *
- * `origin` says whether a skill can be edited here. Skills belonging to the project are
- * visible to everyone in it, whoever wrote them.
- * @summary List the skills this project can use
- */
-export const ListSkillsResponse = SkillListResponseBody;
 
 /**
  * Creates it, or replaces the project's skill of that name. The whole package goes in each
@@ -494,8 +362,6 @@ export const ListSkillsResponse = SkillListResponseBody;
  */
 export const PutSkillBody = SkillRequestBody;
 
-export const PutSkillResponse = SkillResource;
-
 /**
  * Works for built-in skills too; they simply cannot be written.
  * @summary Read one skill, with its files
@@ -503,8 +369,6 @@ export const PutSkillResponse = SkillResource;
 export const GetSkillParams = zod.strictObject({
   skill: zod.string().describe("The skill's name, as `list-skills` returned it."),
 });
-
-export const GetSkillResponse = SkillResource;
 
 /**
  * Separate from writing it, because this is the frequent one: a skill that is off costs
@@ -520,8 +384,6 @@ export const SetSkillEnabledParams = zod.strictObject({
 
 export const SetSkillEnabledBody = SkillEnabledRequestBody;
 
-export const SetSkillEnabledResponse = SkillResource;
-
 /**
  * A built-in skill of the same name, if there was one, becomes visible again.
  * @summary Delete this project's skill
@@ -529,8 +391,6 @@ export const SetSkillEnabledResponse = SkillResource;
 export const DeleteSkillParams = zod.strictObject({
   skill: zod.string(),
 });
-
-export const DeleteSkillResponse = zod.void();
 
 /**
  * Ordered by most recent activity, limited to the current account's conversations in the current project. `archived` selects between two sets rather than widening one: archived conversations are absent from the default list, and turning the flag on shows those instead.
@@ -574,8 +434,6 @@ export const ListThreadsQueryParams = zod.strictObject({
   limit: zod.int().min(listThreadsQueryLimitMin).max(listThreadsQueryLimitMax).optional(),
 });
 
-export const ListThreadsResponse = ThreadListResponseBody;
-
 /**
  * Omit preferredModelId or set it to null to follow the platform default. A non-null preference is accepted only while model selection is enabled; otherwise the request fails with 403 and code MODEL_SELECTION_DISABLED.
  *
@@ -584,8 +442,6 @@ export const ListThreadsResponse = ThreadListResponseBody;
  */
 export const CreateThreadBody = CreateThreadRequestBody;
 
-export const CreateThreadResponse = ThreadSummaryResource;
-
 /**
  * The complete current state of a conversation, for the first render. Its `stream` gives the address and admission ticket for live output, and what that stream pushes are incremental edits to this same document, so the same rendering logic applies.
  * @summary Fetch the conversation document
@@ -593,8 +449,6 @@ export const CreateThreadResponse = ThreadSummaryResource;
 export const GetThreadParams = zod.strictObject({
   thread: zod.string(),
 });
-
-export const GetThreadResponse = DocumentResource;
 
 /**
  * Changes the title, folder, approval mode, model preference, and whether the conversation is archived. Approval and model preference changes take effect from the next turn; a turn already running keeps the settings it started with.
@@ -614,8 +468,6 @@ export const UpdateThreadParams = zod.strictObject({
 
 export const UpdateThreadBody = UpdateThreadRequestBody;
 
-export const UpdateThreadResponse = ThreadSummaryResource;
-
 /**
  * Removes the conversation from every list and makes it unreachable by id. The assistant can no longer find it either — neither by searching past conversations nor by reading one back.
  *
@@ -630,8 +482,6 @@ export const DeleteThreadParams = zod.strictObject({
   thread: zod.string(),
 });
 
-export const DeleteThreadResponse = zod.void();
-
 /**
  * The batch id comes from the conversation document's `wait`. This is idempotent: submitting the same batch again neither changes a decision already in effect nor reports an error. Returns 404 when the batch does not belong to that conversation.
  * @summary Approve or decline a batch of tool calls
@@ -642,8 +492,6 @@ export const DecideApprovalParams = zod.strictObject({
 });
 
 export const DecideApprovalBody = DecideRequestBody;
-
-export const DecideApprovalResponse = zod.void();
 
 /**
  * The first render only carries the latest stretch of a conversation; anything above it is fetched here, one stretch at a time. Pass the document's earlier.before as `before`; the `earlier` in the response is the cursor for the stretch above that, and null means the top has been reached. The entries have the same shape and the same order (oldest first) as `items` in the document, so they can be prepended as they are.
@@ -662,8 +510,6 @@ export const ListEarlierItemsQueryParams = zod.strictObject({
     .describe("From the document's earlier.before; returns entries before this ordinal"),
 });
 
-export const ListEarlierItemsResponse = EarlierResponseBody;
-
 /**
  * Calling this on a conversation with no running turn also returns 204 rather than an error — the user pressing stop races with the turn finishing on its own, and both outcomes are the same. This operation remains available while the project is suspended or being cleaned up.
  * @summary Interrupt a running turn
@@ -671,8 +517,6 @@ export const ListEarlierItemsResponse = EarlierResponseBody;
 export const InterruptThreadParams = zod.strictObject({
   thread: zod.string(),
 });
-
-export const InterruptThreadResponse = zod.void();
 
 /**
  * Returns a turnId immediately without waiting for execution — a turn can run for tens of minutes. Progress arrives on the live stream the conversation document's `stream` points at, not in this response. Sending while the assistant is still working is allowed: the message is put in line and `queued` comes back true, to be read at the next step of the turn already running — so the editor should stay open rather than blocking on a busy conversation.
@@ -683,8 +527,6 @@ export const SendMessageParams = zod.strictObject({
 });
 
 export const SendMessageBody = SendMessageRequestBody;
-
-export const SendMessageResponse = TurnIDResponseBody;
 
 /**
  * The question id comes from the conversation document's `wait`. An already-answered question also returns 204 — another tab may have submitted first, or the auto-answer window may have expired, and in both cases the turn has already continued with an answer.
@@ -697,16 +539,12 @@ export const AnswerQuestionParams = zod.strictObject({
 
 export const AnswerQuestionBody = AnswerRequestBody;
 
-export const AnswerQuestionResponse = zod.void();
-
 /**
  * @summary Mark a conversation as read
  */
 export const MarkThreadReadParams = zod.strictObject({
   thread: zod.string(),
 });
-
-export const MarkThreadReadResponse = zod.void();
 
 /**
  * Reverts the entry at `ordinal` and everything after it. Reverted entries stay in the transcript marked `reverted`, and ordinals are not renumbered. Returns how many were actually reverted.
@@ -717,5 +555,3 @@ export const RevertThreadParams = zod.strictObject({
 });
 
 export const RevertThreadBody = RevertRequestBody;
-
-export const RevertThreadResponse = RevertedCountResponseBody;

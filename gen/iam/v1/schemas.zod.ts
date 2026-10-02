@@ -18,43 +18,13 @@ import { AttachPolicyRequestBody } from "./validators/attachPolicyRequestBody.zo
 
 import { BatchGetMembersRequestBody } from "./validators/batchGetMembersRequestBody.zod.js";
 
-import { BatchGetMembersResponseBody } from "./validators/batchGetMembersResponseBody.zod.js";
-
-import { CatalogListResponseBody } from "./validators/catalogListResponseBody.zod.js";
-
 import { CreateRoleRequestBody } from "./validators/createRoleRequestBody.zod.js";
 
 import { CreateSSHKeyRequestBody } from "./validators/createSSHKeyRequestBody.zod.js";
 
 import { IssueInvitationRequestBody } from "./validators/issueInvitationRequestBody.zod.js";
 
-import { IssuedInvitationResponseBody } from "./validators/issuedInvitationResponseBody.zod.js";
-
-import { LengthAwarePageInvitationResource } from "./validators/lengthAwarePageInvitationResource.zod.js";
-
-import { LengthAwarePageMemberResource } from "./validators/lengthAwarePageMemberResource.zod.js";
-
-import { LengthAwarePageSSHKeyResource } from "./validators/lengthAwarePageSSHKeyResource.zod.js";
-
-import { MemberResource } from "./validators/memberResource.zod.js";
-
-import { MembershipResource } from "./validators/membershipResource.zod.js";
-
-import { OwnershipTransferResponseBody } from "./validators/ownershipTransferResponseBody.zod.js";
-
-import { PolicyListResponseBody } from "./validators/policyListResponseBody.zod.js";
-
-import { PolicyResource } from "./validators/policyResource.zod.js";
-
-import { ProjectAccessResource } from "./validators/projectAccessResource.zod.js";
-
 import { RenameSSHKeyRequestBody } from "./validators/renameSSHKeyRequestBody.zod.js";
-
-import { RoleListResponseBody } from "./validators/roleListResponseBody.zod.js";
-
-import { RoleResource } from "./validators/roleResource.zod.js";
-
-import { SSHKeyResource } from "./validators/sSHKeyResource.zod.js";
 
 import { SetMemberPermissionsRequestBody } from "./validators/setMemberPermissionsRequestBody.zod.js";
 
@@ -69,35 +39,9 @@ import { UpdateProjectRequestBody } from "./validators/updateProjectRequestBody.
 import { UpdateRoleRequestBody } from "./validators/updateRoleRequestBody.zod.js";
 
 /**
- * Each service registers its own catalogue with IAM at start-up, so this is the platform-wide list rather than the permissions of IAM alone. **IAM does not decide anything with it** — each service decides using the caller's grant together with its own catalogue, and this list only serves to render the choices. A service that has never started does not appear here.
- * @summary List every permission the platform can grant
- */
-export const ListPermissionsResponse = CatalogListResponseBody;
-
-/**
- * Visible to any member; no further permission is required.
- * @summary Get a project
- */
-export const GetProjectResponse = ProjectAccessResource;
-
-/**
  * @summary Update the name and description of a project
  */
 export const UpdateProjectBody = UpdateProjectRequestBody;
-
-export const UpdateProjectResponse = ProjectAccessResource;
-
-/**
- * Only the owner can do this, and it cannot be undone. The project enters DELETING and each service begins removing the resources under it. The project itself remains readable afterwards, answering that it is gone rather than 404.
- * @summary Delete a project
- */
-export const DeleteProjectResponse = ProjectAccessResource;
-
-/**
- * Facts rather than a conclusion. There is no `allowed` field here, because each service holds the catalogue mapping its operations to permissions and decides on its own.
- * @summary Get the caller's standing in this project
- */
-export const GetProjectMembershipResponse = MembershipResource;
 
 /**
  * Visible to any member, on the same rule as the member list. Who has been invited is part of who is in the project.
@@ -124,15 +68,11 @@ export const ListProjectInvitationsQueryParams = zod.strictObject({
     .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
 });
 
-export const ListProjectInvitationsResponse = LengthAwarePageInvitationResource;
-
 /**
  * An invitation stands for 14 days. The roles it carries are validated against the project as it stood when the invitation was sent, so it expires rather than outliving the arrangement it rests on.
  * @summary Send an invitation
  */
 export const IssueInvitationBody = IssueInvitationRequestBody;
-
-export const IssueInvitationResponse = IssuedInvitationResponseBody;
 
 /**
  * @summary Withdraw an invitation that has not been redeemed
@@ -140,8 +80,6 @@ export const IssueInvitationResponse = IssuedInvitationResponseBody;
 export const RevokeInvitationParams = zod.strictObject({
   invitationId: zod.uuid(),
 });
-
-export const RevokeInvitationResponse = zod.void();
 
 /**
  * Resolves a set of account ids to the people behind them, scoped to the current project and **including members who have since left it**.
@@ -152,8 +90,6 @@ export const RevokeInvitationResponse = zod.void();
  * @summary Resolve members by id, including those who have left
  */
 export const BatchGetMembersBody = BatchGetMembersRequestBody;
-
-export const BatchGetMembersResponse = BatchGetMembersResponseBody;
 
 /**
  * @summary List the members of a project
@@ -186,8 +122,6 @@ export const ListMembersQueryParams = zod.strictObject({
     .describe("Matches against user id, email address or name"),
 });
 
-export const ListMembersResponse = LengthAwarePageMemberResource;
-
 /**
  * Removing someone else requires `iam:members.manage`; leaving requires only membership of the project. The owner can do neither, and has to transfer ownership first.
  * @summary Remove a member, or leave the project
@@ -197,8 +131,6 @@ export const removeMemberPathUserIdMax = 255;
 export const RemoveMemberParams = zod.strictObject({
   userId: zod.string().max(removeMemberPathUserIdMax),
 });
-
-export const RemoveMemberResponse = zod.void();
 
 /**
  * The list is replaced in full rather than added to or removed from. The `OWNER` role of the owner is unaffected.
@@ -212,8 +144,6 @@ export const SetMemberRolesParams = zod.strictObject({
 
 export const SetMemberRolesBody = SetMemberRolesRequestBody;
 
-export const SetMemberRolesResponse = MemberResource;
-
 /**
  * Replaces, in full, the permissions attached directly to the base policy. A direct permission grants one person something without creating a role only they hold, and it does not follow later changes to any role. Requires `iam:members.manage`.
  * @summary Set the permissions attached directly to a member
@@ -225,8 +155,6 @@ export const SetMemberPermissionsParams = zod.strictObject({
 });
 
 export const SetMemberPermissionsBody = SetMemberPermissionsRequestBody;
-
-export const SetMemberPermissionsResponse = PolicyResource;
 
 /**
  * Visible to any member, on the same rule as the member list. What has been granted to whom is part of who is in the project.
@@ -242,15 +170,11 @@ export const ListPoliciesQueryParams = zod.strictObject({
     .describe("Restricts the result to one person. Omitting it covers the whole project"),
 });
 
-export const ListPoliciesResponse = PolicyListResponseBody;
-
 /**
  * This creates an **additional** policy, which either carries a resource scope or has `deny` as its effect. An `allow` covering every resource is a base policy, of which each member holds exactly one, and it is changed with set-member-roles and set-member-permissions. `roles` cannot contain `OWNER` or `ADMIN`. Requires `iam:members.manage`.
  * @summary Attach a policy
  */
 export const AttachPolicyBody = AttachPolicyRequestBody;
-
-export const AttachPolicyResponse = PolicyResource;
 
 /**
  * Visible to any member, on the same rule as list-policies; no further permission is required.
@@ -259,8 +183,6 @@ export const AttachPolicyResponse = PolicyResource;
 export const GetPolicyParams = zod.strictObject({
   policyId: zod.uuid(),
 });
-
-export const GetPolicyResponse = PolicyResource;
 
 /**
  * Replaced in full rather than field by field — `resources`, `roles` and `permissions` are each overwritten, and an omitted one becomes empty. The **kind** of a policy cannot change — a base policy (an `allow` covering every resource) cannot take a resource scope, and a scoped policy cannot have its scope cleared. Delete and recreate to change the kind. Requires `iam:members.manage`.
@@ -272,8 +194,6 @@ export const UpdatePolicyParams = zod.strictObject({
 
 export const UpdatePolicyBody = UpdatePolicyRequestBody;
 
-export const UpdatePolicyResponse = PolicyResource;
-
 /**
  * A base policy cannot be detached; it is where a member's roles sit. Use remove-member to take someone out of the project. Requires `iam:members.manage`.
  * @summary Detach a policy
@@ -282,27 +202,16 @@ export const DetachPolicyParams = zod.strictObject({
   policyId: zod.uuid(),
 });
 
-export const DetachPolicyResponse = zod.void();
-
 /**
  * The only way `OWNER` moves, and only the owner can initiate it.
  * @summary Transfer ownership of a project
  */
 export const TransferProjectOwnershipBody = TransferOwnershipRequestBody;
 
-export const TransferProjectOwnershipResponse = OwnershipTransferResponseBody;
-
-/**
- * @summary List the roles in this project
- */
-export const ListRolesResponse = RoleListResponseBody;
-
 /**
  * @summary Create a role
  */
 export const CreateRoleBody = CreateRoleRequestBody;
-
-export const CreateRoleResponse = RoleResource;
 
 /**
  * @summary Get a role
@@ -312,8 +221,6 @@ export const getRolePathCodeMax = 64;
 export const GetRoleParams = zod.strictObject({
   code: zod.string().max(getRolePathCodeMax),
 });
-
-export const GetRoleResponse = RoleResource;
 
 /**
  * The name, the description and the permissions are replaced in full. Every member holding the role is recompiled in the same transaction, so the change takes effect on the next request.
@@ -327,8 +234,6 @@ export const UpdateRoleParams = zod.strictObject({
 
 export const UpdateRoleBody = UpdateRoleRequestBody;
 
-export const UpdateRoleResponse = RoleResource;
-
 /**
  * Refused while anyone still holds it. Cascading the removal would quietly demote every holder.
  * @summary Delete a role
@@ -338,8 +243,6 @@ export const deleteRolePathCodeMax = 64;
 export const DeleteRoleParams = zod.strictObject({
   code: zod.string().max(deleteRolePathCodeMax),
 });
-
-export const DeleteRoleResponse = zod.void();
 
 /**
  * Both the keys belonging to members and the keys belonging to the project are listed; the `owner_user_id` on each one tells them apart.
@@ -379,15 +282,11 @@ export const ListSshKeysQueryParams = zod.strictObject({
     ),
 });
 
-export const ListSshKeysResponse = LengthAwarePageSSHKeyResource;
-
 /**
  * `owner=me` adds a key of the caller's own, which any member may do. `owner=project` adds a key shared by the project, requires `iam:ssh_keys.manage`, and lands on every machine created in the project afterwards.
  * @summary Add an SSH key
  */
 export const CreateSshKeyBody = CreateSSHKeyRequestBody;
-
-export const CreateSshKeyResponse = SSHKeyResource;
 
 /**
  * @summary Get an SSH key
@@ -395,8 +294,6 @@ export const CreateSshKeyResponse = SSHKeyResource;
 export const GetSshKeyParams = zod.strictObject({
   keyId: zod.uuid(),
 });
-
-export const GetSshKeyResponse = SSHKeyResource;
 
 /**
  * Only the name can change. The key, its type and its fingerprint are three statements about one thing, and changing one of them would leave the row describing a key that does not exist.
@@ -408,8 +305,6 @@ export const RenameSshKeyParams = zod.strictObject({
 
 export const RenameSshKeyBody = RenameSSHKeyRequestBody;
 
-export const RenameSshKeyResponse = SSHKeyResource;
-
 /**
  * The row remains and its status becomes `REVOKED`, so it stays answerable afterwards which key was trusted at the time.
  * @summary Revoke an SSH key
@@ -417,5 +312,3 @@ export const RenameSshKeyResponse = SSHKeyResource;
 export const RevokeSshKeyParams = zod.strictObject({
   keyId: zod.uuid(),
 });
-
-export const RevokeSshKeyResponse = SSHKeyResource;

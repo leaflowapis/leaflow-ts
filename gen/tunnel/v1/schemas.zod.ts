@@ -37,62 +37,6 @@
  */
 import * as zod from "zod";
 
-import { SubscriptionResource } from "./validators/subscriptionResource.zod.js";
-
-import { TunnelResource } from "./validators/tunnelResource.zod.js";
-
-import { UsageResource } from "./validators/usageResource.zod.js";
-
-import { UsageSeriesResource } from "./validators/usageSeriesResource.zod.js";
-
-/**
- * `TUNNEL_NOT_FOUND` means no tunnel has been generated yet.
- *
- * 403 `TUNNEL_NOT_ENTITLED` states something else: the project has not been entitled to layer 4 at all.
- *
- * The subscription address, the usage and the quota each have their own endpoint and are not repeated here.
- * @summary Get the layer 4 tunnel of the current project
- */
-export const GetL4TunnelResponse = TunnelResource;
-
-/**
- * **Idempotent**: calling it again returns the existing tunnel rather than an error.
- *
- * Read the address from the subscription endpoint afterwards; it is not returned here.
- * @summary Generate the layer 4 tunnel
- */
-export const GenerateL4TunnelResponse = TunnelResource;
-
-/**
- * **This URL is a credential, equivalent to a password.** It yields every node of the project along with their passwords. It is returned here alone, and appears neither in the tunnel itself nor in any list.
- *
- * Do not call this endpoint before the user asks for the address.
- *
- * A `status` of `preparing` leaves the link usable; its contents are derived at the moment it is fetched.
- * @summary Get the subscription address
- */
-export const GetL4TunnelSubscriptionResponse = SubscriptionResource;
-
-/**
- * **This is the remedy for an exposed credential, and every subscription already distributed stops working at once.**
- *
- * The subscription token and the node passwords are replaced together, so every client has to fetch the subscription again before it can carry on. Confirm that this is the intended outcome before calling.
- *
- * A tunnel disabled by the platform cannot be rotated (`TUNNEL_DISABLED_FOR_ROTATE`); resolve the cause first.
- *
- * Read the new address from the subscription endpoint afterwards; **it is not returned here**.
- * @summary Rotate the subscription address and the node passwords
- */
-export const RotateL4TunnelSubscriptionResponse = TunnelResource;
-
-/**
- * Read live.
- *
- * Only `billed_bytes` decides whether the quota is exceeded: a route may carry a multiplier such as 1.5× or 0×, so `raw_bytes`, the volume actually transferred, need not equal it. A `quota_bytes` of 0 means unlimited.
- * @summary Get the usage of the current period
- */
-export const GetL4TunnelUsageResponse = UsageResource;
-
 /**
  * Cut by calendar day. A day carrying no traffic is absent rather than zero, so a chart has to fill the date axis itself.
  *
@@ -113,5 +57,3 @@ export const ListL4TunnelUsageSeriesQueryParams = zod.strictObject({
       "How many days to cover. 0 requests the default of 30; the range accepted is 1–365, and a larger value is clamped to it",
     ),
 });
-
-export const ListL4TunnelUsageSeriesResponse = UsageSeriesResource;
