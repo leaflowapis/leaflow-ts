@@ -55,8 +55,9 @@ export default defineConfig(
             input,
             output: {
               ...output,
-              target: `./src/${module}/functions.ts`,
-              schemas: `./src/${module}/models`,
+              target: `./src/${module}/generated/functions.ts`,
+              schemas: `./src/${module}/generated/models`,
+              clean: true,
               client: "fetch",
               headers: true,
               urlEncodeParameters: true,
@@ -71,8 +72,8 @@ export default defineConfig(
             input,
             output: {
               ...output,
-              target: `./src/${module}/schemas.zod.ts`,
-              schemas: `./src/${module}/validators`,
+              target: `./src/${module}/generated/schemas.zod.ts`,
+              schemas: `./src/${module}/generated/validators`,
               client: "zod",
               override: { zod },
             },

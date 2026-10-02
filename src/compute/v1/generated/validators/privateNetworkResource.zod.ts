@@ -22,24 +22,14 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { PrivateNetworkOperation } from "./privateNetworkOperation.zod.js";
 
 export const PrivateNetworkResource = zod.strictObject({
   cidr: zod.string(),
   created_at: zod.iso.datetime({ offset: true }),
-  has_internet_gateway: zod.boolean(),
   id: zod.uuid(),
   name: zod.string(),
   region_id: zod.uuid(),
-  status: zod
-    .enum(["pending", "available", "error", "unknown", "missing"])
-    .describe(
-      "Only `available` accepts new instances, interfaces and floating IPs. `missing` means the network no longer exists in the cloud.",
-    ),
   updated_at: zod.iso.datetime({ offset: true }),
-  operation: zod
-    .union([PrivateNetworkOperation, zod.null()])
-    .describe("The operation in progress on this private network, or null when none is."),
 });
 
 export type PrivateNetworkResource = zod.input<typeof PrivateNetworkResource>;

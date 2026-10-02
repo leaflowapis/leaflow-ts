@@ -4610,7 +4610,7 @@ export const getCreatePrivateNetworkUrl = () => {
 };
 
 /**
- * Creates a network, a router and a default security group in one call. The default security group denies all inbound traffic and permits all outbound traffic.
+ * Creates a private network definition and its default security group. The default security group denies all inbound traffic and permits all outbound traffic.
  * @summary Create a private network
  */
 export const createPrivateNetwork = async (
@@ -4795,7 +4795,7 @@ export const getDeletePrivateNetworkUrl = (privateNetworkId: string) => {
 };
 
 /**
- * Release is rejected while instances or network interfaces remain in the network. IPv6, the router and the security groups are released with it.
+ * Deletion is rejected while instances or network interfaces remain in the network. Its subnets, routes, security groups and IPv6 configuration are removed with it.
  * @summary Release a private network
  */
 export const deletePrivateNetwork = async (
