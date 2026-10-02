@@ -30,7 +30,7 @@
   "sideEffects": false,
   "scripts": {
     "generate": "orval",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "npm run build",
     "format:check": "prettier --check orval.config.mjs src"
