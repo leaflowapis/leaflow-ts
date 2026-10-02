@@ -1,6 +1,12 @@
 node_modules/
+node_modules
+fixtures/orval-open-properties/inputs/
+fixtures/orval-open-properties/gen/
+fixtures/orval-open-properties/compiled/
 dist/
 leaflowapis/
 
 # 本地生成时的临时输出目录，没有任何东西引用它。
 .local-sdk/
+
+.npm-cache/
