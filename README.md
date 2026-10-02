@@ -34,8 +34,8 @@ are both available; Billing retains `billing.account`, `billing.catalog` and `bi
 **Parsing is caller wiring, not an automatic SDK pre-send guarantee.** Call `.parse` on generated
 body/query/path/declared-header schemas before invoking the native operation. Authorization is not a
 contract header schema; keep token handling in the existing transport. No global coercion is enabled.
-The SDK does not automatically parse responses. Exported response schemas are available for a caller
-that explicitly chooses response validation.
+Zod generation is limited to request validation. Normal response models and native fetch return types
+remain available; responses are not automatically parsed or restricted by request validators.
 
 ## Generation and release
 
@@ -52,27 +52,23 @@ invokes the official tool, builds normal package barrels and records routing/aut
 explicit `.js` files rather than invalid directory imports. No generated imports are rewritten. Official `urlEncodeParameters:true` protects native path helpers
 for string keys containing `/`, `#`, spaces or `%`; no URL helper is hand-edited.
 
-`CONTRACTS_REF` currently names a **local unpublished contract candidate**. The local generation is
-an exercise; after review the parent must first publish contracts, set the published remote SHA and
-regenerate using the default remote path. Package version stays `0.0.0`; existing CI injects snapshot
-or tag versions. This candidate is not a published SDK release.
+`CONTRACTS_REF` pins published contract commit `7d63a7ba860cd66d6dcf630142b2e7943080b633`. Existing CI injects
+snapshot or tag package versions; the working-tree package version remains `0.0.0`. Run generation
+from the remote source, or supply a clean checkout of that exact published commit with `CONTRACTS_DIR`.
 
-See `evidence/orval/READINESS.md` for the fixed final contract SHA, package checksums, checks and
-native signatures. Generic pre-send fixture failures and earlier 59/0e results remain separate evidence.
-The actual 314 closed-object components, disjoint BootDisk, corrected int32 bounds and final checkout
-zero-HTTP rejections are checked; this does not establish every full request or frontend call site.
+Fixed financial request objects reject undeclared fields. Quote lines, refund lines and dimension
+settings are closed; price and rate-rule tier inputs are closed independently of shared response tiers.
+Explicit dictionary fields such as `labels` and `dimensions` keep their permitted business keys.
+Caller-supplied zero, false, null and decimal strings retain their meanings; declared defaults may
+be added by the generated schema. Request amount limits are distinct from response and quantity limits.
 
-**Release gate: native open-object semantics remain unresolved.** Seven known-property request
-components allow extensions because additionalProperties is omitted. Native global strict rejects
-those legal extensions. Independent copies using `additionalProperties:true` or `{}` behave the same;
-no product contract was narrowed. Exact refs and affected operations are in
-`evidence/orval/open-unspecified-review.json` and the public candidate's
-`fixtures/orval-open-properties/`. Final financial source also adds four object constraint branches;
-actual full coupon requests pass native Zod intersection tests, so a branch inventory alone is not a
-composition failure. Einstein owns further native-configuration/source-equivalence review.
+The native source-backed financial request matrix and both built SDKs pass 113 request cases, including
+misspelled fields and invalid amounts rejected before fetch. Fixed-source regeneration, NodeNext
+compilation and package-entry checks are recorded in the validation evidence. Earlier generic tool
+limitations remain historical evidence; these checks do not establish every frontend call site or
+authenticated business acceptance.
 
 The native Zod target does not emit a request body schema for the octet-stream Blob upload.
 Source contracts also do not encode every BillingChoice business condition. These are explicit
 coverage limits, not proof of complete request validation. Frontend/BFF call-site wiring, authentication
-and release approval remain with their owners. Do not publish this candidate before the open-object
-release gate is resolved.
+and authenticated business acceptance remain with their owners.
