@@ -1,4 +1,4 @@
-export * from "../../../../gen/type/error/v1/functions.js";
-export * from "../../../../gen/type/error/v1/models/error.js";
-export * from "../../../../gen/type/error/v1/models/errorMeta.js";
-export * as schemas from "../../../../gen/type/error/v1/schemas.zod.js";
+export * from "./functions.js";
+export * from "./models/error.js";
+export * from "./models/errorMeta.js";
+export * as schemas from "./schemas.zod.js";

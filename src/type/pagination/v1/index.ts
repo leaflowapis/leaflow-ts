@@ -1,8 +1,8 @@
-export * from "../../../../gen/type/pagination/v1/functions.js";
-export * from "../../../../gen/type/pagination/v1/models/cursorPagination.js";
-export * from "../../../../gen/type/pagination/v1/models/cursorParameter.js";
-export * from "../../../../gen/type/pagination/v1/models/idsParameter.js";
-export * from "../../../../gen/type/pagination/v1/models/offsetPagination.js";
-export * from "../../../../gen/type/pagination/v1/models/pageParameter.js";
-export * from "../../../../gen/type/pagination/v1/models/pageSizeParameter.js";
-export * as schemas from "../../../../gen/type/pagination/v1/schemas.zod.js";
+export * from "./functions.js";
+export * from "./models/cursorPagination.js";
+export * from "./models/cursorParameter.js";
+export * from "./models/idsParameter.js";
+export * from "./models/offsetPagination.js";
+export * from "./models/pageParameter.js";
+export * from "./models/pageSizeParameter.js";
+export * as schemas from "./schemas.zod.js";

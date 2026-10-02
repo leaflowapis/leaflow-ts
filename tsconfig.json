@@ -10,7 +10,7 @@
     "declaration": true,
     "verbatimModuleSyntax": true,
     "outDir": "dist",
-    "rootDir": "."
+    "rootDir": "src"
   },
-  "include": ["gen", "src"]
+  "include": ["src"]
 }
