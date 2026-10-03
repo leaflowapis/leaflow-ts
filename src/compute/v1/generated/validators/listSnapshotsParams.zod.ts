@@ -24,13 +24,14 @@
 import * as zod from "zod";
 
 export const listSnapshotsParamsPageDefault = 1;
+export const listSnapshotsParamsPageMax = 2147483647;
 
 export const listSnapshotsParamsPageSizeDefault = 50;
 export const listSnapshotsParamsPageSizeMax = 200;
 
 export const ListSnapshotsParams = zod.strictObject({
   disk_id: zod.uuid().optional().describe("Return only the snapshots of this disk"),
-  page: zod.int().min(1).default(listSnapshotsParamsPageDefault),
+  page: zod.int().min(1).max(listSnapshotsParamsPageMax).default(listSnapshotsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

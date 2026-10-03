@@ -24,12 +24,17 @@
 import * as zod from "zod";
 
 export const listFloatingIpsParamsPageDefault = 1;
+export const listFloatingIpsParamsPageMax = 2147483647;
 
 export const listFloatingIpsParamsPageSizeDefault = 50;
 export const listFloatingIpsParamsPageSizeMax = 200;
 
 export const ListFloatingIpsParams = zod.strictObject({
-  page: zod.int().min(1).default(listFloatingIpsParamsPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listFloatingIpsParamsPageMax)
+    .default(listFloatingIpsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

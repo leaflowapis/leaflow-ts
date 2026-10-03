@@ -23,26 +23,19 @@ import * as zod from "zod";
 export const listIncidentsParamsLimitDefault = 50;
 export const listIncidentsParamsLimitMax = 200;
 
+export const listIncidentsParamsOffsetDefault = 0;
 export const listIncidentsParamsOffsetMin = 0;
 export const listIncidentsParamsOffsetMax = 10000;
 
 export const listIncidentsParamsKeywordMax = 255;
 
 export const ListIncidentsParams = zod.strictObject({
-  limit: zod
-    .int()
-    .min(1)
-    .max(listIncidentsParamsLimitMax)
-    .default(listIncidentsParamsLimitDefault)
-    .describe("Maximum number of records in this page"),
+  limit: zod.int().min(1).max(listIncidentsParamsLimitMax).default(listIncidentsParamsLimitDefault),
   offset: zod
     .int()
     .min(listIncidentsParamsOffsetMin)
     .max(listIncidentsParamsOffsetMax)
-    .optional()
-    .describe(
-      "Number of records to skip. For deeper paging, use the cursor-paged endpoint instead",
-    ),
+    .default(listIncidentsParamsOffsetDefault),
   server_id: zod.string().optional().describe("Restrict to a single machine"),
   web_check_id: zod
     .string()

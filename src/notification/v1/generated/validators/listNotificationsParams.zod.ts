@@ -66,6 +66,7 @@ import { NotificationSeverity } from "./notificationSeverity.zod.js";
 export const listNotificationsParamsLimitDefault = 50;
 export const listNotificationsParamsLimitMax = 200;
 
+export const listNotificationsParamsOffsetDefault = 0;
 export const listNotificationsParamsOffsetMin = 0;
 export const listNotificationsParamsOffsetMax = 10000;
 
@@ -77,14 +78,12 @@ export const ListNotificationsParams = zod.strictObject({
     .int()
     .min(1)
     .max(listNotificationsParamsLimitMax)
-    .default(listNotificationsParamsLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .default(listNotificationsParamsLimitDefault),
   offset: zod
     .int()
     .min(listNotificationsParamsOffsetMin)
     .max(listNotificationsParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listNotificationsParamsOffsetDefault),
   scope: NotificationScope.optional(),
   type: zod.string().max(listNotificationsParamsTypeMax).optional(),
   min_severity: NotificationSeverity.optional(),

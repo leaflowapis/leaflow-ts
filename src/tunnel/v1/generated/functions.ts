@@ -35,17 +35,14 @@
  * - **Daily usage does not sum to the usage of the current period.** One is cut by calendar day and the other by billing period.
  * OpenAPI spec version: 1.0.0
  */
-import type { Error } from "./models/error.js";
-
-import type { ListL4TunnelUsageSeriesParams } from "./models/listL4TunnelUsageSeriesParams.js";
-
-import type { SubscriptionResource } from "./models/subscriptionResource.js";
-
-import type { TunnelResource } from "./models/tunnelResource.js";
-
-import type { UsageResource } from "./models/usageResource.js";
-
-import type { UsageSeriesResource } from "./models/usageSeriesResource.js";
+import type {
+  Error,
+  ListL4TunnelUsageSeriesParams,
+  SubscriptionResource,
+  TunnelResource,
+  UsageResource,
+  UsageSeriesResource,
+} from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;

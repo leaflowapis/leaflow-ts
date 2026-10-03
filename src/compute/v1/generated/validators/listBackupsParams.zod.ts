@@ -24,13 +24,14 @@
 import * as zod from "zod";
 
 export const listBackupsParamsPageDefault = 1;
+export const listBackupsParamsPageMax = 2147483647;
 
 export const listBackupsParamsPageSizeDefault = 50;
 export const listBackupsParamsPageSizeMax = 200;
 
 export const ListBackupsParams = zod.strictObject({
   disk_id: zod.uuid().optional().describe("Return only the backups of this disk"),
-  page: zod.int().min(1).default(listBackupsParamsPageDefault),
+  page: zod.int().min(1).max(listBackupsParamsPageMax).default(listBackupsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

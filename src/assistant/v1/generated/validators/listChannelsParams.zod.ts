@@ -51,22 +51,17 @@ import * as zod from "zod";
 export const listChannelsParamsLimitDefault = 50;
 export const listChannelsParamsLimitMax = 200;
 
+export const listChannelsParamsOffsetDefault = 0;
 export const listChannelsParamsOffsetMin = 0;
 export const listChannelsParamsOffsetMax = 10000;
 
 export const ListChannelsParams = zod.strictObject({
-  limit: zod
-    .int()
-    .min(1)
-    .max(listChannelsParamsLimitMax)
-    .default(listChannelsParamsLimitDefault)
-    .describe("How many entries this page returns at most"),
+  limit: zod.int().min(1).max(listChannelsParamsLimitMax).default(listChannelsParamsLimitDefault),
   offset: zod
     .int()
     .min(listChannelsParamsOffsetMin)
     .max(listChannelsParamsOffsetMax)
-    .optional()
-    .describe("How many to skip. To page deeper, use the cursor-paged operation instead"),
+    .default(listChannelsParamsOffsetDefault),
   platform: zod.string().optional(),
   active: zod.boolean().optional().describe("Return only channels that are enabled"),
 });

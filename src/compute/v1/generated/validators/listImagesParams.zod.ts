@@ -25,6 +25,7 @@ import * as zod from "zod";
 import { ImageVisibility } from "./imageVisibility.zod.js";
 
 export const listImagesParamsPageDefault = 1;
+export const listImagesParamsPageMax = 2147483647;
 
 export const listImagesParamsPageSizeDefault = 50;
 export const listImagesParamsPageSizeMax = 200;
@@ -32,7 +33,7 @@ export const listImagesParamsPageSizeMax = 200;
 export const ListImagesParams = zod.strictObject({
   region_id: zod.uuid().optional(),
   visibility: ImageVisibility.optional(),
-  page: zod.int().min(1).default(listImagesParamsPageDefault),
+  page: zod.int().min(1).max(listImagesParamsPageMax).default(listImagesParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

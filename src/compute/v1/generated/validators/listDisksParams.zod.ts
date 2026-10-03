@@ -24,6 +24,7 @@
 import * as zod from "zod";
 
 export const listDisksParamsPageDefault = 1;
+export const listDisksParamsPageMax = 2147483647;
 
 export const listDisksParamsPageSizeDefault = 50;
 export const listDisksParamsPageSizeMax = 200;
@@ -31,7 +32,7 @@ export const listDisksParamsPageSizeMax = 200;
 export const ListDisksParams = zod.strictObject({
   region_id: zod.uuid().optional(),
   availability_zone_id: zod.uuid().optional(),
-  page: zod.int().min(1).default(listDisksParamsPageDefault),
+  page: zod.int().min(1).max(listDisksParamsPageMax).default(listDisksParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

@@ -35,7 +35,7 @@ export const listRequestsParamsModelIdMax = 128;
 export const listRequestsParamsLimitDefault = 50;
 export const listRequestsParamsLimitMax = 200;
 
-export const listRequestsParamsCursorMax = 512;
+export const listRequestsParamsCursorMax = 1024;
 
 export const ListRequestsParams = zod.strictObject({
   from: zod.iso
@@ -54,17 +54,8 @@ export const ListRequestsParams = zod.strictObject({
     .enum(["in_flight", "succeeded", "refused", "upstream_failed", "client_aborted"])
     .optional()
     .describe("Restricts the result to the specified status"),
-  limit: zod
-    .int()
-    .min(1)
-    .max(listRequestsParamsLimitMax)
-    .default(listRequestsParamsLimitDefault)
-    .describe("Maximum number of items in this page"),
-  cursor: zod
-    .string()
-    .max(listRequestsParamsCursorMax)
-    .optional()
-    .describe("The `next_cursor` returned by the previous page. Omitted on the first page"),
+  limit: zod.int().min(1).max(listRequestsParamsLimitMax).default(listRequestsParamsLimitDefault),
+  cursor: zod.string().min(1).max(listRequestsParamsCursorMax).optional(),
 });
 
 export type ListRequestsParams = zod.input<typeof ListRequestsParams>;

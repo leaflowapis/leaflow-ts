@@ -24,13 +24,14 @@
 import * as zod from "zod";
 
 export const listIpv4PoolsParamsPageDefault = 1;
+export const listIpv4PoolsParamsPageMax = 2147483647;
 
 export const listIpv4PoolsParamsPageSizeDefault = 50;
 export const listIpv4PoolsParamsPageSizeMax = 200;
 
 export const ListIpv4PoolsParams = zod.strictObject({
   region_id: zod.uuid().optional(),
-  page: zod.int().min(1).default(listIpv4PoolsParamsPageDefault),
+  page: zod.int().min(1).max(listIpv4PoolsParamsPageMax).default(listIpv4PoolsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

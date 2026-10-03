@@ -64,6 +64,7 @@ import { SetRecordSetRequestBody } from "./validators/setRecordSetRequestBody.zo
 export const listCredentialsQueryLimitDefault = 50;
 export const listCredentialsQueryLimitMax = 200;
 
+export const listCredentialsQueryOffsetDefault = 0;
 export const listCredentialsQueryOffsetMin = 0;
 export const listCredentialsQueryOffsetMax = 10000;
 
@@ -73,13 +74,13 @@ export const ListCredentialsQueryParams = zod.strictObject({
     .min(1)
     .max(listCredentialsQueryLimitMax)
     .default(listCredentialsQueryLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listCredentialsQueryOffsetMin)
     .max(listCredentialsQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listCredentialsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   provider: zod
     .enum(["cloudflare", "tencentcloud", "alidns", "route53"])
     .optional()
@@ -208,9 +209,10 @@ export const ListRecordsParams = zod.strictObject({
 
 export const listRecordsQueryNameMax = 253;
 
-export const listRecordsQueryLimitDefault = 100;
-export const listRecordsQueryLimitMax = 500;
+export const listRecordsQueryLimitDefault = 50;
+export const listRecordsQueryLimitMax = 200;
 
+export const listRecordsQueryOffsetDefault = 0;
 export const listRecordsQueryOffsetMin = 0;
 export const listRecordsQueryOffsetMax = 10000;
 
@@ -237,13 +239,13 @@ export const ListRecordsQueryParams = zod.strictObject({
     .min(1)
     .max(listRecordsQueryLimitMax)
     .default(listRecordsQueryLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listRecordsQueryOffsetMin)
     .max(listRecordsQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listRecordsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
 });
 
 /**

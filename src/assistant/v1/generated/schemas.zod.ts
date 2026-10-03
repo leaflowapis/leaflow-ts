@@ -115,6 +115,7 @@ export const DownloadAttachmentParams = zod.strictObject({
 export const listBindingsQueryLimitDefault = 50;
 export const listBindingsQueryLimitMax = 200;
 
+export const listBindingsQueryOffsetDefault = 0;
 export const listBindingsQueryOffsetMin = 0;
 export const listBindingsQueryOffsetMax = 10000;
 
@@ -124,13 +125,13 @@ export const ListBindingsQueryParams = zod.strictObject({
     .min(1)
     .max(listBindingsQueryLimitMax)
     .default(listBindingsQueryLimitDefault)
-    .describe("How many entries this page returns at most"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listBindingsQueryOffsetMin)
     .max(listBindingsQueryOffsetMax)
-    .optional()
-    .describe("How many to skip. To page deeper, use the cursor-paged operation instead"),
+    .default(listBindingsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   platform: zod.string().optional(),
   channelId: zod.uuid().optional(),
   active: zod.boolean().optional().describe("Return only bindings that are active"),
@@ -156,6 +157,7 @@ export const DeleteBindingParams = zod.strictObject({
 export const listChannelsQueryLimitDefault = 50;
 export const listChannelsQueryLimitMax = 200;
 
+export const listChannelsQueryOffsetDefault = 0;
 export const listChannelsQueryOffsetMin = 0;
 export const listChannelsQueryOffsetMax = 10000;
 
@@ -165,13 +167,13 @@ export const ListChannelsQueryParams = zod.strictObject({
     .min(1)
     .max(listChannelsQueryLimitMax)
     .default(listChannelsQueryLimitDefault)
-    .describe("How many entries this page returns at most"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listChannelsQueryOffsetMin)
     .max(listChannelsQueryOffsetMax)
-    .optional()
-    .describe("How many to skip. To page deeper, use the cursor-paged operation instead"),
+    .default(listChannelsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   platform: zod.string().optional(),
   active: zod.boolean().optional().describe("Return only channels that are enabled"),
 });
@@ -394,15 +396,17 @@ export const DeleteSkillParams = zod.strictObject({
 
 /**
  * Ordered by most recent activity, limited to the current account's conversations in the current project. `archived` selects between two sets rather than widening one: archived conversations are absent from the default list, and turning the flag on shows those instead.
+ *
+ * Pass the returned nextCursor as cursor; omit cursor on the first page. Continue with the same q, archived and folder filters. The cursor marks a position in the activity order, so changing filters between pages does not continue the same list.
  * @summary List conversations
  */
 export const listThreadsQueryQMax = 100;
 
 export const listThreadsQueryFolderMax = 64;
 
-export const listThreadsQueryCursorMax = 128;
+export const listThreadsQueryCursorMax = 1024;
 
-export const listThreadsQueryLimitMin = 0;
+export const listThreadsQueryLimitDefault = 50;
 export const listThreadsQueryLimitMax = 200;
 
 export const ListThreadsQueryParams = zod.strictObject({
@@ -426,12 +430,16 @@ export const ListThreadsQueryParams = zod.strictObject({
     ),
   cursor: zod
     .string()
+    .min(1)
     .max(listThreadsQueryCursorMax)
     .optional()
-    .describe(
-      "Where the previous page ended, from its `nextCursor`. Omit it for the first page.\n\nIt is a position, not an offset, and that matters here: this list is ordered by recent activity, and the activity happens while it is being read. An offset would hand back a conversation twice when one moves up in between, and skip one when it moves down — silently, because a conversation that was skipped simply is not there.\n\nPass the same `q`, `archived` and `folder` along with it. A cursor carries a position, not the question that produced it, so changing the filters mid-scroll walks a range nobody asked for.",
-    ),
-  limit: zod.int().min(listThreadsQueryLimitMin).max(listThreadsQueryLimitMax).optional(),
+    .describe("The next_cursor returned by the previous page. Omit it for the first page."),
+  limit: zod
+    .int()
+    .min(1)
+    .max(listThreadsQueryLimitMax)
+    .default(listThreadsQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
 });
 
 /**

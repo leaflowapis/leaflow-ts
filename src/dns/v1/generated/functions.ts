@@ -48,39 +48,25 @@
  * the one certificate issuance must use.
  * OpenAPI spec version: 1.0.0
  */
-import type { CreateCredentialRequestBody } from "./models/createCredentialRequestBody.js";
-
-import type { CredentialResource } from "./models/credentialResource.js";
-
-import type { DeleteRecordSetParams } from "./models/deleteRecordSetParams.js";
-
-import type { Error } from "./models/error.js";
-
-import type { LengthAwarePageCredentialResource } from "./models/lengthAwarePageCredentialResource.js";
-
-import type { LengthAwarePageRecordSetResource } from "./models/lengthAwarePageRecordSetResource.js";
-
-import type { ListCredentialsParams } from "./models/listCredentialsParams.js";
-
-import type { ListRecordsParams } from "./models/listRecordsParams.js";
-
-import type { ListZonesParams } from "./models/listZonesParams.js";
-
-import type { ModifyRecordSetParams } from "./models/modifyRecordSetParams.js";
-
-import type { ModifyRecordSetRequestBody } from "./models/modifyRecordSetRequestBody.js";
-
-import type { RecordSetResource } from "./models/recordSetResource.js";
-
-import type { RecordType } from "./models/recordType.js";
-
-import type { RenameCredentialRequestBody } from "./models/renameCredentialRequestBody.js";
-
-import type { SetRecordSetParams } from "./models/setRecordSetParams.js";
-
-import type { SetRecordSetRequestBody } from "./models/setRecordSetRequestBody.js";
-
-import type { ZoneListResponseBody } from "./models/zoneListResponseBody.js";
+import type {
+  CreateCredentialRequestBody,
+  CredentialResource,
+  DeleteRecordSetParams,
+  Error,
+  LengthAwarePageCredentialResource,
+  LengthAwarePageRecordSetResource,
+  ListCredentialsParams,
+  ListRecordsParams,
+  ListZonesParams,
+  ModifyRecordSetParams,
+  ModifyRecordSetRequestBody,
+  RecordSetResource,
+  RecordType,
+  RenameCredentialRequestBody,
+  SetRecordSetParams,
+  SetRecordSetRequestBody,
+  ZoneListResponseBody,
+} from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;

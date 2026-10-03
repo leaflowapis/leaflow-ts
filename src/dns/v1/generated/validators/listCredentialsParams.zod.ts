@@ -54,6 +54,7 @@ import { Provider } from "./provider.zod.js";
 export const listCredentialsParamsLimitDefault = 50;
 export const listCredentialsParamsLimitMax = 200;
 
+export const listCredentialsParamsOffsetDefault = 0;
 export const listCredentialsParamsOffsetMin = 0;
 export const listCredentialsParamsOffsetMax = 10000;
 
@@ -62,14 +63,12 @@ export const ListCredentialsParams = zod.strictObject({
     .int()
     .min(1)
     .max(listCredentialsParamsLimitMax)
-    .default(listCredentialsParamsLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .default(listCredentialsParamsLimitDefault),
   offset: zod
     .int()
     .min(listCredentialsParamsOffsetMin)
     .max(listCredentialsParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listCredentialsParamsOffsetDefault),
   provider: Provider.optional(),
 });
 

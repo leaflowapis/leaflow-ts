@@ -24,12 +24,13 @@
 import * as zod from "zod";
 
 export const listSubnetsParamsPageDefault = 1;
+export const listSubnetsParamsPageMax = 2147483647;
 
 export const listSubnetsParamsPageSizeDefault = 50;
 export const listSubnetsParamsPageSizeMax = 200;
 
 export const ListSubnetsParams = zod.strictObject({
-  page: zod.int().min(1).default(listSubnetsParamsPageDefault),
+  page: zod.int().min(1).max(listSubnetsParamsPageMax).default(listSubnetsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

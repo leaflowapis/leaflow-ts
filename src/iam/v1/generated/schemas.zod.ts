@@ -48,8 +48,9 @@ export const UpdateProjectBody = UpdateProjectRequestBody;
  * @summary List the invitations this project is still waiting on
  */
 export const listProjectInvitationsQueryLimitDefault = 50;
-export const listProjectInvitationsQueryLimitMax = 100;
+export const listProjectInvitationsQueryLimitMax = 200;
 
+export const listProjectInvitationsQueryOffsetDefault = 0;
 export const listProjectInvitationsQueryOffsetMin = 0;
 export const listProjectInvitationsQueryOffsetMax = 10000;
 
@@ -59,13 +60,13 @@ export const ListProjectInvitationsQueryParams = zod.strictObject({
     .min(1)
     .max(listProjectInvitationsQueryLimitMax)
     .default(listProjectInvitationsQueryLimitDefault)
-    .describe("Maximum number of items in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listProjectInvitationsQueryOffsetMin)
     .max(listProjectInvitationsQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listProjectInvitationsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
 });
 
 /**
@@ -95,8 +96,9 @@ export const BatchGetMembersBody = BatchGetMembersRequestBody;
  * @summary List the members of a project
  */
 export const listMembersQueryLimitDefault = 50;
-export const listMembersQueryLimitMax = 100;
+export const listMembersQueryLimitMax = 200;
 
+export const listMembersQueryOffsetDefault = 0;
 export const listMembersQueryOffsetMin = 0;
 export const listMembersQueryOffsetMax = 10000;
 
@@ -108,13 +110,13 @@ export const ListMembersQueryParams = zod.strictObject({
     .min(1)
     .max(listMembersQueryLimitMax)
     .default(listMembersQueryLimitDefault)
-    .describe("Maximum number of items in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listMembersQueryOffsetMin)
     .max(listMembersQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listMembersQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   keyword: zod
     .string()
     .max(listMembersQueryKeywordMax)
@@ -249,8 +251,9 @@ export const DeleteRoleParams = zod.strictObject({
  * @summary List the SSH keys of this project
  */
 export const listSshKeysQueryLimitDefault = 50;
-export const listSshKeysQueryLimitMax = 100;
+export const listSshKeysQueryLimitMax = 200;
 
+export const listSshKeysQueryOffsetDefault = 0;
 export const listSshKeysQueryOffsetMin = 0;
 export const listSshKeysQueryOffsetMax = 10000;
 
@@ -262,13 +265,13 @@ export const ListSshKeysQueryParams = zod.strictObject({
     .min(1)
     .max(listSshKeysQueryLimitMax)
     .default(listSshKeysQueryLimitDefault)
-    .describe("Maximum number of items in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listSshKeysQueryOffsetMin)
     .max(listSshKeysQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listSshKeysQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   status: zod
     .enum(["ACTIVE", "REVOKED"])
     .optional()

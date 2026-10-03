@@ -52,9 +52,9 @@ export const listThreadsParamsQMax = 100;
 
 export const listThreadsParamsFolderMax = 64;
 
-export const listThreadsParamsCursorMax = 128;
+export const listThreadsParamsCursorMax = 1024;
 
-export const listThreadsParamsLimitMin = 0;
+export const listThreadsParamsLimitDefault = 50;
 export const listThreadsParamsLimitMax = 200;
 
 export const ListThreadsParams = zod.strictObject({
@@ -72,8 +72,8 @@ export const ListThreadsParams = zod.strictObject({
     .max(listThreadsParamsFolderMax)
     .optional()
     .describe("A folder id, or empty for the conversations in no folder"),
-  cursor: zod.string().max(listThreadsParamsCursorMax).optional(),
-  limit: zod.int().min(listThreadsParamsLimitMin).max(listThreadsParamsLimitMax).optional(),
+  cursor: zod.string().min(1).max(listThreadsParamsCursorMax).optional(),
+  limit: zod.int().min(1).max(listThreadsParamsLimitMax).default(listThreadsParamsLimitDefault),
 });
 
 export type ListThreadsParams = zod.input<typeof ListThreadsParams>;

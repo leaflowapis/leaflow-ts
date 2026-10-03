@@ -17,49 +17,30 @@
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
  * OpenAPI spec version: 1.0.0
  */
-import type { AcceptConsentsRequestBody } from "./models/acceptConsentsRequestBody.js";
-
-import type { AcceptInvitationByTokenRequestBody } from "./models/acceptInvitationByTokenRequestBody.js";
-
-import type { AcceptedInvitationResponseBody } from "./models/acceptedInvitationResponseBody.js";
-
-import type { AccountResource } from "./models/accountResource.js";
-
-import type { AgreementListResponseBody } from "./models/agreementListResponseBody.js";
-
-import type { ConsentListResponseBody } from "./models/consentListResponseBody.js";
-
-import type { CreateProjectRequestBody } from "./models/createProjectRequestBody.js";
-
-import type { Error } from "./models/error.js";
-
-import type { IdentityVerificationResource } from "./models/identityVerificationResource.js";
-
-import type { InvitationPreviewResource } from "./models/invitationPreviewResource.js";
-
-import type { LengthAwarePageInvitationResource } from "./models/lengthAwarePageInvitationResource.js";
-
-import type { LengthAwarePageProjectAccessResource } from "./models/lengthAwarePageProjectAccessResource.js";
-
-import type { ListMyInvitationsParams } from "./models/listMyInvitationsParams.js";
-
-import type { ListProjectsParams } from "./models/listProjectsParams.js";
-
-import type { LocaleOptionsResource } from "./models/localeOptionsResource.js";
-
-import type { PreviewInvitationByTokenParams } from "./models/previewInvitationByTokenParams.js";
-
-import type { ProjectAccessResource } from "./models/projectAccessResource.js";
-
-import type { RegisterRequestBody } from "./models/registerRequestBody.js";
-
-import type { ScopedTokenResponseBody } from "./models/scopedTokenResponseBody.js";
-
-import type { SettingsResource } from "./models/settingsResource.js";
-
-import type { SubmitIdentityVerificationRequestBody } from "./models/submitIdentityVerificationRequestBody.js";
-
-import type { UpdateAccountRequestBody } from "./models/updateAccountRequestBody.js";
+import type {
+  AcceptConsentsRequestBody,
+  AcceptInvitationByTokenRequestBody,
+  AcceptedInvitationResponseBody,
+  AccountResource,
+  AgreementListResponseBody,
+  ConsentListResponseBody,
+  CreateProjectRequestBody,
+  Error,
+  IdentityVerificationResource,
+  InvitationPreviewResource,
+  LengthAwarePageInvitationResource,
+  LengthAwarePageProjectAccessResource,
+  ListMyInvitationsParams,
+  ListProjectsParams,
+  LocaleOptionsResource,
+  PreviewInvitationByTokenParams,
+  ProjectAccessResource,
+  RegisterRequestBody,
+  ScopedTokenResponseBody,
+  SettingsResource,
+  SubmitIdentityVerificationRequestBody,
+  UpdateAccountRequestBody,
+} from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;

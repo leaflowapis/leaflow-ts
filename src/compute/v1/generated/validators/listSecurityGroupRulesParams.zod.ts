@@ -24,12 +24,17 @@
 import * as zod from "zod";
 
 export const listSecurityGroupRulesParamsPageDefault = 1;
+export const listSecurityGroupRulesParamsPageMax = 2147483647;
 
 export const listSecurityGroupRulesParamsPageSizeDefault = 50;
 export const listSecurityGroupRulesParamsPageSizeMax = 200;
 
 export const ListSecurityGroupRulesParams = zod.strictObject({
-  page: zod.int().min(1).default(listSecurityGroupRulesParamsPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listSecurityGroupRulesParamsPageMax)
+    .default(listSecurityGroupRulesParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

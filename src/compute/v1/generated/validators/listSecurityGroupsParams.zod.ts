@@ -24,6 +24,7 @@
 import * as zod from "zod";
 
 export const listSecurityGroupsParamsPageDefault = 1;
+export const listSecurityGroupsParamsPageMax = 2147483647;
 
 export const listSecurityGroupsParamsPageSizeDefault = 50;
 export const listSecurityGroupsParamsPageSizeMax = 200;
@@ -34,7 +35,11 @@ export const ListSecurityGroupsParams = zod.strictObject({
     .string()
     .optional()
     .describe("Return only the security groups of this private network"),
-  page: zod.int().min(1).default(listSecurityGroupsParamsPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listSecurityGroupsParamsPageMax)
+    .default(listSecurityGroupsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

@@ -59,65 +59,38 @@
  * time returns `CREDENTIAL_TICKET_CONSUMED`.
  * OpenAPI spec version: 1.0.0
  */
-import type { AnnouncementListResource } from "./models/announcementListResource.js";
-
-import type { AnnouncementReadResultResource } from "./models/announcementReadResultResource.js";
-
-import type { AuthorizeRealtimeChannelRequestBody } from "./models/authorizeRealtimeChannelRequestBody.js";
-
-import type { ChannelListResponseBody } from "./models/channelListResponseBody.js";
-
-import type { ChannelResource } from "./models/channelResource.js";
-
-import type { ConfirmEmailOverrideRequestBody } from "./models/confirmEmailOverrideRequestBody.js";
-
-import type { CountUnreadNotificationsParams } from "./models/countUnreadNotificationsParams.js";
-
-import type { CreateChannelRequestBody } from "./models/createChannelRequestBody.js";
-
-import type { CredentialTicketResource } from "./models/credentialTicketResource.js";
-
-import type { DeleteTypePreferenceParams } from "./models/deleteTypePreferenceParams.js";
-
-import type { EmailOverrideCodeResource } from "./models/emailOverrideCodeResource.js";
-
-import type { Error } from "./models/error.js";
-
-import type { LengthAwarePageNotificationResource } from "./models/lengthAwarePageNotificationResource.js";
-
-import type { ListNotificationsParams } from "./models/listNotificationsParams.js";
-
-import type { ListTypePreferencesParams } from "./models/listTypePreferencesParams.js";
-
-import type { ListUserChannelsParams } from "./models/listUserChannelsParams.js";
-
-import type { MarkNotificationsReadRequestBody } from "./models/markNotificationsReadRequestBody.js";
-
-import type { NotificationResource } from "./models/notificationResource.js";
-
-import type { NotificationTypeListResponseBody } from "./models/notificationTypeListResponseBody.js";
-
-import type { PreferencesResource } from "./models/preferencesResource.js";
-
-import type { RealtimeAuthResource } from "./models/realtimeAuthResource.js";
-
-import type { RealtimeConnectionResource } from "./models/realtimeConnectionResource.js";
-
-import type { RevealedCredentialResource } from "./models/revealedCredentialResource.js";
-
-import type { TypePreferenceListResponseBody } from "./models/typePreferenceListResponseBody.js";
-
-import type { TypePreferenceResource } from "./models/typePreferenceResource.js";
-
-import type { UnreadCountResource } from "./models/unreadCountResource.js";
-
-import type { UpdateChannelRequestBody } from "./models/updateChannelRequestBody.js";
-
-import type { UpdatePreferencesRequestBody } from "./models/updatePreferencesRequestBody.js";
-
-import type { UpdateTypePreferenceParams } from "./models/updateTypePreferenceParams.js";
-
-import type { UpdateTypePreferenceRequestBody } from "./models/updateTypePreferenceRequestBody.js";
+import type {
+  AnnouncementListResource,
+  AnnouncementReadResultResource,
+  AuthorizeRealtimeChannelRequestBody,
+  ChannelListResponseBody,
+  ChannelResource,
+  ConfirmEmailOverrideRequestBody,
+  CountUnreadNotificationsParams,
+  CreateChannelRequestBody,
+  CredentialTicketResource,
+  DeleteTypePreferenceParams,
+  EmailOverrideCodeResource,
+  Error,
+  LengthAwarePageNotificationResource,
+  ListNotificationsParams,
+  ListTypePreferencesParams,
+  ListUserChannelsParams,
+  MarkNotificationsReadRequestBody,
+  NotificationResource,
+  NotificationTypeListResponseBody,
+  PreferencesResource,
+  RealtimeAuthResource,
+  RealtimeConnectionResource,
+  RevealedCredentialResource,
+  TypePreferenceListResponseBody,
+  TypePreferenceResource,
+  UnreadCountResource,
+  UpdateChannelRequestBody,
+  UpdatePreferencesRequestBody,
+  UpdateTypePreferenceParams,
+  UpdateTypePreferenceRequestBody,
+} from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;

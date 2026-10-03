@@ -55,24 +55,19 @@ import { TicketStatus } from "./ticketStatus.zod.js";
 export const listTicketsParamsLimitDefault = 50;
 export const listTicketsParamsLimitMax = 200;
 
+export const listTicketsParamsOffsetDefault = 0;
 export const listTicketsParamsOffsetMin = 0;
 export const listTicketsParamsOffsetMax = 10000;
 
 export const listTicketsParamsKeywordMax = 128;
 
 export const ListTicketsParams = zod.strictObject({
-  limit: zod
-    .int()
-    .min(1)
-    .max(listTicketsParamsLimitMax)
-    .default(listTicketsParamsLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+  limit: zod.int().min(1).max(listTicketsParamsLimitMax).default(listTicketsParamsLimitDefault),
   offset: zod
     .int()
     .min(listTicketsParamsOffsetMin)
     .max(listTicketsParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listTicketsParamsOffsetDefault),
   status: TicketStatus.optional(),
   priority: TicketPriority.optional(),
   category_id: zod.uuid().optional(),

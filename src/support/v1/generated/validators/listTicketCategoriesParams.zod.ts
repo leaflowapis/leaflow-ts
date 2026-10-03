@@ -50,9 +50,10 @@
  */
 import * as zod from "zod";
 
-export const listTicketCategoriesParamsLimitDefault = 100;
+export const listTicketCategoriesParamsLimitDefault = 50;
 export const listTicketCategoriesParamsLimitMax = 200;
 
+export const listTicketCategoriesParamsOffsetDefault = 0;
 export const listTicketCategoriesParamsOffsetMin = 0;
 export const listTicketCategoriesParamsOffsetMax = 10000;
 
@@ -61,14 +62,12 @@ export const ListTicketCategoriesParams = zod.strictObject({
     .int()
     .min(1)
     .max(listTicketCategoriesParamsLimitMax)
-    .default(listTicketCategoriesParamsLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .default(listTicketCategoriesParamsLimitDefault),
   offset: zod
     .int()
     .min(listTicketCategoriesParamsOffsetMin)
     .max(listTicketCategoriesParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listTicketCategoriesParamsOffsetDefault),
 });
 
 export type ListTicketCategoriesParams = zod.input<typeof ListTicketCategoriesParams>;

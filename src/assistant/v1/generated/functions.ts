@@ -46,99 +46,55 @@
  * - three terminal events: `done` this turn finished (carrying its final status), `paused` the assistant is waiting on the user (fetch the document again and read `wait`), `stalled` execution was interrupted and will not resume — do not reconnect.
  * OpenAPI spec version: 1.0.0
  */
-import type { AnswerRequestBody } from "./models/answerRequestBody.js";
-
-import type { BindingCodeResponseBody } from "./models/bindingCodeResponseBody.js";
-
-import type { BindingResource } from "./models/bindingResource.js";
-
-import type { ChannelResource } from "./models/channelResource.js";
-
-import type { ChannelWithSecretResponseBody } from "./models/channelWithSecretResponseBody.js";
-
-import type { CheckSenderParams } from "./models/checkSenderParams.js";
-
-import type { CreateChannelRequestBody } from "./models/createChannelRequestBody.js";
-
-import type { CreateFolderRequestBody } from "./models/createFolderRequestBody.js";
-
-import type { CreateThreadRequestBody } from "./models/createThreadRequestBody.js";
-
-import type { DecideRequestBody } from "./models/decideRequestBody.js";
-
-import type { DocumentResource } from "./models/documentResource.js";
-
-import type { DynamicCallResultRequestBody } from "./models/dynamicCallResultRequestBody.js";
-
-import type { EarlierResponseBody } from "./models/earlierResponseBody.js";
-
-import type { Error } from "./models/error.js";
-
-import type { FolderListResponseBody } from "./models/folderListResponseBody.js";
-
-import type { FolderResource } from "./models/folderResource.js";
-
-import type { LengthAwarePageBindingResource } from "./models/lengthAwarePageBindingResource.js";
-
-import type { LengthAwarePageChannelResource } from "./models/lengthAwarePageChannelResource.js";
-
-import type { ListBindingsParams } from "./models/listBindingsParams.js";
-
-import type { ListChannelRejectionsParams } from "./models/listChannelRejectionsParams.js";
-
-import type { ListChannelsParams } from "./models/listChannelsParams.js";
-
-import type { ListEarlierItemsParams } from "./models/listEarlierItemsParams.js";
-
-import type { ListThreadsParams } from "./models/listThreadsParams.js";
-
-import type { LoginResource } from "./models/loginResource.js";
-
-import type { MemoryListResponseBody } from "./models/memoryListResponseBody.js";
-
-import type { ModelListResponseBody } from "./models/modelListResponseBody.js";
-
-import type { PlatformListResponseBody } from "./models/platformListResponseBody.js";
-
-import type { RejectionListResponseBody } from "./models/rejectionListResponseBody.js";
-
-import type { RevertRequestBody } from "./models/revertRequestBody.js";
-
-import type { RevertedCountResponseBody } from "./models/revertedCountResponseBody.js";
-
-import type { RotateSecretRequestBody } from "./models/rotateSecretRequestBody.js";
-
-import type { SendMessageRequestBody } from "./models/sendMessageRequestBody.js";
-
-import type { SenderCheckResource } from "./models/senderCheckResource.js";
-
-import type { SkillEnabledRequestBody } from "./models/skillEnabledRequestBody.js";
-
-import type { SkillListResponseBody } from "./models/skillListResponseBody.js";
-
-import type { SkillRequestBody } from "./models/skillRequestBody.js";
-
-import type { SkillResource } from "./models/skillResource.js";
-
-import type { ThreadListResponseBody } from "./models/threadListResponseBody.js";
-
-import type { ThreadSummaryResource } from "./models/threadSummaryResource.js";
-
-import type { TurnIDResponseBody } from "./models/turnIDResponseBody.js";
-
-import type { UpdateChannelRequestBody } from "./models/updateChannelRequestBody.js";
-
-import type { UpdateFolderRequestBody } from "./models/updateFolderRequestBody.js";
-
-import type { UpdateThreadRequestBody } from "./models/updateThreadRequestBody.js";
-
-import type { UploadAttachmentParams } from "./models/uploadAttachmentParams.js";
-
-import type { UploadedResource } from "./models/uploadedResource.js";
-
-import type { VerifyCodeRequestBody } from "./models/verifyCodeRequestBody.js";
-
-import type { WebhookSecretResponseBody } from "./models/webhookSecretResponseBody.js";
+import type {
+  AnswerRequestBody,
+  BindingCodeResponseBody,
+  BindingResource,
+  ChannelResource,
+  ChannelWithSecretResponseBody,
+  CheckSenderParams,
+  CreateChannelRequestBody,
+  CreateFolderRequestBody,
+  CreateThreadRequestBody,
+  DecideRequestBody,
+  DocumentResource,
+  DynamicCallResultRequestBody,
+  EarlierResponseBody,
+  Error,
+  FolderListResponseBody,
+  FolderResource,
+  LengthAwarePageBindingResource,
+  LengthAwarePageChannelResource,
+  ListBindingsParams,
+  ListChannelRejectionsParams,
+  ListChannelsParams,
+  ListEarlierItemsParams,
+  ListThreadsParams,
+  LoginResource,
+  MemoryListResponseBody,
+  ModelListResponseBody,
+  PlatformListResponseBody,
+  RejectionListResponseBody,
+  RevertRequestBody,
+  RevertedCountResponseBody,
+  RotateSecretRequestBody,
+  SendMessageRequestBody,
+  SenderCheckResource,
+  SkillEnabledRequestBody,
+  SkillListResponseBody,
+  SkillRequestBody,
+  SkillResource,
+  ThreadListResponseBody,
+  ThreadSummaryResource,
+  TurnIDResponseBody,
+  UpdateChannelRequestBody,
+  UpdateFolderRequestBody,
+  UpdateThreadRequestBody,
+  UploadAttachmentParams,
+  UploadedResource,
+  VerifyCodeRequestBody,
+  WebhookSecretResponseBody,
+} from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
@@ -1914,6 +1870,8 @@ export const getListThreadsUrl = (params?: ListThreadsParams) => {
 
 /**
  * Ordered by most recent activity, limited to the current account's conversations in the current project. `archived` selects between two sets rather than widening one: archived conversations are absent from the default list, and turning the flag on shows those instead.
+ *
+ * Pass the returned nextCursor as cursor; omit cursor on the first page. Continue with the same q, archived and folder filters. The cursor marks a position in the activity order, so changing filters between pages does not continue the same list.
  * @summary List conversations
  */
 export const listThreads = async (

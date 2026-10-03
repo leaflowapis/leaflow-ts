@@ -20,8 +20,9 @@
 import * as zod from "zod";
 
 export const listMyInvitationsParamsLimitDefault = 50;
-export const listMyInvitationsParamsLimitMax = 100;
+export const listMyInvitationsParamsLimitMax = 200;
 
+export const listMyInvitationsParamsOffsetDefault = 0;
 export const listMyInvitationsParamsOffsetMin = 0;
 export const listMyInvitationsParamsOffsetMax = 10000;
 
@@ -30,14 +31,12 @@ export const ListMyInvitationsParams = zod.strictObject({
     .int()
     .min(1)
     .max(listMyInvitationsParamsLimitMax)
-    .default(listMyInvitationsParamsLimitDefault)
-    .describe("Maximum number of items in this page"),
+    .default(listMyInvitationsParamsLimitDefault),
   offset: zod
     .int()
     .min(listMyInvitationsParamsOffsetMin)
     .max(listMyInvitationsParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listMyInvitationsParamsOffsetDefault),
 });
 
 export type ListMyInvitationsParams = zod.input<typeof ListMyInvitationsParams>;

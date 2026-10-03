@@ -51,22 +51,17 @@ import * as zod from "zod";
 export const listBindingsParamsLimitDefault = 50;
 export const listBindingsParamsLimitMax = 200;
 
+export const listBindingsParamsOffsetDefault = 0;
 export const listBindingsParamsOffsetMin = 0;
 export const listBindingsParamsOffsetMax = 10000;
 
 export const ListBindingsParams = zod.strictObject({
-  limit: zod
-    .int()
-    .min(1)
-    .max(listBindingsParamsLimitMax)
-    .default(listBindingsParamsLimitDefault)
-    .describe("How many entries this page returns at most"),
+  limit: zod.int().min(1).max(listBindingsParamsLimitMax).default(listBindingsParamsLimitDefault),
   offset: zod
     .int()
     .min(listBindingsParamsOffsetMin)
     .max(listBindingsParamsOffsetMax)
-    .optional()
-    .describe("How many to skip. To page deeper, use the cursor-paged operation instead"),
+    .default(listBindingsParamsOffsetDefault),
   platform: zod.string().optional(),
   channelId: zod.uuid().optional(),
   active: zod.boolean().optional().describe("Return only bindings that are active"),

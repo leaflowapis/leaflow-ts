@@ -26,6 +26,7 @@ import * as zod from "zod";
 export const listInstancesParamsLabelMax = 128;
 
 export const listInstancesParamsPageDefault = 1;
+export const listInstancesParamsPageMax = 2147483647;
 
 export const listInstancesParamsPageSizeDefault = 50;
 export const listInstancesParamsPageSizeMax = 200;
@@ -36,7 +37,7 @@ export const ListInstancesParams = zod.strictObject({
     .max(listInstancesParamsLabelMax)
     .optional()
     .describe("A label to filter by, written as `key:value`"),
-  page: zod.int().min(1).default(listInstancesParamsPageDefault),
+  page: zod.int().min(1).max(listInstancesParamsPageMax).default(listInstancesParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

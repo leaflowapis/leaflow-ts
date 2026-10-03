@@ -24,12 +24,17 @@
 import * as zod from "zod";
 
 export const listInstanceDisksParamsPageDefault = 1;
+export const listInstanceDisksParamsPageMax = 2147483647;
 
 export const listInstanceDisksParamsPageSizeDefault = 50;
 export const listInstanceDisksParamsPageSizeMax = 200;
 
 export const ListInstanceDisksParams = zod.strictObject({
-  page: zod.int().min(1).default(listInstanceDisksParamsPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listInstanceDisksParamsPageMax)
+    .default(listInstanceDisksParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

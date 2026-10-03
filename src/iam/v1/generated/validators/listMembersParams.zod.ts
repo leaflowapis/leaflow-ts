@@ -15,26 +15,21 @@
 import * as zod from "zod";
 
 export const listMembersParamsLimitDefault = 50;
-export const listMembersParamsLimitMax = 100;
+export const listMembersParamsLimitMax = 200;
 
+export const listMembersParamsOffsetDefault = 0;
 export const listMembersParamsOffsetMin = 0;
 export const listMembersParamsOffsetMax = 10000;
 
 export const listMembersParamsKeywordMax = 255;
 
 export const ListMembersParams = zod.strictObject({
-  limit: zod
-    .int()
-    .min(1)
-    .max(listMembersParamsLimitMax)
-    .default(listMembersParamsLimitDefault)
-    .describe("Maximum number of items in this page"),
+  limit: zod.int().min(1).max(listMembersParamsLimitMax).default(listMembersParamsLimitDefault),
   offset: zod
     .int()
     .min(listMembersParamsOffsetMin)
     .max(listMembersParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listMembersParamsOffsetDefault),
   keyword: zod
     .string()
     .max(listMembersParamsKeywordMax)

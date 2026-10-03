@@ -7,35 +7,27 @@
  */
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
-import { QuotedLine } from "./quotedLine.zod.js";
+import { QuoteItem } from "./quoteItem.zod.js";
 
 export const Quote = zod
   .strictObject({
-    lines: zod
-      .array(QuotedLine)
+    items: zod
+      .array(QuoteItem)
       .describe(
         "One line for each item the purchase would order, in the order it would order them.",
       ),
-    subtotal: zod
-      .union([Money, zod.null()])
-      .describe(
-        "Sum of line amounts before discounts, less tax already included in the discounted line\namounts, as on an invoice. Null when any line cannot be priced.",
-      ),
-    discount_amount: zod
-      .union([Money, zod.null()])
-      .describe("Sum of line discounts. Null when any line cannot be priced."),
-    tax_amount: zod
-      .union([Money, zod.null()])
-      .describe("Sum of tax on the discounted line amounts. Null when any line cannot be priced."),
-    total: zod
-      .union([Money, zod.null()])
-      .describe(
-        "subtotal minus discount_amount plus tax_amount: what checkout collects, before applying\ncredit grants or balance. Equals the sum of line totals and excludes estimated_usage_amount.\nNull when any line cannot be priced.",
-      ),
+    subtotal: Money.describe(
+      "Sum of line amounts before discounts, less tax already included in the discounted line\namounts, as on an invoice.",
+    ),
+    discount_amount: Money.describe("Sum of line discounts."),
+    tax_amount: Money.describe("Sum of tax on the discounted line amounts."),
+    total: Money.describe(
+      "subtotal minus discount_amount plus tax_amount: what checkout collects, before applying\ncredit grants or balance. Equals the sum of line totals and excludes estimated_usage_amount.",
+    ),
     estimated_usage_amount: zod
       .union([Money, zod.null()])
       .describe(
-        "Sum of the lines' estimated_usage_amount. A projection, not part of total and not collected at\ncheckout. Null when no line is billed for usage or when any usage cannot be priced.",
+        "Sum of the lines' estimated_usage_amount. A projection, not part of total and not collected at\ncheckout. Null when no usage estimate is requested.",
       ),
     currency: zod.string(),
     proration_date: zod.iso
@@ -51,7 +43,7 @@ export const Quote = zod
       ),
   })
   .describe(
-    "A price preview for the purchase described by a service, calculated by Billing. Nothing is saved,\ncharged or reserved, and no discount redemption is consumed. Account discounts and tax are\nevaluated as for automatic checkout. Promotion codes are evaluated through Billing quote operations.\nAll amounts use currency. This preview does not lock prices or guarantee discount availability.",
+    "A price preview for the purchase described by a service, calculated by Billing. Nothing is saved,\ncharged or reserved, and no discount redemption is consumed. Account discounts and tax are\nevaluated as for automatic checkout. Promotion codes are evaluated through Billing quote operations.\nAll amounts use currency. This preview does not lock prices or guarantee discount availability.\nSuccess includes complete checkout amounts and every requested usage estimate. If any item or\nrequested usage estimate cannot be calculated, the operation returns its existing structured\nerror response; it never returns a partial quote with HTTP 200.",
   );
 
 export type Quote = zod.input<typeof Quote>;

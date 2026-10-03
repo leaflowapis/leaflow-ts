@@ -67,6 +67,7 @@ import { UpdateServerRequestBody } from "./validators/updateServerRequestBody.zo
 export const listIncidentsQueryLimitDefault = 50;
 export const listIncidentsQueryLimitMax = 200;
 
+export const listIncidentsQueryOffsetDefault = 0;
 export const listIncidentsQueryOffsetMin = 0;
 export const listIncidentsQueryOffsetMax = 10000;
 
@@ -78,15 +79,13 @@ export const ListIncidentsQueryParams = zod.strictObject({
     .min(1)
     .max(listIncidentsQueryLimitMax)
     .default(listIncidentsQueryLimitDefault)
-    .describe("Maximum number of records in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listIncidentsQueryOffsetMin)
     .max(listIncidentsQueryOffsetMax)
-    .optional()
-    .describe(
-      "Number of records to skip. For deeper paging, use the cursor-paged endpoint instead",
-    ),
+    .default(listIncidentsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   server_id: zod.string().optional().describe("Restrict to a single machine"),
   web_check_id: zod.string().optional().describe("Restrict to a single web check"),
   incident_status: zod.enum(["PROBLEM", "RESOLVED"]).optional(),
@@ -184,6 +183,8 @@ export const ReopenIncidentParams = zod.strictObject({
 
 /**
  * Cursor paging rather than offset paging: the timeline is append-only, and offset paging would skip or repeat entries whenever a new one is written.
+ *
+ * Omit cursor on the first page. An empty next_cursor means there is no following page; do not send an empty cursor.
  * @summary List the timeline of an incident
  */
 export const ListIncidentTimelineParams = zod.strictObject({
@@ -191,19 +192,23 @@ export const ListIncidentTimelineParams = zod.strictObject({
 });
 
 export const listIncidentTimelineQueryLimitDefault = 50;
-export const listIncidentTimelineQueryLimitMin = 0;
-export const listIncidentTimelineQueryLimitMax = 500;
+export const listIncidentTimelineQueryLimitMax = 200;
+
+export const listIncidentTimelineQueryCursorMax = 1024;
 
 export const ListIncidentTimelineQueryParams = zod.strictObject({
   limit: zod
     .int()
-    .min(listIncidentTimelineQueryLimitMin)
+    .min(1)
     .max(listIncidentTimelineQueryLimitMax)
-    .default(listIncidentTimelineQueryLimitDefault),
+    .default(listIncidentTimelineQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   cursor: zod
     .string()
+    .min(1)
+    .max(listIncidentTimelineQueryCursorMax)
     .optional()
-    .describe("The `next_cursor` returned by the previous page. Empty starts from the beginning"),
+    .describe("The next_cursor returned by the previous page. Omit it for the first page."),
 });
 
 /**
@@ -324,6 +329,7 @@ export const ListProjectTopItemsQueryParams = zod.strictObject({
 export const listServersQueryLimitDefault = 50;
 export const listServersQueryLimitMax = 200;
 
+export const listServersQueryOffsetDefault = 0;
 export const listServersQueryOffsetMin = 0;
 export const listServersQueryOffsetMax = 10000;
 
@@ -335,15 +341,13 @@ export const ListServersQueryParams = zod.strictObject({
     .min(1)
     .max(listServersQueryLimitMax)
     .default(listServersQueryLimitDefault)
-    .describe("Maximum number of records in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listServersQueryOffsetMin)
     .max(listServersQueryOffsetMax)
-    .optional()
-    .describe(
-      "Number of records to skip. For deeper paging, use the cursor-paged endpoint instead",
-    ),
+    .default(listServersQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   keyword: zod
     .string()
     .max(listServersQueryKeywordMax)
@@ -595,6 +599,7 @@ export const PutStatusPageComponentSourcesBody = PutStatusPageComponentSourcesRe
 export const listStatusPageIncidentsQueryLimitDefault = 50;
 export const listStatusPageIncidentsQueryLimitMax = 200;
 
+export const listStatusPageIncidentsQueryOffsetDefault = 0;
 export const listStatusPageIncidentsQueryOffsetMin = 0;
 export const listStatusPageIncidentsQueryOffsetMax = 10000;
 
@@ -604,12 +609,13 @@ export const ListStatusPageIncidentsQueryParams = zod.strictObject({
     .min(1)
     .max(listStatusPageIncidentsQueryLimitMax)
     .default(listStatusPageIncidentsQueryLimitDefault)
-    .describe("Maximum number of records in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listStatusPageIncidentsQueryOffsetMin)
     .max(listStatusPageIncidentsQueryOffsetMax)
-    .optional(),
+    .default(listStatusPageIncidentsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
 });
 
 /**
@@ -647,6 +653,7 @@ export const PostStatusPageIncidentUpdateBody = PostStatusPageIncidentUpdateRequ
 export const listStatusPageMaintenancesQueryLimitDefault = 50;
 export const listStatusPageMaintenancesQueryLimitMax = 200;
 
+export const listStatusPageMaintenancesQueryOffsetDefault = 0;
 export const listStatusPageMaintenancesQueryOffsetMin = 0;
 export const listStatusPageMaintenancesQueryOffsetMax = 10000;
 
@@ -656,12 +663,13 @@ export const ListStatusPageMaintenancesQueryParams = zod.strictObject({
     .min(1)
     .max(listStatusPageMaintenancesQueryLimitMax)
     .default(listStatusPageMaintenancesQueryLimitDefault)
-    .describe("Maximum number of records in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listStatusPageMaintenancesQueryOffsetMin)
     .max(listStatusPageMaintenancesQueryOffsetMax)
-    .optional(),
+    .default(listStatusPageMaintenancesQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
 });
 
 /**

@@ -24,13 +24,18 @@
 import * as zod from "zod";
 
 export const listPrivateNetworksParamsPageDefault = 1;
+export const listPrivateNetworksParamsPageMax = 2147483647;
 
 export const listPrivateNetworksParamsPageSizeDefault = 50;
 export const listPrivateNetworksParamsPageSizeMax = 200;
 
 export const ListPrivateNetworksParams = zod.strictObject({
   region_id: zod.uuid().optional(),
-  page: zod.int().min(1).default(listPrivateNetworksParamsPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listPrivateNetworksParamsPageMax)
+    .default(listPrivateNetworksParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

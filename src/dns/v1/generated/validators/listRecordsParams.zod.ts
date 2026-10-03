@@ -53,9 +53,10 @@ import { RecordType } from "./recordType.zod.js";
 
 export const listRecordsParamsNameMax = 253;
 
-export const listRecordsParamsLimitDefault = 100;
-export const listRecordsParamsLimitMax = 500;
+export const listRecordsParamsLimitDefault = 50;
+export const listRecordsParamsLimitMax = 200;
 
+export const listRecordsParamsOffsetDefault = 0;
 export const listRecordsParamsOffsetMin = 0;
 export const listRecordsParamsOffsetMax = 10000;
 
@@ -74,18 +75,12 @@ export const ListRecordsParams = zod.strictObject({
       "Return only record sets with this name, given relative to the domain. `@` denotes the domain itself",
     ),
   type: RecordType.optional(),
-  limit: zod
-    .int()
-    .min(1)
-    .max(listRecordsParamsLimitMax)
-    .default(listRecordsParamsLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+  limit: zod.int().min(1).max(listRecordsParamsLimitMax).default(listRecordsParamsLimitDefault),
   offset: zod
     .int()
     .min(listRecordsParamsOffsetMin)
     .max(listRecordsParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listRecordsParamsOffsetDefault),
 });
 
 export type ListRecordsParams = zod.input<typeof ListRecordsParams>;

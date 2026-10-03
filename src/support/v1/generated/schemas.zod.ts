@@ -63,6 +63,7 @@ import { CreateTicketSatisfactionRequestBody } from "./validators/createTicketSa
 export const listTicketsQueryLimitDefault = 50;
 export const listTicketsQueryLimitMax = 200;
 
+export const listTicketsQueryOffsetDefault = 0;
 export const listTicketsQueryOffsetMin = 0;
 export const listTicketsQueryOffsetMax = 10000;
 
@@ -74,13 +75,13 @@ export const ListTicketsQueryParams = zod.strictObject({
     .min(1)
     .max(listTicketsQueryLimitMax)
     .default(listTicketsQueryLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listTicketsQueryOffsetMin)
     .max(listTicketsQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listTicketsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   status: zod
     .enum(["OPEN", "AWAITING_USER", "CLOSED"])
     .optional()
@@ -144,6 +145,7 @@ export const ListTicketMessagesParams = zod.strictObject({
 export const listTicketMessagesQueryLimitDefault = 50;
 export const listTicketMessagesQueryLimitMax = 200;
 
+export const listTicketMessagesQueryOffsetDefault = 0;
 export const listTicketMessagesQueryOffsetMin = 0;
 export const listTicketMessagesQueryOffsetMax = 10000;
 
@@ -153,13 +155,13 @@ export const ListTicketMessagesQueryParams = zod.strictObject({
     .min(1)
     .max(listTicketMessagesQueryLimitMax)
     .default(listTicketMessagesQueryLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listTicketMessagesQueryOffsetMin)
     .max(listTicketMessagesQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listTicketMessagesQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
 });
 
 /**
@@ -201,9 +203,10 @@ export const CreateTicketSatisfactionBody = CreateTicketSatisfactionRequestBody;
  * Ordered for presentation. Categories no longer accepting new tickets are omitted, including those still attached to existing tickets.
  * @summary List the categories accepting new tickets
  */
-export const listTicketCategoriesQueryLimitDefault = 100;
+export const listTicketCategoriesQueryLimitDefault = 50;
 export const listTicketCategoriesQueryLimitMax = 200;
 
+export const listTicketCategoriesQueryOffsetDefault = 0;
 export const listTicketCategoriesQueryOffsetMin = 0;
 export const listTicketCategoriesQueryOffsetMax = 10000;
 
@@ -213,13 +216,13 @@ export const ListTicketCategoriesQueryParams = zod.strictObject({
     .min(1)
     .max(listTicketCategoriesQueryLimitMax)
     .default(listTicketCategoriesQueryLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listTicketCategoriesQueryOffsetMin)
     .max(listTicketCategoriesQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listTicketCategoriesQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
 });
 
 /**
@@ -268,9 +271,10 @@ export const DownloadAttachmentQueryParams = zod.strictObject({
  * `completed_at` are what actually happened, and are null until it does.
  * @summary List maintenance notices
  */
-export const listMaintenancesQueryLimitDefault = 20;
+export const listMaintenancesQueryLimitDefault = 50;
 export const listMaintenancesQueryLimitMax = 200;
 
+export const listMaintenancesQueryOffsetDefault = 0;
 export const listMaintenancesQueryOffsetMin = 0;
 export const listMaintenancesQueryOffsetMax = 10000;
 
@@ -282,13 +286,13 @@ export const ListMaintenancesQueryParams = zod.strictObject({
     .min(1)
     .max(listMaintenancesQueryLimitMax)
     .default(listMaintenancesQueryLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listMaintenancesQueryOffsetMin)
     .max(listMaintenancesQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listMaintenancesQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   status: zod
     .enum(["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELLED"])
     .optional()
@@ -319,6 +323,7 @@ export const ListMaintenanceTimelineParams = zod.strictObject({
 export const listMaintenanceTimelineQueryLimitDefault = 50;
 export const listMaintenanceTimelineQueryLimitMax = 200;
 
+export const listMaintenanceTimelineQueryOffsetDefault = 0;
 export const listMaintenanceTimelineQueryOffsetMin = 0;
 export const listMaintenanceTimelineQueryOffsetMax = 10000;
 
@@ -328,11 +333,11 @@ export const ListMaintenanceTimelineQueryParams = zod.strictObject({
     .min(1)
     .max(listMaintenanceTimelineQueryLimitMax)
     .default(listMaintenanceTimelineQueryLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listMaintenanceTimelineQueryOffsetMin)
     .max(listMaintenanceTimelineQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listMaintenanceTimelineQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
 });

@@ -24,12 +24,13 @@
 import * as zod from "zod";
 
 export const listRoutesParamsPageDefault = 1;
+export const listRoutesParamsPageMax = 2147483647;
 
 export const listRoutesParamsPageSizeDefault = 50;
 export const listRoutesParamsPageSizeMax = 200;
 
 export const ListRoutesParams = zod.strictObject({
-  page: zod.int().min(1).default(listRoutesParamsPageDefault),
+  page: zod.int().min(1).max(listRoutesParamsPageMax).default(listRoutesParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

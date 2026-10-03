@@ -24,12 +24,13 @@
 import * as zod from "zod";
 
 export const listPortsParamsPageDefault = 1;
+export const listPortsParamsPageMax = 2147483647;
 
 export const listPortsParamsPageSizeDefault = 50;
 export const listPortsParamsPageSizeMax = 200;
 
 export const ListPortsParams = zod.strictObject({
-  page: zod.int().min(1).default(listPortsParamsPageDefault),
+  page: zod.int().min(1).max(listPortsParamsPageMax).default(listPortsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

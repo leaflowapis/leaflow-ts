@@ -26,6 +26,7 @@ import * as zod from "zod";
 export const listOperationLogsParamsActionMax = 64;
 
 export const listOperationLogsParamsPageDefault = 1;
+export const listOperationLogsParamsPageMax = 2147483647;
 
 export const listOperationLogsParamsPageSizeDefault = 50;
 export const listOperationLogsParamsPageSizeMax = 200;
@@ -38,7 +39,11 @@ export const ListOperationLogsParams = zod.strictObject({
     .describe(
       "Return a single kind of operation; the value matches the operation id of the endpoint",
     ),
-  page: zod.int().min(1).default(listOperationLogsParamsPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listOperationLogsParamsPageMax)
+    .default(listOperationLogsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

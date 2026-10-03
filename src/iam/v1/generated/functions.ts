@@ -12,69 +12,40 @@
  * project. It does not state whether a given operation is allowed; each service declares which permission its own operations require.
  * OpenAPI spec version: 1.0.0
  */
-import type { AttachPolicyRequestBody } from "./models/attachPolicyRequestBody.js";
-
-import type { BatchGetMembersRequestBody } from "./models/batchGetMembersRequestBody.js";
-
-import type { BatchGetMembersResponseBody } from "./models/batchGetMembersResponseBody.js";
-
-import type { CatalogListResponseBody } from "./models/catalogListResponseBody.js";
-
-import type { CreateRoleRequestBody } from "./models/createRoleRequestBody.js";
-
-import type { CreateSSHKeyRequestBody } from "./models/createSSHKeyRequestBody.js";
-
-import type { Error } from "./models/error.js";
-
-import type { IssueInvitationRequestBody } from "./models/issueInvitationRequestBody.js";
-
-import type { IssuedInvitationResponseBody } from "./models/issuedInvitationResponseBody.js";
-
-import type { LengthAwarePageInvitationResource } from "./models/lengthAwarePageInvitationResource.js";
-
-import type { LengthAwarePageMemberResource } from "./models/lengthAwarePageMemberResource.js";
-
-import type { LengthAwarePageSSHKeyResource } from "./models/lengthAwarePageSSHKeyResource.js";
-
-import type { ListMembersParams } from "./models/listMembersParams.js";
-
-import type { ListPoliciesParams } from "./models/listPoliciesParams.js";
-
-import type { ListProjectInvitationsParams } from "./models/listProjectInvitationsParams.js";
-
-import type { ListSshKeysParams } from "./models/listSshKeysParams.js";
-
-import type { MemberResource } from "./models/memberResource.js";
-
-import type { MembershipResource } from "./models/membershipResource.js";
-
-import type { OwnershipTransferResponseBody } from "./models/ownershipTransferResponseBody.js";
-
-import type { PolicyListResponseBody } from "./models/policyListResponseBody.js";
-
-import type { PolicyResource } from "./models/policyResource.js";
-
-import type { ProjectAccessResource } from "./models/projectAccessResource.js";
-
-import type { RenameSSHKeyRequestBody } from "./models/renameSSHKeyRequestBody.js";
-
-import type { RoleListResponseBody } from "./models/roleListResponseBody.js";
-
-import type { RoleResource } from "./models/roleResource.js";
-
-import type { SSHKeyResource } from "./models/sSHKeyResource.js";
-
-import type { SetMemberPermissionsRequestBody } from "./models/setMemberPermissionsRequestBody.js";
-
-import type { SetMemberRolesRequestBody } from "./models/setMemberRolesRequestBody.js";
-
-import type { TransferOwnershipRequestBody } from "./models/transferOwnershipRequestBody.js";
-
-import type { UpdatePolicyRequestBody } from "./models/updatePolicyRequestBody.js";
-
-import type { UpdateProjectRequestBody } from "./models/updateProjectRequestBody.js";
-
-import type { UpdateRoleRequestBody } from "./models/updateRoleRequestBody.js";
+import type {
+  AttachPolicyRequestBody,
+  BatchGetMembersRequestBody,
+  BatchGetMembersResponseBody,
+  CatalogListResponseBody,
+  CreateRoleRequestBody,
+  CreateSSHKeyRequestBody,
+  Error,
+  IssueInvitationRequestBody,
+  IssuedInvitationResponseBody,
+  LengthAwarePageInvitationResource,
+  LengthAwarePageMemberResource,
+  LengthAwarePageSSHKeyResource,
+  ListMembersParams,
+  ListPoliciesParams,
+  ListProjectInvitationsParams,
+  ListSshKeysParams,
+  MemberResource,
+  MembershipResource,
+  OwnershipTransferResponseBody,
+  PolicyListResponseBody,
+  PolicyResource,
+  ProjectAccessResource,
+  RenameSSHKeyRequestBody,
+  RoleListResponseBody,
+  RoleResource,
+  SSHKeyResource,
+  SetMemberPermissionsRequestBody,
+  SetMemberRolesRequestBody,
+  TransferOwnershipRequestBody,
+  UpdatePolicyRequestBody,
+  UpdateProjectRequestBody,
+  UpdateRoleRequestBody,
+} from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;

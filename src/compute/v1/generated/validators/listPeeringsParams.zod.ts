@@ -24,12 +24,13 @@
 import * as zod from "zod";
 
 export const listPeeringsParamsPageDefault = 1;
+export const listPeeringsParamsPageMax = 2147483647;
 
 export const listPeeringsParamsPageSizeDefault = 50;
 export const listPeeringsParamsPageSizeMax = 200;
 
 export const ListPeeringsParams = zod.strictObject({
-  page: zod.int().min(1).default(listPeeringsParamsPageDefault),
+  page: zod.int().min(1).max(listPeeringsParamsPageMax).default(listPeeringsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

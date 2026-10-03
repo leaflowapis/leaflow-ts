@@ -24,12 +24,17 @@
 import * as zod from "zod";
 
 export const listBackupCapacityPacksParamsPageDefault = 1;
+export const listBackupCapacityPacksParamsPageMax = 2147483647;
 
 export const listBackupCapacityPacksParamsPageSizeDefault = 50;
 export const listBackupCapacityPacksParamsPageSizeMax = 200;
 
 export const ListBackupCapacityPacksParams = zod.strictObject({
-  page: zod.int().min(1).default(listBackupCapacityPacksParamsPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listBackupCapacityPacksParamsPageMax)
+    .default(listBackupCapacityPacksParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

@@ -33,22 +33,17 @@ import * as zod from "zod";
 export const listApiKeysParamsLimitDefault = 50;
 export const listApiKeysParamsLimitMax = 200;
 
+export const listApiKeysParamsOffsetDefault = 0;
 export const listApiKeysParamsOffsetMin = 0;
 export const listApiKeysParamsOffsetMax = 10000;
 
 export const ListApiKeysParams = zod.strictObject({
-  limit: zod
-    .int()
-    .min(1)
-    .max(listApiKeysParamsLimitMax)
-    .default(listApiKeysParamsLimitDefault)
-    .describe("Maximum number of items in this page"),
+  limit: zod.int().min(1).max(listApiKeysParamsLimitMax).default(listApiKeysParamsLimitDefault),
   offset: zod
     .int()
     .min(listApiKeysParamsOffsetMin)
     .max(listApiKeysParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listApiKeysParamsOffsetDefault),
   status: zod
     .enum(["active", "disabled", "revoked"])
     .optional()

@@ -21,19 +21,17 @@
 import * as zod from "zod";
 
 export const listIncidentTimelineParamsLimitDefault = 50;
-export const listIncidentTimelineParamsLimitMin = 0;
-export const listIncidentTimelineParamsLimitMax = 500;
+export const listIncidentTimelineParamsLimitMax = 200;
+
+export const listIncidentTimelineParamsCursorMax = 1024;
 
 export const ListIncidentTimelineParams = zod.strictObject({
   limit: zod
     .int()
-    .min(listIncidentTimelineParamsLimitMin)
+    .min(1)
     .max(listIncidentTimelineParamsLimitMax)
     .default(listIncidentTimelineParamsLimitDefault),
-  cursor: zod
-    .string()
-    .optional()
-    .describe("The `next_cursor` returned by the previous page. Empty starts from the beginning"),
+  cursor: zod.string().min(1).max(listIncidentTimelineParamsCursorMax).optional(),
 });
 
 export type ListIncidentTimelineParams = zod.input<typeof ListIncidentTimelineParams>;

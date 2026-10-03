@@ -23,6 +23,7 @@ import * as zod from "zod";
 export const listStatusPageIncidentsParamsLimitDefault = 50;
 export const listStatusPageIncidentsParamsLimitMax = 200;
 
+export const listStatusPageIncidentsParamsOffsetDefault = 0;
 export const listStatusPageIncidentsParamsOffsetMin = 0;
 export const listStatusPageIncidentsParamsOffsetMax = 10000;
 
@@ -36,7 +37,7 @@ export const ListStatusPageIncidentsParams = zod.strictObject({
     .int()
     .min(listStatusPageIncidentsParamsOffsetMin)
     .max(listStatusPageIncidentsParamsOffsetMax)
-    .optional(),
+    .default(listStatusPageIncidentsParamsOffsetDefault),
 });
 
 export type ListStatusPageIncidentsParams = zod.input<typeof ListStatusPageIncidentsParams>;

@@ -15,26 +15,21 @@
 import * as zod from "zod";
 
 export const listSshKeysParamsLimitDefault = 50;
-export const listSshKeysParamsLimitMax = 100;
+export const listSshKeysParamsLimitMax = 200;
 
+export const listSshKeysParamsOffsetDefault = 0;
 export const listSshKeysParamsOffsetMin = 0;
 export const listSshKeysParamsOffsetMax = 10000;
 
 export const listSshKeysParamsPurposeMax = 64;
 
 export const ListSshKeysParams = zod.strictObject({
-  limit: zod
-    .int()
-    .min(1)
-    .max(listSshKeysParamsLimitMax)
-    .default(listSshKeysParamsLimitDefault)
-    .describe("Maximum number of items in this page"),
+  limit: zod.int().min(1).max(listSshKeysParamsLimitMax).default(listSshKeysParamsLimitDefault),
   offset: zod
     .int()
     .min(listSshKeysParamsOffsetMin)
     .max(listSshKeysParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listSshKeysParamsOffsetDefault),
   status: zod
     .enum(["ACTIVE", "REVOKED"])
     .optional()

@@ -51,9 +51,10 @@
 import * as zod from "zod";
 import { MaintenanceStatus } from "./maintenanceStatus.zod.js";
 
-export const listMaintenancesParamsLimitDefault = 20;
+export const listMaintenancesParamsLimitDefault = 50;
 export const listMaintenancesParamsLimitMax = 200;
 
+export const listMaintenancesParamsOffsetDefault = 0;
 export const listMaintenancesParamsOffsetMin = 0;
 export const listMaintenancesParamsOffsetMax = 10000;
 
@@ -64,14 +65,12 @@ export const ListMaintenancesParams = zod.strictObject({
     .int()
     .min(1)
     .max(listMaintenancesParamsLimitMax)
-    .default(listMaintenancesParamsLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .default(listMaintenancesParamsLimitDefault),
   offset: zod
     .int()
     .min(listMaintenancesParamsOffsetMin)
     .max(listMaintenancesParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listMaintenancesParamsOffsetDefault),
   status: MaintenanceStatus.optional(),
   component: zod.string().max(listMaintenancesParamsComponentMax).optional(),
 });

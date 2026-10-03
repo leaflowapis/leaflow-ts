@@ -64,8 +64,9 @@ export const SubmitIdentityVerificationBody = SubmitIdentityVerificationRequestB
  * @summary List invitations addressed to the caller
  */
 export const listMyInvitationsQueryLimitDefault = 50;
-export const listMyInvitationsQueryLimitMax = 100;
+export const listMyInvitationsQueryLimitMax = 200;
 
+export const listMyInvitationsQueryOffsetDefault = 0;
 export const listMyInvitationsQueryOffsetMin = 0;
 export const listMyInvitationsQueryOffsetMax = 10000;
 
@@ -75,13 +76,13 @@ export const ListMyInvitationsQueryParams = zod.strictObject({
     .min(1)
     .max(listMyInvitationsQueryLimitMax)
     .default(listMyInvitationsQueryLimitDefault)
-    .describe("Maximum number of items in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listMyInvitationsQueryOffsetMin)
     .max(listMyInvitationsQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listMyInvitationsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
 });
 
 /**
@@ -121,8 +122,9 @@ export const AcceptInvitationParams = zod.strictObject({
  * @summary List the projects the caller belongs to
  */
 export const listProjectsQueryLimitDefault = 50;
-export const listProjectsQueryLimitMax = 100;
+export const listProjectsQueryLimitMax = 200;
 
+export const listProjectsQueryOffsetDefault = 0;
 export const listProjectsQueryOffsetMin = 0;
 export const listProjectsQueryOffsetMax = 10000;
 
@@ -136,13 +138,13 @@ export const ListProjectsQueryParams = zod.strictObject({
     .min(1)
     .max(listProjectsQueryLimitMax)
     .default(listProjectsQueryLimitDefault)
-    .describe("Maximum number of items in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listProjectsQueryOffsetMin)
     .max(listProjectsQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listProjectsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   keyword: zod
     .string()
     .max(listProjectsQueryKeywordMax)

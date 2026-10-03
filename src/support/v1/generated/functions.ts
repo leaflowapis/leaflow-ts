@@ -48,49 +48,30 @@
  * announcements are not part of this API; they are owned by the notification service.
  * OpenAPI spec version: 1.0.0
  */
-import type { CreateTicketMessageRequestBody } from "./models/createTicketMessageRequestBody.js";
-
-import type { CreateTicketRequestBody } from "./models/createTicketRequestBody.js";
-
-import type { CreateTicketSatisfactionRequestBody } from "./models/createTicketSatisfactionRequestBody.js";
-
-import type { DownloadAttachmentParams } from "./models/downloadAttachmentParams.js";
-
-import type { Error } from "./models/error.js";
-
-import type { LengthAwarePageMaintenanceResource } from "./models/lengthAwarePageMaintenanceResource.js";
-
-import type { LengthAwarePageMaintenanceTimelineEntryResource } from "./models/lengthAwarePageMaintenanceTimelineEntryResource.js";
-
-import type { LengthAwarePageTicketCategoryResource } from "./models/lengthAwarePageTicketCategoryResource.js";
-
-import type { LengthAwarePageTicketMessageResource } from "./models/lengthAwarePageTicketMessageResource.js";
-
-import type { LengthAwarePageTicketResource } from "./models/lengthAwarePageTicketResource.js";
-
-import type { ListMaintenanceTimelineParams } from "./models/listMaintenanceTimelineParams.js";
-
-import type { ListMaintenancesParams } from "./models/listMaintenancesParams.js";
-
-import type { ListTicketCategoriesParams } from "./models/listTicketCategoriesParams.js";
-
-import type { ListTicketMessagesParams } from "./models/listTicketMessagesParams.js";
-
-import type { ListTicketsParams } from "./models/listTicketsParams.js";
-
-import type { MaintenanceResource } from "./models/maintenanceResource.js";
-
-import type { NoticeResource } from "./models/noticeResource.js";
-
-import type { TicketAttachmentResource } from "./models/ticketAttachmentResource.js";
-
-import type { TicketMessageResource } from "./models/ticketMessageResource.js";
-
-import type { TicketResource } from "./models/ticketResource.js";
-
-import type { TicketSatisfactionResource } from "./models/ticketSatisfactionResource.js";
-
-import type { UploadAttachmentParams } from "./models/uploadAttachmentParams.js";
+import type {
+  CreateTicketMessageRequestBody,
+  CreateTicketRequestBody,
+  CreateTicketSatisfactionRequestBody,
+  DownloadAttachmentParams,
+  Error,
+  LengthAwarePageMaintenanceResource,
+  LengthAwarePageMaintenanceTimelineEntryResource,
+  LengthAwarePageTicketCategoryResource,
+  LengthAwarePageTicketMessageResource,
+  LengthAwarePageTicketResource,
+  ListMaintenanceTimelineParams,
+  ListMaintenancesParams,
+  ListTicketCategoriesParams,
+  ListTicketMessagesParams,
+  ListTicketsParams,
+  MaintenanceResource,
+  NoticeResource,
+  TicketAttachmentResource,
+  TicketMessageResource,
+  TicketResource,
+  TicketSatisfactionResource,
+  UploadAttachmentParams,
+} from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;

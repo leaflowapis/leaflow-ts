@@ -24,12 +24,17 @@
 import * as zod from "zod";
 
 export const listAvailabilityZonesParamsPageDefault = 1;
+export const listAvailabilityZonesParamsPageMax = 2147483647;
 
 export const listAvailabilityZonesParamsPageSizeDefault = 50;
 export const listAvailabilityZonesParamsPageSizeMax = 200;
 
 export const ListAvailabilityZonesParams = zod.strictObject({
-  page: zod.int().min(1).default(listAvailabilityZonesParamsPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listAvailabilityZonesParamsPageMax)
+    .default(listAvailabilityZonesParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

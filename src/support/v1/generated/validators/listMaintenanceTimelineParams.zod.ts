@@ -53,6 +53,7 @@ import * as zod from "zod";
 export const listMaintenanceTimelineParamsLimitDefault = 50;
 export const listMaintenanceTimelineParamsLimitMax = 200;
 
+export const listMaintenanceTimelineParamsOffsetDefault = 0;
 export const listMaintenanceTimelineParamsOffsetMin = 0;
 export const listMaintenanceTimelineParamsOffsetMax = 10000;
 
@@ -61,14 +62,12 @@ export const ListMaintenanceTimelineParams = zod.strictObject({
     .int()
     .min(1)
     .max(listMaintenanceTimelineParamsLimitMax)
-    .default(listMaintenanceTimelineParamsLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .default(listMaintenanceTimelineParamsLimitDefault),
   offset: zod
     .int()
     .min(listMaintenanceTimelineParamsOffsetMin)
     .max(listMaintenanceTimelineParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listMaintenanceTimelineParamsOffsetDefault),
 });
 
 export type ListMaintenanceTimelineParams = zod.input<typeof ListMaintenanceTimelineParams>;

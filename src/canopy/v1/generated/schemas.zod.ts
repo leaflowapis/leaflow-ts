@@ -42,6 +42,7 @@ import { UpdateAPIKeyRequestBody } from "./validators/updateAPIKeyRequestBody.zo
 export const listApiKeysQueryLimitDefault = 50;
 export const listApiKeysQueryLimitMax = 200;
 
+export const listApiKeysQueryOffsetDefault = 0;
 export const listApiKeysQueryOffsetMin = 0;
 export const listApiKeysQueryOffsetMax = 10000;
 
@@ -51,13 +52,13 @@ export const ListApiKeysQueryParams = zod.strictObject({
     .min(1)
     .max(listApiKeysQueryLimitMax)
     .default(listApiKeysQueryLimitDefault)
-    .describe("Maximum number of items in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listApiKeysQueryOffsetMin)
     .max(listApiKeysQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listApiKeysQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   status: zod
     .enum(["active", "disabled", "revoked"])
     .optional()
@@ -139,6 +140,8 @@ export const GetModelParams = zod.strictObject({
  * **The request and response bodies are not returned**; they are not recorded. Quote the `upstream_request_id` when reporting a problem.
  *
  * A `usage_source` of `estimated` indicates that the upstream provider reported no usage for that request, and that the figures are derived from the character classes of the payload.
+ *
+ * Omit cursor on the first page. Stop when next_cursor is empty; do not send an empty cursor.
  * @summary List request records
  */
 export const listRequestsQueryModelIdMax = 128;
@@ -146,7 +149,7 @@ export const listRequestsQueryModelIdMax = 128;
 export const listRequestsQueryLimitDefault = 50;
 export const listRequestsQueryLimitMax = 200;
 
-export const listRequestsQueryCursorMax = 512;
+export const listRequestsQueryCursorMax = 1024;
 
 export const ListRequestsQueryParams = zod.strictObject({
   from: zod.iso
@@ -170,12 +173,13 @@ export const ListRequestsQueryParams = zod.strictObject({
     .min(1)
     .max(listRequestsQueryLimitMax)
     .default(listRequestsQueryLimitDefault)
-    .describe("Maximum number of items in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   cursor: zod
     .string()
+    .min(1)
     .max(listRequestsQueryCursorMax)
     .optional()
-    .describe("The `next_cursor` returned by the previous page. Omitted on the first page"),
+    .describe("The next_cursor returned by the previous page. Omit it for the first page."),
 });
 
 /**

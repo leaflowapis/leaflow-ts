@@ -24,12 +24,13 @@
 import * as zod from "zod";
 
 export const listRegionsParamsPageDefault = 1;
+export const listRegionsParamsPageMax = 2147483647;
 
 export const listRegionsParamsPageSizeDefault = 50;
 export const listRegionsParamsPageSizeMax = 200;
 
 export const ListRegionsParams = zod.strictObject({
-  page: zod.int().min(1).default(listRegionsParamsPageDefault),
+  page: zod.int().min(1).max(listRegionsParamsPageMax).default(listRegionsParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

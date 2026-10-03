@@ -28,55 +28,33 @@
  * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates stated in each model's `pricing`.
  * OpenAPI spec version: 1.0.0
  */
-import type { APIKeyResource } from "./models/aPIKeyResource.js";
-
-import type { APIKeyUsageListResponseBody } from "./models/aPIKeyUsageListResponseBody.js";
-
-import type { ConflictResponse } from "./models/conflictResponse.js";
-
-import type { CreateAPIKeyRequestBody } from "./models/createAPIKeyRequestBody.js";
-
-import type { CreateServiceRequestBody } from "./models/createServiceRequestBody.js";
-
-import type { CreateServiceResponseBody } from "./models/createServiceResponseBody.js";
-
-import type { CursorPageRequestResource } from "./models/cursorPageRequestResource.js";
-
-import type { Error } from "./models/error.js";
-
-import type { GetUsageSummaryParams } from "./models/getUsageSummaryParams.js";
-
-import type { GetUsageTimelineParams } from "./models/getUsageTimelineParams.js";
-
-import type { IssuedAPIKeyResource } from "./models/issuedAPIKeyResource.js";
-
-import type { LengthAwarePageAPIKeyResource } from "./models/lengthAwarePageAPIKeyResource.js";
-
-import type { ListApiKeysParams } from "./models/listApiKeysParams.js";
-
-import type { ListRequestsParams } from "./models/listRequestsParams.js";
-
-import type { ListUsageByApiKeyParams } from "./models/listUsageByApiKeyParams.js";
-
-import type { ListUsageByModelParams } from "./models/listUsageByModelParams.js";
-
-import type { ModelListResponseBody } from "./models/modelListResponseBody.js";
-
-import type { ModelResource } from "./models/modelResource.js";
-
-import type { ModelUsageListResponseBody } from "./models/modelUsageListResponseBody.js";
-
-import type { Quote } from "./models/quote.js";
-
-import type { RequestResource } from "./models/requestResource.js";
-
-import type { ServiceResource } from "./models/serviceResource.js";
-
-import type { TotalsResource } from "./models/totalsResource.js";
-
-import type { UpdateAPIKeyRequestBody } from "./models/updateAPIKeyRequestBody.js";
-
-import type { UsageTimelineResponseBody } from "./models/usageTimelineResponseBody.js";
+import type {
+  APIKeyResource,
+  APIKeyUsageListResponseBody,
+  ConflictResponse,
+  CreateAPIKeyRequestBody,
+  CreateServiceRequestBody,
+  CreateServiceResponseBody,
+  CursorPageRequestResource,
+  Error,
+  GetUsageSummaryParams,
+  GetUsageTimelineParams,
+  IssuedAPIKeyResource,
+  LengthAwarePageAPIKeyResource,
+  ListApiKeysParams,
+  ListRequestsParams,
+  ListUsageByApiKeyParams,
+  ListUsageByModelParams,
+  ModelListResponseBody,
+  ModelResource,
+  ModelUsageListResponseBody,
+  Quote,
+  RequestResource,
+  ServiceResource,
+  TotalsResource,
+  UpdateAPIKeyRequestBody,
+  UsageTimelineResponseBody,
+} from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
@@ -614,6 +592,8 @@ export const getListRequestsUrl = (params: ListRequestsParams) => {
  * **The request and response bodies are not returned**; they are not recorded. Quote the `upstream_request_id` when reporting a problem.
  *
  * A `usage_source` of `estimated` indicates that the upstream provider reported no usage for that request, and that the figures are derived from the character classes of the payload.
+ *
+ * Omit cursor on the first page. Stop when next_cursor is empty; do not send an empty cursor.
  * @summary List request records
  */
 export const listRequests = async (

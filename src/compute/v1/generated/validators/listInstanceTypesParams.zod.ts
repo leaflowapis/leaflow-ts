@@ -24,13 +24,18 @@
 import * as zod from "zod";
 
 export const listInstanceTypesParamsPageDefault = 1;
+export const listInstanceTypesParamsPageMax = 2147483647;
 
 export const listInstanceTypesParamsPageSizeDefault = 50;
 export const listInstanceTypesParamsPageSizeMax = 200;
 
 export const ListInstanceTypesParams = zod.strictObject({
   region_id: zod.uuid().optional(),
-  page: zod.int().min(1).default(listInstanceTypesParamsPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listInstanceTypesParamsPageMax)
+    .default(listInstanceTypesParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

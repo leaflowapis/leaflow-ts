@@ -1,11 +1,3 @@
 export * from "./generated/functions.js";
-export * from "./generated/models/error.js";
-export * from "./generated/models/errorMeta.js";
-export * from "./generated/models/listL4TunnelUsageSeriesParams.js";
-export * from "./generated/models/subscriptionResource.js";
-export * from "./generated/models/subscriptionResourceStatus.js";
-export * from "./generated/models/tunnelResource.js";
-export * from "./generated/models/usageDayResource.js";
-export * from "./generated/models/usageResource.js";
-export * from "./generated/models/usageSeriesResource.js";
+export * from "./generated/models.js";
 export * as schemas from "./generated/schemas.zod.js";

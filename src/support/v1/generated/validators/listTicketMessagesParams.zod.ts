@@ -53,6 +53,7 @@ import * as zod from "zod";
 export const listTicketMessagesParamsLimitDefault = 50;
 export const listTicketMessagesParamsLimitMax = 200;
 
+export const listTicketMessagesParamsOffsetDefault = 0;
 export const listTicketMessagesParamsOffsetMin = 0;
 export const listTicketMessagesParamsOffsetMax = 10000;
 
@@ -61,14 +62,12 @@ export const ListTicketMessagesParams = zod.strictObject({
     .int()
     .min(1)
     .max(listTicketMessagesParamsLimitMax)
-    .default(listTicketMessagesParamsLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .default(listTicketMessagesParamsLimitDefault),
   offset: zod
     .int()
     .min(listTicketMessagesParamsOffsetMin)
     .max(listTicketMessagesParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listTicketMessagesParamsOffsetDefault),
 });
 
 export type ListTicketMessagesParams = zod.input<typeof ListTicketMessagesParams>;

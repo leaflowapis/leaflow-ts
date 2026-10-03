@@ -87,6 +87,7 @@ import { UpdateTypePreferenceRequestBody } from "./validators/updateTypePreferen
 export const listNotificationsQueryLimitDefault = 50;
 export const listNotificationsQueryLimitMax = 200;
 
+export const listNotificationsQueryOffsetDefault = 0;
 export const listNotificationsQueryOffsetMin = 0;
 export const listNotificationsQueryOffsetMax = 10000;
 
@@ -100,13 +101,13 @@ export const ListNotificationsQueryParams = zod.strictObject({
     .min(1)
     .max(listNotificationsQueryLimitMax)
     .default(listNotificationsQueryLimitDefault)
-    .describe("Maximum number of items to return in this page"),
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
     .min(listNotificationsQueryOffsetMin)
     .max(listNotificationsQueryOffsetMax)
-    .optional()
-    .describe("Number of items to skip"),
+    .default(listNotificationsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
   scope: zod
     .enum(["all", "current_project"])
     .optional()

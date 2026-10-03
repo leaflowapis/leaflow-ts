@@ -125,18 +125,25 @@ import { SetSnapshotQuotaRequestBody } from "./validators/setSnapshotQuotaReques
  * @summary List backups
  */
 export const listBackupsQueryPageDefault = 1;
+export const listBackupsQueryPageMax = 2147483647;
 
 export const listBackupsQueryPageSizeDefault = 50;
 export const listBackupsQueryPageSizeMax = 200;
 
 export const ListBackupsQueryParams = zod.strictObject({
   disk_id: zod.uuid().optional().describe("Return only the backups of this disk"),
-  page: zod.int().min(1).default(listBackupsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listBackupsQueryPageMax)
+    .default(listBackupsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listBackupsQueryPageSizeMax)
-    .default(listBackupsQueryPageSizeDefault),
+    .default(listBackupsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -203,6 +210,7 @@ export const CreateBackupRestoreQuoteBody = RestoreBackupQuoteRequestBody;
  * @summary List disk types on sale
  */
 export const listDiskTypesQueryPageDefault = 1;
+export const listDiskTypesQueryPageMax = 2147483647;
 
 export const listDiskTypesQueryPageSizeDefault = 50;
 export const listDiskTypesQueryPageSizeMax = 200;
@@ -213,12 +221,18 @@ export const ListDiskTypesQueryParams = zod.strictObject({
     .enum(["system", "data"])
     .optional()
     .describe("Filter by intended purchase use. Omit to include both system and data disk types."),
-  page: zod.int().min(1).default(listDiskTypesQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listDiskTypesQueryPageMax)
+    .default(listDiskTypesQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listDiskTypesQueryPageSizeMax)
-    .default(listDiskTypesQueryPageSizeDefault),
+    .default(listDiskTypesQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -240,6 +254,7 @@ export const GetDiskTypeParams = zod.strictObject({
  * @summary List images
  */
 export const listImagesQueryPageDefault = 1;
+export const listImagesQueryPageMax = 2147483647;
 
 export const listImagesQueryPageSizeDefault = 50;
 export const listImagesQueryPageSizeMax = 200;
@@ -250,12 +265,18 @@ export const ListImagesQueryParams = zod.strictObject({
     .enum(["public", "private"])
     .optional()
     .describe("Return only public or only private images. Both are returned when omitted"),
-  page: zod.int().min(1).default(listImagesQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listImagesQueryPageMax)
+    .default(listImagesQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listImagesQueryPageSizeMax)
-    .default(listImagesQueryPageSizeDefault),
+    .default(listImagesQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -320,35 +341,49 @@ export const DeleteImageParams = zod.strictObject({
  * @summary List instance types on sale
  */
 export const listInstanceTypesQueryPageDefault = 1;
+export const listInstanceTypesQueryPageMax = 2147483647;
 
 export const listInstanceTypesQueryPageSizeDefault = 50;
 export const listInstanceTypesQueryPageSizeMax = 200;
 
 export const ListInstanceTypesQueryParams = zod.strictObject({
   region_id: zod.uuid().optional(),
-  page: zod.int().min(1).default(listInstanceTypesQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listInstanceTypesQueryPageMax)
+    .default(listInstanceTypesQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listInstanceTypesQueryPageSizeMax)
-    .default(listInstanceTypesQueryPageSizeDefault),
+    .default(listInstanceTypesQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
  * @summary List available regions
  */
 export const listRegionsQueryPageDefault = 1;
+export const listRegionsQueryPageMax = 2147483647;
 
 export const listRegionsQueryPageSizeDefault = 50;
 export const listRegionsQueryPageSizeMax = 200;
 
 export const ListRegionsQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listRegionsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listRegionsQueryPageMax)
+    .default(listRegionsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listRegionsQueryPageSizeMax)
-    .default(listRegionsQueryPageSizeDefault),
+    .default(listRegionsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -360,17 +395,24 @@ export const ListAvailabilityZonesParams = zod.strictObject({
 });
 
 export const listAvailabilityZonesQueryPageDefault = 1;
+export const listAvailabilityZonesQueryPageMax = 2147483647;
 
 export const listAvailabilityZonesQueryPageSizeDefault = 50;
 export const listAvailabilityZonesQueryPageSizeMax = 200;
 
 export const ListAvailabilityZonesQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listAvailabilityZonesQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listAvailabilityZonesQueryPageMax)
+    .default(listAvailabilityZonesQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listAvailabilityZonesQueryPageSizeMax)
-    .default(listAvailabilityZonesQueryPageSizeDefault),
+    .default(listAvailabilityZonesQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -378,6 +420,7 @@ export const ListAvailabilityZonesQueryParams = zod.strictObject({
  * @summary List disks
  */
 export const listDisksQueryPageDefault = 1;
+export const listDisksQueryPageMax = 2147483647;
 
 export const listDisksQueryPageSizeDefault = 50;
 export const listDisksQueryPageSizeMax = 200;
@@ -388,8 +431,18 @@ export const ListDisksQueryParams = zod.strictObject({
     .uuid()
     .optional()
     .describe("Supplied together with `region_code` to filter attachable disks"),
-  page: zod.int().min(1).default(listDisksQueryPageDefault),
-  page_size: zod.int().min(1).max(listDisksQueryPageSizeMax).default(listDisksQueryPageSizeDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listDisksQueryPageMax)
+    .default(listDisksQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listDisksQueryPageSizeMax)
+    .default(listDisksQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -478,17 +531,24 @@ export const RevertDiskBody = RevertDiskRequestBody;
  * @summary List floating IPs
  */
 export const listFloatingIpsQueryPageDefault = 1;
+export const listFloatingIpsQueryPageMax = 2147483647;
 
 export const listFloatingIpsQueryPageSizeDefault = 50;
 export const listFloatingIpsQueryPageSizeMax = 200;
 
 export const ListFloatingIpsQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listFloatingIpsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listFloatingIpsQueryPageMax)
+    .default(listFloatingIpsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listFloatingIpsQueryPageSizeMax)
-    .default(listFloatingIpsQueryPageSizeDefault),
+    .default(listFloatingIpsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -573,6 +633,7 @@ export const UnbindFloatingIpParams = zod.strictObject({
 export const listInstancesQueryLabelMax = 128;
 
 export const listInstancesQueryPageDefault = 1;
+export const listInstancesQueryPageMax = 2147483647;
 
 export const listInstancesQueryPageSizeDefault = 50;
 export const listInstancesQueryPageSizeMax = 200;
@@ -585,12 +646,18 @@ export const ListInstancesQueryParams = zod.strictObject({
     .describe(
       "Only instances carrying this label, written as `key:value` — for example `env:prod`. Both halves are matched exactly",
     ),
-  page: zod.int().min(1).default(listInstancesQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listInstancesQueryPageMax)
+    .default(listInstancesQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listInstancesQueryPageSizeMax)
-    .default(listInstancesQueryPageSizeDefault),
+    .default(listInstancesQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -826,17 +893,24 @@ export const ListInstanceDisksParams = zod.strictObject({
 });
 
 export const listInstanceDisksQueryPageDefault = 1;
+export const listInstanceDisksQueryPageMax = 2147483647;
 
 export const listInstanceDisksQueryPageSizeDefault = 50;
 export const listInstanceDisksQueryPageSizeMax = 200;
 
 export const ListInstanceDisksQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listInstanceDisksQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listInstanceDisksQueryPageMax)
+    .default(listInstanceDisksQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listInstanceDisksQueryPageSizeMax)
-    .default(listInstanceDisksQueryPageSizeDefault),
+    .default(listInstanceDisksQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -889,17 +963,24 @@ export const ListInstancePortsParams = zod.strictObject({
 });
 
 export const listInstancePortsQueryPageDefault = 1;
+export const listInstancePortsQueryPageMax = 2147483647;
 
 export const listInstancePortsQueryPageSizeDefault = 50;
 export const listInstancePortsQueryPageSizeMax = 200;
 
 export const ListInstancePortsQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listInstancePortsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listInstancePortsQueryPageMax)
+    .default(listInstancePortsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listInstancePortsQueryPageSizeMax)
-    .default(listInstancePortsQueryPageSizeDefault),
+    .default(listInstancePortsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -934,6 +1015,7 @@ export const DetachPortParams = zod.strictObject({
 export const listOperationLogsQueryActionMax = 64;
 
 export const listOperationLogsQueryPageDefault = 1;
+export const listOperationLogsQueryPageMax = 2147483647;
 
 export const listOperationLogsQueryPageSizeDefault = 50;
 export const listOperationLogsQueryPageSizeMax = 200;
@@ -946,25 +1028,42 @@ export const ListOperationLogsQueryParams = zod.strictObject({
     .describe(
       "Return a single kind of operation; the value matches the operation id of the endpoint",
     ),
-  page: zod.int().min(1).default(listOperationLogsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listOperationLogsQueryPageMax)
+    .default(listOperationLogsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listOperationLogsQueryPageSizeMax)
-    .default(listOperationLogsQueryPageSizeDefault),
+    .default(listOperationLogsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
  * @summary List network interfaces
  */
 export const listPortsQueryPageDefault = 1;
+export const listPortsQueryPageMax = 2147483647;
 
 export const listPortsQueryPageSizeDefault = 50;
 export const listPortsQueryPageSizeMax = 200;
 
 export const ListPortsQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listPortsQueryPageDefault),
-  page_size: zod.int().min(1).max(listPortsQueryPageSizeMax).default(listPortsQueryPageSizeDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listPortsQueryPageMax)
+    .default(listPortsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listPortsQueryPageSizeMax)
+    .default(listPortsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -985,18 +1084,25 @@ export const DeletePortParams = zod.strictObject({
  * @summary List private networks
  */
 export const listPrivateNetworksQueryPageDefault = 1;
+export const listPrivateNetworksQueryPageMax = 2147483647;
 
 export const listPrivateNetworksQueryPageSizeDefault = 50;
 export const listPrivateNetworksQueryPageSizeMax = 200;
 
 export const ListPrivateNetworksQueryParams = zod.strictObject({
   region_id: zod.uuid().optional().describe("Returns every region when omitted"),
-  page: zod.int().min(1).default(listPrivateNetworksQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listPrivateNetworksQueryPageMax)
+    .default(listPrivateNetworksQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listPrivateNetworksQueryPageSizeMax)
-    .default(listPrivateNetworksQueryPageSizeDefault),
+    .default(listPrivateNetworksQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -1063,17 +1169,24 @@ export const ListRoutesParams = zod.strictObject({
 });
 
 export const listRoutesQueryPageDefault = 1;
+export const listRoutesQueryPageMax = 2147483647;
 
 export const listRoutesQueryPageSizeDefault = 50;
 export const listRoutesQueryPageSizeMax = 200;
 
 export const ListRoutesQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listRoutesQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listRoutesQueryPageMax)
+    .default(listRoutesQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listRoutesQueryPageSizeMax)
-    .default(listRoutesQueryPageSizeDefault),
+    .default(listRoutesQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -1103,17 +1216,24 @@ export const ListSubnetsParams = zod.strictObject({
 });
 
 export const listSubnetsQueryPageDefault = 1;
+export const listSubnetsQueryPageMax = 2147483647;
 
 export const listSubnetsQueryPageSizeDefault = 50;
 export const listSubnetsQueryPageSizeMax = 200;
 
 export const ListSubnetsQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listSubnetsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listSubnetsQueryPageMax)
+    .default(listSubnetsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listSubnetsQueryPageSizeMax)
-    .default(listSubnetsQueryPageSizeDefault),
+    .default(listSubnetsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -1158,6 +1278,7 @@ export const DeleteSubnetParams = zod.strictObject({
  * @summary List security groups
  */
 export const listSecurityGroupsQueryPageDefault = 1;
+export const listSecurityGroupsQueryPageMax = 2147483647;
 
 export const listSecurityGroupsQueryPageSizeDefault = 50;
 export const listSecurityGroupsQueryPageSizeMax = 200;
@@ -1168,12 +1289,18 @@ export const ListSecurityGroupsQueryParams = zod.strictObject({
     .string()
     .optional()
     .describe("Return only the security groups of this private network"),
-  page: zod.int().min(1).default(listSecurityGroupsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listSecurityGroupsQueryPageMax)
+    .default(listSecurityGroupsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listSecurityGroupsQueryPageSizeMax)
-    .default(listSecurityGroupsQueryPageSizeDefault),
+    .default(listSecurityGroupsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -1215,17 +1342,24 @@ export const ListSecurityGroupRulesParams = zod.strictObject({
 });
 
 export const listSecurityGroupRulesQueryPageDefault = 1;
+export const listSecurityGroupRulesQueryPageMax = 2147483647;
 
 export const listSecurityGroupRulesQueryPageSizeDefault = 50;
 export const listSecurityGroupRulesQueryPageSizeMax = 200;
 
 export const ListSecurityGroupRulesQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listSecurityGroupRulesQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listSecurityGroupRulesQueryPageMax)
+    .default(listSecurityGroupRulesQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listSecurityGroupRulesQueryPageSizeMax)
-    .default(listSecurityGroupRulesQueryPageSizeDefault),
+    .default(listSecurityGroupRulesQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -1338,17 +1472,24 @@ export const ListBackupCapacityPacksParams = zod.strictObject({
 });
 
 export const listBackupCapacityPacksQueryPageDefault = 1;
+export const listBackupCapacityPacksQueryPageMax = 2147483647;
 
 export const listBackupCapacityPacksQueryPageSizeDefault = 50;
 export const listBackupCapacityPacksQueryPageSizeMax = 200;
 
 export const ListBackupCapacityPacksQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listBackupCapacityPacksQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listBackupCapacityPacksQueryPageMax)
+    .default(listBackupCapacityPacksQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listBackupCapacityPacksQueryPageSizeMax)
-    .default(listBackupCapacityPacksQueryPageSizeDefault),
+    .default(listBackupCapacityPacksQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -1377,18 +1518,25 @@ export const CreateBackupCapacityPackQuoteBody = CreateBackupCapacityPackQuoteRe
  * @summary List snapshots
  */
 export const listSnapshotsQueryPageDefault = 1;
+export const listSnapshotsQueryPageMax = 2147483647;
 
 export const listSnapshotsQueryPageSizeDefault = 50;
 export const listSnapshotsQueryPageSizeMax = 200;
 
 export const ListSnapshotsQueryParams = zod.strictObject({
   disk_id: zod.uuid().optional().describe("Return only the snapshots of this disk"),
-  page: zod.int().min(1).default(listSnapshotsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listSnapshotsQueryPageMax)
+    .default(listSnapshotsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listSnapshotsQueryPageSizeMax)
-    .default(listSnapshotsQueryPageSizeDefault),
+    .default(listSnapshotsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
@@ -1432,35 +1580,49 @@ export const DeleteSnapshotParams = zod.strictObject({
  * @summary List public IP pools
  */
 export const listIpv4PoolsQueryPageDefault = 1;
+export const listIpv4PoolsQueryPageMax = 2147483647;
 
 export const listIpv4PoolsQueryPageSizeDefault = 50;
 export const listIpv4PoolsQueryPageSizeMax = 200;
 
 export const ListIpv4PoolsQueryParams = zod.strictObject({
   region_id: zod.uuid().optional(),
-  page: zod.int().min(1).default(listIpv4PoolsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listIpv4PoolsQueryPageMax)
+    .default(listIpv4PoolsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listIpv4PoolsQueryPageSizeMax)
-    .default(listIpv4PoolsQueryPageSizeDefault),
+    .default(listIpv4PoolsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
  * @summary List peerings
  */
 export const listPeeringsQueryPageDefault = 1;
+export const listPeeringsQueryPageMax = 2147483647;
 
 export const listPeeringsQueryPageSizeDefault = 50;
 export const listPeeringsQueryPageSizeMax = 200;
 
 export const ListPeeringsQueryParams = zod.strictObject({
-  page: zod.int().min(1).default(listPeeringsQueryPageDefault),
+  page: zod
+    .int()
+    .min(1)
+    .max(listPeeringsQueryPageMax)
+    .default(listPeeringsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
     .max(listPeeringsQueryPageSizeMax)
-    .default(listPeeringsQueryPageSizeDefault),
+    .default(listPeeringsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**

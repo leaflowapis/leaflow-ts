@@ -23,26 +23,19 @@ import * as zod from "zod";
 export const listServersParamsLimitDefault = 50;
 export const listServersParamsLimitMax = 200;
 
+export const listServersParamsOffsetDefault = 0;
 export const listServersParamsOffsetMin = 0;
 export const listServersParamsOffsetMax = 10000;
 
 export const listServersParamsKeywordMax = 255;
 
 export const ListServersParams = zod.strictObject({
-  limit: zod
-    .int()
-    .min(1)
-    .max(listServersParamsLimitMax)
-    .default(listServersParamsLimitDefault)
-    .describe("Maximum number of records in this page"),
+  limit: zod.int().min(1).max(listServersParamsLimitMax).default(listServersParamsLimitDefault),
   offset: zod
     .int()
     .min(listServersParamsOffsetMin)
     .max(listServersParamsOffsetMax)
-    .optional()
-    .describe(
-      "Number of records to skip. For deeper paging, use the cursor-paged endpoint instead",
-    ),
+    .default(listServersParamsOffsetDefault),
   keyword: zod
     .string()
     .max(listServersParamsKeywordMax)

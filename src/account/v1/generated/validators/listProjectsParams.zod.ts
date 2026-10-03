@@ -20,8 +20,9 @@
 import * as zod from "zod";
 
 export const listProjectsParamsLimitDefault = 50;
-export const listProjectsParamsLimitMax = 100;
+export const listProjectsParamsLimitMax = 200;
 
+export const listProjectsParamsOffsetDefault = 0;
 export const listProjectsParamsOffsetMin = 0;
 export const listProjectsParamsOffsetMax = 10000;
 
@@ -29,18 +30,12 @@ export const listProjectsParamsKeywordMax = 128;
 
 export const listProjectsParamsIncludeDeletedDefault = false;
 export const ListProjectsParams = zod.strictObject({
-  limit: zod
-    .int()
-    .min(1)
-    .max(listProjectsParamsLimitMax)
-    .default(listProjectsParamsLimitDefault)
-    .describe("Maximum number of items in this page"),
+  limit: zod.int().min(1).max(listProjectsParamsLimitMax).default(listProjectsParamsLimitDefault),
   offset: zod
     .int()
     .min(listProjectsParamsOffsetMin)
     .max(listProjectsParamsOffsetMax)
-    .optional()
-    .describe("Number of items to skip. Use the cursor-paged endpoint to page deeper"),
+    .default(listProjectsParamsOffsetDefault),
   keyword: zod
     .string()
     .max(listProjectsParamsKeywordMax)

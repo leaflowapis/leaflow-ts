@@ -25,6 +25,7 @@ import * as zod from "zod";
 import { DiskTypePurpose } from "./diskTypePurpose.zod.js";
 
 export const listDiskTypesParamsPageDefault = 1;
+export const listDiskTypesParamsPageMax = 2147483647;
 
 export const listDiskTypesParamsPageSizeDefault = 50;
 export const listDiskTypesParamsPageSizeMax = 200;
@@ -32,7 +33,7 @@ export const listDiskTypesParamsPageSizeMax = 200;
 export const ListDiskTypesParams = zod.strictObject({
   region_id: zod.uuid().optional(),
   purpose: DiskTypePurpose.optional(),
-  page: zod.int().min(1).default(listDiskTypesParamsPageDefault),
+  page: zod.int().min(1).max(listDiskTypesParamsPageMax).default(listDiskTypesParamsPageDefault),
   page_size: zod
     .int()
     .min(1)

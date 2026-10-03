@@ -18,131 +18,71 @@
  * Enrollment and rotation responses include `tls_psk`. No other endpoint will return it again, so store it immediately. If it is lost, rotate once more — at the cost of updating the agent configuration on the monitored machine.
  * OpenAPI spec version: 1.0.0
  */
-import type { AcknowledgeIncidentRequestBody } from "./models/acknowledgeIncidentRequestBody.js";
-
-import type { AddCommentRequestBody } from "./models/addCommentRequestBody.js";
-
-import type { AssignIncidentRequestBody } from "./models/assignIncidentRequestBody.js";
-
-import type { CloseIncidentRequestBody } from "./models/closeIncidentRequestBody.js";
-
-import type { CursorPageIncidentActivityResource } from "./models/cursorPageIncidentActivityResource.js";
-
-import type { EnableMonitoringRequestBody } from "./models/enableMonitoringRequestBody.js";
-
-import type { EnrollmentResource } from "./models/enrollmentResource.js";
-
-import type { Error } from "./models/error.js";
-
-import type { GetServerMetricParams } from "./models/getServerMetricParams.js";
-
-import type { GetSliReportParams } from "./models/getSliReportParams.js";
-
-import type { IncidentActivityResource } from "./models/incidentActivityResource.js";
-
-import type { IncidentResource } from "./models/incidentResource.js";
-
-import type { ItemListResponseBody } from "./models/itemListResponseBody.js";
-
-import type { LengthAwarePageIncidentResource } from "./models/lengthAwarePageIncidentResource.js";
-
-import type { LengthAwarePageServerResource } from "./models/lengthAwarePageServerResource.js";
-
-import type { LengthAwarePageStatusPageIncidentResource } from "./models/lengthAwarePageStatusPageIncidentResource.js";
-
-import type { LengthAwarePageStatusPageMaintenanceResource } from "./models/lengthAwarePageStatusPageMaintenanceResource.js";
-
-import type { ListIncidentTimelineParams } from "./models/listIncidentTimelineParams.js";
-
-import type { ListIncidentsParams } from "./models/listIncidentsParams.js";
-
-import type { ListProjectTopItemsParams } from "./models/listProjectTopItemsParams.js";
-
-import type { ListServerItemsParams } from "./models/listServerItemsParams.js";
-
-import type { ListServersParams } from "./models/listServersParams.js";
-
-import type { ListStatusPageIncidentsParams } from "./models/listStatusPageIncidentsParams.js";
-
-import type { ListStatusPageMaintenancesParams } from "./models/listStatusPageMaintenancesParams.js";
-
-import type { ListWebChecksParams } from "./models/listWebChecksParams.js";
-
-import type { MaintenanceWindowListResponseBody } from "./models/maintenanceWindowListResponseBody.js";
-
-import type { MaintenanceWindowResource } from "./models/maintenanceWindowResource.js";
-
-import type { MetricResponseBody } from "./models/metricResponseBody.js";
-
-import type { PostStatusPageIncidentUpdateRequestBody } from "./models/postStatusPageIncidentUpdateRequestBody.js";
-
-import type { ProjectOverviewResource } from "./models/projectOverviewResource.js";
-
-import type { PublishStatusPageIncidentRequestBody } from "./models/publishStatusPageIncidentRequestBody.js";
-
-import type { PutMaintenanceWindowRequestBody } from "./models/putMaintenanceWindowRequestBody.js";
-
-import type { PutSLORequestBody } from "./models/putSLORequestBody.js";
-
-import type { PutStatusPageComponentRequestBody } from "./models/putStatusPageComponentRequestBody.js";
-
-import type { PutStatusPageComponentSourcesRequestBody } from "./models/putStatusPageComponentSourcesRequestBody.js";
-
-import type { PutStatusPageDomainRequestBody } from "./models/putStatusPageDomainRequestBody.js";
-
-import type { PutStatusPageGroupOrderRequestBody } from "./models/putStatusPageGroupOrderRequestBody.js";
-
-import type { PutStatusPageGroupRequestBody } from "./models/putStatusPageGroupRequestBody.js";
-
-import type { PutStatusPageOrderRequestBody } from "./models/putStatusPageOrderRequestBody.js";
-
-import type { PutStatusPageRequestBody } from "./models/putStatusPageRequestBody.js";
-
-import type { PutWebCheckRequestBody } from "./models/putWebCheckRequestBody.js";
-
-import type { SLIReportResponseBody } from "./models/sLIReportResponseBody.js";
-
-import type { SLOResource } from "./models/sLOResource.js";
-
-import type { ScheduleStatusPageMaintenanceRequestBody } from "./models/scheduleStatusPageMaintenanceRequestBody.js";
-
-import type { ServerEnrollmentResponseBody } from "./models/serverEnrollmentResponseBody.js";
-
-import type { ServerResource } from "./models/serverResource.js";
-
-import type { ServerResourcesResource } from "./models/serverResourcesResource.js";
-
-import type { SetFollowingRequestBody } from "./models/setFollowingRequestBody.js";
-
-import type { SnapshotResource } from "./models/snapshotResource.js";
-
-import type { StatusPageComponentListResponseBody } from "./models/statusPageComponentListResponseBody.js";
-
-import type { StatusPageComponentResource } from "./models/statusPageComponentResource.js";
-
-import type { StatusPageComponentSourcesResource } from "./models/statusPageComponentSourcesResource.js";
-
-import type { StatusPageDomainResource } from "./models/statusPageDomainResource.js";
-
-import type { StatusPageGroupListResponseBody } from "./models/statusPageGroupListResponseBody.js";
-
-import type { StatusPageGroupResource } from "./models/statusPageGroupResource.js";
-
-import type { StatusPageIncidentResource } from "./models/statusPageIncidentResource.js";
-
-import type { StatusPageMaintenanceResource } from "./models/statusPageMaintenanceResource.js";
-
-import type { StatusPageResource } from "./models/statusPageResource.js";
-
-import type { TemplateCatalogResponseBody } from "./models/templateCatalogResponseBody.js";
-
-import type { TopItemListResponseBody } from "./models/topItemListResponseBody.js";
-
-import type { UpdateServerRequestBody } from "./models/updateServerRequestBody.js";
-
-import type { WebCheckListResponseBody } from "./models/webCheckListResponseBody.js";
-
-import type { WebCheckResource } from "./models/webCheckResource.js";
+import type {
+  AcknowledgeIncidentRequestBody,
+  AddCommentRequestBody,
+  AssignIncidentRequestBody,
+  CloseIncidentRequestBody,
+  CursorPageIncidentActivityResource,
+  EnableMonitoringRequestBody,
+  EnrollmentResource,
+  Error,
+  GetServerMetricParams,
+  GetSliReportParams,
+  IncidentActivityResource,
+  IncidentResource,
+  ItemListResponseBody,
+  LengthAwarePageIncidentResource,
+  LengthAwarePageServerResource,
+  LengthAwarePageStatusPageIncidentResource,
+  LengthAwarePageStatusPageMaintenanceResource,
+  ListIncidentTimelineParams,
+  ListIncidentsParams,
+  ListProjectTopItemsParams,
+  ListServerItemsParams,
+  ListServersParams,
+  ListStatusPageIncidentsParams,
+  ListStatusPageMaintenancesParams,
+  ListWebChecksParams,
+  MaintenanceWindowListResponseBody,
+  MaintenanceWindowResource,
+  MetricResponseBody,
+  PostStatusPageIncidentUpdateRequestBody,
+  ProjectOverviewResource,
+  PublishStatusPageIncidentRequestBody,
+  PutMaintenanceWindowRequestBody,
+  PutSLORequestBody,
+  PutStatusPageComponentRequestBody,
+  PutStatusPageComponentSourcesRequestBody,
+  PutStatusPageDomainRequestBody,
+  PutStatusPageGroupOrderRequestBody,
+  PutStatusPageGroupRequestBody,
+  PutStatusPageOrderRequestBody,
+  PutStatusPageRequestBody,
+  PutWebCheckRequestBody,
+  SLIReportResponseBody,
+  SLOResource,
+  ScheduleStatusPageMaintenanceRequestBody,
+  ServerEnrollmentResponseBody,
+  ServerResource,
+  ServerResourcesResource,
+  SetFollowingRequestBody,
+  SnapshotResource,
+  StatusPageComponentListResponseBody,
+  StatusPageComponentResource,
+  StatusPageComponentSourcesResource,
+  StatusPageDomainResource,
+  StatusPageGroupListResponseBody,
+  StatusPageGroupResource,
+  StatusPageIncidentResource,
+  StatusPageMaintenanceResource,
+  StatusPageResource,
+  TemplateCatalogResponseBody,
+  TopItemListResponseBody,
+  UpdateServerRequestBody,
+  WebCheckListResponseBody,
+  WebCheckResource,
+} from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
 export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
@@ -699,6 +639,8 @@ export const getListIncidentTimelineUrl = (
 
 /**
  * Cursor paging rather than offset paging: the timeline is append-only, and offset paging would skip or repeat entries whenever a new one is written.
+ *
+ * Omit cursor on the first page. An empty next_cursor means there is no following page; do not send an empty cursor.
  * @summary List the timeline of an incident
  */
 export const listIncidentTimeline = async (
