@@ -34,6 +34,15 @@ export const RefundPolicy = {
   prorated: "prorated",
 } as const;
 
+export interface OrderCancel {
+  /**
+   * Omit to select all still-pending items. Explicit selections name one or more items of this order; successful items cannot be reversed here.
+   * @minItems 1
+   * @maxItems 100
+   */
+  order_item_ids?: string[];
+}
+
 /**
  * A decimal string, in the currency stated alongside it.
  *
@@ -1423,7 +1432,11 @@ export interface Invoice {
   /** Subtotal less discount plus tax. Balance and credit grants are payment sources, not reductions of the receivable. */
   total: Money;
   amount_paid?: Money;
-  /** What is still collectible after applied credits and successful payments; never below zero. A draft order invoice is not collectible until checkout confirms it, and a paid or void invoice has none. */
+  /** Issued, non-void credit notes that reduced unpaid receivables. Does not rewrite the original invoice total. */
+  unpaid_credit_notes_amount: Money;
+  /** Issued credit notes against payments already received. This is a return obligation, not evidence of completed refunds. */
+  paid_credit_notes_amount: Money;
+  /** What is still collectible after unpaid credit notes and successful payments; never below zero. A draft order invoice is not collectible until checkout confirms it, and a paid or void invoice has none. */
   amount_due: Money;
   /** @nullable */
   period_start?: string | null;
@@ -1543,6 +1556,56 @@ export interface CreditGrant {
 
 export interface CreditGrantList {
   items: CreditGrant[];
+  pagination: OffsetPagination;
+}
+
+export type CreditNoteStatus = (typeof CreditNoteStatus)[keyof typeof CreditNoteStatus];
+
+export const CreditNoteStatus = {
+  issued: "issued",
+  void: "void",
+} as const;
+
+/**
+ * An issued invoice reduction. Its credited amount is unpaid_amount plus paid_amount. A paid credit records a return obligation; refund_id identifies its refund, whose outcome may still be pending. Original invoice amounts remain unchanged.
+ */
+export interface CreditNote {
+  id: string;
+  invoice_id: string;
+  currency: string;
+  issued_at: string;
+  status: CreditNoteStatus;
+  /**
+   * When this note was voided; null while issued.
+   * @nullable
+   */
+  voided_at: string | null;
+  /** The reduction of unpaid receivables. A void note no longer reduces what is due. */
+  unpaid_amount: Money;
+  /** The credited part of payments already received. This is not proof that its refund has completed. */
+  paid_amount: Money;
+  /**
+   * The refund to the original payment sources, or null when no paid amount was credited.
+   * @nullable
+   */
+  refund_id: string | null;
+}
+
+export interface CreditNoteItem {
+  id: string;
+  credit_note_id: string;
+  invoice_item_id: string;
+  unpaid_amount: Money;
+  paid_amount: Money;
+}
+
+export interface CreditNoteList {
+  items: CreditNote[];
+  pagination: OffsetPagination;
+}
+
+export interface CreditNoteItemList {
+  items: CreditNoteItem[];
   pagination: OffsetPagination;
 }
 
@@ -2080,8 +2143,12 @@ export interface InvoiceSummary {
   tax_amount: string;
   total: string;
   amount_paid: string;
+  /** Issued, non-void credit notes that reduced unpaid receivables. Does not rewrite the original invoice total. */
+  unpaid_credit_notes_amount: Money;
+  /** Issued credit notes against payments already received. This is a return obligation, not evidence of completed refunds. */
+  paid_credit_notes_amount: Money;
   /**
-   * What is still collectible after applied credits and successful payments; never below zero.
+   * What is still collectible after unpaid credit notes and successful payments; never below zero.
    * @pattern ^\d+(\.\d{1,10})?$
    */
   amount_due: string;
@@ -2220,7 +2287,6 @@ export interface Order {
   /** How the order was paid. Absent until it is paid. */
   paid_with?: PaidWith;
   account?: AccountIdentity;
-  cancel_reason?: string;
   change_effective_at?: string;
   id: string;
   /**
@@ -3080,6 +3146,44 @@ export const ListCreditGrantsStatus = {
   expired: "expired",
   voided: "voided",
 } as const;
+
+export type ListCreditNotesParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+  /**
+   * Restrict to one of your accounts. All of them when omitted.
+   */
+  billing_account_id?: AccountIdQueryParameter;
+  /**
+   * Only the notes for this invoice.
+   */
+  invoice_id?: string;
+};
+
+export type ListCreditNoteItemsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+};
 
 export type ListRefundsParams = {
   /**

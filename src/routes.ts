@@ -1,6 +1,33 @@
 // Static contract routing and authentication facts for frontend gateways.
 export const routes = [
   {
+    service: "billing",
+    contract: "billing",
+    method: "GET",
+    path: "/api/v1/credit-notes",
+    operationId: "list-credit-notes",
+    securityScheme: "AccessToken",
+    upstreamUrl: "https://billing.leaflow.cloud",
+  },
+  {
+    service: "billing",
+    contract: "billing",
+    method: "GET",
+    path: "/api/v1/credit-notes/{creditNoteId}",
+    operationId: "get-credit-note",
+    securityScheme: "AccessToken",
+    upstreamUrl: "https://billing.leaflow.cloud",
+  },
+  {
+    service: "billing",
+    contract: "billing",
+    method: "GET",
+    path: "/api/v1/credit-notes/{creditNoteId}/items",
+    operationId: "list-credit-note-items",
+    securityScheme: "AccessToken",
+    upstreamUrl: "https://billing.leaflow.cloud",
+  },
+  {
     service: "account",
     contract: "account",
     method: "GET",

@@ -28,7 +28,6 @@ export const Order = zod
     invoice: InvoiceSummary.optional(),
     paid_with: PaidWith.optional().describe("How the order was paid. Absent until it is paid."),
     account: AccountIdentity.optional(),
-    cancel_reason: zod.string().optional(),
     change_effective_at: zod.iso.datetime({ offset: true }).optional(),
     id: zod.uuid(),
     project_id: zod

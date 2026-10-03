@@ -19,6 +19,9 @@ import type {
   CancellationList,
   CheckoutOrderRequest,
   CreditGrantList,
+  CreditNote,
+  CreditNoteItemList,
+  CreditNoteList,
   CurrencyList,
   DiscountList,
   EntitlementList,
@@ -36,6 +39,8 @@ import type {
   ListBillingAccountsParams,
   ListCancellationsParams,
   ListCreditGrantsParams,
+  ListCreditNoteItemsParams,
+  ListCreditNotesParams,
   ListCurrenciesParams,
   ListEntitlementsParams,
   ListInvoiceItemsParams,
@@ -65,6 +70,7 @@ import type {
   MeteredUsage,
   NotModifiedResponse,
   Order,
+  OrderCancel,
   OrderItemList,
   OrderList,
   PayInvoiceRequest,
@@ -1888,6 +1894,165 @@ export const listCreditGrants = async (
   return { data, status: res.status, headers: res.headers } as listCreditGrantsResponse;
 };
 
+export type listCreditNotesResponse200 = {
+  data: CreditNoteList;
+  status: 200;
+};
+
+export type listCreditNotesResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listCreditNotesResponseSuccess = listCreditNotesResponse200 & {
+  headers: Headers;
+};
+export type listCreditNotesResponseError = listCreditNotesResponseDefault & {
+  headers: Headers;
+};
+
+export type listCreditNotesResponse = listCreditNotesResponseSuccess | listCreditNotesResponseError;
+
+export const getListCreditNotesUrl = (params?: ListCreditNotesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/credit-notes?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/credit-notes`;
+};
+
+/**
+ * Newest issued_at first, then ID. Requires authorization for the invoice's billing account. Filters narrow authorized results and apply before counting and paging.
+ * @summary List credit notes
+ */
+export const listCreditNotes = async (
+  params?: ListCreditNotesParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listCreditNotesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListCreditNotesUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCreditNotesResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listCreditNotesResponse;
+};
+
+export type getCreditNoteResponse200 = {
+  data: CreditNote;
+  status: 200;
+};
+
+export type getCreditNoteResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getCreditNoteResponseSuccess = getCreditNoteResponse200 & {
+  headers: Headers;
+};
+export type getCreditNoteResponseError = getCreditNoteResponseDefault & {
+  headers: Headers;
+};
+
+export type getCreditNoteResponse = getCreditNoteResponseSuccess | getCreditNoteResponseError;
+
+export const getGetCreditNoteUrl = (creditNoteId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/credit-notes/${encodeURIComponent(String(creditNoteId))}`;
+};
+
+/**
+ * Requires authorization for the invoice's billing account.
+ * @summary Get credit note
+ */
+export const getCreditNote = async (
+  creditNoteId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCreditNoteResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCreditNoteUrl(creditNoteId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCreditNoteResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getCreditNoteResponse;
+};
+
+export type listCreditNoteItemsResponse200 = {
+  data: CreditNoteItemList;
+  status: 200;
+};
+
+export type listCreditNoteItemsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listCreditNoteItemsResponseSuccess = listCreditNoteItemsResponse200 & {
+  headers: Headers;
+};
+export type listCreditNoteItemsResponseError = listCreditNoteItemsResponseDefault & {
+  headers: Headers;
+};
+
+export type listCreditNoteItemsResponse =
+  | listCreditNoteItemsResponseSuccess
+  | listCreditNoteItemsResponseError;
+
+export const getListCreditNoteItemsUrl = (
+  creditNoteId: string,
+  params?: ListCreditNoteItemsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/credit-notes/${encodeURIComponent(String(creditNoteId))}/items?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/credit-notes/${encodeURIComponent(String(creditNoteId))}/items`;
+};
+
+/**
+ * The original invoice lines reduced by this note. Requires authorization for their invoice's billing account.
+ * @summary List credit note items
+ */
+export const listCreditNoteItems = async (
+  creditNoteId: string,
+  params?: ListCreditNoteItemsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listCreditNoteItemsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListCreditNoteItemsUrl(creditNoteId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCreditNoteItemsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listCreditNoteItemsResponse;
+};
+
 export type listRefundsResponse200 = {
   data: RefundList;
   status: 200;
@@ -3019,27 +3184,56 @@ export const getCancelOrderUrl = (orderId: string) => {
 };
 
 /**
- * Withdraws an unaccepted order without recording a delivery failure. Payment may be absent,
- * partial or complete; the order becomes canceled and any collected amount is automatically
- * returned to its original payment sources. External payment-method refunds can finish
- * asynchronously. Canceling an already canceled order returns it unchanged. A previously failed
- * order keeps its failure outcome. The order and financial history are retained.
+ * Cancels the selected, still-undelivered items of an unaccepted order without recording a
+ * delivery failure. Omit order_item_ids to select every still-pending item, or name one or
+ * more items. Successful items remain delivered and are not refunded. Whole-order and partial
+ * cancellation both require confirmed non-delivery and necessary cleanup. The order keeps
+ * its existing pending phase while any item is still pending; its final outcome follows all
+ * item outcomes. Previously failed items keep their failure outcome.
  *
- * Refused once the order is accepted: its owning service must coordinate cancellation during
- * provisioning and confirm non-delivery and necessary cleanup before recording cancellation.
- * Delivered items are ended through subscription cancellation. An unknown or in-flight payment
- * outcome must first be reconciled; it is not assumed to be unpaid. Scheduled changes continue
- * to be canceled through the service that owns them. Refund quotations use CreateQuote.refund.
+ * Payment may be absent, partial or complete. Confirmed checkout keeps the selected items'
+ * agreed amounts and discounts; credit notes reduce issued invoices, and collected amounts
+ * are returned to their original payment sources. When checkout has not been confirmed, the
+ * remaining items are quoted again. External payment-method refunds can finish asynchronously.
+ * The order and financial history are retained; the same cancellation does not refund twice.
+ *
+ * Once the order is accepted, its owning service coordinates cancellation and confirms
+ * non-delivery and cleanup through the cancellation RPC. Delivered items are ended through
+ * subscription cancellation. Unknown delivery or payment outcomes are not refund evidence;
+ * in-flight or unknown payments must be reconciled first. Scheduled changes continue to be
+ * canceled through the owning service. Refund quotations use CreateQuote.refund.
  * @summary Cancel order
  */
 export const cancelOrder = async (
   orderId: string,
+  orderCancel?: OrderCancel,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<cancelOrderResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
   const res = await (fetchFn ?? fetch)(getCancelOrderUrl(orderId), {
     ...options,
     method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(orderCancel),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();

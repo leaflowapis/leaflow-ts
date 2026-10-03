@@ -39,8 +39,14 @@ export const Invoice = zod.strictObject({
     "Subtotal less discount plus tax. Balance and credit grants are payment sources, not reductions of the receivable.",
   ),
   amount_paid: Money.optional(),
+  unpaid_credit_notes_amount: Money.describe(
+    "Issued, non-void credit notes that reduced unpaid receivables. Does not rewrite the original invoice total.",
+  ),
+  paid_credit_notes_amount: Money.describe(
+    "Issued credit notes against payments already received. This is a return obligation, not evidence of completed refunds.",
+  ),
   amount_due: Money.describe(
-    "What is still collectible after applied credits and successful payments; never below zero. A draft order invoice is not collectible until checkout confirms it, and a paid or void invoice has none.",
+    "What is still collectible after unpaid credit notes and successful payments; never below zero. A draft order invoice is not collectible until checkout confirms it, and a paid or void invoice has none.",
   ),
   period_start: zod.iso.datetime({ offset: true }).nullish(),
   period_end: zod.iso.datetime({ offset: true }).nullish().describe("Exclusive."),

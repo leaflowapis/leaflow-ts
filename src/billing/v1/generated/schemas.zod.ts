@@ -17,6 +17,8 @@ import { CancellationCreate } from "./validators/cancellationCreate.zod.js";
 
 import { CheckoutOrderRequest } from "./validators/checkoutOrderRequest.zod.js";
 
+import { OrderCancel } from "./validators/orderCancel.zod.js";
+
 import { PayInvoiceRequest } from "./validators/payInvoiceRequest.zod.js";
 
 import { PayTogetherRequest } from "./validators/payTogetherRequest.zod.js";
@@ -608,6 +610,73 @@ export const ListCreditGrantsQueryParams = zod.strictObject({
 });
 
 /**
+ * Newest issued_at first, then ID. Requires authorization for the invoice's billing account. Filters narrow authorized results and apply before counting and paging.
+ * @summary List credit notes
+ */
+export const listCreditNotesQueryPageDefault = 1;
+export const listCreditNotesQueryPageMax = 2147483647;
+
+export const listCreditNotesQueryPageSizeDefault = 50;
+export const listCreditNotesQueryPageSizeMax = 200;
+
+export const ListCreditNotesQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listCreditNotesQueryPageMax)
+    .default(listCreditNotesQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listCreditNotesQueryPageSizeMax)
+    .default(listCreditNotesQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+  billing_account_id: zod
+    .int()
+    .optional()
+    .describe("Restrict to one of your accounts. All of them when omitted."),
+  invoice_id: zod.uuid().optional().describe("Only the notes for this invoice."),
+});
+
+/**
+ * Requires authorization for the invoice's billing account.
+ * @summary Get credit note
+ */
+export const GetCreditNoteParams = zod.strictObject({
+  creditNoteId: zod.uuid(),
+});
+
+/**
+ * The original invoice lines reduced by this note. Requires authorization for their invoice's billing account.
+ * @summary List credit note items
+ */
+export const ListCreditNoteItemsParams = zod.strictObject({
+  creditNoteId: zod.uuid(),
+});
+
+export const listCreditNoteItemsQueryPageDefault = 1;
+export const listCreditNoteItemsQueryPageMax = 2147483647;
+
+export const listCreditNoteItemsQueryPageSizeDefault = 50;
+export const listCreditNoteItemsQueryPageSizeMax = 200;
+
+export const ListCreditNoteItemsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listCreditNoteItemsQueryPageMax)
+    .default(listCreditNoteItemsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listCreditNoteItemsQueryPageSizeMax)
+    .default(listCreditNoteItemsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
+
+/**
  * Newest first.
  * @summary List refunds
  */
@@ -1112,22 +1181,31 @@ export const CheckoutOrderParams = zod.strictObject({
 export const CheckoutOrderBody = CheckoutOrderRequest;
 
 /**
- * Withdraws an unaccepted order without recording a delivery failure. Payment may be absent,
- * partial or complete; the order becomes canceled and any collected amount is automatically
- * returned to its original payment sources. External payment-method refunds can finish
- * asynchronously. Canceling an already canceled order returns it unchanged. A previously failed
- * order keeps its failure outcome. The order and financial history are retained.
+ * Cancels the selected, still-undelivered items of an unaccepted order without recording a
+ * delivery failure. Omit order_item_ids to select every still-pending item, or name one or
+ * more items. Successful items remain delivered and are not refunded. Whole-order and partial
+ * cancellation both require confirmed non-delivery and necessary cleanup. The order keeps
+ * its existing pending phase while any item is still pending; its final outcome follows all
+ * item outcomes. Previously failed items keep their failure outcome.
  *
- * Refused once the order is accepted: its owning service must coordinate cancellation during
- * provisioning and confirm non-delivery and necessary cleanup before recording cancellation.
- * Delivered items are ended through subscription cancellation. An unknown or in-flight payment
- * outcome must first be reconciled; it is not assumed to be unpaid. Scheduled changes continue
- * to be canceled through the service that owns them. Refund quotations use CreateQuote.refund.
+ * Payment may be absent, partial or complete. Confirmed checkout keeps the selected items'
+ * agreed amounts and discounts; credit notes reduce issued invoices, and collected amounts
+ * are returned to their original payment sources. When checkout has not been confirmed, the
+ * remaining items are quoted again. External payment-method refunds can finish asynchronously.
+ * The order and financial history are retained; the same cancellation does not refund twice.
+ *
+ * Once the order is accepted, its owning service coordinates cancellation and confirms
+ * non-delivery and cleanup through the cancellation RPC. Delivered items are ended through
+ * subscription cancellation. Unknown delivery or payment outcomes are not refund evidence;
+ * in-flight or unknown payments must be reconciled first. Scheduled changes continue to be
+ * canceled through the owning service. Refund quotations use CreateQuote.refund.
  * @summary Cancel order
  */
 export const CancelOrderParams = zod.strictObject({
   orderId: zod.uuid(),
 });
+
+export const CancelOrderBody = OrderCancel;
 
 /**
  * One entry per item bought, with the price charged and the period it covers.

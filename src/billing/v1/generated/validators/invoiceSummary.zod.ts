@@ -7,6 +7,7 @@
  */
 import * as zod from "zod";
 import { InvoiceStatus } from "./invoiceStatus.zod.js";
+import { Money } from "./money.zod.js";
 
 export const invoiceSummaryAmountDueRegExp = new RegExp("^\\d+(\\.\\d{1,10})?$");
 
@@ -25,11 +26,17 @@ export const InvoiceSummary = zod
     tax_amount: zod.string(),
     total: zod.string(),
     amount_paid: zod.string(),
+    unpaid_credit_notes_amount: Money.describe(
+      "Issued, non-void credit notes that reduced unpaid receivables. Does not rewrite the original invoice total.",
+    ),
+    paid_credit_notes_amount: Money.describe(
+      "Issued credit notes against payments already received. This is a return obligation, not evidence of completed refunds.",
+    ),
     amount_due: zod
       .string()
       .regex(invoiceSummaryAmountDueRegExp)
       .describe(
-        "What is still collectible after applied credits and successful payments; never below zero.",
+        "What is still collectible after unpaid credit notes and successful payments; never below zero.",
       ),
     amount_refunded: zod.string(),
     due_at: zod.iso.datetime({ offset: true }).optional(),
