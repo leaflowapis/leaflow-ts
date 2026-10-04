@@ -104,7 +104,6 @@ import type {
   SpendRowList,
   Subscription,
   SubscriptionList,
-  TerminateSubscriptionRequest,
   TopUp,
   TopUpCreate,
   TopUpList,
@@ -2209,6 +2208,7 @@ export const getListSubscriptionsUrl = (params?: ListSubscriptionsParams) => {
 };
 
 /**
+ * Lists subscriptions visible to the authorized billing account. Soft-deleted subscriptions are excluded.
  * @summary List subscriptions
  */
 export const listSubscriptions = async (
@@ -2251,6 +2251,7 @@ export const getGetSubscriptionUrl = (subscriptionId: string) => {
 };
 
 /**
+ * Returns a subscription visible to the authorized billing account. Soft-deleted subscriptions are reported as not found.
  * @summary Get subscription
  */
 export const getSubscription = async (
@@ -2295,12 +2296,15 @@ export const getDeleteSubscriptionUrl = (subscriptionId: string) => {
 };
 
 /**
- * Hides an already terminated subscription from your subscription list and detail. Your account
- * access token must authorize the subscription's current billing account. Billing and financial
- * history remain available. This operation cannot force termination, skip cleanup, or delete a
- * pending, provisioning, active or suspended subscription. Other states, including canceled, are
- * refused with 409 BILLING_SUBSCRIPTION_NOT_TERMINATED and status in error params. A canceled
- * subscription must first be converted to terminated. Sends no cleanup command and creates no refund.
+ * Sets deleted_at on a canceled or terminated subscription, hiding it from your subscription
+ * list and detail. Your account access token must authorize the subscription's current billing
+ * account. Preserves commercial status, ended_at and billing and financial history. Completed
+ * cancellations and canceled unfulfilled purchases can be deleted directly, without termination.
+ * Pending, provisioning, active and suspended subscriptions are refused with 409
+ * BILLING_SUBSCRIPTION_NOT_ENDED and status in error params. A scheduled or releasing cancellation
+ * does not make a subscription canceled.
+ * There is no force, skip-cleanup or override option. Repeating deletion preserves the original
+ * deleted_at. Sends no cleanup command and creates no refund; outstanding cleanup continues.
  * @summary Delete subscription
  */
 export const deleteSubscription = async (
@@ -2396,83 +2400,6 @@ export const cancelSubscription = async (
 
   const data: cancelSubscriptionResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as cancelSubscriptionResponse;
-};
-
-export type terminateSubscriptionResponse200 = {
-  data: Subscription;
-  status: 200;
-};
-
-export type terminateSubscriptionResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type terminateSubscriptionResponseSuccess = terminateSubscriptionResponse200 & {
-  headers: Headers;
-};
-export type terminateSubscriptionResponseError = terminateSubscriptionResponseDefault & {
-  headers: Headers;
-};
-
-export type terminateSubscriptionResponse =
-  | terminateSubscriptionResponseSuccess
-  | terminateSubscriptionResponseError;
-
-export const getTerminateSubscriptionUrl = (subscriptionId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/terminate`;
-};
-
-/**
- * Converts an already canceled subscription to terminated so it can subsequently be hidden.
- * Your account access token must authorize the subscription's current billing account. Preserves
- * the original billing end and financial history, sends no new cleanup command, and creates no
- * credit note or refund. A terminated subscription is returned unchanged on repeat; a deleted
- * subscription remains hidden from tenant reads.
- *
- * Account holders cannot force termination of pending, provisioning, active or suspended
- * subscriptions. These states are refused with 400 BILLING_SUBSCRIPTION_INVALID and status in
- * error params. Use cancellation under the agreed terms to end service. Immediate commercial
- * termination is reserved for administrators and the owning service. The audited reason does
- * not grant permission to terminate. No force, skip-cleanup or refund options are accepted.
- * @summary Terminate subscription
- */
-export const terminateSubscription = async (
-  subscriptionId: string,
-  terminateSubscriptionRequest: TerminateSubscriptionRequest,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<terminateSubscriptionResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getTerminateSubscriptionUrl(subscriptionId), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(terminateSubscriptionRequest),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: terminateSubscriptionResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as terminateSubscriptionResponse;
 };
 
 export type createQuoteResponse200 = {

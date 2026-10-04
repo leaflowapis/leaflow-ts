@@ -35,8 +35,6 @@ import { RenewalOrderRequest } from "./validators/renewalOrderRequest.zod.js";
 
 import { SetProjectAssignmentRequest } from "./validators/setProjectAssignmentRequest.zod.js";
 
-import { TerminateSubscriptionRequest } from "./validators/terminateSubscriptionRequest.zod.js";
-
 import { TopUpCreate } from "./validators/topUpCreate.zod.js";
 
 /**
@@ -778,6 +776,7 @@ export const ListUsageChargesQueryParams = zod.strictObject({
 });
 
 /**
+ * Lists subscriptions visible to the authorized billing account. Soft-deleted subscriptions are excluded.
  * @summary List subscriptions
  */
 export const listSubscriptionsQueryPageDefault = 1;
@@ -817,6 +816,7 @@ export const ListSubscriptionsQueryParams = zod.strictObject({
 });
 
 /**
+ * Returns a subscription visible to the authorized billing account. Soft-deleted subscriptions are reported as not found.
  * @summary Get subscription
  */
 export const GetSubscriptionParams = zod.strictObject({
@@ -824,12 +824,15 @@ export const GetSubscriptionParams = zod.strictObject({
 });
 
 /**
- * Hides an already terminated subscription from your subscription list and detail. Your account
- * access token must authorize the subscription's current billing account. Billing and financial
- * history remain available. This operation cannot force termination, skip cleanup, or delete a
- * pending, provisioning, active or suspended subscription. Other states, including canceled, are
- * refused with 409 BILLING_SUBSCRIPTION_NOT_TERMINATED and status in error params. A canceled
- * subscription must first be converted to terminated. Sends no cleanup command and creates no refund.
+ * Sets deleted_at on a canceled or terminated subscription, hiding it from your subscription
+ * list and detail. Your account access token must authorize the subscription's current billing
+ * account. Preserves commercial status, ended_at and billing and financial history. Completed
+ * cancellations and canceled unfulfilled purchases can be deleted directly, without termination.
+ * Pending, provisioning, active and suspended subscriptions are refused with 409
+ * BILLING_SUBSCRIPTION_NOT_ENDED and status in error params. A scheduled or releasing cancellation
+ * does not make a subscription canceled.
+ * There is no force, skip-cleanup or override option. Repeating deletion preserves the original
+ * deleted_at. Sends no cleanup command and creates no refund; outstanding cleanup continues.
  * @summary Delete subscription
  */
 export const DeleteSubscriptionParams = zod.strictObject({
@@ -857,26 +860,6 @@ export const CancelSubscriptionParams = zod.strictObject({
 });
 
 export const CancelSubscriptionBody = CancelSubscriptionRequest;
-
-/**
- * Converts an already canceled subscription to terminated so it can subsequently be hidden.
- * Your account access token must authorize the subscription's current billing account. Preserves
- * the original billing end and financial history, sends no new cleanup command, and creates no
- * credit note or refund. A terminated subscription is returned unchanged on repeat; a deleted
- * subscription remains hidden from tenant reads.
- *
- * Account holders cannot force termination of pending, provisioning, active or suspended
- * subscriptions. These states are refused with 400 BILLING_SUBSCRIPTION_INVALID and status in
- * error params. Use cancellation under the agreed terms to end service. Immediate commercial
- * termination is reserved for administrators and the owning service. The audited reason does
- * not grant permission to terminate. No force, skip-cleanup or refund options are accepted.
- * @summary Terminate subscription
- */
-export const TerminateSubscriptionParams = zod.strictObject({
-  subscriptionId: zod.uuid(),
-});
-
-export const TerminateSubscriptionBody = TerminateSubscriptionRequest;
 
 /**
  * Calculates exactly one target for a billing account you own: proposed items, existing order checkout, renewals, cancellation or order refund. Returns all requested calculations or a structured error. No quote is saved and no resource, payment, reservation or redemption is created.

@@ -1822,6 +1822,8 @@ export interface PaidWith {
  * pending means the purchase relationship exists but its order has not been accepted.
  * provisioning means the service accepted the order and is delivering. For a service-owned
  * purchase, only confirmed delivery moves it to active; paying alone does not.
+ * canceled means cancellation completed, or an unfulfilled purchase was canceled or failed without delivery.
+ * terminated means an administrator or the owning service immediately ended the commercial relationship.
  */
 export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus];
 
@@ -1832,7 +1834,6 @@ export const SubscriptionStatus = {
   suspended: "suspended",
   canceled: "canceled",
   terminated: "terminated",
-  deleted: "deleted",
 } as const;
 
 /**
@@ -1849,8 +1850,8 @@ export const SubscriptionStatus = {
  *
  * One-time delivery may omit a subscription. Renewals reference and extend existing subscriptions
  * rather than creating another; a change keeps the subscription ID and switches its terms when it
- * takes effect. Canceling or failing an
- * unfulfilled purchase closes its pending or provisioning subscriptions without starting a service period.
+ * takes effect. Canceling or failing an unfulfilled purchase sets its pending or provisioning
+ * subscriptions to canceled without starting a service period.
  * Fixed renewals use the agreed recurring_amount and interval; already paid periods retain their
  * original value. Technical state belongs to the owning service.
  *
@@ -1923,6 +1924,8 @@ export interface Subscription {
    * pending means the purchase relationship exists but its order has not been accepted.
    * provisioning means the service accepted the order and is delivering. For a service-owned
    * purchase, only confirmed delivery moves it to active; paying alone does not.
+   * canceled means cancellation completed, or an unfulfilled purchase was canceled or failed without delivery.
+   * terminated means an administrator or the owning service immediately ended the commercial relationship.
    */
   status: SubscriptionStatus;
   /**
@@ -2875,14 +2878,6 @@ export interface CursorPagination {
   page_size: number;
   /** @nullable */
   next_cursor?: string | null;
-}
-
-export interface TerminateSubscriptionRequest {
-  /**
-   * @minLength 8
-   * @maxLength 1024
-   */
-  reason: string;
 }
 
 export interface CancelSubscriptionRequest {
