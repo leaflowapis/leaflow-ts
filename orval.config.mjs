@@ -85,6 +85,8 @@ export default defineConfig(
       const hooks = {
         afterAllFilesWrite: [
           async () => {
+            // 单模块生成不能覆盖其他服务的完整路由表。
+            if (routeModules.size !== modules.length) return;
             const routes = [...routeModules]
               .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
               .flatMap(([, values]) => values);
