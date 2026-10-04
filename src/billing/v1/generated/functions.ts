@@ -14,6 +14,7 @@ import type {
   BillingAccountCreate,
   BillingAccountList,
   BillingAccountUpdate,
+  CancelSubscriptionRequest,
   Cancellation,
   CancellationCreate,
   CancellationList,
@@ -103,6 +104,7 @@ import type {
   SpendRowList,
   Subscription,
   SubscriptionList,
+  TerminateSubscriptionRequest,
   TopUp,
   TopUpCreate,
   TopUpList,
@@ -2265,6 +2267,212 @@ export const getSubscription = async (
 
   const data: getSubscriptionResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as getSubscriptionResponse;
+};
+
+export type deleteSubscriptionResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteSubscriptionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type deleteSubscriptionResponseSuccess = deleteSubscriptionResponse204 & {
+  headers: Headers;
+};
+export type deleteSubscriptionResponseError = deleteSubscriptionResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteSubscriptionResponse =
+  | deleteSubscriptionResponseSuccess
+  | deleteSubscriptionResponseError;
+
+export const getDeleteSubscriptionUrl = (subscriptionId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}`;
+};
+
+/**
+ * Hides an already terminated subscription from your subscription list and detail. Your account
+ * access token must authorize the subscription's current billing account. Billing and financial
+ * history remain available. This operation cannot force termination, skip cleanup, or delete a
+ * pending, provisioning, active or suspended subscription. Other states, including canceled, are
+ * refused with 409 BILLING_SUBSCRIPTION_NOT_TERMINATED and status in error params. A canceled
+ * subscription must first be converted to terminated. Sends no cleanup command and creates no refund.
+ * @summary Delete subscription
+ */
+export const deleteSubscription = async (
+  subscriptionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteSubscriptionResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteSubscriptionUrl(subscriptionId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteSubscriptionResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteSubscriptionResponse;
+};
+
+export type cancelSubscriptionResponse202 = {
+  data: Cancellation;
+  status: 202;
+};
+
+export type cancelSubscriptionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 202>;
+};
+
+export type cancelSubscriptionResponseSuccess = cancelSubscriptionResponse202 & {
+  headers: Headers;
+};
+export type cancelSubscriptionResponseError = cancelSubscriptionResponseDefault & {
+  headers: Headers;
+};
+
+export type cancelSubscriptionResponse =
+  | cancelSubscriptionResponseSuccess
+  | cancelSubscriptionResponseError;
+
+export const getCancelSubscriptionUrl = (subscriptionId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/cancel`;
+};
+
+/**
+ * Requests cancellation on the purchase's agreed terms. Uses the same quotation, eligibility,
+ * metering and original-payment-source refund rules as creating a cancellation.
+ * Supply the refund amount from create-quote with this subscription in cancellation.subscription_ids.
+ * Your account access token must authorize the subscription's current billing account.
+ *
+ * Immediate cancellation asks the owning service to clean up now. Period-end cancellation keeps
+ * the subscription active or suspended until the paid term ends. Neither payment nor acceptance
+ * of this request proves cleanup. The subscription becomes canceled only after the service
+ * confirms release and the end of metering; follow the returned cancellation for progress.
+ *
+ * Related subscriptions released together must be submitted as one group to create-cancellation.
+ * Pending or provisioning purchases are canceled through their order, not this operation.
+ * Repeating the same open cancellation returns it without another refund or command.
+ * @summary Cancel subscription
+ */
+export const cancelSubscription = async (
+  subscriptionId: string,
+  cancelSubscriptionRequest: CancelSubscriptionRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<cancelSubscriptionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCancelSubscriptionUrl(subscriptionId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(cancelSubscriptionRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelSubscriptionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as cancelSubscriptionResponse;
+};
+
+export type terminateSubscriptionResponse200 = {
+  data: Subscription;
+  status: 200;
+};
+
+export type terminateSubscriptionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type terminateSubscriptionResponseSuccess = terminateSubscriptionResponse200 & {
+  headers: Headers;
+};
+export type terminateSubscriptionResponseError = terminateSubscriptionResponseDefault & {
+  headers: Headers;
+};
+
+export type terminateSubscriptionResponse =
+  | terminateSubscriptionResponseSuccess
+  | terminateSubscriptionResponseError;
+
+export const getTerminateSubscriptionUrl = (subscriptionId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/terminate`;
+};
+
+/**
+ * Converts an already canceled subscription to terminated so it can subsequently be hidden.
+ * Your account access token must authorize the subscription's current billing account. Preserves
+ * the original billing end and financial history, sends no new cleanup command, and creates no
+ * credit note or refund. A terminated subscription is returned unchanged on repeat; a deleted
+ * subscription remains hidden from tenant reads.
+ *
+ * Account holders cannot force termination of pending, provisioning, active or suspended
+ * subscriptions. These states are refused with 400 BILLING_SUBSCRIPTION_INVALID and status in
+ * error params. Use cancellation under the agreed terms to end service. Immediate commercial
+ * termination is reserved for administrators and the owning service. The audited reason does
+ * not grant permission to terminate. No force, skip-cleanup or refund options are accepted.
+ * @summary Terminate subscription
+ */
+export const terminateSubscription = async (
+  subscriptionId: string,
+  terminateSubscriptionRequest: TerminateSubscriptionRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<terminateSubscriptionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getTerminateSubscriptionUrl(subscriptionId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(terminateSubscriptionRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: terminateSubscriptionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as terminateSubscriptionResponse;
 };
 
 export type createQuoteResponse200 = {

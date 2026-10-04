@@ -3681,5 +3681,32 @@ export const routes = [
     securityScheme: "ScopedToken",
     upstreamUrl: "https://tunnel.leaflow.cloud",
   },
+  {
+    service: "billing",
+    contract: "billing",
+    method: "DELETE",
+    path: "/api/v1/subscriptions/{subscriptionId}",
+    operationId: "delete-subscription",
+    securityScheme: "AccessToken",
+    upstreamUrl: "https://billing.leaflow.cloud",
+  },
+  {
+    service: "billing",
+    contract: "billing",
+    method: "POST",
+    path: "/api/v1/subscriptions/{subscriptionId}/cancel",
+    operationId: "cancel-subscription",
+    securityScheme: "AccessToken",
+    upstreamUrl: "https://billing.leaflow.cloud",
+  },
+  {
+    service: "billing",
+    contract: "billing",
+    method: "POST",
+    path: "/api/v1/subscriptions/{subscriptionId}/terminate",
+    operationId: "terminate-subscription",
+    securityScheme: "AccessToken",
+    upstreamUrl: "https://billing.leaflow.cloud",
+  },
 ] as const;
 export type Route = (typeof routes)[number];

@@ -85,7 +85,7 @@ export const Subscription = zod
       ),
     auto_renew: zod.boolean(),
     status: zod
-      .enum(["pending", "provisioning", "active", "suspended", "canceled", "terminated"])
+      .enum(["pending", "provisioning", "active", "suspended", "canceled", "terminated", "deleted"])
       .describe(
         "pending means the purchase relationship exists but its order has not been accepted.\nprovisioning means the service accepted the order and is delivering. For a service-owned\npurchase, only confirmed delivery moves it to active; paying alone does not.",
       ),

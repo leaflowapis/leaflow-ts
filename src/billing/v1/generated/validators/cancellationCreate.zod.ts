@@ -12,7 +12,7 @@ import { TerminationPolicy } from "./terminationPolicy.zod.js";
 export const cancellationCreateSubscriptionIdsMax = 50;
 
 export const cancellationCreateExpectedRefundableAmountTwoRegExp = new RegExp(
-  "^-?[0-9]{1,15}([.][0-9]{1,10})?$",
+  "^[0-9]{1,15}([.][0-9]{1,10})?$",
 );
 export const cancellationCreateReasonMax = 1024;
 

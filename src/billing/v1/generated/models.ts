@@ -1832,6 +1832,7 @@ export const SubscriptionStatus = {
   suspended: "suspended",
   canceled: "canceled",
   terminated: "terminated",
+  deleted: "deleted",
 } as const;
 
 /**
@@ -2874,6 +2875,24 @@ export interface CursorPagination {
   page_size: number;
   /** @nullable */
   next_cursor?: string | null;
+}
+
+export interface TerminateSubscriptionRequest {
+  /**
+   * @minLength 8
+   * @maxLength 1024
+   */
+  reason: string;
+}
+
+export interface CancelSubscriptionRequest {
+  mode: TerminationPolicy;
+  /** For immediate cancellation, the quoted whole-second refund basis. Now when omitted. */
+  proration_date?: string;
+  /** The cancellation quote's refundable amount, including an explicit zero. */
+  expected_refundable_amount: Money & string;
+  /** @maxLength 1024 */
+  reason?: string;
 }
 
 /**
