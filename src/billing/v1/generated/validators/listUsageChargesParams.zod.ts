@@ -35,6 +35,7 @@ export const ListUsageChargesParams = zod.strictObject({
   to: zod.iso.datetime({ offset: true }).optional(),
   project_ids: zod.array(zod.uuid()).min(1).max(listUsageChargesParamsProjectIdsMax).optional(),
   meter_id: zod.uuid().optional(),
+  statement_id: zod.uuid().optional(),
 });
 
 export type ListUsageChargesParams = zod.input<typeof ListUsageChargesParams>;

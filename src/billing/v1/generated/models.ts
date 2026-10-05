@@ -570,21 +570,14 @@ export const BillingAccountStatus = {
 } as const;
 
 export interface BillingAccount {
+  /**
+   * The active contact used for invoicing. Must belong to this account; null clears the selection.
+   * @nullable
+   */
+  invoice_contact_id?: string | null;
   id: number;
   /** What you call this account. */
   name?: string;
-  /** The name invoices are made out to. Copied onto each invoice when it is issued. */
-  legal_name?: string;
-  /** Where invoices are sent. */
-  email?: string;
-  address_line1?: string;
-  address_line2?: string;
-  address_city?: string;
-  address_state?: string;
-  address_postal_code?: string;
-  /** Two-letter code. */
-  address_country?: string;
-  tax_id?: string;
   /** Fixed when the account was opened. */
   currency: string;
   status: BillingAccountStatus;
@@ -644,36 +637,16 @@ export interface BillingAccountCreate {
   currency: string;
   /** @maxLength 255 */
   name?: string;
-  /** @maxLength 255 */
-  legal_name?: string;
-  /** @maxLength 255 */
-  email?: string;
 }
 
 export interface BillingAccountUpdate {
+  /**
+   * The active contact used for invoicing. Must belong to this account; null clears the selection.
+   * @nullable
+   */
+  invoice_contact_id?: string | null;
   /** @maxLength 255 */
   name?: string;
-  /** @maxLength 255 */
-  legal_name?: string;
-  /** @maxLength 255 */
-  email?: string;
-  /** @maxLength 255 */
-  address_line1?: string;
-  /** @maxLength 255 */
-  address_line2?: string;
-  /** @maxLength 128 */
-  address_city?: string;
-  /** @maxLength 128 */
-  address_state?: string;
-  /** @maxLength 32 */
-  address_postal_code?: string;
-  /**
-   * @minLength 2
-   * @maxLength 2
-   */
-  address_country?: string;
-  /** @maxLength 64 */
-  tax_id?: string;
 }
 
 export interface BillingAccountList {
@@ -794,6 +767,10 @@ export interface CreditGroup {
  * Account balance, credits, and unpaid charges are reported separately.
  */
 export interface AccountBalance {
+  /** Cash balance minus pending cash returns, unbilled usage estimates and issued unpaid amounts. Credit grants are excluded; the result may be negative. */
+  available_credit: Money;
+  /** Current estimate of rated usage that has not been invoiced. Final pricing and tax are fixed at issuance. */
+  unbilled_amount: Money;
   billing_account_id: number;
   currency: string;
   /**
@@ -807,17 +784,7 @@ export interface AccountBalance {
    * credits balance does not imply that due is zero.
    */
   credits: Money;
-  /**
-   * balance plus credits, the sum shown as the account's funds. Credits count at their recorded remaining
-   * amount, including restricted grants that only pay for what they allow, so total is an upper bound of what
-   * the account can pay with rather than a withdrawable amount. due is reported separately and is not subtracted.
-   */
-  total: Money;
-  /**
-   * The part of currently valid credit that only pays for what its restrictions allow, such as a single
-   * service, a billing type or a first purchase. The rest of the valid credit pays for anything on the account.
-   * Included in credits and therefore in total.
-   */
+  /** Currently valid credit whose use has applicable product, operation or eligibility conditions. Included in credits, separate from cash balance. */
   restricted_credits: Money;
   /**
    * Currently valid, unspent credit grouped by permitted use. Restrictions and
@@ -825,32 +792,9 @@ export interface AccountBalance {
    * spendable balance and may differ from the recorded credits total.
    */
   credit_groups: CreditGroup[];
-  /**
-   * Owed and not yet paid: metered usage that balance and applicable credit could not cover as it was
-   * charged, and issued usage invoices still unpaid. The account is in arrears while this
-   * is above zero. Topping up pays it on the next collection.
-   */
+  /** Amount still payable on issued invoices. Unbilled usage is reported separately; arrears depend on actual eligible funding and grace terms. */
   due: Money;
-}
-
-export interface MeteredUsage {
-  billing_account_id: number;
-  currency: string;
-  /** Resources still metered in the projects the account currently pays for. */
-  active_resource_count: number;
-  /** Subscriptions billed by usage that the account currently pays for and that have not ended. */
-  postpaid_subscription_count: number;
-  /** The start of the seven days the amounts cover. */
-  window_start: string;
-  /** The end of those seven days, the time usage was last priced. */
-  window_end: string;
-  /** Usage priced in the window, before tax and before credit grants. Usage not yet priced is not included. */
-  amount: Money;
-  /**
-   * `amount` per day. Over the window, or over the part of it since the account's usage began
-   * when that is shorter, counting at least one day.
-   */
-  average_daily_amount: Money;
+  pending_returns_amount: Money;
 }
 
 /**
@@ -1358,20 +1302,11 @@ export interface PaymentResult {
 }
 
 /**
- * An order invoice stays `draft` until checkout confirms its discount and final amounts. It
- * cannot be collected while draft. Confirmation makes it `open`, or `paid` when its total is zero
- * without creating a payment transaction. A quote never changes this status.
- *
- * A usage invoice stays `draft` through its month: each charge is added to it as it is priced
- * and paid from credits and balance as it goes. It is issued at the end of the month, becoming
- * `paid` when everything was covered and `open` when something is still owed.
- *
- * `refunded` means the invoice was paid and has since been refunded in full; a partial refund
- * leaves it `paid`, with the refunded part in `amount_refunded`.
- *
- * `void` means the invoice will not be paid and holds no money: nothing was paid, or its order
- * failed or was canceled and everything paid toward it has been returned, as `amount_paid` and
- * `amount_refunded` show.
+ * Draft invoices are private to administrators and cannot be read, listed or paid by customers.
+ * An issued invoice is open until settled; a zero-total issued invoice is immediately paid.
+ * Unbilled usage remains separate from invoices until it is invoiced.
+ * refunded means a full refund; a partial refund leaves the invoice paid.
+ * void means collection has stopped and any funds received have been returned.
  */
 export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
 
@@ -1382,17 +1317,6 @@ export const InvoiceStatus = {
   refunded: "refunded",
   void: "void",
   uncollectible: "uncollectible",
-} as const;
-
-/**
- * What produced it — metered usage for a period, a purchase, or a correction.
- */
-export type InvoiceType = (typeof InvoiceType)[keyof typeof InvoiceType];
-
-export const InvoiceType = {
-  usage: "usage",
-  order: "order",
-  adjustment: "adjustment",
 } as const;
 
 /**
@@ -1411,17 +1335,15 @@ export interface TaxItem {
 }
 
 export interface Invoice {
+  /** Collection has been stopped; any accepted return obligations are completed before final voiding. */
+  void_requested_at?: string;
   due_at?: string;
   amount_refunded?: string;
   tax_items: TaxItem[];
-  /** The purchase that produced this invoice. Absent on usage invoices. */
-  order_id?: string;
   id: string;
   billing_account_id: number;
   /** Numbered per account and per month. */
   number: string;
-  /** What produced it — metered usage for a period, a purchase, or a correction. */
-  type?: InvoiceType;
   currency: string;
   status: InvoiceStatus;
   /**
@@ -1484,7 +1406,6 @@ export const InvoiceItemType = {
 } as const;
 
 export interface InvoiceItem {
-  recurring_amount?: string;
   taxable?: boolean;
   /** Discount applied to this line before tax. */
   discount_amount?: string;
@@ -1492,8 +1413,6 @@ export interface InvoiceItem {
   tax_amount?: string;
   /** The part of tax_amount already included in amount. */
   tax_included_amount?: string;
-  /** The original order line. Refunds follow that line's original payment sources. */
-  order_item_id?: string;
   id: string;
   type?: InvoiceItemType;
   /** @nullable */
@@ -1781,6 +1700,8 @@ export interface UsageCharge {
    * @nullable
    */
   invoice_item_id?: string | null;
+  /** The statement this charge was collected into. */
+  statement_id?: string;
 }
 
 export interface UsageChargeList {
@@ -2194,6 +2115,8 @@ export type OrderItemConfiguration = { [key: string]: unknown };
  * purchase creates its pending subscription when this item is recorded, not when payment succeeds.
  */
 export interface OrderItem {
+  /** Financial lines produced by this purchase item, including setup charges. */
+  invoice_item_ids?: string[];
   /** @minimum 0 */
   position?: number;
   configuration?: OrderItemConfiguration;
@@ -2877,6 +2800,98 @@ export interface QuoteRequest {
 }
 
 /**
+ * A billing-account contact profile with one address. An account can hold multiple contacts; this is not a login identity.
+ */
+export interface Contact {
+  id: string;
+  billing_account_id: number;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name: string;
+  /** @maxLength 255 */
+  legal_name?: string;
+  /** @maxLength 255 */
+  email?: string;
+  /** @maxLength 64 */
+  tax_id?: string;
+  /** @maxLength 255 */
+  address_line1?: string;
+  /** @maxLength 255 */
+  address_line2?: string;
+  /** @maxLength 128 */
+  address_city?: string;
+  /** @maxLength 128 */
+  address_state?: string;
+  /** @maxLength 32 */
+  address_postal_code?: string;
+  /** @pattern ^([A-Z]{2})?$ */
+  address_country?: string;
+  tax_exempt: boolean;
+  active: boolean;
+  created_at: string;
+}
+
+export interface ContactCreate {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name: string;
+  /** @maxLength 255 */
+  legal_name?: string;
+  /** @maxLength 255 */
+  email?: string;
+  /** @maxLength 64 */
+  tax_id?: string;
+  /** @maxLength 255 */
+  address_line1?: string;
+  /** @maxLength 255 */
+  address_line2?: string;
+  /** @maxLength 128 */
+  address_city?: string;
+  /** @maxLength 128 */
+  address_state?: string;
+  /** @maxLength 32 */
+  address_postal_code?: string;
+  /** @pattern ^([A-Z]{2})?$ */
+  address_country?: string;
+}
+
+export interface ContactUpdate {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name?: string;
+  /** @maxLength 255 */
+  legal_name?: string;
+  /** @maxLength 255 */
+  email?: string;
+  /** @maxLength 64 */
+  tax_id?: string;
+  /** @maxLength 255 */
+  address_line1?: string;
+  /** @maxLength 255 */
+  address_line2?: string;
+  /** @maxLength 128 */
+  address_city?: string;
+  /** @maxLength 128 */
+  address_state?: string;
+  /** @maxLength 32 */
+  address_postal_code?: string;
+  /** @pattern ^([A-Z]{2})?$ */
+  address_country?: string;
+  active?: boolean;
+}
+
+export interface ContactList {
+  items: Contact[];
+  pagination: OffsetPagination;
+}
+
+/**
  * Pagination metadata for keyset traversal. Pass next_cursor as cursor to read the following page; null means there is no following page.
  */
 export interface CursorPagination {
@@ -2894,6 +2909,80 @@ export interface CancelSubscriptionRequest {
   expected_refundable_amount: Money & string;
   /** @maxLength 1024 */
   reason?: string;
+}
+
+export interface StatementAmounts {
+  subtotal: Money;
+  discount_amount: Money;
+  tax_amount: Money;
+  total: Money;
+}
+
+export type StatementStatus = (typeof StatementStatus)[keyof typeof StatementStatus];
+
+export const StatementStatus = {
+  open: "open",
+  closed: "closed",
+} as const;
+
+/**
+ * An account's consumption for one billing period, collected at one closing. The first statement of a period (sequence 1) closes after the period ends. Usage priced after that closing is collected in a later statement for the same period, which closes and invoices separately; a closed statement is never rewritten. Payments apply to issued invoices.
+ */
+export interface Statement {
+  id: string;
+  billing_account_id: number;
+  currency: string;
+  period_start: string;
+  period_end: string;
+  /** 1 for the first closing of the period; higher for statements that collect usage priced after an earlier closing. */
+  sequence: number;
+  status: StatementStatus;
+  /** True while the statement is open. The estimate is the priced usage plus tax for the current invoice contact; tier adjustments over the whole period and minimum charges are determined at closing. */
+  estimated: boolean;
+  amounts: StatementAmounts;
+  closed_at?: string;
+  /** The invoice issued at this closing, when it produced one. */
+  invoice_id?: string;
+  created_at: string;
+  calculated_at?: string;
+  credited_amount: Money;
+}
+
+export interface StatementList {
+  items: Statement[];
+  pagination: OffsetPagination;
+}
+
+export interface StatementItem {
+  project_id?: string;
+  product_id?: string;
+  meter_id?: string;
+  unit?: string;
+  /** Net usage quantity. Included only when grouping by meter. */
+  quantity?: string;
+  deducted_quantity?: string;
+  /** Usage not yet priced; not a zero-cost charge. */
+  unrated_quantity?: string;
+  amount: Money;
+}
+
+export type StatementSummaryGroupBy =
+  (typeof StatementSummaryGroupBy)[keyof typeof StatementSummaryGroupBy];
+
+export const StatementSummaryGroupBy = {
+  project: "project",
+  product: "product",
+  meter: "meter",
+} as const;
+
+export interface StatementSummary {
+  statement_id: string;
+  currency: string;
+  estimated: boolean;
+  calculated_at?: string;
+  group_by: StatementSummaryGroupBy;
+  items: StatementItem[];
+  pagination: OffsetPagination;
 }
 
 /**
@@ -2937,6 +3026,21 @@ export type ToRequiredParameter = string;
  * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
  */
 export type ProjectIdsQueryParameter = string[];
+
+export type ListContactsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+};
 
 export type ListCurrenciesParams = {
   /**
@@ -3269,6 +3373,7 @@ export type ListUsageChargesParams = {
    */
   project_ids?: ProjectIdsQueryParameter;
   meter_id?: string;
+  statement_id?: string;
 };
 
 export type ListSubscriptionsParams = {
@@ -3700,7 +3805,8 @@ export type ListSpendParams = {
    */
   to: ToRequiredParameter;
   /**
-   * `resource` groups by the resource each charge names. Items billed under their own
+   * `plan` groups by the plan of the price each charge was priced with, which stays the same after the
+   * subscription changes plan. `resource` groups by the resource each charge names. Items billed under their own
    * identifier — a disk, a public address — appear as their own rows rather than under
    * the machine they are attached to, since the relationship between them is known to
    * the owning service and not here.
@@ -3740,4 +3846,57 @@ export const ListSpendGroupBy = {
   product: "product",
   plan: "plan",
   resource: "resource",
+} as const;
+
+export type ListStatementsParams = {
+  billing_account_id?: number;
+  status?: StatementStatus;
+  from?: string;
+  to?: string;
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+};
+
+export type GetStatementUsageParams = {
+  group_by?: GetStatementUsageGroupBy;
+  /**
+   * @maxItems 100
+   */
+  project_ids?: string[];
+  /**
+   * @maxLength 64
+   */
+  product_id?: string;
+  meter_id?: string;
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+};
+
+export type GetStatementUsageGroupBy =
+  (typeof GetStatementUsageGroupBy)[keyof typeof GetStatementUsageGroupBy];
+
+export const GetStatementUsageGroupBy = {
+  project: "project",
+  product: "product",
+  meter: "meter",
 } as const;

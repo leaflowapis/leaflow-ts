@@ -17,6 +17,10 @@ export const orderItemPositionMin = 0;
 
 export const OrderItem = zod
   .strictObject({
+    invoice_item_ids: zod
+      .array(zod.uuid())
+      .optional()
+      .describe("Financial lines produced by this purchase item, including setup charges."),
     position: zod.int().min(orderItemPositionMin).optional(),
     configuration: zod.record(zod.string(), zod.unknown()).optional(),
     subscription_id: zod

@@ -19,6 +19,10 @@ import type {
   CancellationCreate,
   CancellationList,
   CheckoutOrderRequest,
+  Contact,
+  ContactCreate,
+  ContactList,
+  ContactUpdate,
   CreditGrantList,
   CreditNote,
   CreditNoteItemList,
@@ -31,6 +35,7 @@ import type {
   GetPlanHeaders,
   GetPriceHeaders,
   GetProductHeaders,
+  GetStatementUsageParams,
   Invoice,
   InvoiceItemList,
   InvoiceList,
@@ -39,6 +44,7 @@ import type {
   ListAllowancesParams,
   ListBillingAccountsParams,
   ListCancellationsParams,
+  ListContactsParams,
   ListCreditGrantsParams,
   ListCreditNoteItemsParams,
   ListCreditNotesParams,
@@ -64,11 +70,11 @@ import type {
   ListRefundsParams,
   ListRenewalPricesParams,
   ListSpendParams,
+  ListStatementsParams,
   ListSubscriptionsParams,
   ListTopUpsParams,
   ListTransactionsParams,
   ListUsageChargesParams,
-  MeteredUsage,
   NotModifiedResponse,
   Order,
   OrderCancel,
@@ -102,6 +108,9 @@ import type {
   RenewalPriceList,
   SetProjectAssignmentRequest,
   SpendRowList,
+  Statement,
+  StatementList,
+  StatementSummary,
   Subscription,
   SubscriptionList,
   TopUp,
@@ -152,6 +161,274 @@ export type HTTPStatusCodes =
   | HTTPStatusCode3xx
   | HTTPStatusCode4xx
   | HTTPStatusCode5xx;
+
+export type listContactsResponse200 = {
+  data: ContactList;
+  status: 200;
+};
+
+export type listContactsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listContactsResponseSuccess = listContactsResponse200 & {
+  headers: Headers;
+};
+export type listContactsResponseError = listContactsResponseDefault & {
+  headers: Headers;
+};
+
+export type listContactsResponse = listContactsResponseSuccess | listContactsResponseError;
+
+export const getListContactsUrl = (accountId: number, params?: ListContactsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/contacts?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/contacts`;
+};
+
+/**
+ * @summary List contacts
+ */
+export const listContacts = async (
+  accountId: number,
+  params?: ListContactsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listContactsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListContactsUrl(accountId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listContactsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listContactsResponse;
+};
+
+export type createContactResponse201 = {
+  data: Contact;
+  status: 201;
+};
+
+export type createContactResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createContactResponseSuccess = createContactResponse201 & {
+  headers: Headers;
+};
+export type createContactResponseError = createContactResponseDefault & {
+  headers: Headers;
+};
+
+export type createContactResponse = createContactResponseSuccess | createContactResponseError;
+
+export const getCreateContactUrl = (accountId: number) => {
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/contacts`;
+};
+
+/**
+ * @summary Create contact
+ */
+export const createContact = async (
+  accountId: number,
+  contactCreate: ContactCreate,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createContactResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateContactUrl(accountId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(contactCreate),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createContactResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createContactResponse;
+};
+
+export type getContactResponse200 = {
+  data: Contact;
+  status: 200;
+};
+
+export type getContactResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getContactResponseSuccess = getContactResponse200 & {
+  headers: Headers;
+};
+export type getContactResponseError = getContactResponseDefault & {
+  headers: Headers;
+};
+
+export type getContactResponse = getContactResponseSuccess | getContactResponseError;
+
+export const getGetContactUrl = (contactId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/contacts/${encodeURIComponent(String(contactId))}`;
+};
+
+/**
+ * @summary Get contact
+ */
+export const getContact = async (
+  contactId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getContactResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetContactUrl(contactId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getContactResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getContactResponse;
+};
+
+export type updateContactResponse200 = {
+  data: Contact;
+  status: 200;
+};
+
+export type updateContactResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updateContactResponseSuccess = updateContactResponse200 & {
+  headers: Headers;
+};
+export type updateContactResponseError = updateContactResponseDefault & {
+  headers: Headers;
+};
+
+export type updateContactResponse = updateContactResponseSuccess | updateContactResponseError;
+
+export const getUpdateContactUrl = (contactId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/contacts/${encodeURIComponent(String(contactId))}`;
+};
+
+/**
+ * @summary Update contact
+ */
+export const updateContact = async (
+  contactId: string,
+  contactUpdate: ContactUpdate,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateContactResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateContactUrl(contactId), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(contactUpdate),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateContactResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as updateContactResponse;
+};
+
+export type deleteContactResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteContactResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type deleteContactResponseSuccess = deleteContactResponse204 & {
+  headers: Headers;
+};
+export type deleteContactResponseError = deleteContactResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteContactResponse = deleteContactResponseSuccess | deleteContactResponseError;
+
+export const getDeleteContactUrl = (contactId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/contacts/${encodeURIComponent(String(contactId))}`;
+};
+
+/**
+ * The selected invoice contact must be cleared or replaced before deletion. Issued invoice snapshots are retained.
+ * @summary Delete contact
+ */
+export const deleteContact = async (
+  contactId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteContactResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteContactUrl(contactId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteContactResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteContactResponse;
+};
 
 export type listCurrenciesResponse200 = {
   data: CurrencyList;
@@ -404,10 +681,9 @@ export const getUpdateBillingAccountUrl = (accountId: number) => {
 };
 
 /**
- * The legal name, address and tax identifier are copied onto each invoice when it is
- * issued. Changing them here affects invoices issued afterwards, not those already sent.
- *
- * The currency cannot be changed.
+ * Select an active contact belonging to this account for future invoices. Its legal name,
+ * address and tax identifier are copied when an invoice is issued; issued snapshots are
+ * retained. Set invoice_contact_id to null to clear the selection. The currency cannot change.
  * @summary Update billing account
  */
 export const updateBillingAccount = async (
@@ -490,53 +766,6 @@ export const getAccountBalance = async (
 
   const data: getAccountBalanceResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as getAccountBalanceResponse;
-};
-
-export type getAccountMeteredUsageResponse200 = {
-  data: MeteredUsage;
-  status: 200;
-};
-
-export type getAccountMeteredUsageResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type getAccountMeteredUsageResponseSuccess = getAccountMeteredUsageResponse200 & {
-  headers: Headers;
-};
-export type getAccountMeteredUsageResponseError = getAccountMeteredUsageResponseDefault & {
-  headers: Headers;
-};
-
-export type getAccountMeteredUsageResponse =
-  | getAccountMeteredUsageResponseSuccess
-  | getAccountMeteredUsageResponseError;
-
-export const getGetAccountMeteredUsageUrl = (accountId: number) => {
-  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/metered-usage`;
-};
-
-/**
- * Whether the account has anything billed by usage, and what that usage has cost over the last
- * seven days. Usage is paid from the balance, so this tells how much of the balance it is likely
- * to need: the balance divided by `average_daily_amount` is roughly how many days it lasts.
- * @summary Get account metered usage
- */
-export const getAccountMeteredUsage = async (
-  accountId: number,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<getAccountMeteredUsageResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetAccountMeteredUsageUrl(accountId), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getAccountMeteredUsageResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as getAccountMeteredUsageResponse;
 };
 
 export type listPaymentOptionsResponse200 = {
@@ -2147,9 +2376,7 @@ export const getListUsageChargesUrl = (params?: ListUsageChargesParams) => {
 };
 
 /**
- * Each charge is added to the month's usage invoice as it is priced, summed into one line per
- * subscription, project, resource, meter and rate. Filter by `invoice_item_id` to see the
- * charges behind a line. Charges still waiting to be priced are included too.
+ * Lists priced and pending usage charges. Requires `statement_id`, `invoice_item_id`, or both `from` and `to` spanning at most 31 days; use the statement summary or spend report for longer periods. Charges are summed into one line per subscription, project, resource, meter and rate when their statement closes; filter by `invoice_item_id` to see the charges behind a line. Charges still waiting to be priced are included too.
  *
  * Only charges recorded against your billing accounts are included, before filtering, counting and pagination. Reassigning a project does not move previously recorded charges to its new account.
  * @summary List usage charges
@@ -4217,10 +4444,11 @@ export const getListSpendUrl = (params: ListSpendParams) => {
 };
 
 /**
- * Aggregates rated and invoiced usage charges in the specified time range for one billing account.
- * Includes usage not yet invoiced. Project filters use the account recorded on each charge, including
- * charges for projects later assigned to another account. The total covers all matching groups, not
- * just the returned page.
+ * Sums priced usage for one billing account by UTC day, including usage not yet invoiced. Amounts are
+ * before tax and before the tier adjustments made when a statement closes; minimum charges added at
+ * closing are included. `from` and `to` must fall on UTC day boundaries and span at most 92 days.
+ * Project filters use the account recorded on each charge, including charges for projects later
+ * assigned to another account. The total covers all matching groups, not just the returned page.
  * @summary List account spend
  */
 export const listSpend = async (
@@ -4237,4 +4465,167 @@ export const listSpend = async (
 
   const data: listSpendResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listSpendResponse;
+};
+
+export type listStatementsResponse200 = {
+  data: StatementList;
+  status: 200;
+};
+
+export type listStatementsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listStatementsResponseSuccess = listStatementsResponse200 & {
+  headers: Headers;
+};
+export type listStatementsResponseError = listStatementsResponseDefault & {
+  headers: Headers;
+};
+
+export type listStatementsResponse = listStatementsResponseSuccess | listStatementsResponseError;
+
+export const getListStatementsUrl = (params?: ListStatementsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/statements?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/statements`;
+};
+
+/**
+ * @summary List statements
+ */
+export const listStatements = async (
+  params?: ListStatementsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listStatementsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListStatementsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listStatementsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listStatementsResponse;
+};
+
+export type getStatementResponse200 = {
+  data: Statement;
+  status: 200;
+};
+
+export type getStatementResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getStatementResponseSuccess = getStatementResponse200 & {
+  headers: Headers;
+};
+export type getStatementResponseError = getStatementResponseDefault & {
+  headers: Headers;
+};
+
+export type getStatementResponse = getStatementResponseSuccess | getStatementResponseError;
+
+export const getGetStatementUrl = (statementId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/statements/${encodeURIComponent(String(statementId))}`;
+};
+
+/**
+ * @summary Get statement
+ */
+export const getStatement = async (
+  statementId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getStatementResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetStatementUrl(statementId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getStatementResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getStatementResponse;
+};
+
+export type getStatementUsageResponse200 = {
+  data: StatementSummary;
+  status: 200;
+};
+
+export type getStatementUsageResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getStatementUsageResponseSuccess = getStatementUsageResponse200 & {
+  headers: Headers;
+};
+export type getStatementUsageResponseError = getStatementUsageResponseDefault & {
+  headers: Headers;
+};
+
+export type getStatementUsageResponse =
+  | getStatementUsageResponseSuccess
+  | getStatementUsageResponseError;
+
+export const getGetStatementUsageUrl = (statementId: string, params?: GetStatementUsageParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ["project_ids"];
+
+    if (Array.isArray(value) && explodeParameters.includes(key)) {
+      value.forEach((v) => {
+        normalizedParams.append(key, v === null ? "null" : String(v));
+      });
+      return;
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/statements/${encodeURIComponent(String(statementId))}/usage-summary?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/statements/${encodeURIComponent(String(statementId))}/usage-summary`;
+};
+
+/**
+ * Reads the consumption summary that is updated in the same transaction as usage is priced. Group by project, product or meter and filter within the statement. Quantities are included only for meter groups so different units are never combined.
+ * @summary Get grouped consumption
+ */
+export const getStatementUsage = async (
+  statementId: string,
+  params?: GetStatementUsageParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getStatementUsageResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetStatementUsageUrl(statementId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getStatementUsageResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getStatementUsageResponse;
 };

@@ -8,20 +8,14 @@
 import * as zod from "zod";
 
 export const BillingAccount = zod.strictObject({
+  invoice_contact_id: zod
+    .uuid()
+    .nullish()
+    .describe(
+      "The active contact used for invoicing. Must belong to this account; null clears the selection.",
+    ),
   id: zod.int(),
   name: zod.string().optional().describe("What you call this account."),
-  legal_name: zod
-    .string()
-    .optional()
-    .describe("The name invoices are made out to. Copied onto each invoice when it is issued."),
-  email: zod.string().optional().describe("Where invoices are sent."),
-  address_line1: zod.string().optional(),
-  address_line2: zod.string().optional(),
-  address_city: zod.string().optional(),
-  address_state: zod.string().optional(),
-  address_postal_code: zod.string().optional(),
-  address_country: zod.string().optional().describe("Two-letter code."),
-  tax_id: zod.string().optional(),
   currency: zod.string().describe("Fixed when the account was opened."),
   status: zod.enum(["active", "suspended", "closed"]),
   grace_amount: zod

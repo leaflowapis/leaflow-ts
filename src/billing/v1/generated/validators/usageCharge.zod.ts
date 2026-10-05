@@ -58,6 +58,7 @@ export const UsageCharge = zod.strictObject({
     .describe(
       "The usage invoice line this charge was summed into. Absent while it waits to be priced.",
     ),
+  statement_id: zod.uuid().optional().describe("The statement this charge was collected into."),
 });
 
 export type UsageCharge = zod.input<typeof UsageCharge>;

@@ -19,6 +19,10 @@ import { CancellationCreate } from "./validators/cancellationCreate.zod.js";
 
 import { CheckoutOrderRequest } from "./validators/checkoutOrderRequest.zod.js";
 
+import { ContactCreate } from "./validators/contactCreate.zod.js";
+
+import { ContactUpdate } from "./validators/contactUpdate.zod.js";
+
 import { OrderCancel } from "./validators/orderCancel.zod.js";
 
 import { PayInvoiceRequest } from "./validators/payInvoiceRequest.zod.js";
@@ -36,6 +40,67 @@ import { RenewalOrderRequest } from "./validators/renewalOrderRequest.zod.js";
 import { SetProjectAssignmentRequest } from "./validators/setProjectAssignmentRequest.zod.js";
 
 import { TopUpCreate } from "./validators/topUpCreate.zod.js";
+
+/**
+ * @summary List contacts
+ */
+export const ListContactsParams = zod.strictObject({
+  accountId: zod.int(),
+});
+
+export const listContactsQueryPageDefault = 1;
+export const listContactsQueryPageMax = 2147483647;
+
+export const listContactsQueryPageSizeDefault = 50;
+export const listContactsQueryPageSizeMax = 200;
+
+export const ListContactsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listContactsQueryPageMax)
+    .default(listContactsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listContactsQueryPageSizeMax)
+    .default(listContactsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
+
+/**
+ * @summary Create contact
+ */
+export const CreateContactParams = zod.strictObject({
+  accountId: zod.int(),
+});
+
+export const CreateContactBody = ContactCreate;
+
+/**
+ * @summary Get contact
+ */
+export const GetContactParams = zod.strictObject({
+  contactId: zod.uuid(),
+});
+
+/**
+ * @summary Update contact
+ */
+export const UpdateContactParams = zod.strictObject({
+  contactId: zod.uuid(),
+});
+
+export const UpdateContactBody = ContactUpdate;
+
+/**
+ * The selected invoice contact must be cleared or replaced before deletion. Issued invoice snapshots are retained.
+ * @summary Delete contact
+ */
+export const DeleteContactParams = zod.strictObject({
+  contactId: zod.uuid(),
+});
 
 /**
  * The currencies a new billing account can be opened in. A retired currency is not listed,
@@ -104,10 +169,9 @@ export const GetBillingAccountParams = zod.strictObject({
 });
 
 /**
- * The legal name, address and tax identifier are copied onto each invoice when it is
- * issued. Changing them here affects invoices issued afterwards, not those already sent.
- *
- * The currency cannot be changed.
+ * Select an active contact belonging to this account for future invoices. Its legal name,
+ * address and tax identifier are copied when an invoice is issued; issued snapshots are
+ * retained. Set invoice_contact_id to null to clear the selection. The currency cannot change.
  * @summary Update billing account
  */
 export const UpdateBillingAccountParams = zod.strictObject({
@@ -120,16 +184,6 @@ export const UpdateBillingAccountBody = BillingAccountUpdate;
  * @summary Get account balance
  */
 export const GetAccountBalanceParams = zod.strictObject({
-  accountId: zod.int(),
-});
-
-/**
- * Whether the account has anything billed by usage, and what that usage has cost over the last
- * seven days. Usage is paid from the balance, so this tells how much of the balance it is likely
- * to need: the balance divided by `average_daily_amount` is roughly how many days it lasts.
- * @summary Get account metered usage
- */
-export const GetAccountMeteredUsageParams = zod.strictObject({
   accountId: zod.int(),
 });
 
@@ -479,7 +533,7 @@ export const ListInvoicesQueryParams = zod.strictObject({
     .enum(["draft", "open", "paid", "refunded", "void", "uncollectible"])
     .optional()
     .describe(
-      "An order invoice stays `draft` until checkout confirms its discount and final amounts. It\ncannot be collected while draft. Confirmation makes it `open`, or `paid` when its total is zero\nwithout creating a payment transaction. A quote never changes this status.\n\nA usage invoice stays `draft` through its month: each charge is added to it as it is priced\nand paid from credits and balance as it goes. It is issued at the end of the month, becoming\n`paid` when everything was covered and `open` when something is still owed.\n\n`refunded` means the invoice was paid and has since been refunded in full; a partial refund\nleaves it `paid`, with the refunded part in `amount_refunded`.\n\n`void` means the invoice will not be paid and holds no money: nothing was paid, or its order\nfailed or was canceled and everything paid toward it has been returned, as `amount_paid` and\n`amount_refunded` show.",
+      "Draft invoices are private to administrators and cannot be read, listed or paid by customers.\nAn issued invoice is open until settled; a zero-total issued invoice is immediately paid.\nUnbilled usage remains separate from invoices until it is invoiced.\nrefunded means a full refund; a partial refund leaves the invoice paid.\nvoid means collection has stopped and any funds received have been returned.",
     ),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
@@ -715,9 +769,7 @@ export const ListRefundsQueryParams = zod.strictObject({
 });
 
 /**
- * Each charge is added to the month's usage invoice as it is priced, summed into one line per
- * subscription, project, resource, meter and rate. Filter by `invoice_item_id` to see the
- * charges behind a line. Charges still waiting to be priced are included too.
+ * Lists priced and pending usage charges. Requires `statement_id`, `invoice_item_id`, or both `from` and `to` spanning at most 31 days; use the statement summary or spend report for longer periods. Charges are summed into one line per subscription, project, resource, meter and rate when their statement closes; filter by `invoice_item_id` to see the charges behind a line. Charges still waiting to be priced are included too.
  *
  * Only charges recorded against your billing accounts are included, before filtering, counting and pagination. Reassigning a project does not move previously recorded charges to its new account.
  * @summary List usage charges
@@ -773,6 +825,7 @@ export const ListUsageChargesQueryParams = zod.strictObject({
       "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
     ),
   meter_id: zod.uuid().optional(),
+  statement_id: zod.uuid().optional(),
 });
 
 /**
@@ -1673,10 +1726,11 @@ export const ListActiveResourcesQueryParams = zod.strictObject({
 });
 
 /**
- * Aggregates rated and invoiced usage charges in the specified time range for one billing account.
- * Includes usage not yet invoiced. Project filters use the account recorded on each charge, including
- * charges for projects later assigned to another account. The total covers all matching groups, not
- * just the returned page.
+ * Sums priced usage for one billing account by UTC day, including usage not yet invoiced. Amounts are
+ * before tax and before the tier adjustments made when a statement closes; minimum charges added at
+ * closing are included. `from` and `to` must fall on UTC day boundaries and span at most 92 days.
+ * Project filters use the account recorded on each charge, including charges for projects later
+ * assigned to another account. The total covers all matching groups, not just the returned page.
  * @summary List account spend
  */
 export const listSpendQueryGroupByDefault = `product`;
@@ -1700,7 +1754,7 @@ export const ListSpendQueryParams = zod.strictObject({
     .enum(["product", "plan", "resource"])
     .default(listSpendQueryGroupByDefault)
     .describe(
-      "`resource` groups by the resource each charge names. Items billed under their own\nidentifier — a disk, a public address — appear as their own rows rather than under\nthe machine they are attached to, since the relationship between them is known to\nthe owning service and not here.",
+      "`plan` groups by the plan of the price each charge was priced with, which stays the same after the\nsubscription changes plan. `resource` groups by the resource each charge names. Items billed under their own\nidentifier — a disk, a public address — appear as their own rows rather than under\nthe machine they are attached to, since the relationship between them is known to\nthe owning service and not here.",
     ),
   product_id: zod
     .string()
@@ -1734,4 +1788,77 @@ export const ListSpendQueryParams = zod.strictObject({
     .describe(
       "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
     ),
+});
+
+/**
+ * @summary List statements
+ */
+export const listStatementsQueryPageDefault = 1;
+export const listStatementsQueryPageMax = 2147483647;
+
+export const listStatementsQueryPageSizeDefault = 50;
+export const listStatementsQueryPageSizeMax = 200;
+
+export const ListStatementsQueryParams = zod.strictObject({
+  billing_account_id: zod.int().optional(),
+  status: zod.enum(["open", "closed"]).optional(),
+  from: zod.iso.datetime({ offset: true }).optional(),
+  to: zod.iso.datetime({ offset: true }).optional(),
+  page: zod
+    .int()
+    .min(1)
+    .max(listStatementsQueryPageMax)
+    .default(listStatementsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listStatementsQueryPageSizeMax)
+    .default(listStatementsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
+
+/**
+ * @summary Get statement
+ */
+export const GetStatementParams = zod.strictObject({
+  statementId: zod.uuid(),
+});
+
+/**
+ * Reads the consumption summary that is updated in the same transaction as usage is priced. Group by project, product or meter and filter within the statement. Quantities are included only for meter groups so different units are never combined.
+ * @summary Get grouped consumption
+ */
+export const GetStatementUsageParams = zod.strictObject({
+  statementId: zod.uuid(),
+});
+
+export const getStatementUsageQueryGroupByDefault = `meter`;
+export const getStatementUsageQueryProjectIdsMax = 100;
+
+export const getStatementUsageQueryProductIdMax = 64;
+
+export const getStatementUsageQueryPageDefault = 1;
+export const getStatementUsageQueryPageMax = 2147483647;
+
+export const getStatementUsageQueryPageSizeDefault = 50;
+export const getStatementUsageQueryPageSizeMax = 200;
+
+export const GetStatementUsageQueryParams = zod.strictObject({
+  group_by: zod.enum(["project", "product", "meter"]).default(getStatementUsageQueryGroupByDefault),
+  project_ids: zod.array(zod.uuid()).max(getStatementUsageQueryProjectIdsMax).optional(),
+  product_id: zod.string().max(getStatementUsageQueryProductIdMax).optional(),
+  meter_id: zod.uuid().optional(),
+  page: zod
+    .int()
+    .min(1)
+    .max(getStatementUsageQueryPageMax)
+    .default(getStatementUsageQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(getStatementUsageQueryPageSizeMax)
+    .default(getStatementUsageQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
 });

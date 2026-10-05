@@ -12,15 +12,9 @@ export const billingAccountCreateCurrencyMax = 3;
 
 export const billingAccountCreateNameMax = 255;
 
-export const billingAccountCreateLegalNameMax = 255;
-
-export const billingAccountCreateEmailMax = 255;
-
 export const BillingAccountCreate = zod.strictObject({
   currency: zod.string().min(billingAccountCreateCurrencyMin).max(billingAccountCreateCurrencyMax),
   name: zod.string().max(billingAccountCreateNameMax).optional(),
-  legal_name: zod.string().max(billingAccountCreateLegalNameMax).optional(),
-  email: zod.string().max(billingAccountCreateEmailMax).optional(),
 });
 
 export type BillingAccountCreate = zod.input<typeof BillingAccountCreate>;

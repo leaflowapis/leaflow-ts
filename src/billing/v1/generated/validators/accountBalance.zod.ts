@@ -11,6 +11,12 @@ import { Money } from "./money.zod.js";
 
 export const AccountBalance = zod
   .strictObject({
+    available_credit: Money.describe(
+      "Cash balance minus pending cash returns, unbilled usage estimates and issued unpaid amounts. Credit grants are excluded; the result may be negative.",
+    ),
+    unbilled_amount: Money.describe(
+      "Current estimate of rated usage that has not been invoiced. Final pricing and tax are fixed at issuance.",
+    ),
     billing_account_id: zod.int(),
     currency: zod.string(),
     balance: Money.describe(
@@ -19,11 +25,8 @@ export const AccountBalance = zod
     credits: Money.describe(
       "The recorded remaining credit, including restricted grants. It is not withdrawable\nand is not part of balance. credit_groups describes currently valid credit by permitted use; a positive\ncredits balance does not imply that due is zero.",
     ),
-    total: Money.describe(
-      "balance plus credits, the sum shown as the account's funds. Credits count at their recorded remaining\namount, including restricted grants that only pay for what they allow, so total is an upper bound of what\nthe account can pay with rather than a withdrawable amount. due is reported separately and is not subtracted.",
-    ),
     restricted_credits: Money.describe(
-      "The part of currently valid credit that only pays for what its restrictions allow, such as a single\nservice, a billing type or a first purchase. The rest of the valid credit pays for anything on the account.\nIncluded in credits and therefore in total.",
+      "Currently valid credit whose use has applicable product, operation or eligibility conditions. Included in credits, separate from cash balance.",
     ),
     credit_groups: zod
       .array(CreditGroup)
@@ -31,8 +34,9 @@ export const AccountBalance = zod
         "Currently valid, unspent credit grouped by permitted use. Restrictions and\nvalidity dates determine which charges a group can cover, so these groups are not a general\nspendable balance and may differ from the recorded credits total.",
       ),
     due: Money.describe(
-      "Owed and not yet paid: metered usage that balance and applicable credit could not cover as it was\ncharged, and issued usage invoices still unpaid. The account is in arrears while this\nis above zero. Topping up pays it on the next collection.",
+      "Amount still payable on issued invoices. Unbilled usage is reported separately; arrears depend on actual eligible funding and grace terms.",
     ),
+    pending_returns_amount: Money,
   })
   .describe("Account balance, credits, and unpaid charges are reported separately.");
 

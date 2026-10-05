@@ -10,7 +10,6 @@ import { Money } from "./money.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
 
 export const InvoiceItem = zod.strictObject({
-  recurring_amount: zod.string().optional(),
   taxable: zod.boolean().optional(),
   discount_amount: zod.string().optional().describe("Discount applied to this line before tax."),
   tax_amount: zod
@@ -21,10 +20,6 @@ export const InvoiceItem = zod.strictObject({
     .string()
     .optional()
     .describe("The part of tax_amount already included in amount."),
-  order_item_id: zod
-    .uuid()
-    .optional()
-    .describe("The original order line. Refunds follow that line's original payment sources."),
   id: zod.uuid(),
   type: zod.enum(["usage", "subscription", "one_time", "setup", "adjustment"]).optional(),
   project_id: zod.uuid().nullish(),

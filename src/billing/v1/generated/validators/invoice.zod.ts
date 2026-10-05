@@ -11,20 +11,18 @@ import { Money } from "./money.zod.js";
 import { TaxItem } from "./taxItem.zod.js";
 
 export const Invoice = zod.strictObject({
+  void_requested_at: zod.iso
+    .datetime({ offset: true })
+    .optional()
+    .describe(
+      "Collection has been stopped; any accepted return obligations are completed before final voiding.",
+    ),
   due_at: zod.iso.datetime({ offset: true }).optional(),
   amount_refunded: zod.string().optional(),
   tax_items: zod.array(TaxItem),
-  order_id: zod
-    .uuid()
-    .optional()
-    .describe("The purchase that produced this invoice. Absent on usage invoices."),
   id: zod.uuid(),
   billing_account_id: zod.int(),
   number: zod.string().describe("Numbered per account and per month."),
-  type: zod
-    .enum(["usage", "order", "adjustment"])
-    .optional()
-    .describe("What produced it — metered usage for a period, a purchase, or a correction."),
   currency: zod.string(),
   status: InvoiceStatus,
   subtotal: Money.optional().describe(
