@@ -8,9 +8,9 @@
 import * as zod from "zod";
 
 export const PurchaseOperation = zod
-  .enum(["purchase", "renew", "upgrade", "downgrade"])
+  .enum(["new", "renew", "change"])
   .describe(
-    "Which purchase this applies to. `upgrade` and `downgrade` are told apart by money: a change\nthat costs more for the remainder of the period is an upgrade, one that returns money\nis a downgrade. A change that costs neither more nor less is neither.\n\n`purchase` means a new purchase as opposed to a renewal or a change. It does not mean the\naccount's first purchase.",
+    "Which purchase operation this applies to. `new` covers every new purchase, including\nzero-charge purchases. It does not mean the account's first purchase; use\n`first_purchase_only` for that restriction. `renew` covers renewals. `change` covers\nconfiguration or billing-term changes, including changes that increase or decrease\nthe amount due and changes with no additional charge or refund.",
   );
 
 export type PurchaseOperation = zod.input<typeof PurchaseOperation>;
