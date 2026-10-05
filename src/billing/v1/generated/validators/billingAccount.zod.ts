@@ -36,6 +36,12 @@ export const BillingAccount = zod.strictObject({
     .describe(
       "How long this account has to top up after crossing the suspension threshold.\n0 means none. Whichever runs out first — this or grace_amount — ends the grace.",
     ),
+  closed_at: zod.iso
+    .datetime({ offset: true })
+    .nullish()
+    .describe(
+      "The actual time this account was closed, in UTC (RFC 3339).\nNull or absent if the account is not closed or its historical close time is unknown.",
+    ),
   created_at: zod.iso.datetime({ offset: true }),
 });
 

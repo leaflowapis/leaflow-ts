@@ -598,6 +598,12 @@ export interface BillingAccount {
    * 0 means none. Whichever runs out first — this or grace_amount — ends the grace.
    */
   grace_period_seconds?: number;
+  /**
+   * The actual time this account was closed, in UTC (RFC 3339).
+   * Null or absent if the account is not closed or its historical close time is unknown.
+   * @nullable
+   */
+  readonly closed_at?: string | null;
   created_at: string;
 }
 
