@@ -418,6 +418,8 @@ export interface CancellationItem {
    */
   billing_type: CancellationItemBillingType;
   status: CancellationItemStatus;
+  /** Execution stopped or its result is unknown. Present while release still requires resolution; it does not establish refund eligibility. */
+  failure_code?: string;
   release_started_at?: string;
   /** When the service ended, as confirmed by the service that provides it. */
   effective_at?: string;

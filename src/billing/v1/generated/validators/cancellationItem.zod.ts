@@ -24,6 +24,12 @@ export const CancellationItem = zod
         "How the subscription is paid for. Only a `prepaid` subscription renews automatically; creating\nthe cancellation turned that off, and withdrawing the cancellation leaves it off.",
       ),
     status: zod.enum(["requested", "scheduled", "releasing", "completed", "canceled", "failed"]),
+    failure_code: zod
+      .string()
+      .optional()
+      .describe(
+        "Execution stopped or its result is unknown. Present while release still requires resolution; it does not establish refund eligibility.",
+      ),
     release_started_at: zod.iso.datetime({ offset: true }).optional(),
     effective_at: zod.iso
       .datetime({ offset: true })
