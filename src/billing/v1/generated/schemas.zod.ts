@@ -42,6 +42,7 @@ import { SetProjectAssignmentRequest } from "./validators/setProjectAssignmentRe
 import { TopUpCreate } from "./validators/topUpCreate.zod.js";
 
 /**
+ * Paginated contact profiles belonging to the billing account in the path, including inactive contacts. Returns 404 if the account does not exist.
  * @summary List contacts
  */
 export const ListContactsParams = zod.strictObject({
@@ -70,6 +71,7 @@ export const ListContactsQueryParams = zod.strictObject({
 });
 
 /**
+ * Creates a contact profile for the billing account in the path. Creating a contact does not select it for invoicing; set the account invoice_contact_id separately.
  * @summary Create contact
  */
 export const CreateContactParams = zod.strictObject({
@@ -79,26 +81,31 @@ export const CreateContactParams = zod.strictObject({
 export const CreateContactBody = ContactCreate;
 
 /**
+ * Returns a contact belonging to this billing account. Returns 404 if the contact does not exist in this account.
  * @summary Get contact
  */
 export const GetContactParams = zod.strictObject({
+  accountId: zod.int(),
   contactId: zod.uuid(),
 });
 
 /**
+ * Updates a contact belonging to this billing account. Returns 404 if the contact does not exist in this account.
  * @summary Update contact
  */
 export const UpdateContactParams = zod.strictObject({
+  accountId: zod.int(),
   contactId: zod.uuid(),
 });
 
 export const UpdateContactBody = ContactUpdate;
 
 /**
- * The selected invoice contact must be cleared or replaced before deletion. Issued invoice snapshots are retained.
+ * Deletes a contact belonging to this billing account. Returns 404 if the contact does not exist in this account. The selected invoice contact must be cleared or replaced before deletion. Issued invoice snapshots are retained.
  * @summary Delete contact
  */
 export const DeleteContactParams = zod.strictObject({
+  accountId: zod.int(),
   contactId: zod.uuid(),
 });
 
@@ -129,6 +136,7 @@ export const ListCurrenciesQueryParams = zod.strictObject({
 });
 
 /**
+ * Paginated billing accounts owned by the authenticated user. Accounts owned by other users are excluded; the result is empty when the user owns none.
  * @summary List billing accounts
  */
 export const listBillingAccountsQueryPageDefault = 1;
@@ -162,6 +170,7 @@ export const ListBillingAccountsQueryParams = zod.strictObject({
 export const CreateBillingAccountBody = BillingAccountCreate;
 
 /**
+ * Returns an owned account settlement currency, lifecycle state and selected invoice contact. Returns 404 if the account does not exist and 403 if it belongs to another user.
  * @summary Get billing account
  */
 export const GetBillingAccountParams = zod.strictObject({
@@ -181,6 +190,7 @@ export const UpdateBillingAccountParams = zod.strictObject({
 export const UpdateBillingAccountBody = BillingAccountUpdate;
 
 /**
+ * Returns the owned account balance, applicable credit groups, unpaid invoice amounts, unbilled estimates and pending returns separately. Returns 404 for a missing account and 403 for an account owned by another user.
  * @summary Get account balance
  */
 export const GetAccountBalanceParams = zod.strictObject({
@@ -220,6 +230,7 @@ export const ListPaymentOptionsQueryParams = zod.strictObject({
 });
 
 /**
+ * Paginated current project assignments to accounts owned by the authenticated user. Filter by billing_account_id or project_ids; historical financial records keep their original account assignment.
  * @summary List project assignments
  */
 export const listProjectAssignmentsQueryPageDefault = 1;
@@ -371,6 +382,7 @@ export const CancelTopUpParams = zod.strictObject({
 });
 
 /**
+ * Paginated saved payment methods for owned billing accounts, optionally restricted to billing_account_id. Removed methods are excluded; they do not disappear from historical payment records.
  * @summary List payment methods
  */
 export const listPaymentMethodsQueryPageDefault = 1;
@@ -409,6 +421,7 @@ export const ListPaymentMethodsQueryParams = zod.strictObject({
 export const CreatePaymentMethodSetupBody = PaymentMethodSetup;
 
 /**
+ * Selects an active saved payment method as the default for its owned billing account and returns it. Expired or removed methods cannot be selected; selecting the current default is idempotent.
  * @summary Set default payment method
  */
 export const SetDefaultPaymentMethodParams = zod.strictObject({
@@ -504,6 +517,7 @@ export const PayTogetherBody = PayTogetherRequest;
 export const PreviewPayTogetherBody = PayTogetherRequest;
 
 /**
+ * Paginated issued invoices belonging to owned billing accounts, filtered by billing_account_id, status and creation interval. Drafts are excluded; top-ups do not create invoices.
  * @summary List invoices
  */
 export const listInvoicesQueryPageDefault = 1;
@@ -540,6 +554,7 @@ export const ListInvoicesQueryParams = zod.strictObject({
 });
 
 /**
+ * Returns an issued invoice for an owned billing account with its amounts, tax lines and payment state. Returns 404 for a missing or unissued invoice and 403 when its account belongs to another user.
  * @summary Get invoice
  */
 export const GetInvoiceParams = zod.strictObject({
@@ -547,6 +562,7 @@ export const GetInvoiceParams = zod.strictObject({
 });
 
 /**
+ * Paginated lines of an issued invoice belonging to an owned billing account, including their service periods and project references. A missing or unissued invoice returns 404; another user account returns 403.
  * @summary List invoice items
  */
 export const ListInvoiceItemsParams = zod.strictObject({
@@ -575,6 +591,7 @@ export const ListInvoiceItemsQueryParams = zod.strictObject({
 });
 
 /**
+ * Paginated ledger entries for owned billing accounts, optionally filtered by billing_account_id and creation interval. Each entry retains its amount, currency and any referenced credit grant.
  * @summary List transactions
  */
 export const listTransactionsQueryPageDefault = 1;
@@ -1016,6 +1033,7 @@ export const ListCancellationsQueryParams = zod.strictObject({
 export const CreateCancellationBody = CancellationCreate;
 
 /**
+ * Returns a cancellation request for an authorized billing account with its schedule, expected refundable amount and individual subscription outcomes. Read individual item states for per-subscription outcomes, including partial success.
  * @summary Get a cancellation
  */
 export const GetCancellationParams = zod.strictObject({
@@ -1232,6 +1250,7 @@ export const ListOrdersQueryParams = zod.strictObject({
 });
 
 /**
+ * Returns an order charged to an owned billing account with its commercial state and invoice reference. An unknown order returns 404; an order on another user account is forbidden.
  * @summary Get order
  */
 export const GetOrderParams = zod.strictObject({
@@ -1450,6 +1469,7 @@ export const ListPricesHeader = zod.strictObject({
 });
 
 /**
+ * Paginated registered catalog products with their service identities and descriptions. Supports If- None-Match and returns 304 when the selected page has not changed.
  * @summary List catalog products
  */
 export const listProductsQueryPageDefault = 1;
@@ -1545,6 +1565,7 @@ export const GetPriceHeader = zod.strictObject({
 });
 
 /**
+ * Paginated active plans for the required product_id, with their feature allocations. An unknown product returns 404; If-None-Match can return 304 for an unchanged page.
  * @summary List catalog plans
  */
 export const listPlansQueryProductIdMax = 64;
@@ -1791,6 +1812,7 @@ export const ListSpendQueryParams = zod.strictObject({
 });
 
 /**
+ * Paginated consumption statement batches for owned billing accounts, filtered by billing_account_id, open or closed state and period-start interval. A closed batch is not proof that the whole month has finished.
  * @summary List statements
  */
 export const listStatementsQueryPageDefault = 1;
@@ -1819,6 +1841,7 @@ export const ListStatementsQueryParams = zod.strictObject({
 });
 
 /**
+ * Returns an owned-account consumption batch with its period, estimated or closed amounts and invoice reference. Returns 404 for a missing batch and 403 when the billing account belongs to another user.
  * @summary Get statement
  */
 export const GetStatementParams = zod.strictObject({

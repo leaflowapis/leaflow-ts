@@ -198,6 +198,7 @@ export const getListContactsUrl = (accountId: number, params?: ListContactsParam
 };
 
 /**
+ * Paginated contact profiles belonging to the billing account in the path, including inactive contacts. Returns 404 if the account does not exist.
  * @summary List contacts
  */
 export const listContacts = async (
@@ -241,6 +242,7 @@ export const getCreateContactUrl = (accountId: number) => {
 };
 
 /**
+ * Creates a contact profile for the billing account in the path. Creating a contact does not select it for invoicing; set the account invoice_contact_id separately.
  * @summary Create contact
  */
 export const createContact = async (
@@ -300,19 +302,21 @@ export type getContactResponseError = getContactResponseDefault & {
 
 export type getContactResponse = getContactResponseSuccess | getContactResponseError;
 
-export const getGetContactUrl = (contactId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/contacts/${encodeURIComponent(String(contactId))}`;
+export const getGetContactUrl = (accountId: number, contactId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/contacts/${encodeURIComponent(String(contactId))}`;
 };
 
 /**
+ * Returns a contact belonging to this billing account. Returns 404 if the contact does not exist in this account.
  * @summary Get contact
  */
 export const getContact = async (
+  accountId: number,
   contactId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getContactResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetContactUrl(contactId), {
+  const res = await (fetchFn ?? fetch)(getGetContactUrl(accountId, contactId), {
     ...options,
     method: "GET",
   });
@@ -342,14 +346,16 @@ export type updateContactResponseError = updateContactResponseDefault & {
 
 export type updateContactResponse = updateContactResponseSuccess | updateContactResponseError;
 
-export const getUpdateContactUrl = (contactId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/contacts/${encodeURIComponent(String(contactId))}`;
+export const getUpdateContactUrl = (accountId: number, contactId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/contacts/${encodeURIComponent(String(contactId))}`;
 };
 
 /**
+ * Updates a contact belonging to this billing account. Returns 404 if the contact does not exist in this account.
  * @summary Update contact
  */
 export const updateContact = async (
+  accountId: number,
   contactId: string,
   contactUpdate: ContactUpdate,
   options?: RequestInit,
@@ -374,7 +380,7 @@ export const updateContact = async (
     }
     return headers;
   };
-  const res = await (fetchFn ?? fetch)(getUpdateContactUrl(contactId), {
+  const res = await (fetchFn ?? fetch)(getUpdateContactUrl(accountId, contactId), {
     ...options,
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
@@ -406,20 +412,21 @@ export type deleteContactResponseError = deleteContactResponseDefault & {
 
 export type deleteContactResponse = deleteContactResponseSuccess | deleteContactResponseError;
 
-export const getDeleteContactUrl = (contactId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/contacts/${encodeURIComponent(String(contactId))}`;
+export const getDeleteContactUrl = (accountId: number, contactId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/contacts/${encodeURIComponent(String(contactId))}`;
 };
 
 /**
- * The selected invoice contact must be cleared or replaced before deletion. Issued invoice snapshots are retained.
+ * Deletes a contact belonging to this billing account. Returns 404 if the contact does not exist in this account. The selected invoice contact must be cleared or replaced before deletion. Issued invoice snapshots are retained.
  * @summary Delete contact
  */
 export const deleteContact = async (
+  accountId: number,
   contactId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteContactResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteContactUrl(contactId), {
+  const res = await (fetchFn ?? fetch)(getDeleteContactUrl(accountId, contactId), {
     ...options,
     method: "DELETE",
   });
@@ -524,6 +531,7 @@ export const getListBillingAccountsUrl = (params?: ListBillingAccountsParams) =>
 };
 
 /**
+ * Paginated billing accounts owned by the authenticated user. Accounts owned by other users are excluded; the result is empty when the user owns none.
  * @summary List billing accounts
  */
 export const listBillingAccounts = async (
@@ -637,6 +645,7 @@ export const getGetBillingAccountUrl = (accountId: number) => {
 };
 
 /**
+ * Returns an owned account settlement currency, lifecycle state and selected invoice contact. Returns 404 if the account does not exist and 403 if it belongs to another user.
  * @summary Get billing account
  */
 export const getBillingAccount = async (
@@ -750,6 +759,7 @@ export const getGetAccountBalanceUrl = (accountId: number) => {
 };
 
 /**
+ * Returns the owned account balance, applicable credit groups, unpaid invoice amounts, unbilled estimates and pending returns separately. Returns 404 for a missing account and 403 for an account owned by another user.
  * @summary Get account balance
  */
 export const getAccountBalance = async (
@@ -867,6 +877,7 @@ export const getListProjectAssignmentsUrl = (params?: ListProjectAssignmentsPara
 };
 
 /**
+ * Paginated current project assignments to accounts owned by the authenticated user. Filter by billing_account_id or project_ids; historical financial records keep their original account assignment.
  * @summary List project assignments
  */
 export const listProjectAssignments = async (
@@ -1330,6 +1341,7 @@ export const getListPaymentMethodsUrl = (params?: ListPaymentMethodsParams) => {
 };
 
 /**
+ * Paginated saved payment methods for owned billing accounts, optionally restricted to billing_account_id. Removed methods are excluded; they do not disappear from historical payment records.
  * @summary List payment methods
  */
 export const listPaymentMethods = async (
@@ -1444,6 +1456,7 @@ export const getSetDefaultPaymentMethodUrl = (paymentMethodId: string) => {
 };
 
 /**
+ * Selects an active saved payment method as the default for its owned billing account and returns it. Expired or removed methods cannot be selected; selecting the current default is idempotent.
  * @summary Set default payment method
  */
 export const setDefaultPaymentMethod = async (
@@ -1835,6 +1848,7 @@ export const getListInvoicesUrl = (params?: ListInvoicesParams) => {
 };
 
 /**
+ * Paginated issued invoices belonging to owned billing accounts, filtered by billing_account_id, status and creation interval. Drafts are excluded; top-ups do not create invoices.
  * @summary List invoices
  */
 export const listInvoices = async (
@@ -1877,6 +1891,7 @@ export const getGetInvoiceUrl = (invoiceId: string) => {
 };
 
 /**
+ * Returns an issued invoice for an owned billing account with its amounts, tax lines and payment state. Returns 404 for a missing or unissued invoice and 403 when its account belongs to another user.
  * @summary Get invoice
  */
 export const getInvoice = async (
@@ -1933,6 +1948,7 @@ export const getListInvoiceItemsUrl = (invoiceId: string, params?: ListInvoiceIt
 };
 
 /**
+ * Paginated lines of an issued invoice belonging to an owned billing account, including their service periods and project references. A missing or unissued invoice returns 404; another user account returns 403.
  * @summary List invoice items
  */
 export const listInvoiceItems = async (
@@ -1990,6 +2006,7 @@ export const getListTransactionsUrl = (params?: ListTransactionsParams) => {
 };
 
 /**
+ * Paginated ledger entries for owned billing accounts, optionally filtered by billing_account_id and creation interval. Each entry retains its amount, currency and any referenced credit grant.
  * @summary List transactions
  */
 export const listTransactions = async (
@@ -2890,6 +2907,7 @@ export const getGetCancellationUrl = (cancellationId: string) => {
 };
 
 /**
+ * Returns a cancellation request for an authorized billing account with its schedule, expected refundable amount and individual subscription outcomes. Read individual item states for per-subscription outcomes, including partial success.
  * @summary Get a cancellation
  */
 export const getCancellation = async (
@@ -3399,6 +3417,7 @@ export const getGetOrderUrl = (orderId: string) => {
 };
 
 /**
+ * Returns an order charged to an owned billing account with its commercial state and invoice reference. An unknown order returns 404; an order on another user account is forbidden.
  * @summary Get order
  */
 export const getOrder = async (
@@ -3850,6 +3869,7 @@ export const getListProductsUrl = (params?: ListProductsParams) => {
 };
 
 /**
+ * Paginated registered catalog products with their service identities and descriptions. Supports If- None-Match and returns 304 when the selected page has not changed.
  * @summary List catalog products
  */
 export const listProducts = async (
@@ -4139,6 +4159,7 @@ export const getListPlansUrl = (params: ListPlansParams) => {
 };
 
 /**
+ * Paginated active plans for the required product_id, with their feature allocations. An unknown product returns 404; If-None-Match can return 304 for an unchanged page.
  * @summary List catalog plans
  */
 export const listPlans = async (
@@ -4503,6 +4524,7 @@ export const getListStatementsUrl = (params?: ListStatementsParams) => {
 };
 
 /**
+ * Paginated consumption statement batches for owned billing accounts, filtered by billing_account_id, open or closed state and period-start interval. A closed batch is not proof that the whole month has finished.
  * @summary List statements
  */
 export const listStatements = async (
@@ -4545,6 +4567,7 @@ export const getGetStatementUrl = (statementId: string) => {
 };
 
 /**
+ * Returns an owned-account consumption batch with its period, estimated or closed amounts and invoice reference. Returns 404 for a missing batch and 403 when the billing account belongs to another user.
  * @summary Get statement
  */
 export const getStatement = async (
