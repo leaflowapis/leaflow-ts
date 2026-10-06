@@ -51,12 +51,14 @@ export const UsageCharge = zod.strictObject({
   invoice_id: zod
     .uuid()
     .nullish()
-    .describe("The usage invoice this charge was added to. Absent while it waits to be priced."),
+    .describe(
+      "The usage invoice this charge was added to. Absent until its statement closes and always absent for unrated charges.",
+    ),
   invoice_item_id: zod
     .uuid()
     .nullish()
     .describe(
-      "The usage invoice line this charge was summed into. Absent while it waits to be priced.",
+      "The usage invoice line this charge was summed into. Absent until its statement closes and always absent for unrated charges.",
     ),
   statement_id: zod.uuid().optional().describe("The statement this charge was collected into."),
 });

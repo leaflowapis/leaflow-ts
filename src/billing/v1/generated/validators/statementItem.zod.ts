@@ -21,7 +21,9 @@ export const StatementItem = zod.strictObject({
   unrated_quantity: zod
     .string()
     .optional()
-    .describe("Usage not yet priced; not a zero-cost charge."),
+    .describe(
+      "Usage that had no applicable price when it occurred. It is not charged, either now or later.",
+    ),
   amount: Money,
 });
 

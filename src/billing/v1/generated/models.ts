@@ -767,7 +767,7 @@ export interface CreditGroup {
  * Account balance, credits, and unpaid charges are reported separately.
  */
 export interface AccountBalance {
-  /** Cash balance minus pending cash returns, unbilled usage estimates and issued unpaid amounts. Credit grants are excluded; the result may be negative. */
+  /** Balance minus pending balance returns, unbilled usage estimates and issued unpaid amounts. Credit grants are excluded; the result may be negative. */
   available_credit: Money;
   /** Current estimate of rated usage that has not been invoiced. Final pricing and tax are fixed at issuance. */
   unbilled_amount: Money;
@@ -784,7 +784,7 @@ export interface AccountBalance {
    * credits balance does not imply that due is zero.
    */
   credits: Money;
-  /** Currently valid credit whose use has applicable product, operation or eligibility conditions. Included in credits, separate from cash balance. */
+  /** Currently valid credit whose use has applicable product, operation or eligibility conditions. Included in credits, separate from the balance. */
   restricted_credits: Money;
   /**
    * Currently valid, unspent credit grouped by permitted use. Restrictions and
@@ -1691,12 +1691,12 @@ export interface UsageCharge {
   amount?: Money;
   currency: string;
   /**
-   * The usage invoice this charge was added to. Absent while it waits to be priced.
+   * The usage invoice this charge was added to. Absent until its statement closes and always absent for unrated charges.
    * @nullable
    */
   invoice_id?: string | null;
   /**
-   * The usage invoice line this charge was summed into. Absent while it waits to be priced.
+   * The usage invoice line this charge was summed into. Absent until its statement closes and always absent for unrated charges.
    * @nullable
    */
   invoice_item_id?: string | null;
@@ -2937,7 +2937,7 @@ export interface Statement {
   /** 1 for the first closing of the period; higher for statements that collect usage priced after an earlier closing. */
   sequence: number;
   status: StatementStatus;
-  /** True while the statement is open. The estimate is the priced usage plus tax for the current invoice contact; tier adjustments over the whole period and minimum charges are determined at closing. */
+  /** True while the statement is open. The estimate applies tier pricing to the period's usage so far and adds tax for the current invoice contact. Minimum charges are added at closing, and a tier reduction larger than this statement's own charges is credited to earlier invoices of the period at closing. */
   estimated: boolean;
   amounts: StatementAmounts;
   closed_at?: string;
@@ -2961,7 +2961,7 @@ export interface StatementItem {
   /** Net usage quantity. Included only when grouping by meter. */
   quantity?: string;
   deducted_quantity?: string;
-  /** Usage not yet priced; not a zero-cost charge. */
+  /** Usage that had no applicable price when it occurred. It is not charged, either now or later. */
   unrated_quantity?: string;
   amount: Money;
 }

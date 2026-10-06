@@ -26,7 +26,7 @@ export const Statement = zod
     estimated: zod
       .boolean()
       .describe(
-        "True while the statement is open. The estimate is the priced usage plus tax for the current invoice contact; tier adjustments over the whole period and minimum charges are determined at closing.",
+        "True while the statement is open. The estimate applies tier pricing to the period's usage so far and adds tax for the current invoice contact. Minimum charges are added at closing, and a tier reduction larger than this statement's own charges is credited to earlier invoices of the period at closing.",
       ),
     amounts: StatementAmounts,
     closed_at: zod.iso.datetime({ offset: true }).optional(),

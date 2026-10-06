@@ -12,7 +12,7 @@ import { Money } from "./money.zod.js";
 export const AccountBalance = zod
   .strictObject({
     available_credit: Money.describe(
-      "Cash balance minus pending cash returns, unbilled usage estimates and issued unpaid amounts. Credit grants are excluded; the result may be negative.",
+      "Balance minus pending balance returns, unbilled usage estimates and issued unpaid amounts. Credit grants are excluded; the result may be negative.",
     ),
     unbilled_amount: Money.describe(
       "Current estimate of rated usage that has not been invoiced. Final pricing and tax are fixed at issuance.",
@@ -26,7 +26,7 @@ export const AccountBalance = zod
       "The recorded remaining credit, including restricted grants. It is not withdrawable\nand is not part of balance. credit_groups describes currently valid credit by permitted use; a positive\ncredits balance does not imply that due is zero.",
     ),
     restricted_credits: Money.describe(
-      "Currently valid credit whose use has applicable product, operation or eligibility conditions. Included in credits, separate from cash balance.",
+      "Currently valid credit whose use has applicable product, operation or eligibility conditions. Included in credits, separate from the balance.",
     ),
     credit_groups: zod
       .array(CreditGroup)
