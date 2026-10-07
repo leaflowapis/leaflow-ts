@@ -35,6 +35,7 @@ import type {
   PolicyListResponseBody,
   PolicyResource,
   ProjectAccessResource,
+  QuotaListResponseBody,
   RenameSSHKeyRequestBody,
   RoleListResponseBody,
   RoleResource,
@@ -320,6 +321,48 @@ export const getProjectMembership = async (
 
   const data: getProjectMembershipResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as getProjectMembershipResponse;
+};
+
+export type listQuotasResponse200 = {
+  data: QuotaListResponseBody;
+  status: 200;
+};
+
+export type listQuotasResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listQuotasResponseSuccess = listQuotasResponse200 & {
+  headers: Headers;
+};
+export type listQuotasResponseError = listQuotasResponseDefault & {
+  headers: Headers;
+};
+
+export type listQuotasResponse = listQuotasResponseSuccess | listQuotasResponseError;
+
+export const getListQuotasUrl = () => {
+  return `https://iam.leaflow.cloud/api/v1/quotas`;
+};
+
+/**
+ * How much of something this project may have in each service, such as instances or VPCs, with the limit in effect for it. A request that would exceed a limit is refused by the service concerned. Each service shows what the project currently has.
+ * @summary List this project's quotas
+ */
+export const listQuotas = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listQuotasResponse> => {
+  const res = await (fetchFn ?? fetch)(getListQuotasUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listQuotasResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listQuotasResponse;
 };
 
 export type listProjectInvitationsResponse200 = {

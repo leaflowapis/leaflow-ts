@@ -146,6 +146,19 @@ export interface UpdateProjectRequestBody {
   name?: string;
 }
 
+export interface QuotaResource {
+  /** The service enforcing the quota. */
+  service: string;
+  name: string;
+  description: string;
+  /** The most this project may have. */
+  limit: number;
+}
+
+export interface QuotaListResponseBody {
+  items: QuotaResource[];
+}
+
 export interface MembershipResource {
   traits: ProjectTraitResource[];
   /** @nullable */
