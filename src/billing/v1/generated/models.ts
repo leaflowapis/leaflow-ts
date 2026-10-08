@@ -1663,7 +1663,7 @@ export interface RefundList {
 export type UsageChargeDimensions = { [key: string]: string };
 
 export interface UsageCharge {
-  subscription_id?: string;
+  subscription_id: string;
   id: string;
   project_id?: string;
   /**
@@ -1688,15 +1688,15 @@ export interface UsageCharge {
   /** What was charged for — the gross quantity less the part covered. */
   quantity: string;
   unit_amount?: Money;
-  amount?: Money;
+  amount: Money;
   currency: string;
   /**
-   * The usage invoice this charge was added to. Absent until its statement closes and always absent for unrated charges.
+   * Present after the statement is closed and its invoice is issued.
    * @nullable
    */
   invoice_id?: string | null;
   /**
-   * The usage invoice line this charge was summed into. Absent until its statement closes and always absent for unrated charges.
+   * Present after the statement is closed and its invoice is issued.
    * @nullable
    */
   invoice_item_id?: string | null;
@@ -1990,7 +1990,7 @@ export interface AutoRenewSet {
  * Confirmation moves it to pending. Both pending_checkout
  * and pending can expire or be canceled; neither establishes service delivery.
  *
- * Follows the items. `pending` has confirmed checkout, is not yet accepted and may be paid or unpaid. `active` is
+ * Follows the items. `pending` has confirmed checkout, is not yet accepted and may be paid or unpaid. `accepted` is
  * accepted with items still being set up. `completed` means every item was set up.
  * `partially_completed` means some items were set up and the others failed or were canceled and were
  * refunded to their original payment sources. `failed` means no item was delivered and at least one failed; collected amounts for the
@@ -2002,7 +2002,7 @@ export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 export const OrderStatus = {
   pending_checkout: "pending_checkout",
   pending: "pending",
-  active: "active",
+  accepted: "accepted",
   completed: "completed",
   partially_completed: "partially_completed",
   failed: "failed",
@@ -2711,7 +2711,7 @@ export const ActiveResourceStatus = {
   active: "active",
   suspended: "suspended",
   closing: "closing",
-  completed: "completed",
+  closed: "closed",
 } as const;
 
 /**
@@ -2735,9 +2735,9 @@ export interface ActiveResource {
   dimensions?: ActiveResourceDimensions;
   status: ActiveResourceStatus;
   started_at: string;
-  /** Usage has been generated up to this boundary; it does not imply invoicing or payment. */
-  metered_until: string;
   project_id?: string;
+  /** Usage has been generated up to this boundary; it does not imply invoicing or payment. */
+  usage_generated_until: string;
 }
 
 export interface ActiveResourceList {
@@ -2961,8 +2961,6 @@ export interface StatementItem {
   /** Net usage quantity. Included only when grouping by meter. */
   quantity?: string;
   deducted_quantity?: string;
-  /** Usage that had no applicable price when it occurred. It is not charged, either now or later. */
-  unrated_quantity?: string;
   amount: Money;
 }
 
@@ -3795,7 +3793,7 @@ export const ListActiveResourcesStatus = {
   active: "active",
   suspended: "suspended",
   closing: "closing",
-  completed: "completed",
+  closed: "closed",
 } as const;
 
 export type ListSpendParams = {

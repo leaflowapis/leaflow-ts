@@ -32,7 +32,7 @@ export const ListActiveResourcesParams = zod.strictObject({
   project_ids: zod.array(zod.uuid()).min(1).max(listActiveResourcesParamsProjectIdsMax).optional(),
   meter_id: zod.uuid().optional(),
   product_id: ProductID.optional(),
-  status: zod.enum(["active", "suspended", "closing", "completed"]).optional(),
+  status: zod.enum(["active", "suspended", "closing", "closed"]).optional(),
 });
 
 export type ListActiveResourcesParams = zod.input<typeof ListActiveResourcesParams>;

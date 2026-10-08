@@ -18,12 +18,6 @@ export const StatementItem = zod.strictObject({
     .optional()
     .describe("Net usage quantity. Included only when grouping by meter."),
   deducted_quantity: zod.string().optional(),
-  unrated_quantity: zod
-    .string()
-    .optional()
-    .describe(
-      "Usage that had no applicable price when it occurred. It is not charged, either now or later.",
-    ),
   amount: Money,
 });
 

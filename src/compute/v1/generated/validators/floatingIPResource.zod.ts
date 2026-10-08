@@ -28,6 +28,16 @@ import { ReleaseSetItem } from "./releaseSetItem.zod.js";
 
 export const FloatingIPResource = zod
   .strictObject({
+    allocated_at: zod.iso
+      .datetime({ offset: true })
+      .nullable()
+      .describe(
+        "When the current or most recent address holding was allocated; null before an address is claimed.",
+      ),
+    released_at: zod.iso
+      .datetime({ offset: true })
+      .nullable()
+      .describe("When that address holding was released; null while held or before allocation."),
     address: zod
       .string()
       .nullable()

@@ -1022,6 +1022,16 @@ export interface IPv4Binding {
  */
 export interface FloatingIPResource {
   /**
+   * When the current or most recent address holding was allocated; null before an address is claimed.
+   * @nullable
+   */
+  allocated_at: string | null;
+  /**
+   * When that address holding was released; null while held or before allocation.
+   * @nullable
+   */
+  released_at: string | null;
+  /**
    * The allocated public address. Null until the address is allocated.
    * @nullable
    */
@@ -1817,24 +1827,10 @@ export interface RenamePrivateNetworkRequestBody {
   name: string;
 }
 
-/**
- * `active` means IPv6 is fully available
- */
-export type IPv6ResponseBodyStatus =
-  (typeof IPv6ResponseBodyStatus)[keyof typeof IPv6ResponseBodyStatus];
-
-export const IPv6ResponseBodyStatus = {
-  pending: "pending",
-  active: "active",
-  draining: "draining",
-} as const;
-
 export interface IPv6ResponseBody {
   /** The allocated /64 prefix; empty while IPv6 is disabled */
   cidr: string;
   enabled: boolean;
-  /** `active` means IPv6 is fully available */
-  status: IPv6ResponseBodyStatus;
 }
 
 export interface RouteResource {

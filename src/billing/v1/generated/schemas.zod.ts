@@ -786,9 +786,7 @@ export const ListRefundsQueryParams = zod.strictObject({
 });
 
 /**
- * Lists priced and unrated usage charges. Requires `statement_id`, `invoice_item_id`, or both `from` and `to` spanning at most 31 days; use the statement summary or spend report for longer periods. Charges are summed into one line per subscription, project, resource, meter and rate when their statement closes; filter by `invoice_item_id` to see the charges behind a line. Unrated charges had no applicable price when the usage occurred and are not billed.
- *
- * Only charges recorded against your billing accounts are included, before filtering, counting and pagination. Reassigning a project does not move previously recorded charges to its new account.
+ * Lists priced usage charges in the requested financial scope. Usage without a price at occurrence time is never charged retrospectively.
  * @summary List usage charges
  */
 export const listUsageChargesQueryPageDefault = 1;
@@ -1227,7 +1225,7 @@ export const ListOrdersQueryParams = zod.strictObject({
     .enum([
       "pending_checkout",
       "pending",
-      "active",
+      "accepted",
       "completed",
       "partially_completed",
       "failed",
@@ -1235,7 +1233,7 @@ export const ListOrdersQueryParams = zod.strictObject({
     ])
     .optional()
     .describe(
-      "pending_checkout has recorded purchase terms but no confirmed checkout; only a deferred order\nwith an amount due reaches it, since a zero-total order completes checkout at placement.\nConfirmation moves it to pending. Both pending_checkout\nand pending can expire or be canceled; neither establishes service delivery.\n\nFollows the items. `pending` has confirmed checkout, is not yet accepted and may be paid or unpaid. `active` is\naccepted with items still being set up. `completed` means every item was set up.\n`partially_completed` means some items were set up and the others failed or were canceled and were\nrefunded to their original payment sources. `failed` means no item was delivered and at least one failed; collected amounts for the\nundelivered items are refunded. `canceled` means every item was withdrawn without delivery; collected amounts are\nreturned to their original payment sources.",
+      "pending_checkout has recorded purchase terms but no confirmed checkout; only a deferred order\nwith an amount due reaches it, since a zero-total order completes checkout at placement.\nConfirmation moves it to pending. Both pending_checkout\nand pending can expire or be canceled; neither establishes service delivery.\n\nFollows the items. `pending` has confirmed checkout, is not yet accepted and may be paid or unpaid. `accepted` is\naccepted with items still being set up. `completed` means every item was set up.\n`partially_completed` means some items were set up and the others failed or were canceled and were\nrefunded to their original payment sources. `failed` means no item was delivered and at least one failed; collected amounts for the\nundelivered items are refunded. `canceled` means every item was withdrawn without delivery; collected amounts are\nreturned to their original payment sources.",
     ),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
@@ -1743,7 +1741,7 @@ export const ListActiveResourcesQueryParams = zod.strictObject({
     .regex(listActiveResourcesQueryProductIdRegExp)
     .optional()
     .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
-  status: zod.enum(["active", "suspended", "closing", "completed"]).optional(),
+  status: zod.enum(["active", "suspended", "closing", "closed"]).optional(),
 });
 
 /**

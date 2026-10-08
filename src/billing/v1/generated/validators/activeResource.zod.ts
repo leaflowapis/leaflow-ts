@@ -29,14 +29,14 @@ export const ActiveResource = zod
       .string()
       .describe("How much is held — cores, MiB, cards. Not how much has been used."),
     dimensions: zod.record(zod.string(), zod.string()).optional(),
-    status: zod.enum(["active", "suspended", "closing", "completed"]),
+    status: zod.enum(["active", "suspended", "closing", "closed"]),
     started_at: zod.iso.datetime({ offset: true }),
-    metered_until: zod.iso
+    project_id: zod.uuid().optional(),
+    usage_generated_until: zod.iso
       .datetime({ offset: true })
       .describe(
         "Usage has been generated up to this boundary; it does not imply invoicing or payment.",
       ),
-    project_id: zod.uuid().optional(),
   })
   .describe("A resource currently accruing charges by the second.");
 

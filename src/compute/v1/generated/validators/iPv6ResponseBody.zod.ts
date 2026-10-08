@@ -26,9 +26,6 @@ import * as zod from "zod";
 export const IPv6ResponseBody = zod.strictObject({
   cidr: zod.string().describe("The allocated /64 prefix; empty while IPv6 is disabled"),
   enabled: zod.boolean(),
-  status: zod
-    .enum(["pending", "active", "draining"])
-    .describe("`active` means IPv6 is fully available"),
 });
 
 export type IPv6ResponseBody = zod.input<typeof IPv6ResponseBody>;

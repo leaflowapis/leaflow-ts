@@ -12,7 +12,7 @@ import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Product } from "./product.zod.js";
 
 export const UsageCharge = zod.strictObject({
-  subscription_id: zod.uuid().optional(),
+  subscription_id: zod.uuid(),
   id: zod.uuid(),
   project_id: zod.uuid().optional(),
   project: zod
@@ -46,20 +46,16 @@ export const UsageCharge = zod.strictObject({
     .string()
     .describe("What was charged for — the gross quantity less the part covered."),
   unit_amount: Money.optional(),
-  amount: Money.optional(),
+  amount: Money,
   currency: zod.string(),
   invoice_id: zod
     .uuid()
     .nullish()
-    .describe(
-      "The usage invoice this charge was added to. Absent until its statement closes and always absent for unrated charges.",
-    ),
+    .describe("Present after the statement is closed and its invoice is issued."),
   invoice_item_id: zod
     .uuid()
     .nullish()
-    .describe(
-      "The usage invoice line this charge was summed into. Absent until its statement closes and always absent for unrated charges.",
-    ),
+    .describe("Present after the statement is closed and its invoice is issued."),
   statement_id: zod.uuid().optional().describe("The statement this charge was collected into."),
 });
 
