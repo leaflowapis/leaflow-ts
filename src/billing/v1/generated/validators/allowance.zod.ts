@@ -20,10 +20,15 @@ export const Allowance = zod.strictObject({
   product: Product,
   meter: ObjectIdentity,
   unit: zod.string().optional().describe("The unit it is counted in, such as `MiB`."),
-  source_type: zod
-    .enum(["included", "promotional"])
+  category: zod
+    .enum(["paid", "promotional"])
     .describe(
-      "`included` came with a recurring purchase and ends with its subscription, `promotional` was\ngranted.",
+      "Whether the quantity was paid for or granted free of charge. Both are consumed the same way.",
+    ),
+  dimensions: zod
+    .record(zod.string(), zod.string())
+    .describe(
+      "Exact values for a subset of the meter's dimensions. Only usage with these values is deducted;\nomitted dimensions are not restricted.",
     ),
   name: zod.string(),
   quantity: zod.string().describe("How much was granted."),

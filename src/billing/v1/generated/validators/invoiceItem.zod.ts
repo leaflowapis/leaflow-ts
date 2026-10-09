@@ -12,6 +12,8 @@ import { NamedIdentity } from "./namedIdentity.zod.js";
 export const InvoiceItem = zod.strictObject({
   taxable: zod.boolean().optional(),
   discount_amount: zod.string().optional().describe("Discount applied to this line before tax."),
+  discount_id: zod.uuid().nullish().describe("The account discount applied to this line."),
+  coupon_id: zod.uuid().nullish().describe("The coupon applied to this line."),
   tax_amount: zod
     .string()
     .optional()

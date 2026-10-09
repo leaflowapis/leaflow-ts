@@ -1409,6 +1409,16 @@ export interface InvoiceItem {
   taxable?: boolean;
   /** Discount applied to this line before tax. */
   discount_amount?: string;
+  /**
+   * The account discount applied to this line.
+   * @nullable
+   */
+  discount_id?: string | null;
+  /**
+   * The coupon applied to this line.
+   * @nullable
+   */
+  coupon_id?: string | null;
   /** Tax on the discounted line, including tax already included in the price. */
   tax_amount?: string;
   /** The part of tax_amount already included in amount. */
@@ -2292,7 +2302,21 @@ export const DiscountType = {
 } as const;
 
 /**
- * A coupon held on this account. It applies at checkout without a code.
+ * Whether the discount continues on renewals of the purchased item. `once` applies only to the
+ * purchase or renewal that uses the coupon, `recurring` continues for `frequency_duration` billing
+ * periods including the first, and `forever` continues on every renewal.
+ */
+export type DiscountFrequency = (typeof DiscountFrequency)[keyof typeof DiscountFrequency];
+
+export const DiscountFrequency = {
+  once: "once",
+  recurring: "recurring",
+  forever: "forever",
+} as const;
+
+/**
+ * A coupon held on this account for a period. Within the period it applies without a code to purchases and
+ * to metered usage that the coupon covers.
  */
 export interface Discount {
   min_amount?: string;
@@ -2302,9 +2326,14 @@ export interface Discount {
   status: DiscountStatus;
   revoked_at?: string;
   type: DiscountType;
-  recurring?: boolean;
+  /**
+   * Whether the discount continues on renewals of the purchased item. `once` applies only to the
+   * purchase or renewal that uses the coupon, `recurring` continues for `frequency_duration` billing
+   * periods including the first, and `forever` continues on every renewal.
+   */
+  frequency?: DiscountFrequency;
   /** @minimum 1 */
-  recurring_cycles?: number;
+  frequency_duration?: number;
   id: string;
   name?: string;
   /** For a percentage discount, out of one hundred. */
@@ -2336,15 +2365,20 @@ export interface OrderItemList {
 }
 
 /**
- * `included` came with a recurring purchase and ends with its subscription, `promotional` was
- * granted.
+ * Whether the quantity was paid for or granted free of charge. Both are consumed the same way.
  */
-export type AllowanceSourceType = (typeof AllowanceSourceType)[keyof typeof AllowanceSourceType];
+export type AllowanceCategory = (typeof AllowanceCategory)[keyof typeof AllowanceCategory];
 
-export const AllowanceSourceType = {
-  included: "included",
+export const AllowanceCategory = {
+  paid: "paid",
   promotional: "promotional",
 } as const;
+
+/**
+ * Exact values for a subset of the meter's dimensions. Only usage with these values is deducted;
+ * omitted dimensions are not restricted.
+ */
+export type AllowanceDimensions = { [key: string]: string };
 
 export type AllowanceStatus = (typeof AllowanceStatus)[keyof typeof AllowanceStatus];
 
@@ -2365,11 +2399,13 @@ export interface Allowance {
   meter: ObjectIdentity;
   /** The unit it is counted in, such as `MiB`. */
   unit?: string;
+  /** Whether the quantity was paid for or granted free of charge. Both are consumed the same way. */
+  category: AllowanceCategory;
   /**
-   * `included` came with a recurring purchase and ends with its subscription, `promotional` was
-   * granted.
+   * Exact values for a subset of the meter's dimensions. Only usage with these values is deducted;
+   * omitted dimensions are not restricted.
    */
-  source_type: AllowanceSourceType;
+  dimensions: AllowanceDimensions;
   name: string;
   /** How much was granted. */
   quantity: string;

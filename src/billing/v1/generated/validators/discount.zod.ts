@@ -18,8 +18,13 @@ export const Discount = zod
     status: zod.enum(["active", "revoked"]),
     revoked_at: zod.iso.datetime({ offset: true }).optional(),
     type: zod.enum(["percentage", "fixed_amount", "price_override", "free_setup"]),
-    recurring: zod.boolean().optional(),
-    recurring_cycles: zod.int().min(1).optional(),
+    frequency: zod
+      .enum(["once", "recurring", "forever"])
+      .optional()
+      .describe(
+        "Whether the discount continues on renewals of the purchased item. `once` applies only to the\npurchase or renewal that uses the coupon, `recurring` continues for `frequency_duration` billing\nperiods including the first, and `forever` continues on every renewal.",
+      ),
+    frequency_duration: zod.int().min(1).optional(),
     id: zod.uuid(),
     name: zod.string().optional(),
     percent_off: zod.string().optional().describe("For a percentage discount, out of one hundred."),
@@ -36,7 +41,9 @@ export const Discount = zod
     started_at: zod.iso.datetime({ offset: true }).optional(),
     ended_at: zod.iso.datetime({ offset: true }).nullish(),
   })
-  .describe("A coupon held on this account. It applies at checkout without a code.");
+  .describe(
+    "A coupon held on this account for a period. Within the period it applies without a code to purchases and\nto metered usage that the coupon covers.",
+  );
 
 export type Discount = zod.input<typeof Discount>;
 export type DiscountOutput = zod.output<typeof Discount>;
