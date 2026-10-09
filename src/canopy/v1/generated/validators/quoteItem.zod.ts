@@ -31,39 +31,45 @@
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
 
+export const quoteItemIndexMin = 0;
+
 export const QuoteItem = zod
   .strictObject({
+    tax_amount: Money,
+    tax_included_amount: Money,
+    index: zod
+      .int()
+      .min(quoteItemIndexMin)
+      .describe(
+        "Zero-based request line index, or the recorded order item's position for an order quote.",
+      ),
+    order_item_id: zod
+      .uuid()
+      .optional()
+      .describe("Present for an existing order quote; identifies the recorded item being priced."),
+    price_id: zod
+      .uuid()
+      .describe("The selected price, including when the request identified it indirectly."),
     plan_name: zod.string(),
     unit_amount: zod
       .union([Money, zod.null()])
       .describe(
-        "Unit price before discounts, with tax included only where the price includes it. Null when\nno single unit price applies, such as tiered or multiple-rate pricing or an immediate change.",
+        "Unit price before discounts. Null when no single unit price applies, such as tiered or multiple-rate pricing.",
       ),
-    quantity: zod.string().describe("The quantity priced."),
-    amount: Money.describe(
-      "Before discounts, including any setup charges. Contains tax only where the price includes it.\nZero for an item with no immediate charge.",
-    ),
-    discount_amount: Money.describe(
-      "Total reduction on this line, including any committed recurring discount.",
-    ),
-    tax_amount: Money.describe(
-      "Tax on the discounted amount, including any tax already contained in that amount.",
-    ),
-    tax_included_amount: Money.describe(
-      "The part of tax_amount already contained in amount minus discount_amount.",
-    ),
-    total: Money.describe(
-      "amount minus discount_amount plus tax_amount minus tax_included_amount.",
-    ),
-    estimated_usage_amount: zod
-      .union([Money, zod.null()])
+    quantity: zod
+      .string()
       .describe(
-        "Projected charge for this line's future usage over the period stated by the quoting operation,\nat current rates, before discounts and tax and not rounded. Not part of amount or total and\nnot collected at checkout. Null when no usage estimate is requested for this line.",
+        "The quantity priced. When duration_seconds is supplied for metered usage, this is quantity multiplied by that duration.",
       ),
+    amount: Money.describe(
+      "Amount before discounts and including any setup charge. For requested future usage this is an estimate, not a collectible checkout amount.",
+    ),
+    discount_amount: Money,
+    total: Money,
     currency: zod.string(),
   })
   .describe(
-    "One calculated purchase line. Fixed purchase amounts are rounded as checkout rounds them.\nA line without an immediate charge has zero checkout amounts. unit_amount remains null when\nno single unit price applies; an unrequested usage estimate remains null.",
+    "One fully calculated purchase, estimated postpaid usage or recorded order item. Amounts use the\nbilling-account currency. An item with no immediate charge has zero checkout amounts.",
   );
 
 export type QuoteItem = zod.input<typeof QuoteItem>;

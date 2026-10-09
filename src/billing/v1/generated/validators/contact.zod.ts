@@ -41,7 +41,11 @@ export const Contact = zod
     address_state: zod.string().max(contactAddressStateMax).optional(),
     address_postal_code: zod.string().max(contactAddressPostalCodeMax).optional(),
     address_country: zod.string().regex(contactAddressCountryRegExp).optional(),
-    tax_exempt: zod.boolean(),
+    tax_exempt: zod
+      .enum(["none", "exempt", "reverse"])
+      .describe(
+        "How tax applies to the customer, as in Stripe. `none` taxes normally. `exempt` charges no tax.\n`reverse` charges no tax and leaves it to the customer under the reverse-charge mechanism;\ninvoices state this. Only operators change it.",
+      ),
     active: zod.boolean(),
     created_at: zod.iso.datetime({ offset: true }),
   })

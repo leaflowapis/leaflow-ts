@@ -33,7 +33,7 @@ export const Applicability = zod
     excluded_prices: zod.array(PriceOption).optional(),
   })
   .describe(
-    "Anything not excluded that matches an inclusion, or anything not excluded when no inclusion is\ngiven, subject to the billing type, operation and term conditions. Entries always include their\ndisplay fields; archived plans and prices stay listed with active set to false.",
+    "Anything not excluded that matches an inclusion, or anything not excluded when no inclusion is\ngiven, subject to the charge type, operation and term conditions. Entries always include their\ndisplay fields; archived plans and prices stay listed with active set to false.",
   );
 
 export type Applicability = zod.input<typeof Applicability>;

@@ -22,10 +22,9 @@ export const Order = zod
     promotion_code: zod
       .string()
       .optional()
-      .describe(
-        "Code text frozen when checkout applied the coupon. Absent for an account discount.",
-      ),
-    invoice: InvoiceSummary.optional(),
+      .describe("Code text frozen when the coupon was applied. Absent for an account discount."),
+    invoice_id: zod.uuid().describe("The order's invoice, the same as invoice.id."),
+    invoice: InvoiceSummary,
     paid_with: PaidWith.optional().describe("How the order was paid. Absent until it is paid."),
     account: AccountIdentity.optional(),
     change_effective_at: zod.iso.datetime({ offset: true }).optional(),
@@ -46,13 +45,13 @@ export const Order = zod
       .int()
       .optional()
       .describe(
-        "The billing account the order was placed with. It does not change when the project is later\nlinked to another billing account. While this account is suspended or closed the order cannot\nbe accepted, and a change scheduled for the end of a period is not invoiced and is called off\nwhen the current period ends; such requests fail with BILLING_ACCOUNT_UNAVAILABLE.",
+        "The billing account the order was placed with. It does not change when the project is later\nlinked to another billing account. While this account is suspended or closed the order cannot\nbe accepted, and the invoice of a change scheduled for the end of a period is not issued and the change is called off\nwhen the current period ends; such requests fail with BILLING_ACCOUNT_UNAVAILABLE.",
       ),
     currency: zod.string(),
     type: zod
-      .enum(["purchase", "renew", "change", "adopt"])
+      .enum(["new", "renew", "modify"])
       .describe(
-        "`adopt` brings a resource that already existed under billing. It charges nothing at\nthe time and starts billing from the moment agreed.",
+        "`new` buys, `renew` extends a prepaid subscription, `modify` changes a subscription's configuration or billing terms.",
       ),
     status: OrderStatus,
     change_effective: zod
@@ -64,8 +63,12 @@ export const Order = zod
     expires_at: zod.iso
       .datetime({ offset: true })
       .nullish()
+      .describe("Acceptance deadline. Pending orders can expire automatically."),
+    checkout_confirmed_at: zod.iso
+      .datetime({ offset: true })
+      .nullish()
       .describe(
-        "Acceptance deadline. pending_checkout and pending orders can expire automatically.",
+        "When the discount and amount were fixed: at placement for automatic checkout and for a\nzero total, otherwise when the invoice was first paid. Null while a deferred order awaits payment.",
       ),
     created_at: zod.iso.datetime({ offset: true }),
     items: zod
@@ -75,7 +78,7 @@ export const Order = zod
       ),
   })
   .describe(
-    "A recorded purchase. pending_checkout requires explicit Billing confirmation before collection\nor acceptance, even without an invoice. Coupon fields describe a discount confirmed at checkout and are absent\nbefore confirmation; a quote never populates them. A draft invoice contains base purchase\namounts awaiting checkout. Payment and acceptance remain separate from resource delivery.",
+    "A recorded purchase with its invoice from placement; a zero-total invoice, such as for postpaid\nadmission, is issued and paid at placement whatever the checkout mode. Until checkout_confirmed_at is set, the\ninvoice is a draft at base prices: paying it fixes the discount and amount, issues it and collects it, and the\norder cannot be accepted before then. Coupon fields describe the discount fixed at that point and are absent\nbefore it; a quote never populates them. Payment and acceptance remain separate from resource delivery.",
   );
 
 export type Order = zod.input<typeof Order>;

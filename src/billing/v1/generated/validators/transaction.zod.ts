@@ -47,7 +47,7 @@ export const Transaction = zod
     billing_account_id: zod.int().optional(),
     type: TransactionType,
     amount: Money.describe(
-      "Signed by type: positive for `topup` and `payment`, negative for `refund` and `payout`.\nAn `adjustment` is positive when it adds to the balance and negative when it takes from\nit. For the other types the sign does not tell the effect on the balance: a payment from\nthe balance lowers it, while a payment by gateway or by credit leaves it unchanged.",
+      "Signed by type: positive for `topup` and `payment`, negative for `refund`.\nAn `adjustment` is positive when it adds to the balance and negative when it takes from\nit. For the other types the sign does not tell the effect on the balance: a payment from\nthe balance lowers it, while a payment by gateway or by credit leaves it unchanged.",
     ),
     remaining_amount: Money.describe(
       "How much of this transaction is still available in the balance. Only top-ups, positive\nadjustments and gateway payments later returned to the balance can be non-zero.",

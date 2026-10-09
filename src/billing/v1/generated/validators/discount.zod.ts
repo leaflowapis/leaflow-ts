@@ -15,8 +15,12 @@ export const Discount = zod
     billing_account_id: zod.int().optional(),
     coupon_id: zod.uuid(),
     promotion_code_id: zod.uuid().optional(),
-    status: zod.enum(["active", "revoked"]),
-    revoked_at: zod.iso.datetime({ offset: true }).optional(),
+    status: zod
+      .enum(["scheduled", "active", "expired", "voided"])
+      .describe(
+        "`scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or\n`voided` once Leaflow withdrew it.",
+      ),
+    voided_at: zod.iso.datetime({ offset: true }).optional(),
     type: zod.enum(["percentage", "fixed_amount", "price_override", "free_setup"]),
     frequency: zod
       .enum(["once", "recurring", "forever"])
@@ -38,8 +42,11 @@ export const Discount = zod
       .boolean()
       .optional()
       .describe("Restricted to your first purchase of anything it applies to."),
-    started_at: zod.iso.datetime({ offset: true }).optional(),
-    ended_at: zod.iso.datetime({ offset: true }).nullish(),
+    valid_from: zod.iso.datetime({ offset: true }).optional(),
+    valid_until: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("Absent follows the coupon's own validity."),
   })
   .describe(
     "A coupon held on this account for a period. Within the period it applies without a code to purchases and\nto metered usage that the coupon covers.",

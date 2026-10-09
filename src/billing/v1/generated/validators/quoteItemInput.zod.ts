@@ -28,7 +28,7 @@ export const QuoteItemInput = zod
     price_type: zod
       .enum(["postpaid", "prepaid", "one_time"])
       .optional()
-      .describe("Narrows the selection when a plan offers more than one billing type."),
+      .describe("Narrows the selection when a plan offers more than one charge type."),
     interval: zod.enum(["none", "day", "month", "year"]).optional(),
     interval_count: zod.int().min(1).optional(),
     termination_policy: TerminationPolicy.optional().describe(

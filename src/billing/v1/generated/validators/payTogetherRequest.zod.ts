@@ -6,15 +6,25 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { Money } from "./money.zod.js";
 
 export const payTogetherRequestInvoiceIdsMax = 100;
 
 export const payTogetherRequestOrderIdsMax = 100;
 
+export const payTogetherRequestExpectedAmountTwoRegExp = new RegExp(
+  "^[0-9]{1,15}([.][0-9]{1,10})?$",
+);
+
 export const PayTogetherRequest = zod
   .strictObject({
     invoice_ids: zod.array(zod.uuid()).max(payTogetherRequestInvoiceIdsMax).optional(),
     order_ids: zod.array(zod.uuid()).max(payTogetherRequestOrderIdsMax).optional(),
+    expected_amount: Money.and(zod.string().regex(payTogetherRequestExpectedAmountTwoRegExp))
+      .optional()
+      .describe(
+        "The amount due to expect across all of them, before credit grants or balance, as preview-pay-together\ngave it. A different amount fails with BILLING_AMOUNT_CHANGED and nothing is charged. Omit to skip\nthe comparison.",
+      ),
   })
   .describe(
     "Name at least one invoice or order. They must all belong to the same account and share\nits currency; anything else is refused rather than partly paid.",

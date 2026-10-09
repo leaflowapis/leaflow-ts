@@ -8,17 +8,9 @@
 import * as zod from "zod";
 
 export const OrderStatus = zod
-  .enum([
-    "pending_checkout",
-    "pending",
-    "accepted",
-    "completed",
-    "partially_completed",
-    "failed",
-    "canceled",
-  ])
+  .enum(["pending", "accepted", "completed", "partially_completed", "failed", "canceled"])
   .describe(
-    "pending_checkout has recorded purchase terms but no confirmed checkout; only a deferred order\nwith an amount due reaches it, since a zero-total order completes checkout at placement.\nConfirmation moves it to pending. Both pending_checkout\nand pending can expire or be canceled; neither establishes service delivery.\n\nFollows the items. `pending` has confirmed checkout, is not yet accepted and may be paid or unpaid. `accepted` is\naccepted with items still being set up. `completed` means every item was set up.\n`partially_completed` means some items were set up and the others failed or were canceled and were\nrefunded to their original payment sources. `failed` means no item was delivered and at least one failed; collected amounts for the\nundelivered items are refunded. `canceled` means every item was withdrawn without delivery; collected amounts are\nreturned to their original payment sources.",
+    "Follows the items. `pending` is not yet accepted and may be unpaid or paid; its invoice shows\nwhether payment is still needed, and it can expire or be canceled. `accepted` is accepted with items still\nbeing set up. `completed` means every item was set up. `partially_completed` means some items were set up\nand the others failed or were canceled and were refunded to their original payment sources. `failed` means\nno item was delivered and at least one failed; collected amounts for the undelivered items are refunded.\n`canceled` means every item was withdrawn without delivery; collected amounts are returned to their original\npayment sources. No status establishes service delivery by itself.",
   );
 
 export type OrderStatus = zod.input<typeof OrderStatus>;

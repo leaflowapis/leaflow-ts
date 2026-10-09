@@ -46,7 +46,7 @@ export const ServiceResource = zod
       ])
       .nullable()
       .describe(
-        "Why the enablement failed; null unless `status` is `failed`. `order_declined` means Billing did not accept the order, for example because the billing account is suspended; `order_canceled` means the order was withdrawn; `order_expired` means its checkout was not confirmed in time.",
+        "Why the enablement failed; null unless `status` is `failed`. `order_declined` means Billing did not accept the order, for example because the billing account is suspended; `order_canceled` means the order was withdrawn; `order_expired` means it was not paid in time.",
       ),
     order_id: zod
       .uuid()

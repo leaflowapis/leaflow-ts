@@ -13,15 +13,15 @@ export const CancellationItem = zod
     id: zod
       .uuid()
       .describe(
-        "The cancellation request of this subscription, the same as `Subscription.cancellation_request.id`.",
+        "The cancellation item of this subscription, the same as `Subscription.cancellation.id`.",
       ),
     subscription_id: zod.uuid(),
     plan_id: zod.uuid(),
     plan_name: zod.string(),
-    billing_type: zod
+    charge_type: zod
       .enum(["postpaid", "prepaid", "one_time"])
       .describe(
-        "How the subscription is paid for. Only a `prepaid` subscription renews automatically; creating\nthe cancellation turned that off, and withdrawing the cancellation leaves it off.",
+        "How the subscription is charged. Creating the cancellation turned automatic renewal off;\nwithdrawing it turns renewal back on for a `postpaid` subscription and leaves it off for a\n`prepaid` one.",
       ),
     status: zod.enum(["requested", "scheduled", "releasing", "completed", "canceled", "failed"]),
     failure_code: zod

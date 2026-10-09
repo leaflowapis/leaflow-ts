@@ -37,7 +37,7 @@ export const QuoteRequest = zod
       .uuid()
       .optional()
       .describe(
-        "Preview checkout of this existing order. Its recorded purchase terms supply every line, and a\nconfirmed order returns its recorded amounts. A preview does not change the order.",
+        "Preview paying this existing order. Its recorded purchase terms supply every line, and an order\nwhose terms are fixed returns its recorded amounts. A preview does not change the order.",
       ),
     renewals: zod
       .array(QuoteRenewal)

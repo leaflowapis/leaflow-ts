@@ -18,7 +18,6 @@ import type {
   Cancellation,
   CancellationCreate,
   CancellationList,
-  CheckoutOrderRequest,
   Contact,
   ContactCreate,
   ContactList,
@@ -32,6 +31,7 @@ import type {
   EntitlementList,
   Error,
   ErrorResponse,
+  FeatureGrantList,
   GetPlanHeaders,
   GetPriceHeaders,
   GetProductHeaders,
@@ -50,6 +50,7 @@ import type {
   ListCreditNotesParams,
   ListCurrenciesParams,
   ListEntitlementsParams,
+  ListFeatureGrantsParams,
   ListInvoiceItemsParams,
   ListInvoicesParams,
   ListOrderItemsParams,
@@ -1548,15 +1549,26 @@ export const getPayInvoiceUrl = (invoiceId: string) => {
  * Applies eligible credit grants and available balance as requested, then collects the remainder
  * through the selected payment gateway and method. With no gateway selection, insufficient
  * account funds fail without starting an online payment. Card and non-card methods use this same
- * operation. Promotion codes are confirmed by checkout, before collecting payment.
+ * operation.
+ *
+ * The draft invoice of a deferred order is priced when it is first paid: Billing applies
+ * promotion_code, or the best applicable account discount when it is omitted, compares the total
+ * with expected_amount, records the discount on the order and issues the invoice before collecting.
+ * An invalid or inapplicable code fails rather than collecting full price, and a different total
+ * fails with `BILLING_AMOUNT_CHANGED`; in both cases nothing changes. The terms are fixed before
+ * any funds are collected and stay fixed when collection does not complete, for example with
+ * insufficient funds or a declined card: later attempts reuse them, and a different promotion_code
+ * is then refused with `BILLING_ORDER_CHECKOUT_CONFLICT`. A deferred period-end change can be paid
+ * once its first period is due to be invoiced; earlier attempts are refused with
+ * `BILLING_CHANGE_NOT_INVOICED`.
  *
  * Returns a payment action when customer interaction is required. requires_action and processing
  * do not mean paid; the invoice is marked paid after payment is confirmed. An unresolved payment
  * attempt is reused, and retries do not apply credit grants or balance twice.
  *
  * Calling this on an invoice that is already paid returns the existing payment result without
- * another charge. A draft order invoice must first be confirmed through checkout. It and a void
- * invoice are refused with `BILLING_INVOICE_NOT_PAYABLE`; the invoice of an order that has failed or was
+ * another charge. A void invoice is refused with `BILLING_INVOICE_NOT_PAYABLE`; the invoice of an
+ * order that has failed or was
  * canceled, with `BILLING_ORDER_FAILED` or `BILLING_ORDER_CANCELED`; and that of an order whose
  * payment deadline has passed, with `BILLING_ORDER_EXPIRED`.
  * @summary Pay an invoice
@@ -1645,6 +1657,8 @@ export const getPreviewInvoicePaymentUrl = (
  * straight afterwards takes exactly these amounts unless the account's funds change in between.
  * Nothing is charged, reserved or created.
  *
+ * A draft order invoice is priced as paying it with the same promotion_code would price it.
+ *
  * Refused with the same errors as paying, except that insufficient funds are not an error here:
  * they show as a `gateway_amount` above zero.
  * @summary Preview invoice payment
@@ -1692,13 +1706,17 @@ export const getPayTogetherUrl = () => {
 /**
  * Pays outstanding invoices, including the invoices of the listed orders, from the account's
  * eligible credit grants and then its balance. No payment gateway is used; an invoice to be
- * paid online is paid on its own.
+ * paid online is paid on its own. The draft invoice of a deferred order takes the best applicable
+ * account discount and is issued first, and stays issued if the payment fails; pay it on its own to
+ * apply a promotion code.
  *
  * Either every invoice is paid or none is. When the credit grants and balance cannot cover
  * them all, the request fails with `BILLING_INSUFFICIENT_FUNDS` and nothing is charged.
+ * A total different from expected_amount fails with `BILLING_AMOUNT_CHANGED` and nothing is charged.
  * Invoices that are already paid are not charged again. An invoice with an online payment
- * still in progress is refused with `BILLING_PAYMENT_PENDING`, a draft order invoice or void invoice with
- * `BILLING_INVOICE_NOT_PAYABLE`, an order that has failed or was canceled with
+ * still in progress is refused with `BILLING_PAYMENT_PENDING`, a void invoice with
+ * `BILLING_INVOICE_NOT_PAYABLE`, a deferred period-end change not yet due to be invoiced with
+ * `BILLING_CHANGE_NOT_INVOICED`, an order that has failed or was canceled with
  * `BILLING_ORDER_FAILED` or `BILLING_ORDER_CANCELED`, and an order whose payment deadline has
  * passed with `BILLING_ORDER_EXPIRED`.
  * @summary Pay together
@@ -1848,7 +1866,7 @@ export const getListInvoicesUrl = (params?: ListInvoicesParams) => {
 };
 
 /**
- * Paginated issued invoices belonging to owned billing accounts, filtered by billing_account_id, status and creation interval. Drafts are excluded; top-ups do not create invoices.
+ * Paginated issued invoices belonging to owned billing accounts, filtered by billing_account_id, status and creation interval. Drafts are excluded, including the draft invoice of an order awaiting payment, which is reached through its order; top-ups do not create invoices.
  * @summary List invoices
  */
 export const listInvoices = async (
@@ -1891,7 +1909,7 @@ export const getGetInvoiceUrl = (invoiceId: string) => {
 };
 
 /**
- * Returns an issued invoice for an owned billing account with its amounts, tax lines and payment state. Returns 404 for a missing or unissued invoice and 403 when its account belongs to another user.
+ * Returns an invoice for an owned billing account with its amounts, tax lines and payment state, whether issued or the draft invoice of an order. Returns 404 for a missing invoice or another draft and 403 when its account belongs to another user.
  * @summary Get invoice
  */
 export const getInvoice = async (
@@ -1948,7 +1966,7 @@ export const getListInvoiceItemsUrl = (invoiceId: string, params?: ListInvoiceIt
 };
 
 /**
- * Paginated lines of an issued invoice belonging to an owned billing account, including their service periods and project references. A missing or unissued invoice returns 404; another user account returns 403.
+ * Paginated lines of an invoice belonging to an owned billing account, issued or the draft invoice of an order, including their service periods and project references. A missing invoice or another draft returns 404; another user account returns 403.
  * @summary List invoice items
  */
 export const listInvoiceItems = async (
@@ -2668,11 +2686,11 @@ export const getCreateQuoteUrl = () => {
 };
 
 /**
- * Calculates exactly one target for a billing account you own: proposed items, existing order checkout, renewals, cancellation or order refund. Returns all requested calculations or a structured error. No quote is saved and no resource, payment, reservation or redemption is created.
+ * Calculates exactly one target for a billing account you own: proposed items, an existing order, renewals, cancellation or order refund. Returns all requested calculations or a structured error. No quote is saved and no resource, payment, reservation or redemption is created.
  *
  * Existing orders use their recorded purchase account and terms. Renewals and cancellations use the account currently paying for each subscription. Every target must belong to the requested account. A project association or project token does not authorize a quote.
  *
- * Use an existing order quote's total as expected_amount at checkout. A confirmed order returns its recorded amounts; a different promotion code is refused. Requested future usage estimates are not collectible checkout amounts. An unknown delivery outcome is not proof of refund eligibility.
+ * Use an existing order quote's total as expected_amount when paying the order's invoice. An order whose terms are fixed returns its recorded amounts; a different promotion code is refused. Requested future usage estimates are not collectible checkout amounts. An unknown delivery outcome is not proof of refund eligibility.
  * @summary Create a quote
  */
 export const createQuote = async (
@@ -2905,7 +2923,7 @@ export const getGetCancellationUrl = (cancellationId: string) => {
 };
 
 /**
- * Returns a cancellation request for an authorized billing account with its schedule, expected refundable amount and individual subscription outcomes. Read individual item states for per-subscription outcomes, including partial success.
+ * Returns a cancellation for an authorized billing account with its schedule, expected refundable amount and individual subscription outcomes. Read individual item states for per-subscription outcomes, including partial success.
  * @summary Get a cancellation
  */
 export const getCancellation = async (
@@ -3068,7 +3086,7 @@ export const getRenewSubscriptionUrl = (subscriptionId: string) => {
 };
 
 /**
- * Purchases prepaid periods from paid_until using the agreed recurring amount, and pays for them at
+ * Purchases prepaid periods from current_term_end using the agreed recurring amount, and pays for them at
  * once. A changed interval selects a current price and freezes new terms on the order, applied
  * only after fulfillment. Existing paid periods keep their value.
  *
@@ -3154,12 +3172,12 @@ export const getCreateRenewalOrderUrl = (subscriptionId: string) => {
 
 /**
  * Places a renewal order with a draft invoice, without applying a new discount or charging anything.
- * Quote and confirm its checkout before collecting payment to renew. Existing subscription
+ * Pay its invoice to renew; a promotion code can be applied when paying. Existing subscription
  * discount commitments are retained. The periods and price are chosen as for renewing. The order
  * can be paid until the current paid period ends, and never after the end of the first period it renews; unpaid by
  * then, it is canceled. While auto-renew is on, the renewal due at the end of the period pays
- * this order instead of placing another, confirming checkout with an applicable account discount
- * first if it has not already been confirmed.
+ * this order instead of placing another, applying an applicable account discount first if the
+ * order's terms are not fixed yet.
  *
  * Save `order_id` before submitting and read the order after an unknown outcome; creating it a
  * second time conflicts.
@@ -3227,8 +3245,9 @@ export const getSetAutoRenewUrl = (subscriptionId: string) => {
 };
 
 /**
- * Controls automatic prepaid renewal. Disabling it does not shorten paid_until and still permits
- * manual renewal. Postpaid subscriptions do not renew and keep this false.
+ * Controls automatic prepaid renewal. Disabling it does not shorten current_term_end and still permits
+ * manual renewal. A postpaid subscription always continues until it is canceled; setting it is refused with 409
+ * `BILLING_SUBSCRIPTION_AUTO_RENEW_FIXED`.
  *
  * While the subscription has an open cancellation, turning it on or off is refused with 409
  * `BILLING_SUBSCRIPTION_OPERATION_PENDING` and `meta.cancellation_id`: creating the cancellation
@@ -3370,9 +3389,9 @@ export const getListOrdersUrl = (params?: ListOrdersParams) => {
 };
 
 /**
- * Lists acceptance status and associated invoice amounts. pending_checkout awaits confirmation;
- * pending has confirmed checkout and may be unpaid or paid. active means accepted, not delivered.
- * pending_checkout and pending orders can expire at expires_at.
+ * Lists acceptance status and associated invoice amounts. A pending order is not yet accepted;
+ * its invoice shows whether it still needs payment. accepted means accepted, not delivered.
+ * Pending orders can expire at expires_at.
  * @summary List orders
  */
 export const listOrders = async (
@@ -3434,106 +3453,6 @@ export const getOrder = async (
   return { data, status: res.status, headers: res.headers } as getOrderResponse;
 };
 
-export type checkoutOrderResponse200 = {
-  data: Order;
-  status: 200;
-};
-
-export type checkoutOrderResponse409 = {
-  data: Error;
-  status: 409;
-};
-
-export type checkoutOrderResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type checkoutOrderResponseSuccess = checkoutOrderResponse200 & {
-  headers: Headers;
-};
-export type checkoutOrderResponseError = (
-  | checkoutOrderResponse409
-  | checkoutOrderResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type checkoutOrderResponse = checkoutOrderResponseSuccess | checkoutOrderResponseError;
-
-export const getCheckoutOrderUrl = (orderId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/orders/${encodeURIComponent(String(orderId))}/checkout`;
-};
-
-/**
- * Confirms the purchase's final amount and discount. Supply the same promotion_code used for the
- * preview, or omit it to select an applicable account discount. At most one new coupon is applied
- * to an order; existing subscription discount commitments are not stacked with a new coupon on
- * the same line. Promotion codes are evaluated against the order, not client-supplied line amounts.
- *
- * Rechecks eligibility and redemption availability. A different total fails with
- * BILLING_AMOUNT_CHANGED. An invalid or inapplicable code fails rather than collecting full price.
- * A failed confirmation leaves the invoice draft and reserves no discount redemption.
- *
- * A successful confirmation records the discount, including any recurring discount terms,
- * reserves its redemption, moves pending_checkout to pending and finalizes the invoice when one
- * is required. The reservation counts toward the code's limits and is consumed when the invoice
- * is paid, or at confirmation when nothing is due. Use pay-invoice to collect
- * its outstanding amount from account funds or a payment gateway. No payment attempt or checkout
- * session is created by this operation. An order whose total is zero completes checkout at
- * placement in either mode and does not need this operation; an order with an amount due, even
- * when credits would cover it, still does. Checkout alone does not confirm resource delivery.
- *
- * Retrying with the same code and expected amount returns the existing order without another
- * redemption. Omitting the code on a confirmed checkout retains its recorded discount. Changing
- * that code is refused with BILLING_ORDER_CHECKOUT_CONFLICT. Payment retries reuse the confirmed
- * terms. Cancellation, expiry or complete fulfillment failure releases the reservation or returns
- * the consumed redemption; a refund alone does not.
- *
- * The order must belong to one of your billing accounts. A canceled, failed or expired order
- * cannot be checked out. A period-end change cannot be checked out before its renewal invoice is
- * available. Orders retain their billing account and currency after a project is linked elsewhere;
- * discounts from another account cannot be used for them.
- * @summary Confirm order checkout
- */
-export const checkoutOrder = async (
-  orderId: string,
-  checkoutOrderRequest: CheckoutOrderRequest,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<checkoutOrderResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCheckoutOrderUrl(orderId), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(checkoutOrderRequest),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: checkoutOrderResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as checkoutOrderResponse;
-};
-
 export type cancelOrderResponse200 = {
   data: Order;
   status: 200;
@@ -3570,10 +3489,10 @@ export const getCancelOrderUrl = (orderId: string) => {
  * its existing pending phase while any item is still pending; its final outcome follows all
  * item outcomes. Previously failed items keep their failure outcome.
  *
- * Payment may be absent, partial or complete. Confirmed checkout keeps the selected items'
- * agreed amounts and discounts; credit notes reduce issued invoices, and collected amounts
- * are returned to their original payment sources. When checkout has not been confirmed, the
- * remaining items are quoted again. External payment-method refunds can finish asynchronously.
+ * Payment may be absent, partial or complete. Once the order's terms are fixed, the selected items
+ * keep their agreed amounts and discounts; credit notes reduce issued invoices, and collected amounts
+ * are returned to their original payment sources. While the terms of a deferred order are not fixed,
+ * the remaining items are priced again. External payment-method refunds can finish asynchronously.
  * The order and financial history are retained; the same cancellation does not refund twice.
  *
  * Once the order is accepted, its owning service coordinates cancellation and confirms
@@ -3719,8 +3638,9 @@ export const getListEntitlementsUrl = (params?: ListEntitlementsParams) => {
  * does not appear, so that "this does not exist" and "this has not been bought" cannot be
  * confused.
  *
- * Derived from live subscriptions rather than stored, so this always agrees with what is
- * being paid for. It stops being listed as soon as the subscription providing it ends.
+ * Derived from live subscriptions and active feature grants rather than stored, so this always
+ * agrees with what is being paid for and granted. It stops being listed as soon as the
+ * subscription or grant providing it ends.
  * @summary List entitlements
  */
 export const listEntitlements = async (
@@ -3737,6 +3657,65 @@ export const listEntitlements = async (
 
   const data: listEntitlementsResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listEntitlementsResponse;
+};
+
+export type listFeatureGrantsResponse200 = {
+  data: FeatureGrantList;
+  status: 200;
+};
+
+export type listFeatureGrantsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listFeatureGrantsResponseSuccess = listFeatureGrantsResponse200 & {
+  headers: Headers;
+};
+export type listFeatureGrantsResponseError = listFeatureGrantsResponseDefault & {
+  headers: Headers;
+};
+
+export type listFeatureGrantsResponse =
+  | listFeatureGrantsResponseSuccess
+  | listFeatureGrantsResponseError;
+
+export const getListFeatureGrantsUrl = (params?: ListFeatureGrantsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/feature-grants?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/feature-grants`;
+};
+
+/**
+ * Access to features held by a billing account for a period, for example through a membership. While a grant
+ * is active, every project whose current billing account holds it has the feature, in addition to the
+ * features of its own subscriptions.
+ * @summary List feature grants
+ */
+export const listFeatureGrants = async (
+  params?: ListFeatureGrantsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listFeatureGrantsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListFeatureGrantsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listFeatureGrantsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listFeatureGrantsResponse;
 };
 
 export type listPricesResponse200 = {

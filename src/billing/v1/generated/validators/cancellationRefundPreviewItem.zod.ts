@@ -20,11 +20,11 @@ export const CancellationRefundPreviewItem = zod
       .describe(
         "The project and its current name, for display. Absent for a purchase at account level, and when the\nproject details cannot be read at the moment.",
       ),
-    billing_type: zod.enum(["postpaid", "prepaid", "one_time"]),
+    charge_type: zod.enum(["postpaid", "prepaid", "one_time"]),
     auto_renew: zod
       .boolean()
       .describe(
-        "Whether automatic renewal is on now. Creating the cancellation turns it off, and withdrawing\nthe cancellation does not turn it back on. Always false for a subscription that is not\n`prepaid`.",
+        "Whether automatic renewal is on now. Creating the cancellation turns it off. Withdrawing the\ncancellation does not turn it back on for a prepaid subscription; a postpaid subscription continues\nuntil it is canceled and turns it back on.",
       ),
     unused_amount: Money,
     refundable_amount: Money,

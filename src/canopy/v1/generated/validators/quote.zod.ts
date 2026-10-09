@@ -30,12 +30,12 @@
  */
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
-import { QuoteItem } from "./quoteItem.zod.js";
+import { QuoteItemDc1fddb } from "./quoteItemDc1fddb.zod.js";
 
 export const Quote = zod
   .strictObject({
     items: zod
-      .array(QuoteItem)
+      .array(QuoteItemDc1fddb)
       .describe(
         "One line for each item the purchase would order, in the order it would order them.",
       ),

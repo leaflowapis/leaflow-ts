@@ -7,9 +7,12 @@
  */
 import * as zod from "zod";
 
+export const previewInvoicePaymentParamsPromotionCodeMax = 64;
+
 export const previewInvoicePaymentParamsUseBalanceDefault = true;
 export const previewInvoicePaymentParamsUseCreditsDefault = true;
 export const PreviewInvoicePaymentParams = zod.strictObject({
+  promotion_code: zod.string().min(1).max(previewInvoicePaymentParamsPromotionCodeMax).optional(),
   use_balance: zod.boolean().default(previewInvoicePaymentParamsUseBalanceDefault),
   use_credits: zod.boolean().default(previewInvoicePaymentParamsUseCreditsDefault),
 });

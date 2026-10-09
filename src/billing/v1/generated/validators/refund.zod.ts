@@ -12,7 +12,7 @@ import { Transaction } from "./transaction.zod.js";
 
 export const Refund = zod.strictObject({
   transaction_id: zod.uuid().optional(),
-  cancellation_request_id: zod.uuid().optional(),
+  cancellation_item_id: zod.uuid().optional(),
   transactions: zod
     .array(Transaction)
     .describe(

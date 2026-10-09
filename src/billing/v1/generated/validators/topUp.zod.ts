@@ -19,7 +19,7 @@ export const TopUp = zod
     amount: Money.describe("What is credited to the account, in the account's own currency."),
     currency: zod.string(),
     remaining_amount: Money.optional().describe(
-      "The part of this top-up still held in the balance. Pending refunds and payouts can temporarily\nreserve part of it; it is not a promise that the whole amount is immediately withdrawable.",
+      "The part of this top-up still held in the balance. Pending refunds can temporarily\nreserve part of it; it is not a promise that the whole amount is immediately withdrawable.",
     ),
     status: zod
       .enum(["pending", "succeeded", "failed", "canceled"])

@@ -7,13 +7,12 @@
  */
 import * as zod from "zod";
 import { AccountIdentity } from "./accountIdentity.zod.js";
-import { CancellationRequest } from "./cancellationRequest.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
-import { PaidWith } from "./paidWith.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
+import { SubscriptionCancellation } from "./subscriptionCancellation.zod.js";
 import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
 export const subscriptionDiscountedRenewalsRemainingMin = 0;
@@ -21,14 +20,14 @@ export const subscriptionDiscountedRenewalsRemainingMin = 0;
 export const Subscription = zod
   .strictObject({
     currency: zod.string(),
-    billing_type: zod.enum(["postpaid", "prepaid", "one_time"]),
+    charge_type: zod.enum(["postpaid", "prepaid", "one_time"]),
     interval: zod.enum(["none", "day", "month", "year"]),
     interval_count: zod.int().min(1).optional(),
     recurring_amount: zod
       .string()
       .optional()
       .describe(
-        "Whole-subscription prepaid renewal amount, after continuing discounts and before tax.\nPending subscriptions show base terms until checkout confirms any new continuing discount.\nAbsent for other billing types.",
+        "Whole-subscription prepaid renewal amount, after continuing discounts and before tax.\nPending subscriptions show base terms until paying the order fixes any new continuing discount.\nAbsent for other charge types.",
       ),
     termination_policy: TerminationPolicy.optional(),
     refund_policy: RefundPolicy.optional(),
@@ -47,10 +46,13 @@ export const Subscription = zod
       .optional(),
     suspend_reason: zod.string().optional(),
     billing_cycle_anchor: zod.iso.datetime({ offset: true }).optional(),
-    cancellation_request: CancellationRequest.optional(),
-    paid_with: PaidWith.optional().describe(
-      "How the purchase, or the latest renewal paid with a saved card, was paid. Automatic renewal\ntries this card after the account's balance and credits, and the account's default card after\nthat.",
-    ),
+    cancellation: SubscriptionCancellation.optional(),
+    default_payment_method_id: zod
+      .uuid()
+      .nullish()
+      .describe(
+        "The saved payment method automatic renewal charges after the account's balance and credits,\nbefore the account's default payment method. Set when the purchase, or a renewal, is paid with a saved\npayment method. It is used only while it belongs to the account that pays the renewal.",
+      ),
     created_at: zod.iso.datetime({ offset: true }).optional(),
     id: zod.uuid(),
     billing_account_id: zod
@@ -77,13 +79,29 @@ export const Subscription = zod
     plan_name: zod.string(),
     price_id: zod.uuid(),
     quantity: zod.string(),
-    paid_until: zod.iso
+    current_term_end: zod.iso
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "End of the prepaid service already activated. Null until a new subscription becomes active,\neven when its purchase has been paid, and for postpaid subscriptions with no prepaid end date.",
+        "When a prepaid subscription renews or expires, the end of the last service period bought.\nRenewing several periods in advance moves it. Null until a new subscription becomes active, even when\nits purchase has been paid, and for postpaid subscriptions.",
       ),
-    auto_renew: zod.boolean(),
+    current_period_start: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe(
+        "Start of the service period in effect now. Null when none is, including for postpaid subscriptions.",
+      ),
+    current_period_end: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe(
+        "End of the service period in effect now. Renewing in advance moves `current_term_end`, not\nthis. Null when no period is in effect, including for postpaid subscriptions.",
+      ),
+    auto_renew: zod
+      .boolean()
+      .describe(
+        "A prepaid subscription renews automatically while this is on. A postpaid subscription always continues until it is canceled; this is true until a cancellation is requested and cannot be set.",
+      ),
     status: zod
       .enum(["pending", "provisioning", "active", "suspended", "canceled", "terminated"])
       .describe(

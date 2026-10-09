@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { Money } from "./money.zod.js";
 
 export const payInvoiceRequestPaymentGatewayMax = 32;
 
@@ -13,6 +14,11 @@ export const payInvoiceRequestMethodTypeMax = 64;
 
 export const payInvoiceRequestUseBalanceDefault = true;
 export const payInvoiceRequestUseCreditsDefault = true;
+export const payInvoiceRequestPromotionCodeMax = 64;
+
+export const payInvoiceRequestExpectedAmountTwoRegExp = new RegExp(
+  "^[0-9]{1,15}([.][0-9]{1,10})?$",
+);
 
 export const PayInvoiceRequest = zod
   .strictObject({
@@ -49,6 +55,19 @@ export const PayInvoiceRequest = zod
         "Apply eligible, unexpired credit grants before using the balance. This never withdraws grants or converts them into balance.",
       ),
     return_url: zod.string().optional(),
+    promotion_code: zod
+      .string()
+      .min(1)
+      .max(payInvoiceRequestPromotionCodeMax)
+      .optional()
+      .describe(
+        "The code to apply while the order's terms are not yet fixed. Omit to apply the best applicable\naccount discount, or to keep the discount already recorded.",
+      ),
+    expected_amount: Money.and(zod.string().regex(payInvoiceRequestExpectedAmountTwoRegExp))
+      .optional()
+      .describe(
+        "The invoice total to expect, after discounts and tax and before credit grants or balance, as the\npayment preview or an order quote gave it. A different total fails with BILLING_AMOUNT_CHANGED\nand nothing is charged. Omit to skip the comparison; an explicit zero is compared.",
+      ),
   })
   .describe(
     "Applies eligible credit grants and the available balance as requested, then collects only the remainder\nthrough the selected gateway. Grants restricted to other purchases are not counted as available funds.\nAn unresolved channel payment is reused; retries do not apply the grant or balance portions twice.\nWithout a gateway selection, insufficient account funds fail without starting an online payment.",

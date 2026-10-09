@@ -16,14 +16,20 @@ export const Rate = zod.strictObject({
   dimensions: zod
     .record(zod.string(), zod.string())
     .describe("The attributes this rate applies to, such as region and machine type."),
-  pricing_model: zod.enum(["per_unit", "graduated", "volume"]),
+  billing_scheme: zod
+    .enum(["per_unit", "tiered"])
+    .describe(
+      "`per_unit` multiplies `unit_amount`; `tiered` walks the tiers as `tiers_mode` says.",
+    ),
+  tiers_mode: zod
+    .enum(["none", "graduated", "volume"])
+    .describe(
+      "`graduated` charges each band at its own rate; `volume` charges everything at the rate of the band the total lands in. `none` for a `per_unit` rate.",
+    ),
   unit_amount: Money.optional().describe(
     "Present for `per_unit`. Tiered rates carry their amounts on the tiers.",
   ),
-  tiers: zod
-    .array(Tier)
-    .optional()
-    .describe("Present for `graduated` and `volume`, in ascending order."),
+  tiers: zod.array(Tier).optional().describe("Present for a tiered rate, in ascending order."),
   unit_quantity: zod
     .string()
     .optional()

@@ -26,10 +26,10 @@ export const InvoiceSummary = zod
     tax_amount: zod.string(),
     total: zod.string(),
     amount_paid: zod.string(),
-    unpaid_credit_notes_amount: Money.describe(
+    pre_payment_credit_notes_amount: Money.describe(
       "Issued, non-void credit notes that reduced unpaid receivables. Does not rewrite the original invoice total.",
     ),
-    paid_credit_notes_amount: Money.describe(
+    post_payment_credit_notes_amount: Money.describe(
       "Issued credit notes against payments already received. This is a return obligation, not evidence of completed refunds.",
     ),
     amount_due: zod
@@ -42,7 +42,7 @@ export const InvoiceSummary = zod
     due_at: zod.iso.datetime({ offset: true }).optional(),
   })
   .describe(
-    "Purchase-related invoice amounts, without account contact details or payment methods. A draft\norder invoice shows base amounts awaiting checkout, not a confirmed discount or collectible total.\nAbsent when no invoice has been created; absence does not establish acceptance or delivery.",
+    "Purchase-related invoice amounts, without account contact details or payment methods. Every order\nhas an invoice from placement. A draft shows base prices until it is paid, when the discount is\napplied and it is issued; a zero-total invoice is issued and paid at placement whatever the\ncheckout mode. Neither establishes acceptance or delivery.",
   );
 
 export type InvoiceSummary = zod.input<typeof InvoiceSummary>;

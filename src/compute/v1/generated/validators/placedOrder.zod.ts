@@ -22,23 +22,18 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { InvoiceSummary } from "./invoiceSummary.zod.js";
 
 export const PlacedOrder = zod
   .strictObject({
-    invoice_id: zod
-      .uuid()
-      .nullable()
-      .describe(
-        "The invoice for this purchase, which may still be a draft awaiting checkout. Null when no invoice has been created. Its presence or absence does not establish whether delivery may begin.",
-      ),
-    order_id: zod
-      .uuid()
-      .describe(
-        "The order, including for purchases without an immediate charge. Payment alone does not imply that the service has completed delivery.",
-      ),
+    order_id: zod.uuid(),
+    invoice_id: zod.uuid().describe("The order's invoice, the same as invoice.id."),
+    invoice: InvoiceSummary.describe(
+      "What the purchase charges. A draft shows the base price in total and is paid through Billing, where a\npromotion code can still be applied; an open invoice is issued and awaits its amount_due; a paid one\nneeds nothing further. A zero-total invoice is issued and paid at placement.",
+    ),
   })
   .describe(
-    "Identifies the purchase. Read the order for purchase progress and its invoice for amounts and payment status.",
+    "The Billing order this purchase placed and its invoice as they stood at placement. Read the order and\nthe invoice in Billing for current progress: the service starts delivery only after Billing accepts the\norder, and payment alone does not mean delivery has completed.",
   );
 
 export type PlacedOrder = zod.input<typeof PlacedOrder>;

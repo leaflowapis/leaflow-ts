@@ -12,8 +12,8 @@ export const CreditNoteItem = zod.strictObject({
   id: zod.uuid(),
   credit_note_id: zod.uuid(),
   invoice_item_id: zod.uuid(),
-  unpaid_amount: Money,
-  paid_amount: Money,
+  pre_payment_amount: Money,
+  post_payment_amount: Money,
 });
 
 export type CreditNoteItem = zod.input<typeof CreditNoteItem>;

@@ -48,7 +48,7 @@ export const OrderItem = zod
     completes_on_payment: zod.boolean(),
     recurring_amount: zod.string().optional(),
     setup_amount: zod.string().optional(),
-    billing_type: zod
+    charge_type: zod
       .enum(["postpaid", "prepaid", "one_time"])
       .describe("The payment timing of the selected price."),
     tax_amount: zod
@@ -89,7 +89,7 @@ export const OrderItem = zod
     status: OrderItemStatus,
   })
   .describe(
-    "Frozen purchase terms. Monetary fields come from related invoice-line snapshots and are absent\nwhen there is no immediate invoice. Later catalog changes do not reprice this line. A new service\npurchase creates its pending subscription when this item is recorded, not when payment succeeds.",
+    "Frozen purchase terms. Monetary fields come from related invoice-line snapshots and are zero\nfor a line with no immediate charge, such as postpaid admission. Later catalog changes do not reprice this line. A new service\npurchase creates its pending subscription when this item is recorded, not when payment succeeds.",
   );
 
 export type OrderItem = zod.input<typeof OrderItem>;
