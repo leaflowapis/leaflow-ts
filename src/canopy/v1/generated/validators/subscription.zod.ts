@@ -74,7 +74,7 @@ export const Subscription = zod
       .uuid()
       .nullish()
       .describe(
-        "The saved payment method automatic renewal charges after the account's balance and credits,\nbefore the account's default payment method. Set when the purchase, or a renewal, is paid with a saved\npayment method. It is used only while it belongs to the account that pays the renewal.",
+        "The saved payment method automatic renewal charges after the account's balance and credits,\nbefore the account's default payment method. Set when the purchase, a renewal or a change is paid with a\nsaved payment method; paying any other way leaves it unchanged. It is used only while it belongs to the\naccount that pays the renewal.",
       ),
     created_at: zod.iso.datetime({ offset: true }).optional(),
     id: zod.uuid(),

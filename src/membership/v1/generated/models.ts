@@ -872,6 +872,10 @@ export interface Quote {
 /**
  * A cancellation to quote: what ending these subscriptions together would return. One mode per
  * request; to compare, quote `immediate` and `period_end` separately.
+ *
+ * Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being
+ * canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a
+ * paid change still waiting to switch (`meta.order_id`).
  */
 export interface QuoteCancellation {
   /**
@@ -1594,6 +1598,9 @@ export interface PaymentMethodSetupResult {
  * through the selected gateway. Grants restricted to other purchases are not counted as available funds.
  * An unresolved channel payment is reused; retries do not apply the grant or balance portions twice.
  * Without a gateway selection, insufficient account funds fail without starting an online payment.
+ *
+ * `payment_gateway` and `method_type` are given together, and `payment_method_id` only with both;
+ * otherwise the request is refused with `BILLING_PURCHASE_INVALID`.
  */
 export interface PayInvoiceRequest {
   /**
@@ -2374,8 +2381,9 @@ export interface Subscription {
   cancellation?: SubscriptionCancellation;
   /**
    * The saved payment method automatic renewal charges after the account's balance and credits,
-   * before the account's default payment method. Set when the purchase, or a renewal, is paid with a saved
-   * payment method. It is used only while it belongs to the account that pays the renewal.
+   * before the account's default payment method. Set when the purchase, a renewal or a change is paid with a
+   * saved payment method; paying any other way leaves it unchanged. It is used only while it belongs to the
+   * account that pays the renewal.
    * @nullable
    */
   default_payment_method_id?: string | null;
@@ -2553,6 +2561,8 @@ export interface RenewalOrderRequest {
   interval_count?: number;
   /** As in renewing. */
   interval?: RenewalOrderRequestInterval;
+  /** As in renewing. */
+  termination_policy?: TerminationPolicy;
 }
 
 export interface AutoRenewSet {

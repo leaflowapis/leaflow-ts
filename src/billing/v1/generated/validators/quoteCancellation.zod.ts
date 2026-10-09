@@ -22,7 +22,7 @@ export const QuoteCancellation = zod
     mode: TerminationPolicy,
   })
   .describe(
-    "A cancellation to quote: what ending these subscriptions together would return. One mode per\nrequest; to compare, quote `immediate` and `period_end` separately.",
+    "A cancellation to quote: what ending these subscriptions together would return. One mode per\nrequest; to compare, quote `immediate` and `period_end` separately.\n\nRefused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being\ncanceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a\npaid change still waiting to switch (`meta.order_id`).",
   );
 
 export type QuoteCancellation = zod.input<typeof QuoteCancellation>;

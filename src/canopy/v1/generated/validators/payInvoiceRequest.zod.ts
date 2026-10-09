@@ -93,7 +93,7 @@ export const PayInvoiceRequest = zod
       ),
   })
   .describe(
-    "Applies eligible credit grants and the available balance as requested, then collects only the remainder\nthrough the selected gateway. Grants restricted to other purchases are not counted as available funds.\nAn unresolved channel payment is reused; retries do not apply the grant or balance portions twice.\nWithout a gateway selection, insufficient account funds fail without starting an online payment.",
+    "Applies eligible credit grants and the available balance as requested, then collects only the remainder\nthrough the selected gateway. Grants restricted to other purchases are not counted as available funds.\nAn unresolved channel payment is reused; retries do not apply the grant or balance portions twice.\nWithout a gateway selection, insufficient account funds fail without starting an online payment.\n\n`payment_gateway` and `method_type` are given together, and `payment_method_id` only with both;\notherwise the request is refused with `BILLING_PURCHASE_INVALID`.",
   );
 
 export type PayInvoiceRequest = zod.input<typeof PayInvoiceRequest>;
