@@ -12,7 +12,10 @@ import { Money } from "./money.zod.js";
 export const AccountBalance = zod
   .strictObject({
     available_credit: Money.describe(
-      "Balance minus pending balance returns, unbilled usage estimates and issued unpaid amounts. Credit grants are excluded; the result may be negative.",
+      "Balance minus pending balance returns and the part of unbilled_amount and due that estimated_credit_applied does not cover. Negative only when the balance and applicable credit fall short of what the account owes.",
+    ),
+    estimated_credit_applied: Money.describe(
+      "Credit expected to pay unbilled_amount and due. Each charge is matched to grants whose scope, validity and conditions it meets, in the order credit is applied at payment. Nothing is reserved or deducted until an invoice is paid, so credits still includes this amount.",
     ),
     unbilled_amount: Money.describe(
       "Current estimate of rated usage that has not been invoiced. Final pricing and tax are fixed at issuance.",
