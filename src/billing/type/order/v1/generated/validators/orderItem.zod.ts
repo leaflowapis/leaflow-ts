@@ -83,8 +83,16 @@ export const OrderItem = zod
     ),
     amount: Money.optional().describe("`gross_amount` less `discount_amount`."),
     currency: zod.string(),
-    period_start: zod.iso.datetime({ offset: true }).nullish(),
-    period_end: zod.iso.datetime({ offset: true }).nullish(),
+    period_start: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe(
+        "The start of the service period this line paid for. Frozen at placement for renewals and period-end changes; for a prepaid line of a new purchase, fixed from the second its invoice is paid and kept when delivery is confirmed. Absent for postpaid and one-time lines.",
+      ),
+    period_end: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("The end of that service period, exclusive."),
     status: OrderItemStatus,
   })
   .describe(

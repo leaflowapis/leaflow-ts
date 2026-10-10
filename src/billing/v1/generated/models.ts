@@ -2272,9 +2272,15 @@ export interface OrderItem {
   /** `gross_amount` less `discount_amount`. */
   amount?: Money;
   currency: string;
-  /** @nullable */
+  /**
+   * The start of the service period this line paid for. Frozen at placement for renewals and period-end changes; for a prepaid line of a new purchase, fixed from the second its invoice is paid and kept when delivery is confirmed. Absent for postpaid and one-time lines.
+   * @nullable
+   */
   period_start?: string | null;
-  /** @nullable */
+  /**
+   * The end of that service period, exclusive.
+   * @nullable
+   */
   period_end?: string | null;
   status: OrderItemStatus;
 }
