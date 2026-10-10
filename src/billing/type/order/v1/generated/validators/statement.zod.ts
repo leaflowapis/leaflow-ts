@@ -9,6 +9,7 @@ import * as zod from "zod";
 import { Money } from "./money.zod.js";
 import { StatementAmounts } from "./statementAmounts.zod.js";
 import { StatementStatus } from "./statementStatus.zod.js";
+import { StatementType } from "./statementType.zod.js";
 
 export const Statement = zod
   .strictObject({
@@ -17,16 +18,13 @@ export const Statement = zod
     currency: zod.string(),
     period_start: zod.iso.datetime({ offset: true }),
     period_end: zod.iso.datetime({ offset: true }),
-    sequence: zod
-      .int()
-      .describe(
-        "1 for the first closing of the period; higher for statements that collect usage priced after an earlier closing.",
-      ),
+    sequence: zod.int().describe("Increases with each closing of the period."),
     status: StatementStatus,
+    type: StatementType,
     estimated: zod
       .boolean()
       .describe(
-        "True while the statement is open. The estimate applies tier pricing to the period's usage so far and adds tax for the current invoice contact. Minimum charges are added at closing, and a tier reduction larger than this statement's own charges is credited to earlier invoices of the period at closing.",
+        "True while the statement is open. The estimate applies tier pricing to the period's usage so far and adds tax for the current invoice contact. Minimum charges are added at the period's final closing, and a tier reduction larger than this statement's own charges is credited to earlier invoices of the period at closing.",
       ),
     amounts: StatementAmounts,
     closed_at: zod.iso.datetime({ offset: true }).optional(),
@@ -39,7 +37,7 @@ export const Statement = zod
     credited_amount: Money,
   })
   .describe(
-    "An account's consumption for one billing period, collected at one closing. The first statement of a period (sequence 1) closes after the period ends. Usage priced after that closing is collected in a later statement for the same period, which closes and invoices separately; a closed statement is never rewritten. Payments apply to issued invoices.",
+    "An account's consumption for one billing period, collected at one closing. Usage is billed after every settlement run, about hourly; each closing issues an invoice for the usage priced since the previous closing and collects it from credits and balance at once, and later usage is collected in the next statement of the same period. A closed statement is never rewritten. The period's consumption is the sum of its statements.",
   );
 
 export type Statement = zod.input<typeof Statement>;

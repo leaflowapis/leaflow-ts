@@ -3112,7 +3112,18 @@ export const StatementStatus = {
 } as const;
 
 /**
- * An account's consumption for one billing period, collected at one closing. The first statement of a period (sequence 1) closes after the period ends. Usage priced after that closing is collected in a later statement for the same period, which closes and invoices separately; a closed statement is never rewritten. Payments apply to issued invoices.
+ * interim: a closing before the period's usage is final; minimum charges are not applied. final: the first closing after the period ended and its late usage was settled; minimum charges for the whole period are applied. supplement: a closing after the final one, for usage priced late. An open statement is interim.
+ */
+export type StatementType = (typeof StatementType)[keyof typeof StatementType];
+
+export const StatementType = {
+  interim: "interim",
+  final: "final",
+  supplement: "supplement",
+} as const;
+
+/**
+ * An account's consumption for one billing period, collected at one closing. Usage is billed after every settlement run, about hourly; each closing issues an invoice for the usage priced since the previous closing and collects it from credits and balance at once, and later usage is collected in the next statement of the same period. A closed statement is never rewritten. The period's consumption is the sum of its statements.
  */
 export interface Statement {
   id: string;
@@ -3120,10 +3131,11 @@ export interface Statement {
   currency: string;
   period_start: string;
   period_end: string;
-  /** 1 for the first closing of the period; higher for statements that collect usage priced after an earlier closing. */
+  /** Increases with each closing of the period. */
   sequence: number;
   status: StatementStatus;
-  /** True while the statement is open. The estimate applies tier pricing to the period's usage so far and adds tax for the current invoice contact. Minimum charges are added at closing, and a tier reduction larger than this statement's own charges is credited to earlier invoices of the period at closing. */
+  type: StatementType;
+  /** True while the statement is open. The estimate applies tier pricing to the period's usage so far and adds tax for the current invoice contact. Minimum charges are added at the period's final closing, and a tier reduction larger than this statement's own charges is credited to earlier invoices of the period at closing. */
   estimated: boolean;
   amounts: StatementAmounts;
   closed_at?: string;
