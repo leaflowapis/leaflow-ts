@@ -68,7 +68,6 @@ export const OrderItem = zod
       .describe(
         "Prepaid items only: the plan's postpaid hourly price for this item's quantity before tax, frozen at\npurchase, used for time used short of a full month. Null when the plan has no postpaid price.",
       ),
-    completes_on_payment: zod.boolean(),
     recurring_amount: zod.string().optional(),
     setup_amount: zod.string().optional(),
     charge_type: zod

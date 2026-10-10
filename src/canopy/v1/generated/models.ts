@@ -2875,7 +2875,6 @@ export interface OrderItem {
    * @nullable
    */
   refund_hourly_amount?: string | null;
-  completes_on_payment: boolean;
   recurring_amount?: string;
   setup_amount?: string;
   /** The payment timing of the selected price. */
