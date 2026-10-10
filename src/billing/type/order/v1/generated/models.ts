@@ -974,7 +974,7 @@ export interface AccountBalance {
    * spendable balance and may differ from the recorded credits total.
    */
   credit_groups: CreditGroup[];
-  /** Amount still payable on issued invoices. Unbilled usage is reported separately; arrears depend on actual eligible funding and grace terms. */
+  /** Amount still payable on issued invoices. The invoice of an order not yet accepted is a request to pay for that order rather than a debt, so it is excluded here and from available_credit. Unbilled usage is reported separately; arrears depend on actual eligible funding and grace terms. */
   due: Money;
   pending_returns_amount: Money;
 }

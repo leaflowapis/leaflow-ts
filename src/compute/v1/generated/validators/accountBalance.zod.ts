@@ -53,7 +53,7 @@ export const AccountBalance = zod
         "Currently valid, unspent credit grouped by permitted use. Restrictions and\nvalidity dates determine which charges a group can cover, so these groups are not a general\nspendable balance and may differ from the recorded credits total.",
       ),
     due: Money.describe(
-      "Amount still payable on issued invoices. Unbilled usage is reported separately; arrears depend on actual eligible funding and grace terms.",
+      "Amount still payable on issued invoices. The invoice of an order not yet accepted is a request to pay for that order rather than a debt, so it is excluded here and from available_credit. Unbilled usage is reported separately; arrears depend on actual eligible funding and grace terms.",
     ),
     pending_returns_amount: Money,
   })
