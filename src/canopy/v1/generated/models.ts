@@ -3639,6 +3639,33 @@ export interface StatementAmounts {
   total: Money;
 }
 
+/**
+ * One billing account's usage billing for one UTC calendar month, summed over the month's statements. It is a summary, not something to pay; each closing's invoice is collected on its own.
+ */
+export interface MonthlyStatement {
+  billing_account_id: number;
+  currency: string;
+  period_start: string;
+  period_end: string;
+  /** True after the period's final closing, which applies minimum charges for the whole month. Usage priced later is still billed in supplement statements and added here. */
+  finalized: boolean;
+  finalized_at?: string;
+  /** Statements of the period, including the open one. */
+  statement_count: number;
+  billed: StatementAmounts;
+  credited_amount: Money;
+  unbilled?: StatementAmounts;
+  credit_applied: Money;
+  amount_paid: Money;
+  amount_due: Money;
+  amount_refunded: Money;
+}
+
+export interface MonthlyStatementList {
+  items: MonthlyStatement[];
+  pagination: OffsetPagination;
+}
+
 export type StatementStatus = (typeof StatementStatus)[keyof typeof StatementStatus];
 
 export const StatementStatus = {

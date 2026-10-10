@@ -1846,6 +1846,34 @@ export const ListSpendQueryParams = zod.strictObject({
 });
 
 /**
+ * Usage billing by UTC calendar month for owned billing accounts, newest first. Each period combines its statements, the invoices they issued and how those invoices were paid; usage is billed about hourly, so a month holds many statements. Filter by billing_account_id and by period start.
+ * @summary List monthly statements
+ */
+export const listMonthlyStatementsQueryPageDefault = 1;
+export const listMonthlyStatementsQueryPageMax = 2147483647;
+
+export const listMonthlyStatementsQueryPageSizeDefault = 50;
+export const listMonthlyStatementsQueryPageSizeMax = 200;
+
+export const ListMonthlyStatementsQueryParams = zod.strictObject({
+  billing_account_id: zod.int().optional(),
+  from: zod.iso.datetime({ offset: true }).optional().describe("Earliest period start, inclusive."),
+  to: zod.iso.datetime({ offset: true }).optional().describe("Latest period start, exclusive."),
+  page: zod
+    .int()
+    .min(1)
+    .max(listMonthlyStatementsQueryPageMax)
+    .default(listMonthlyStatementsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listMonthlyStatementsQueryPageSizeMax)
+    .default(listMonthlyStatementsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
+
+/**
  * Paginated consumption statement batches for owned billing accounts, filtered by billing_account_id, open or closed state and period-start interval. A closed batch is not proof that the whole month has finished.
  * @summary List statements
  */

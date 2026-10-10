@@ -53,6 +53,7 @@ import type {
   ListFeatureGrantsParams,
   ListInvoiceItemsParams,
   ListInvoicesParams,
+  ListMonthlyStatementsParams,
   ListOrderItemsParams,
   ListOrdersParams,
   ListPaymentMethodsParams,
@@ -76,6 +77,7 @@ import type {
   ListTopUpsParams,
   ListTransactionsParams,
   ListUsageChargesParams,
+  MonthlyStatementList,
   NotModifiedResponse,
   Order,
   OrderCancel,
@@ -4473,6 +4475,63 @@ export const listSpend = async (
 
   const data: listSpendResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listSpendResponse;
+};
+
+export type listMonthlyStatementsResponse200 = {
+  data: MonthlyStatementList;
+  status: 200;
+};
+
+export type listMonthlyStatementsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listMonthlyStatementsResponseSuccess = listMonthlyStatementsResponse200 & {
+  headers: Headers;
+};
+export type listMonthlyStatementsResponseError = listMonthlyStatementsResponseDefault & {
+  headers: Headers;
+};
+
+export type listMonthlyStatementsResponse =
+  | listMonthlyStatementsResponseSuccess
+  | listMonthlyStatementsResponseError;
+
+export const getListMonthlyStatementsUrl = (params?: ListMonthlyStatementsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/monthly-statements?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/monthly-statements`;
+};
+
+/**
+ * Usage billing by UTC calendar month for owned billing accounts, newest first. Each period combines its statements, the invoices they issued and how those invoices were paid; usage is billed about hourly, so a month holds many statements. Filter by billing_account_id and by period start.
+ * @summary List monthly statements
+ */
+export const listMonthlyStatements = async (
+  params?: ListMonthlyStatementsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listMonthlyStatementsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListMonthlyStatementsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listMonthlyStatementsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listMonthlyStatementsResponse;
 };
 
 export type listStatementsResponse200 = {
