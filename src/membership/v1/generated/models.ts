@@ -2295,6 +2295,55 @@ export const SubscriptionInterval = {
 } as const;
 
 /**
+ * Follows the items. `pending` is not yet accepted and may be unpaid or paid; its invoice shows
+ * whether payment is still needed, and it can expire or be canceled. `accepted` is accepted with items still
+ * being set up. `completed` means every item was set up. `partially_completed` means some items were set up
+ * and the others failed or were canceled and were refunded to their original payment sources. `failed` means
+ * no item was delivered and at least one failed; collected amounts for the undelivered items are refunded.
+ * `canceled` means every item was withdrawn without delivery; collected amounts are returned to their original
+ * payment sources. No status establishes service delivery by itself.
+ */
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+
+export const OrderStatus = {
+  pending: "pending",
+  accepted: "accepted",
+  completed: "completed",
+  partially_completed: "partially_completed",
+  failed: "failed",
+  canceled: "canceled",
+} as const;
+
+export type ScheduledChangeInterval =
+  (typeof ScheduledChangeInterval)[keyof typeof ScheduledChangeInterval];
+
+export const ScheduledChangeInterval = {
+  day: "day",
+  month: "month",
+  year: "year",
+} as const;
+
+/**
+ * The next accepted period-end change for a subscription. It describes the target terms and does not change the current subscription until effective_at.
+ */
+export interface ScheduledChange {
+  order_id: string;
+  status: OrderStatus;
+  /** When the target terms take effect, normally the end of the current paid period. */
+  effective_at: string;
+  plan_id: string;
+  plan_name: string;
+  price_id: string;
+  quantity: string;
+  /** The target prepaid renewal amount before tax. */
+  recurring_amount: string;
+  currency: string;
+  interval: ScheduledChangeInterval;
+  /** @minimum 1 */
+  interval_count: number;
+}
+
+/**
  * pending means the purchase relationship exists but its order has not been accepted.
  * provisioning means the service accepted the order and is delivering. For a service-owned
  * purchase, only confirmed delivery moves it to active; paying alone does not.
@@ -2360,6 +2409,8 @@ export interface Subscription {
   suspend_reason?: string;
   billing_cycle_anchor?: string;
   cancellation?: SubscriptionCancellation;
+  /** The accepted period-end change currently scheduled for this subscription. Null when no such change exists. */
+  scheduled_change?: ScheduledChange | null;
   /**
    * The saved payment method automatic renewal charges after the account's balance and credits,
    * before the account's default payment method. Set when the purchase, a renewal or a change is paid with a
@@ -2549,26 +2600,6 @@ export interface RenewalOrderRequest {
 export interface AutoRenewSet {
   auto_renew: boolean;
 }
-
-/**
- * Follows the items. `pending` is not yet accepted and may be unpaid or paid; its invoice shows
- * whether payment is still needed, and it can expire or be canceled. `accepted` is accepted with items still
- * being set up. `completed` means every item was set up. `partially_completed` means some items were set up
- * and the others failed or were canceled and were refunded to their original payment sources. `failed` means
- * no item was delivered and at least one failed; collected amounts for the undelivered items are refunded.
- * `canceled` means every item was withdrawn without delivery; collected amounts are returned to their original
- * payment sources. No status establishes service delivery by itself.
- */
-export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
-
-export const OrderStatus = {
-  pending: "pending",
-  accepted: "accepted",
-  completed: "completed",
-  partially_completed: "partially_completed",
-  failed: "failed",
-  canceled: "canceled",
-} as const;
 
 /**
  * `pending` is waiting to be set up. `completed` was confirmed by the service.

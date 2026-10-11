@@ -554,7 +554,7 @@ export const PayTogetherBody = PayTogetherRequest;
 export const PreviewPayTogetherBody = PayTogetherRequest;
 
 /**
- * Paginated issued invoices belonging to owned billing accounts, filtered by billing_account_id, status and creation interval. Drafts are excluded, including the draft invoice of an order awaiting payment, which is reached through its order; top-ups do not create invoices.
+ * Paginated issued invoices belonging to owned billing accounts, filtered by billing_account_id, subscription_id, status and creation interval. Drafts are excluded, including the draft invoice of an order awaiting payment, which is reached through its order; top-ups do not create invoices.
  * @summary List invoices
  */
 export const listInvoicesQueryPageDefault = 1;
@@ -585,6 +585,12 @@ export const ListInvoicesQueryParams = zod.strictObject({
     .optional()
     .describe(
       "A draft is not yet issued. The draft invoice of an order shows base prices until it is paid, when\nthe discount is applied and it is issued; other drafts are private to administrators.\nAn issued invoice is open until settled; a zero-total issued invoice is immediately paid.\nUnbilled usage remains separate from invoices until it is invoiced.\nA refund does not change the status: a paid invoice stays paid, with the refunded part in\namount_refunded. void means collection has stopped and any funds received have been returned.",
+    ),
+  subscription_id: zod
+    .uuid()
+    .optional()
+    .describe(
+      "Only invoices containing a charge from this subscription. The returned invoice amount is the total for the whole invoice.",
     ),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
@@ -1157,8 +1163,10 @@ export const CreateRenewalOrderParams = zod.strictObject({
 export const CreateRenewalOrderBody = RenewalOrderRequest;
 
 /**
- * Controls automatic prepaid renewal. Disabling it does not shorten current_term_end and still permits
- * manual renewal. A postpaid subscription always continues until it is canceled; setting it is refused with 409
+ * Controls automatic prepaid renewal for an active or suspended subscription. A pending or provisioning
+ * subscription cannot set this preference and returns 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_INACTIVE`. Disabling it does
+ * not shorten current_term_end and still permits manual renewal. A postpaid subscription always continues until it is
+ * canceled; setting it is refused with 409
  * `BILLING_SUBSCRIPTION_AUTO_RENEW_FIXED`.
  *
  * While the subscription has an open cancellation, turning it on or off is refused with 409

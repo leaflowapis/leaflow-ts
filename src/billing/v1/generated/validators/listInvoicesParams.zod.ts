@@ -23,6 +23,7 @@ export const ListInvoicesParams = zod.strictObject({
     .default(listInvoicesParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
   status: InvoiceStatus.optional(),
+  subscription_id: zod.uuid().optional(),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional(),
 });

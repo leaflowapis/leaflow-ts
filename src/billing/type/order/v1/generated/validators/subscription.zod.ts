@@ -12,6 +12,7 @@ import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
+import { ScheduledChange } from "./scheduledChange.zod.js";
 import { SubscriptionCancellation } from "./subscriptionCancellation.zod.js";
 import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
@@ -47,6 +48,12 @@ export const Subscription = zod
     suspend_reason: zod.string().optional(),
     billing_cycle_anchor: zod.iso.datetime({ offset: true }).optional(),
     cancellation: SubscriptionCancellation.optional(),
+    scheduled_change: zod
+      .union([ScheduledChange, zod.null()])
+      .optional()
+      .describe(
+        "The accepted period-end change currently scheduled for this subscription. Null when no such change exists.",
+      ),
     default_payment_method_id: zod
       .uuid()
       .nullish()
