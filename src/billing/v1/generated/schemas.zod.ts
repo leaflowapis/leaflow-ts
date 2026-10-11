@@ -39,6 +39,85 @@ import { SetProjectAssignmentRequest } from "./validators/setProjectAssignmentRe
 
 import { TopUpCreate } from "./validators/topUpCreate.zod.js";
 
+import { WithdrawalCreate } from "./validators/withdrawalCreate.zod.js";
+
+import { WithdrawalPreviewRequest } from "./validators/withdrawalPreviewRequest.zod.js";
+
+/**
+ * Paginated fixed source allocations and their outcomes. A failed source does not undo refunds already completed through other sources.
+ * @summary List withdrawal items
+ */
+export const ListWithdrawalItemsParams = zod.strictObject({
+  withdrawalId: zod.uuid(),
+});
+
+export const listWithdrawalItemsQueryPageDefault = 1;
+export const listWithdrawalItemsQueryPageMax = 2147483647;
+
+export const listWithdrawalItemsQueryPageSizeDefault = 50;
+export const listWithdrawalItemsQueryPageSizeMax = 200;
+
+export const ListWithdrawalItemsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listWithdrawalItemsQueryPageMax)
+    .default(listWithdrawalItemsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listWithdrawalItemsQueryPageSizeMax)
+    .default(listWithdrawalItemsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
+
+/**
+ * Paginated account withdrawal history, newest first. Account authorization applies to every record.
+ * @summary List withdrawals
+ */
+export const listWithdrawalsQueryPageDefault = 1;
+export const listWithdrawalsQueryPageMax = 2147483647;
+
+export const listWithdrawalsQueryPageSizeDefault = 50;
+export const listWithdrawalsQueryPageSizeMax = 200;
+
+export const ListWithdrawalsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listWithdrawalsQueryPageMax)
+    .default(listWithdrawalsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listWithdrawalsQueryPageSizeMax)
+    .default(listWithdrawalsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+  billing_account_id: zod.int().optional(),
+});
+
+/**
+ * Withdraws the requested account balance through the original top-ups in receipt order. Fees are calculated independently per source. expected_items and expected_refund_amount must match the accepted preview. Reusing the same ID with different terms fails. Only successful items collect a fee.
+ * @summary Create withdrawal
+ */
+export const CreateWithdrawalBody = WithdrawalCreate;
+
+/**
+ * Previews the available balance deduction, fees and exact refund allocation by original source. Omit amount to preview all available principal. Creates no withdrawal and reserves no funds. Fails if a selected source has no configured refund route or its original processing cost is not yet available.
+ * @summary Preview withdrawal
+ */
+export const PreviewWithdrawalBody = WithdrawalPreviewRequest;
+
+/**
+ * Reads the accepted amounts and aggregate outcome of an authorized withdrawal. List its source items for each original-method refund result.
+ * @summary Get withdrawal
+ */
+export const GetWithdrawalParams = zod.strictObject({
+  withdrawalId: zod.uuid(),
+});
+
 /**
  * Paginated contact profiles belonging to the billing account in the path, including inactive contacts. Returns 404 if the account does not exist.
  * @summary List contacts

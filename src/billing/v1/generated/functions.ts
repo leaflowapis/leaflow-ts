@@ -77,6 +77,8 @@ import type {
   ListTopUpsParams,
   ListTransactionsParams,
   ListUsageChargesParams,
+  ListWithdrawalItemsParams,
+  ListWithdrawalsParams,
   MonthlyStatementList,
   NotModifiedResponse,
   Order,
@@ -121,6 +123,12 @@ import type {
   TopUpList,
   TransactionList,
   UsageChargeList,
+  Withdrawal,
+  WithdrawalCreate,
+  WithdrawalItemList,
+  WithdrawalList,
+  WithdrawalPreview,
+  WithdrawalPreviewRequest,
 } from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
@@ -164,6 +172,297 @@ export type HTTPStatusCodes =
   | HTTPStatusCode3xx
   | HTTPStatusCode4xx
   | HTTPStatusCode5xx;
+
+export type listWithdrawalItemsResponse200 = {
+  data: WithdrawalItemList;
+  status: 200;
+};
+
+export type listWithdrawalItemsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listWithdrawalItemsResponseSuccess = listWithdrawalItemsResponse200 & {
+  headers: Headers;
+};
+export type listWithdrawalItemsResponseError = listWithdrawalItemsResponseDefault & {
+  headers: Headers;
+};
+
+export type listWithdrawalItemsResponse =
+  | listWithdrawalItemsResponseSuccess
+  | listWithdrawalItemsResponseError;
+
+export const getListWithdrawalItemsUrl = (
+  withdrawalId: string,
+  params?: ListWithdrawalItemsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/withdrawals/${encodeURIComponent(String(withdrawalId))}/items?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/withdrawals/${encodeURIComponent(String(withdrawalId))}/items`;
+};
+
+/**
+ * Paginated fixed source allocations and their outcomes. A failed source does not undo refunds already completed through other sources.
+ * @summary List withdrawal items
+ */
+export const listWithdrawalItems = async (
+  withdrawalId: string,
+  params?: ListWithdrawalItemsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listWithdrawalItemsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListWithdrawalItemsUrl(withdrawalId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listWithdrawalItemsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listWithdrawalItemsResponse;
+};
+
+export type listWithdrawalsResponse200 = {
+  data: WithdrawalList;
+  status: 200;
+};
+
+export type listWithdrawalsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listWithdrawalsResponseSuccess = listWithdrawalsResponse200 & {
+  headers: Headers;
+};
+export type listWithdrawalsResponseError = listWithdrawalsResponseDefault & {
+  headers: Headers;
+};
+
+export type listWithdrawalsResponse = listWithdrawalsResponseSuccess | listWithdrawalsResponseError;
+
+export const getListWithdrawalsUrl = (params?: ListWithdrawalsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/withdrawals?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/withdrawals`;
+};
+
+/**
+ * Paginated account withdrawal history, newest first. Account authorization applies to every record.
+ * @summary List withdrawals
+ */
+export const listWithdrawals = async (
+  params?: ListWithdrawalsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listWithdrawalsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListWithdrawalsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listWithdrawalsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listWithdrawalsResponse;
+};
+
+export type createWithdrawalResponse201 = {
+  data: Withdrawal;
+  status: 201;
+};
+
+export type createWithdrawalResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createWithdrawalResponseSuccess = createWithdrawalResponse201 & {
+  headers: Headers;
+};
+export type createWithdrawalResponseError = createWithdrawalResponseDefault & {
+  headers: Headers;
+};
+
+export type createWithdrawalResponse =
+  | createWithdrawalResponseSuccess
+  | createWithdrawalResponseError;
+
+export const getCreateWithdrawalUrl = () => {
+  return `https://billing.leaflow.cloud/api/v1/withdrawals`;
+};
+
+/**
+ * Withdraws the requested account balance through the original top-ups in receipt order. Fees are calculated independently per source. expected_items and expected_refund_amount must match the accepted preview. Reusing the same ID with different terms fails. Only successful items collect a fee.
+ * @summary Create withdrawal
+ */
+export const createWithdrawal = async (
+  withdrawalCreate: WithdrawalCreate,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createWithdrawalResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateWithdrawalUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(withdrawalCreate),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createWithdrawalResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createWithdrawalResponse;
+};
+
+export type previewWithdrawalResponse200 = {
+  data: WithdrawalPreview;
+  status: 200;
+};
+
+export type previewWithdrawalResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type previewWithdrawalResponseSuccess = previewWithdrawalResponse200 & {
+  headers: Headers;
+};
+export type previewWithdrawalResponseError = previewWithdrawalResponseDefault & {
+  headers: Headers;
+};
+
+export type previewWithdrawalResponse =
+  | previewWithdrawalResponseSuccess
+  | previewWithdrawalResponseError;
+
+export const getPreviewWithdrawalUrl = () => {
+  return `https://billing.leaflow.cloud/api/v1/withdrawals/preview`;
+};
+
+/**
+ * Previews the available balance deduction, fees and exact refund allocation by original source. Omit amount to preview all available principal. Creates no withdrawal and reserves no funds. Fails if a selected source has no configured refund route or its original processing cost is not yet available.
+ * @summary Preview withdrawal
+ */
+export const previewWithdrawal = async (
+  withdrawalPreviewRequest: WithdrawalPreviewRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<previewWithdrawalResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getPreviewWithdrawalUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(withdrawalPreviewRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: previewWithdrawalResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as previewWithdrawalResponse;
+};
+
+export type getWithdrawalResponse200 = {
+  data: Withdrawal;
+  status: 200;
+};
+
+export type getWithdrawalResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getWithdrawalResponseSuccess = getWithdrawalResponse200 & {
+  headers: Headers;
+};
+export type getWithdrawalResponseError = getWithdrawalResponseDefault & {
+  headers: Headers;
+};
+
+export type getWithdrawalResponse = getWithdrawalResponseSuccess | getWithdrawalResponseError;
+
+export const getGetWithdrawalUrl = (withdrawalId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/withdrawals/${encodeURIComponent(String(withdrawalId))}`;
+};
+
+/**
+ * Reads the accepted amounts and aggregate outcome of an authorized withdrawal. List its source items for each original-method refund result.
+ * @summary Get withdrawal
+ */
+export const getWithdrawal = async (
+  withdrawalId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getWithdrawalResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetWithdrawalUrl(withdrawalId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getWithdrawalResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getWithdrawalResponse;
+};
 
 export type listContactsResponse200 = {
   data: ContactList;

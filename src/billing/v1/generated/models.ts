@@ -1212,6 +1212,7 @@ export const TransactionType = {
   payment: "payment",
   refund: "refund",
   adjustment: "adjustment",
+  fee: "fee",
 } as const;
 
 /**
@@ -3005,6 +3006,185 @@ export interface QuoteRequest {
 }
 
 /**
+ * Pagination metadata for keyset traversal. Pass next_cursor as cursor to read the following page; null means there is no following page.
+ */
+export interface CursorPagination {
+  /** @minimum 1 */
+  page_size: number;
+  /** @nullable */
+  next_cursor?: string | null;
+}
+
+export interface WithdrawalAllocation {
+  source_transaction_id: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+}
+
+export type WithdrawalItemStatus = (typeof WithdrawalItemStatus)[keyof typeof WithdrawalItemStatus];
+
+export const WithdrawalItemStatus = {
+  pending: "pending",
+  succeeded: "succeeded",
+  failed: "failed",
+  reversed: "reversed",
+} as const;
+
+/**
+ * The original top-up and its refund destination. Card details are included when the original payment method was saved; missing card details do not change the original refund route.
+ */
+export interface WithdrawalSource {
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /**
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency: string;
+  received_at: string;
+  payment_gateway: string;
+  method_type: string;
+  card_brand?: string;
+  /** @pattern ^[0-9]{4}$ */
+  card_last4?: string;
+}
+
+/**
+ * The fixed principal deduction, withdrawal fee and exact refund obligation for one original top-up. Each item has its own refund; payment_gateway and method_type identify the original route.
+ */
+export interface WithdrawalItem {
+  source_transaction_id: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+  id: string;
+  withdrawal_id: string;
+  billing_account_id: number;
+  /**
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency: string;
+  refund_id: string;
+  fee_transaction_id?: string;
+  status: WithdrawalItemStatus;
+  completed_at?: string;
+  payment_gateway: string;
+  method_type: string;
+  source: WithdrawalSource;
+  /** The original gateway failure code when a refund failed, or refund_reversed when a completed refund was reversed. Absent while pending or successful. */
+  failure_code?: string;
+}
+
+export type WithdrawalStatus = (typeof WithdrawalStatus)[keyof typeof WithdrawalStatus];
+
+export const WithdrawalStatus = {
+  pending: "pending",
+  processing: "processing",
+  succeeded: "succeeded",
+  partially_completed: "partially_completed",
+  failed: "failed",
+  reversed: "reversed",
+} as const;
+
+/**
+ * An account withdrawal to the original payment methods of its unused top-ups. Accepted amounts are fixed. deducted_amount, settled_amount and charged_fee_amount report completed source items. Failed items release their principal and fee reservations; successful items are retained when another source fails.
+ */
+export interface Withdrawal {
+  id: string;
+  billing_account_id: number;
+  /**
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  deducted_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  settled_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  charged_fee_amount: string;
+  status: WithdrawalStatus;
+  created_at: string;
+  completed_at?: string;
+  /** Identity that submitted this withdrawal. It can differ from the billing account owner. */
+  created_by?: string;
+}
+
+export interface WithdrawalPreviewItem {
+  source_transaction_id: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+  source: WithdrawalSource;
+}
+
+export interface WithdrawalPreview {
+  billing_account_id: number;
+  /**
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  available_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+  /** @maxItems 200 */
+  items: WithdrawalPreviewItem[];
+}
+
+export interface WithdrawalPreviewRequest {
+  billing_account_id: number;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount?: string;
+}
+
+export interface WithdrawalCreate {
+  id: string;
+  billing_account_id: number;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  expected_refund_amount: string;
+  /**
+   * @minItems 1
+   * @maxItems 200
+   */
+  expected_items: WithdrawalAllocation[];
+}
+
+export interface WithdrawalList {
+  items: Withdrawal[];
+  pagination: OffsetPagination;
+}
+
+export interface WithdrawalItemList {
+  items: WithdrawalItem[];
+  pagination: OffsetPagination;
+}
+
+/**
  * How tax applies to the customer, as in Stripe. `none` taxes normally. `exempt` charges no tax.
  * `reverse` charges no tax and leaves it to the customer under the reverse-charge mechanism;
  * invoices state this. Only operators change it.
@@ -3112,16 +3292,6 @@ export interface ContactUpdate {
 export interface ContactList {
   items: Contact[];
   pagination: OffsetPagination;
-}
-
-/**
- * Pagination metadata for keyset traversal. Pass next_cursor as cursor to read the following page; null means there is no following page.
- */
-export interface CursorPagination {
-  /** @minimum 1 */
-  page_size: number;
-  /** @nullable */
-  next_cursor?: string | null;
 }
 
 export interface CancelSubscriptionRequest {
@@ -3286,6 +3456,37 @@ export type ToRequiredParameter = string;
  * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
  */
 export type ProjectIdsQueryParameter = string[];
+
+export type ListWithdrawalItemsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+};
+
+export type ListWithdrawalsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+  billing_account_id?: number;
+};
 
 export type ListContactsParams = {
   /**

@@ -2824,113 +2824,172 @@ export interface CursorPagination {
   next_cursor?: string | null;
 }
 
-/**
- * How tax applies to the customer, as in Stripe. `none` taxes normally. `exempt` charges no tax.
- * `reverse` charges no tax and leaves it to the customer under the reverse-charge mechanism;
- * invoices state this. Only operators change it.
- */
-export type ContactTaxExempt = (typeof ContactTaxExempt)[keyof typeof ContactTaxExempt];
+export interface WithdrawalAllocation {
+  source_transaction_id: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+}
 
-export const ContactTaxExempt = {
-  none: "none",
-  exempt: "exempt",
-  reverse: "reverse",
+export type WithdrawalItemStatus = (typeof WithdrawalItemStatus)[keyof typeof WithdrawalItemStatus];
+
+export const WithdrawalItemStatus = {
+  pending: "pending",
+  succeeded: "succeeded",
+  failed: "failed",
+  reversed: "reversed",
 } as const;
 
 /**
- * A billing-account contact profile with one address. An account can hold multiple contacts; this is not a login identity.
+ * The original top-up and its refund destination. Card details are included when the original payment method was saved; missing card details do not change the original refund route.
  */
-export interface Contact {
+export interface WithdrawalSource {
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /**
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency: string;
+  received_at: string;
+  payment_gateway: string;
+  method_type: string;
+  card_brand?: string;
+  /** @pattern ^[0-9]{4}$ */
+  card_last4?: string;
+}
+
+/**
+ * The fixed principal deduction, withdrawal fee and exact refund obligation for one original top-up. Each item has its own refund; payment_gateway and method_type identify the original route.
+ */
+export interface WithdrawalItem {
+  source_transaction_id: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+  id: string;
+  withdrawal_id: string;
+  billing_account_id: number;
+  /**
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency: string;
+  refund_id: string;
+  fee_transaction_id?: string;
+  status: WithdrawalItemStatus;
+  completed_at?: string;
+  payment_gateway: string;
+  method_type: string;
+  source: WithdrawalSource;
+  /** The original gateway failure code when a refund failed, or refund_reversed when a completed refund was reversed. Absent while pending or successful. */
+  failure_code?: string;
+}
+
+export type WithdrawalStatus = (typeof WithdrawalStatus)[keyof typeof WithdrawalStatus];
+
+export const WithdrawalStatus = {
+  pending: "pending",
+  processing: "processing",
+  succeeded: "succeeded",
+  partially_completed: "partially_completed",
+  failed: "failed",
+  reversed: "reversed",
+} as const;
+
+/**
+ * An account withdrawal to the original payment methods of its unused top-ups. Accepted amounts are fixed. deducted_amount, settled_amount and charged_fee_amount report completed source items. Failed items release their principal and fee reservations; successful items are retained when another source fails.
+ */
+export interface Withdrawal {
   id: string;
   billing_account_id: number;
   /**
-   * @minLength 1
-   * @maxLength 255
+   * @minLength 3
+   * @maxLength 3
    */
-  name: string;
-  /** @maxLength 255 */
-  legal_name?: string;
-  /** @maxLength 255 */
-  email?: string;
-  /** @maxLength 64 */
-  tax_id?: string;
-  /** @maxLength 255 */
-  address_line1?: string;
-  /** @maxLength 255 */
-  address_line2?: string;
-  /** @maxLength 128 */
-  address_city?: string;
-  /** @maxLength 128 */
-  address_state?: string;
-  /** @maxLength 32 */
-  address_postal_code?: string;
-  /** @pattern ^([A-Z]{2})?$ */
-  address_country?: string;
-  /**
-   * How tax applies to the customer, as in Stripe. `none` taxes normally. `exempt` charges no tax.
-   * `reverse` charges no tax and leaves it to the customer under the reverse-charge mechanism;
-   * invoices state this. Only operators change it.
-   */
-  tax_exempt: ContactTaxExempt;
-  active: boolean;
+  currency: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  deducted_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  settled_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  charged_fee_amount: string;
+  status: WithdrawalStatus;
   created_at: string;
+  completed_at?: string;
+  /** Identity that submitted this withdrawal. It can differ from the billing account owner. */
+  created_by?: string;
 }
 
-export interface ContactCreate {
+export interface WithdrawalPreviewItem {
+  source_transaction_id: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+  source: WithdrawalSource;
+}
+
+export interface WithdrawalPreview {
+  billing_account_id: number;
   /**
-   * @minLength 1
-   * @maxLength 255
+   * @minLength 3
+   * @maxLength 3
    */
-  name: string;
-  /** @maxLength 255 */
-  legal_name?: string;
-  /** @maxLength 255 */
-  email?: string;
-  /** @maxLength 64 */
-  tax_id?: string;
-  /** @maxLength 255 */
-  address_line1?: string;
-  /** @maxLength 255 */
-  address_line2?: string;
-  /** @maxLength 128 */
-  address_city?: string;
-  /** @maxLength 128 */
-  address_state?: string;
-  /** @maxLength 32 */
-  address_postal_code?: string;
-  /** @pattern ^([A-Z]{2})?$ */
-  address_country?: string;
+  currency: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  available_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  fee_amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  refund_amount: string;
+  /** @maxItems 200 */
+  items: WithdrawalPreviewItem[];
 }
 
-export interface ContactUpdate {
+export interface WithdrawalPreviewRequest {
+  billing_account_id: number;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount?: string;
+}
+
+export interface WithdrawalCreate {
+  id: string;
+  billing_account_id: number;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  amount: string;
+  /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
+  expected_refund_amount: string;
   /**
-   * @minLength 1
-   * @maxLength 255
+   * @minItems 1
+   * @maxItems 200
    */
-  name?: string;
-  /** @maxLength 255 */
-  legal_name?: string;
-  /** @maxLength 255 */
-  email?: string;
-  /** @maxLength 64 */
-  tax_id?: string;
-  /** @maxLength 255 */
-  address_line1?: string;
-  /** @maxLength 255 */
-  address_line2?: string;
-  /** @maxLength 128 */
-  address_city?: string;
-  /** @maxLength 128 */
-  address_state?: string;
-  /** @maxLength 32 */
-  address_postal_code?: string;
-  /** @pattern ^([A-Z]{2})?$ */
-  address_country?: string;
-  active?: boolean;
+  expected_items: WithdrawalAllocation[];
 }
 
-export interface ContactList {
-  items: Contact[];
+export interface WithdrawalList {
+  items: Withdrawal[];
+  pagination: OffsetPagination;
+}
+
+export interface WithdrawalItemList {
+  items: WithdrawalItem[];
   pagination: OffsetPagination;
 }
 
@@ -4106,6 +4165,7 @@ export const TransactionType = {
   payment: "payment",
   refund: "refund",
   adjustment: "adjustment",
+  fee: "fee",
 } as const;
 
 /**
@@ -5843,6 +5903,116 @@ export interface QuoteRequest {
    */
   promotion_code?: string;
   refund?: OrderRefundQuoteInput;
+}
+
+/**
+ * How tax applies to the customer, as in Stripe. `none` taxes normally. `exempt` charges no tax.
+ * `reverse` charges no tax and leaves it to the customer under the reverse-charge mechanism;
+ * invoices state this. Only operators change it.
+ */
+export type ContactTaxExempt = (typeof ContactTaxExempt)[keyof typeof ContactTaxExempt];
+
+export const ContactTaxExempt = {
+  none: "none",
+  exempt: "exempt",
+  reverse: "reverse",
+} as const;
+
+/**
+ * A billing-account contact profile with one address. An account can hold multiple contacts; this is not a login identity.
+ */
+export interface Contact {
+  id: string;
+  billing_account_id: number;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name: string;
+  /** @maxLength 255 */
+  legal_name?: string;
+  /** @maxLength 255 */
+  email?: string;
+  /** @maxLength 64 */
+  tax_id?: string;
+  /** @maxLength 255 */
+  address_line1?: string;
+  /** @maxLength 255 */
+  address_line2?: string;
+  /** @maxLength 128 */
+  address_city?: string;
+  /** @maxLength 128 */
+  address_state?: string;
+  /** @maxLength 32 */
+  address_postal_code?: string;
+  /** @pattern ^([A-Z]{2})?$ */
+  address_country?: string;
+  /**
+   * How tax applies to the customer, as in Stripe. `none` taxes normally. `exempt` charges no tax.
+   * `reverse` charges no tax and leaves it to the customer under the reverse-charge mechanism;
+   * invoices state this. Only operators change it.
+   */
+  tax_exempt: ContactTaxExempt;
+  active: boolean;
+  created_at: string;
+}
+
+export interface ContactCreate {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name: string;
+  /** @maxLength 255 */
+  legal_name?: string;
+  /** @maxLength 255 */
+  email?: string;
+  /** @maxLength 64 */
+  tax_id?: string;
+  /** @maxLength 255 */
+  address_line1?: string;
+  /** @maxLength 255 */
+  address_line2?: string;
+  /** @maxLength 128 */
+  address_city?: string;
+  /** @maxLength 128 */
+  address_state?: string;
+  /** @maxLength 32 */
+  address_postal_code?: string;
+  /** @pattern ^([A-Z]{2})?$ */
+  address_country?: string;
+}
+
+export interface ContactUpdate {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  name?: string;
+  /** @maxLength 255 */
+  legal_name?: string;
+  /** @maxLength 255 */
+  email?: string;
+  /** @maxLength 64 */
+  tax_id?: string;
+  /** @maxLength 255 */
+  address_line1?: string;
+  /** @maxLength 255 */
+  address_line2?: string;
+  /** @maxLength 128 */
+  address_city?: string;
+  /** @maxLength 128 */
+  address_state?: string;
+  /** @maxLength 32 */
+  address_postal_code?: string;
+  /** @pattern ^([A-Z]{2})?$ */
+  address_country?: string;
+  active?: boolean;
+}
+
+export interface ContactList {
+  items: Contact[];
+  pagination: OffsetPagination;
 }
 
 export interface CancelSubscriptionRequest {

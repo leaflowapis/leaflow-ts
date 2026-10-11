@@ -8,7 +8,7 @@
 import * as zod from "zod";
 
 export const TransactionType = zod
-  .enum(["topup", "payment", "refund", "adjustment"])
+  .enum(["topup", "payment", "refund", "adjustment", "fee"])
   .describe(
     "topup adds to the balance; payment settles an invoice; refund returns original funds; adjustment changes the balance with an audit reason.",
   );
