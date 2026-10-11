@@ -25,6 +25,11 @@ export const Grant = zod
     discount_id: zod.uuid().nullable(),
     allowance_id: zod.uuid().nullable(),
     feature_grant_id: zod.uuid().nullable(),
+    valid_from: zod.iso.datetime({ offset: true }),
+    valid_until: zod.iso
+      .datetime({ offset: true })
+      .nullable()
+      .describe("Exclusive expiry; null means no expiry."),
     issued_at: zod.iso.datetime({ offset: true }),
   })
   .describe("A benefit grant with frozen terms and Billing resource identifiers.");

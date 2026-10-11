@@ -251,6 +251,12 @@ export interface Grant {
   allowance_id: string | null;
   /** @nullable */
   feature_grant_id: string | null;
+  valid_from: string;
+  /**
+   * Exclusive expiry; null means no expiry.
+   * @nullable
+   */
+  valid_until: string | null;
   issued_at: string;
 }
 
