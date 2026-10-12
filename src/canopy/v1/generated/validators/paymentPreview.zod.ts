@@ -30,11 +30,13 @@
  */
 import * as zod from "zod";
 import { AppliedCredit } from "./appliedCredit.zod.js";
+import { Funds } from "./funds.zod.js";
 import { Money } from "./money.zod.js";
 import { PaymentPreviewInvoice } from "./paymentPreviewInvoice.zod.js";
 
 export const PaymentPreview = zod
   .strictObject({
+    funds: Funds.optional(),
     currency: zod.string(),
     amount_due: Money.describe("What is outstanding before paying."),
     credit_applied: Money.describe(

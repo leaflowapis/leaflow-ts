@@ -19,6 +19,26 @@
 export type Money = string;
 
 /**
+ * Account funding for this purchase, calculated by Billing. Amounts use the enclosing response currency.
+ * Credit eligibility and all purchase requirements are already evaluated. Nothing is charged or reserved.
+ * A prepaid purchase may instead use an online payment method.
+ */
+export interface Funds {
+  /** Spendable balance after pending returns. */
+  available_balance_amount: Money;
+  /** Currently effective credits eligible for the quoted purchases or postpaid usage. Each grant is counted once. */
+  usable_credit_amount: Money;
+  /** Currently effective credits that cannot fund any quoted purchase or postpaid target. Unused eligible credits are not restricted. */
+  restricted_credit_amount: Money;
+  /** Minimum spendable balance needed after eligible credits, covering immediate charges and every new postpaid admission requirement. */
+  required_balance_amount: Money;
+  /** Additional balance needed now. Zero means account funds satisfy this quote. No funds are reserved. */
+  balance_shortfall_amount: Money;
+  /** Minimum recharge that covers the shortfall, respecting the currency minimum recharge and currency precision. Zero when no additional balance is needed. */
+  required_top_up_amount: Money;
+}
+
+/**
  * One calculated purchase line. Fixed purchase amounts are rounded as checkout rounds them.
  * A line without an immediate charge has zero checkout amounts. unit_amount remains null when
  * no single unit price applies; an unrequested usage estimate remains null.
@@ -64,11 +84,13 @@ export interface QuoteItem {
  * error response; it never returns a partial quote with HTTP 200.
  */
 export interface Quote {
+  funds: Funds;
   /**
    * Whether the account's current balance and eligible credits cover immediate charges
    * and the currency's minimum top-up for every new postpaid item. False preserves this
    * complete price preview. Nothing is reserved; checkout rechecks funds. Prepaid
    * purchases may also use an online payment method.
+   * @deprecated
    */
   funds_sufficient: boolean;
   /** One line for each item the purchase would order, in the order it would order them. */

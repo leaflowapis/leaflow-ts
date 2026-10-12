@@ -7,6 +7,7 @@
  */
 import * as zod from "zod";
 import { CancellationRefundPreview } from "./cancellationRefundPreview.zod.js";
+import { Funds } from "./funds.zod.js";
 import { Money } from "./money.zod.js";
 import { OrderRefundQuote } from "./orderRefundQuote.zod.js";
 import { QuotedDiscount } from "./quotedDiscount.zod.js";
@@ -15,6 +16,9 @@ import { QuoteRenewalResult } from "./quoteRenewalResult.zod.js";
 
 export const Quote = zod
   .strictObject({
+    funds: Funds.optional().describe(
+      "Account funding for an existing-order checkout quote. Absent for usage estimates, refunds and cancellation previews.",
+    ),
     subtotal: Money,
     discount_amount: Money,
     tax_amount: Money,

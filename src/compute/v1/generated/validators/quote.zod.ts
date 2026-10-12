@@ -22,11 +22,13 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { Funds } from "./funds.zod.js";
 import { Money } from "./money.zod.js";
 import { QuoteItem } from "./quoteItem.zod.js";
 
 export const Quote = zod
   .strictObject({
+    funds: Funds,
     funds_sufficient: zod
       .boolean()
       .describe(
