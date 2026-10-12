@@ -11,6 +11,11 @@ import { QuoteItem } from "./quoteItem.zod.js";
 
 export const Quote = zod
   .strictObject({
+    funds_sufficient: zod
+      .boolean()
+      .describe(
+        "Whether the account's current balance and eligible credits cover immediate charges\nand the currency's minimum top-up for every new postpaid item. False preserves this\ncomplete price preview. Nothing is reserved; checkout rechecks funds. Prepaid\npurchases may also use an online payment method.",
+      ),
     items: zod
       .array(QuoteItem)
       .describe(

@@ -2626,6 +2626,13 @@ export interface QuoteItem {
  * error response; it never returns a partial quote with HTTP 200.
  */
 export interface Quote {
+  /**
+   * Whether the account's current balance and eligible credits cover immediate charges
+   * and the currency's minimum top-up for every new postpaid item. False preserves this
+   * complete price preview. Nothing is reserved; checkout rechecks funds. Prepaid
+   * purchases may also use an online payment method.
+   */
+  funds_sufficient: boolean;
   /** One line for each item the purchase would order, in the order it would order them. */
   items: QuoteItem[];
   /**
