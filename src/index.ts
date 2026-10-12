@@ -2,6 +2,7 @@ export * as account from "./account/v1/index.js";
 export * as assistant from "./assistant/v1/index.js";
 export * as billing from "./billing/v1/index.js";
 export * as canopy from "./canopy/v1/index.js";
+export * as canopyInference from "./canopy/inference/v1/index.js";
 export * as compute from "./compute/v1/index.js";
 export * as dns from "./dns/v1/index.js";
 export * as iam from "./iam/v1/index.js";

@@ -238,12 +238,13 @@ export interface BillingChoice {
 }
 
 /**
- * automatic confirms checkout with applicable account discounts and collects payment from eligible
- * credit grants and available balance. Insufficient funds fail the purchase with HTTP 422
+ * automatic applies the best applicable account discount, issues the invoice and pays it from eligible
+ * credit grants and available balance at placement. Insufficient funds fail the purchase with HTTP 422
  * BILLING_INSUFFICIENT_FUNDS; no Billing order, charge or discount redemption is committed.
- * deferred creates a pending_checkout order for subsequent confirmation and payment through Billing.
- * No new discount redemption or payment is made when the order is created. An order whose total is
- * zero, with nothing to pay or discount, completes checkout at placement in either mode.
+ * deferred places the order with a draft invoice at base prices and collects nothing. Paying that
+ * invoice through Billing applies a promotion code or the best applicable account discount, issues the
+ * invoice and collects it; an order still unpaid at its deadline expires. A zero-total invoice is issued
+ * and paid at placement in either mode.
  */
 export type CheckoutMode = (typeof CheckoutMode)[keyof typeof CheckoutMode];
 
@@ -268,7 +269,7 @@ export type Money = string;
 /**
  * Shared checkout choices for a product purchase. Omitting this object or mode selects
  * automatic checkout. Each purchase creates its own order. Promotion codes are supplied only to
- * Billing quote and checkout operations. A service may retain a failed creation record when Billing
+ * Billing quote and payment operations. A service may retain a failed creation record when Billing
  * refuses a purchase; no infrastructure is created for that refusal.
  */
 export interface CheckoutOptions {
@@ -277,7 +278,7 @@ export interface CheckoutOptions {
    * Expected invoice total after discounts and tax, before applying credit grants or balance.
    * A different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.
    * Accepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred
-   * checkout, confirm the amount through Billing.
+   * checkout, give the expected amount when paying the invoice through Billing.
    */
   expected_amount?: Money & string;
 }
