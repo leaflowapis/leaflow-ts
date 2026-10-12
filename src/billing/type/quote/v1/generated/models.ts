@@ -85,14 +85,6 @@ export interface QuoteItem {
  */
 export interface Quote {
   funds: Funds;
-  /**
-   * Whether the account's current balance and eligible credits cover immediate charges
-   * and the currency's minimum top-up for every new postpaid item. False preserves this
-   * complete price preview. Nothing is reserved; checkout rechecks funds. Prepaid
-   * purchases may also use an online payment method.
-   * @deprecated
-   */
-  funds_sufficient: boolean;
   /** One line for each item the purchase would order, in the order it would order them. */
   items: QuoteItem[];
   /**
