@@ -274,7 +274,11 @@ export const RequestResourceUsageSource = {
 } as const;
 
 export interface RequestResource {
-  api_key_id: string;
+  /**
+   * Null for a request made by an internal service directly for the project.
+   * @nullable
+   */
+  api_key_id: string | null;
   /** The portion served from the upstream prefix cache, which costs an order of magnitude less than ordinary input */
   cache_read_tokens: number;
   cache_write_tokens: number;

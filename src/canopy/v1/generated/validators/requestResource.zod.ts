@@ -31,7 +31,10 @@
 import * as zod from "zod";
 
 export const RequestResource = zod.strictObject({
-  api_key_id: zod.uuid(),
+  api_key_id: zod
+    .uuid()
+    .nullable()
+    .describe("Null for a request made by an internal service directly for the project."),
   cache_read_tokens: zod
     .int()
     .describe(
