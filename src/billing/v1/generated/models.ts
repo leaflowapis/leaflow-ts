@@ -1437,6 +1437,23 @@ export const InvoiceItemType = {
   adjustment: "adjustment",
 } as const;
 
+/**
+ * The value of one paid period moved to the new configuration of a subscription.
+ */
+export interface InvoiceItemProration {
+  /** The earlier invoice line that paid for the period. */
+  credited_invoice_item_id: string;
+  /** The wording of the earlier invoice line as recorded when this invoice was created. */
+  description: string;
+  period_start: string;
+  /** Exclusive. */
+  period_end: string;
+  /** Before tax and discounts, the new configuration for the period. */
+  remaining_amount: Money;
+  /** Before tax, the unused value of the earlier line for the period, credited against `remaining_amount`. */
+  credited_amount: Money;
+}
+
 export interface InvoiceItem {
   taxable?: boolean;
   /** Discount applied to this line before tax. */
@@ -1482,6 +1499,11 @@ export interface InvoiceItem {
   period_start?: string | null;
   /** @nullable */
   period_end?: string | null;
+  /**
+   * Present on a line that changes a subscription immediately, one entry for each paid period it
+   * covers. `amount` is the sum of `remaining_amount` minus `credited_amount` over the entries.
+   */
+  prorations?: InvoiceItemProration[];
 }
 
 export interface InvoiceItemList {
@@ -1899,8 +1921,6 @@ export interface Subscription {
   termination_policy?: TerminationPolicy;
   refund_policy?: RefundPolicy;
   order_item_id?: string;
-  /** Present only on subscriptions created by an earlier change that replaced the subscription. A change now keeps the subscription ID. */
-  replaces_subscription_id?: string;
   coupon_id?: string;
   coupon?: ObjectIdentity;
   /** @minimum 0 */
@@ -2282,8 +2302,8 @@ export interface OrderItem {
   /**
    * Before discounts: the price applied to the quantity, which for a per-unit price is `unit_amount`
    * times `quantity`; a minimum charge can make it higher. For an upgrade that takes effect at once it is
-   * the new price minus the old price for the time left in the paid period, both at the subscription's
-   * own period price, and the period end does not move; a downgrade charges nothing and may refund the
+   * the new price for the time left in the paid period, at the subscription's own period price, minus
+   * the amount paid for that time, and the period end does not move; a downgrade charges nothing and may refund the
    * difference instead. A change between equal period prices charges and refunds nothing. The setup fee is not part of it; see `setup_amount`.
    *
    * Under an inclusive tax rate it includes tax, as the price does, and the included part is

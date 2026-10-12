@@ -33,12 +33,6 @@ export const Subscription = zod
     termination_policy: TerminationPolicy.optional(),
     refund_policy: RefundPolicy.optional(),
     order_item_id: zod.uuid().optional(),
-    replaces_subscription_id: zod
-      .uuid()
-      .optional()
-      .describe(
-        "Present only on subscriptions created by an earlier change that replaced the subscription. A change now keeps the subscription ID.",
-      ),
     coupon_id: zod.uuid().optional(),
     coupon: ObjectIdentity.optional(),
     discounted_renewals_remaining: zod

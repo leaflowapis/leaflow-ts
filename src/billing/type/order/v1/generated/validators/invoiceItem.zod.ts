@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { InvoiceItemProration } from "./invoiceItemProration.zod.js";
 import { Money } from "./money.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
 
@@ -48,6 +49,12 @@ export const InvoiceItem = zod.strictObject({
   currency: zod.string(),
   period_start: zod.iso.datetime({ offset: true }).nullish(),
   period_end: zod.iso.datetime({ offset: true }).nullish(),
+  prorations: zod
+    .array(InvoiceItemProration)
+    .optional()
+    .describe(
+      "Present on a line that changes a subscription immediately, one entry for each paid period it\ncovers. `amount` is the sum of `remaining_amount` minus `credited_amount` over the entries.",
+    ),
 });
 
 export type InvoiceItem = zod.input<typeof InvoiceItem>;
