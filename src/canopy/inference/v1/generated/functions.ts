@@ -125,7 +125,11 @@ export const createChatCompletion = async (
     body: JSON.stringify(chatCompletionRequest),
   });
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const body = [204, 205, 304].includes(res.status)
+    ? null
+    : res.headers.get("content-type")?.includes("application/json")
+      ? JSON.parse(await res.text())
+      : await res.blob();
   const data: createChatCompletionResponse["data"] = body as createChatCompletionResponse["data"];
   return { data, status: res.status, headers: res.headers } as createChatCompletionResponse;
 };
@@ -196,85 +200,89 @@ export const createEmbeddings = async (
   return { data, status: res.status, headers: res.headers } as createEmbeddingsResponse;
 };
 
-export type listModelsResponse200 = {
+export type listInferenceModelsResponse200 = {
   data: ModelList;
   status: 200;
 };
 
-export type listModelsResponseDefault = {
+export type listInferenceModelsResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type listModelsResponseSuccess = listModelsResponse200 & {
+export type listInferenceModelsResponseSuccess = listInferenceModelsResponse200 & {
   headers: Headers;
 };
-export type listModelsResponseError = listModelsResponseDefault & {
+export type listInferenceModelsResponseError = listInferenceModelsResponseDefault & {
   headers: Headers;
 };
 
-export type listModelsResponse = listModelsResponseSuccess | listModelsResponseError;
+export type listInferenceModelsResponse =
+  | listInferenceModelsResponseSuccess
+  | listInferenceModelsResponseError;
 
-export const getListModelsUrl = () => {
+export const getListInferenceModelsUrl = () => {
   return `https://canopy.leaflow.cloud/v1/models`;
 };
 
 /**
  * @summary List callable models with capabilities and parameter limits
  */
-export const listModels = async (
+export const listInferenceModels = async (
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<listModelsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListModelsUrl(), {
+): Promise<listInferenceModelsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListInferenceModelsUrl(), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listModelsResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listModelsResponse;
+  const data: listInferenceModelsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listInferenceModelsResponse;
 };
 
-export type getModelResponse200 = {
+export type getInferenceModelResponse200 = {
   data: Model;
   status: 200;
 };
 
-export type getModelResponseDefault = {
+export type getInferenceModelResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type getModelResponseSuccess = getModelResponse200 & {
+export type getInferenceModelResponseSuccess = getInferenceModelResponse200 & {
   headers: Headers;
 };
-export type getModelResponseError = getModelResponseDefault & {
+export type getInferenceModelResponseError = getInferenceModelResponseDefault & {
   headers: Headers;
 };
 
-export type getModelResponse = getModelResponseSuccess | getModelResponseError;
+export type getInferenceModelResponse =
+  | getInferenceModelResponseSuccess
+  | getInferenceModelResponseError;
 
-export const getGetModelUrl = (model: string) => {
+export const getGetInferenceModelUrl = (model: string) => {
   return `https://canopy.leaflow.cloud/v1/models/${encodeURIComponent(String(model))}`;
 };
 
 /**
  * @summary Get a callable model with capabilities and parameter limits
  */
-export const getModel = async (
+export const getInferenceModel = async (
   model: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<getModelResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetModelUrl(model), {
+): Promise<getInferenceModelResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetInferenceModelUrl(model), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getModelResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as getModelResponse;
+  const data: getInferenceModelResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getInferenceModelResponse;
 };

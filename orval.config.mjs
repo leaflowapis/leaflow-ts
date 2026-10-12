@@ -85,6 +85,15 @@ export default defineConfig(
       const hooks = {
         afterAllFilesWrite: [
           async () => {
+            if (module === "canopy/inference/v1") {
+              const path = `./src/${module}/generated/functions.ts`;
+              const code = readFileSync(path, "utf8");
+              const updated = code.replace(
+                "const body = [204, 205, 304].includes(res.status) ? null : await res.blob();",
+                'const body = [204, 205, 304].includes(res.status) ? null : res.headers.get("content-type")?.includes("application/json") ? JSON.parse(await res.text()) : await res.blob();',
+              );
+              writeFileSync(path, updated);
+            }
             // 单模块生成不能覆盖其他服务的完整路由表。
             if (routeModules.size !== modules.length) return;
             const routes = [...routeModules]

@@ -26,6 +26,6 @@ export const CreateEmbeddingsBody = EmbeddingRequest;
 /**
  * @summary Get a callable model with capabilities and parameter limits
  */
-export const GetModelParams = zod.strictObject({
+export const GetInferenceModelParams = zod.strictObject({
   model: zod.string(),
 });
