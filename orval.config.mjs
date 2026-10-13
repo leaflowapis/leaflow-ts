@@ -85,7 +85,7 @@ export default defineConfig(
       const hooks = {
         afterAllFilesWrite: [
           async () => {
-            if (module === "canopy/inference/v1") {
+            if (module === "canopy/v1") {
               const path = `./src/${module}/generated/functions.ts`;
               const code = readFileSync(path, "utf8");
               const updated = code.replace(

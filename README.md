@@ -18,6 +18,12 @@ npm run generate
 npm run build
 ```
 
-`orval.config.mjs` is plain official Orval configuration that recursively discovers OpenAPI entry documents. No custom generator,
-output postprocessing or compatibility forwarding layer is used. For local generation, CONTRACTS_DIR
+`orval.config.mjs` is plain official Orval configuration that recursively discovers OpenAPI entry documents. The Canopy hook chooses JSON or Blob for the chat completion response according to Content-Type,
+so JSON and SSE retain their respective response formats. No compatibility forwarding layer is used. For local generation, CONTRACTS_DIR
 may point to an existing clean checkout of the exact CONTRACTS_REF commit. CI checks out that commit.
+
+## Canopy migration
+
+Project inference and management are exported from `canopy` and `@leaflow/sdk/canopy/v1`.
+Replace `canopyInference` and `@leaflow/sdk/canopy/inference/v1` imports with the shared Canopy module.
+The OpenAI-compatible `/v1` paths, management `/api/v1` paths and scoped-token authentication are unchanged.

@@ -1253,7 +1253,7 @@ export const routes = [
   },
   {
     service: "canopy",
-    contract: "canopy/inference",
+    contract: "canopy",
     method: "POST",
     path: "/v1/chat/completions",
     operationId: "create-chat-completion",
@@ -1262,7 +1262,7 @@ export const routes = [
   },
   {
     service: "canopy",
-    contract: "canopy/inference",
+    contract: "canopy",
     method: "POST",
     path: "/v1/embeddings",
     operationId: "create-embeddings",
@@ -1271,7 +1271,7 @@ export const routes = [
   },
   {
     service: "canopy",
-    contract: "canopy/inference",
+    contract: "canopy",
     method: "GET",
     path: "/v1/models",
     operationId: "list-inference-models",
@@ -1280,7 +1280,7 @@ export const routes = [
   },
   {
     service: "canopy",
-    contract: "canopy/inference",
+    contract: "canopy",
     method: "GET",
     path: "/v1/models/{model}",
     operationId: "get-inference-model",
