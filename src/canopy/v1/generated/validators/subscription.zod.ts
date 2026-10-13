@@ -37,6 +37,7 @@ import { ProductID } from "./productID.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
 import { ScheduledChange } from "./scheduledChange.zod.js";
 import { SubscriptionCancellation } from "./subscriptionCancellation.zod.js";
+import { SubscriptionRestriction } from "./subscriptionRestriction.zod.js";
 import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
 export const subscriptionDiscountedRenewalsRemainingMin = 0;
@@ -62,7 +63,12 @@ export const Subscription = zod
       .int()
       .min(subscriptionDiscountedRenewalsRemainingMin)
       .optional(),
-    suspend_reason: zod.string().optional(),
+    restrictions: zod
+      .array(SubscriptionRestriction)
+      .optional()
+      .describe(
+        "The operations currently prevented on the subscription, sorted. The subscription is suspended while this contains billing.subscriptions.use.",
+      ),
     billing_cycle_anchor: zod.iso.datetime({ offset: true }).optional(),
     cancellation: SubscriptionCancellation.optional(),
     scheduled_change: zod

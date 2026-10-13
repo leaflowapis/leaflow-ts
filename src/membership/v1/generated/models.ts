@@ -2406,6 +2406,20 @@ export const SubscriptionInterval = {
 } as const;
 
 /**
+ * An operation Leaflow prevents on a subscription. billing.subscriptions.use stops the service. renew prevents renewal and payment of a renewal order. modify prevents placing a change order. cancel prevents cancellation. terminate prevents immediate termination.
+ */
+export type SubscriptionRestriction =
+  (typeof SubscriptionRestriction)[keyof typeof SubscriptionRestriction];
+
+export const SubscriptionRestriction = {
+  billingsubscriptionsuse: "billing.subscriptions.use",
+  billingsubscriptionsrenew: "billing.subscriptions.renew",
+  billingsubscriptionsmodify: "billing.subscriptions.modify",
+  billingsubscriptionscancel: "billing.subscriptions.cancel",
+  billingsubscriptionsterminate: "billing.subscriptions.terminate",
+} as const;
+
+/**
  * Follows the items. `pending` is not yet accepted and may be unpaid or paid; its invoice shows
  * whether payment is still needed, and it can expire or be canceled. `accepted` is accepted with items still
  * being set up. `completed` means every item was set up. `partially_completed` means some items were set up
@@ -2515,7 +2529,8 @@ export interface Subscription {
   coupon?: ObjectIdentity;
   /** @minimum 0 */
   discounted_renewals_remaining?: number;
-  suspend_reason?: string;
+  /** The operations currently prevented on the subscription, sorted. The subscription is suspended while this contains billing.subscriptions.use. */
+  restrictions?: SubscriptionRestriction[];
   billing_cycle_anchor?: string;
   cancellation?: SubscriptionCancellation;
   /** The accepted period-end change currently scheduled for this subscription. Null when no such change exists. */
