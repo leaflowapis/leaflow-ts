@@ -31,6 +31,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { ReasoningDiagnostics } from "./reasoningDiagnostics.zod.js";
 
 export const RequestResource = zod.strictObject({
   api_key_id: zod
@@ -66,6 +67,7 @@ export const RequestResource = zod.strictObject({
     .describe(
       "upstream means the figures were reported by the provider; estimated means they were derived from the character classes of the payload",
     ),
+  reasoning: zod.union([ReasoningDiagnostics, zod.null()]),
 });
 
 export type RequestResource = zod.input<typeof RequestResource>;

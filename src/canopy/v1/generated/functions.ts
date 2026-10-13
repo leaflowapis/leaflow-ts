@@ -59,6 +59,9 @@ import type {
   ModelUsageListResponseBody,
   Quote,
   RequestResource,
+  ResponseCreate,
+  ResponseDeleted,
+  ResponseResource,
   ServiceResource,
   TotalsResource,
   UpdateAPIKeyRequestBody,
@@ -106,6 +109,165 @@ export type HTTPStatusCodes =
   | HTTPStatusCode3xx
   | HTTPStatusCode4xx
   | HTTPStatusCode5xx;
+
+export type createResponseResponse200ApplicationJson = {
+  data: ResponseResource;
+  status: 200;
+};
+
+export type createResponseResponse200TextEventStream = {
+  data: Blob;
+  status: 200;
+};
+
+export type createResponseResponseDefault = {
+  data: InferenceError;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type createResponseResponseSuccess = (
+  | createResponseResponse200ApplicationJson
+  | createResponseResponse200TextEventStream
+) & {
+  headers: Headers;
+};
+export type createResponseResponseError = createResponseResponseDefault & {
+  headers: Headers;
+};
+
+export type createResponseResponse = createResponseResponseSuccess | createResponseResponseError;
+
+export const getCreateResponseUrl = () => {
+  return `https://canopy.leaflow.cloud/v1/responses`;
+};
+
+/**
+ * Supports JSON, SSE and native upstream response storage. Stored continuation is restricted to the current project and original provider credential. WebSocket clients connect with GET /v1/responses and send response.create events; one response may be active on a connection at a time. The connection stays on its initial model and provider credential.
+ * @summary Create a model response
+ */
+export const createResponse = async (
+  responseCreate: ResponseCreate,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createResponseResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateResponseUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(responseCreate),
+  });
+
+  const body = [204, 205, 304].includes(res.status)
+    ? null
+    : res.headers.get("content-type")?.includes("application/json")
+      ? JSON.parse(await res.text())
+      : await res.blob();
+  const data: createResponseResponse["data"] = body as createResponseResponse["data"];
+  return { data, status: res.status, headers: res.headers } as createResponseResponse;
+};
+
+export type getResponseResponse200 = {
+  data: ResponseResource;
+  status: 200;
+};
+
+export type getResponseResponseDefault = {
+  data: InferenceError;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getResponseResponseSuccess = getResponseResponse200 & {
+  headers: Headers;
+};
+export type getResponseResponseError = getResponseResponseDefault & {
+  headers: Headers;
+};
+
+export type getResponseResponse = getResponseResponseSuccess | getResponseResponseError;
+
+export const getGetResponseUrl = (response: string) => {
+  return `https://canopy.leaflow.cloud/v1/responses/${encodeURIComponent(String(response))}`;
+};
+
+/**
+ * @summary Get a stored response
+ */
+export const getResponse = async (
+  response: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getResponseResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetResponseUrl(response), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getResponseResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getResponseResponse;
+};
+
+export type deleteResponseResponse200 = {
+  data: ResponseDeleted;
+  status: 200;
+};
+
+export type deleteResponseResponseDefault = {
+  data: InferenceError;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type deleteResponseResponseSuccess = deleteResponseResponse200 & {
+  headers: Headers;
+};
+export type deleteResponseResponseError = deleteResponseResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteResponseResponse = deleteResponseResponseSuccess | deleteResponseResponseError;
+
+export const getDeleteResponseUrl = (response: string) => {
+  return `https://canopy.leaflow.cloud/v1/responses/${encodeURIComponent(String(response))}`;
+};
+
+/**
+ * @summary Delete a stored response
+ */
+export const deleteResponse = async (
+  response: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteResponseResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteResponseUrl(response), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteResponseResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as deleteResponseResponse;
+};
 
 export type createChatCompletionResponse200ApplicationJson = {
   data: ChatCompletion;

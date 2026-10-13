@@ -31,6 +31,9 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { Modality } from "./modality.zod.js";
+import { ModelCapabilities } from "./modelCapabilities.zod.js";
+import { ModelEndpoint } from "./modelEndpoint.zod.js";
 
 export const Model = zod.strictObject({
   id: zod.string(),
@@ -40,10 +43,24 @@ export const Model = zod.strictObject({
   display_name: zod.string(),
   context_length: zod.int(),
   max_output_tokens: zod.int(),
-  supports_vision: zod.boolean(),
-  supports_tools: zod.boolean(),
-  supports_reasoning: zod.boolean(),
-  reasoning_tiers: zod.array(zod.string()),
+  developer: zod
+    .string()
+    .describe("The model developer; not the upstream provider or model family."),
+  description: zod.string(),
+  input_modalities: zod
+    .array(Modality)
+    .nullable()
+    .describe("Accepted input modalities. Null means unknown."),
+  output_modalities: zod
+    .array(Modality)
+    .nullable()
+    .describe("Produced output modalities. Image input does not imply image generation."),
+  capabilities: ModelCapabilities,
+  supported_endpoints: zod
+    .array(ModelEndpoint)
+    .describe(
+      "Explicitly supported API endpoints. Requests to any other endpoint are rejected before upstream admission.",
+    ),
 });
 
 export type Model = zod.input<typeof Model>;

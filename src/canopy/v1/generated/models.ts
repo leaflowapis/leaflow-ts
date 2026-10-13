@@ -30,6 +30,25 @@
  * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates stated in each model's `pricing`.
  * OpenAPI spec version: 1.0.0
  */
+export type ReasoningDiagnosticsRequested = { [key: string]: unknown };
+
+export type ReasoningDiagnosticsEffective = { [key: string]: unknown };
+
+export type ReasoningDiagnosticsTranslation =
+  (typeof ReasoningDiagnosticsTranslation)[keyof typeof ReasoningDiagnosticsTranslation];
+
+export const ReasoningDiagnosticsTranslation = {
+  translate: "translate",
+  passthrough: "passthrough",
+  strip: "strip",
+} as const;
+
+export interface ReasoningDiagnostics {
+  requested: ReasoningDiagnosticsRequested;
+  effective?: ReasoningDiagnosticsEffective;
+  translation?: ReasoningDiagnosticsTranslation;
+}
+
 export type ChatCompletionRequestMessagesItem = { [key: string]: unknown };
 
 export interface ChatCompletionRequest {
@@ -74,6 +93,73 @@ export interface EmbeddingResponse {
   [key: string]: unknown;
 }
 
+export type Modality = (typeof Modality)[keyof typeof Modality];
+
+export const Modality = {
+  text: "text",
+  image: "image",
+  audio: "audio",
+  video: "video",
+  file: "file",
+  embedding: "embedding",
+} as const;
+
+/**
+ * @nullable
+ */
+export type ReasoningCapabilitiesBudgetTokens = {
+  /** @minimum 0 */
+  min: number;
+  /** @minimum 0 */
+  max: number;
+} | null;
+
+export interface ReasoningCapabilities {
+  supported: boolean;
+  /**
+   * Null means unknown; an empty array means effort is not configurable.
+   * @nullable
+   */
+  effort_levels: string[] | null;
+  /** @nullable */
+  default_effort: string | null;
+  /** @nullable */
+  modes: string[] | null;
+  /** @nullable */
+  budget_tokens: ReasoningCapabilitiesBudgetTokens;
+  /** @nullable */
+  summary: string[] | null;
+}
+
+export interface EndpointCapabilities {
+  /** @nullable */
+  function_calling: boolean | null;
+  /** @nullable */
+  structured_output: boolean | null;
+  reasoning: ReasoningCapabilities | null;
+}
+
+/**
+ * Verified capabilities keyed by API endpoint, for example /v1/chat/completions or /v1/responses. Missing keys and null values mean unknown. Current route availability is separate.
+ */
+export interface ModelCapabilities {
+  [key: string]: EndpointCapabilities;
+}
+
+export type ModelEndpoint = (typeof ModelEndpoint)[keyof typeof ModelEndpoint];
+
+export const ModelEndpoint = {
+  "/v1/chat/completions": "/v1/chat/completions",
+  "/v1/responses": "/v1/responses",
+  "/v1/embeddings": "/v1/embeddings",
+  "/v1/images/generations": "/v1/images/generations",
+  "/v1/images/edits": "/v1/images/edits",
+  "/v1/audio/transcriptions": "/v1/audio/transcriptions",
+  "/v1/audio/translations": "/v1/audio/translations",
+  "/v1/audio/speech": "/v1/audio/speech",
+  "/v1/realtime": "/v1/realtime",
+} as const;
+
 export interface Model {
   id: string;
   object: "model";
@@ -82,10 +168,22 @@ export interface Model {
   display_name: string;
   context_length: number;
   max_output_tokens: number;
-  supports_vision: boolean;
-  supports_tools: boolean;
-  supports_reasoning: boolean;
-  reasoning_tiers: string[];
+  /** The model developer; not the upstream provider or model family. */
+  developer: string;
+  description: string;
+  /**
+   * Accepted input modalities. Null means unknown.
+   * @nullable
+   */
+  input_modalities: Modality[] | null;
+  /**
+   * Produced output modalities. Image input does not imply image generation.
+   * @nullable
+   */
+  output_modalities: Modality[] | null;
+  capabilities: ModelCapabilities;
+  /** Explicitly supported API endpoints. Requests to any other endpoint are rejected before upstream admission. */
+  supported_endpoints: ModelEndpoint[];
 }
 
 export interface ModelList {
@@ -317,12 +415,23 @@ export interface ModelResource {
   max_output_tokens: number;
   /** What requests to this model cost. Null when the project has no billing account. */
   pricing: ModelPricing | null;
-  /** The values accepted for `reasoning_effort`. Empty means it is not supported */
-  reasoning_tiers: string[];
   status: ModelResourceStatus;
-  supports_reasoning: boolean;
-  supports_tools: boolean;
-  supports_vision: boolean;
+  /** The model developer; not the upstream provider or model family. */
+  developer: string;
+  description: string;
+  /**
+   * Accepted input modalities. Null means unknown.
+   * @nullable
+   */
+  input_modalities: Modality[] | null;
+  /**
+   * Produced output modalities. Image input does not imply image generation.
+   * @nullable
+   */
+  output_modalities: Modality[] | null;
+  capabilities: ModelCapabilities;
+  /** Explicitly supported API endpoints. Requests to any other endpoint are rejected before upstream admission. */
+  supported_endpoints: ModelEndpoint[];
 }
 
 export interface ModelListResponseBody {
@@ -383,6 +492,7 @@ export interface RequestResource {
   upstream_status: number;
   /** upstream means the figures were reported by the provider; estimated means they were derived from the character classes of the payload */
   usage_source: RequestResourceUsageSource;
+  reasoning: ReasoningDiagnostics | null;
 }
 
 export interface CursorPageRequestResource {
@@ -721,6 +831,39 @@ export interface Quote {
    * payment sources, including the tax paid on it. total is zero for such a change.
    */
   refundable_amount: Money | null;
+}
+
+export type ResponseCreateReasoning = { [key: string]: unknown };
+
+export type ResponseCreateToolsItem = { [key: string]: unknown };
+
+/**
+ * Native Responses request. model may be omitted when continuing a project-owned stored response. store defaults to false. Only caller-executed function and custom tools are supported. background, conversation and WebSocket-only fields are rejected over HTTP.
+ */
+export interface ResponseCreate {
+  model?: string;
+  input?: unknown;
+  /** @nullable */
+  instructions?: string | null;
+  store?: boolean;
+  stream?: boolean;
+  /** @nullable */
+  previous_response_id?: string | null;
+  reasoning?: ResponseCreateReasoning;
+  tools?: ResponseCreateToolsItem[];
+  /** @minimum 1 */
+  max_output_tokens?: number;
+  [key: string]: unknown;
+}
+
+export interface ResponseResource {
+  [key: string]: unknown;
+}
+
+export interface ResponseDeleted {
+  id: string;
+  object: string;
+  deleted: boolean;
 }
 
 /**

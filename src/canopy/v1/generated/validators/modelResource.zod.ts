@@ -31,6 +31,9 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { Modality } from "./modality.zod.js";
+import { ModelCapabilities } from "./modelCapabilities.zod.js";
+import { ModelEndpoint } from "./modelEndpoint.zod.js";
 import { ModelPricing } from "./modelPricing.zod.js";
 
 export const ModelResource = zod.strictObject({
@@ -46,13 +49,25 @@ export const ModelResource = zod.strictObject({
   pricing: zod
     .union([ModelPricing, zod.null()])
     .describe("What requests to this model cost. Null when the project has no billing account."),
-  reasoning_tiers: zod
-    .array(zod.string())
-    .describe("The values accepted for `reasoning_effort`. Empty means it is not supported"),
   status: zod.enum(["available", "draining", "retired"]),
-  supports_reasoning: zod.boolean(),
-  supports_tools: zod.boolean(),
-  supports_vision: zod.boolean(),
+  developer: zod
+    .string()
+    .describe("The model developer; not the upstream provider or model family."),
+  description: zod.string(),
+  input_modalities: zod
+    .array(Modality)
+    .nullable()
+    .describe("Accepted input modalities. Null means unknown."),
+  output_modalities: zod
+    .array(Modality)
+    .nullable()
+    .describe("Produced output modalities. Image input does not imply image generation."),
+  capabilities: ModelCapabilities,
+  supported_endpoints: zod
+    .array(ModelEndpoint)
+    .describe(
+      "Explicitly supported API endpoints. Requests to any other endpoint are rejected before upstream admission.",
+    ),
 });
 
 export type ModelResource = zod.input<typeof ModelResource>;

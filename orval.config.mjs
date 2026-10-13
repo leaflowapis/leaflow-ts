@@ -88,7 +88,7 @@ export default defineConfig(
             if (module === "canopy/v1") {
               const path = `./src/${module}/generated/functions.ts`;
               const code = readFileSync(path, "utf8");
-              const updated = code.replace(
+              const updated = code.replaceAll(
                 "const body = [204, 205, 304].includes(res.status) ? null : await res.blob();",
                 'const body = [204, 205, 304].includes(res.status) ? null : res.headers.get("content-type")?.includes("application/json") ? JSON.parse(await res.text()) : await res.blob();',
               );

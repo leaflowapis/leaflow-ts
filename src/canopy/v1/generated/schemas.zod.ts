@@ -40,7 +40,29 @@ import { CreateServiceRequestBody } from "./validators/createServiceRequestBody.
 
 import { EmbeddingRequest } from "./validators/embeddingRequest.zod.js";
 
+import { ResponseCreate } from "./validators/responseCreate.zod.js";
+
 import { UpdateAPIKeyRequestBody } from "./validators/updateAPIKeyRequestBody.zod.js";
+
+/**
+ * Supports JSON, SSE and native upstream response storage. Stored continuation is restricted to the current project and original provider credential. WebSocket clients connect with GET /v1/responses and send response.create events; one response may be active on a connection at a time. The connection stays on its initial model and provider credential.
+ * @summary Create a model response
+ */
+export const CreateResponseBody = ResponseCreate;
+
+/**
+ * @summary Get a stored response
+ */
+export const GetResponseParams = zod.strictObject({
+  response: zod.string(),
+});
+
+/**
+ * @summary Delete a stored response
+ */
+export const DeleteResponseParams = zod.strictObject({
+  response: zod.string(),
+});
 
 /**
  * Authenticated project inference. Billing ownership comes only from the verified project token; no Canopy API key or project header is required.
