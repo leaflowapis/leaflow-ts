@@ -2698,6 +2698,8 @@ export const SubscriptionStatus = {
  * the owning service enforces current holdings against the purchased count.
  */
 export interface Subscription {
+  /** Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them. */
+  renewal_discounts_enabled?: boolean;
   currency: string;
   charge_type: SubscriptionChargeType;
   interval: SubscriptionInterval;
@@ -3000,6 +3002,8 @@ export type OrderItemConfiguration = { [key: string]: unknown };
  * purchase creates its pending subscription when this item is recorded, not when payment succeeds.
  */
 export interface OrderItem {
+  /** Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them. */
+  renewal_discounts_enabled?: boolean;
   /** Financial lines produced by this purchase item, including setup charges. */
   invoice_item_ids?: string[];
   /** @minimum 0 */

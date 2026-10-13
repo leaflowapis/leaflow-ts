@@ -17,6 +17,12 @@ export const orderItemPositionMin = 0;
 
 export const OrderItem = zod
   .strictObject({
+    renewal_discounts_enabled: zod
+      .boolean()
+      .optional()
+      .describe(
+        "Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them.",
+      ),
     invoice_item_ids: zod
       .array(zod.uuid())
       .optional()

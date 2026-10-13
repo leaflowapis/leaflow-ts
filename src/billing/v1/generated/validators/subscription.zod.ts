@@ -21,6 +21,12 @@ export const subscriptionDiscountedRenewalsRemainingMin = 0;
 
 export const Subscription = zod
   .strictObject({
+    renewal_discounts_enabled: zod
+      .boolean()
+      .optional()
+      .describe(
+        "Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them.",
+      ),
     currency: zod.string(),
     charge_type: zod.enum(["postpaid", "prepaid", "one_time"]),
     interval: zod.enum(["none", "day", "month", "year"]),
