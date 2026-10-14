@@ -41,6 +41,12 @@ export const InvoiceItem = zod.strictObject({
     .optional()
     .describe("The part covered by an included allowance, and therefore not charged."),
   unit_amount: Money.optional(),
+  unit_quantity: zod
+    .string()
+    .optional()
+    .describe(
+      "The quantity `unit_amount` prices, such as 1000000 tokens or 3600 seconds: `amount` is `quantity` × `unit_amount` ÷ `unit_quantity`. Present together with `unit_amount`.",
+    ),
   amount: Money,
   currency: zod.string(),
   period_start: zod.iso.datetime({ offset: true }).nullish(),

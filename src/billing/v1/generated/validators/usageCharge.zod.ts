@@ -43,6 +43,12 @@ export const UsageCharge = zod.strictObject({
     .string()
     .describe("The quantity charged: gross quantity less the part covered by allowances."),
   unit_amount: Money.optional(),
+  unit_quantity: zod
+    .string()
+    .optional()
+    .describe(
+      "The quantity `unit_amount` prices, such as 1000000 tokens or 3600 seconds: `amount` is `quantity` × `unit_amount` ÷ `unit_quantity`.",
+    ),
   amount: Money,
   currency: zod.string(),
   invoice_id: zod

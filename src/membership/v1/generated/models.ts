@@ -1864,6 +1864,8 @@ export interface InvoiceItem {
   /** The part covered by an included allowance, and therefore not charged. */
   deducted_quantity?: string;
   unit_amount?: Money;
+  /** The quantity `unit_amount` prices, such as 1000000 tokens or 3600 seconds: `amount` is `quantity` × `unit_amount` ÷ `unit_quantity`. Present together with `unit_amount`. */
+  unit_quantity?: string;
   amount: Money;
   currency: string;
   /** @nullable */
@@ -2136,6 +2138,8 @@ export interface UsageCharge {
   /** The quantity charged: gross quantity less the part covered by allowances. */
   quantity: string;
   unit_amount?: Money;
+  /** The quantity `unit_amount` prices, such as 1000000 tokens or 3600 seconds: `amount` is `quantity` × `unit_amount` ÷ `unit_quantity`. */
+  unit_quantity?: string;
   amount: Money;
   currency: string;
   /**
