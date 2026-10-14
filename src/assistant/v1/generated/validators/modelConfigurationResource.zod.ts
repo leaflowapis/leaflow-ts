@@ -20,10 +20,9 @@
 import * as zod from "zod";
 
 export const ModelConfigurationResource = zod.strictObject({
-  allowModelSelection: zod.boolean(),
-  defaultModelId: zod.string(),
-  allowedModelIds: zod.array(zod.string()),
-  defaultReasoningEffort: zod.string(),
+  defaultModelId: zod
+    .string()
+    .describe("Default Canopy model id. The model catalogue and capabilities are owned by Canopy."),
 });
 
 export type ModelConfigurationResource = zod.input<typeof ModelConfigurationResource>;

@@ -34,7 +34,7 @@ export const CreateThreadRequestBody = zod.strictObject({
     .max(createThreadRequestBodyPreferredModelIdMax)
     .nullish()
     .describe(
-      "A Canopy model id to prefer. Omit or pass null to follow the platform default. Non-null requires allowModelSelection; a disallowed, retired or removed id falls back to the default without clearing the preference.",
+      "A Canopy model id to prefer. Omit or pass null to follow the platform default. The model must be available in Canopy and support Assistant conversations. A retired or removed id falls back to the default without clearing the preference.",
     ),
   reasoningEffort: zod
     .string()

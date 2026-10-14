@@ -714,7 +714,7 @@ export interface CreateThreadRequestBody {
   /** Absent uses the platform's default approval mode */
   approvalMode?: CreateThreadRequestBodyApprovalMode;
   /**
-   * A Canopy model id to prefer. Omit or pass null to follow the platform default. Non-null requires allowModelSelection; a disallowed, retired or removed id falls back to the default without clearing the preference.
+   * A Canopy model id to prefer. Omit or pass null to follow the platform default. The model must be available in Canopy and support Assistant conversations. A retired or removed id falls back to the default without clearing the preference.
    * @minLength 1
    * @maxLength 128
    * @nullable
@@ -1607,10 +1607,8 @@ export interface CompleteUploadRequestBody {
 }
 
 export interface ModelConfigurationResource {
-  allowModelSelection: boolean;
+  /** Default Canopy model id. The model catalogue and capabilities are owned by Canopy. */
   defaultModelId: string;
-  allowedModelIds: string[];
-  defaultReasoningEffort: string;
 }
 
 export interface MoveThreadRequestBody {
