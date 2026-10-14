@@ -13,18 +13,16 @@ export const PaymentAction = zod
     provider: zod
       .string()
       .optional()
-      .describe("Identifies the browser adapter for an SDK action, for example stripe."),
+      .describe("The browser adapter for the action, for example stripe."),
     url: zod.url().optional(),
-    qr_code: zod.string().optional().describe("QR content to render and scan, not an image URL."),
+    qr_code: zod.string().optional().describe("QR content to render, not an image URL."),
     client_secret: zod
       .string()
       .optional()
-      .describe("Short-lived client credential for this payment's browser confirmation."),
+      .describe("Short-lived client credential for confirming this payment in the browser."),
     public_key: zod.string().optional(),
   })
-  .describe(
-    "The customer's next interaction. The gateway reports the actual payment outcome separately.",
-  );
+  .describe("The customer's next step; the payment outcome is reported separately.");
 
 export type PaymentAction = zod.input<typeof PaymentAction>;
 export type PaymentActionOutput = zod.output<typeof PaymentAction>;

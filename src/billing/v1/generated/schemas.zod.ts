@@ -29,8 +29,6 @@ import { PayTogetherRequest } from "./validators/payTogetherRequest.zod.js";
 
 import { PaymentMethodSetup } from "./validators/paymentMethodSetup.zod.js";
 
-import { QuoteRequest } from "./validators/quoteRequest.zod.js";
-
 import { RenewRequest } from "./validators/renewRequest.zod.js";
 
 import { RenewalOrderRequest } from "./validators/renewalOrderRequest.zod.js";
@@ -41,10 +39,8 @@ import { TopUpCreate } from "./validators/topUpCreate.zod.js";
 
 import { WithdrawalCreate } from "./validators/withdrawalCreate.zod.js";
 
-import { WithdrawalPreviewRequest } from "./validators/withdrawalPreviewRequest.zod.js";
-
 /**
- * Paginated fixed source allocations and their outcomes. A failed source does not undo refunds already completed through other sources.
+ * The withdrawal's items and their outcomes. A failed item does not undo refunds completed through other items.
  * @summary List withdrawal items
  */
 export const ListWithdrawalItemsParams = zod.strictObject({
@@ -73,7 +69,7 @@ export const ListWithdrawalItemsQueryParams = zod.strictObject({
 });
 
 /**
- * Paginated account withdrawal history, newest first. Account authorization applies to every record.
+ * Withdrawals, newest first.
  * @summary List withdrawals
  */
 export const listWithdrawalsQueryPageDefault = 1;
@@ -99,19 +95,13 @@ export const ListWithdrawalsQueryParams = zod.strictObject({
 });
 
 /**
- * Withdraws the requested account balance through the original top-ups in receipt order. Fees are calculated independently per source. expected_items and expected_refund_amount must match the accepted preview. Reusing the same ID with different terms fails. Only successful items collect a fee.
+ * Withdraws the requested balance through the original top-ups, oldest first, with fees calculated per source. expected_items and expected_refund_amount must match the preview. Reusing the ID with different terms fails. Only successful items are charged a fee.
  * @summary Create withdrawal
  */
 export const CreateWithdrawalBody = WithdrawalCreate;
 
 /**
- * Previews the available balance deduction, fees and exact refund allocation by original source. Omit amount to preview all available principal. Creates no withdrawal and reserves no funds. Fails if a selected source has no configured refund route or its original processing cost is not yet available.
- * @summary Preview withdrawal
- */
-export const PreviewWithdrawalBody = WithdrawalPreviewRequest;
-
-/**
- * Reads the accepted amounts and aggregate outcome of an authorized withdrawal. List its source items for each original-method refund result.
+ * A withdrawal with its accepted amounts and overall outcome; list its items for each refund result.
  * @summary Get withdrawal
  */
 export const GetWithdrawalParams = zod.strictObject({
@@ -119,7 +109,7 @@ export const GetWithdrawalParams = zod.strictObject({
 });
 
 /**
- * Paginated contact profiles belonging to the billing account in the path, including inactive contacts. Returns 404 if the account does not exist.
+ * Contacts of the billing account, inactive ones included. Returns 404 if the account does not exist.
  * @summary List contacts
  */
 export const ListContactsParams = zod.strictObject({
@@ -148,7 +138,7 @@ export const ListContactsQueryParams = zod.strictObject({
 });
 
 /**
- * Creates a contact profile for the billing account in the path. Creating a contact does not select it for invoicing; set the account invoice_contact_id separately.
+ * Creates a contact for the billing account. To use it on invoices, set the account's invoice_contact_id.
  * @summary Create contact
  */
 export const CreateContactParams = zod.strictObject({
@@ -158,7 +148,7 @@ export const CreateContactParams = zod.strictObject({
 export const CreateContactBody = ContactCreate;
 
 /**
- * Returns a contact belonging to this billing account. Returns 404 if the contact does not exist in this account.
+ * A contact of this billing account. Returns 404 if it does not exist in the account.
  * @summary Get contact
  */
 export const GetContactParams = zod.strictObject({
@@ -167,7 +157,7 @@ export const GetContactParams = zod.strictObject({
 });
 
 /**
- * Updates a contact belonging to this billing account. Returns 404 if the contact does not exist in this account.
+ * Updates a contact of this billing account. Returns 404 if it does not exist in the account.
  * @summary Update contact
  */
 export const UpdateContactParams = zod.strictObject({
@@ -178,7 +168,7 @@ export const UpdateContactParams = zod.strictObject({
 export const UpdateContactBody = ContactUpdate;
 
 /**
- * Deletes a contact belonging to this billing account. Returns 404 if the contact does not exist in this account. The selected invoice contact must be cleared or replaced before deletion. Issued invoice snapshots are retained.
+ * Deletes a contact of this billing account; 404 if it does not exist in the account. A contact selected for invoices must be cleared or replaced first. Issued invoices keep their copy.
  * @summary Delete contact
  */
 export const DeleteContactParams = zod.strictObject({
@@ -187,8 +177,7 @@ export const DeleteContactParams = zod.strictObject({
 });
 
 /**
- * The currencies a new billing account can be opened in. A retired currency is not listed,
- * although accounts already opened in it keep working. Results are paginated.
+ * Currencies a new billing account can be opened in; retired currencies are not listed.
  * @summary List currencies accounts can be opened in
  */
 export const listCurrenciesQueryPageDefault = 1;
@@ -213,7 +202,7 @@ export const ListCurrenciesQueryParams = zod.strictObject({
 });
 
 /**
- * Paginated billing accounts owned by the authenticated user. Accounts owned by other users are excluded; the result is empty when the user owns none.
+ * Billing accounts owned by the authenticated user.
  * @summary List billing accounts
  */
 export const listBillingAccountsQueryPageDefault = 1;
@@ -238,16 +227,13 @@ export const ListBillingAccountsQueryParams = zod.strictObject({
 });
 
 /**
- * The currency is chosen here and cannot be changed afterwards. Everything charged to the
- * account — prices, orders, invoices, balance — is denominated in it.
- *
- * One person may hold several accounts, for example a personal one and one for a team.
+ * Creates a billing account. Its currency is fixed: prices, orders, invoices and balance are all in it.
  * @summary Create billing account
  */
 export const CreateBillingAccountBody = BillingAccountCreate;
 
 /**
- * Returns an owned account settlement currency, lifecycle state and selected invoice contact. Returns 404 if the account does not exist and 403 if it belongs to another user.
+ * Your billing account with its currency, status and invoice contact. Returns 404 if it does not exist and 403 if it belongs to another user.
  * @summary Get billing account
  */
 export const GetBillingAccountParams = zod.strictObject({
@@ -255,9 +241,7 @@ export const GetBillingAccountParams = zod.strictObject({
 });
 
 /**
- * Select an active contact belonging to this account for future invoices. Its legal name,
- * address and tax identifier are copied when an invoice is issued; issued snapshots are
- * retained. Set invoice_contact_id to null to clear the selection. The currency cannot change.
+ * Selects an active contact of this account for future invoices; its legal name, address and tax identifier are copied when an invoice is issued. Set invoice_contact_id to null to clear it. The currency cannot change.
  * @summary Update billing account
  */
 export const UpdateBillingAccountParams = zod.strictObject({
@@ -267,7 +251,7 @@ export const UpdateBillingAccountParams = zod.strictObject({
 export const UpdateBillingAccountBody = BillingAccountUpdate;
 
 /**
- * Returns the owned account balance, applicable credit groups, unpaid invoice amounts, unbilled estimates and pending returns separately. Returns 404 for a missing account and 403 for an account owned by another user.
+ * The balance of your account, with credit groups, unpaid invoice amounts, unbilled estimates and pending returns. Returns 404 for a missing account and 403 for another user's account.
  * @summary Get account balance
  */
 export const GetAccountBalanceParams = zod.strictObject({
@@ -275,10 +259,7 @@ export const GetAccountBalanceParams = zod.strictObject({
 });
 
 /**
- * Lists the payment gateways and methods that currently accept payment in this account's currency, the
- * preferred gateway first. Top-ups and invoice payments must name a gateway and method listed here;
- * others are refused. An empty result means no online payment is available for this account.
- * Results are paginated.
+ * The payment gateways and methods currently accepting the account's currency, preferred gateway first. Top-ups and invoice payments must use one listed here. An empty result means online payment is unavailable for the account.
  * @summary List payment options
  */
 export const ListPaymentOptionsParams = zod.strictObject({
@@ -307,7 +288,7 @@ export const ListPaymentOptionsQueryParams = zod.strictObject({
 });
 
 /**
- * Paginated current project assignments to accounts owned by the authenticated user. Filter by billing_account_id or project_ids; historical financial records keep their original account assignment.
+ * Current project assignments to your billing accounts, filtered by billing_account_id or project_ids. Past charges keep the account they were assigned to.
  * @summary List project assignments
  */
 export const listProjectAssignmentsQueryPageDefault = 1;
@@ -338,13 +319,12 @@ export const ListProjectAssignmentsQueryParams = zod.strictObject({
     .max(listProjectAssignmentsQueryProjectIdsMax)
     .optional()
     .describe(
-      "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
     ),
 });
 
 /**
- * Returns the current assignment for the project identified by projectId. Returns 404 when
- * no billing account is assigned; no resources can be created until one is assigned.
+ * The project's current assignment. Returns 404 when no billing account is assigned; the project cannot create resources until one is.
  * @summary Get project assignment
  */
 export const GetProjectAssignmentParams = zod.strictObject({
@@ -352,17 +332,13 @@ export const GetProjectAssignmentParams = zod.strictObject({
 });
 
 /**
- * Charges already incurred remain with the billing account that was linked when they
- * occurred, and are still invoiced to it. Metered resources are settled up to the moment of
- * the change. Amounts owed by the previous billing account remain owed by it and do not
- * prevent the change.
+ * Links the project to another billing account. Charges already incurred stay with the account linked when they
+ * occurred and are invoiced to it; metered resources are settled up to the moment of the change. Amounts the
+ * previous account owes do not prevent the change. Orders keep the account they were placed with; paid periods
+ * are unaffected, and renewals are charged to the new account.
  *
- * Orders keep the billing account they were placed with and are fulfilled as placed. Periods
- * already paid for are unaffected; renewals are charged to the new billing account.
- *
- * The request is refused once the project no longer accepts purchases because it is being
- * deleted, and while a subscription or an order in progress in the project uses a currency
- * other than that of the new billing account.
+ * Refused once the project no longer accepts purchases because it is being deleted, and while a subscription or
+ * an in-progress order of the project uses a currency other than the new account's.
  * @summary Set project assignment
  */
 export const SetProjectAssignmentParams = zod.strictObject({
@@ -372,17 +348,7 @@ export const SetProjectAssignmentParams = zod.strictObject({
 export const SetProjectAssignmentBody = SetProjectAssignmentRequest;
 
 /**
- * Ends the project's current assignment without deleting its assignment history.
- *
- * Permitted only when nothing in the project is still running or in progress: no metered
- * resources, no subscriptions that have not ended, and no orders in progress, including
- * changes scheduled for the end of a period. Orders are not modified by this request; wait
- * for them to complete, and have the service that scheduled a change call it off.
- *
- * Charges already incurred remain with the billing account and are invoiced to it as usual.
- * Amounts the billing account owes do not prevent unlinking.
- *
- * After this the project cannot make purchases until a billing account is linked again.
+ * Ends the project's current assignment; the assignment history is kept. Allowed only when the project has no metered resources, no subscriptions that have not ended and no orders in progress, including period-end changes; orders are not modified, so wait for them to complete. Charges already incurred stay with the billing account and are invoiced as usual; amounts it owes do not prevent unlinking. The project cannot make purchases until a billing account is linked again.
  * @summary Unlink project billing account
  */
 export const UnlinkProjectBillingAccountParams = zod.strictObject({
@@ -390,8 +356,7 @@ export const UnlinkProjectBillingAccountParams = zod.strictObject({
 });
 
 /**
- * Lists only the authenticated user's top-ups. Includes pending, failed and canceled attempts; no invoice is
- * created for a top-up. Items carry no `action`; read a pending top-up with get-top-up to continue its payment.
+ * Your top-ups, including pending, failed and canceled attempts. Items carry no `action`; read a pending top-up with get-top-up to continue its payment.
  * @summary List top ups
  */
 export const listTopUpsQueryPageDefault = 1;
@@ -416,24 +381,17 @@ export const ListTopUpsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
 });
 
 /**
- * Creates a top-up for an account owned by the authenticated user and returns its payment information.
- * The balance increases only after the payment gateway confirms receipt. A top-up has no invoice.
- * Keep the supplied ID to query the original attempt after a lost response; duplicate creation conflicts.
+ * Creates a top-up for an account of the authenticated user and returns its payment information. The balance increases when the gateway confirms receipt. Keep the supplied ID to read the attempt after a lost response; creating it again conflicts.
  * @summary Create top up
  */
 export const CreateTopUpBody = TopUpCreate;
 
 /**
- * Reads a top-up owned by the authenticated user, including its outcome and the part of it not yet spent.
- * It is not an invoice.
- *
- * While the top-up is pending, the answer includes the customer's next step as the payment gateway
- * currently reports it, so that a payment interrupted by a closed page can be continued. When the gateway
- * cannot be reached, the top-up is returned without `action`; read it again later.
+ * A top-up of the authenticated user, with its outcome and unspent amount. While it is pending, `action` carries the customer's next step as the gateway reports it, so an interrupted payment can be continued; when the gateway cannot be reached, `action` is omitted.
  * @summary Get top up
  */
 export const GetTopUpParams = zod.strictObject({
@@ -441,17 +399,14 @@ export const GetTopUpParams = zod.strictObject({
 });
 
 /**
- * Withdraws a pending top-up owned by the authenticated user at the payment gateway. It becomes
- * `canceled` with `cancellation_reason` `requested_by_customer`, and no money is collected for it. Canceling a
- * top-up that is already canceled returns it unchanged.
+ * Withdraws a pending top-up of the authenticated user at the payment gateway. It becomes `canceled` with
+ * `cancellation_reason` `requested_by_customer`, and nothing is collected. Canceling a canceled top-up returns
+ * it unchanged. If the gateway has already collected the payment, the top-up is returned as `succeeded` with the
+ * balance increased; check `status` in the response.
  *
- * If the gateway has already collected the payment, nothing is withdrawn and the top-up is returned
- * as `succeeded` with the balance increased. Check `status` in the answer rather than assuming the
- * cancellation took effect.
- *
- * Fails with 409 and BILLING_TOPUP_NOT_CANCELABLE when the top-up has already succeeded or failed,
- * with `status` naming that outcome, and while the gateway is processing the payment and can no
- * longer withdraw it, with `status` set to `pending`; read the top-up again later in that case.
+ * Fails with 409 `BILLING_TOPUP_NOT_CANCELABLE` when the top-up has succeeded or failed, with `status` naming
+ * the outcome, or while the gateway is processing the payment, with `status` `pending`; read the top-up again
+ * later.
  * @summary Cancel top up
  */
 export const CancelTopUpParams = zod.strictObject({
@@ -459,7 +414,7 @@ export const CancelTopUpParams = zod.strictObject({
 });
 
 /**
- * Paginated saved payment methods for owned billing accounts, optionally restricted to billing_account_id. Removed methods are excluded; they do not disappear from historical payment records.
+ * Saved payment methods of your billing accounts, optionally for one billing_account_id. Removed methods are not listed.
  * @summary List payment methods
  */
 export const listPaymentMethodsQueryPageDefault = 1;
@@ -484,21 +439,17 @@ export const ListPaymentMethodsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
 });
 
 /**
- * Returns what is needed to hand the browser over to the payment gateway's own card
- * form. Nothing is charged, and the method appears in the list once the gateway
- * confirms it.
- *
- * Card numbers are never sent to or stored by this service.
+ * Returns what the browser needs to open the payment gateway's card form. Nothing is charged; the method is listed once the gateway confirms it. Card numbers never reach this service.
  * @summary Create payment method setup
  */
 export const CreatePaymentMethodSetupBody = PaymentMethodSetup;
 
 /**
- * Selects an active saved payment method as the default for its owned billing account and returns it. Expired or removed methods cannot be selected; selecting the current default is idempotent.
+ * Makes an active saved payment method the default for its billing account and returns it. Expired or removed methods cannot be selected; selecting the current default changes nothing.
  * @summary Set default payment method
  */
 export const SetDefaultPaymentMethodParams = zod.strictObject({
@@ -506,8 +457,7 @@ export const SetDefaultPaymentMethodParams = zod.strictObject({
 });
 
 /**
- * Refused when it is the only method on an account that has resources billed by the hour,
- * as there would be nothing left to charge when the balance runs out.
+ * Refused when it is the only payment method of an account with metered resources.
  * @summary Delete payment method
  */
 export const DeletePaymentMethodParams = zod.strictObject({
@@ -515,41 +465,30 @@ export const DeletePaymentMethodParams = zod.strictObject({
 });
 
 /**
- * Applies eligible credit grants and available balance as requested, then collects the remainder
- * through the selected payment gateway and method. With no gateway selection, insufficient
- * account funds fail without starting an online payment. Card and non-card methods use this same
- * operation.
+ * Pays the invoice from eligible credit grants and balance as requested, and collects the remainder through the
+ * selected gateway and method. Without a gateway, insufficient funds fail and no online payment starts.
  *
- * The draft invoice of a deferred order is priced when it is first paid: Billing applies
- * promotion_code, or the best applicable account discount when it is omitted, compares the total
- * with expected_amount, records the discount on the order and issues the invoice before collecting.
- * An invalid or inapplicable code fails rather than collecting full price, and a different total
- * fails with `BILLING_AMOUNT_CHANGED`; in both cases nothing changes. The terms are fixed before
- * any funds are collected and stay fixed when collection does not complete, for example with
- * insufficient funds or a declined card: later attempts reuse them, and a different promotion_code
- * is then refused with `BILLING_ORDER_CHECKOUT_CONFLICT`. A deferred period-end change can be paid
- * once its first period is due to be invoiced; earlier attempts are refused with
+ * The draft invoice of a deferred order is priced on its first payment: promotion_code, or otherwise the best
+ * applicable account discount, is applied, the total is compared with expected_amount, and the invoice is issued
+ * before collection. An invalid or inapplicable code fails, and a total other than expected_amount fails with
+ * `BILLING_AMOUNT_CHANGED`; neither changes anything. Once fixed, the terms stay fixed even if collection does
+ * not complete, and a different promotion_code is refused with `BILLING_ORDER_CHECKOUT_CONFLICT`. A deferred
+ * period-end change can be paid only once its first period is due to be invoiced; earlier attempts fail with
  * `BILLING_CHANGE_NOT_INVOICED`.
  *
- * Returns a payment action when customer interaction is required. requires_action and processing
- * do not mean paid; the invoice is marked paid after payment is confirmed. An unresolved online
- * payment made with the same gateway, method and saved payment method is reused, and retries do not
- * apply credit grants or balance twice. Paying any other way cancels that earlier online payment
- * first; if the gateway had already collected it, the invoice is paid by it and nothing more is
- * charged. One the gateway is still processing is refused with `BILLING_PAYMENT_PENDING` and
- * `meta.transaction_id`; wait for its outcome.
+ * Returns a payment action when the customer must act; requires_action and processing are not paid. An
+ * unresolved online payment with the same gateway, method and saved payment method is reused, and retries never
+ * apply credit grants or balance twice. Paying any other way first cancels that payment; if the gateway had
+ * already collected it, the invoice is paid by it and nothing more is charged. A payment the gateway is still
+ * processing fails with `BILLING_PAYMENT_PENDING` and `meta.transaction_id`.
  *
- * Calling this on an invoice that is already paid returns the existing payment result without
- * another charge. A void invoice is refused with `BILLING_INVOICE_NOT_PAYABLE`; the invoice of an
- * order that has failed or was
- * canceled, with `BILLING_ORDER_FAILED` or `BILLING_ORDER_CANCELED`; and that of an order whose
- * payment deadline has passed, with `BILLING_ORDER_EXPIRED`. A renewal invoice is also refused with
- * `BILLING_INVOICE_NOT_PAYABLE` while its subscription is being canceled, is being reclaimed or has
- * ended, with `meta.reason` `subscription_canceling`, `subscription_reclaiming` or
- * `subscription_ended` respectively. A usage invoice is billed to the smallest fraction a balance can
- * hold, finer than a payment method can charge, so paying one online is refused with
- * `BILLING_INVOICE_NOT_PAYABLE` and `meta.reason` `usage_invoice`; it is collected from credit grants
- * and balance automatically, including right after a top-up.
+ * A paid invoice returns its existing result without another charge. Refused with `BILLING_INVOICE_NOT_PAYABLE`
+ * for a void invoice; `BILLING_ORDER_FAILED` or `BILLING_ORDER_CANCELED` for the invoice of a failed or canceled
+ * order; `BILLING_ORDER_EXPIRED` after the order's payment deadline; `BILLING_INVOICE_NOT_PAYABLE` with
+ * `meta.reason` `subscription_canceling`, `subscription_reclaiming` or `subscription_ended` for a renewal
+ * invoice whose subscription is being canceled, is being reclaimed or has ended; and
+ * `BILLING_INVOICE_NOT_PAYABLE` with `meta.reason` `usage_invoice` for a usage invoice, which is collected from
+ * credit grants and balance automatically, including right after a top-up.
  * @summary Pay an invoice
  */
 export const PayInvoiceParams = zod.strictObject({
@@ -585,7 +524,7 @@ export const PreviewInvoicePaymentQueryParams = zod.strictObject({
     .min(1)
     .max(previewInvoicePaymentQueryPromotionCodeMax)
     .optional()
-    .describe("As in paying. Considered only while the order's terms are not yet fixed."),
+    .describe("As in paying; used only while the order's terms are not fixed."),
   use_balance: zod
     .boolean()
     .default(previewInvoicePaymentQueryUseBalanceDefault)
@@ -597,43 +536,25 @@ export const PreviewInvoicePaymentQueryParams = zod.strictObject({
 });
 
 /**
- * Pays outstanding invoices, including the invoices of the listed orders, from the account's
- * eligible credit grants and then its balance. No payment gateway is used; an invoice to be
- * paid online is paid on its own. The draft invoice of a deferred order takes the best applicable
- * account discount and is issued first, and stays issued if the payment fails; pay it on its own to
- * apply a promotion code.
+ * Pays outstanding invoices, including those of the listed orders, from eligible credit grants and then balance,
+ * without a payment gateway. The draft invoice of a deferred order takes the best applicable account discount
+ * and is issued first, staying issued if payment fails; pay it alone to use a promotion code.
  *
- * Either every invoice is paid or none is. When the credit grants and balance cannot cover
- * them all, the request fails with `BILLING_INSUFFICIENT_FUNDS` and nothing is charged.
- * A total different from expected_amount fails with `BILLING_AMOUNT_CHANGED` and nothing is charged.
- * Invoices that are already paid are not charged again. An online payment started earlier for one
- * of the invoices is canceled first; one the gateway is still processing is refused with
- * `BILLING_PAYMENT_PENDING` and `meta.transaction_id`, a void invoice with
- * `BILLING_INVOICE_NOT_PAYABLE`, a deferred period-end change not yet due to be invoiced with
- * `BILLING_CHANGE_NOT_INVOICED`, an order that has failed or was canceled with
- * `BILLING_ORDER_FAILED` or `BILLING_ORDER_CANCELED`, and an order whose payment deadline has
- * passed with `BILLING_ORDER_EXPIRED`. A renewal invoice is refused with
- * `BILLING_INVOICE_NOT_PAYABLE` while its subscription is being canceled, is being reclaimed or has
- * ended, with `meta.reason` `subscription_canceling`, `subscription_reclaiming` or
- * `subscription_ended` respectively.
+ * All invoices are paid or none: insufficient funds fail with `BILLING_INSUFFICIENT_FUNDS`, and a total other
+ * than expected_amount fails with `BILLING_AMOUNT_CHANGED`, charging nothing. Paid invoices are not charged
+ * again. An earlier online payment for one of the invoices is canceled first; one the gateway is still
+ * processing is refused with `BILLING_PAYMENT_PENDING` and `meta.transaction_id`. Also refused with
+ * `BILLING_INVOICE_NOT_PAYABLE` for a void invoice; `BILLING_CHANGE_NOT_INVOICED` for a period-end change not
+ * yet due; `BILLING_ORDER_FAILED`, `BILLING_ORDER_CANCELED` or `BILLING_ORDER_EXPIRED` for an order in that
+ * state; and `BILLING_INVOICE_NOT_PAYABLE` with `meta.reason` `subscription_canceling`,
+ * `subscription_reclaiming` or `subscription_ended` for a renewal invoice of a subscription being canceled,
+ * being reclaimed or ended.
  * @summary Pay together
  */
 export const PayTogetherBody = PayTogetherRequest;
 
 /**
- * What paying these invoices together now would take from credit grants and from the balance,
- * invoice by invoice in the order they would be paid. It is computed as paying together computes
- * it. Nothing is charged, reserved or created.
- *
- * Refused with the same errors as paying together, except that insufficient funds are not an
- * error here: they show as a `gateway_amount` above zero, and paying together would then be
- * refused with `BILLING_INSUFFICIENT_FUNDS`.
- * @summary Preview paying together
- */
-export const PreviewPayTogetherBody = PayTogetherRequest;
-
-/**
- * Paginated issued invoices belonging to owned billing accounts, filtered by billing_account_id, subscription_id, status and creation interval. Drafts are excluded, including the draft invoice of an order awaiting payment, which is reached through its order; top-ups do not create invoices.
+ * Issued invoices of your billing accounts. Drafts are not listed; an order's draft invoice is reached through its order. Top-ups have no invoices.
  * @summary List invoices
  */
 export const listInvoicesQueryPageDefault = 1;
@@ -658,25 +579,25 @@ export const ListInvoicesQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   status: zod
-    .enum(["draft", "open", "paid", "void", "uncollectible"])
+    .enum(["draft", "open", "paid", "void"])
     .optional()
     .describe(
-      "A draft is not yet issued. The draft invoice of an order shows base prices until it is paid, when\nthe discount is applied and it is issued; other drafts are private to administrators.\nAn issued invoice is open until settled; a zero-total issued invoice is immediately paid.\nUnbilled usage remains separate from invoices until it is invoiced.\nA refund does not change the status: a paid invoice stays paid, with the refunded part in\namount_refunded. void means collection has stopped and any funds received have been returned.",
+      "`draft`: not yet issued; an order's draft invoice shows base prices until it is paid, when the discount is applied and it is issued. Other drafts are visible only to operators. `open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage not yet invoiced is not on any invoice.",
     ),
   subscription_id: zod
     .uuid()
     .optional()
     .describe(
-      "Only invoices containing a charge from this subscription. The returned invoice amount is the total for the whole invoice.",
+      "Only invoices with a charge from this subscription; amounts are for the whole invoice.",
     ),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
 });
 
 /**
- * Returns an invoice for an owned billing account with its amounts, tax lines and payment state, whether issued or the draft invoice of an order. Returns 404 for a missing invoice or another draft and 403 when its account belongs to another user.
+ * An invoice of your billing account, issued or an order's draft, with its amounts, tax lines and payment state. A missing invoice or another draft returns 404; an invoice of another user's account returns 403.
  * @summary Get invoice
  */
 export const GetInvoiceParams = zod.strictObject({
@@ -684,7 +605,7 @@ export const GetInvoiceParams = zod.strictObject({
 });
 
 /**
- * Paginated lines of an invoice belonging to an owned billing account, issued or the draft invoice of an order, including their service periods and project references. A missing invoice or another draft returns 404; another user account returns 403.
+ * Lines of an invoice of your billing account, issued or an order's draft, with their service periods and projects. A missing invoice or another draft returns 404; an invoice of another user's account returns 403.
  * @summary List invoice items
  */
 export const ListInvoiceItemsParams = zod.strictObject({
@@ -713,7 +634,7 @@ export const ListInvoiceItemsQueryParams = zod.strictObject({
 });
 
 /**
- * Paginated ledger entries for owned billing accounts, optionally filtered by billing_account_id and creation interval. Each entry retains its amount, currency and any referenced credit grant.
+ * Ledger entries of your billing accounts, filtered by billing_account_id and creation time.
  * @summary List transactions
  */
 export const listTransactionsQueryPageDefault = 1;
@@ -738,14 +659,13 @@ export const ListTransactionsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
 });
 
 /**
- * Coupons placed on the account directly, which apply at checkout without a code being
- * entered. A coupon reached through a code is not listed here.
+ * Coupons held by the account, applied at checkout without a code. Coupons reached through a code are not listed.
  * @summary List the coupons held on this account
  */
 export const listAccountDiscountsQueryPageDefault = 1;
@@ -770,12 +690,11 @@ export const ListAccountDiscountsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
 });
 
 /**
- * Each grant shows what remains and what it may be used for. Credit is spent before the balance
- * and cannot be withdrawn.
+ * Credit grants with what remains and what each may pay for. Credit is spent before balance and cannot be withdrawn.
  * @summary List credit grants
  */
 export const listCreditGrantsQueryPageDefault = 1;
@@ -800,12 +719,12 @@ export const ListCreditGrantsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   status: zod.enum(["active", "depleted", "expired", "voided"]).optional(),
 });
 
 /**
- * Newest issued_at first, then ID. Requires authorization for the invoice's billing account. Filters narrow authorized results and apply before counting and paging.
+ * Credit notes, newest first. Filters apply within the billing accounts you are authorized for.
  * @summary List credit notes
  */
 export const listCreditNotesQueryPageDefault = 1;
@@ -830,7 +749,7 @@ export const ListCreditNotesQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   invoice_id: zod.uuid().optional().describe("Only the notes for this invoice."),
 });
 
@@ -843,7 +762,7 @@ export const GetCreditNoteParams = zod.strictObject({
 });
 
 /**
- * The original invoice lines reduced by this note. Requires authorization for their invoice's billing account.
+ * The invoice lines this credit note reduced.
  * @summary List credit note items
  */
 export const ListCreditNoteItemsParams = zod.strictObject({
@@ -897,18 +816,18 @@ export const ListRefundsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   invoice_id: zod.uuid().optional().describe("Only the refunds of this invoice."),
   order_id: zod
     .uuid()
     .optional()
     .describe(
-      "Only the refunds that belong to this order: those of its invoice, such as the refund of a\npurchase that could not be delivered, and those it caused on an earlier invoice, such as\nthe difference returned after a downgrade.",
+      "Refunds of this order: those of its invoice, such as for an undeliverable purchase, and those it caused on an earlier invoice, such as a downgrade difference.",
     ),
 });
 
 /**
- * Lists priced usage charges in the requested financial scope. Usage without a price at occurrence time is never charged retrospectively.
+ * Priced usage charges in the requested scope. Usage that had no price when it occurred is never charged later.
  * @summary List usage charges
  */
 export const listUsageChargesQueryPageDefault = 1;
@@ -938,14 +857,14 @@ export const ListUsageChargesQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   product_id: zod
     .string()
     .min(1)
     .max(listUsageChargesQueryProductIdMax)
     .regex(listUsageChargesQueryProductIdRegExp)
     .optional()
-    .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
+    .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
   resource_id: zod.string().optional(),
   invoice_item_id: zod
     .uuid()
@@ -959,14 +878,14 @@ export const ListUsageChargesQueryParams = zod.strictObject({
     .max(listUsageChargesQueryProjectIdsMax)
     .optional()
     .describe(
-      "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
     ),
   meter_id: zod.uuid().optional(),
   statement_id: zod.uuid().optional(),
 });
 
 /**
- * Lists subscriptions visible to the authorized billing account. Soft-deleted subscriptions are excluded.
+ * Subscriptions of the authorized billing account. Deleted subscriptions are not listed.
  * @summary List subscriptions
  */
 export const listSubscriptionsQueryPageDefault = 1;
@@ -994,19 +913,19 @@ export const ListSubscriptionsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   project_ids: zod
     .array(zod.uuid())
     .min(1)
     .max(listSubscriptionsQueryProjectIdsMax)
     .optional()
     .describe(
-      "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
     ),
 });
 
 /**
- * Returns a subscription visible to the authorized billing account. Soft-deleted subscriptions are reported as not found.
+ * A subscription of the authorized billing account. Deleted subscriptions are reported as not found.
  * @summary Get subscription
  */
 export const GetSubscriptionParams = zod.strictObject({
@@ -1014,15 +933,7 @@ export const GetSubscriptionParams = zod.strictObject({
 });
 
 /**
- * Sets deleted_at on a canceled or terminated subscription, hiding it from your subscription
- * list and detail. Your account access token must authorize the subscription's current billing
- * account. Preserves commercial status, ended_at and billing and financial history. Completed
- * cancellations and canceled unfulfilled purchases can be deleted directly, without termination.
- * Pending, provisioning, active and suspended subscriptions are refused with 409
- * BILLING_SUBSCRIPTION_NOT_ENDED and status in error params. A scheduled or releasing cancellation
- * does not make a subscription canceled.
- * There is no force, skip-cleanup or override option. Repeating deletion preserves the original
- * deleted_at. Sends no cleanup command and creates no refund; outstanding cleanup continues.
+ * Hides a canceled or terminated subscription from your subscription list and detail by setting deleted_at; its status, ended_at and history are kept. The token must authorize the subscription's current billing account. A subscription that has not ended is refused with 409 `BILLING_SUBSCRIPTION_NOT_ENDED` and `status`. Repeating it keeps the original deleted_at. It sends no cleanup command and creates no refund.
  * @summary Delete subscription
  */
 export const DeleteSubscriptionParams = zod.strictObject({
@@ -1030,19 +941,15 @@ export const DeleteSubscriptionParams = zod.strictObject({
 });
 
 /**
- * Requests cancellation on the purchase's agreed terms. Uses the same quotation, eligibility,
- * metering and original-payment-source refund rules as creating a cancellation.
- * Supply the refund amount from create-quote with this subscription in cancellation.subscription_ids.
- * Your account access token must authorize the subscription's current billing account.
+ * Requests cancellation on the purchase's agreed terms, with the same rules as creating a cancellation. Give the
+ * refund amount from a quote with this subscription in `cancellation.subscription_ids`. The token must authorize
+ * the subscription's current billing account.
  *
- * Immediate cancellation asks the owning service to clean up now. Period-end cancellation keeps
- * the subscription active or suspended until the paid term ends. Neither payment nor acceptance
- * of this request proves cleanup. The subscription becomes canceled only after the service
- * confirms release and the end of metering; follow the returned cancellation for progress.
- *
- * Related subscriptions released together must be submitted as one group to create-cancellation.
- * Pending or provisioning purchases are canceled through their order, not this operation.
- * Repeating the same open cancellation returns it without another refund or command.
+ * Immediate cancellation asks the owning service to release the resources now; period-end cancellation keeps the
+ * subscription active or suspended until the paid term ends. The subscription becomes canceled when the service
+ * confirms the release; follow the returned cancellation. Subscriptions released together must be canceled
+ * together through create-cancellation, and pending or provisioning purchases through their order. Repeating the
+ * request while the cancellation is open returns it.
  * @summary Cancel subscription
  */
 export const CancelSubscriptionParams = zod.strictObject({
@@ -1052,17 +959,7 @@ export const CancelSubscriptionParams = zod.strictObject({
 export const CancelSubscriptionBody = CancelSubscriptionRequest;
 
 /**
- * Calculates exactly one target for a billing account you own: proposed items, an existing order, renewals, cancellation or order refund. Returns all requested calculations or a structured error. No quote is saved and no resource, payment, reservation or redemption is created.
- *
- * Existing orders use their recorded purchase account and terms. Renewals and cancellations use the account currently paying for each subscription. Every target must belong to the requested account. A project association or project token does not authorize a quote.
- *
- * Use an existing order quote's total as expected_amount when paying the order's invoice. An order whose terms are fixed returns its recorded amounts; a different promotion code is refused. Requested future usage estimates are not collectible checkout amounts. An unknown delivery outcome is not proof of refund eligibility.
- * @summary Create a quote
- */
-export const CreateQuoteBody = QuoteRequest;
-
-/**
- * Newest first. Filter by `subscription_id` and `status=open` to find the cancellation now under way for a subscription.
+ * Newest first. Filter by `subscription_id` and `status=open` to find a subscription's cancellation in progress.
  * @summary List cancellations
  */
 export const listCancellationsQueryPageDefault = 1;
@@ -1089,7 +986,7 @@ export const ListCancellationsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   subscription_id: zod
     .uuid()
     .optional()
@@ -1104,57 +1001,47 @@ export const ListCancellationsQueryParams = zod.strictObject({
     .max(listCancellationsQueryProjectIdsMax)
     .optional()
     .describe(
-      "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
     ),
 });
 
 /**
- * Ends a set of subscriptions of one service together, at one time. Deleting a resource that a
- * subscription pays for is an `immediate` cancellation of every subscription released with it,
- * such as a server with the disks deleted along with it, or an address with its bandwidth.
+ * Ends subscriptions of one service together. Deleting a resource is an `immediate` cancellation of every
+ * subscription released with it, such as a server with its disks or an address with its bandwidth.
  *
- * The service that provides the resources releases them: at once for `immediate`, or at
- * `scheduled_at`, the end of the paid term, for `period_end`. When release is confirmed, the
- * unused value is returned the way it was paid, under the refund terms agreed when each
- * subscription was bought. For `immediate` the refund is computed as of `proration_date`, so the
- * amount confirmed here is the amount returned: prepaid service used while the resources are
- * being released is not deducted from it. Usage of a postpaid subscription is charged until its
- * resources are released, as usual.
+ * The owning service releases the resources at once for `immediate`, or at `scheduled_at`, the end of the paid
+ * term, for `period_end`. When release is confirmed, the unused value is returned to the original payment
+ * sources under each subscription's refund terms. For `immediate` the refund is computed as of `proration_date`
+ * and is not reduced by service used during release. Metered usage is charged until release.
  *
- * `mode` must be allowed for every subscription. Postpaid and one-time subscriptions end only
- * `immediate`. A prepaid subscription ends `period_end` while its paid term lasts, and
- * `immediate` unless its termination terms allow only the end of the paid term and that term has
- * not ended yet. For `period_end` the paid terms of all the subscriptions must end at the same
+ * `mode` must be allowed for every subscription. Metered and one-time subscriptions end only `immediate`. A
+ * licensed subscription ends `period_end` while its paid term lasts, and `immediate` unless its terms allow only
+ * the end of the paid term and that term has not ended. For `period_end` all paid terms must end at the same
  * time.
  *
  * Refused with:
- * - 400 `BILLING_CANCELLATION_INVALID` when `subscription_ids` or `proration_date` is not
- *   acceptable (`meta.field`), or the subscriptions do not all belong to one service, project,
- *   account and currency;
- * - 409 `BILLING_CANCELLATION_CONFLICT` when a subscription has not started or has ended;
- * - 422 `BILLING_CANCELLATION_MODE_FIXED` when `mode` is not allowed for a subscription, and
- *   `BILLING_CANCELLATION_TERMS_UNSET` when a prepaid subscription has no termination terms;
- *   both carry `meta.subscription_id`;
- * - 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when, for `period_end`, the paid terms end at
- *   different times;
- * - 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled
- *   (`meta.cancellation_id`) or reclaimed (`meta.reason` `reclaim_requested`), or has a paid
- *   change still waiting to switch (`meta.order_id`);
- * - 409 `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online payment for a renewal of one of them
- *   is in progress;
- * - 409 `BILLING_CANCELLATION_REFUND_CHANGED` when the refund is no longer
- *   `expected_refundable_amount`; quote again.
  *
- * Sending the same request again, for the same subscriptions, mode and amount while that
- * cancellation is still open, returns it with 200 rather than creating another. Renewal orders
- * still waiting for payment are canceled along with it, and automatic renewal is turned off for
- * every subscription in the set, for `period_end` as well as `immediate`.
+ * - 400 `BILLING_CANCELLATION_INVALID` when `subscription_ids` or `proration_date` is invalid (`meta.field`), or
+ *   the subscriptions do not share one service, project, account and currency;
+ * - 409 `BILLING_CANCELLATION_CONFLICT` when a subscription has not started or has ended;
+ * - 422 `BILLING_CANCELLATION_MODE_FIXED` when `mode` is not allowed, and `BILLING_CANCELLATION_TERMS_UNSET`
+ *   when a licensed subscription has no termination terms, both with `meta.subscription_id`;
+ * - 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when, for `period_end`, the paid terms end at different times;
+ * - 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled
+ *   (`meta.cancellation_id`) or reclaimed (`meta.reason` `reclaim_requested`), or has a paid change waiting to
+ *   switch (`meta.order_id`);
+ * - 409 `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online renewal payment for one of them is in progress;
+ * - 409 `BILLING_CANCELLATION_REFUND_CHANGED` when the refund no longer equals `expected_refundable_amount`.
+ *
+ * Repeating the request for the same subscriptions, mode and amount while the cancellation is open returns it
+ * with 200. Unpaid renewal orders are canceled with it, and automatic renewal is turned off for every
+ * subscription.
  * @summary Cancel subscriptions
  */
 export const CreateCancellationBody = CancellationCreate;
 
 /**
- * Returns a cancellation for an authorized billing account with its schedule, expected refundable amount and individual subscription outcomes. Read individual item states for per-subscription outcomes, including partial success.
+ * A cancellation of your billing account with its schedule, expected refundable amount and the outcome for each subscription, including partial success.
  * @summary Get a cancellation
  */
 export const GetCancellationParams = zod.strictObject({
@@ -1162,11 +1049,7 @@ export const GetCancellationParams = zod.strictObject({
 });
 
 /**
- * Withdraws the whole cancellation while none of its resources has begun to be released; the
- * subscriptions continue as before, except that automatic renewal, turned off when the
- * cancellation was created, stays off until it is turned on again. After that it is refused with
- * 409 `BILLING_CANCELLATION_CONFLICT`. Withdrawing one that is already withdrawn returns it
- * unchanged.
+ * Withdraws the whole cancellation while no resource has begun to be released; afterwards it is refused with 409 `BILLING_CANCELLATION_CONFLICT`. The subscriptions continue, but automatic renewal, turned off when the cancellation was created, stays off until it is turned on again. Withdrawing a withdrawn cancellation returns it unchanged.
  * @summary Withdraw a cancellation
  */
 export const WithdrawCancellationParams = zod.strictObject({
@@ -1203,17 +1086,15 @@ export const ListRenewalPricesQueryParams = zod.strictObject({
 });
 
 /**
- * Purchases prepaid periods from current_term_end using the agreed recurring amount, and pays for them at
- * once. A changed interval selects a current price and freezes new terms on the order, applied
- * only after fulfillment. Existing paid periods keep their value.
+ * Buys licensed periods from current_term_end at the agreed recurring amount and pays for them at once. A
+ * different interval selects the price currently sold for it and fixes new terms on the order, applied after
+ * fulfillment. Paid periods keep their value.
  *
- * Without `payment_method_id`, the renewal is paid from credit grants and the balance as
- * `use_credits` and `use_balance` allow; when they cannot pay it all, the renewal is refused with
- * `BILLING_INSUFFICIENT_FUNDS` and no order is left. To pay another way, create a renewal order
- * and pay its invoice instead.
+ * Without `payment_method_id`, the renewal is paid from credit grants and balance as `use_credits` and
+ * `use_balance` allow; when they cannot cover it, the request fails with `BILLING_INSUFFICIENT_FUNDS` and no
+ * order is left. To pay another way, create a renewal order and pay its invoice.
  *
- * Save order_id before submitting and query the order after an unknown outcome; duplicate
- * creation conflicts.
+ * Keep order_id and read the order after an unknown outcome; creating it again conflicts.
  * @summary Renew subscription
  */
 export const RenewSubscriptionParams = zod.strictObject({
@@ -1223,16 +1104,14 @@ export const RenewSubscriptionParams = zod.strictObject({
 export const RenewSubscriptionBody = RenewRequest;
 
 /**
- * Places a renewal order with a draft invoice, without applying a new discount or charging anything.
- * Pay its invoice to renew; a promotion code can be applied when paying. Existing subscription
- * discount commitments are retained. The periods and price are chosen as for renewing. The order
- * can be paid until the current paid period ends, and never after the end of the first period it renews; unpaid by
- * then, it is canceled. While auto-renew is on, the renewal due at the end of the period pays
- * this order instead of placing another, applying an applicable account discount first if the
- * order's terms are not fixed yet.
+ * Places a renewal order with a draft invoice, without applying a new discount or charging anything. Pay its
+ * invoice to renew; a promotion code can be applied when paying. Existing subscription discounts are kept.
+ * Periods and price are chosen as for renewing. The order can be paid until the current paid period ends, and
+ * never after the end of the first period it renews; unpaid by then, it is canceled. While auto-renew is on, the
+ * renewal due at the end of the period pays this order instead of placing another, applying an applicable
+ * account discount first if its terms are not fixed yet.
  *
- * Save `order_id` before submitting and read the order after an unknown outcome; creating it a
- * second time conflicts.
+ * Keep `order_id` and read the order after an unknown outcome; creating it again conflicts.
  * @summary Create renewal order
  */
 export const CreateRenewalOrderParams = zod.strictObject({
@@ -1242,15 +1121,7 @@ export const CreateRenewalOrderParams = zod.strictObject({
 export const CreateRenewalOrderBody = RenewalOrderRequest;
 
 /**
- * Controls automatic prepaid renewal for an active or suspended subscription. A pending or provisioning
- * subscription cannot set this preference and returns 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_INACTIVE`. Disabling it does
- * not shorten current_term_end and still permits manual renewal. A postpaid subscription always continues until it is
- * canceled; setting it is refused with 409
- * `BILLING_SUBSCRIPTION_AUTO_RENEW_FIXED`.
- *
- * While the subscription has an open cancellation, turning it on or off is refused with 409
- * `BILLING_SUBSCRIPTION_OPERATION_PENDING` and `meta.cancellation_id`: creating the cancellation
- * turned it off, and withdrawing the cancellation does not turn it back on.
+ * Turns automatic renewal of an active or suspended licensed subscription on or off. Turning it off does not shorten current_term_end and still allows manual renewal. Refused with 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_INACTIVE` for a pending or provisioning subscription, 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_FIXED` for a metered subscription, which continues until it is canceled, and 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` with `meta.cancellation_id` while a cancellation is open: creating it turned renewal off, and withdrawing it does not turn renewal back on.
  * @summary Set auto renew
  */
 export const SetAutoRenewParams = zod.strictObject({
@@ -1260,13 +1131,7 @@ export const SetAutoRenewParams = zod.strictObject({
 export const SetAutoRenewBody = AutoRenewSet;
 
 /**
- * Lists remaining usage quantities, such as bytes, seconds or tokens. Applicable allowances are
- * consumed before usage is charged. Lower priority values are consumed first, followed by earlier
- * expiry and earlier issuance.
- *
- * Unused quantity expires without a refund or carry-over. Promotional allowances apply to usage paid
- * by their holding account. Included allowances apply only to the associated subscription, including
- * after its project moves to another billing account.
+ * Remaining usage quantities, such as bytes, seconds or tokens. Applicable allowances are consumed before usage is charged: lower priority values first, then earlier expiry, then earlier issuance. Unused quantity expires without refund or carry-over. Promotional allowances apply to usage paid by their holding account; included allowances apply only to their subscription, also after its project moves to another billing account.
  * @summary List allowances
  */
 export const listAllowancesQueryPageDefault = 1;
@@ -1296,7 +1161,7 @@ export const ListAllowancesQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   meter_id: zod.uuid().optional().describe("Filter by the meter UUID."),
   status: zod.enum(["active", "depleted", "expired", "voided"]).optional(),
   product_id: zod
@@ -1305,21 +1170,19 @@ export const ListAllowancesQueryParams = zod.strictObject({
     .max(listAllowancesQueryProductIdMax)
     .regex(listAllowancesQueryProductIdRegExp)
     .optional()
-    .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
+    .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
   project_ids: zod
     .array(zod.uuid())
     .min(1)
     .max(listAllowancesQueryProjectIdsMax)
     .optional()
     .describe(
-      "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
     ),
 });
 
 /**
- * Lists acceptance status and associated invoice amounts. A pending order is not yet accepted;
- * its invoice shows whether it still needs payment. accepted means accepted, not delivered.
- * Pending orders can expire at expires_at.
+ * Orders with their status and invoice amounts. A pending order is not yet accepted and can expire at expires_at; its invoice shows whether payment is needed. Accepted does not mean delivered.
  * @summary List orders
  */
 export const listOrdersQueryPageDefault = 1;
@@ -1346,12 +1209,12 @@ export const ListOrdersQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   status: zod
     .enum(["pending", "accepted", "completed", "partially_completed", "failed", "canceled"])
     .optional()
     .describe(
-      "Follows the items. `pending` is not yet accepted and may be unpaid or paid; its invoice shows\nwhether payment is still needed, and it can expire or be canceled. `accepted` is accepted with items still\nbeing set up. `completed` means every item was set up. `partially_completed` means some items were set up\nand the others failed or were canceled and were refunded to their original payment sources. `failed` means\nno item was delivered and at least one failed; collected amounts for the undelivered items are refunded.\n`canceled` means every item was withdrawn without delivery; collected amounts are returned to their original\npayment sources. No status establishes service delivery by itself.",
+      "Follows the items. `pending`: not yet accepted, paid or unpaid; its invoice shows whether payment is needed, and it can expire or be canceled. `accepted`: items are being set up. `completed`: every item was set up. `partially_completed`: some items were set up and the others failed or were canceled and refunded to their original payment sources. `failed`: no item was delivered and at least one failed; amounts collected for undelivered items are refunded. `canceled`: every item was withdrawn without delivery; collected amounts are returned to their original payment sources. No status by itself means the service was delivered.",
     ),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
@@ -1361,12 +1224,12 @@ export const ListOrdersQueryParams = zod.strictObject({
     .max(listOrdersQueryProjectIdsMax)
     .optional()
     .describe(
-      "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
     ),
 });
 
 /**
- * Returns an order charged to an owned billing account with its commercial state and invoice reference. An unknown order returns 404; an order on another user account is forbidden.
+ * An order of your billing account with its status and invoice. An unknown order returns 404; another user's order returns 403.
  * @summary Get order
  */
 export const GetOrderParams = zod.strictObject({
@@ -1374,24 +1237,19 @@ export const GetOrderParams = zod.strictObject({
 });
 
 /**
- * Cancels the selected, still-undelivered items of an unaccepted order without recording a
- * delivery failure. Omit order_item_ids to select every still-pending item, or name one or
- * more items. Successful items remain delivered and are not refunded. Whole-order and partial
- * cancellation both require confirmed non-delivery and necessary cleanup. The order keeps
- * its existing pending phase while any item is still pending; its final outcome follows all
- * item outcomes. Previously failed items keep their failure outcome.
+ * Cancels the selected undelivered items of an order that has not been accepted, without recording a delivery
+ * failure. Omit order_item_ids to select every pending item. Delivered items stay delivered and are not
+ * refunded; failed items keep their outcome. The order stays pending while any item is pending, and its final
+ * status follows its items.
  *
- * Payment may be absent, partial or complete. Once the order's terms are fixed, the selected items
- * keep their agreed amounts and discounts; credit notes reduce issued invoices, and collected amounts
- * are returned to their original payment sources. While the terms of a deferred order are not fixed,
- * the remaining items are priced again. External payment-method refunds can finish asynchronously. An online payment still waiting for the payer is canceled with the order; one the gateway is already processing is refused with `BILLING_PAYMENT_PENDING` and `meta.transaction_id`.
- * The order and financial history are retained; the same cancellation does not refund twice.
+ * Once the order's terms are fixed, the canceled items keep their agreed amounts and discounts: credit notes
+ * reduce the issued invoice, and collected amounts return to their original payment sources, possibly
+ * asynchronously. While a deferred order's terms are not fixed, the remaining items are priced again. An online
+ * payment waiting for the payer is canceled with the order; one the gateway is processing is refused with
+ * `BILLING_PAYMENT_PENDING` and `meta.transaction_id`. Repeating the cancellation does not refund twice.
  *
- * Once the order is accepted, its owning service coordinates cancellation and confirms
- * non-delivery and cleanup through the cancellation RPC. Delivered items are ended through
- * subscription cancellation. Unknown delivery or payment outcomes are not refund evidence;
- * in-flight or unknown payments must be reconciled first. Scheduled changes continue to be
- * canceled through the owning service. Refund quotations use CreateQuote.refund.
+ * An accepted order is canceled by its owning service, and delivered items through subscription cancellation.
+ * Refunds are quoted with the quote operation's `refund` target.
  * @summary Cancel order
  */
 export const CancelOrderParams = zod.strictObject({
@@ -1430,13 +1288,7 @@ export const ListOrderItemsQueryParams = zod.strictObject({
 });
 
 /**
- * Capabilities that come with what has been bought. A capability that is not held simply
- * does not appear, so that "this does not exist" and "this has not been bought" cannot be
- * confused.
- *
- * Derived from live subscriptions and active feature grants rather than stored, so this always
- * agrees with what is being paid for and granted. It stops being listed as soon as the
- * subscription or grant providing it ends.
+ * Capabilities granted by live subscriptions and active feature grants. A capability not held is not listed, and one stops being listed when the subscription or grant providing it ends.
  * @summary List entitlements
  */
 export const listEntitlementsQueryPageDefault = 1;
@@ -1467,14 +1319,14 @@ export const ListEntitlementsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   project_ids: zod
     .array(zod.uuid())
     .min(1)
     .max(listEntitlementsQueryProjectIdsMax)
     .optional()
     .describe(
-      "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
     ),
   product_id: zod
     .string()
@@ -1482,13 +1334,11 @@ export const ListEntitlementsQueryParams = zod.strictObject({
     .max(listEntitlementsQueryProductIdMax)
     .regex(listEntitlementsQueryProductIdRegExp)
     .optional()
-    .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
+    .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
 });
 
 /**
- * Access to features held by a billing account for a period, for example through a membership. While a grant
- * is active, every project whose current billing account holds it has the feature, in addition to the
- * features of its own subscriptions.
+ * Features held by a billing account for a period, for example through a membership. While a grant is active, every project whose current billing account holds it has the feature, in addition to its subscriptions' features.
  * @summary List feature grants
  */
 export const listFeatureGrantsQueryPageDefault = 1;
@@ -1517,14 +1367,14 @@ export const ListFeatureGrantsQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   product_id: zod
     .string()
     .min(1)
     .max(listFeatureGrantsQueryProductIdMax)
     .regex(listFeatureGrantsQueryProductIdRegExp)
     .optional()
-    .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
+    .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
   status: zod
     .enum(["scheduled", "active", "expired", "voided"])
     .optional()
@@ -1532,13 +1382,7 @@ export const ListFeatureGrantsQueryParams = zod.strictObject({
 });
 
 /**
- * Every sellable thing and what it costs, in one request. A plan appears once per price.
- *
- * `currency` is required: a plan has a price in each currency it is sold in, so "what does
- * this cost" has no answer without one.
- *
- * Archived prices are left out. Existing subscriptions keep the terms they were bought at, so
- * this is not the place to look up what an existing purchase is paying.
+ * Every active price in the currency, one entry per plan and price. Archived prices are not listed; existing subscriptions keep the terms they were bought at.
  * @summary List what is on sale, with prices
  */
 export const listPricesQueryPageDefault = 1;
@@ -1578,11 +1422,9 @@ export const ListPricesQueryParams = zod.strictObject({
     .max(listPricesQueryProductIdMax)
     .regex(listPricesQueryProductIdRegExp)
     .optional()
-    .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
-  type: zod
-    .enum(["postpaid", "prepaid", "one_time"])
-    .optional()
-    .describe("Narrows to one payment timing."),
+    .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
+  type: zod.enum(["one_time", "recurring"]).optional().describe("Narrows to one price type."),
+  usage_type: zod.enum(["licensed", "metered"]).optional().describe("Narrows to one usage type."),
 });
 
 export const ListPricesHeader = zod.strictObject({
@@ -1590,12 +1432,12 @@ export const ListPricesHeader = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
+      "The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.",
     ),
 });
 
 /**
- * Paginated registered catalog products with their service identities and descriptions. Supports If- None-Match and returns 304 when the selected page has not changed.
+ * Registered products. If-None-Match returns 304 for an unchanged page.
  * @summary List catalog products
  */
 export const listProductsQueryPageDefault = 1;
@@ -1624,13 +1466,12 @@ export const ListProductsHeader = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
+      "The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.",
     ),
 });
 
 /**
- * Resolves an identifier that was stored elsewhere — on an order line, an invoice line, or
- * the terms of a credit — into something that can be displayed.
+ * A product by its ID.
  * @summary Get a service
  */
 export const getProductPathProductIdMax = 64;
@@ -1643,7 +1484,7 @@ export const GetProductParams = zod.strictObject({
     .min(1)
     .max(getProductPathProductIdMax)
     .regex(getProductPathProductIdRegExp)
-    .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
+    .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
 });
 
 export const GetProductHeader = zod.strictObject({
@@ -1651,13 +1492,12 @@ export const GetProductHeader = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
+      "The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.",
     ),
 });
 
 /**
- * Resolves a stored identifier into something that can be displayed. Returns items that are
- * no longer on sale: an existing purchase still refers to one.
+ * A plan, including one no longer on sale.
  * @summary Get a sellable item
  */
 export const GetPlanParams = zod.strictObject({
@@ -1669,12 +1509,12 @@ export const GetPlanHeader = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
+      "The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.",
     ),
 });
 
 /**
- * Returns the catalog price, including archived prices. Fixed purchase history and renewal agreements are shown on orders and subscriptions rather than reconstructed from today's catalog.
+ * A catalog price, archived prices included. The terms of past purchases are on their orders and subscriptions.
  * @summary Get a price
  */
 export const GetPriceParams = zod.strictObject({
@@ -1686,12 +1526,12 @@ export const GetPriceHeader = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
+      "The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.",
     ),
 });
 
 /**
- * Paginated active plans for the required product_id, with their feature allocations. An unknown product returns 404; If-None-Match can return 304 for an unchanged page.
+ * Active plans of product_id with their features. An unknown product returns 404; If-None-Match returns 304 for an unchanged page.
  * @summary List catalog plans
  */
 export const listPlansQueryProductIdMax = 64;
@@ -1709,7 +1549,7 @@ export const ListPlansQueryParams = zod.strictObject({
     .min(1)
     .max(listPlansQueryProductIdMax)
     .regex(listPlansQueryProductIdRegExp)
-    .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
+    .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
   page: zod
     .int()
     .min(1)
@@ -1729,13 +1569,12 @@ export const ListPlansHeader = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
+      "The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.",
     ),
 });
 
 /**
- * Public list prices only. An account holding a negotiated agreement may be charged less;
- * it is never charged more.
+ * Public list prices. An account with a negotiated agreement may be charged less, never more.
  * @summary List catalog prices
  */
 export const ListPricesByPlanParams = zod.strictObject({
@@ -1769,13 +1608,12 @@ export const ListPricesByPlanHeader = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
+      "The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.",
     ),
 });
 
 /**
- * Only public price lists are readable here. A list written for a single agreement is not,
- * and its identifier cannot be used to reach it.
+ * Rules of a public rate card; contract cards are not readable here.
  * @summary List catalog rates
  */
 export const ListRatesParams = zod.strictObject({
@@ -1805,7 +1643,7 @@ export const ListRatesQueryParams = zod.strictObject({
   at: zod.iso
     .datetime({ offset: true })
     .optional()
-    .describe("Return the rates in effect at this moment. Defaults to now."),
+    .describe("Rates in effect at this moment; defaults to now."),
 });
 
 export const ListRatesHeader = zod.strictObject({
@@ -1813,14 +1651,12 @@ export const ListRatesHeader = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "The `ETag` from an earlier reply. When the catalogue has not changed since, the\nanswer is `304` with no body.\n\nSend it on every catalogue read. An unchanged catalogue is answered without a body.",
+      "The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.",
     ),
 });
 
 /**
- * Lists continuous metering registrations paid for by your billing accounts. Their state does not
- * describe machine runtime or health. Project filters narrow the authorized accounts; they do not
- * grant project-based access.
+ * Continuous metering registrations paid for by your billing accounts. Their state does not describe the resource's runtime. Project filters only narrow the result.
  * @summary List active resources
  */
 export const listActiveResourcesQueryPageDefault = 1;
@@ -1852,14 +1688,14 @@ export const ListActiveResourcesQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .optional()
-    .describe("Restrict to one of your accounts. All of them when omitted."),
+    .describe("Only this account of yours; all when omitted."),
   project_ids: zod
     .array(zod.uuid())
     .min(1)
     .max(listActiveResourcesQueryProjectIdsMax)
     .optional()
     .describe(
-      "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
     ),
   meter_id: zod.uuid().optional(),
   product_id: zod
@@ -1868,7 +1704,7 @@ export const ListActiveResourcesQueryParams = zod.strictObject({
     .max(listActiveResourcesQueryProductIdMax)
     .regex(listActiveResourcesQueryProductIdRegExp)
     .optional()
-    .describe("Immutable platform service identifier, such as compute, canopy or assistant."),
+    .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
   status: zod.enum(["active", "suspended", "closing", "closed"]).optional(),
 });
 
@@ -1898,10 +1734,10 @@ export const ListSpendQueryParams = zod.strictObject({
     .datetime({ offset: true })
     .describe("Exclusive. One month is `[2026-09-01, 2026-10-01)`."),
   group_by: zod
-    .enum(["product", "plan", "resource"])
+    .enum(["product", "plan", "resource", "meter"])
     .default(listSpendQueryGroupByDefault)
     .describe(
-      "`plan` groups by the plan of the price each charge was priced with, which stays the same after the\nsubscription changes plan. `resource` groups by the resource each charge names. Items billed under their own\nidentifier — a disk, a public address — appear as their own rows rather than under\nthe machine they are attached to, since the relationship between them is known to\nthe owning service and not here.",
+      "`plan` groups by the plan of the price each charge was priced with, unchanged after the subscription changes plan. `resource` groups by the resource each charge names; a disk or an address billed under its own identifier is its own row. `meter` groups by meter and the values of its presentation dimensions, such as the model and token kind, and includes the quantity used.",
     ),
   product_id: zod
     .string()
@@ -1925,7 +1761,7 @@ export const ListSpendQueryParams = zod.strictObject({
   billing_account_id: zod
     .int()
     .describe(
-      "The authorized billing account whose currency and charges are used for this report.",
+      "The billing account whose currency and charges the report uses; it must be authorized.",
     ),
   project_ids: zod
     .array(zod.uuid())
@@ -1933,12 +1769,12 @@ export const ListSpendQueryParams = zod.strictObject({
     .max(listSpendQueryProjectIdsMax)
     .optional()
     .describe(
-      "Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.",
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
     ),
 });
 
 /**
- * Usage billing by UTC calendar month for owned billing accounts, newest first. Each period combines its statements, the invoices they issued and how those invoices were paid; usage is billed about hourly, so a month holds many statements. Filter by billing_account_id and by period start.
+ * Usage billing per UTC calendar month for your billing accounts, newest first. Each month combines its statements, the invoices they issued and how those were paid.
  * @summary List monthly statements
  */
 export const listMonthlyStatementsQueryPageDefault = 1;
@@ -1966,7 +1802,7 @@ export const ListMonthlyStatementsQueryParams = zod.strictObject({
 });
 
 /**
- * Paginated consumption statement batches for owned billing accounts, filtered by billing_account_id, open or closed state and period-start interval. A closed batch is not proof that the whole month has finished.
+ * Statements of your billing accounts, filtered by billing_account_id, open or closed and period start. A closed statement does not mean the month is complete.
  * @summary List statements
  */
 export const listStatementsQueryPageDefault = 1;
@@ -1995,7 +1831,7 @@ export const ListStatementsQueryParams = zod.strictObject({
 });
 
 /**
- * Returns an owned-account consumption batch with its period, estimated or closed amounts and invoice reference. Returns 404 for a missing batch and 403 when the billing account belongs to another user.
+ * A statement of your billing account with its period, estimated or closed amounts and invoice. Returns 404 for a missing statement and 403 for another user's account.
  * @summary Get statement
  */
 export const GetStatementParams = zod.strictObject({
@@ -2003,7 +1839,7 @@ export const GetStatementParams = zod.strictObject({
 });
 
 /**
- * Reads the consumption summary that is updated in the same transaction as usage is priced. Group by project, product or meter and filter within the statement. Quantities are included only for meter groups so different units are never combined.
+ * The statement's consumption, grouped by project, product or meter and filtered within the statement. Quantities are given only for meter groups; grouping by meter also splits by the meter's presentation dimensions.
  * @summary Get grouped consumption
  */
 export const GetStatementUsageParams = zod.strictObject({

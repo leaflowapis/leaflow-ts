@@ -33,9 +33,9 @@
 import * as zod from "zod";
 
 export const InvoiceStatus = zod
-  .enum(["draft", "open", "paid", "void", "uncollectible"])
+  .enum(["draft", "open", "paid", "void"])
   .describe(
-    "A draft is not yet issued. The draft invoice of an order shows base prices until it is paid, when\nthe discount is applied and it is issued; other drafts are private to administrators.\nAn issued invoice is open until settled; a zero-total issued invoice is immediately paid.\nUnbilled usage remains separate from invoices until it is invoiced.\nA refund does not change the status: a paid invoice stays paid, with the refunded part in\namount_refunded. void means collection has stopped and any funds received have been returned.",
+    "`draft`: not yet issued; an order's draft invoice shows base prices until it is paid, when the discount is applied and it is issued. Other drafts are visible only to operators. `open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage not yet invoiced is not on any invoice.",
   );
 
 export type InvoiceStatus = zod.input<typeof InvoiceStatus>;

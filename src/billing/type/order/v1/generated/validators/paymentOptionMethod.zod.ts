@@ -14,7 +14,7 @@ export const PaymentOptionMethod = zod.strictObject({
   reusable: zod
     .boolean()
     .describe(
-      "Whether a method of this type can be saved with create-payment-method-setup and charged later\nwithout the customer present. Methods that are not reusable are paid anew each time.",
+      "Whether this method type can be saved with create-payment-method-setup and charged later without the customer.",
     ),
 });
 

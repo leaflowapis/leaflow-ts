@@ -52,9 +52,7 @@ export const PayInvoiceRequest = zod
       .min(1)
       .max(payInvoiceRequestPaymentGatewayMax)
       .optional()
-      .describe(
-        "Required to collect an online remainder. An existing attempt keeps its original gateway.",
-      ),
+      .describe("Required to collect an online remainder. An existing attempt keeps its gateway."),
     method_type: zod
       .string()
       .min(1)
@@ -65,19 +63,17 @@ export const PayInvoiceRequest = zod
       .uuid()
       .optional()
       .describe(
-        "Optional saved card owned by this billing account and belonging to the selected gateway. Omit to complete payment interactively.",
+        "A saved card of this billing account at the selected gateway. Omit to pay interactively.",
       ),
     use_balance: zod
       .boolean()
       .default(payInvoiceRequestUseBalanceDefault)
-      .describe(
-        "Whether to apply the available balance. Credit grants are controlled separately by use_credits.",
-      ),
+      .describe("Whether to apply the balance; credit grants are controlled by use_credits."),
     use_credits: zod
       .boolean()
       .default(payInvoiceRequestUseCreditsDefault)
       .describe(
-        "Apply eligible, unexpired credit grants before using the balance. This never withdraws grants or converts them into balance.",
+        "Apply eligible, unexpired credit grants before the balance. Grants are never converted into balance.",
       ),
     return_url: zod.string().optional(),
     promotion_code: zod
@@ -86,12 +82,12 @@ export const PayInvoiceRequest = zod
       .max(payInvoiceRequestPromotionCodeMax)
       .optional()
       .describe(
-        "The code to apply while the order's terms are not yet fixed. Omit to apply the best applicable\naccount discount, or to keep the discount already recorded.",
+        "The code to apply while the order's terms are not fixed. Omit to apply the best applicable account discount, or to keep the discount already recorded.",
       ),
     expected_amount: Money.and(zod.string().regex(payInvoiceRequestExpectedAmountTwoRegExp))
       .optional()
       .describe(
-        "The invoice total to expect, after discounts and tax and before credit grants or balance, as the\npayment preview or an order quote gave it. A different total fails with BILLING_AMOUNT_CHANGED\nand nothing is charged. Omit to skip the comparison; an explicit zero is compared.",
+        "The invoice total to expect, after discounts and tax and before credit grants or balance, as the payment preview or an order quote gave it. A different total fails with `BILLING_AMOUNT_CHANGED` and nothing is charged. Omit to skip the check; zero is checked.",
       ),
   })
   .describe(

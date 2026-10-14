@@ -48,12 +48,10 @@ export const PayTogetherRequest = zod
     expected_amount: Money.and(zod.string().regex(payTogetherRequestExpectedAmountTwoRegExp))
       .optional()
       .describe(
-        "The amount due to expect across all of them, before credit grants or balance, as preview-pay-together\ngave it. A different amount fails with BILLING_AMOUNT_CHANGED and nothing is charged. Omit to skip\nthe comparison.",
+        "The amount due across all invoices, before credit grants or balance, as preview-pay-together gave it. A different amount fails with `BILLING_AMOUNT_CHANGED` and nothing is charged. Omit to skip the check.",
       ),
   })
-  .describe(
-    "Name at least one invoice or order. They must all belong to the same account and share\nits currency; anything else is refused rather than partly paid.",
-  );
+  .describe("Name at least one invoice or order. All must belong to one account in its currency.");
 
 export type PayTogetherRequest = zod.input<typeof PayTogetherRequest>;
 export type PayTogetherRequestOutput = zod.output<typeof PayTogetherRequest>;

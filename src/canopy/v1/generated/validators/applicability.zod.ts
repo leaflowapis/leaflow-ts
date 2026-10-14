@@ -33,21 +33,30 @@
 import * as zod from "zod";
 import { ApplicablePlan } from "./applicablePlan.zod.js";
 import { PriceOption } from "./priceOption.zod.js";
+import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { PurchaseOperation } from "./purchaseOperation.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const Applicability = zod
   .strictObject({
     products: zod.array(Product).optional(),
     plans: zod.array(ApplicablePlan).optional(),
     prices: zod.array(PriceOption).optional(),
-    price_types: zod.array(zod.string()).optional(),
+    price_types: zod
+      .array(PriceType)
+      .optional()
+      .describe("The price types covered; empty covers both."),
+    usage_types: zod
+      .array(UsageType)
+      .optional()
+      .describe("The usage types covered; empty covers both."),
     operations: zod.array(PurchaseOperation).optional(),
     min_term_months: zod
       .int()
       .optional()
       .describe(
-        "The shortest term a purchase may have, in months. A purchase with no term, such as\nmetered usage, never qualifies while this is set.",
+        "The shortest term a purchase may have, in months. Purchases without a term, such as metered usage, do not qualify while this is set.",
       ),
     max_term_months: zod
       .int()
@@ -58,7 +67,7 @@ export const Applicability = zod
     excluded_prices: zod.array(PriceOption).optional(),
   })
   .describe(
-    "Anything not excluded that matches an inclusion, or anything not excluded when no inclusion is\ngiven, subject to the charge type, operation and term conditions. Entries always include their\ndisplay fields; archived plans and prices stay listed with active set to false.",
+    "Covers anything not excluded that matches an inclusion, or anything not excluded when no inclusion is given, subject to the price type, usage type, operation and term conditions. Archived plans and prices stay listed with active false.",
   );
 
 export type Applicability = zod.input<typeof Applicability>;

@@ -11,7 +11,7 @@ import { Money } from "./money.zod.js";
 
 export const CreditGroup = zod.strictObject({
   applies_to: Applicability.describe(
-    "What the credit in this group may pay for. No restrictions means anything on the account.",
+    "What the credit in this group may pay for; no restrictions means anything on the account.",
   ),
   first_purchase_only: zod
     .boolean()

@@ -44,13 +44,13 @@ export const Contact = zod
     tax_exempt: zod
       .enum(["none", "exempt", "reverse"])
       .describe(
-        "How tax applies to the customer, as in Stripe. `none` taxes normally. `exempt` charges no tax.\n`reverse` charges no tax and leaves it to the customer under the reverse-charge mechanism;\ninvoices state this. Only operators change it.",
+        "How tax applies to the customer, as in Stripe: `none` taxes normally, `exempt` charges no tax, `reverse` charges no tax under the reverse-charge mechanism, stated on invoices. Only operators change it.",
       ),
     active: zod.boolean(),
     created_at: zod.iso.datetime({ offset: true }),
   })
   .describe(
-    "A billing-account contact profile with one address. An account can hold multiple contacts; this is not a login identity.",
+    "A contact of a billing account with one address. An account can hold several; a contact is not a login.",
   );
 
 export type Contact = zod.input<typeof Contact>;

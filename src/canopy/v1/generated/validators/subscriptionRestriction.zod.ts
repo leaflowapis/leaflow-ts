@@ -41,7 +41,7 @@ export const SubscriptionRestriction = zod
     "billing.subscriptions.terminate",
   ])
   .describe(
-    "An operation Leaflow prevents on a subscription. billing.subscriptions.use stops the service. renew prevents renewal and payment of a renewal order. modify prevents placing a change order. cancel prevents cancellation. terminate prevents immediate termination.",
+    "An operation prevented on the subscription. `billing.subscriptions.use` stops the service. `renew` prevents renewal and paying a renewal order. `modify` prevents placing a change order. `cancel` prevents cancellation. `terminate` prevents immediate termination.",
   );
 
 export type SubscriptionRestriction = zod.input<typeof SubscriptionRestriction>;

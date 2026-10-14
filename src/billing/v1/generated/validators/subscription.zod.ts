@@ -9,6 +9,7 @@ import * as zod from "zod";
 import { AccountIdentity } from "./accountIdentity.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
+import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
@@ -16,6 +17,7 @@ import { ScheduledChange } from "./scheduledChange.zod.js";
 import { SubscriptionCancellation } from "./subscriptionCancellation.zod.js";
 import { SubscriptionRestriction } from "./subscriptionRestriction.zod.js";
 import { TerminationPolicy } from "./terminationPolicy.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const subscriptionDiscountedRenewalsRemainingMin = 0;
 
@@ -28,14 +30,20 @@ export const Subscription = zod
         "Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them.",
       ),
     currency: zod.string(),
-    charge_type: zod.enum(["postpaid", "prepaid", "one_time"]),
+    type: PriceType,
+    usage_type: UsageType,
+    dimensions: zod
+      .record(zod.string(), zod.string())
+      .describe(
+        "The dimension values of what was bought, such as region and instance type. Empty when the purchase gave none.",
+      ),
     interval: zod.enum(["none", "day", "month", "year"]),
     interval_count: zod.int().min(1).optional(),
     recurring_amount: zod
       .string()
       .optional()
       .describe(
-        "Whole-subscription prepaid renewal amount, after continuing discounts and before tax.\nPending subscriptions show base terms until paying the order fixes any new continuing discount.\nAbsent for other charge types.",
+        "The whole licensed subscription's renewal amount, after continuing discounts and before tax. A pending subscription shows base terms until paying the order fixes any new discount. Absent for metered and one-time subscriptions.",
       ),
     termination_policy: TerminationPolicy.optional(),
     refund_policy: RefundPolicy.optional(),
@@ -50,7 +58,7 @@ export const Subscription = zod
       .array(SubscriptionRestriction)
       .optional()
       .describe(
-        "The operations currently prevented on the subscription, sorted. The subscription is suspended while this contains billing.subscriptions.use.",
+        "The operations currently prevented on the subscription, sorted; it is suspended while this contains `billing.subscriptions.use`.",
       ),
     billing_cycle_anchor: zod.iso.datetime({ offset: true }).optional(),
     cancellation: SubscriptionCancellation.optional(),
@@ -58,13 +66,13 @@ export const Subscription = zod
       .union([ScheduledChange, zod.null()])
       .optional()
       .describe(
-        "The accepted period-end change currently scheduled for this subscription. Null when no such change exists.",
+        "The accepted period-end change scheduled for this subscription; null when there is none.",
       ),
     default_payment_method_id: zod
       .uuid()
       .nullish()
       .describe(
-        "The saved payment method automatic renewal charges after the account's balance and credits,\nbefore the account's default payment method. Set when the purchase, a renewal or a change is paid with a\nsaved payment method; paying any other way leaves it unchanged. It is used only while it belongs to the\naccount that pays the renewal.",
+        "The saved payment method automatic renewal charges after balance and credits, before the account's default payment method. Set when a purchase, renewal or change is paid with a saved payment method. Used only while it belongs to the account paying the renewal.",
       ),
     created_at: zod.iso.datetime({ offset: true }).optional(),
     id: zod.uuid(),
@@ -79,13 +87,13 @@ export const Subscription = zod
       .uuid()
       .nullish()
       .describe(
-        "Which project this is for. Absent when it was bought at account level, such as a\nmembership, which belongs to no single project.",
+        "The project it is for. Absent for an account-level purchase, such as a membership.",
       ),
     project: zod
       .union([NamedIdentity, zod.null()])
       .optional()
       .describe(
-        "The project and its current name, for display. Absent for a purchase at account level,\nand when the project no longer exists or its details cannot be read at the moment;\n`project_id` still identifies it then.",
+        "The project and its current name. Absent for an account-level purchase or when the project cannot be read; `project_id` still identifies it.",
       ),
     product: Product,
     plan_id: zod.uuid(),
@@ -96,40 +104,40 @@ export const Subscription = zod
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "When a prepaid subscription renews or expires, the end of the last service period bought.\nRenewing several periods in advance moves it. Null until a new subscription becomes active, even when\nits purchase has been paid, and for postpaid subscriptions.",
+        "When a licensed subscription renews or expires: the end of the last period bought, moved by renewing in advance. Null until the subscription becomes active, even when its purchase has been paid, and for metered subscriptions.",
       ),
     current_period_start: zod.iso
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "Start of the service period in effect now. Null when none is, including for postpaid subscriptions.",
+        "Start of the service period in effect now. Null when none is, including for metered subscriptions.",
       ),
     current_period_end: zod.iso
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "End of the service period in effect now. Renewing in advance moves `current_term_end`, not\nthis. Null when no period is in effect, including for postpaid subscriptions.",
+        "End of the service period in effect now; renewing in advance moves `current_term_end`, not this. Null when no period is in effect, including for metered subscriptions.",
       ),
     auto_renew: zod
       .boolean()
       .describe(
-        "A prepaid subscription renews automatically while this is on. A postpaid subscription always continues until it is canceled; this is true until a cancellation is requested and cannot be set.",
+        "Whether a licensed subscription renews automatically. A metered subscription continues until it is canceled; for it this is true until a cancellation is requested, and cannot be set.",
       ),
     status: zod
       .enum(["pending", "provisioning", "active", "suspended", "canceled", "terminated"])
       .describe(
-        "pending means the purchase relationship exists but its order has not been accepted.\nprovisioning means the service accepted the order and is delivering. For a service-owned\npurchase, only confirmed delivery moves it to active; paying alone does not.\ncanceled means cancellation completed, or an unfulfilled purchase was canceled or failed without delivery.\nterminated means an administrator or the owning service immediately ended the commercial relationship.",
+        "`pending`: the order has not been accepted. `provisioning`: the owning service accepted the order and is delivering. `active`: delivery was confirmed; payment alone does not make a subscription active. `suspended`: service is stopped while a lien restricts its use. `canceled`: cancellation completed, or an undelivered purchase was canceled or failed. `terminated`: an operator or the owning service ended it immediately.",
       ),
     started_at: zod.iso
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "Confirmed start of service. Null until a new subscription becomes active, including after payment.",
+        "When service started. Null until a new subscription becomes active, also after payment.",
       ),
     ended_at: zod.iso.datetime({ offset: true }).nullish(),
   })
   .describe(
-    "An independently billed purchase relationship, separate from the owning service's resource.\nPlacing a new prepaid or postpaid service order creates a pending subscription for each line\nin the same purchase transaction. Its ID is returned on the order item and remains stable\nthrough checkout and delivery. One order may create several subscriptions, such as an instance,\nits system disk and its address; it has no single subscription ID.\n\nPending and provisioning do not grant service or accrue usage. A service-owned subscription\nbecomes provisioning when the owning service accepts the order, and active when the service\nconfirms delivery, with started_at set to the confirmed effective time; payment changes neither. Prepaid service periods start\nthen; postpaid usage starts only when the service reports actual delivery and metering.\n\nOne-time delivery may omit a subscription. Renewals reference and extend existing subscriptions\nrather than creating another; a change keeps the subscription ID and switches its terms when it\ntakes effect. Canceling or failing an unfulfilled purchase sets its pending or provisioning\nsubscriptions to canceled without starting a service period.\nFixed renewals use the agreed recurring_amount and interval; already paid periods retain their\noriginal value. Technical state belongs to the owning service.\n\nA purchased shared capacity limit, such as a regional snapshot count quota, can have its own\nsubscription. Activating that capacity confirms delivery of the quota, not individual snapshots.\nCreating or deleting snapshots within it does not create, activate or terminate more subscriptions;\nthe owning service enforces current holdings against the purchased count.",
+    "A purchase that is billed, renewed and changed on its own, separate from the owning service's resource. A new\nrecurring purchase creates a pending subscription for each order line; its ID is returned on the order item\nand stays the same through checkout, delivery, renewals and changes. A one-time purchase may create none.\n\nPending and provisioning subscriptions grant no service. A subscription becomes provisioning when the owning\nservice accepts the order, and active when the service confirms delivery, which sets started_at; payment\nchanges neither. Licensed service periods start at delivery, and metered usage is charged as the service\nreports it. Canceling or failing an undelivered purchase cancels its subscriptions without starting a period.\nRenewals use recurring_amount and the agreed interval; paid periods keep their value.\n\nA shared capacity limit, such as a regional snapshot quota, has one subscription for the purchased quantity\nrather than one per item.",
   );
 
 export type Subscription = zod.input<typeof Subscription>;

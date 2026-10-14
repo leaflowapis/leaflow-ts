@@ -13,6 +13,12 @@ export const StatementItem = zod.strictObject({
   product_id: zod.string().optional(),
   meter_id: zod.uuid().optional(),
   unit: zod.string().optional(),
+  dimensions: zod
+    .record(zod.string(), zod.string())
+    .optional()
+    .describe(
+      "The values of the meter's presentation dimensions, such as the model and token kind. Included only when grouping by meter, which splits each meter by these values.",
+    ),
   quantity: zod
     .string()
     .optional()

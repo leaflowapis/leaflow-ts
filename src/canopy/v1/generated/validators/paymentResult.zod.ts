@@ -38,16 +38,11 @@ import { Transaction } from "./transaction.zod.js";
 
 export const PaymentResult = zod.strictObject({
   transactions: zod.array(Transaction),
-  transaction_id: zod
-    .uuid()
-    .optional()
-    .describe(
-      "The gateway transaction, when one is involved. Balance and credit-grant payments are separate transactions.",
-    ),
+  transaction_id: zod.uuid().optional().describe("The gateway transaction, when one is involved."),
   status: PaymentStatus,
   amount_paid: Money,
   amount_due: Money.describe(
-    "What is still outstanding. Zero once the payment succeeds. Unchanged while\n`processing`: nothing is collected until the gateway confirms it.",
+    "What is still outstanding: zero once the payment succeeds, unchanged while `processing`.",
   ),
   currency: zod.string(),
   credit_applied: Money.optional(),
@@ -55,14 +50,14 @@ export const PaymentResult = zod.strictObject({
   payment_gateway: zod.string().optional(),
   method_type: zod.string().optional(),
   balance_applied: Money.optional().describe(
-    "The amount already paid from the account's balance toward this invoice. Retrying an online remainder\ndoes not debit it again. A canceled purchase returns funds through its refund process.",
+    "The amount already paid from balance toward this invoice; retrying the online remainder does not debit it again.",
   ),
   action: PaymentAction.optional(),
   retriable: zod
     .boolean()
     .optional()
     .describe(
-      "Whether paying again is worth attempting. False for a refusal that will keep\nhappening — a closed account, an amount over a limit — so that a client does not\nretry in a loop.",
+      "Whether paying again can succeed. False for a refusal that will repeat, such as a closed account or an amount over a limit.",
     ),
   invoice_id: zod.uuid().nullish(),
   order_id: zod.uuid().nullish(),
@@ -70,7 +65,7 @@ export const PaymentResult = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "Why the payment did not go through. Present with `failed`. For a declined gateway payment the\nvalue is the gateway's own code, passed on unchanged: the card issuer's decline code when\nthere is one (Stripe's decline_code, such as insufficient_funds or lost_card), otherwise the\ngateway's error code (Stripe's code, such as card_declined, expired_card or\npayment_intent_authentication_failure). Clients map it to their own wording and treat an\nunknown value as a generic decline.",
+      "Why the payment failed; present with `failed`. For a declined gateway payment, the gateway's code unchanged: the issuer's decline code when there is one (Stripe decline_code, such as insufficient_funds), otherwise the gateway's error code (Stripe code, such as card_declined). Treat an unknown value as a generic decline.",
     ),
 });
 

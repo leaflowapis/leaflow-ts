@@ -6,20 +6,28 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { BillingScheme } from "./billingScheme.zod.js";
 import { Money } from "./money.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
+import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
 import { TerminationPolicy } from "./terminationPolicy.zod.js";
 import { Tier } from "./tier.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const Price = zod.strictObject({
   rate_card: ObjectIdentity.optional(),
   lookup_key: zod.string().optional(),
   product: Product,
   plan: ObjectIdentity,
-  meter_id: zod.uuid().optional(),
+  meter_id: zod
+    .uuid()
+    .optional()
+    .describe(
+      "For a metered price with its own amounts, the meter it charges. For a licensed price, the meter its quantity is held on. Absent otherwise.",
+    ),
   meter: ObjectIdentity.optional(),
   unit_quantity: zod.string(),
   active: zod
@@ -31,28 +39,25 @@ export const Price = zod.strictObject({
   id: zod.uuid(),
   plan_id: zod.uuid(),
   currency: zod.string(),
-  type: zod
-    .enum(["postpaid", "prepaid", "one_time"])
-    .describe(
-      "`postpaid` charges for what is used, `prepaid` buys a period in advance, `one_time`\ncharges once.",
-    ),
-  billing_scheme: zod
-    .enum(["per_unit", "tiered", "rated"])
-    .describe(
-      "How the amount is arrived at. `rated` means the rate depends on attributes such as\nregion or machine type, and is looked up on a price list.",
-    ),
+  type: PriceType,
+  usage_type: UsageType,
+  billing_scheme: BillingScheme.optional().describe(
+    "Absent when the price delegates to a rate card, where the rate depends on attributes such as region or machine type.",
+  ),
   unit_amount: Money.optional().describe("Present for `per_unit`."),
   tiers_mode: zod
     .enum(["none", "graduated", "volume"])
     .optional()
     .describe(
-      "`none` for a price that is not tiered, which is most of them.\n\nOtherwise `graduated` charges each band at its own rate, and `volume` charges\neverything at the rate of the band the total falls in.",
+      "How a ladder is walked: `graduated` charges each band at its own rate, `volume` charges everything at the rate of the band the total falls in. `none` when not tiered.",
     ),
   tiers: zod.array(Tier).optional().describe("Present for `tiered`, in ascending order."),
   rate_card_id: zod
     .uuid()
     .optional()
-    .describe("For `rated` prices, the price list the rates are read from."),
+    .describe(
+      "Present when the price delegates to a rate card, the price list its rates are read from.",
+    ),
   min_quantity: zod
     .string()
     .optional()
@@ -61,7 +66,7 @@ export const Price = zod.strictObject({
     .string()
     .optional()
     .describe(
-      "The largest purchasable quantity. Omitted when no maximum applies. A quantity above this limit is\nrejected with BILLING_PRICE_INVALID and field=max_quantity.",
+      "The largest quantity that may be bought; absent when there is no limit. A larger quantity is refused with `BILLING_PRICE_INVALID` and `field` `max_quantity`.",
     ),
   quantity_step: zod
     .string()
@@ -72,7 +77,7 @@ export const Price = zod.strictObject({
   interval_count: zod
     .int()
     .optional()
-    .describe("For prepaid prices, how many periods one purchase covers."),
+    .describe("For recurring licensed prices, how many interval units one period covers."),
   interval: zod.enum(["none", "day", "month", "year"]),
   setup_fee: Money.optional(),
 });

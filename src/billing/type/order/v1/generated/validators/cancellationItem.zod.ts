@@ -7,28 +7,29 @@
  */
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
+import { PriceType } from "./priceType.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const CancellationItem = zod
   .strictObject({
     id: zod
       .uuid()
       .describe(
-        "The cancellation item of this subscription, the same as `Subscription.cancellation.id`.",
+        "The subscription's cancellation item, the same as `Subscription.cancellation.id`.",
       ),
     subscription_id: zod.uuid(),
     plan_id: zod.uuid(),
     plan_name: zod.string(),
-    charge_type: zod
-      .enum(["postpaid", "prepaid", "one_time"])
-      .describe(
-        "How the subscription is charged. Creating the cancellation turned automatic renewal off;\nwithdrawing it turns renewal back on for a `postpaid` subscription and leaves it off for a\n`prepaid` one.",
-      ),
+    type: PriceType,
+    usage_type: UsageType.describe(
+      "Creating the cancellation turned automatic renewal off; withdrawing it turns renewal back on\nfor a `metered` subscription and leaves it off for a `licensed` one.",
+    ),
     status: zod.enum(["requested", "scheduled", "releasing", "completed", "canceled", "failed"]),
     failure_code: zod
       .string()
       .optional()
       .describe(
-        "Execution stopped or its result is unknown. Present while release still requires resolution; it does not establish refund eligibility.",
+        "The release stopped or its result is unknown; present while the release needs resolution.",
       ),
     release_started_at: zod.iso.datetime({ offset: true }).optional(),
     effective_at: zod.iso

@@ -27,20 +27,18 @@ export const CancellationCreate = zod.strictObject({
     .datetime({ offset: true })
     .optional()
     .describe(
-      "For `immediate`, the `proration_date` of the quote: a whole second, not in the future and\nat most ten minutes old. The refund is computed as of it. Now when omitted.",
+      "For `immediate`, the quote's `proration_date`: a whole second, not in the future and at most ten minutes old; the refund is computed as of it. Now when omitted.",
     ),
   expected_refundable_amount: Money.and(
     zod.string().regex(cancellationCreateExpectedRefundableAmountTwoRegExp),
   ).describe(
-    "The `refundable_amount` of the quote. The cancellation is refused when the refund differs.",
+    "The quote's `refundable_amount`; the cancellation is refused when the refund differs.",
   ),
   reason: zod
     .string()
     .max(cancellationCreateReasonMax)
     .optional()
-    .describe(
-      "A note from the account holder. It is kept with the cancellation and not shown elsewhere.",
-    ),
+    .describe("A note from the account holder, kept with the cancellation."),
 });
 
 export type CancellationCreate = zod.input<typeof CancellationCreate>;

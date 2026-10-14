@@ -10,7 +10,7 @@ import * as zod from "zod";
 export const RefundPolicy = zod
   .enum(["none", "prorated"])
   .describe(
-    "none refunds nothing. prorated refunds the amount paid for the current period minus the value of\nthe time used, never below zero and never more than what remains unrefunded. The time used runs\nfrom the period start to the effective cancellation time and is valued at the plan's\nshorter-period prices in the same currency, frozen at purchase as the order item's\nrefund_monthly_amount and refund_hourly_amount: each full calendar month at the one-month prepaid\nprice, the remainder at the postpaid hourly price or, without one, at the one-month price by the\nsecond. When the plan has no prepaid period shorter than the one bought, the time used is valued\nat the price paid, pro rata by the second. Discounts are not refunded, as they were never paid,\nand setup fees are excluded. The refunded part returns to the payment sources it came from. Tax\npaid is refunded in the same proportion as the amount it was paid on.",
+    "`none` refunds nothing. `prorated` refunds the amount paid for the current period minus the value of the time used, never below zero or above what remains unrefunded. Time used runs from the period start to the effective cancellation and is valued at prices frozen on the order item: each full calendar month at `refund_monthly_amount`, the rest at `refund_hourly_amount` or, without it, at the monthly price by the second. When the plan has no licensed period shorter than the one bought, time used is valued pro rata at the price paid. Discounts and setup fees are not refunded. Refunds return to the original payment sources, with tax refunded in proportion.",
   );
 
 export type RefundPolicy = zod.input<typeof RefundPolicy>;

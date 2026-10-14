@@ -20,7 +20,9 @@ export const listSpendParamsProjectIdsMax = 100;
 export const ListSpendParams = zod.strictObject({
   from: zod.iso.datetime({ offset: true }),
   to: zod.iso.datetime({ offset: true }),
-  group_by: zod.enum(["product", "plan", "resource"]).default(listSpendParamsGroupByDefault),
+  group_by: zod
+    .enum(["product", "plan", "resource", "meter"])
+    .default(listSpendParamsGroupByDefault),
   product_id: ProductID.optional(),
   page: zod.int().min(1).max(listSpendParamsPageMax).default(listSpendParamsPageDefault),
   page_size: zod

@@ -32,6 +32,7 @@
  */
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
+import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Product } from "./product.zod.js";
 
 export const SpendRow = zod.strictObject({
@@ -39,6 +40,18 @@ export const SpendRow = zod.strictObject({
   plan_id: zod.uuid().optional(),
   plan_name: zod.string().optional(),
   resource_id: zod.string().optional().describe("Present only when grouped by resource."),
+  meter: ObjectIdentity.optional().describe("Present only when grouped by meter."),
+  unit: zod.string().optional().describe("Present only when grouped by meter."),
+  quantity: zod
+    .string()
+    .optional()
+    .describe("Net usage quantity, present only when grouped by meter."),
+  dimensions: zod
+    .record(zod.string(), zod.string())
+    .optional()
+    .describe(
+      "The values of the meter's presentation dimensions, present only when grouped by meter.",
+    ),
   amount: Money,
   currency: zod.string(),
 });

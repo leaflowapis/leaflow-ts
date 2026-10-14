@@ -53,7 +53,7 @@ export const QuoteRenewal = zod
       .describe("How many consecutive periods to renew for."),
   })
   .describe(
-    "Price renewing a prepaid subscription. Give `price_id`, or `interval` with\n`interval_count`, to renew for another term at the price currently sold for it. Naming\nthe current term, or giving neither, renews at the agreed amount. A term sold at several\nprices that differ in termination policy is refused with 409\n`BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `termination_policy` or `price_id` is given.",
+    "Price renewing a licensed subscription. Give `price_id`, or `interval` with\n`interval_count`, to renew for another term at the price currently sold for it. Naming\nthe current term, or giving neither, renews at the agreed amount. A term sold at several\nprices that differ in termination policy is refused with 409\n`BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `termination_policy` or `price_id` is given.",
   );
 
 export type QuoteRenewal = zod.input<typeof QuoteRenewal>;

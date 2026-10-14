@@ -35,7 +35,7 @@ import * as zod from "zod";
 export const PaymentCancellationReason = zod
   .enum(["abandoned", "requested_by_customer"])
   .describe(
-    "Why a gateway payment was withdrawn. `abandoned` means the customer did not complete it within the time\nallowed for payment. `requested_by_customer` means the customer canceled it.",
+    "Why a gateway payment was withdrawn: `abandoned` when the customer did not complete it in time, `requested_by_customer` when the customer canceled it.",
   );
 
 export type PaymentCancellationReason = zod.input<typeof PaymentCancellationReason>;

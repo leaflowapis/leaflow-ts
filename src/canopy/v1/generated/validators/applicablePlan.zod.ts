@@ -39,7 +39,7 @@ export const ApplicablePlan = zod
     active: zod.boolean(),
   })
   .describe(
-    "A plan it refers to. active is false once the plan is archived; it still applies to subscriptions already on this plan.",
+    "A plan referenced by an applicability; active is false once it is archived, and the reference still applies.",
   );
 
 export type ApplicablePlan = zod.input<typeof ApplicablePlan>;

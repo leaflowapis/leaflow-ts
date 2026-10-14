@@ -35,16 +35,12 @@ import { PaymentAction } from "./paymentAction.zod.js";
 
 export const PaymentMethodSetupResult = zod
   .strictObject({
-    setup_id: zod
-      .string()
-      .describe(
-        "The gateway's identifier for this attempt. Use it to tell a reloaded page apart\nfrom a second attempt.",
-      ),
+    setup_id: zod.string().describe("The gateway's identifier for this attempt."),
     payment_gateway: zod.string(),
     action: PaymentAction,
   })
   .describe(
-    "What the payment gateway's browser library needs in order to collect a card. There is\nno address to redirect to: the form is rendered in the page, and the card goes straight\nfrom the browser to the gateway.",
+    "What the payment gateway's browser library needs to collect a card in the page; the card goes from the browser straight to the gateway.",
   );
 
 export type PaymentMethodSetupResult = zod.input<typeof PaymentMethodSetupResult>;

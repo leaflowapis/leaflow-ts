@@ -23,7 +23,7 @@ export const QuoteRequest = zod
       .int()
       .min(1)
       .describe(
-        "The billing account to price for. It must belong to you. Existing orders must have been purchased\nwith this account; renewals and cancellations must currently be paid for by it.",
+        "The billing account to price for; it must be yours. Existing orders must have been placed with it, and renewals and cancellations must currently be paid by it.",
       ),
     items: zod
       .array(QuoteItemInput)
@@ -31,13 +31,13 @@ export const QuoteRequest = zod
       .max(quoteRequestItemsMax)
       .optional()
       .describe(
-        "A proposed purchase priced in the account currency. Metered items may estimate specified usage\nquantities; those estimates are not amounts collectible at checkout.",
+        "A proposed purchase priced in the account's currency. Metered items may include usage estimates, which are not checkout amounts.",
       ),
     order_id: zod
       .uuid()
       .optional()
       .describe(
-        "Preview paying this existing order. Its recorded purchase terms supply every line, and an order\nwhose terms are fixed returns its recorded amounts. A preview does not change the order.",
+        "Preview paying this order. Its recorded terms supply every line, and an order whose terms are fixed returns its recorded amounts. The order does not change.",
       ),
     renewals: zod
       .array(QuoteRenewal)
@@ -45,14 +45,14 @@ export const QuoteRequest = zod
       .max(quoteRequestRenewalsMax)
       .optional()
       .describe(
-        "Preview renewing these subscriptions, each at most once. Each entry represents a separate\nrenewal order. To preview a new promotion code, create a renewal order and quote it by order_id.",
+        "Preview renewing these subscriptions, each at most once; each entry is a separate renewal order. To preview a promotion code, create a renewal order and quote it by order_id.",
       ),
     cancellation: QuoteCancellation.optional(),
     promotion_code: zod.string().min(1).max(quoteRequestPromotionCodeMax).optional(),
     refund: OrderRefundQuoteInput.optional(),
   })
   .describe(
-    '"Quote exactly one target: proposed items, an existing order, renewals, a cancellation or an order\nrefund. All targets use the specified billing account. Nothing is saved, charged, reserved or\ncanceled. Promotion codes apply only to a purchase basket or an existing order. An invalid\ncombination returns BILLING_PURCHASE_INVALID with the offending field."',
+    "Quote exactly one target for the billing account: proposed items, an existing order, renewals, a cancellation or an order refund. Promotion codes apply only to proposed items or an existing order. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.",
   );
 
 export type QuoteRequest = zod.input<typeof QuoteRequest>;

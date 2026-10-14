@@ -18,7 +18,7 @@ export const MonthlyStatement = zod
     finalized: zod
       .boolean()
       .describe(
-        "True after the period's final closing, which applies minimum charges for the whole month. Usage priced later is still billed in supplement statements and added here.",
+        "True after the period's final closing, which applies the month's minimum charges. Usage priced later is billed in supplement statements and added here.",
       ),
     finalized_at: zod.iso.datetime({ offset: true }).optional(),
     statement_count: zod.int().describe("Statements of the period, including the open one."),
@@ -31,7 +31,7 @@ export const MonthlyStatement = zod
     amount_refunded: Money,
   })
   .describe(
-    "One billing account's usage billing for one UTC calendar month, summed over the month's statements. It is a summary, not something to pay; each closing's invoice is collected on its own.",
+    "One billing account's usage billing for one UTC calendar month, summed over its statements. Not payable itself; each statement's invoice is collected on its own.",
   );
 
 export type MonthlyStatement = zod.input<typeof MonthlyStatement>;

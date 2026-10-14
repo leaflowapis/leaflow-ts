@@ -10,7 +10,7 @@ import * as zod from "zod";
 export const OrderItemStatus = zod
   .enum(["pending", "completed", "failed", "canceled"])
   .describe(
-    "`pending` is waiting to be set up. `completed` was confirmed by the service.\n`failed` was not set up and its amount was refunded to the original payment sources.\n`canceled` was confirmed withdrawn without delivery; any collected amount is returned. A completed item is ended by canceling\nits subscription.",
+    "`pending`: waiting to be set up. `completed`: set up, as confirmed by the service. `failed`: not set up; its amount was refunded to the original payment sources. `canceled`: withdrawn without delivery; any collected amount is returned. A completed item ends when its subscription is canceled.",
   );
 
 export type OrderItemStatus = zod.input<typeof OrderItemStatus>;

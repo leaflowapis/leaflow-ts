@@ -17,17 +17,18 @@ export const ActiveResource = zod
     state_changed_at: zod.iso.datetime({ offset: true }).optional(),
     subscription_id: zod
       .uuid()
-      .describe(
-        "The postpaid subscription charged for this metering record, including shared services.",
-      ),
+      .describe("The metered subscription charged for this metering record."),
     resource_id: zod.string(),
     product: Product,
-    resource_type: zod.string().optional().describe("What it is, as its own service names it."),
+    resource_type: zod
+      .string()
+      .optional()
+      .describe("The resource type, as the owning service names it."),
     meter: ObjectIdentity,
     unit: zod.string().optional(),
     quantity: zod
       .string()
-      .describe("How much is held — cores, MiB, cards. Not how much has been used."),
+      .describe("How much is held, such as cores, MiB or cards; not how much was used."),
     dimensions: zod.record(zod.string(), zod.string()).optional(),
     status: zod.enum(["active", "suspended", "closing", "closed"]),
     started_at: zod.iso.datetime({ offset: true }),
@@ -35,10 +36,10 @@ export const ActiveResource = zod
     usage_generated_until: zod.iso
       .datetime({ offset: true })
       .describe(
-        "Usage has been generated up to this boundary; it does not imply invoicing or payment.",
+        "Usage has been generated up to this boundary; it says nothing about invoicing or payment.",
       ),
   })
-  .describe("A resource currently accruing charges by the second.");
+  .describe("A resource charged continuously by the second.");
 
 export type ActiveResource = zod.input<typeof ActiveResource>;
 export type ActiveResourceOutput = zod.output<typeof ActiveResource>;

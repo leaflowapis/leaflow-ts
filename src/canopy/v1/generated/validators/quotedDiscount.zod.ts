@@ -46,7 +46,7 @@ export const QuotedDiscount = zod
       .describe("Code text for a promotion_code discount; null for an account_discount."),
   })
   .describe(
-    "The discount selected for this calculation. Its presence in a quote does not apply it or\nreserve a redemption. Discount amounts are reported on the quote and its lines.",
+    "The discount selected for this calculation, not applied and not reserved. Amounts are on the quote and its lines.",
   );
 
 export type QuotedDiscount = zod.input<typeof QuotedDiscount>;

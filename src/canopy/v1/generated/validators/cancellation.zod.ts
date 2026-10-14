@@ -47,21 +47,21 @@ export const Cancellation = zod
       .describe("For `immediate`, the second the refund is computed as of."),
     origin: zod
       .enum(["customer", "operator", "project_deletion"])
-      .describe("Who asked for it. `project_deletion` means the project was deleted."),
+      .describe("Who requested it; `project_deletion` means the project was deleted."),
     billing_account_id: zod
       .int()
       .describe(
-        "The billing account that paid for these subscriptions when the cancellation was created: the\naccount of an account-level purchase, or the account the project was linked to.",
+        "The billing account paying for these subscriptions when the cancellation was created: the purchasing account of an account-level purchase, or the project's linked account.",
       ),
     currency: zod.string(),
     expected_refundable_amount: Money.optional().describe(
-      "The refund confirmed when it was created. Absent when the platform created it.",
+      "The refund confirmed when the cancellation was created. Absent when the platform created it.",
     ),
     failure_code: zod
       .string()
       .optional()
       .describe(
-        "Present with `failed`. A code of the service that provides the resources, such as a disk\nthat can only be released with its server. Clients map it to their own wording.",
+        "Present with `failed`: the owning service's code, such as for a disk that can only be released with its server.",
       ),
     requested_at: zod.iso.datetime({ offset: true }),
     completed_at: zod.iso.datetime({ offset: true }).optional(),

@@ -45,9 +45,7 @@ export const RenewalPrice = zod.strictObject({
   currency: zod.string().optional(),
   current: zod
     .boolean()
-    .describe(
-      "The term this item already bills at. Renewing for it uses the price bought\noriginally, so a later price change does not affect it.",
-    ),
+    .describe("The term the subscription renews at now; renewing for it keeps the agreed price."),
 });
 
 export type RenewalPrice = zod.input<typeof RenewalPrice>;

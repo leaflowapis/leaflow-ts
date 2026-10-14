@@ -50,13 +50,13 @@ export const Transaction = zod
       .enum(["balance", "credit", "gateway"])
       .optional()
       .describe(
-        "Present on refunds. Where this part of the refund goes.\n\n- `balance`: back to the account balance.\n- `credit`: back to the credit grant that paid, which keeps its original expiry.\n- `gateway`: back to the payment method it was paid with.",
+        "Present on refunds: where this part goes. `balance`: the account balance. `credit`: the credit grant that paid, keeping its original expiry. `gateway`: the payment method it was paid with.",
       ),
     status: zod
       .enum(["pending", "succeeded", "failed", "canceled"])
       .optional()
       .describe(
-        "`failed` means the operation did not succeed; for a gateway payment, that the gateway declined\nit. `canceled` means a gateway payment was withdrawn without collecting money. After either,\nan invoice the payment was meant to pay remains open for another payment.",
+        "`failed`: the operation did not succeed; for a gateway payment, the gateway declined it. `canceled`: a gateway payment was withdrawn without collecting money. Either way, the invoice it was for stays open.",
       ),
     cancellation_reason: PaymentCancellationReason.optional(),
     payment_gateway: zod.string().optional(),
@@ -65,24 +65,24 @@ export const Transaction = zod
       .string()
       .optional()
       .describe(
-        "Why it failed. Present with `failed`. For a declined gateway payment the value is the\ngateway's own code, passed on unchanged: the card issuer's decline code when there is one\n(Stripe's decline_code, such as insufficient_funds or lost_card), otherwise the gateway's\nerror code (Stripe's code, such as card_declined, expired_card or\npayment_intent_authentication_failure). Clients map it to their own wording and treat an\nunknown value as a generic decline.",
+        "Why it failed; present with `failed`. For a declined gateway payment, the gateway's code unchanged: the issuer's decline code when there is one (Stripe decline_code, such as insufficient_funds), otherwise the gateway's error code (Stripe code, such as card_declined). Treat an unknown value as a generic decline.",
       ),
     settled_at: zod.iso.datetime({ offset: true }).optional(),
     id: zod.uuid(),
     billing_account_id: zod.int().optional(),
     type: TransactionType,
     amount: Money.describe(
-      "Signed by type: positive for `topup` and `payment`, negative for `refund`.\nAn `adjustment` is positive when it adds to the balance and negative when it takes from\nit. For the other types the sign does not tell the effect on the balance: a payment from\nthe balance lowers it, while a payment by gateway or by credit leaves it unchanged.",
+      "Signed by type: positive for `topup` and `payment`, negative for `refund`. An `adjustment` is positive when it adds to the balance and negative when it takes from it. For other types the sign does not show the effect on the balance: a payment from balance lowers it, a payment by gateway or credit does not.",
     ),
     remaining_amount: Money.describe(
-      "How much of this transaction is still available in the balance. Only top-ups, positive\nadjustments and gateway payments later returned to the balance can be non-zero.",
+      "How much of this transaction is still in the balance. Only top-ups, positive adjustments and gateway payments returned to the balance can be non-zero.",
     ),
     currency: zod.string(),
     reason: zod.string().optional(),
     created_at: zod.iso.datetime({ offset: true }),
   })
   .describe(
-    "A funds operation. Each payment has one source; refunds identify the original successful transaction. Unknown gateway results remain pending. Payments from the balance or a gateway are distinct from credit-grant payments.",
+    "A funds movement with one source. Refunds name the original transaction. Unknown gateway results stay pending.",
   );
 
 export type Transaction = zod.input<typeof Transaction>;

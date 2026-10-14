@@ -6,7 +6,9 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { PriceType } from "./priceType.zod.js";
 import { ProductID } from "./productID.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const listPricesParamsPageDefault = 1;
 export const listPricesParamsPageMax = 2147483647;
@@ -26,7 +28,8 @@ export const ListPricesParams = zod.strictObject({
     .default(listPricesParamsPageSizeDefault),
   currency: zod.string().min(listPricesParamsCurrencyMin).max(listPricesParamsCurrencyMax),
   product_id: ProductID.optional(),
-  type: zod.enum(["postpaid", "prepaid", "one_time"]).optional(),
+  type: PriceType.optional(),
+  usage_type: UsageType.optional(),
 });
 
 export type ListPricesParams = zod.input<typeof ListPricesParams>;

@@ -6,21 +6,29 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { BillingScheme } from "./billingScheme.zod.js";
 import { Money } from "./money.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Tier } from "./tier.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const Rate = zod.strictObject({
   meter: ObjectIdentity,
-  unit: zod.string().optional().describe("The unit readings arrive in, such as `core-second`."),
+  unit: zod
+    .string()
+    .optional()
+    .describe("The unit readings are reported in, such as `core-second`."),
   dimensions: zod
     .record(zod.string(), zod.string())
-    .describe("The attributes this rate applies to, such as region and machine type."),
-  billing_scheme: zod
-    .enum(["per_unit", "tiered"])
-    .describe(
-      "`per_unit` multiplies `unit_amount`; `tiered` walks the tiers as `tiers_mode` says.",
-    ),
+    .describe("The dimension values this rate applies to, such as region and machine type."),
+  billing_scheme: BillingScheme,
+  usage_type: UsageType.describe(
+    "`metered` prices usage; `licensed` prices holding a quantity for one period.",
+  ),
+  interval: zod
+    .enum(["none", "day", "month", "year"])
+    .describe("Licensed rates only, the period the amount buys; `none` for metered rates."),
+  interval_count: zod.int().nullish(),
   tiers_mode: zod
     .enum(["none", "graduated", "volume"])
     .describe(
@@ -34,7 +42,7 @@ export const Rate = zod.strictObject({
     .string()
     .optional()
     .describe(
-      'How many measured units one amount covers. An hourly rate on a per-second meter is\n`"3600"`.',
+      'How many measured units one amount covers; an hourly rate on a per-second meter is `"3600"`.',
     ),
   currency: zod.string(),
   effective_from: zod.iso.datetime({ offset: true }),

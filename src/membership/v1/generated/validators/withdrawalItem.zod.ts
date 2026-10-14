@@ -35,11 +35,11 @@ export const WithdrawalItem = zod
       .string()
       .optional()
       .describe(
-        "The original gateway failure code when a refund failed, or refund_reversed when a completed refund was reversed. Absent while pending or successful.",
+        "The gateway's failure code when a refund failed, or `refund_reversed` when a completed refund was reversed. Absent while pending or successful.",
       ),
   })
   .describe(
-    "The fixed principal deduction, withdrawal fee and exact refund obligation for one original top-up. Each item has its own refund; payment_gateway and method_type identify the original route.",
+    "For one original top-up: the principal deducted, the withdrawal fee and the amount refunded, through its own refund. payment_gateway and method_type identify the original route.",
   );
 
 export type WithdrawalItem = zod.input<typeof WithdrawalItem>;

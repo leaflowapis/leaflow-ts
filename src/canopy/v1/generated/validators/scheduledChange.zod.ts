@@ -44,13 +44,13 @@ export const ScheduledChange = zod
     plan_name: zod.string(),
     price_id: zod.uuid(),
     quantity: zod.string(),
-    recurring_amount: zod.string().describe("The target prepaid renewal amount before tax."),
+    recurring_amount: zod.string().describe("The target licensed renewal amount before tax."),
     currency: zod.string(),
     interval: zod.enum(["day", "month", "year"]),
     interval_count: zod.int().min(1),
   })
   .describe(
-    "The next accepted period-end change for a subscription. It describes the target terms and does not change the current subscription until effective_at.",
+    "The next accepted period-end change of the subscription: the target terms, applied at effective_at.",
   );
 
 export type ScheduledChange = zod.input<typeof ScheduledChange>;

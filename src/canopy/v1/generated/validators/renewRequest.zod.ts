@@ -42,14 +42,14 @@ export const RenewRequest = zod.strictObject({
   order_id: zod
     .uuid()
     .describe(
-      "Purchase ID saved before submitting. Duplicate creation conflicts; query this order after an unknown result.",
+      "The order ID, chosen by the caller. Creating it again conflicts; read the order after an unknown outcome.",
     ),
   periods: zod
     .int()
     .min(1)
     .default(renewRequestPeriodsDefault)
     .describe(
-      "How many further periods to buy, each at the price this item already bills at.\n\nBuying twelve monthly periods is not the same as buying one yearly term: a longer\nterm is usually sold at a lower price, and that price is only reached by naming the\ninterval. Use `interval_count` and `interval` for that.",
+      "How many further periods to buy, each at the price the subscription already renews at. To buy a longer term at its own price, give `interval` and `interval_count` instead.",
     ),
   interval_count: zod
     .int()

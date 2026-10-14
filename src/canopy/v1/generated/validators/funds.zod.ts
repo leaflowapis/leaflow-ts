@@ -37,13 +37,13 @@ export const Funds = zod
   .strictObject({
     available_balance_amount: Money.describe("Spendable balance after pending returns."),
     usable_credit_amount: Money.describe(
-      "Currently effective credits eligible for the quoted purchases or postpaid usage. Each grant is counted once.",
+      "Currently effective credits eligible for the quoted purchases or metered usage. Each grant is counted once.",
     ),
     restricted_credit_amount: Money.describe(
-      "Currently effective credits that cannot fund any quoted purchase or postpaid target. Unused eligible credits are not restricted.",
+      "Currently effective credits that cannot fund any quoted purchase or metered target. Unused eligible credits are not restricted.",
     ),
     required_balance_amount: Money.describe(
-      "Minimum spendable balance needed after eligible credits, covering immediate charges and every new postpaid admission requirement.",
+      "Minimum spendable balance needed after eligible credits, covering immediate charges and every new metered purchase's admission requirement.",
     ),
     balance_shortfall_amount: Money.describe(
       "Additional balance needed now. Zero means account funds satisfy this quote. No funds are reserved.",
@@ -53,7 +53,7 @@ export const Funds = zod
     ),
   })
   .describe(
-    "Account funding for this purchase, calculated by Billing. Amounts use the enclosing response currency.\nCredit eligibility and all purchase requirements are already evaluated. Nothing is charged or reserved.\nA prepaid purchase may instead use an online payment method.\n",
+    "Account funding for this purchase, calculated by Billing. Amounts use the enclosing response currency.\nCredit eligibility and all purchase requirements are already evaluated. Nothing is charged or reserved.\nA licensed purchase may instead be paid with an online payment method.\n",
   );
 
 export type Funds = zod.input<typeof Funds>;

@@ -17,9 +17,7 @@ export const Entitlement = zod.strictObject({
   expires_at: zod.iso
     .datetime({ offset: true })
     .nullish()
-    .describe(
-      "When the subscription providing it ends. Absent for a metered subscription, which\nhas no end date.",
-    ),
+    .describe("When the providing subscription ends. Absent for a metered subscription."),
 });
 
 export type Entitlement = zod.input<typeof Entitlement>;

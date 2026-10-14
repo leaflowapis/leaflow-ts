@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 /**
- * Whether a fulfilled purchase may end immediately or only after its paid term. Does not grant a refund. When absent, the terms are not configured and termination requires review.
+ * Whether a delivered purchase may end immediately or only at the end of its paid term; refunds follow the refund policy. When absent, no termination terms were agreed.
  */
 export type TerminationPolicy = (typeof TerminationPolicy)[keyof typeof TerminationPolicy];
 
@@ -16,16 +16,7 @@ export const TerminationPolicy = {
 } as const;
 
 /**
- * none refunds nothing. prorated refunds the amount paid for the current period minus the value of
- * the time used, never below zero and never more than what remains unrefunded. The time used runs
- * from the period start to the effective cancellation time and is valued at the plan's
- * shorter-period prices in the same currency, frozen at purchase as the order item's
- * refund_monthly_amount and refund_hourly_amount: each full calendar month at the one-month prepaid
- * price, the remainder at the postpaid hourly price or, without one, at the one-month price by the
- * second. When the plan has no prepaid period shorter than the one bought, the time used is valued
- * at the price paid, pro rata by the second. Discounts are not refunded, as they were never paid,
- * and setup fees are excluded. The refunded part returns to the payment sources it came from. Tax
- * paid is refunded in the same proportion as the amount it was paid on.
+ * `none` refunds nothing. `prorated` refunds the amount paid for the current period minus the value of the time used, never below zero or above what remains unrefunded. Time used runs from the period start to the effective cancellation and is valued at prices frozen on the order item: each full calendar month at `refund_monthly_amount`, the rest at `refund_hourly_amount` or, without it, at the monthly price by the second. When the plan has no licensed period shorter than the one bought, time used is valued pro rata at the price paid. Discounts and setup fees are not refunded. Refunds return to the original payment sources, with tax refunded in proportion.
  */
 export type RefundPolicy = (typeof RefundPolicy)[keyof typeof RefundPolicy];
 
@@ -52,7 +43,7 @@ export const QuoteRenewalInterval = {
 } as const;
 
 /**
- * Price renewing a prepaid subscription. Give `price_id`, or `interval` with
+ * Price renewing a licensed subscription. Give `price_id`, or `interval` with
  * `interval_count`, to renew for another term at the price currently sold for it. Naming
  * the current term, or giving neither, renews at the agreed amount. A term sold at several
  * prices that differ in termination policy is refused with 409
@@ -97,9 +88,7 @@ export const QuoteRenewalResultInterval = {
 export type Money = string;
 
 /**
- * What renewing would charge. Renewing the same subscription for the same term and number
- * of periods charges exactly `total`, unless prices or the discounts the account holds
- * change in between.
+ * What renewing would charge. Renewing the same subscription for the same term and periods charges exactly `total` unless prices or the account's discounts change first.
  */
 export interface QuoteRenewalResult {
   /** Which renewal of the request this answers. */
@@ -110,11 +99,7 @@ export interface QuoteRenewalResult {
   interval: QuoteRenewalResultInterval;
   interval_count: number;
   periods: number;
-  /**
-   * The price of the periods before the discounts the account holds. A discount the
-   * subscription already carries is reflected here. Contains tax only where the price
-   * itself includes it.
-   */
+  /** The price of the periods before the account's discounts, with any discount the subscription carries already reflected; includes tax only where the price does. */
   amount: Money;
   /** The reduction from a discount the account holds. */
   discount_amount: Money;
@@ -130,25 +115,25 @@ export interface QuoteRenewalResult {
 }
 
 /**
- * One fully calculated purchase, estimated postpaid usage or recorded order item. Amounts use the
+ * One fully calculated purchase, estimated metered usage or recorded order item. Amounts use the
  * billing-account currency. An item with no immediate charge has zero checkout amounts.
  */
 export interface QuoteItem {
   tax_amount: Money;
   tax_included_amount: Money;
   /**
-   * Zero-based request line index, or the recorded order item's position for an order quote.
+   * The zero-based request line index, or the recorded order item's position for an order quote.
    * @minimum 0
    */
   index: number;
   /** Present for an existing order quote; identifies the recorded item being priced. */
   order_item_id?: string;
-  /** The selected price, including when the request identified it indirectly. */
+  /** The selected price, also when the request identified it indirectly. */
   price_id: string;
   plan_name: string;
   /** Unit price before discounts. Null when no single unit price applies, such as tiered or multiple-rate pricing. */
   unit_amount: Money | null;
-  /** The quantity priced. When duration_seconds is supplied for metered usage, this is quantity multiplied by that duration. */
+  /** The quantity priced; with duration_seconds, quantity times the duration. */
   quantity: string;
   /** Amount before discounts and including any setup charge. For requested future usage this is an estimate, not a collectible checkout amount. */
   amount: Money;
@@ -160,16 +145,16 @@ export interface QuoteItem {
 /**
  * Account funding for this purchase, calculated by Billing. Amounts use the enclosing response currency.
  * Credit eligibility and all purchase requirements are already evaluated. Nothing is charged or reserved.
- * A prepaid purchase may instead use an online payment method.
+ * A licensed purchase may instead be paid with an online payment method.
  */
 export interface Funds {
   /** Spendable balance after pending returns. */
   available_balance_amount: Money;
-  /** Currently effective credits eligible for the quoted purchases or postpaid usage. Each grant is counted once. */
+  /** Currently effective credits eligible for the quoted purchases or metered usage. Each grant is counted once. */
   usable_credit_amount: Money;
-  /** Currently effective credits that cannot fund any quoted purchase or postpaid target. Unused eligible credits are not restricted. */
+  /** Currently effective credits that cannot fund any quoted purchase or metered target. Unused eligible credits are not restricted. */
   restricted_credit_amount: Money;
-  /** Minimum spendable balance needed after eligible credits, covering immediate charges and every new postpaid admission requirement. */
+  /** Minimum spendable balance needed after eligible credits, covering immediate charges and every new metered purchase's admission requirement. */
   required_balance_amount: Money;
   /** Additional balance needed now. Zero means account funds satisfy this quote. No funds are reserved. */
   balance_shortfall_amount: Money;
@@ -185,8 +170,7 @@ export const QuotedDiscountType = {
 } as const;
 
 /**
- * The discount selected for this calculation. Its presence in a quote does not apply it or
- * reserve a redemption. Discount amounts are reported on the quote and its lines.
+ * The discount selected for this calculation, not applied and not reserved. Amounts are on the quote and its lines.
  */
 export interface QuotedDiscount {
   type: QuotedDiscountType;
@@ -216,33 +200,39 @@ export interface NamedIdentity {
   name: string;
 }
 
-export type CancellationRefundPreviewItemChargeType =
-  (typeof CancellationRefundPreviewItemChargeType)[keyof typeof CancellationRefundPreviewItemChargeType];
+/**
+ * `one_time` charges once when bought. `recurring` charges again for every period, or for usage as it is settled.
+ */
+export type PriceType = (typeof PriceType)[keyof typeof PriceType];
 
-export const CancellationRefundPreviewItemChargeType = {
-  postpaid: "postpaid",
-  prepaid: "prepaid",
+export const PriceType = {
   one_time: "one_time",
+  recurring: "recurring",
 } as const;
 
 /**
- * One subscription of the quoted cancellation. The amounts mean what they mean in the total.
+ * `licensed` charges for the quantity bought, each period paid before it starts. `metered` charges for the usage
+ * reported, after it is settled; a metered subscription lasts until it is canceled. A one-time price is licensed.
+ */
+export type UsageType = (typeof UsageType)[keyof typeof UsageType];
+
+export const UsageType = {
+  licensed: "licensed",
+  metered: "metered",
+} as const;
+
+/**
+ * One subscription of the quoted cancellation.
  */
 export interface CancellationRefundPreviewItem {
   subscription_id: string;
   plan_id: string;
   plan_name: string;
-  /**
-   * The project and its current name, for display. Absent for a purchase at account level, and when the
-   * project details cannot be read at the moment.
-   */
+  /** The project and its current name. Absent for an account-level purchase or when the project cannot be read. */
   project?: NamedIdentity | null;
-  charge_type: CancellationRefundPreviewItemChargeType;
-  /**
-   * Whether automatic renewal is on now. Creating the cancellation turns it off. Withdrawing the
-   * cancellation does not turn it back on for a prepaid subscription; a postpaid subscription continues
-   * until it is canceled and turns it back on.
-   */
+  type: PriceType;
+  usage_type: UsageType;
+  /** Whether automatic renewal is on now. Creating the cancellation turns it off; withdrawing it turns it back on for a metered subscription but not for a licensed one. */
   auto_renew: boolean;
   unused_amount: Money;
   refundable_amount: Money;
@@ -253,19 +243,19 @@ export interface CancellationRefundPreviewItem {
 }
 
 /**
- * What the cancellation would return, subscription by subscription and in total, as of now. Give
- * `proration_date` and `refundable_amount` when creating the cancellation.
+ * What the cancellation would return, per subscription and in total, as of now. Give `proration_date` and
+ * `refundable_amount` when creating the cancellation.
  *
- * - `unused_amount`: before tax, the amount paid for the current periods minus the value of the
- *   time used, valued as refund policy `prorated` describes, whatever the refund terms say.
- * - `refundable_amount`: what is returned the way it was paid, including the tax paid on it;
- *   `refund_amount` plus `credit_amount`.
- * - `refund_amount`: the part returned to the balance or to the payment method.
+ * - `unused_amount`: before tax, the amount paid for the current periods minus the value of the time used,
+ *   valued as refund policy `prorated` describes, whatever the refund terms say.
+ * - `refundable_amount`: what is returned the way it was paid, tax included; `refund_amount` plus
+ *   `credit_amount`.
+ * - `refund_amount`: the part returned to the balance or the payment method.
  * - `credit_amount`: the part restored to the credit grants that paid.
  * - `tax_amount`: the tax included in `refundable_amount`.
  * - `forfeited_amount`: before tax, the part of `unused_amount` the refund terms do not return.
  *
- * Postpaid and one-time subscriptions show zero; usage until release is charged as usual.
+ * Metered and one-time subscriptions show zero; their usage until release is charged as usual.
  */
 export interface CancellationRefundPreview {
   mode: TerminationPolicy;
@@ -284,11 +274,7 @@ export interface CancellationRefundPreview {
 }
 
 /**
- * An estimated refund to original payment sources. Before acceptance, cancellation returns the
- * collected amount. For delivered service, only value funded by this order is included; renewals
- * are evaluated under their own orders and the agreed termination terms apply. An unknown
- * delivery outcome is not evidence that a refund is eligible. This calculation does not create
- * a refund; the amount returned is determined when cancellation or termination is confirmed.
+ * An estimated refund to the original payment sources. Before acceptance, cancellation returns the collected amount. For delivered service, only value paid by this order is included; renewals are evaluated with their own orders under the agreed termination terms. Nothing is refunded by the quote; the amount is fixed when cancellation or termination is confirmed.
  */
 export interface OrderRefundQuote {
   order_id: string;
@@ -299,21 +285,15 @@ export interface OrderRefundQuote {
 }
 
 /**
- * A complete calculation in one billing-account currency, without saving a quote or reserving funds or
- * redemptions. The request fails if any item cannot be priced. Requested future usage estimates are
- * included in totals for reporting and are not collectible at checkout. Only an existing-order quote
- * provides that order's checkout amount.
+ * A complete calculation in the billing account's currency; nothing is saved or reserved. The request fails if any item cannot be priced. Usage estimates are included in totals but are not collected at checkout; only an existing-order quote gives that order's checkout amount.
  */
 export interface Quote {
-  /** Account funding for an existing-order checkout quote. Absent for usage estimates, refunds and cancellation previews. */
+  /** Account funds for an existing-order checkout quote. Absent for usage estimates, refunds and cancellations. */
   funds?: Funds;
   subtotal: Money;
   discount_amount: Money;
   tax_amount: Money;
-  /**
-   * The discount evaluated for a purchase or order, without applying it. Null when none is selected or
-   * when quoting renewals or a cancellation. A confirmed order reports its recorded discount.
-   */
+  /** The discount a purchase or order would get, not yet applied. Null when there is none, and for renewals and cancellations. A confirmed order reports its recorded discount. */
   discount: QuotedDiscount | null;
   items: QuoteItem[];
   renewals: QuoteRenewalResult[];
@@ -321,21 +301,16 @@ export interface Quote {
   cancellation?: CancellationRefundPreview;
   total: Money;
   currency: string;
-  /** Present only when an order refund was requested. Nothing is collectible for this target. */
+  /** Present when an order refund was requested. */
   refund?: OrderRefundQuote;
 }
 
 /**
- * A cancellation to quote: what ending these subscriptions together would return. One mode per
- * request; to compare, quote `immediate` and `period_end` separately.
- *
- * Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being
- * canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a
- * paid change still waiting to switch (`meta.order_id`).
+ * A cancellation to quote: what ending these subscriptions together would return, for one mode; quote `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).
  */
 export interface QuoteCancellation {
   /**
-   * The subscriptions to end together, all of one service. Every subscription released with a resource must be included.
+   * The subscriptions to end together, all of one service, including every subscription released with a resource.
    * @minItems 1
    * @maxItems 50
    */
@@ -351,15 +326,12 @@ export interface CancellationCreate {
    */
   subscription_ids: string[];
   mode: TerminationPolicy;
-  /**
-   * For `immediate`, the `proration_date` of the quote: a whole second, not in the future and
-   * at most ten minutes old. The refund is computed as of it. Now when omitted.
-   */
+  /** For `immediate`, the quote's `proration_date`: a whole second, not in the future and at most ten minutes old; the refund is computed as of it. Now when omitted. */
   proration_date?: string;
-  /** The `refundable_amount` of the quote. The cancellation is refused when the refund differs. */
+  /** The quote's `refundable_amount`; the cancellation is refused when the refund differs. */
   expected_refundable_amount: Money & string;
   /**
-   * A note from the account holder. It is kept with the cancellation and not shown elsewhere.
+   * A note from the account holder, kept with the cancellation.
    * @maxLength 1024
    */
   reason?: string;
@@ -377,7 +349,7 @@ export const CancellationStatus = {
 } as const;
 
 /**
- * Who asked for it. `project_deletion` means the project was deleted.
+ * Who requested it; `project_deletion` means the project was deleted.
  */
 export type CancellationOrigin = (typeof CancellationOrigin)[keyof typeof CancellationOrigin];
 
@@ -385,20 +357,6 @@ export const CancellationOrigin = {
   customer: "customer",
   operator: "operator",
   project_deletion: "project_deletion",
-} as const;
-
-/**
- * How the subscription is charged. Creating the cancellation turned automatic renewal off;
- * withdrawing it turns renewal back on for a `postpaid` subscription and leaves it off for a
- * `prepaid` one.
- */
-export type CancellationItemChargeType =
-  (typeof CancellationItemChargeType)[keyof typeof CancellationItemChargeType];
-
-export const CancellationItemChargeType = {
-  postpaid: "postpaid",
-  prepaid: "prepaid",
-  one_time: "one_time",
 } as const;
 
 export type CancellationItemStatus =
@@ -417,19 +375,19 @@ export const CancellationItemStatus = {
  * One subscription of the cancellation.
  */
 export interface CancellationItem {
-  /** The cancellation item of this subscription, the same as `Subscription.cancellation.id`. */
+  /** The subscription's cancellation item, the same as `Subscription.cancellation.id`. */
   id: string;
   subscription_id: string;
   plan_id: string;
   plan_name: string;
+  type: PriceType;
   /**
-   * How the subscription is charged. Creating the cancellation turned automatic renewal off;
-   * withdrawing it turns renewal back on for a `postpaid` subscription and leaves it off for a
-   * `prepaid` one.
+   * Creating the cancellation turned automatic renewal off; withdrawing it turns renewal back on
+   * for a `metered` subscription and leaves it off for a `licensed` one.
    */
-  charge_type: CancellationItemChargeType;
+  usage_type: UsageType;
   status: CancellationItemStatus;
-  /** Execution stopped or its result is unknown. Present while release still requires resolution; it does not establish refund eligibility. */
+  /** The release stopped or its result is unknown; present while the release needs resolution. */
   failure_code?: string;
   release_started_at?: string;
   /** When the service ended, as confirmed by the service that provides it. */
@@ -460,20 +418,14 @@ export interface Cancellation {
   scheduled_at?: string;
   /** For `immediate`, the second the refund is computed as of. */
   proration_date?: string;
-  /** Who asked for it. `project_deletion` means the project was deleted. */
+  /** Who requested it; `project_deletion` means the project was deleted. */
   origin: CancellationOrigin;
-  /**
-   * The billing account that paid for these subscriptions when the cancellation was created: the
-   * account of an account-level purchase, or the account the project was linked to.
-   */
+  /** The billing account paying for these subscriptions when the cancellation was created: the purchasing account of an account-level purchase, or the project's linked account. */
   billing_account_id: number;
   currency: string;
-  /** The refund confirmed when it was created. Absent when the platform created it. */
+  /** The refund confirmed when the cancellation was created. Absent when the platform created it. */
   expected_refundable_amount?: Money;
-  /**
-   * Present with `failed`. A code of the service that provides the resources, such as a disk
-   * that can only be released with its server. Clients map it to their own wording.
-   */
+  /** Present with `failed`: the owning service's code, such as for a disk that can only be released with its server. */
   failure_code?: string;
   requested_at: string;
   completed_at?: string;
@@ -519,13 +471,11 @@ export const SubscriptionCancellationMode = {
 } as const;
 
 /**
- * The latest cancellation that includes the subscription, with this subscription's item. `id` is the
- * item; `cancellation_id` is the cancellation. scheduled_at is the intended time; effective_at is the
- * confirmed end of service. A cancellation alone does not stop metering or issue a refund.
+ * The latest cancellation including the subscription, with this subscription's item: `id` is the item and `cancellation_id` the cancellation. scheduled_at is the intended time and effective_at the confirmed end of service.
  */
 export interface SubscriptionCancellation {
   reason?: string;
-  /** The cancellation this request belongs to, with the other subscriptions released together. */
+  /** The cancellation this item belongs to, with the other subscriptions released together. */
   cancellation_id?: string;
   id: string;
   subscription_id: string;
@@ -560,7 +510,7 @@ export interface Error {
 }
 
 /**
- * Immutable platform service identifier, such as compute, canopy or assistant.
+ * The platform service's fixed identifier, such as compute, canopy or assistant.
  * @minLength 1
  * @maxLength 64
  * @pattern ^[a-z][a-z0-9]*(-[a-z0-9]+)*$
@@ -583,29 +533,22 @@ export const BillingAccountStatus = {
 
 export interface BillingAccount {
   /**
-   * The active contact used for invoicing. Must belong to this account; null clears the selection.
+   * The active contact used for invoices, of this account; null clears it.
    * @nullable
    */
   invoice_contact_id?: string | null;
   id: number;
-  /** What you call this account. */
+  /** Your name for the account. */
   name?: string;
   /** Fixed when the account was opened. */
   currency: string;
   status: BillingAccountStatus;
-  /**
-   * How far past the suspension threshold this account may go before its resources are
-   * suspended. "0" means none: the account is suspended as soon as it crosses the threshold.
-   */
+  /** How far past the suspension threshold the account may go before its resources are suspended; `0` means none. */
   grace_amount?: string;
-  /**
-   * How long this account has to top up after crossing the suspension threshold.
-   * 0 means none. Whichever runs out first — this or grace_amount — ends the grace.
-   */
+  /** How long the account has to top up after crossing the suspension threshold, in seconds; `0` means none. Grace ends when this or grace_amount runs out. */
   grace_period_seconds?: number;
   /**
-   * The actual time this account was closed, in UTC (RFC 3339).
-   * Null or absent if the account is not closed or its historical close time is unknown.
+   * When the account was closed. Null if it is not closed or the time is unknown.
    * @nullable
    */
   readonly closed_at?: string | null;
@@ -623,7 +566,7 @@ export interface Currency {
    */
   code: string;
   /**
-   * Decimal places of the currency, the ISO 4217 minor unit.
+   * Decimal places of the ISO 4217 minor unit.
    * @minimum 0
    * @maximum 4
    */
@@ -653,7 +596,7 @@ export interface BillingAccountCreate {
 
 export interface BillingAccountUpdate {
   /**
-   * The active contact used for invoicing. Must belong to this account; null clears the selection.
+   * The active contact used for invoices, of this account; null clears it.
    * @nullable
    */
   invoice_contact_id?: string | null;
@@ -667,7 +610,7 @@ export interface BillingAccountList {
 }
 
 /**
- * A plan it refers to. active is false once the plan is archived; it still applies to subscriptions already on this plan.
+ * A plan referenced by an applicability; active is false once it is archived, and the reference still applies.
  */
 export interface ApplicablePlan {
   id: string;
@@ -676,7 +619,7 @@ export interface ApplicablePlan {
 }
 
 /**
- * A catalog object inlined for display.
+ * A catalog object, inlined for display.
  */
 export interface ObjectIdentity {
   lookup_key?: string;
@@ -684,21 +627,14 @@ export interface ObjectIdentity {
   name: string;
 }
 
-export type PriceOptionBillingScheme =
-  (typeof PriceOptionBillingScheme)[keyof typeof PriceOptionBillingScheme];
+/**
+ * `per_unit` multiplies a unit amount; `tiered` walks a ladder.
+ */
+export type BillingScheme = (typeof BillingScheme)[keyof typeof BillingScheme];
 
-export const PriceOptionBillingScheme = {
+export const BillingScheme = {
   per_unit: "per_unit",
   tiered: "tiered",
-  rated: "rated",
-} as const;
-
-export type PriceOptionType = (typeof PriceOptionType)[keyof typeof PriceOptionType];
-
-export const PriceOptionType = {
-  postpaid: "postpaid",
-  prepaid: "prepaid",
-  one_time: "one_time",
 } as const;
 
 export type PriceOptionInterval = (typeof PriceOptionInterval)[keyof typeof PriceOptionInterval];
@@ -711,16 +647,18 @@ export const PriceOptionInterval = {
 } as const;
 
 /**
- * A price's display terms, including archived prices referenced by an applicability list.
+ * A price's display terms, including archived prices referenced by an applicability.
  */
 export interface PriceOption {
   product: Product;
   plan: ObjectIdentity;
-  billing_scheme: PriceOptionBillingScheme;
+  /** Absent when the price delegates to a rate card. */
+  billing_scheme?: BillingScheme;
   unit_quantity: string;
   id: string;
   currency: string;
-  type: PriceOptionType;
+  type: PriceType;
+  usage_type: UsageType;
   interval: PriceOptionInterval;
   /** How many periods one purchase covers. */
   interval_count?: number;
@@ -730,11 +668,7 @@ export interface PriceOption {
 }
 
 /**
- * Which purchase operation this applies to. `new` covers every new purchase, including
- * zero-charge purchases. It does not mean the account's first purchase; use
- * `first_purchase_only` for that restriction. `renew` covers renewals. `modify` covers
- * configuration or billing-term changes, including changes that increase or decrease
- * the amount due and changes with no additional charge or refund.
+ * The purchase operation covered. `new`: every new purchase, including zero-charge ones; it does not mean the account's first purchase, which `first_purchase_only` restricts. `renew`: renewals. `modify`: configuration or billing-term changes, whether they charge, refund or neither.
  */
 export type PurchaseOperation = (typeof PurchaseOperation)[keyof typeof PurchaseOperation];
 
@@ -745,20 +679,18 @@ export const PurchaseOperation = {
 } as const;
 
 /**
- * Anything not excluded that matches an inclusion, or anything not excluded when no inclusion is
- * given, subject to the charge type, operation and term conditions. Entries always include their
- * display fields; archived plans and prices stay listed with active set to false.
+ * Covers anything not excluded that matches an inclusion, or anything not excluded when no inclusion is given, subject to the price type, usage type, operation and term conditions. Archived plans and prices stay listed with active false.
  */
 export interface Applicability {
   products?: Product[];
   plans?: ApplicablePlan[];
   prices?: PriceOption[];
-  price_types?: string[];
+  /** The price types covered; empty covers both. */
+  price_types?: PriceType[];
+  /** The usage types covered; empty covers both. */
+  usage_types?: UsageType[];
   operations?: PurchaseOperation[];
-  /**
-   * The shortest term a purchase may have, in months. A purchase with no term, such as
-   * metered usage, never qualifies while this is set.
-   */
+  /** The shortest term a purchase may have, in months. Purchases without a term, such as metered usage, do not qualify while this is set. */
   min_term_months?: number;
   /** The longest term a purchase may have, in months. */
   max_term_months?: number;
@@ -768,7 +700,7 @@ export interface Applicability {
 }
 
 export interface CreditGroup {
-  /** What the credit in this group may pay for. No restrictions means anything on the account. */
+  /** What the credit in this group may pay for; no restrictions means anything on the account. */
   applies_to: Applicability;
   /** Restricted to your first purchase of anything it applies to. */
   first_purchase_only?: boolean;
@@ -776,50 +708,36 @@ export interface CreditGroup {
 }
 
 /**
- * Account balance, credits, and unpaid charges are reported separately.
+ * Balance, credits and unpaid charges, each reported separately.
  */
 export interface AccountBalance {
   /** Balance minus pending balance returns and the part of unbilled_amount and due that estimated_credit_applied does not cover. Negative only when the balance and applicable credit fall short of what the account owes. */
   available_credit: Money;
-  /** Credit expected to pay unbilled_amount and due. Each charge is matched to grants whose scope, validity and conditions it meets, in the order credit is applied at payment. Nothing is reserved or deducted until an invoice is paid, so credits still includes this amount. */
+  /** Credit expected to pay unbilled_amount and due, matching each charge to the grants whose scope, validity and conditions it meets, in the order credit is applied at payment. Nothing is deducted until an invoice is paid, so credits still includes this amount. */
   estimated_credit_applied: Money;
-  /** Current estimate of rated usage that has not been invoiced. Final pricing and tax are fixed at issuance. */
+  /** Current estimate of priced usage that has not been invoiced. Final pricing and tax are fixed at issuance. */
   unbilled_amount: Money;
   billing_account_id: number;
   currency: string;
-  /**
-   * Prepaid funds in the account currency, excluding credits. May be negative after a payment
-   * dispute. Outstanding charges are reported separately in due; this value is not a withdrawal quote.
-   */
+  /** Topped-up funds in the account's currency, excluding credits. May be negative after a payment dispute. Amounts owed are reported in due; this is not a withdrawable amount. */
   balance: Money;
-  /**
-   * The recorded remaining credit, including restricted grants. It is not withdrawable
-   * and is not part of balance. credit_groups describes currently valid credit by permitted use; a positive
-   * credits balance does not imply that due is zero.
-   */
+  /** Remaining credit, including restricted grants; not withdrawable and not part of balance. credit_groups shows currently valid credit by permitted use; positive credits do not mean due is zero. */
   credits: Money;
-  /** Currently valid credit whose use has applicable product, operation or eligibility conditions. Included in credits, separate from the balance. */
+  /** Currently valid credit restricted to certain products, operations or conditions; part of credits, not of balance. */
   restricted_credits: Money;
-  /**
-   * Currently valid, unspent credit grouped by permitted use. Restrictions and
-   * validity dates determine which charges a group can cover, so these groups are not a general
-   * spendable balance and may differ from the recorded credits total.
-   */
+  /** Currently valid unspent credit grouped by permitted use. Each group covers only the charges its restrictions and validity allow, and the groups may differ from the recorded credits total. */
   credit_groups: CreditGroup[];
-  /** Amount still payable on issued invoices. The invoice of an order not yet accepted is a request to pay for that order rather than a debt, so it is excluded here and from available_credit. Unbilled usage is reported separately; arrears depend on actual eligible funding and grace terms. */
+  /** Amount still payable on issued invoices. The invoice of an order not yet accepted is excluded, here and from available_credit. Usage not yet invoiced is reported separately. */
   due: Money;
   pending_returns_amount: Money;
 }
 
 /**
- * A project's assignment to a billing account for the interval from effective_from to effective_to. An open-ended assignment has no end time.
+ * A project's assignment to a billing account from effective_from until effective_to; an open assignment has no end.
  */
 export interface ProjectAssignment {
   project_id: string;
-  /**
-   * The project and its current name, for display. Absent when the project no longer exists or its
-   * details cannot be read at the moment; `project_id` still identifies it.
-   */
+  /** The project and its current name. Absent when the project cannot be read; `project_id` still identifies it. */
   project?: NamedIdentity | null;
   billing_account_id: number;
   account_name?: string;
@@ -839,16 +757,7 @@ export interface SetProjectAssignmentRequest {
 }
 
 /**
- * `pending` until the payment gateway reaches a result. The balance increases on `succeeded`.
- *
- * `failed` means the gateway declined the payment. A declined attempt ends the top-up at once
- * and the payment is withdrawn at the gateway; to pay another way, create a new top-up.
- * `canceled` means the attempt was withdrawn without collecting money; `cancellation_reason`
- * says why. Unknown gateway outcomes remain `pending`, and a browser redirect is not proof of
- * payment.
- *
- * `failed` and `canceled` are final. If the gateway nevertheless collects payment for such an
- * attempt, the amount is credited as a separate `succeeded` top-up.
+ * `pending` until the payment gateway reaches a result; the balance increases on `succeeded`. `failed`: the gateway declined the payment, which is withdrawn at the gateway; create a new top-up to pay another way. `canceled`: withdrawn without collecting money, for the reason in `cancellation_reason`. Unknown gateway outcomes stay `pending`; a browser redirect is not proof of payment. `failed` and `canceled` are final; a payment the gateway collects afterwards is credited as a separate `succeeded` top-up.
  */
 export type TopUpStatus = (typeof TopUpStatus)[keyof typeof TopUpStatus];
 
@@ -866,8 +775,7 @@ export interface AccountIdentity {
 }
 
 /**
- * Why a gateway payment was withdrawn. `abandoned` means the customer did not complete it within the time
- * allowed for payment. `requested_by_customer` means the customer canceled it.
+ * Why a gateway payment was withdrawn: `abandoned` when the customer did not complete it in time, `requested_by_customer` when the customer canceled it.
  */
 export type PaymentCancellationReason =
   (typeof PaymentCancellationReason)[keyof typeof PaymentCancellationReason];
@@ -886,77 +794,49 @@ export const PaymentActionType = {
 } as const;
 
 /**
- * The customer's next interaction. The gateway reports the actual payment outcome separately.
+ * The customer's next step; the payment outcome is reported separately.
  */
 export interface PaymentAction {
   type: PaymentActionType;
-  /** Identifies the browser adapter for an SDK action, for example stripe. */
+  /** The browser adapter for the action, for example stripe. */
   provider?: string;
   url?: string;
-  /** QR content to render and scan, not an image URL. */
+  /** QR content to render, not an image URL. */
   qr_code?: string;
-  /** Short-lived client credential for this payment's browser confirmation. */
+  /** Short-lived client credential for confirming this payment in the browser. */
   client_secret?: string;
   public_key?: string;
 }
 
 /**
- * A top-up attempt and its outcome. A successful top-up adds a traceable amount to the balance; it is not a credit grant and has no associated invoice.
+ * A top-up attempt and its outcome. A successful top-up adds to the balance; it is not a credit grant and has no invoice.
  */
 export interface TopUp {
   id: string;
   billing_account_id: number;
   account: AccountIdentity;
-  /** What is credited to the account, in the account's own currency. */
+  /** What is credited to the account, in its currency. */
   amount: Money;
   currency: string;
-  /**
-   * The part of this top-up still held in the balance. Pending refunds can temporarily
-   * reserve part of it; it is not a promise that the whole amount is immediately withdrawable.
-   */
+  /** The part of this top-up still in the balance. Pending refunds may hold part of it, so not all of it is necessarily withdrawable. */
   remaining_amount?: Money;
-  /**
-   * `pending` until the payment gateway reaches a result. The balance increases on `succeeded`.
-   *
-   * `failed` means the gateway declined the payment. A declined attempt ends the top-up at once
-   * and the payment is withdrawn at the gateway; to pay another way, create a new top-up.
-   * `canceled` means the attempt was withdrawn without collecting money; `cancellation_reason`
-   * says why. Unknown gateway outcomes remain `pending`, and a browser redirect is not proof of
-   * payment.
-   *
-   * `failed` and `canceled` are final. If the gateway nevertheless collects payment for such an
-   * attempt, the amount is credited as a separate `succeeded` top-up.
-   */
+  /** `pending` until the payment gateway reaches a result; the balance increases on `succeeded`. `failed`: the gateway declined the payment, which is withdrawn at the gateway; create a new top-up to pay another way. `canceled`: withdrawn without collecting money, for the reason in `cancellation_reason`. Unknown gateway outcomes stay `pending`; a browser redirect is not proof of payment. `failed` and `canceled` are final; a payment the gateway collects afterwards is credited as a separate `succeeded` top-up. */
   status: TopUpStatus;
   cancellation_reason?: PaymentCancellationReason;
   /** Which payment gateway collected it. */
   payment_gateway?: string;
   /** The selected payment method, such as card, wechat_pay or alipay. */
   method_type?: string;
-  /**
-   * The currency the customer was actually charged in, when the checkout page collected a
-   * local one. Absent when it was the same as the account's.
-   */
+  /** The currency the customer was charged in when the checkout collected a local currency; absent when it is the account's. */
   presentment_currency?: string;
-  /**
-   * What was charged, in `presentment_currency`. It will not equal `amount`, and it is
-   * the figure that appears on the customer's card or wallet statement.
-   */
+  /** The amount charged in `presentment_currency`, as shown on the customer's statement. */
   presentment_amount?: Money;
-  /**
-   * Why the gateway declined it. Present with `failed`. The value is the gateway's own code,
-   * passed on unchanged: the card issuer's decline code when there is one (Stripe's decline_code,
-   * such as insufficient_funds or lost_card), otherwise the gateway's error code (Stripe's code,
-   * such as card_declined, expired_card or payment_intent_authentication_failure). Clients map it
-   * to their own wording and treat an unknown value as a generic decline.
-   */
+  /** Why the gateway declined it; present with `failed`. The gateway's code unchanged: the issuer's decline code when there is one (Stripe decline_code, such as insufficient_funds), otherwise the gateway's error code (Stripe code, such as card_declined). Treat an unknown value as a generic decline. */
   failure_reason?: string;
   action?: PaymentAction;
   created_at: string;
   /**
-   * When the funds arrived. Later than `created_at` — by days for a bank transfer — so
-   * reconciling against a statement uses this rather than the moment it was started.
-   * Absent until the payment completes.
+   * When the funds arrived, possibly days after `created_at`. Absent until the payment completes.
    * @nullable
    */
   settled_at?: string | null;
@@ -964,7 +844,7 @@ export interface TopUp {
 
 export interface TopUpCreate {
   /**
-   * The gateway explicitly selected from the available payment options.
+   * The gateway selected from the available payment options.
    * @minLength 1
    * @maxLength 32
    */
@@ -975,21 +855,12 @@ export interface TopUpCreate {
    * @maxLength 64
    */
   method_type: string;
-  /** The ID of this top-up attempt. Keep it before submitting and query it after an uncertain response. */
+  /** The top-up ID, chosen by the caller. Read it after an uncertain response. */
   id: string;
   billing_account_id: number;
-  /**
-   * In the account's currency, and no finer than that currency's smallest unit:
-   * two decimals for most, none for the yen. A finer amount is refused here rather
-   * than at the checkout page, where the customer would see the gateway's own wording
-   * instead of an explanation.
-   *
-   * There is a minimum, which differs by currency. Below it the gateway's fee
-   * exceeds the top-up itself, so such a payment costs more to accept than it brings.
-   * The minimum in force is returned with the rejection.
-   */
+  /** In the account's currency, no finer than its smallest unit (two decimals for most currencies, none for JPY). An amount below the currency's minimum top-up is refused, and the minimum is returned with the error. */
   amount: Money & string;
-  /** Charge a saved method instead of opening a checkout page. */
+  /** Charge a saved payment method instead of opening a checkout page. */
   payment_method_id?: string;
   /** Where to send the customer after checkout. */
   return_url?: string;
@@ -1003,15 +874,12 @@ export interface TopUpList {
 export interface PaymentOptionMethod {
   /** The value to send as `method_type`, such as card, wechat_pay or alipay. */
   method_type: string;
-  /**
-   * Whether a method of this type can be saved with create-payment-method-setup and charged later
-   * without the customer present. Methods that are not reusable are paid anew each time.
-   */
+  /** Whether this method type can be saved with create-payment-method-setup and charged later without the customer. */
   reusable: boolean;
 }
 
 /**
- * A payment gateway that accepts payment in the account's currency, with the methods it accepts.
+ * A gateway accepting the account's currency, with its payment methods.
  */
 export interface PaymentOption {
   /** The value to send as `payment_gateway`. */
@@ -1062,15 +930,10 @@ export interface PaymentMethodSetup {
 }
 
 /**
- * What the payment gateway's browser library needs in order to collect a card. There is
- * no address to redirect to: the form is rendered in the page, and the card goes straight
- * from the browser to the gateway.
+ * What the payment gateway's browser library needs to collect a card in the page; the card goes from the browser straight to the gateway.
  */
 export interface PaymentMethodSetupResult {
-  /**
-   * The gateway's identifier for this attempt. Use it to tell a reloaded page apart
-   * from a second attempt.
-   */
+  /** The gateway's identifier for this attempt. */
   setup_id: string;
   payment_gateway: string;
   action: PaymentAction;
@@ -1087,7 +950,7 @@ export interface PaymentMethodSetupResult {
  */
 export interface PayInvoiceRequest {
   /**
-   * Required to collect an online remainder. An existing attempt keeps its original gateway.
+   * Required to collect an online remainder. An existing attempt keeps its gateway.
    * @minLength 1
    * @maxLength 32
    */
@@ -1098,53 +961,37 @@ export interface PayInvoiceRequest {
    * @maxLength 64
    */
   method_type?: string;
-  /** Optional saved card owned by this billing account and belonging to the selected gateway. Omit to complete payment interactively. */
+  /** A saved card of this billing account at the selected gateway. Omit to pay interactively. */
   payment_method_id?: string;
-  /** Whether to apply the available balance. Credit grants are controlled separately by use_credits. */
+  /** Whether to apply the balance; credit grants are controlled by use_credits. */
   use_balance?: boolean;
-  /** Apply eligible, unexpired credit grants before using the balance. This never withdraws grants or converts them into balance. */
+  /** Apply eligible, unexpired credit grants before the balance. Grants are never converted into balance. */
   use_credits?: boolean;
   return_url?: string;
   /**
-   * The code to apply while the order's terms are not yet fixed. Omit to apply the best applicable
-   * account discount, or to keep the discount already recorded.
+   * The code to apply while the order's terms are not fixed. Omit to apply the best applicable account discount, or to keep the discount already recorded.
    * @minLength 1
    * @maxLength 64
    */
   promotion_code?: string;
-  /**
-   * The invoice total to expect, after discounts and tax and before credit grants or balance, as the
-   * payment preview or an order quote gave it. A different total fails with BILLING_AMOUNT_CHANGED
-   * and nothing is charged. Omit to skip the comparison; an explicit zero is compared.
-   */
+  /** The invoice total to expect, after discounts and tax and before credit grants or balance, as the payment preview or an order quote gave it. A different total fails with `BILLING_AMOUNT_CHANGED` and nothing is charged. Omit to skip the check; zero is checked. */
   expected_amount?: Money & string;
 }
 
 /**
- * Name at least one invoice or order. They must all belong to the same account and share
- * its currency; anything else is refused rather than partly paid.
+ * Name at least one invoice or order. All must belong to one account in its currency.
  */
 export interface PayTogetherRequest {
   /** @maxItems 100 */
   invoice_ids?: string[];
   /** @maxItems 100 */
   order_ids?: string[];
-  /**
-   * The amount due to expect across all of them, before credit grants or balance, as preview-pay-together
-   * gave it. A different amount fails with BILLING_AMOUNT_CHANGED and nothing is charged. Omit to skip
-   * the comparison.
-   */
+  /** The amount due across all invoices, before credit grants or balance, as preview-pay-together gave it. A different amount fails with `BILLING_AMOUNT_CHANGED` and nothing is charged. Omit to skip the check. */
   expected_amount?: Money & string;
 }
 
 /**
- * The current payment outcome.
- *
- * succeeded means payment is complete. processing means confirmation is pending; poll the invoice or
- * order rather than submitting another payment. requires_action means the customer must complete the
- * supplied action. failed means the attempt did not succeed and failure_reason explains the outcome; a
- * declined gateway payment is withdrawn at the gateway, and paying again starts a new payment with the
- * same or another method.
+ * `succeeded`: paid. `processing`: confirmation is pending; poll the invoice or order instead of paying again. `requires_action`: the customer must complete the returned action. `failed`: the attempt did not succeed, for the reason in failure_reason; a declined gateway payment is withdrawn, and paying again starts a new payment.
  */
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 
@@ -1174,7 +1021,7 @@ export interface PaymentPreviewInvoice {
 }
 
 /**
- * What paying would take, computed as paying computes it. Nothing is charged or reserved.
+ * What paying would take, calculated as paying does. Nothing is charged or reserved.
  */
 export interface PaymentPreview {
   funds?: Funds;
@@ -1183,24 +1030,20 @@ export interface PaymentPreview {
   amount_due: Money;
   /** What credit grants would pay. Grants restricted to other purchases pay nothing here. */
   credit_applied: Money;
-  /** The credit grants that would pay, in the order they would be used. */
+  /** The credit grants that would pay, in the order used. */
   credit_grants: AppliedCredit[];
   /** What the balance would pay. */
   balance_applied: Money;
-  /** What would remain to be paid online. Paying without a gateway is refused with `BILLING_INSUFFICIENT_FUNDS` while this is above zero. */
+  /** What would remain to pay online. Paying without a gateway is refused with `BILLING_INSUFFICIENT_FUNDS` while this is above zero. */
   gateway_amount: Money;
   /** The available balance after paying. */
   balance_after: Money;
-  /** Paying together only. Each invoice, in the order it would be paid. */
+  /** Paying together only: each invoice, in payment order. */
   invoices?: PaymentPreviewInvoice[];
 }
 
 /**
- * Present on refunds. Where this part of the refund goes.
- *
- * - `balance`: back to the account balance.
- * - `credit`: back to the credit grant that paid, which keeps its original expiry.
- * - `gateway`: back to the payment method it was paid with.
+ * Present on refunds: where this part goes. `balance`: the account balance. `credit`: the credit grant that paid, keeping its original expiry. `gateway`: the payment method it was paid with.
  */
 export type TransactionRefundDestination =
   (typeof TransactionRefundDestination)[keyof typeof TransactionRefundDestination];
@@ -1212,9 +1055,7 @@ export const TransactionRefundDestination = {
 } as const;
 
 /**
- * `failed` means the operation did not succeed; for a gateway payment, that the gateway declined
- * it. `canceled` means a gateway payment was withdrawn without collecting money. After either,
- * an invoice the payment was meant to pay remains open for another payment.
+ * `failed`: the operation did not succeed; for a gateway payment, the gateway declined it. `canceled`: a gateway payment was withdrawn without collecting money. Either way, the invoice it was for stays open.
  */
 export type TransactionStatus = (typeof TransactionStatus)[keyof typeof TransactionStatus];
 
@@ -1239,7 +1080,7 @@ export const TransactionType = {
 } as const;
 
 /**
- * A funds operation. Each payment has one source; refunds identify the original successful transaction. Unknown gateway results remain pending. Payments from the balance or a gateway are distinct from credit-grant payments.
+ * A funds movement with one source. Refunds name the original transaction. Unknown gateway results stay pending.
  */
 export interface Transaction {
   invoice_id?: string;
@@ -1248,47 +1089,22 @@ export interface Transaction {
   credit_grant_id?: string;
   credit_grant?: ObjectIdentity;
   refund_id?: string;
-  /**
-   * Present on refunds. Where this part of the refund goes.
-   *
-   * - `balance`: back to the account balance.
-   * - `credit`: back to the credit grant that paid, which keeps its original expiry.
-   * - `gateway`: back to the payment method it was paid with.
-   */
+  /** Present on refunds: where this part goes. `balance`: the account balance. `credit`: the credit grant that paid, keeping its original expiry. `gateway`: the payment method it was paid with. */
   refund_destination?: TransactionRefundDestination;
-  /**
-   * `failed` means the operation did not succeed; for a gateway payment, that the gateway declined
-   * it. `canceled` means a gateway payment was withdrawn without collecting money. After either,
-   * an invoice the payment was meant to pay remains open for another payment.
-   */
+  /** `failed`: the operation did not succeed; for a gateway payment, the gateway declined it. `canceled`: a gateway payment was withdrawn without collecting money. Either way, the invoice it was for stays open. */
   status?: TransactionStatus;
   cancellation_reason?: PaymentCancellationReason;
   payment_gateway?: string;
   method_type?: string;
-  /**
-   * Why it failed. Present with `failed`. For a declined gateway payment the value is the
-   * gateway's own code, passed on unchanged: the card issuer's decline code when there is one
-   * (Stripe's decline_code, such as insufficient_funds or lost_card), otherwise the gateway's
-   * error code (Stripe's code, such as card_declined, expired_card or
-   * payment_intent_authentication_failure). Clients map it to their own wording and treat an
-   * unknown value as a generic decline.
-   */
+  /** Why it failed; present with `failed`. For a declined gateway payment, the gateway's code unchanged: the issuer's decline code when there is one (Stripe decline_code, such as insufficient_funds), otherwise the gateway's error code (Stripe code, such as card_declined). Treat an unknown value as a generic decline. */
   failure_reason?: string;
   settled_at?: string;
   id: string;
   billing_account_id?: number;
   type: TransactionType;
-  /**
-   * Signed by type: positive for `topup` and `payment`, negative for `refund`.
-   * An `adjustment` is positive when it adds to the balance and negative when it takes from
-   * it. For the other types the sign does not tell the effect on the balance: a payment from
-   * the balance lowers it, while a payment by gateway or by credit leaves it unchanged.
-   */
+  /** Signed by type: positive for `topup` and `payment`, negative for `refund`. An `adjustment` is positive when it adds to the balance and negative when it takes from it. For other types the sign does not show the effect on the balance: a payment from balance lowers it, a payment by gateway or credit does not. */
   amount: Money;
-  /**
-   * How much of this transaction is still available in the balance. Only top-ups, positive
-   * adjustments and gateway payments later returned to the balance can be non-zero.
-   */
+  /** How much of this transaction is still in the balance. Only top-ups, positive adjustments and gateway payments returned to the balance can be non-zero. */
   remaining_amount: Money;
   currency: string;
   reason?: string;
@@ -1297,54 +1113,32 @@ export interface Transaction {
 
 export interface PaymentResult {
   transactions: Transaction[];
-  /** The gateway transaction, when one is involved. Balance and credit-grant payments are separate transactions. */
+  /** The gateway transaction, when one is involved. */
   transaction_id?: string;
   status: PaymentStatus;
   amount_paid: Money;
-  /**
-   * What is still outstanding. Zero once the payment succeeds. Unchanged while
-   * `processing`: nothing is collected until the gateway confirms it.
-   */
+  /** What is still outstanding: zero once the payment succeeds, unchanged while `processing`. */
   amount_due: Money;
   currency: string;
   credit_applied?: Money;
   gateway_amount?: Money;
   payment_gateway?: string;
   method_type?: string;
-  /**
-   * The amount already paid from the account's balance toward this invoice. Retrying an online remainder
-   * does not debit it again. A canceled purchase returns funds through its refund process.
-   */
+  /** The amount already paid from balance toward this invoice; retrying the online remainder does not debit it again. */
   balance_applied?: Money;
   action?: PaymentAction;
-  /**
-   * Whether paying again is worth attempting. False for a refusal that will keep
-   * happening — a closed account, an amount over a limit — so that a client does not
-   * retry in a loop.
-   */
+  /** Whether paying again can succeed. False for a refusal that will repeat, such as a closed account or an amount over a limit. */
   retriable?: boolean;
   /** @nullable */
   invoice_id?: string | null;
   /** @nullable */
   order_id?: string | null;
-  /**
-   * Why the payment did not go through. Present with `failed`. For a declined gateway payment the
-   * value is the gateway's own code, passed on unchanged: the card issuer's decline code when
-   * there is one (Stripe's decline_code, such as insufficient_funds or lost_card), otherwise the
-   * gateway's error code (Stripe's code, such as card_declined, expired_card or
-   * payment_intent_authentication_failure). Clients map it to their own wording and treat an
-   * unknown value as a generic decline.
-   */
+  /** Why the payment failed; present with `failed`. For a declined gateway payment, the gateway's code unchanged: the issuer's decline code when there is one (Stripe decline_code, such as insufficient_funds), otherwise the gateway's error code (Stripe code, such as card_declined). Treat an unknown value as a generic decline. */
   failure_reason?: string;
 }
 
 /**
- * A draft is not yet issued. The draft invoice of an order shows base prices until it is paid, when
- * the discount is applied and it is issued; other drafts are private to administrators.
- * An issued invoice is open until settled; a zero-total issued invoice is immediately paid.
- * Unbilled usage remains separate from invoices until it is invoiced.
- * A refund does not change the status: a paid invoice stays paid, with the refunded part in
- * amount_refunded. void means collection has stopped and any funds received have been returned.
+ * `draft`: not yet issued; an order's draft invoice shows base prices until it is paid, when the discount is applied and it is issued. Other drafts are visible only to operators. `open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage not yet invoiced is not on any invoice.
  */
 export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
 
@@ -1353,12 +1147,10 @@ export const InvoiceStatus = {
   open: "open",
   paid: "paid",
   void: "void",
-  uncollectible: "uncollectible",
 } as const;
 
 /**
- * How tax applied to the customer when the invoice was issued. `reverse` means no tax was
- * charged because the customer accounts for it under the reverse-charge mechanism.
+ * How tax applied to the customer when the invoice was issued; `reverse` means no tax was charged under the reverse-charge mechanism.
  */
 export type InvoiceCustomerTaxExempt =
   (typeof InvoiceCustomerTaxExempt)[keyof typeof InvoiceCustomerTaxExempt];
@@ -1385,7 +1177,7 @@ export interface TaxItem {
 }
 
 export interface Invoice {
-  /** Collection has been stopped; any accepted return obligations are completed before final voiding. */
+  /** Collection has stopped; accepted return obligations are completed. */
   void_requested_at?: string;
   due_at?: string;
   amount_refunded?: string;
@@ -1405,16 +1197,16 @@ export interface Invoice {
   /** Sum of the line discounts, taken off before tax. */
   discount_amount?: Money;
   tax_amount?: Money;
-  /** Successful credit-grant payments included in amount_paid. Does not reduce the receivable or tax base. */
+  /** Successful credit-grant payments, included in amount_paid; they do not reduce the receivable or tax base. */
   credit_applied?: Money;
-  /** Subtotal less discount plus tax. Balance and credit grants are payment sources, not reductions of the receivable. */
+  /** Subtotal less discount plus tax. Balance and credit grants pay it; they do not reduce it. */
   total: Money;
   amount_paid?: Money;
-  /** Issued, non-void credit notes that reduced unpaid receivables. Does not rewrite the original invoice total. */
+  /** Issued credit notes that reduced unpaid receivables; the original invoice total is unchanged. */
   pre_payment_credit_notes_amount: Money;
-  /** Issued credit notes against payments already received. This is a return obligation, not evidence of completed refunds. */
+  /** Issued credit notes against payments already received; their refunds may not have completed. */
   post_payment_credit_notes_amount: Money;
-  /** What is still collectible after unpaid credit notes and successful payments; never below zero. A draft has none; its total is the base price, and a payment preview shows what paying it would collect. A paid or void invoice has none either. */
+  /** What is still collectible after unpaid credit notes and successful payments; never below zero. Zero for a draft, whose total is the base price, and for a paid or void invoice. */
   amount_due: Money;
   /** @nullable */
   period_start?: string | null;
@@ -1423,17 +1215,11 @@ export interface Invoice {
    * @nullable
    */
   period_end?: string | null;
-  /**
-   * Who this was billed to, as recorded when the invoice was issued. Later changes to
-   * the account do not alter it.
-   */
+  /** The billing details recorded when the invoice was issued. */
   customer_name?: string;
   customer_email?: string;
   customer_tax_id?: string;
-  /**
-   * How tax applied to the customer when the invoice was issued. `reverse` means no tax was
-   * charged because the customer accounts for it under the reverse-charge mechanism.
-   */
+  /** How tax applied to the customer when the invoice was issued; `reverse` means no tax was charged under the reverse-charge mechanism. */
   customer_tax_exempt?: InvoiceCustomerTaxExempt;
   customer_address_line1?: string;
   customer_address_line2?: string;
@@ -1461,12 +1247,17 @@ export const InvoiceItemType = {
 } as const;
 
 /**
+ * For a usage line, the values of its meter's presentation dimensions, such as the model and token kind. Empty for other lines.
+ */
+export type InvoiceItemDimensions = { [key: string]: string };
+
+/**
  * The value of one paid period moved to the new configuration of a subscription.
  */
 export interface InvoiceItemProration {
   /** The earlier invoice line that paid for the period. */
   credited_invoice_item_id: string;
-  /** The wording of the earlier invoice line as recorded when this invoice was created. */
+  /** The earlier invoice line's wording as recorded. */
   description: string;
   period_start: string;
   /** Exclusive. */
@@ -1499,17 +1290,10 @@ export interface InvoiceItem {
   type?: InvoiceItemType;
   /** @nullable */
   project_id?: string | null;
-  /**
-   * The project the charge was for and its current name, for display. Absent when the line is
-   * not for a project, and when the project no longer exists or its details cannot be read at
-   * the moment; `project_id` still identifies it then.
-   */
+  /** The project the charge was for and its current name. Absent when the line has no project or the project cannot be read; `project_id` still identifies it. */
   project?: NamedIdentity | null;
   resource_id?: string;
-  /**
-   * The wording as recorded when the invoice was issued. It is not re-translated
-   * afterwards, so that an invoice continues to read as it did when it was sent.
-   */
+  /** The line's wording as recorded when the invoice was issued. */
   description: string;
   unit?: string;
   quantity?: string;
@@ -1522,6 +1306,8 @@ export interface InvoiceItem {
   period_start?: string | null;
   /** @nullable */
   period_end?: string | null;
+  /** For a usage line, the values of its meter's presentation dimensions, such as the model and token kind. Empty for other lines. */
+  dimensions?: InvoiceItemDimensions;
   /**
    * Present on a line that changes a subscription immediately, one entry for each paid period it
    * covers. `amount` is the sum of `remaining_amount` minus `credited_amount` over the entries.
@@ -1579,9 +1365,7 @@ export const CreditNoteStatus = {
 } as const;
 
 /**
- * Why the note was issued. Notes from canceled, expired or failed orders carry the order's reason;
- * `usage_true_up` returns a tier price reduction settled after the original invoice; `operator` is
- * issued by Leaflow on request.
+ * Why the note was issued. Notes for canceled, expired or failed orders carry the order's reason; `usage_true_up` returns a tier price reduction settled after the original invoice; `operator` was issued on request.
  */
 export type CreditNoteReason = (typeof CreditNoteReason)[keyof typeof CreditNoteReason];
 
@@ -1597,7 +1381,7 @@ export const CreditNoteReason = {
 } as const;
 
 /**
- * An issued invoice reduction. Its credited amount is pre_payment_amount plus post_payment_amount. A paid credit records a return obligation; refund_id identifies its refund, whose outcome may still be pending. Original invoice amounts remain unchanged.
+ * A reduction of an issued invoice; the original invoice amounts do not change. The credited amount is pre_payment_amount plus post_payment_amount. A paid part creates a refund, identified by refund_id, whose outcome may still be pending.
  */
 export interface CreditNote {
   id: string;
@@ -1612,18 +1396,14 @@ export interface CreditNote {
   voided_at: string | null;
   /** The reduction of unpaid receivables. A void note no longer reduces what is due. */
   pre_payment_amount: Money;
-  /** The credited part of payments already received. This is not proof that its refund has completed. */
+  /** The credited part of payments already received; its refund may not have completed. */
   post_payment_amount: Money;
   /**
-   * The refund to the original payment sources, or null when no paid amount was credited.
+   * The refund to the original payment sources; null when no paid amount was credited.
    * @nullable
    */
   refund_id: string | null;
-  /**
-   * Why the note was issued. Notes from canceled, expired or failed orders carry the order's reason;
-   * `usage_true_up` returns a tier price reduction settled after the original invoice; `operator` is
-   * issued by Leaflow on request.
-   */
+  /** Why the note was issued. Notes for canceled, expired or failed orders carry the order's reason; `usage_true_up` returns a tier price reduction settled after the original invoice; `operator` was issued on request. */
   reason: CreditNoteReason;
 }
 
@@ -1646,7 +1426,7 @@ export interface CreditNoteItemList {
 }
 
 /**
- * Use balance_amount, credit_amount and gateway_amount, which also show a refund split between several destinations.
+ * Use balance_amount, credit_amount and gateway_amount, which also show a refund split between destinations.
  * @deprecated
  */
 export type RefundDestination = (typeof RefundDestination)[keyof typeof RefundDestination];
@@ -1678,22 +1458,19 @@ export const RefundStatus = {
 } as const;
 
 /**
- * Why the refund was made. Clients map the code to their own wording. More codes may be added;
- * treat an unknown code as a refund without a stated reason.
+ * Why the refund was made. New codes may be added; treat an unknown code as unspecified.
  *
  * - `provisioning_failed`: the purchase could not be delivered.
- * - `order_expired`: the order expired after part of it had been paid.
- * - `order_canceled`: the account holder canceled the order after part of it had been paid.
- * - `change_canceled`: a scheduled change was withdrawn after part of it had been paid.
- * - `change_expired`: a scheduled change could not take effect before its time passed.
- * - `subscription_canceled`: the subscription was canceled and its unused value returned under
- *   its refund terms.
- * - `future_period_canceled`: a renewal that had not started yet was withdrawn.
- * - `downgrade_difference`: after a downgrade, the remaining value of what was paid, valued as refund
- *   policy `prorated` describes, minus the new configuration's cost for the remaining time at the
- *   change item's `refund_monthly_amount` and `refund_hourly_amount`. Nothing is refunded when that is
- *   zero or less.
- * - `usage_true_up`: usage priced again over the whole month cost less than was charged.
+ * - `order_expired`: the order expired after part of it was paid.
+ * - `order_canceled`: the order was canceled after part of it was paid.
+ * - `change_canceled`: a scheduled change was withdrawn after part of it was paid.
+ * - `change_expired`: a scheduled change could not take effect in time.
+ * - `subscription_canceled`: the unused value of a canceled subscription, under its refund terms.
+ * - `future_period_canceled`: a renewal that had not started was withdrawn.
+ * - `downgrade_difference`: after a downgrade, the remaining paid value, valued as refund policy `prorated`
+ *   describes, minus the new configuration's cost for the remaining time at the change item's
+ *   `refund_monthly_amount` and `refund_hourly_amount`.
+ * - `usage_true_up`: usage priced over the whole month cost less than was charged.
  * - `payment_not_applied`: a payment arrived after its invoice could no longer be paid.
  * - `operator`: made by the platform operator.
  */
@@ -1716,15 +1493,14 @@ export const RefundReason = {
 export interface Refund {
   transaction_id?: string;
   cancellation_item_id?: string;
-  /** Original funds-return split and each result. Unknown gateway results remain pending. */
+  /** The refund split by original payment source, with each result. Unknown gateway results stay pending. */
   transactions: Transaction[];
   id: string;
   billing_account_id?: number;
   /** @nullable */
   invoice_id?: string | null;
   /**
-   * The order the refund belongs to: the order that caused it, such as a downgrade, otherwise
-   * the order of the refunded invoice. Null for refunds of top-ups and of usage invoices.
+   * The order the refund belongs to: the order that caused it, such as a downgrade, otherwise the order of the refunded invoice. Null for refunds of top-ups and usage invoices.
    * @nullable
    */
   order_id?: string | null;
@@ -1740,7 +1516,7 @@ export interface Refund {
   settled_amount?: Money;
   currency: string;
   /**
-   * Use balance_amount, credit_amount and gateway_amount, which also show a refund split between several destinations.
+   * Use balance_amount, credit_amount and gateway_amount, which also show a refund split between destinations.
    * @deprecated
    */
   destination?: RefundDestination;
@@ -1769,7 +1545,7 @@ export interface RefundList {
 }
 
 /**
- * The attributes the rate was chosen by, such as region and machine type.
+ * The dimension values the rate was matched by, such as region and machine type.
  */
 export type UsageChargeDimensions = { [key: string]: string };
 
@@ -1777,26 +1553,23 @@ export interface UsageCharge {
   subscription_id: string;
   id: string;
   project_id?: string;
-  /**
-   * The project and its current name, for display. Absent when the project no longer exists or its
-   * details cannot be read at the moment; `project_id` still identifies it.
-   */
+  /** The project and its current name. Absent when the project cannot be read; `project_id` still identifies it. */
   project?: NamedIdentity | null;
   product: Product;
   /** Which resource this was charged for. Empty for charges not tied to one. */
   resource_id?: string;
   meter: ObjectIdentity;
   unit?: string;
-  /** The attributes the rate was chosen by, such as region and machine type. */
+  /** The dimension values the rate was matched by, such as region and machine type. */
   dimensions?: UsageChargeDimensions;
   window_start: string;
   /** Exclusive. */
   window_end: string;
-  /** How much was used, before any included allowance. */
+  /** Quantity used before allowances. */
   gross_quantity?: string;
   /** How much of that was covered by an allowance. */
   deducted_quantity?: string;
-  /** What was charged for — the gross quantity less the part covered. */
+  /** The quantity charged: gross quantity less the part covered by allowances. */
   quantity: string;
   unit_amount?: Money;
   amount: Money;
@@ -1820,15 +1593,6 @@ export interface UsageChargeList {
   pagination: OffsetPagination;
 }
 
-export type SubscriptionChargeType =
-  (typeof SubscriptionChargeType)[keyof typeof SubscriptionChargeType];
-
-export const SubscriptionChargeType = {
-  postpaid: "postpaid",
-  prepaid: "prepaid",
-  one_time: "one_time",
-} as const;
-
 export type SubscriptionInterval = (typeof SubscriptionInterval)[keyof typeof SubscriptionInterval];
 
 export const SubscriptionInterval = {
@@ -1839,7 +1603,7 @@ export const SubscriptionInterval = {
 } as const;
 
 /**
- * An operation Leaflow prevents on a subscription. billing.subscriptions.use stops the service. renew prevents renewal and payment of a renewal order. modify prevents placing a change order. cancel prevents cancellation. terminate prevents immediate termination.
+ * An operation prevented on the subscription. `billing.subscriptions.use` stops the service. `renew` prevents renewal and paying a renewal order. `modify` prevents placing a change order. `cancel` prevents cancellation. `terminate` prevents immediate termination.
  */
 export type SubscriptionRestriction =
   (typeof SubscriptionRestriction)[keyof typeof SubscriptionRestriction];
@@ -1853,13 +1617,7 @@ export const SubscriptionRestriction = {
 } as const;
 
 /**
- * Follows the items. `pending` is not yet accepted and may be unpaid or paid; its invoice shows
- * whether payment is still needed, and it can expire or be canceled. `accepted` is accepted with items still
- * being set up. `completed` means every item was set up. `partially_completed` means some items were set up
- * and the others failed or were canceled and were refunded to their original payment sources. `failed` means
- * no item was delivered and at least one failed; collected amounts for the undelivered items are refunded.
- * `canceled` means every item was withdrawn without delivery; collected amounts are returned to their original
- * payment sources. No status establishes service delivery by itself.
+ * Follows the items. `pending`: not yet accepted, paid or unpaid; its invoice shows whether payment is needed, and it can expire or be canceled. `accepted`: items are being set up. `completed`: every item was set up. `partially_completed`: some items were set up and the others failed or were canceled and refunded to their original payment sources. `failed`: no item was delivered and at least one failed; amounts collected for undelivered items are refunded. `canceled`: every item was withdrawn without delivery; collected amounts are returned to their original payment sources. No status by itself means the service was delivered.
  */
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
@@ -1882,7 +1640,7 @@ export const ScheduledChangeInterval = {
 } as const;
 
 /**
- * The next accepted period-end change for a subscription. It describes the target terms and does not change the current subscription until effective_at.
+ * The next accepted period-end change of the subscription: the target terms, applied at effective_at.
  */
 export interface ScheduledChange {
   order_id: string;
@@ -1893,7 +1651,7 @@ export interface ScheduledChange {
   plan_name: string;
   price_id: string;
   quantity: string;
-  /** The target prepaid renewal amount before tax. */
+  /** The target licensed renewal amount before tax. */
   recurring_amount: string;
   currency: string;
   interval: ScheduledChangeInterval;
@@ -1902,11 +1660,7 @@ export interface ScheduledChange {
 }
 
 /**
- * pending means the purchase relationship exists but its order has not been accepted.
- * provisioning means the service accepted the order and is delivering. For a service-owned
- * purchase, only confirmed delivery moves it to active; paying alone does not.
- * canceled means cancellation completed, or an unfulfilled purchase was canceled or failed without delivery.
- * terminated means an administrator or the owning service immediately ended the commercial relationship.
+ * `pending`: the order has not been accepted. `provisioning`: the owning service accepted the order and is delivering. `active`: delivery was confirmed; payment alone does not make a subscription active. `suspended`: service is stopped while a lien restricts its use. `canceled`: cancellation completed, or an undelivered purchase was canceled or failed. `terminated`: an operator or the owning service ended it immediately.
  */
 export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus];
 
@@ -1920,42 +1674,36 @@ export const SubscriptionStatus = {
 } as const;
 
 /**
- * An independently billed purchase relationship, separate from the owning service's resource.
- * Placing a new prepaid or postpaid service order creates a pending subscription for each line
- * in the same purchase transaction. Its ID is returned on the order item and remains stable
- * through checkout and delivery. One order may create several subscriptions, such as an instance,
- * its system disk and its address; it has no single subscription ID.
+ * The dimension values of what was bought, such as region and instance type. Empty when the purchase gave none.
+ */
+export type SubscriptionDimensions = { [key: string]: string };
+
+/**
+ * A purchase that is billed, renewed and changed on its own, separate from the owning service's resource. A new
+ * recurring purchase creates a pending subscription for each order line; its ID is returned on the order item
+ * and stays the same through checkout, delivery, renewals and changes. A one-time purchase may create none.
  *
- * Pending and provisioning do not grant service or accrue usage. A service-owned subscription
- * becomes provisioning when the owning service accepts the order, and active when the service
- * confirms delivery, with started_at set to the confirmed effective time; payment changes neither. Prepaid service periods start
- * then; postpaid usage starts only when the service reports actual delivery and metering.
+ * Pending and provisioning subscriptions grant no service. A subscription becomes provisioning when the owning
+ * service accepts the order, and active when the service confirms delivery, which sets started_at; payment
+ * changes neither. Licensed service periods start at delivery, and metered usage is charged as the service
+ * reports it. Canceling or failing an undelivered purchase cancels its subscriptions without starting a period.
+ * Renewals use recurring_amount and the agreed interval; paid periods keep their value.
  *
- * One-time delivery may omit a subscription. Renewals reference and extend existing subscriptions
- * rather than creating another; a change keeps the subscription ID and switches its terms when it
- * takes effect. Canceling or failing an unfulfilled purchase sets its pending or provisioning
- * subscriptions to canceled without starting a service period.
- * Fixed renewals use the agreed recurring_amount and interval; already paid periods retain their
- * original value. Technical state belongs to the owning service.
- *
- * A purchased shared capacity limit, such as a regional snapshot count quota, can have its own
- * subscription. Activating that capacity confirms delivery of the quota, not individual snapshots.
- * Creating or deleting snapshots within it does not create, activate or terminate more subscriptions;
- * the owning service enforces current holdings against the purchased count.
+ * A shared capacity limit, such as a regional snapshot quota, has one subscription for the purchased quantity
+ * rather than one per item.
  */
 export interface Subscription {
   /** Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them. */
   renewal_discounts_enabled?: boolean;
   currency: string;
-  charge_type: SubscriptionChargeType;
+  type: PriceType;
+  usage_type: UsageType;
+  /** The dimension values of what was bought, such as region and instance type. Empty when the purchase gave none. */
+  dimensions: SubscriptionDimensions;
   interval: SubscriptionInterval;
   /** @minimum 1 */
   interval_count?: number;
-  /**
-   * Whole-subscription prepaid renewal amount, after continuing discounts and before tax.
-   * Pending subscriptions show base terms until paying the order fixes any new continuing discount.
-   * Absent for other charge types.
-   */
+  /** The whole licensed subscription's renewal amount, after continuing discounts and before tax. A pending subscription shows base terms until paying the order fixes any new discount. Absent for metered and one-time subscriptions. */
   recurring_amount?: string;
   termination_policy?: TerminationPolicy;
   refund_policy?: RefundPolicy;
@@ -1964,17 +1712,14 @@ export interface Subscription {
   coupon?: ObjectIdentity;
   /** @minimum 0 */
   discounted_renewals_remaining?: number;
-  /** The operations currently prevented on the subscription, sorted. The subscription is suspended while this contains billing.subscriptions.use. */
+  /** The operations currently prevented on the subscription, sorted; it is suspended while this contains `billing.subscriptions.use`. */
   restrictions?: SubscriptionRestriction[];
   billing_cycle_anchor?: string;
   cancellation?: SubscriptionCancellation;
-  /** The accepted period-end change currently scheduled for this subscription. Null when no such change exists. */
+  /** The accepted period-end change scheduled for this subscription; null when there is none. */
   scheduled_change?: ScheduledChange | null;
   /**
-   * The saved payment method automatic renewal charges after the account's balance and credits,
-   * before the account's default payment method. Set when the purchase, a renewal or a change is paid with a
-   * saved payment method; paying any other way leaves it unchanged. It is used only while it belongs to the
-   * account that pays the renewal.
+   * The saved payment method automatic renewal charges after balance and credits, before the account's default payment method. Set when a purchase, renewal or change is paid with a saved payment method. Used only while it belongs to the account paying the renewal.
    * @nullable
    */
   default_payment_method_id?: string | null;
@@ -1985,16 +1730,11 @@ export interface Subscription {
   account: AccountIdentity;
   product_id: ProductID;
   /**
-   * Which project this is for. Absent when it was bought at account level, such as a
-   * membership, which belongs to no single project.
+   * The project it is for. Absent for an account-level purchase, such as a membership.
    * @nullable
    */
   project_id?: string | null;
-  /**
-   * The project and its current name, for display. Absent for a purchase at account level,
-   * and when the project no longer exists or its details cannot be read at the moment;
-   * `project_id` still identifies it then.
-   */
+  /** The project and its current name. Absent for an account-level purchase or when the project cannot be read; `project_id` still identifies it. */
   project?: NamedIdentity | null;
   product: Product;
   plan_id: string;
@@ -2002,35 +1742,26 @@ export interface Subscription {
   price_id: string;
   quantity: string;
   /**
-   * When a prepaid subscription renews or expires, the end of the last service period bought.
-   * Renewing several periods in advance moves it. Null until a new subscription becomes active, even when
-   * its purchase has been paid, and for postpaid subscriptions.
+   * When a licensed subscription renews or expires: the end of the last period bought, moved by renewing in advance. Null until the subscription becomes active, even when its purchase has been paid, and for metered subscriptions.
    * @nullable
    */
   current_term_end?: string | null;
   /**
-   * Start of the service period in effect now. Null when none is, including for postpaid subscriptions.
+   * Start of the service period in effect now. Null when none is, including for metered subscriptions.
    * @nullable
    */
   current_period_start?: string | null;
   /**
-   * End of the service period in effect now. Renewing in advance moves `current_term_end`, not
-   * this. Null when no period is in effect, including for postpaid subscriptions.
+   * End of the service period in effect now; renewing in advance moves `current_term_end`, not this. Null when no period is in effect, including for metered subscriptions.
    * @nullable
    */
   current_period_end?: string | null;
-  /** A prepaid subscription renews automatically while this is on. A postpaid subscription always continues until it is canceled; this is true until a cancellation is requested and cannot be set. */
+  /** Whether a licensed subscription renews automatically. A metered subscription continues until it is canceled; for it this is true until a cancellation is requested, and cannot be set. */
   auto_renew: boolean;
-  /**
-   * pending means the purchase relationship exists but its order has not been accepted.
-   * provisioning means the service accepted the order and is delivering. For a service-owned
-   * purchase, only confirmed delivery moves it to active; paying alone does not.
-   * canceled means cancellation completed, or an unfulfilled purchase was canceled or failed without delivery.
-   * terminated means an administrator or the owning service immediately ended the commercial relationship.
-   */
+  /** `pending`: the order has not been accepted. `provisioning`: the owning service accepted the order and is delivering. `active`: delivery was confirmed; payment alone does not make a subscription active. `suspended`: service is stopped while a lien restricts its use. `canceled`: cancellation completed, or an undelivered purchase was canceled or failed. `terminated`: an operator or the owning service ended it immediately. */
   status: SubscriptionStatus;
   /**
-   * Confirmed start of service. Null until a new subscription becomes active, including after payment.
+   * When service started. Null until a new subscription becomes active, also after payment.
    * @nullable
    */
   started_at?: string | null;
@@ -2061,10 +1792,7 @@ export interface RenewalPrice {
   /** What renewing for this term costs, for the quantity held. */
   amount?: Money;
   currency?: string;
-  /**
-   * The term this item already bills at. Renewing for it uses the price bought
-   * originally, so a later price change does not affect it.
-   */
+  /** The term the subscription renews at now; renewing for it keeps the agreed price. */
   current: boolean;
 }
 
@@ -2085,14 +1813,10 @@ export const RenewRequestInterval = {
 } as const;
 
 export interface RenewRequest {
-  /** Purchase ID saved before submitting. Duplicate creation conflicts; query this order after an unknown result. */
+  /** The order ID, chosen by the caller. Creating it again conflicts; read the order after an unknown outcome. */
   order_id: string;
   /**
-   * How many further periods to buy, each at the price this item already bills at.
-   *
-   * Buying twelve monthly periods is not the same as buying one yearly term: a longer
-   * term is usually sold at a lower price, and that price is only reached by naming the
-   * interval. Use `interval_count` and `interval` for that.
+   * How many further periods to buy, each at the price the subscription already renews at. To buy a longer term at its own price, give `interval` and `interval_count` instead.
    * @minimum 1
    */
   periods?: number;
@@ -2135,10 +1859,10 @@ export const RenewalOrderRequestInterval = {
 } as const;
 
 /**
- * The periods and price of the renewal, chosen as in renewing.
+ * The renewal's periods and price, chosen as in renewing.
  */
 export interface RenewalOrderRequest {
-  /** Purchase ID saved before submitting. Duplicate creation conflicts; query this order after an unknown result. */
+  /** The order ID, chosen by the caller. Creating it again conflicts; read the order after an unknown outcome. */
   order_id: string;
   /**
    * As in renewing.
@@ -2161,10 +1885,7 @@ export interface AutoRenewSet {
 }
 
 /**
- * `pending` is waiting to be set up. `completed` was confirmed by the service.
- * `failed` was not set up and its amount was refunded to the original payment sources.
- * `canceled` was confirmed withdrawn without delivery; any collected amount is returned. A completed item is ended by canceling
- * its subscription.
+ * `pending`: waiting to be set up. `completed`: set up, as confirmed by the service. `failed`: not set up; its amount was refunded to the original payment sources. `canceled`: withdrawn without delivery; any collected amount is returned. A completed item ends when its subscription is canceled.
  */
 export type OrderItemStatus = (typeof OrderItemStatus)[keyof typeof OrderItemStatus];
 
@@ -2176,7 +1897,7 @@ export const OrderItemStatus = {
 } as const;
 
 /**
- * `new` buys, `renew` extends a prepaid subscription, `modify` changes a subscription's configuration or billing terms.
+ * `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms.
  */
 export type OrderType = (typeof OrderType)[keyof typeof OrderType];
 
@@ -2187,12 +1908,7 @@ export const OrderType = {
 } as const;
 
 /**
- * When a plan change takes effect. `none` on anything that is not a change.
- *
- * `period_end` orders stay pending until the first period at the new price is paid. That period
- * is invoiced shortly before the current paid period ends and starts when it ends; if the
- * invoice is still unpaid by then, the order is canceled and the subscription renews or ends as
- * usual. Renewing in the meantime moves all of this along with it.
+ * When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced shortly before the current paid period ends and starts when it ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual. A renewal in the meantime moves the change to the end of the renewed period.
  */
 export type OrderChangeEffective = (typeof OrderChangeEffective)[keyof typeof OrderChangeEffective];
 
@@ -2203,10 +1919,7 @@ export const OrderChangeEffective = {
 } as const;
 
 /**
- * Purchase-related invoice amounts, without account contact details or payment methods. Every order
- * has an invoice from placement. A draft shows base prices until it is paid, when the discount is
- * applied and it is issued; a zero-total invoice is issued and paid at placement whatever the
- * checkout mode. Neither establishes acceptance or delivery.
+ * An order's invoice amounts, without contact details or payment methods. A draft shows base prices until it is paid, when the discount is applied and it is issued; a zero-total invoice is issued and paid at placement.
  */
 export interface InvoiceSummary {
   id: string;
@@ -2224,9 +1937,9 @@ export interface InvoiceSummary {
   tax_amount: string;
   total: string;
   amount_paid: string;
-  /** Issued, non-void credit notes that reduced unpaid receivables. Does not rewrite the original invoice total. */
+  /** Issued credit notes that reduced unpaid receivables; the original invoice total is unchanged. */
   pre_payment_credit_notes_amount: Money;
-  /** Issued credit notes against payments already received. This is a return obligation, not evidence of completed refunds. */
+  /** Issued credit notes against payments already received; their refunds may not have completed. */
   post_payment_credit_notes_amount: Money;
   /**
    * What is still collectible after unpaid credit notes and successful payments; never below zero.
@@ -2238,8 +1951,7 @@ export interface InvoiceSummary {
 }
 
 /**
- * How it was paid. Removing the payment method afterwards does not change it; `payment_method_id`
- * then names a removed payment method.
+ * How it was paid. `payment_method_id` still names the payment method after it is removed.
  */
 export interface PaidWith {
   /**
@@ -2264,23 +1976,15 @@ export const OrderItemInterval = {
   year: "year",
 } as const;
 
-/**
- * The payment timing of the selected price.
- */
-export type OrderItemChargeType = (typeof OrderItemChargeType)[keyof typeof OrderItemChargeType];
-
-export const OrderItemChargeType = {
-  postpaid: "postpaid",
-  prepaid: "prepaid",
-  one_time: "one_time",
-} as const;
-
 export type OrderItemConfiguration = { [key: string]: unknown };
 
 /**
- * Frozen purchase terms. Monetary fields come from related invoice-line snapshots and are zero
- * for a line with no immediate charge, such as postpaid admission. Later catalog changes do not reprice this line. A new service
- * purchase creates its pending subscription when this item is recorded, not when payment succeeds.
+ * The dimension values the line was bought with, such as region and instance type. Empty when the purchase gave none.
+ */
+export type OrderItemDimensions = { [key: string]: string };
+
+/**
+ * The purchase terms frozen at placement. Monetary fields come from the order's invoice lines and are zero without an immediate charge, such as for a metered purchase. Later catalog changes do not reprice the line. A new service purchase has its pending subscription from placement.
  */
 export interface OrderItem {
   /** Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them. */
@@ -2290,11 +1994,7 @@ export interface OrderItem {
   /** @minimum 0 */
   position?: number;
   configuration?: OrderItemConfiguration;
-  /**
-   * Stable Billing subscription ID. A new prepaid or postpaid service purchase returns the
-   * pending subscription here; renewals and changes reference the existing subscription, which
-   * keeps its ID. Absent for delivery without a subscription. This is not a business resource ID.
-   */
+  /** The Billing subscription: the new pending subscription of a recurring purchase, or the existing one renewed or changed, which keeps its ID. Absent for a purchase without a subscription. */
   subscription_id?: string;
   interval: OrderItemInterval;
   /** @minimum 1 */
@@ -2302,22 +2002,21 @@ export interface OrderItem {
   termination_policy?: TerminationPolicy;
   refund_policy?: RefundPolicy;
   /**
-   * Prepaid items only: the plan's one-month prepaid price for this item's quantity before tax, frozen
-   * at purchase, used to value time used under a prorated refund or a downgrade. Null when the plan has
-   * no prepaid period shorter than the one bought.
+   * Recurring licensed items only: the plan's one-month licensed price for this item's quantity, before tax and frozen at purchase, used to value time under a prorated refund or a downgrade. Null when the plan has no licensed period shorter than the one bought.
    * @nullable
    */
   refund_monthly_amount?: string | null;
   /**
-   * Prepaid items only: the plan's postpaid hourly price for this item's quantity before tax, frozen at
-   * purchase, used for time used short of a full month. Null when the plan has no postpaid price.
+   * Recurring licensed items only, the plan's metered hourly price for this item's quantity before tax, frozen at purchase, used for time used short of a full month. Null when the licensed price has no meter.
    * @nullable
    */
   refund_hourly_amount?: string | null;
   recurring_amount?: string;
   setup_amount?: string;
-  /** The payment timing of the selected price. */
-  charge_type: OrderItemChargeType;
+  type: PriceType;
+  usage_type: UsageType;
+  /** The dimension values the line was bought with, such as region and instance type. Empty when the purchase gave none. */
+  dimensions: OrderItemDimensions;
   /** Total tax after discounts, including any tax already included in the price. */
   tax_amount?: string;
   /** The part of tax_amount already included in gross_amount; it is not charged again. */
@@ -2329,45 +2028,28 @@ export interface OrderItem {
   product?: Product;
   /** Which plan was bought. */
   plan_id: string;
-  /**
-   * What it was called when bought. It does not follow later catalogue renames and is
-   * not translated.
-   */
+  /** The name when bought. */
   plan_name: string;
   quantity: string;
-  /**
-   * The unit amount of the price this line is charged under. Absent for a tiered price, which has no
-   * single unit amount, and for a change that takes effect at once, which is charged as `gross_amount`
-   * describes.
-   */
+  /** The unit amount of the price the line is charged under. Absent for a tiered price, and for an immediate change, which is charged as `gross_amount` describes. */
   unit_amount?: Money;
   /**
-   * Before discounts: the price applied to the quantity, which for a per-unit price is `unit_amount`
-   * times `quantity`; a minimum charge can make it higher. For an upgrade that takes effect at once it is
-   * the new price for the time left in the paid period, at the subscription's own period price, minus
-   * the amount paid for that time, and the period end does not move; a downgrade charges nothing and may refund the
-   * difference instead. A change between equal period prices charges and refunds nothing. The setup fee is not part of it; see `setup_amount`.
+   * Before discounts and setup fees: the price applied to the quantity, `unit_amount` times `quantity` for a per-
+   * unit price, raised by any minimum charge. For an immediate upgrade it is the new price for the rest of the
+   * paid period minus the amount paid for that time; a downgrade, or a change between equal period prices, charges
+   * nothing.
    *
-   * Under an inclusive tax rate it includes tax, as the price does, and the included part is
-   * `tax_included_amount`. A renewal at the agreed terms is the exception: the agreed amount excludes
-   * tax, and tax is added to it.
+   * Under an inclusive tax rate it includes tax, shown in `tax_included_amount`, except for a renewal at agreed
+   * terms, whose amount excludes tax.
    */
   gross_amount?: Money;
-  /**
-   * The reduction on this line: from the coupon the order uses and, for a renewal at the agreed terms,
-   * from the discount the subscription carries.
-   *
-   * A carried discount is part of the agreed amount. It is listed here, and `gross_amount` is then
-   * `unit_amount` times `quantity`, except in two cases where `gross_amount` is the agreed amount and
-   * the carried discount is already reflected in it: the renewal order also uses a coupon the account
-   * holds, or the account's tax rate is inclusive.
-   */
+  /** The reduction on this line, from the order's coupon and, for a renewal at agreed terms, from the subscription's carried discount. With a carried discount, `gross_amount` is `unit_amount` times `quantity`, except when the renewal order also uses an account coupon or the tax rate is inclusive: then `gross_amount` is the agreed amount, which already reflects the carried discount. */
   discount_amount?: Money;
   /** `gross_amount` less `discount_amount`. */
   amount?: Money;
   currency: string;
   /**
-   * The start of the service period this line paid for. Frozen at placement for renewals and period-end changes; for a prepaid line of a new purchase, fixed from the second its invoice is paid and kept when delivery is confirmed. Absent for postpaid and one-time lines.
+   * The start of the service period this line paid for. Fixed at placement for renewals and period-end changes, and for a licensed line of a new purchase when its invoice is paid. Absent for metered and one-time lines.
    * @nullable
    */
   period_start?: string | null;
@@ -2380,17 +2062,13 @@ export interface OrderItem {
 }
 
 /**
- * A recorded purchase with its invoice from placement; a zero-total invoice, such as for postpaid
- * admission, is issued and paid at placement whatever the checkout mode. Until checkout_confirmed_at is set, the
- * invoice is a draft at base prices: paying it fixes the discount and amount, issues it and collects it, and the
- * order cannot be accepted before then. Coupon fields describe the discount fixed at that point and are absent
- * before it; a quote never populates them. Payment and acceptance remain separate from resource delivery.
+ * A recorded purchase with its invoice from placement; a zero-total invoice, such as for a metered purchase, is issued and paid at placement in either checkout mode. Until checkout_confirmed_at is set, the invoice is a draft at base prices: paying it fixes the discount and amount, issues it and collects it, and the order cannot be accepted before then. Coupon fields describe the discount fixed then and are absent before. Payment and acceptance do not mean the resources were delivered.
  */
 export interface Order {
   coupon_id?: string;
   coupon?: ObjectIdentity;
   promotion_code_id?: string;
-  /** Code text frozen when the coupon was applied. Absent for an account discount. */
+  /** The promotion code applied. Absent for an account discount. */
   promotion_code?: string;
   /** The order's invoice, the same as invoice.id. */
   invoice_id: string;
@@ -2401,53 +2079,32 @@ export interface Order {
   change_effective_at?: string;
   id: string;
   /**
-   * Which project it was bought for. Absent for a purchase made at account level, such
-   * as a membership.
+   * The project it was bought for. Absent for an account-level purchase, such as a membership.
    * @nullable
    */
   project_id?: string | null;
-  /**
-   * The project and its current name, for display. Absent for a purchase at account level,
-   * and when the project no longer exists or its details cannot be read at the moment;
-   * `project_id` still identifies it then.
-   */
+  /** The project and its current name. Absent for an account-level purchase or when the project cannot be read; `project_id` still identifies it. */
   project?: NamedIdentity | null;
-  /**
-   * The billing account the order was placed with. It does not change when the project is later
-   * linked to another billing account. While this account is suspended or closed the order cannot
-   * be accepted, and the invoice of a change scheduled for the end of a period is not issued and the change is called off
-   * when the current period ends; such requests fail with BILLING_ACCOUNT_UNAVAILABLE.
-   */
+  /** The billing account the order was placed with, unchanged when the project is later linked to another account. While it is suspended or closed, the order cannot be accepted, and a period-end change's invoice is not issued and the change is called off when the current period ends; such requests fail with `BILLING_ACCOUNT_UNAVAILABLE`. */
   billing_account_id?: number;
   currency: string;
-  /** `new` buys, `renew` extends a prepaid subscription, `modify` changes a subscription's configuration or billing terms. */
+  /** `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms. */
   type: OrderType;
   status: OrderStatus;
-  /**
-   * When a plan change takes effect. `none` on anything that is not a change.
-   *
-   * `period_end` orders stay pending until the first period at the new price is paid. That period
-   * is invoiced shortly before the current paid period ends and starts when it ends; if the
-   * invoice is still unpaid by then, the order is canceled and the subscription renews or ends as
-   * usual. Renewing in the meantime moves all of this along with it.
-   */
+  /** When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced shortly before the current paid period ends and starts when it ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual. A renewal in the meantime moves the change to the end of the renewed period. */
   change_effective?: OrderChangeEffective;
   /**
-   * Acceptance deadline. Pending orders can expire automatically.
+   * Acceptance deadline; a pending order expires after it.
    * @nullable
    */
   expires_at?: string | null;
   /**
-   * When the discount and amount were fixed: at placement for automatic checkout and for a
-   * zero total, otherwise when the invoice was first paid. Null while a deferred order awaits payment.
+   * When the discount and amount were fixed: at placement for automatic checkout or a zero total, otherwise when the invoice was first paid. Null while a deferred order awaits payment.
    * @nullable
    */
   checkout_confirmed_at?: string | null;
   created_at: string;
-  /**
-   * What was bought. Present on a single order and on every order in a list, so a list
-   * can be rendered without a further request per row.
-   */
+  /** What was bought. */
   items: OrderItem[];
 }
 
@@ -2457,8 +2114,7 @@ export interface OrderList {
 }
 
 /**
- * `scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or
- * `voided` once Leaflow withdrew it.
+ * `scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or `voided` once withdrawn.
  */
 export type DiscountStatus = (typeof DiscountStatus)[keyof typeof DiscountStatus];
 
@@ -2479,9 +2135,7 @@ export const DiscountType = {
 } as const;
 
 /**
- * Whether the discount continues on renewals of the purchased item. `once` applies only to the
- * purchase or renewal that uses the coupon, `recurring` continues for `frequency_duration` billing
- * periods including the first, and `forever` continues on every renewal.
+ * Whether the discount continues on renewals: `once` applies only to the purchase or renewal using the coupon, `recurring` for `frequency_duration` periods including the first, `forever` on every renewal.
  */
 export type DiscountFrequency = (typeof DiscountFrequency)[keyof typeof DiscountFrequency];
 
@@ -2492,26 +2146,18 @@ export const DiscountFrequency = {
 } as const;
 
 /**
- * A coupon held on this account for a period. Within the period it applies without a code to purchases and
- * to metered usage that the coupon covers.
+ * A coupon held by the account for a period, applying without a code to the purchases and metered usage it covers.
  */
 export interface Discount {
   min_amount?: string;
   billing_account_id?: number;
   coupon_id: string;
   promotion_code_id?: string;
-  /**
-   * `scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or
-   * `voided` once Leaflow withdrew it.
-   */
+  /** `scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or `voided` once withdrawn. */
   status: DiscountStatus;
   voided_at?: string;
   type: DiscountType;
-  /**
-   * Whether the discount continues on renewals of the purchased item. `once` applies only to the
-   * purchase or renewal that uses the coupon, `recurring` continues for `frequency_duration` billing
-   * periods including the first, and `forever` continues on every renewal.
-   */
+  /** Whether the discount continues on renewals: `once` applies only to the purchase or renewal using the coupon, `recurring` for `frequency_duration` periods including the first, `forever` on every renewal. */
   frequency?: DiscountFrequency;
   /** @minimum 1 */
   frequency_duration?: number;
@@ -2523,10 +2169,7 @@ export interface Discount {
   /** Caps a percentage discount. */
   max_discount?: Money;
   currency?: string;
-  /**
-   * What it may be used for. Absent means it applies to anything on the account,
-   * including setup fees and traffic.
-   */
+  /** What it may pay for. Absent means anything on the account, including setup fees and usage. */
   applies_to: Applicability;
   /** Restricted to your first purchase of anything it applies to. */
   first_purchase_only?: boolean;
@@ -2549,7 +2192,7 @@ export interface OrderItemList {
 }
 
 /**
- * Whether the quantity was paid for or granted free of charge. Both are consumed the same way.
+ * Whether the quantity was paid for or granted free; both are consumed the same way.
  */
 export type AllowanceCategory = (typeof AllowanceCategory)[keyof typeof AllowanceCategory];
 
@@ -2583,7 +2226,7 @@ export interface Allowance {
   meter: ObjectIdentity;
   /** The unit it is counted in, such as `MiB`. */
   unit?: string;
-  /** Whether the quantity was paid for or granted free of charge. Both are consumed the same way. */
+  /** Whether the quantity was paid for or granted free; both are consumed the same way. */
   category: AllowanceCategory;
   /**
    * Exact values for a subset of the meter's dimensions. Only usage with these values is deducted;
@@ -2595,16 +2238,12 @@ export interface Allowance {
   quantity: string;
   /** How much is left. */
   remaining_quantity: string;
-  /**
-   * Lower values are consumed first. At equal priority, earlier expiry and then earlier issuance take
-   * precedence.
-   */
+  /** Lower values are consumed first; at equal priority, earlier expiry and then earlier issuance. */
   priority?: number;
   status: AllowanceStatus;
   valid_from: string;
   /**
-   * When it lapses. Anything unused at that point is lost; it is not refunded and does
-   * not carry over. Absent when it does not expire on its own.
+   * When the allowance lapses; unused quantity is lost. Absent when it does not expire.
    * @nullable
    */
   valid_until?: string | null;
@@ -2653,8 +2292,7 @@ export interface Entitlement {
   name?: string;
   enabled: boolean;
   /**
-   * When the subscription providing it ends. Absent for a metered subscription, which
-   * has no end date.
+   * When the providing subscription ends. Absent for a metered subscription.
    * @nullable
    */
   expires_at?: string | null;
@@ -2693,34 +2331,7 @@ export interface PlanList {
 }
 
 /**
- * `postpaid` charges for what is used, `prepaid` buys a period in advance, `one_time`
- * charges once.
- */
-export type PriceType = (typeof PriceType)[keyof typeof PriceType];
-
-export const PriceType = {
-  postpaid: "postpaid",
-  prepaid: "prepaid",
-  one_time: "one_time",
-} as const;
-
-/**
- * How the amount is arrived at. `rated` means the rate depends on attributes such as
- * region or machine type, and is looked up on a price list.
- */
-export type PriceBillingScheme = (typeof PriceBillingScheme)[keyof typeof PriceBillingScheme];
-
-export const PriceBillingScheme = {
-  per_unit: "per_unit",
-  tiered: "tiered",
-  rated: "rated",
-} as const;
-
-/**
- * `none` for a price that is not tiered, which is most of them.
- *
- * Otherwise `graduated` charges each band at its own rate, and `volume` charges
- * everything at the rate of the band the total falls in.
+ * How a ladder is walked: `graduated` charges each band at its own rate, `volume` charges everything at the rate of the band the total falls in. `none` when not tiered.
  */
 export type PriceTiersMode = (typeof PriceTiersMode)[keyof typeof PriceTiersMode];
 
@@ -2741,7 +2352,7 @@ export const PriceInterval = {
 
 export interface Tier {
   /**
-   * The upper bound of this band. Null on the last band, which has no bound.
+   * The band's inclusive upper bound; null for the last band.
    * @nullable
    */
   up_to?: string | null;
@@ -2755,6 +2366,7 @@ export interface Price {
   lookup_key?: string;
   product: Product;
   plan: ObjectIdentity;
+  /** For a metered price with its own amounts, the meter it charges. For a licensed price, the meter its quantity is held on. Absent otherwise. */
   meter_id?: string;
   meter?: ObjectIdentity;
   unit_quantity: string;
@@ -2766,39 +2378,25 @@ export interface Price {
   id: string;
   plan_id: string;
   currency: string;
-  /**
-   * `postpaid` charges for what is used, `prepaid` buys a period in advance, `one_time`
-   * charges once.
-   */
   type: PriceType;
-  /**
-   * How the amount is arrived at. `rated` means the rate depends on attributes such as
-   * region or machine type, and is looked up on a price list.
-   */
-  billing_scheme: PriceBillingScheme;
+  usage_type: UsageType;
+  /** Absent when the price delegates to a rate card, where the rate depends on attributes such as region or machine type. */
+  billing_scheme?: BillingScheme;
   /** Present for `per_unit`. */
   unit_amount?: Money;
-  /**
-   * `none` for a price that is not tiered, which is most of them.
-   *
-   * Otherwise `graduated` charges each band at its own rate, and `volume` charges
-   * everything at the rate of the band the total falls in.
-   */
+  /** How a ladder is walked: `graduated` charges each band at its own rate, `volume` charges everything at the rate of the band the total falls in. `none` when not tiered. */
   tiers_mode?: PriceTiersMode;
   /** Present for `tiered`, in ascending order. */
   tiers?: Tier[];
-  /** For `rated` prices, the price list the rates are read from. */
+  /** Present when the price delegates to a rate card, the price list its rates are read from. */
   rate_card_id?: string;
   /** The smallest quantity that can be bought. Absent means no lower bound. */
   min_quantity?: string;
-  /**
-   * The largest purchasable quantity. Omitted when no maximum applies. A quantity above this limit is
-   * rejected with BILLING_PRICE_INVALID and field=max_quantity.
-   */
+  /** The largest quantity that may be bought; absent when there is no limit. A larger quantity is refused with `BILLING_PRICE_INVALID` and `field` `max_quantity`. */
   max_quantity?: string;
   /** Quantities must be a multiple of this. Absent means any quantity within the bounds. */
   quantity_step?: string;
-  /** For prepaid prices, how many periods one purchase covers. */
+  /** For recurring licensed prices, how many interval units one period covers. */
   interval_count?: number;
   interval: PriceInterval;
   setup_fee?: Money;
@@ -2810,18 +2408,20 @@ export interface PriceList {
 }
 
 /**
- * The attributes this rate applies to, such as region and machine type.
+ * The dimension values this rate applies to, such as region and machine type.
  */
 export type RateDimensions = { [key: string]: string };
 
 /**
- * `per_unit` multiplies `unit_amount`; `tiered` walks the tiers as `tiers_mode` says.
+ * Licensed rates only, the period the amount buys; `none` for metered rates.
  */
-export type RateBillingScheme = (typeof RateBillingScheme)[keyof typeof RateBillingScheme];
+export type RateInterval = (typeof RateInterval)[keyof typeof RateInterval];
 
-export const RateBillingScheme = {
-  per_unit: "per_unit",
-  tiered: "tiered",
+export const RateInterval = {
+  none: "none",
+  day: "day",
+  month: "month",
+  year: "year",
 } as const;
 
 /**
@@ -2837,22 +2437,24 @@ export const RateTiersMode = {
 
 export interface Rate {
   meter: ObjectIdentity;
-  /** The unit readings arrive in, such as `core-second`. */
+  /** The unit readings are reported in, such as `core-second`. */
   unit?: string;
-  /** The attributes this rate applies to, such as region and machine type. */
+  /** The dimension values this rate applies to, such as region and machine type. */
   dimensions: RateDimensions;
-  /** `per_unit` multiplies `unit_amount`; `tiered` walks the tiers as `tiers_mode` says. */
-  billing_scheme: RateBillingScheme;
+  billing_scheme: BillingScheme;
+  /** `metered` prices usage; `licensed` prices holding a quantity for one period. */
+  usage_type: UsageType;
+  /** Licensed rates only, the period the amount buys; `none` for metered rates. */
+  interval: RateInterval;
+  /** @nullable */
+  interval_count?: number | null;
   /** `graduated` charges each band at its own rate; `volume` charges everything at the rate of the band the total lands in. `none` for a `per_unit` rate. */
   tiers_mode: RateTiersMode;
   /** Present for `per_unit`. Tiered rates carry their amounts on the tiers. */
   unit_amount?: Money;
   /** Present for a tiered rate, in ascending order. */
   tiers?: Tier[];
-  /**
-   * How many measured units one amount covers. An hourly rate on a per-second meter is
-   * `"3600"`.
-   */
+  /** How many measured units one amount covers; an hourly rate on a per-second meter is `"3600"`. */
   unit_quantity?: string;
   currency: string;
   effective_from: string;
@@ -2865,18 +2467,6 @@ export interface RateList {
   pagination: OffsetPagination;
 }
 
-/**
- * Narrows the selection when a plan offers more than one charge type.
- */
-export type QuoteItemInputPriceType =
-  (typeof QuoteItemInputPriceType)[keyof typeof QuoteItemInputPriceType];
-
-export const QuoteItemInputPriceType = {
-  postpaid: "postpaid",
-  prepaid: "prepaid",
-  one_time: "one_time",
-} as const;
-
 export type QuoteItemInputInterval =
   (typeof QuoteItemInputInterval)[keyof typeof QuoteItemInputInterval];
 
@@ -2888,22 +2478,12 @@ export const QuoteItemInputInterval = {
 } as const;
 
 /**
- * The attributes the price depends on — region, instance type, token class.
- *
- * Required when the price draws its rates from a price list, which is how anything
- * sold by region or by machine type is priced. A price that carries a single unit
- * amount, or a ladder, has no attributes to give and takes none.
- *
- * Every attribute the meter declares must be present. A combination with no rate
- * covering it is refused rather than priced at zero.
+ * The dimension values the rate depends on, such as region, instance type or token kind: those of the usage for a metered estimate, and those of what is bought for a licensed price on a rate card. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero.
  */
 export type QuoteItemInputDimensions = { [key: string]: string };
 
 /**
- * Identify a price directly, or select a price for a plan. For each resource give its ID or lookup
- * key, never both. Lookup keys require product_id. Meter, dimensions or duration_seconds request a
- * postpaid usage estimate. Such an estimate cannot be combined with a promotion code or treated as a
- * checkout amount. Without a usage estimate, a postpaid item includes only any setup charge.
+ * Identify a price, or select one for a plan; give each resource's ID or lookup key, never both, and product_id with lookup keys. For a metered price, a meter or duration_seconds requests a usage estimate, which cannot be combined with a promotion code and is not a checkout amount. Without one, a metered item includes only any setup charge.
  */
 export interface QuoteItemInput {
   /**
@@ -2919,12 +2499,14 @@ export interface QuoteItemInput {
   price_id?: string;
   product_id?: ProductID;
   plan_id?: string;
-  /** Narrows the selection when a plan offers more than one charge type. */
-  price_type?: QuoteItemInputPriceType;
+  /** Narrows the selection when a plan offers more than one price type. */
+  price_type?: PriceType;
+  /** Narrows the selection when a plan offers more than one usage type. */
+  usage_type?: UsageType;
   interval?: QuoteItemInputInterval;
   /** @minimum 1 */
   interval_count?: number;
-  /** Selects among prepaid prices with otherwise identical billing terms. Ambiguous terms are refused instead of choosing a price arbitrarily. */
+  /** Selects among licensed prices with otherwise identical billing terms. Ambiguous terms are refused instead of choosing a price arbitrarily. */
   termination_policy?: TerminationPolicy;
   /** @pattern ^(?:(?:[1-9][0-9]{0,27}|0(?:[1-9][0-9]{0,26}|0(?:[1-9][0-9]{0,25}|0(?:[1-9][0-9]{0,24}|0(?:[1-9][0-9]{0,23}|0(?:[1-9][0-9]{0,22}|0(?:[1-9][0-9]{0,21}|0(?:[1-9][0-9]{0,20}|0(?:[1-9][0-9]{0,19}|0(?:[1-9][0-9]{0,18}|0(?:[1-9][0-9]{0,17}|0(?:[1-9][0-9]{0,16}|0(?:[1-9][0-9]{0,15}|0(?:[1-9][0-9]{0,14}|0(?:[1-9][0-9]{0,13}|0(?:[1-9][0-9]{0,12}|0(?:[1-9][0-9]{0,11}|0(?:[1-9][0-9]{0,10}|0(?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9])))))))))))))))))))))))))))([.][0-9]{1,10})?|0{1,28}[.](?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))$ */
   quantity: string;
@@ -2934,24 +2516,16 @@ export interface QuoteItemInput {
    * @maxLength 128
    */
   meter_lookup_key?: string;
-  /**
-   * The attributes the price depends on — region, instance type, token class.
-   *
-   * Required when the price draws its rates from a price list, which is how anything
-   * sold by region or by machine type is priced. A price that carries a single unit
-   * amount, or a ladder, has no attributes to give and takes none.
-   *
-   * Every attribute the meter declares must be present. A combination with no rate
-   * covering it is refused rather than priced at zero.
-   */
+  /** The dimension values the rate depends on, such as region, instance type or token kind: those of the usage for a metered estimate, and those of what is bought for a licensed price on a rate card. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero. */
   dimensions?: QuoteItemInputDimensions;
-  /**
-   * For metered items, how long to price for. This allows an estimate such as "about
-   * this much per month" to be shown before anything exists. The priced quantity is
-   * `quantity` multiplied by this duration.
-   */
+  /** For a metered estimate, how long to price for, in seconds; the priced quantity is `quantity` times this duration. */
   duration_seconds?: number;
 }
+
+/**
+ * The values of the meter's presentation dimensions, present only when grouped by meter.
+ */
+export type SpendRowDimensions = { [key: string]: string };
 
 export interface SpendRow {
   product?: Product;
@@ -2959,13 +2533,21 @@ export interface SpendRow {
   plan_name?: string;
   /** Present only when grouped by resource. */
   resource_id?: string;
+  /** Present only when grouped by meter. */
+  meter?: ObjectIdentity;
+  /** Present only when grouped by meter. */
+  unit?: string;
+  /** Net usage quantity, present only when grouped by meter. */
+  quantity?: string;
+  /** The values of the meter's presentation dimensions, present only when grouped by meter. */
+  dimensions?: SpendRowDimensions;
   amount: Money;
   currency: string;
 }
 
 export interface SpendRowList {
   items: SpendRow[];
-  /** The sum over the whole period, not only the page returned. */
+  /** The total over all matching groups, not only the page returned. */
   total: Money;
   currency: string;
   pagination: OffsetPagination;
@@ -2983,28 +2565,28 @@ export const ActiveResourceStatus = {
 } as const;
 
 /**
- * A resource currently accruing charges by the second.
+ * A resource charged continuously by the second.
  */
 export interface ActiveResource {
   id: string;
   ended_at?: string;
   suspended_at?: string;
   state_changed_at?: string;
-  /** The postpaid subscription charged for this metering record, including shared services. */
+  /** The metered subscription charged for this metering record. */
   subscription_id: string;
   resource_id: string;
   product: Product;
-  /** What it is, as its own service names it. */
+  /** The resource type, as the owning service names it. */
   resource_type?: string;
   meter: ObjectIdentity;
   unit?: string;
-  /** How much is held — cores, MiB, cards. Not how much has been used. */
+  /** How much is held, such as cores, MiB or cards; not how much was used. */
   quantity: string;
   dimensions?: ActiveResourceDimensions;
   status: ActiveResourceStatus;
   started_at: string;
   project_id?: string;
-  /** Usage has been generated up to this boundary; it does not imply invoicing or payment. */
+  /** Usage has been generated up to this boundary; it says nothing about invoicing or payment. */
   usage_generated_until: string;
 }
 
@@ -3014,7 +2596,7 @@ export interface ActiveResourceList {
 }
 
 /**
- * An estimate of the refundable value of one order or selected items. This does not cancel the order, stop service or create a refund.
+ * An estimate of the refundable value of an order or selected items; nothing is canceled or refunded.
  */
 export interface OrderRefundQuoteInput {
   order_id: string;
@@ -3027,33 +2609,24 @@ export interface OrderRefundQuoteInput {
 }
 
 /**
- * "Quote exactly one target: proposed items, an existing order, renewals, a cancellation or an order
- * refund. All targets use the specified billing account. Nothing is saved, charged, reserved or
- * canceled. Promotion codes apply only to a purchase basket or an existing order. An invalid
- * combination returns BILLING_PURCHASE_INVALID with the offending field."
+ * Quote exactly one target for the billing account: proposed items, an existing order, renewals, a cancellation or an order refund. Promotion codes apply only to proposed items or an existing order. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.
  */
 export interface QuoteRequest {
   /**
-   * The billing account to price for. It must belong to you. Existing orders must have been purchased
-   * with this account; renewals and cancellations must currently be paid for by it.
+   * The billing account to price for; it must be yours. Existing orders must have been placed with it, and renewals and cancellations must currently be paid by it.
    * @minimum 1
    */
   billing_account_id: number;
   /**
-   * A proposed purchase priced in the account currency. Metered items may estimate specified usage
-   * quantities; those estimates are not amounts collectible at checkout.
+   * A proposed purchase priced in the account's currency. Metered items may include usage estimates, which are not checkout amounts.
    * @minItems 1
    * @maxItems 100
    */
   items?: QuoteItemInput[];
-  /**
-   * Preview paying this existing order. Its recorded purchase terms supply every line, and an order
-   * whose terms are fixed returns its recorded amounts. A preview does not change the order.
-   */
+  /** Preview paying this order. Its recorded terms supply every line, and an order whose terms are fixed returns its recorded amounts. The order does not change. */
   order_id?: string;
   /**
-   * Preview renewing these subscriptions, each at most once. Each entry represents a separate
-   * renewal order. To preview a new promotion code, create a renewal order and quote it by order_id.
+   * Preview renewing these subscriptions, each at most once; each entry is a separate renewal order. To preview a promotion code, create a renewal order and quote it by order_id.
    * @minItems 1
    * @maxItems 100
    */
@@ -3097,7 +2670,7 @@ export const WithdrawalItemStatus = {
 } as const;
 
 /**
- * The original top-up and its refund destination. Card details are included when the original payment method was saved; missing card details do not change the original refund route.
+ * The original top-up and where its refund goes. Card details are included when the original payment method was saved.
  */
 export interface WithdrawalSource {
   /** @pattern ^[0-9]{1,15}([.][0-9]{1,10})?$ */
@@ -3116,7 +2689,7 @@ export interface WithdrawalSource {
 }
 
 /**
- * The fixed principal deduction, withdrawal fee and exact refund obligation for one original top-up. Each item has its own refund; payment_gateway and method_type identify the original route.
+ * For one original top-up: the principal deducted, the withdrawal fee and the amount refunded, through its own refund. payment_gateway and method_type identify the original route.
  */
 export interface WithdrawalItem {
   source_transaction_id: string;
@@ -3141,7 +2714,7 @@ export interface WithdrawalItem {
   payment_gateway: string;
   method_type: string;
   source: WithdrawalSource;
-  /** The original gateway failure code when a refund failed, or refund_reversed when a completed refund was reversed. Absent while pending or successful. */
+  /** The gateway's failure code when a refund failed, or `refund_reversed` when a completed refund was reversed. Absent while pending or successful. */
   failure_code?: string;
 }
 
@@ -3157,7 +2730,7 @@ export const WithdrawalStatus = {
 } as const;
 
 /**
- * An account withdrawal to the original payment methods of its unused top-ups. Accepted amounts are fixed. deducted_amount, settled_amount and charged_fee_amount report completed source items. Failed items release their principal and fee reservations; successful items are retained when another source fails.
+ * A withdrawal of account balance to the original payment methods of its unused top-ups. Accepted amounts are fixed. deducted_amount, settled_amount and charged_fee_amount cover completed items. A failed item releases its principal and fee; successful items stand when another item fails.
  */
 export interface Withdrawal {
   id: string;
@@ -3182,7 +2755,7 @@ export interface Withdrawal {
   status: WithdrawalStatus;
   created_at: string;
   completed_at?: string;
-  /** Identity that submitted this withdrawal. It can differ from the billing account owner. */
+  /** Who submitted the withdrawal; may differ from the account owner. */
   created_by?: string;
 }
 
@@ -3247,9 +2820,7 @@ export interface WithdrawalItemList {
 }
 
 /**
- * How tax applies to the customer, as in Stripe. `none` taxes normally. `exempt` charges no tax.
- * `reverse` charges no tax and leaves it to the customer under the reverse-charge mechanism;
- * invoices state this. Only operators change it.
+ * How tax applies to the customer, as in Stripe: `none` taxes normally, `exempt` charges no tax, `reverse` charges no tax under the reverse-charge mechanism, stated on invoices. Only operators change it.
  */
 export type ContactTaxExempt = (typeof ContactTaxExempt)[keyof typeof ContactTaxExempt];
 
@@ -3260,7 +2831,7 @@ export const ContactTaxExempt = {
 } as const;
 
 /**
- * A billing-account contact profile with one address. An account can hold multiple contacts; this is not a login identity.
+ * A contact of a billing account with one address. An account can hold several; a contact is not a login.
  */
 export interface Contact {
   id: string;
@@ -3288,11 +2859,7 @@ export interface Contact {
   address_postal_code?: string;
   /** @pattern ^([A-Z]{2})?$ */
   address_country?: string;
-  /**
-   * How tax applies to the customer, as in Stripe. `none` taxes normally. `exempt` charges no tax.
-   * `reverse` charges no tax and leaves it to the customer under the reverse-charge mechanism;
-   * invoices state this. Only operators change it.
-   */
+  /** How tax applies to the customer, as in Stripe: `none` taxes normally, `exempt` charges no tax, `reverse` charges no tax under the reverse-charge mechanism, stated on invoices. Only operators change it. */
   tax_exempt: ContactTaxExempt;
   active: boolean;
   created_at: string;
@@ -3374,14 +2941,14 @@ export interface StatementAmounts {
 }
 
 /**
- * One billing account's usage billing for one UTC calendar month, summed over the month's statements. It is a summary, not something to pay; each closing's invoice is collected on its own.
+ * One billing account's usage billing for one UTC calendar month, summed over its statements. Not payable itself; each statement's invoice is collected on its own.
  */
 export interface MonthlyStatement {
   billing_account_id: number;
   currency: string;
   period_start: string;
   period_end: string;
-  /** True after the period's final closing, which applies minimum charges for the whole month. Usage priced later is still billed in supplement statements and added here. */
+  /** True after the period's final closing, which applies the month's minimum charges. Usage priced later is billed in supplement statements and added here. */
   finalized: boolean;
   finalized_at?: string;
   /** Statements of the period, including the open one. */
@@ -3408,7 +2975,7 @@ export const StatementStatus = {
 } as const;
 
 /**
- * interim: a closing before the period's usage is final; minimum charges are not applied. final: the first closing after the period ended and its late usage was settled; minimum charges for the whole period are applied. supplement: a closing after the final one, for usage priced late. An open statement is interim.
+ * `interim`: a closing before the period's usage is final, without minimum charges. `final`: the first closing after the period ended and its late usage was settled, applying the period's minimum charges. `supplement`: a closing after the final one, for usage priced late. An open statement is interim.
  */
 export type StatementType = (typeof StatementType)[keyof typeof StatementType];
 
@@ -3419,7 +2986,7 @@ export const StatementType = {
 } as const;
 
 /**
- * An account's consumption for one billing period, collected at one closing. Usage is billed after every settlement run, about hourly; each closing issues an invoice for the usage priced since the previous closing and collects it from credits and balance at once, and later usage is collected in the next statement of the same period. A closed statement is never rewritten. The period's consumption is the sum of its statements.
+ * An account's consumption for one billing period up to one closing. Usage is invoiced after every settlement run, about hourly: each closing issues an invoice for the usage priced since the previous one and collects it from credits and balance, and later usage goes into the next statement of the same period. A closed statement does not change. The period's consumption is the sum of its statements.
  */
 export interface Statement {
   id: string;
@@ -3431,7 +2998,7 @@ export interface Statement {
   sequence: number;
   status: StatementStatus;
   type: StatementType;
-  /** True while the statement is open. The estimate applies tier pricing to the period's usage so far and adds tax for the current invoice contact. Minimum charges are added at the period's final closing, and a tier reduction larger than this statement's own charges is credited to earlier invoices of the period at closing. */
+  /** True while the statement is open. The estimate prices the period's usage so far at tier prices and adds tax for the current invoice contact. Minimum charges are added at the period's final closing, and a tier reduction larger than this statement's charges is credited to the period's earlier invoices at closing. */
   estimated: boolean;
   amounts: StatementAmounts;
   closed_at?: string;
@@ -3447,11 +3014,18 @@ export interface StatementList {
   pagination: OffsetPagination;
 }
 
+/**
+ * The values of the meter's presentation dimensions, such as the model and token kind. Included only when grouping by meter, which splits each meter by these values.
+ */
+export type StatementItemDimensions = { [key: string]: string };
+
 export interface StatementItem {
   project_id?: string;
   product_id?: string;
   meter_id?: string;
   unit?: string;
+  /** The values of the meter's presentation dimensions, such as the model and token kind. Included only when grouping by meter, which splits each meter by these values. */
+  dimensions?: StatementItemDimensions;
   /** Net usage quantity. Included only when grouping by meter. */
   quantity?: string;
   deducted_quantity?: string;
@@ -3483,7 +3057,7 @@ export interface StatementSummary {
 export type ErrorResponse = Error;
 
 /**
- * Unchanged since the `ETag` that was sent. No body.
+ * Unchanged since the given `ETag`; no body.
  */
 export type NotModifiedResponse = void;
 
@@ -3495,15 +3069,12 @@ export type FromParameter = string;
 export type ToParameter = string;
 
 /**
- * Restrict to one of your accounts. All of them when omitted.
+ * Only this account of yours; all when omitted.
  */
 export type AccountIdQueryParameter = number;
 
 /**
- * The `ETag` from an earlier reply. When the catalogue has not changed since, the
- * answer is `304` with no body.
- *
- * Send it on every catalogue read. An unchanged catalogue is answered without a body.
+ * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
  */
 export type IfNoneMatchParameter = string;
 
@@ -3515,7 +3086,7 @@ export type FromRequiredParameter = string;
 export type ToRequiredParameter = string;
 
 /**
- * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+ * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
  */
 export type ProjectIdsQueryParameter = string[];
 
@@ -3625,7 +3196,7 @@ export type ListProjectAssignmentsParams = {
   page_size?: number;
   billing_account_id?: number;
   /**
-   * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
    * @minItems 1
    * @maxItems 100
    */
@@ -3646,7 +3217,7 @@ export type ListTopUpsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
 };
@@ -3665,14 +3236,14 @@ export type ListPaymentMethodsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
 };
 
 export type PreviewInvoicePaymentParams = {
   /**
-   * As in paying. Considered only while the order's terms are not yet fixed.
+   * As in paying; used only while the order's terms are not fixed.
    * @minLength 1
    * @maxLength 64
    */
@@ -3701,12 +3272,12 @@ export type ListInvoicesParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   status?: InvoiceStatus;
   /**
-   * Only invoices containing a charge from this subscription. The returned invoice amount is the total for the whole invoice.
+   * Only invoices with a charge from this subscription; amounts are for the whole invoice.
    */
   subscription_id?: string;
   from?: FromParameter;
@@ -3745,7 +3316,7 @@ export type ListTransactionsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   from?: FromParameter;
@@ -3769,7 +3340,7 @@ export type ListAccountDiscountsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
 };
@@ -3788,7 +3359,7 @@ export type ListCreditGrantsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   status?: ListCreditGrantsStatus;
@@ -3818,7 +3389,7 @@ export type ListCreditNotesParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   /**
@@ -3856,7 +3427,7 @@ export type ListRefundsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   /**
@@ -3864,9 +3435,7 @@ export type ListRefundsParams = {
    */
   invoice_id?: string;
   /**
-   * Only the refunds that belong to this order: those of its invoice, such as the refund of a
-   * purchase that could not be delivered, and those it caused on an earlier invoice, such as
-   * the difference returned after a downgrade.
+   * Refunds of this order: those of its invoice, such as for an undeliverable purchase, and those it caused on an earlier invoice, such as a downgrade difference.
    */
   order_id?: string;
 };
@@ -3885,7 +3454,7 @@ export type ListUsageChargesParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   product_id?: ProductID;
@@ -3900,7 +3469,7 @@ export type ListUsageChargesParams = {
    */
   to?: ToParameter;
   /**
-   * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
    * @minItems 1
    * @maxItems 100
    */
@@ -3924,11 +3493,11 @@ export type ListSubscriptionsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   /**
-   * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
    * @minItems 1
    * @maxItems 100
    */
@@ -3949,7 +3518,7 @@ export type ListCancellationsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   /**
@@ -3961,7 +3530,7 @@ export type ListCancellationsParams = {
    */
   status?: ListCancellationsStatus;
   /**
-   * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
    * @minItems 1
    * @maxItems 100
    */
@@ -4010,7 +3579,7 @@ export type ListAllowancesParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   /**
@@ -4020,7 +3589,7 @@ export type ListAllowancesParams = {
   status?: ListAllowancesStatus;
   product_id?: ProductID;
   /**
-   * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
    * @minItems 1
    * @maxItems 100
    */
@@ -4050,7 +3619,7 @@ export type ListOrdersParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   status?: OrderStatus;
@@ -4060,7 +3629,7 @@ export type ListOrdersParams = {
    */
   to?: ToParameter;
   /**
-   * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
    * @minItems 1
    * @maxItems 100
    */
@@ -4096,11 +3665,11 @@ export type ListEntitlementsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   /**
-   * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
    * @minItems 1
    * @maxItems 100
    */
@@ -4122,7 +3691,7 @@ export type ListFeatureGrantsParams = {
    */
   page_size?: number;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   product_id?: ProductID;
@@ -4150,25 +3719,18 @@ export type ListPricesParams = {
   currency: string;
   product_id?: ProductID;
   /**
-   * Narrows to one payment timing.
+   * Narrows to one price type.
    */
-  type?: ListPricesType;
+  type?: PriceType;
+  /**
+   * Narrows to one usage type.
+   */
+  usage_type?: UsageType;
 };
-
-export type ListPricesType = (typeof ListPricesType)[keyof typeof ListPricesType];
-
-export const ListPricesType = {
-  postpaid: "postpaid",
-  prepaid: "prepaid",
-  one_time: "one_time",
-} as const;
 
 export type ListPricesHeaders = {
   /**
-   * The `ETag` from an earlier reply. When the catalogue has not changed since, the
-   * answer is `304` with no body.
-   *
-   * Send it on every catalogue read. An unchanged catalogue is answered without a body.
+   * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
   "If-None-Match"?: IfNoneMatchParameter;
 };
@@ -4190,40 +3752,28 @@ export type ListProductsParams = {
 
 export type ListProductsHeaders = {
   /**
-   * The `ETag` from an earlier reply. When the catalogue has not changed since, the
-   * answer is `304` with no body.
-   *
-   * Send it on every catalogue read. An unchanged catalogue is answered without a body.
+   * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
   "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type GetProductHeaders = {
   /**
-   * The `ETag` from an earlier reply. When the catalogue has not changed since, the
-   * answer is `304` with no body.
-   *
-   * Send it on every catalogue read. An unchanged catalogue is answered without a body.
+   * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
   "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type GetPlanHeaders = {
   /**
-   * The `ETag` from an earlier reply. When the catalogue has not changed since, the
-   * answer is `304` with no body.
-   *
-   * Send it on every catalogue read. An unchanged catalogue is answered without a body.
+   * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
   "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type GetPriceHeaders = {
   /**
-   * The `ETag` from an earlier reply. When the catalogue has not changed since, the
-   * answer is `304` with no body.
-   *
-   * Send it on every catalogue read. An unchanged catalogue is answered without a body.
+   * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
   "If-None-Match"?: IfNoneMatchParameter;
 };
@@ -4246,10 +3796,7 @@ export type ListPlansParams = {
 
 export type ListPlansHeaders = {
   /**
-   * The `ETag` from an earlier reply. When the catalogue has not changed since, the
-   * answer is `304` with no body.
-   *
-   * Send it on every catalogue read. An unchanged catalogue is answered without a body.
+   * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
   "If-None-Match"?: IfNoneMatchParameter;
 };
@@ -4272,10 +3819,7 @@ export type ListPricesByPlanParams = {
 
 export type ListPricesByPlanHeaders = {
   /**
-   * The `ETag` from an earlier reply. When the catalogue has not changed since, the
-   * answer is `304` with no body.
-   *
-   * Send it on every catalogue read. An unchanged catalogue is answered without a body.
+   * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
   "If-None-Match"?: IfNoneMatchParameter;
 };
@@ -4298,17 +3842,14 @@ export type ListRatesParams = {
    */
   meter_id?: string;
   /**
-   * Return the rates in effect at this moment. Defaults to now.
+   * Rates in effect at this moment; defaults to now.
    */
   at?: string;
 };
 
 export type ListRatesHeaders = {
   /**
-   * The `ETag` from an earlier reply. When the catalogue has not changed since, the
-   * answer is `304` with no body.
-   *
-   * Send it on every catalogue read. An unchanged catalogue is answered without a body.
+   * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
   "If-None-Match"?: IfNoneMatchParameter;
 };
@@ -4328,11 +3869,11 @@ export type ListActiveResourcesParams = {
   page_size?: number;
   resource_id?: string;
   /**
-   * Restrict to one of your accounts. All of them when omitted.
+   * Only this account of yours; all when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
   /**
-   * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
    * @minItems 1
    * @maxItems 100
    */
@@ -4359,11 +3900,7 @@ export type ListSpendParams = {
    */
   to: ToRequiredParameter;
   /**
-   * `plan` groups by the plan of the price each charge was priced with, which stays the same after the
-   * subscription changes plan. `resource` groups by the resource each charge names. Items billed under their own
-   * identifier — a disk, a public address — appear as their own rows rather than under
-   * the machine they are attached to, since the relationship between them is known to
-   * the owning service and not here.
+   * `plan` groups by the plan of the price each charge was priced with, unchanged after the subscription changes plan. `resource` groups by the resource each charge names; a disk or an address billed under its own identifier is its own row. `meter` groups by meter and the values of its presentation dimensions, such as the model and token kind, and includes the quantity used.
    */
   group_by?: ListSpendGroupBy;
   /**
@@ -4383,11 +3920,11 @@ export type ListSpendParams = {
    */
   page_size?: number;
   /**
-   * The authorized billing account whose currency and charges are used for this report.
+   * The billing account whose currency and charges the report uses; it must be authorized.
    */
   billing_account_id: number;
   /**
-   * Restrict the account-authorized results to these projects. Omit for all projects and account-level records. This filter does not grant access to another billing account.
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
    * @minItems 1
    * @maxItems 100
    */
@@ -4400,6 +3937,7 @@ export const ListSpendGroupBy = {
   product: "product",
   plan: "plan",
   resource: "resource",
+  meter: "meter",
 } as const;
 
 export type ListMonthlyStatementsParams = {

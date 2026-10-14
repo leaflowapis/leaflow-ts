@@ -6,19 +6,25 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { BillingScheme } from "./billingScheme.zod.js";
 import { Money } from "./money.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
+import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const PriceOption = zod
   .strictObject({
     product: Product,
     plan: ObjectIdentity,
-    billing_scheme: zod.enum(["per_unit", "tiered", "rated"]),
+    billing_scheme: BillingScheme.optional().describe(
+      "Absent when the price delegates to a rate card.",
+    ),
     unit_quantity: zod.string(),
     id: zod.uuid(),
     currency: zod.string(),
-    type: zod.enum(["postpaid", "prepaid", "one_time"]),
+    type: PriceType,
+    usage_type: UsageType,
     interval: zod.enum(["none", "day", "month", "year"]),
     interval_count: zod.int().optional().describe("How many periods one purchase covers."),
     unit_amount: Money.optional(),
@@ -28,9 +34,7 @@ export const PriceOption = zod
         "False once the price is archived. It still applies to purchases already made at this price.",
       ),
   })
-  .describe(
-    "A price's display terms, including archived prices referenced by an applicability list.",
-  );
+  .describe("A price's display terms, including archived prices referenced by an applicability.");
 
 export type PriceOption = zod.input<typeof PriceOption>;
 export type PriceOptionOutput = zod.output<typeof PriceOption>;

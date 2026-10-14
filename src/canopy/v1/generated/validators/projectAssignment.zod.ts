@@ -40,7 +40,7 @@ export const ProjectAssignment = zod
       .union([NamedIdentity, zod.null()])
       .optional()
       .describe(
-        "The project and its current name, for display. Absent when the project no longer exists or its\ndetails cannot be read at the moment; `project_id` still identifies it.",
+        "The project and its current name. Absent when the project cannot be read; `project_id` still identifies it.",
       ),
     billing_account_id: zod.int(),
     account_name: zod.string().optional(),
@@ -49,7 +49,7 @@ export const ProjectAssignment = zod
     effective_to: zod.iso.datetime({ offset: true }).nullish(),
   })
   .describe(
-    "A project's assignment to a billing account for the interval from effective_from to effective_to. An open-ended assignment has no end time.",
+    "A project's assignment to a billing account from effective_from until effective_to; an open assignment has no end.",
   );
 
 export type ProjectAssignment = zod.input<typeof ProjectAssignment>;

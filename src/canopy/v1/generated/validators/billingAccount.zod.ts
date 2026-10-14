@@ -36,31 +36,27 @@ export const BillingAccount = zod.strictObject({
   invoice_contact_id: zod
     .uuid()
     .nullish()
-    .describe(
-      "The active contact used for invoicing. Must belong to this account; null clears the selection.",
-    ),
+    .describe("The active contact used for invoices, of this account; null clears it."),
   id: zod.int(),
-  name: zod.string().optional().describe("What you call this account."),
+  name: zod.string().optional().describe("Your name for the account."),
   currency: zod.string().describe("Fixed when the account was opened."),
   status: zod.enum(["active", "suspended", "closed"]),
   grace_amount: zod
     .string()
     .optional()
     .describe(
-      'How far past the suspension threshold this account may go before its resources are\nsuspended. "0" means none: the account is suspended as soon as it crosses the threshold.',
+      "How far past the suspension threshold the account may go before its resources are suspended; `0` means none.",
     ),
   grace_period_seconds: zod
     .int()
     .optional()
     .describe(
-      "How long this account has to top up after crossing the suspension threshold.\n0 means none. Whichever runs out first — this or grace_amount — ends the grace.",
+      "How long the account has to top up after crossing the suspension threshold, in seconds; `0` means none. Grace ends when this or grace_amount runs out.",
     ),
   closed_at: zod.iso
     .datetime({ offset: true })
     .nullish()
-    .describe(
-      "The actual time this account was closed, in UTC (RFC 3339).\nNull or absent if the account is not closed or its historical close time is unknown.",
-    ),
+    .describe("When the account was closed. Null if it is not closed or the time is unknown."),
   created_at: zod.iso.datetime({ offset: true }),
 });
 

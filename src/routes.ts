@@ -579,7 +579,7 @@ export const routes = [
   {
     service: "billing",
     contract: "billing",
-    method: "POST",
+    method: "QUERY",
     path: "/api/v1/withdrawals/preview",
     operationId: "preview-withdrawal",
     securityScheme: "AccessToken",
@@ -840,7 +840,7 @@ export const routes = [
   {
     service: "billing",
     contract: "billing",
-    method: "POST",
+    method: "QUERY",
     path: "/api/v1/payments/preview",
     operationId: "preview-pay-together",
     securityScheme: "AccessToken",
@@ -984,9 +984,9 @@ export const routes = [
   {
     service: "billing",
     contract: "billing",
-    method: "POST",
+    method: "QUERY",
     path: "/api/v1/quotes",
-    operationId: "create-quote",
+    operationId: "get-quote",
     securityScheme: "AccessToken",
     upstreamUrl: "https://billing.leaflow.cloud",
   },

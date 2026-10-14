@@ -51,7 +51,7 @@ export const PaidWith = zod
     last4: zod.string().optional(),
   })
   .describe(
-    "How it was paid. Removing the payment method afterwards does not change it; `payment_method_id`\nthen names a removed payment method.",
+    "How it was paid. `payment_method_id` still names the payment method after it is removed.",
   );
 
 export type PaidWith = zod.input<typeof PaidWith>;

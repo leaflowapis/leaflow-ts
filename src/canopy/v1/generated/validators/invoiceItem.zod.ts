@@ -55,14 +55,10 @@ export const InvoiceItem = zod.strictObject({
     .union([NamedIdentity, zod.null()])
     .optional()
     .describe(
-      "The project the charge was for and its current name, for display. Absent when the line is\nnot for a project, and when the project no longer exists or its details cannot be read at\nthe moment; `project_id` still identifies it then.",
+      "The project the charge was for and its current name. Absent when the line has no project or the project cannot be read; `project_id` still identifies it.",
     ),
   resource_id: zod.string().optional(),
-  description: zod
-    .string()
-    .describe(
-      "The wording as recorded when the invoice was issued. It is not re-translated\nafterwards, so that an invoice continues to read as it did when it was sent.",
-    ),
+  description: zod.string().describe("The line's wording as recorded when the invoice was issued."),
   unit: zod.string().optional(),
   quantity: zod.string().optional(),
   deducted_quantity: zod
@@ -74,6 +70,12 @@ export const InvoiceItem = zod.strictObject({
   currency: zod.string(),
   period_start: zod.iso.datetime({ offset: true }).nullish(),
   period_end: zod.iso.datetime({ offset: true }).nullish(),
+  dimensions: zod
+    .record(zod.string(), zod.string())
+    .optional()
+    .describe(
+      "For a usage line, the values of its meter's presentation dimensions, such as the model and token kind. Empty for other lines.",
+    ),
   prorations: zod
     .array(InvoiceItemProration)
     .optional()

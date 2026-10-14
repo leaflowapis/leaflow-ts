@@ -46,20 +46,18 @@ export const PaymentPreview = zod
     ),
     credit_grants: zod
       .array(AppliedCredit)
-      .describe("The credit grants that would pay, in the order they would be used."),
+      .describe("The credit grants that would pay, in the order used."),
     balance_applied: Money.describe("What the balance would pay."),
     gateway_amount: Money.describe(
-      "What would remain to be paid online. Paying without a gateway is refused with `BILLING_INSUFFICIENT_FUNDS` while this is above zero.",
+      "What would remain to pay online. Paying without a gateway is refused with `BILLING_INSUFFICIENT_FUNDS` while this is above zero.",
     ),
     balance_after: Money.describe("The available balance after paying."),
     invoices: zod
       .array(PaymentPreviewInvoice)
       .optional()
-      .describe("Paying together only. Each invoice, in the order it would be paid."),
+      .describe("Paying together only: each invoice, in payment order."),
   })
-  .describe(
-    "What paying would take, computed as paying computes it. Nothing is charged or reserved.",
-  );
+  .describe("What paying would take, calculated as paying does. Nothing is charged or reserved.");
 
 export type PaymentPreview = zod.input<typeof PaymentPreview>;
 export type PaymentPreviewOutput = zod.output<typeof PaymentPreview>;
