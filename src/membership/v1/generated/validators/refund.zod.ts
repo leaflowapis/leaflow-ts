@@ -16,7 +16,7 @@ export const Refund = zod.strictObject({
   transactions: zod
     .array(Transaction)
     .describe(
-      "Original funds-return split and each result. Unknown gateway results remain pending.",
+      "The refund split by original payment source, with each result. Unknown gateway results stay pending.",
     ),
   id: zod.uuid(),
   billing_account_id: zod.int().optional(),
@@ -25,7 +25,7 @@ export const Refund = zod.strictObject({
     .uuid()
     .nullish()
     .describe(
-      "The order the refund belongs to: the order that caused it, such as a downgrade, otherwise\nthe order of the refunded invoice. Null for refunds of top-ups and of usage invoices.",
+      "The order the refund belongs to: the order that caused it, such as a downgrade, otherwise the order of the refunded invoice. Null for refunds of top-ups and usage invoices.",
     ),
   amount: Money.describe(
     "The whole refund. Equals balance_amount plus credit_amount plus gateway_amount.",
@@ -39,7 +39,7 @@ export const Refund = zod.strictObject({
     .enum(["balance", "gateway"])
     .optional()
     .describe(
-      "Use balance_amount, credit_amount and gateway_amount, which also show a refund split between several destinations.",
+      "Use balance_amount, credit_amount and gateway_amount, which also show a refund split between destinations.",
     ),
   status: zod
     .enum(["pending", "processing", "succeeded", "failed"])

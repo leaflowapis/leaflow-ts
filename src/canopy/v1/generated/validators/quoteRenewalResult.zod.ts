@@ -50,7 +50,7 @@ export const QuoteRenewalResult = zod
     interval_count: zod.int(),
     periods: zod.int(),
     amount: Money.describe(
-      "The price of the periods before the discounts the account holds. A discount the\nsubscription already carries is reflected here. Contains tax only where the price\nitself includes it.",
+      "The price of the periods before the account's discounts, with any discount the subscription carries already reflected; includes tax only where the price does.",
     ),
     discount_amount: Money.describe("The reduction from a discount the account holds."),
     tax_amount: Money.describe("Tax on the discounted amount."),
@@ -60,7 +60,7 @@ export const QuoteRenewalResult = zod
     ),
   })
   .describe(
-    "What renewing would charge. Renewing the same subscription for the same term and number\nof periods charges exactly `total`, unless prices or the discounts the account holds\nchange in between.",
+    "What renewing would charge. Renewing the same subscription for the same term and periods charges exactly `total` unless prices or the account's discounts change first.",
   );
 
 export type QuoteRenewalResult = zod.input<typeof QuoteRenewalResult>;

@@ -12,7 +12,7 @@ import { SpendRow } from "./spendRow.zod.js";
 
 export const SpendRowList = zod.strictObject({
   items: zod.array(SpendRow),
-  total: Money.describe("The sum over the whole period, not only the page returned."),
+  total: Money.describe("The total over all matching groups, not only the page returned."),
   currency: zod.string(),
   pagination: OffsetPagination,
 });

@@ -55,9 +55,7 @@ export const Allowance = zod.strictObject({
   unit: zod.string().optional().describe("The unit it is counted in, such as `MiB`."),
   category: zod
     .enum(["paid", "promotional"])
-    .describe(
-      "Whether the quantity was paid for or granted free of charge. Both are consumed the same way.",
-    ),
+    .describe("Whether the quantity was paid for or granted free; both are consumed the same way."),
   dimensions: zod
     .record(zod.string(), zod.string())
     .describe(
@@ -70,7 +68,7 @@ export const Allowance = zod.strictObject({
     .int()
     .optional()
     .describe(
-      "Lower values are consumed first. At equal priority, earlier expiry and then earlier issuance take\nprecedence.",
+      "Lower values are consumed first; at equal priority, earlier expiry and then earlier issuance.",
     ),
   status: zod.enum(["active", "depleted", "expired", "voided"]),
   valid_from: zod.iso.datetime({ offset: true }),
@@ -78,7 +76,7 @@ export const Allowance = zod.strictObject({
     .datetime({ offset: true })
     .nullish()
     .describe(
-      "When it lapses. Anything unused at that point is lost; it is not refunded and does\nnot carry over. Absent when it does not expire on its own.",
+      "When the allowance lapses; unused quantity is lost. Absent when it does not expire.",
     ),
 });
 

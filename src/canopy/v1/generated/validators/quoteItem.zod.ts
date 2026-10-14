@@ -51,7 +51,7 @@ export const QuoteItem = zod
       .int()
       .min(quoteItemIndexMin)
       .describe(
-        "Zero-based request line index, or the recorded order item's position for an order quote.",
+        "The zero-based request line index, or the recorded order item's position for an order quote.",
       ),
     order_item_id: zod
       .uuid()
@@ -59,7 +59,7 @@ export const QuoteItem = zod
       .describe("Present for an existing order quote; identifies the recorded item being priced."),
     price_id: zod
       .uuid()
-      .describe("The selected price, including when the request identified it indirectly."),
+      .describe("The selected price, also when the request identified it indirectly."),
     plan_name: zod.string(),
     unit_amount: zod
       .union([Money, zod.null()])
@@ -68,9 +68,7 @@ export const QuoteItem = zod
       ),
     quantity: zod
       .string()
-      .describe(
-        "The quantity priced. When duration_seconds is supplied for metered usage, this is quantity multiplied by that duration.",
-      ),
+      .describe("The quantity priced; with duration_seconds, quantity times the duration."),
     amount: Money.describe(
       "Amount before discounts and including any setup charge. For requested future usage this is an estimate, not a collectible checkout amount.",
     ),
@@ -79,7 +77,7 @@ export const QuoteItem = zod
     currency: zod.string(),
   })
   .describe(
-    "One fully calculated purchase, estimated postpaid usage or recorded order item. Amounts use the\nbilling-account currency. An item with no immediate charge has zero checkout amounts.",
+    "One fully calculated purchase, estimated metered usage or recorded order item. Amounts use the\nbilling-account currency. An item with no immediate charge has zero checkout amounts.",
   );
 
 export type QuoteItem = zod.input<typeof QuoteItem>;

@@ -41,12 +41,10 @@ export const Withdrawal = zod
     created_by: zod
       .string()
       .optional()
-      .describe(
-        "Identity that submitted this withdrawal. It can differ from the billing account owner.",
-      ),
+      .describe("Who submitted the withdrawal; may differ from the account owner."),
   })
   .describe(
-    "An account withdrawal to the original payment methods of its unused top-ups. Accepted amounts are fixed. deducted_amount, settled_amount and charged_fee_amount report completed source items. Failed items release their principal and fee reservations; successful items are retained when another source fails.",
+    "A withdrawal of account balance to the original payment methods of its unused top-ups. Accepted amounts are fixed. deducted_amount, settled_amount and charged_fee_amount cover completed items. A failed item releases its principal and fee; successful items stand when another item fails.",
   );
 
 export type Withdrawal = zod.input<typeof Withdrawal>;

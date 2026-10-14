@@ -13,9 +13,7 @@ export const PaymentOption = zod
     payment_gateway: zod.string().describe("The value to send as `payment_gateway`."),
     methods: zod.array(PaymentOptionMethod),
   })
-  .describe(
-    "A payment gateway that accepts payment in the account's currency, with the methods it accepts.",
-  );
+  .describe("A gateway accepting the account's currency, with its payment methods.");
 
 export type PaymentOption = zod.input<typeof PaymentOption>;
 export type PaymentOptionOutput = zod.output<typeof PaymentOption>;

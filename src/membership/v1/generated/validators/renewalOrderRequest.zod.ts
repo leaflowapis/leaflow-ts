@@ -15,7 +15,7 @@ export const RenewalOrderRequest = zod
     order_id: zod
       .uuid()
       .describe(
-        "Purchase ID saved before submitting. Duplicate creation conflicts; query this order after an unknown result.",
+        "The order ID, chosen by the caller. Creating it again conflicts; read the order after an unknown outcome.",
       ),
     periods: zod
       .int()
@@ -26,7 +26,7 @@ export const RenewalOrderRequest = zod
     interval: zod.enum(["day", "month", "year"]).optional().describe("As in renewing."),
     termination_policy: TerminationPolicy.optional().describe("As in renewing."),
   })
-  .describe("The periods and price of the renewal, chosen as in renewing.");
+  .describe("The renewal's periods and price, chosen as in renewing.");
 
 export type RenewalOrderRequest = zod.input<typeof RenewalOrderRequest>;
 export type RenewalOrderRequestOutput = zod.output<typeof RenewalOrderRequest>;

@@ -43,7 +43,7 @@ import * as zod from "zod";
 export const OrderStatus = zod
   .enum(["pending", "accepted", "completed", "partially_completed", "failed", "canceled"])
   .describe(
-    "Follows the items. `pending` is not yet accepted and may be unpaid or paid; its invoice shows\nwhether payment is still needed, and it can expire or be canceled. `accepted` is accepted with items still\nbeing set up. `completed` means every item was set up. `partially_completed` means some items were set up\nand the others failed or were canceled and were refunded to their original payment sources. `failed` means\nno item was delivered and at least one failed; collected amounts for the undelivered items are refunded.\n`canceled` means every item was withdrawn without delivery; collected amounts are returned to their original\npayment sources. No status establishes service delivery by itself.",
+    "Follows the items. `pending`: not yet accepted, paid or unpaid; its invoice shows whether payment is needed, and it can expire or be canceled. `accepted`: items are being set up. `completed`: every item was set up. `partially_completed`: some items were set up and the others failed or were canceled and refunded to their original payment sources. `failed`: no item was delivered and at least one failed; amounts collected for undelivered items are refunded. `canceled`: every item was withdrawn without delivery; collected amounts are returned to their original payment sources. No status by itself means the service was delivered.",
   );
 
 export type OrderStatus = zod.input<typeof OrderStatus>;

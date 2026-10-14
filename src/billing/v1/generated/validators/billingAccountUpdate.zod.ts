@@ -13,9 +13,7 @@ export const BillingAccountUpdate = zod.strictObject({
   invoice_contact_id: zod
     .uuid()
     .nullish()
-    .describe(
-      "The active contact used for invoicing. Must belong to this account; null clears the selection.",
-    ),
+    .describe("The active contact used for invoices, of this account; null clears it."),
   name: zod.string().max(billingAccountUpdateNameMax).optional(),
 });
 

@@ -57,7 +57,7 @@ export const Statement = zod
     estimated: zod
       .boolean()
       .describe(
-        "True while the statement is open. The estimate applies tier pricing to the period's usage so far and adds tax for the current invoice contact. Minimum charges are added at the period's final closing, and a tier reduction larger than this statement's own charges is credited to earlier invoices of the period at closing.",
+        "True while the statement is open. The estimate prices the period's usage so far at tier prices and adds tax for the current invoice contact. Minimum charges are added at the period's final closing, and a tier reduction larger than this statement's charges is credited to the period's earlier invoices at closing.",
       ),
     amounts: StatementAmounts,
     closed_at: zod.iso.datetime({ offset: true }).optional(),
@@ -70,7 +70,7 @@ export const Statement = zod
     credited_amount: Money,
   })
   .describe(
-    "An account's consumption for one billing period, collected at one closing. Usage is billed after every settlement run, about hourly; each closing issues an invoice for the usage priced since the previous closing and collects it from credits and balance at once, and later usage is collected in the next statement of the same period. A closed statement is never rewritten. The period's consumption is the sum of its statements.",
+    "An account's consumption for one billing period up to one closing. Usage is invoiced after every settlement run, about hourly: each closing issues an invoice for the usage priced since the previous one and collects it from credits and balance, and later usage goes into the next statement of the same period. A closed statement does not change. The period's consumption is the sum of its statements.",
   );
 
 export type Statement = zod.input<typeof Statement>;

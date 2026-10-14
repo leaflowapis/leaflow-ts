@@ -11,8 +11,8 @@
  * ## Conventions
  *
  * - **Purchases.** A purchase that creates resources returns them together with a PlacedOrder. They are readable at once and start as `pending`: the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the order in Billing for checkout and payment progress.
- * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the prepaid and postpaid options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
- * - **Checkout.** Omit `checkout` for automatic checkout, which pays from eligible credit grants and balance when the order is placed; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` and nothing is created until checkout is confirmed and paid through Billing. An order whose total is zero, such as a postpaid purchase with nothing due now, completes checkout at placement in either mode and proceeds to provisioning.
+ * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the licensed and metered options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
+ * - **Checkout.** Omit `checkout` for automatic checkout, which pays from eligible credit grants and balance when the order is placed; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` and nothing is created until checkout is confirmed and paid through Billing. An order whose total is zero, such as a metered purchase with nothing due now, completes checkout at placement in either mode and proceeds to provisioning.
  * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its order is placed until it is applied or its order is canceled, including while it awaits checkout. Renaming and replacing labels or notes are not operations and are accepted at any time.
  * - **Billing relationships.** A purchased resource records its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
  * - **Availability zones.** A disk and an instance must reside in the same availability zone to be attached. Instance types and disk types are each bound to one availability zone, so choosing a type determines the zone.
@@ -195,11 +195,15 @@ export interface RenameBackupRequestBody {
   name: string;
 }
 
-export type BillingChoiceMode = (typeof BillingChoiceMode)[keyof typeof BillingChoiceMode];
+/**
+ * `licensed` pays for a period in advance; `metered` bills usage until canceled.
+ */
+export type BillingChoiceUsageType =
+  (typeof BillingChoiceUsageType)[keyof typeof BillingChoiceUsageType];
 
-export const BillingChoiceMode = {
-  prepaid: "prepaid",
-  postpaid: "postpaid",
+export const BillingChoiceUsageType = {
+  licensed: "licensed",
+  metered: "metered",
 } as const;
 
 export type BillingPeriodUnit = (typeof BillingPeriodUnit)[keyof typeof BillingPeriodUnit];
@@ -229,10 +233,11 @@ export const TerminationPolicy = {
 } as const;
 
 /**
- * The commercial terms for one newly purchased component. Prepaid requires period and termination_policy; postpaid refuses both. Components in one instance order must use the same mode and period, while their termination policies may differ.
+ * The commercial terms for one newly purchased component. Licensed requires period and termination_policy; metered refuses both. Components in one instance order must use the same usage type and period, while their termination policies may differ.
  */
 export interface BillingChoice {
-  mode: BillingChoiceMode;
+  /** `licensed` pays for a period in advance; `metered` bills usage until canceled. */
+  usage_type: BillingChoiceUsageType;
   period?: BillingPeriod;
   termination_policy?: TerminationPolicy;
 }
@@ -514,11 +519,15 @@ export const DiskTypeResourceMedia = {
   nvme: "nvme",
 } as const;
 
-export type PricingOptionMode = (typeof PricingOptionMode)[keyof typeof PricingOptionMode];
+/**
+ * `licensed` pays for a period in advance; `metered` bills usage until canceled.
+ */
+export type PricingOptionUsageType =
+  (typeof PricingOptionUsageType)[keyof typeof PricingOptionUsageType];
 
-export const PricingOptionMode = {
-  prepaid: "prepaid",
-  postpaid: "postpaid",
+export const PricingOptionUsageType = {
+  licensed: "licensed",
+  metered: "metered",
 } as const;
 
 /**
@@ -535,7 +544,7 @@ export const PricingOptionQuantityUnit = {
 } as const;
 
 /**
- * Postpaid only; null for prepaid. The time unit of `unit_amount`.
+ * Metered only; null for licensed. The time unit of `unit_amount`.
  * @nullable
  */
 export type PricingOptionUnit = (typeof PricingOptionUnit)[keyof typeof PricingOptionUnit] | null;
@@ -558,36 +567,37 @@ export const PricingOptionTerminationPolicy = {
 } as const;
 
 /**
- * One way to buy an item. Choose it by giving its mode, period and explicit prepaid termination_policy as billing.
+ * One way to buy an item. Choose it by giving its usage_type, period and termination_policy as billing.
  */
 export interface PricingOption {
-  mode: PricingOptionMode;
-  /** The term of a prepaid option; null for postpaid. */
+  /** `licensed` pays for a period in advance; `metered` bills usage until canceled. */
+  usage_type: PricingOptionUsageType;
+  /** The term of a licensed option; null for metered. */
   period: BillingPeriod | null;
   /** What the amounts are for: one `item`, such as an instance or an address; one `gib` of size or capacity; one `mbps` of bandwidth; or one `snapshot` slot. */
   quantity_unit: PricingOptionQuantityUnit;
   /**
-   * Prepaid only; null for postpaid. The amount for one period, per quantity unit.
+   * Licensed only; null for metered. The amount for one period, per quantity unit.
    * @nullable
    */
   amount: string | null;
   /**
-   * Prepaid only; null for postpaid. `amount` spread over the months of the period.
+   * Licensed only; null for metered. `amount` spread over the months of the period.
    * @nullable
    */
   monthly_amount: string | null;
   /**
-   * Prepaid only. How much lower `monthly_amount` is than that of the shortest prepaid period of the same item, as a decimal percentage. Null for that shortest period and for postpaid.
+   * Licensed only. How much lower `monthly_amount` is than that of the shortest licensed period of the same item, as a decimal percentage. Null for that shortest period and for metered.
    * @nullable
    */
   saving_percent: string | null;
   /**
-   * Postpaid only; null for prepaid. The amount for one `unit` of time, per quantity unit.
+   * Metered only; null for licensed. The amount for one `unit` of time, per quantity unit.
    * @nullable
    */
   unit_amount: string | null;
   /**
-   * Postpaid only; null for prepaid. The time unit of `unit_amount`.
+   * Metered only; null for licensed. The time unit of `unit_amount`.
    * @nullable
    */
   unit: PricingOptionUnit;
@@ -2316,10 +2326,10 @@ export interface BackupService {
    * The total `capacity_gib` of the active capacity packs in this region; this much retained capacity is covered each hour.
    * @minimum 0
    */
-  prepaid_capacity_gib: number;
-  /** The postpaid usage price of backups in this region. Null when the project has no billing account. */
+  pack_capacity_gib: number;
+  /** The metered usage price of backups in this region. Null when the project has no billing account. */
   readonly pricing: Pricing | null;
-  /** The prepaid options of capacity packs in this region, per GiB. Null when the project has no billing account. */
+  /** The licensed options of capacity packs in this region, per GiB. Null when the project has no billing account. */
   readonly capacity_pack_pricing: Pricing | null;
 }
 
@@ -2362,7 +2372,7 @@ export const BackupCapacityPackFailureReason = {
 } as const;
 
 /**
- * Prepaid backup capacity for one region, sold by Compute and bought for a term through its own Billing subscription. Compute applies its coverage to backup usage; it is not a Billing allowance or credit.
+ * Backup capacity for one region, sold by Compute and bought for a term through its own Billing subscription. Compute applies its coverage to backup usage; it is not a Billing allowance or credit.
  */
 export interface BackupCapacityPack {
   id: string;
@@ -2583,16 +2593,16 @@ export interface SetFloatingIPBandwidthQuoteRequestBody {
 /**
  * Account funding for this purchase, calculated by Billing. Amounts use the enclosing response currency.
  * Credit eligibility and all purchase requirements are already evaluated. Nothing is charged or reserved.
- * A prepaid purchase may instead use an online payment method.
+ * A licensed purchase may instead be paid with an online payment method.
  */
 export interface Funds {
   /** Spendable balance after pending returns. */
   available_balance_amount: Money;
-  /** Currently effective credits eligible for the quoted purchases or postpaid usage. Each grant is counted once. */
+  /** Currently effective credits eligible for the quoted purchases or metered usage. Each grant is counted once. */
   usable_credit_amount: Money;
-  /** Currently effective credits that cannot fund any quoted purchase or postpaid target. Unused eligible credits are not restricted. */
+  /** Currently effective credits that cannot fund any quoted purchase or metered target. Unused eligible credits are not restricted. */
   restricted_credit_amount: Money;
-  /** Minimum spendable balance needed after eligible credits, covering immediate charges and every new postpaid admission requirement. */
+  /** Minimum spendable balance needed after eligible credits, covering immediate charges and every new metered purchase's admission requirement. */
   required_balance_amount: Money;
   /** Additional balance needed now. Zero means account funds satisfy this quote. No funds are reserved. */
   balance_shortfall_amount: Money;

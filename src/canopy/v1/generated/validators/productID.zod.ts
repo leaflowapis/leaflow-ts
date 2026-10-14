@@ -49,7 +49,7 @@ export const ProductID = zod
   .min(1)
   .max(ProductIDMax)
   .regex(ProductIDRegExp)
-  .describe("Immutable platform service identifier, such as compute, canopy or assistant.");
+  .describe("The platform service's fixed identifier, such as compute, canopy or assistant.");
 
 export type ProductID = zod.input<typeof ProductID>;
 export type ProductIDOutput = zod.output<typeof ProductID>;

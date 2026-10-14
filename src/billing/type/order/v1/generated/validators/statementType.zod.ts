@@ -10,7 +10,7 @@ import * as zod from "zod";
 export const StatementType = zod
   .enum(["interim", "final", "supplement"])
   .describe(
-    "interim: a closing before the period's usage is final; minimum charges are not applied. final: the first closing after the period ended and its late usage was settled; minimum charges for the whole period are applied. supplement: a closing after the final one, for usage priced late. An open statement is interim.",
+    "`interim`: a closing before the period's usage is final, without minimum charges. `final`: the first closing after the period ended and its late usage was settled, applying the period's minimum charges. `supplement`: a closing after the final one, for usage priced late. An open statement is interim.",
   );
 
 export type StatementType = zod.input<typeof StatementType>;

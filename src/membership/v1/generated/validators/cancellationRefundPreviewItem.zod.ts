@@ -8,6 +8,8 @@
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
+import { PriceType } from "./priceType.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const CancellationRefundPreviewItem = zod
   .strictObject({
@@ -18,13 +20,14 @@ export const CancellationRefundPreviewItem = zod
       .union([NamedIdentity, zod.null()])
       .optional()
       .describe(
-        "The project and its current name, for display. Absent for a purchase at account level, and when the\nproject details cannot be read at the moment.",
+        "The project and its current name. Absent for an account-level purchase or when the project cannot be read.",
       ),
-    charge_type: zod.enum(["postpaid", "prepaid", "one_time"]),
+    type: PriceType,
+    usage_type: UsageType,
     auto_renew: zod
       .boolean()
       .describe(
-        "Whether automatic renewal is on now. Creating the cancellation turns it off. Withdrawing the\ncancellation does not turn it back on for a prepaid subscription; a postpaid subscription continues\nuntil it is canceled and turns it back on.",
+        "Whether automatic renewal is on now. Creating the cancellation turns it off; withdrawing it turns it back on for a metered subscription but not for a licensed one.",
       ),
     unused_amount: Money,
     refundable_amount: Money,
@@ -33,9 +36,7 @@ export const CancellationRefundPreviewItem = zod
     tax_amount: Money,
     forfeited_amount: Money,
   })
-  .describe(
-    "One subscription of the quoted cancellation. The amounts mean what they mean in the total.",
-  );
+  .describe("One subscription of the quoted cancellation.");
 
 export type CancellationRefundPreviewItem = zod.input<typeof CancellationRefundPreviewItem>;
 export type CancellationRefundPreviewItemOutput = zod.output<typeof CancellationRefundPreviewItem>;

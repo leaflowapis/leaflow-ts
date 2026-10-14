@@ -46,11 +46,7 @@ export const InvoiceItemProration = zod
     credited_invoice_item_id: zod
       .uuid()
       .describe("The earlier invoice line that paid for the period."),
-    description: zod
-      .string()
-      .describe(
-        "The wording of the earlier invoice line as recorded when this invoice was created.",
-      ),
+    description: zod.string().describe("The earlier invoice line's wording as recorded."),
     period_start: zod.iso.datetime({ offset: true }),
     period_end: zod.iso.datetime({ offset: true }).describe("Exclusive."),
     remaining_amount: Money.describe(

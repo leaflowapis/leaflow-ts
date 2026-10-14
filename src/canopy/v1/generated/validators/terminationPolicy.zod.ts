@@ -43,7 +43,7 @@ import * as zod from "zod";
 export const TerminationPolicy = zod
   .enum(["immediate", "period_end"])
   .describe(
-    "Whether a fulfilled purchase may end immediately or only after its paid term. Does not grant a refund. When absent, the terms are not configured and termination requires review.",
+    "Whether a delivered purchase may end immediately or only at the end of its paid term; refunds follow the refund policy. When absent, no termination terms were agreed.",
   );
 
 export type TerminationPolicy = zod.input<typeof TerminationPolicy>;

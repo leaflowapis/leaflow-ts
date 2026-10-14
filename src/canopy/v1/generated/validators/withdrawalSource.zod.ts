@@ -57,7 +57,7 @@ export const WithdrawalSource = zod
     card_last4: zod.string().regex(withdrawalSourceCardLast4RegExp).optional(),
   })
   .describe(
-    "The original top-up and its refund destination. Card details are included when the original payment method was saved; missing card details do not change the original refund route.",
+    "The original top-up and where its refund goes. Card details are included when the original payment method was saved.",
   );
 
 export type WithdrawalSource = zod.input<typeof WithdrawalSource>;

@@ -52,7 +52,7 @@ export const UsageCharge = zod.strictObject({
     .union([NamedIdentity, zod.null()])
     .optional()
     .describe(
-      "The project and its current name, for display. Absent when the project no longer exists or its\ndetails cannot be read at the moment; `project_id` still identifies it.",
+      "The project and its current name. Absent when the project cannot be read; `project_id` still identifies it.",
     ),
   product: Product,
   resource_id: zod
@@ -64,21 +64,24 @@ export const UsageCharge = zod.strictObject({
   dimensions: zod
     .record(zod.string(), zod.string())
     .optional()
-    .describe("The attributes the rate was chosen by, such as region and machine type."),
+    .describe("The dimension values the rate was matched by, such as region and machine type."),
   window_start: zod.iso.datetime({ offset: true }),
   window_end: zod.iso.datetime({ offset: true }).describe("Exclusive."),
-  gross_quantity: zod
-    .string()
-    .optional()
-    .describe("How much was used, before any included allowance."),
+  gross_quantity: zod.string().optional().describe("Quantity used before allowances."),
   deducted_quantity: zod
     .string()
     .optional()
     .describe("How much of that was covered by an allowance."),
   quantity: zod
     .string()
-    .describe("What was charged for — the gross quantity less the part covered."),
+    .describe("The quantity charged: gross quantity less the part covered by allowances."),
   unit_amount: Money.optional(),
+  unit_quantity: zod
+    .string()
+    .optional()
+    .describe(
+      "The quantity `unit_amount` prices, such as 1000000 tokens or 3600 seconds: `amount` is `quantity` × `unit_amount` ÷ `unit_quantity`.",
+    ),
   amount: Money,
   currency: zod.string(),
   invoice_id: zod

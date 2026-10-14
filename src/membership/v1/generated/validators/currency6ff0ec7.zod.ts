@@ -27,7 +27,7 @@ export const Currency6ff0ec7 = zod
       .int()
       .min(currency6ff0ec7ExponentMin)
       .max(currency6ff0ec7ExponentMax)
-      .describe("Decimal places of the currency, the ISO 4217 minor unit."),
+      .describe("Decimal places of the ISO 4217 minor unit."),
     name: zod.string().min(1).max(currency6ff0ec7NameMax),
     minimum_top_up: Money,
   })

@@ -8,10 +8,12 @@
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
 import { OrderItemStatus } from "./orderItemStatus.zod.js";
+import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
 import { TerminationPolicy } from "./terminationPolicy.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const orderItemPositionMin = 0;
 
@@ -33,7 +35,7 @@ export const OrderItem = zod
       .uuid()
       .optional()
       .describe(
-        "Stable Billing subscription ID. A new prepaid or postpaid service purchase returns the\npending subscription here; renewals and changes reference the existing subscription, which\nkeeps its ID. Absent for delivery without a subscription. This is not a business resource ID.",
+        "The Billing subscription: the new pending subscription of a recurring purchase, or the existing one renewed or changed, which keeps its ID. Absent for a purchase without a subscription.",
       ),
     interval: zod.enum(["none", "day", "month", "year"]),
     interval_count: zod.int().min(1).optional(),
@@ -43,19 +45,23 @@ export const OrderItem = zod
       .string()
       .nullish()
       .describe(
-        "Prepaid items only: the plan's one-month prepaid price for this item's quantity before tax, frozen\nat purchase, used to value time used under a prorated refund or a downgrade. Null when the plan has\nno prepaid period shorter than the one bought.",
+        "Recurring licensed items only: the plan's one-month licensed price for this item's quantity, before tax and frozen at purchase, used to value time under a prorated refund or a downgrade. Null when the plan has no licensed period shorter than the one bought.",
       ),
     refund_hourly_amount: zod
       .string()
       .nullish()
       .describe(
-        "Prepaid items only: the plan's postpaid hourly price for this item's quantity before tax, frozen at\npurchase, used for time used short of a full month. Null when the plan has no postpaid price.",
+        "Recurring licensed items only, the plan's metered hourly price for this item's quantity before tax, frozen at purchase, used for time used short of a full month. Null when the licensed price has no meter.",
       ),
     recurring_amount: zod.string().optional(),
     setup_amount: zod.string().optional(),
-    charge_type: zod
-      .enum(["postpaid", "prepaid", "one_time"])
-      .describe("The payment timing of the selected price."),
+    type: PriceType,
+    usage_type: UsageType,
+    dimensions: zod
+      .record(zod.string(), zod.string())
+      .describe(
+        "The dimension values the line was bought with, such as region and instance type. Empty when the purchase gave none.",
+      ),
     tax_amount: zod
       .string()
       .optional()
@@ -72,20 +78,16 @@ export const OrderItem = zod
     product_id: ProductID.optional(),
     product: Product.optional(),
     plan_id: zod.uuid().describe("Which plan was bought."),
-    plan_name: zod
-      .string()
-      .describe(
-        "What it was called when bought. It does not follow later catalogue renames and is\nnot translated.",
-      ),
+    plan_name: zod.string().describe("The name when bought."),
     quantity: zod.string(),
     unit_amount: Money.optional().describe(
-      "The unit amount of the price this line is charged under. Absent for a tiered price, which has no\nsingle unit amount, and for a change that takes effect at once, which is charged as `gross_amount`\ndescribes.",
+      "The unit amount of the price the line is charged under. Absent for a tiered price, and for an immediate change, which is charged as `gross_amount` describes.",
     ),
     gross_amount: Money.optional().describe(
-      "Before discounts: the price applied to the quantity, which for a per-unit price is `unit_amount`\ntimes `quantity`; a minimum charge can make it higher. For an upgrade that takes effect at once it is\nthe new price for the time left in the paid period, at the subscription's own period price, minus\nthe amount paid for that time, and the period end does not move; a downgrade charges nothing and may refund the\ndifference instead. A change between equal period prices charges and refunds nothing. The setup fee is not part of it; see `setup_amount`.\n\nUnder an inclusive tax rate it includes tax, as the price does, and the included part is\n`tax_included_amount`. A renewal at the agreed terms is the exception: the agreed amount excludes\ntax, and tax is added to it.",
+      "Before discounts and setup fees: the price applied to the quantity, `unit_amount` times `quantity` for a per-\nunit price, raised by any minimum charge. For an immediate upgrade it is the new price for the rest of the\npaid period minus the amount paid for that time; a downgrade, or a change between equal period prices, charges\nnothing.\n\nUnder an inclusive tax rate it includes tax, shown in `tax_included_amount`, except for a renewal at agreed\nterms, whose amount excludes tax.",
     ),
     discount_amount: Money.optional().describe(
-      "The reduction on this line: from the coupon the order uses and, for a renewal at the agreed terms,\nfrom the discount the subscription carries.\n\nA carried discount is part of the agreed amount. It is listed here, and `gross_amount` is then\n`unit_amount` times `quantity`, except in two cases where `gross_amount` is the agreed amount and\nthe carried discount is already reflected in it: the renewal order also uses a coupon the account\nholds, or the account's tax rate is inclusive.",
+      "The reduction on this line, from the order's coupon and, for a renewal at agreed terms, from the subscription's carried discount. With a carried discount, `gross_amount` is `unit_amount` times `quantity`, except when the renewal order also uses an account coupon or the tax rate is inclusive: then `gross_amount` is the agreed amount, which already reflects the carried discount.",
     ),
     amount: Money.optional().describe("`gross_amount` less `discount_amount`."),
     currency: zod.string(),
@@ -93,7 +95,7 @@ export const OrderItem = zod
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "The start of the service period this line paid for. Frozen at placement for renewals and period-end changes; for a prepaid line of a new purchase, fixed from the second its invoice is paid and kept when delivery is confirmed. Absent for postpaid and one-time lines.",
+        "The start of the service period this line paid for. Fixed at placement for renewals and period-end changes, and for a licensed line of a new purchase when its invoice is paid. Absent for metered and one-time lines.",
       ),
     period_end: zod.iso
       .datetime({ offset: true })
@@ -102,7 +104,7 @@ export const OrderItem = zod
     status: OrderItemStatus,
   })
   .describe(
-    "Frozen purchase terms. Monetary fields come from related invoice-line snapshots and are zero\nfor a line with no immediate charge, such as postpaid admission. Later catalog changes do not reprice this line. A new service\npurchase creates its pending subscription when this item is recorded, not when payment succeeds.",
+    "The purchase terms frozen at placement. Monetary fields come from the order's invoice lines and are zero without an immediate charge, such as for a metered purchase. Later catalog changes do not reprice the line. A new service purchase has its pending subscription from placement.",
   );
 
 export type OrderItem = zod.input<typeof OrderItem>;

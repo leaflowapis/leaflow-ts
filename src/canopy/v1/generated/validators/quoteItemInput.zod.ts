@@ -39,8 +39,10 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { PriceType } from "./priceType.zod.js";
 import { ProductID } from "./productID.zod.js";
 import { TerminationPolicy } from "./terminationPolicy.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const quoteItemInputPriceLookupKeyMax = 128;
 
@@ -58,14 +60,16 @@ export const QuoteItemInput = zod
     price_id: zod.uuid().optional(),
     product_id: ProductID.optional(),
     plan_id: zod.uuid().optional(),
-    price_type: zod
-      .enum(["postpaid", "prepaid", "one_time"])
-      .optional()
-      .describe("Narrows the selection when a plan offers more than one charge type."),
+    price_type: PriceType.optional().describe(
+      "Narrows the selection when a plan offers more than one price type.",
+    ),
+    usage_type: UsageType.optional().describe(
+      "Narrows the selection when a plan offers more than one usage type.",
+    ),
     interval: zod.enum(["none", "day", "month", "year"]).optional(),
     interval_count: zod.int().min(1).optional(),
     termination_policy: TerminationPolicy.optional().describe(
-      "Selects among prepaid prices with otherwise identical billing terms. Ambiguous terms are refused instead of choosing a price arbitrarily.",
+      "Selects among licensed prices with otherwise identical billing terms. Ambiguous terms are refused instead of choosing a price arbitrarily.",
     ),
     quantity: zod.string().regex(quoteItemInputQuantityRegExp),
     meter_id: zod.uuid().optional(),
@@ -74,17 +78,17 @@ export const QuoteItemInput = zod
       .record(zod.string(), zod.string())
       .optional()
       .describe(
-        "The attributes the price depends on — region, instance type, token class.\n\nRequired when the price draws its rates from a price list, which is how anything\nsold by region or by machine type is priced. A price that carries a single unit\namount, or a ladder, has no attributes to give and takes none.\n\nEvery attribute the meter declares must be present. A combination with no rate\ncovering it is refused rather than priced at zero.",
+        "The dimension values the rate depends on, such as region, instance type or token kind: those of the usage for a metered estimate, and those of what is bought for a licensed price on a rate card. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero.",
       ),
     duration_seconds: zod
       .int()
       .optional()
       .describe(
-        'For metered items, how long to price for. This allows an estimate such as "about\nthis much per month" to be shown before anything exists. The priced quantity is\n`quantity` multiplied by this duration.',
+        "For a metered estimate, how long to price for, in seconds; the priced quantity is `quantity` times this duration.",
       ),
   })
   .describe(
-    "Identify a price directly, or select a price for a plan. For each resource give its ID or lookup\nkey, never both. Lookup keys require product_id. Meter, dimensions or duration_seconds request a\npostpaid usage estimate. Such an estimate cannot be combined with a promotion code or treated as a\ncheckout amount. Without a usage estimate, a postpaid item includes only any setup charge.",
+    "Identify a price, or select one for a plan; give each resource's ID or lookup key, never both, and product_id with lookup keys. For a metered price, a meter or duration_seconds requests a usage estimate, which cannot be combined with a promotion code and is not a checkout amount. Without one, a metered item includes only any setup charge.",
   );
 
 export type QuoteItemInput = zod.input<typeof QuoteItemInput>;

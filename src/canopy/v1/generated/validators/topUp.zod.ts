@@ -49,15 +49,15 @@ export const TopUp = zod
     id: zod.uuid(),
     billing_account_id: zod.int(),
     account: AccountIdentity,
-    amount: Money.describe("What is credited to the account, in the account's own currency."),
+    amount: Money.describe("What is credited to the account, in its currency."),
     currency: zod.string(),
     remaining_amount: Money.optional().describe(
-      "The part of this top-up still held in the balance. Pending refunds can temporarily\nreserve part of it; it is not a promise that the whole amount is immediately withdrawable.",
+      "The part of this top-up still in the balance. Pending refunds may hold part of it, so not all of it is necessarily withdrawable.",
     ),
     status: zod
       .enum(["pending", "succeeded", "failed", "canceled"])
       .describe(
-        "`pending` until the payment gateway reaches a result. The balance increases on `succeeded`.\n\n`failed` means the gateway declined the payment. A declined attempt ends the top-up at once\nand the payment is withdrawn at the gateway; to pay another way, create a new top-up.\n`canceled` means the attempt was withdrawn without collecting money; `cancellation_reason`\nsays why. Unknown gateway outcomes remain `pending`, and a browser redirect is not proof of\npayment.\n\n`failed` and `canceled` are final. If the gateway nevertheless collects payment for such an\nattempt, the amount is credited as a separate `succeeded` top-up.",
+        "`pending` until the payment gateway reaches a result; the balance increases on `succeeded`. `failed`: the gateway declined the payment, which is withdrawn at the gateway; create a new top-up to pay another way. `canceled`: withdrawn without collecting money, for the reason in `cancellation_reason`. Unknown gateway outcomes stay `pending`; a browser redirect is not proof of payment. `failed` and `canceled` are final; a payment the gateway collects afterwards is credited as a separate `succeeded` top-up.",
       ),
     cancellation_reason: PaymentCancellationReason.optional(),
     payment_gateway: zod.string().optional().describe("Which payment gateway collected it."),
@@ -69,16 +69,16 @@ export const TopUp = zod
       .string()
       .optional()
       .describe(
-        "The currency the customer was actually charged in, when the checkout page collected a\nlocal one. Absent when it was the same as the account's.",
+        "The currency the customer was charged in when the checkout collected a local currency; absent when it is the account's.",
       ),
     presentment_amount: Money.optional().describe(
-      "What was charged, in `presentment_currency`. It will not equal `amount`, and it is\nthe figure that appears on the customer's card or wallet statement.",
+      "The amount charged in `presentment_currency`, as shown on the customer's statement.",
     ),
     failure_reason: zod
       .string()
       .optional()
       .describe(
-        "Why the gateway declined it. Present with `failed`. The value is the gateway's own code,\npassed on unchanged: the card issuer's decline code when there is one (Stripe's decline_code,\nsuch as insufficient_funds or lost_card), otherwise the gateway's error code (Stripe's code,\nsuch as card_declined, expired_card or payment_intent_authentication_failure). Clients map it\nto their own wording and treat an unknown value as a generic decline.",
+        "Why the gateway declined it; present with `failed`. The gateway's code unchanged: the issuer's decline code when there is one (Stripe decline_code, such as insufficient_funds), otherwise the gateway's error code (Stripe code, such as card_declined). Treat an unknown value as a generic decline.",
       ),
     action: PaymentAction.optional(),
     created_at: zod.iso.datetime({ offset: true }),
@@ -86,11 +86,11 @@ export const TopUp = zod
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "When the funds arrived. Later than `created_at` — by days for a bank transfer — so\nreconciling against a statement uses this rather than the moment it was started.\nAbsent until the payment completes.",
+        "When the funds arrived, possibly days after `created_at`. Absent until the payment completes.",
       ),
   })
   .describe(
-    "A top-up attempt and its outcome. A successful top-up adds a traceable amount to the balance; it is not a credit grant and has no associated invoice.",
+    "A top-up attempt and its outcome. A successful top-up adds to the balance; it is not a credit grant and has no invoice.",
   );
 
 export type TopUp = zod.input<typeof TopUp>;

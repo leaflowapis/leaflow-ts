@@ -47,7 +47,7 @@ export const SubscriptionCancellation = zod
       .uuid()
       .optional()
       .describe(
-        "The cancellation this request belongs to, with the other subscriptions released together.",
+        "The cancellation this item belongs to, with the other subscriptions released together.",
       ),
     id: zod.uuid(),
     subscription_id: zod.uuid(),
@@ -64,7 +64,7 @@ export const SubscriptionCancellation = zod
     failure_reason: zod.string().optional(),
   })
   .describe(
-    "The latest cancellation that includes the subscription, with this subscription's item. `id` is the\nitem; `cancellation_id` is the cancellation. scheduled_at is the intended time; effective_at is the\nconfirmed end of service. A cancellation alone does not stop metering or issue a refund.",
+    "The latest cancellation including the subscription, with this subscription's item: `id` is the item and `cancellation_id` the cancellation. scheduled_at is the intended time and effective_at the confirmed end of service.",
   );
 
 export type SubscriptionCancellation = zod.input<typeof SubscriptionCancellation>;

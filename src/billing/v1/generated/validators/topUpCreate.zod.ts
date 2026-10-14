@@ -21,7 +21,7 @@ export const TopUpCreate = zod.strictObject({
     .string()
     .min(1)
     .max(topUpCreatePaymentGatewayMax)
-    .describe("The gateway explicitly selected from the available payment options."),
+    .describe("The gateway selected from the available payment options."),
   method_type: zod
     .string()
     .min(1)
@@ -29,17 +29,15 @@ export const TopUpCreate = zod.strictObject({
     .describe("The selected method, such as card, wechat_pay or alipay."),
   id: zod
     .uuid()
-    .describe(
-      "The ID of this top-up attempt. Keep it before submitting and query it after an uncertain response.",
-    ),
+    .describe("The top-up ID, chosen by the caller. Read it after an uncertain response."),
   billing_account_id: zod.int(),
   amount: Money.and(zod.string().regex(topUpCreateAmountTwoRegExp)).describe(
-    "In the account's currency, and no finer than that currency's smallest unit:\ntwo decimals for most, none for the yen. A finer amount is refused here rather\nthan at the checkout page, where the customer would see the gateway's own wording\ninstead of an explanation.\n\nThere is a minimum, which differs by currency. Below it the gateway's fee\nexceeds the top-up itself, so such a payment costs more to accept than it brings.\nThe minimum in force is returned with the rejection.",
+    "In the account's currency, no finer than its smallest unit (two decimals for most currencies, none for JPY). An amount below the currency's minimum top-up is refused, and the minimum is returned with the error.",
   ),
   payment_method_id: zod
     .uuid()
     .optional()
-    .describe("Charge a saved method instead of opening a checkout page."),
+    .describe("Charge a saved payment method instead of opening a checkout page."),
   return_url: zod.string().optional().describe("Where to send the customer after checkout."),
 });
 

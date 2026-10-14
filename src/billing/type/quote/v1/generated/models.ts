@@ -21,16 +21,16 @@ export type Money = string;
 /**
  * Account funding for this purchase, calculated by Billing. Amounts use the enclosing response currency.
  * Credit eligibility and all purchase requirements are already evaluated. Nothing is charged or reserved.
- * A prepaid purchase may instead use an online payment method.
+ * A licensed purchase may instead be paid with an online payment method.
  */
 export interface Funds {
   /** Spendable balance after pending returns. */
   available_balance_amount: Money;
-  /** Currently effective credits eligible for the quoted purchases or postpaid usage. Each grant is counted once. */
+  /** Currently effective credits eligible for the quoted purchases or metered usage. Each grant is counted once. */
   usable_credit_amount: Money;
-  /** Currently effective credits that cannot fund any quoted purchase or postpaid target. Unused eligible credits are not restricted. */
+  /** Currently effective credits that cannot fund any quoted purchase or metered target. Unused eligible credits are not restricted. */
   restricted_credit_amount: Money;
-  /** Minimum spendable balance needed after eligible credits, covering immediate charges and every new postpaid admission requirement. */
+  /** Minimum spendable balance needed after eligible credits, covering immediate charges and every new metered purchase's admission requirement. */
   required_balance_amount: Money;
   /** Additional balance needed now. Zero means account funds satisfy this quote. No funds are reserved. */
   balance_shortfall_amount: Money;

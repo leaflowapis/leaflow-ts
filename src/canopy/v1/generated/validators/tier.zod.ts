@@ -45,7 +45,7 @@ export const Tier = zod.strictObject({
   up_to: zod
     .string()
     .nullish()
-    .describe("The upper bound of this band. Null on the last band, which has no bound."),
+    .describe("The band's inclusive upper bound; null for the last band."),
   unit_amount: Money,
   flat_amount: Money.optional().describe(
     "Charged once when this band is reached, in addition to the per-unit amount.",

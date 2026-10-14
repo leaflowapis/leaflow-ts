@@ -60,10 +60,10 @@ export const InvoiceSummary = zod
     total: zod.string(),
     amount_paid: zod.string(),
     pre_payment_credit_notes_amount: Money.describe(
-      "Issued, non-void credit notes that reduced unpaid receivables. Does not rewrite the original invoice total.",
+      "Issued credit notes that reduced unpaid receivables; the original invoice total is unchanged.",
     ),
     post_payment_credit_notes_amount: Money.describe(
-      "Issued credit notes against payments already received. This is a return obligation, not evidence of completed refunds.",
+      "Issued credit notes against payments already received; their refunds may not have completed.",
     ),
     amount_due: zod
       .string()
@@ -75,7 +75,7 @@ export const InvoiceSummary = zod
     due_at: zod.iso.datetime({ offset: true }).optional(),
   })
   .describe(
-    "Purchase-related invoice amounts, without account contact details or payment methods. Every order\nhas an invoice from placement. A draft shows base prices until it is paid, when the discount is\napplied and it is issued; a zero-total invoice is issued and paid at placement whatever the\ncheckout mode. Neither establishes acceptance or delivery.",
+    "An order's invoice amounts, without contact details or payment methods. A draft shows base prices until it is paid, when the discount is applied and it is issued; a zero-total invoice is issued and paid at placement.",
   );
 
 export type InvoiceSummary = zod.input<typeof InvoiceSummary>;

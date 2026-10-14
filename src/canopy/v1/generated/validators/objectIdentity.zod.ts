@@ -46,7 +46,7 @@ export const ObjectIdentity = zod
     id: zod.uuid(),
     name: zod.string(),
   })
-  .describe("A catalog object inlined for display.");
+  .describe("A catalog object, inlined for display.");
 
 export type ObjectIdentity = zod.input<typeof ObjectIdentity>;
 export type ObjectIdentityOutput = zod.output<typeof ObjectIdentity>;

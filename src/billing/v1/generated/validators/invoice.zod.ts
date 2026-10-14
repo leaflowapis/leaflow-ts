@@ -14,9 +14,7 @@ export const Invoice = zod.strictObject({
   void_requested_at: zod.iso
     .datetime({ offset: true })
     .optional()
-    .describe(
-      "Collection has been stopped; any accepted return obligations are completed before final voiding.",
-    ),
+    .describe("Collection has stopped; accepted return obligations are completed."),
   due_at: zod.iso.datetime({ offset: true }).optional(),
   amount_refunded: zod.string().optional(),
   tax_items: zod.array(TaxItem),
@@ -31,36 +29,34 @@ export const Invoice = zod.strictObject({
   discount_amount: Money.optional().describe("Sum of the line discounts, taken off before tax."),
   tax_amount: Money.optional(),
   credit_applied: Money.optional().describe(
-    "Successful credit-grant payments included in amount_paid. Does not reduce the receivable or tax base.",
+    "Successful credit-grant payments, included in amount_paid; they do not reduce the receivable or tax base.",
   ),
   total: Money.describe(
-    "Subtotal less discount plus tax. Balance and credit grants are payment sources, not reductions of the receivable.",
+    "Subtotal less discount plus tax. Balance and credit grants pay it; they do not reduce it.",
   ),
   amount_paid: Money.optional(),
   pre_payment_credit_notes_amount: Money.describe(
-    "Issued, non-void credit notes that reduced unpaid receivables. Does not rewrite the original invoice total.",
+    "Issued credit notes that reduced unpaid receivables; the original invoice total is unchanged.",
   ),
   post_payment_credit_notes_amount: Money.describe(
-    "Issued credit notes against payments already received. This is a return obligation, not evidence of completed refunds.",
+    "Issued credit notes against payments already received; their refunds may not have completed.",
   ),
   amount_due: Money.describe(
-    "What is still collectible after unpaid credit notes and successful payments; never below zero. A draft has none; its total is the base price, and a payment preview shows what paying it would collect. A paid or void invoice has none either.",
+    "What is still collectible after unpaid credit notes and successful payments; never below zero. Zero for a draft, whose total is the base price, and for a paid or void invoice.",
   ),
   period_start: zod.iso.datetime({ offset: true }).nullish(),
   period_end: zod.iso.datetime({ offset: true }).nullish().describe("Exclusive."),
   customer_name: zod
     .string()
     .optional()
-    .describe(
-      "Who this was billed to, as recorded when the invoice was issued. Later changes to\nthe account do not alter it.",
-    ),
+    .describe("The billing details recorded when the invoice was issued."),
   customer_email: zod.string().optional(),
   customer_tax_id: zod.string().optional(),
   customer_tax_exempt: zod
     .enum(["none", "exempt", "reverse"])
     .optional()
     .describe(
-      "How tax applied to the customer when the invoice was issued. `reverse` means no tax was\ncharged because the customer accounts for it under the reverse-charge mechanism.",
+      "How tax applied to the customer when the invoice was issued; `reverse` means no tax was charged under the reverse-charge mechanism.",
     ),
   customer_address_line1: zod.string().optional(),
   customer_address_line2: zod.string().optional(),

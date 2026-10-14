@@ -17,7 +17,7 @@ import { QuoteRenewalResult } from "./quoteRenewalResult.zod.js";
 export const Quote = zod
   .strictObject({
     funds: Funds.optional().describe(
-      "Account funding for an existing-order checkout quote. Absent for usage estimates, refunds and cancellation previews.",
+      "Account funds for an existing-order checkout quote. Absent for usage estimates, refunds and cancellations.",
     ),
     subtotal: Money,
     discount_amount: Money,
@@ -25,7 +25,7 @@ export const Quote = zod
     discount: zod
       .union([QuotedDiscount, zod.null()])
       .describe(
-        "The discount evaluated for a purchase or order, without applying it. Null when none is selected or\nwhen quoting renewals or a cancellation. A confirmed order reports its recorded discount.",
+        "The discount a purchase or order would get, not yet applied. Null when there is none, and for renewals and cancellations. A confirmed order reports its recorded discount.",
       ),
     items: zod.array(QuoteItem),
     renewals: zod.array(QuoteRenewalResult),
@@ -34,12 +34,10 @@ export const Quote = zod
     ),
     total: Money,
     currency: zod.string(),
-    refund: OrderRefundQuote.optional().describe(
-      "Present only when an order refund was requested. Nothing is collectible for this target.",
-    ),
+    refund: OrderRefundQuote.optional().describe("Present when an order refund was requested."),
   })
   .describe(
-    "A complete calculation in one billing-account currency, without saving a quote or reserving funds or\nredemptions. The request fails if any item cannot be priced. Requested future usage estimates are\nincluded in totals for reporting and are not collectible at checkout. Only an existing-order quote\nprovides that order's checkout amount.",
+    "A complete calculation in the billing account's currency; nothing is saved or reserved. The request fails if any item cannot be priced. Usage estimates are included in totals but are not collected at checkout; only an existing-order quote gives that order's checkout amount.",
   );
 
 export type Quote = zod.input<typeof Quote>;

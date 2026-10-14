@@ -22,7 +22,7 @@ export const OrderRefundQuoteInput = zod
       ),
   })
   .describe(
-    "An estimate of the refundable value of one order or selected items. This does not cancel the order, stop service or create a refund.",
+    "An estimate of the refundable value of an order or selected items; nothing is canceled or refunded.",
   );
 
 export type OrderRefundQuoteInput = zod.input<typeof OrderRefundQuoteInput>;

@@ -56,13 +56,13 @@ export const CreditNote = zod
       "The reduction of unpaid receivables. A void note no longer reduces what is due.",
     ),
     post_payment_amount: Money.describe(
-      "The credited part of payments already received. This is not proof that its refund has completed.",
+      "The credited part of payments already received; its refund may not have completed.",
     ),
     refund_id: zod
       .uuid()
       .nullable()
       .describe(
-        "The refund to the original payment sources, or null when no paid amount was credited.",
+        "The refund to the original payment sources; null when no paid amount was credited.",
       ),
     reason: zod
       .enum([
@@ -76,11 +76,11 @@ export const CreditNote = zod
         "operator",
       ])
       .describe(
-        "Why the note was issued. Notes from canceled, expired or failed orders carry the order's reason;\n`usage_true_up` returns a tier price reduction settled after the original invoice; `operator` is\nissued by Leaflow on request.",
+        "Why the note was issued. Notes for canceled, expired or failed orders carry the order's reason; `usage_true_up` returns a tier price reduction settled after the original invoice; `operator` was issued on request.",
       ),
   })
   .describe(
-    "An issued invoice reduction. Its credited amount is pre_payment_amount plus post_payment_amount. A paid credit records a return obligation; refund_id identifies its refund, whose outcome may still be pending. Original invoice amounts remain unchanged.",
+    "A reduction of an issued invoice; the original invoice amounts do not change. The credited amount is pre_payment_amount plus post_payment_amount. A paid part creates a refund, identified by refund_id, whose outcome may still be pending.",
   );
 
 export type CreditNote = zod.input<typeof CreditNote>;

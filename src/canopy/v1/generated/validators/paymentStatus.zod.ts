@@ -43,7 +43,7 @@ import * as zod from "zod";
 export const PaymentStatus = zod
   .enum(["succeeded", "processing", "requires_action", "failed"])
   .describe(
-    "The current payment outcome.\n\nsucceeded means payment is complete. processing means confirmation is pending; poll the invoice or\norder rather than submitting another payment. requires_action means the customer must complete the\nsupplied action. failed means the attempt did not succeed and failure_reason explains the outcome; a\ndeclined gateway payment is withdrawn at the gateway, and paying again starts a new payment with the\nsame or another method.",
+    "`succeeded`: paid. `processing`: confirmation is pending; poll the invoice or order instead of paying again. `requires_action`: the customer must complete the returned action. `failed`: the attempt did not succeed, for the reason in failure_reason; a declined gateway payment is withdrawn, and paying again starts a new payment.",
   );
 
 export type PaymentStatus = zod.input<typeof PaymentStatus>;

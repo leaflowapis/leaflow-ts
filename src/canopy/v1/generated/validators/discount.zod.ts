@@ -51,7 +51,7 @@ export const Discount = zod
     status: zod
       .enum(["scheduled", "active", "expired", "voided"])
       .describe(
-        "`scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or\n`voided` once Leaflow withdrew it.",
+        "`scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or `voided` once withdrawn.",
       ),
     voided_at: zod.iso.datetime({ offset: true }).optional(),
     type: zod.enum(["percentage", "fixed_amount", "price_override", "free_setup"]),
@@ -59,7 +59,7 @@ export const Discount = zod
       .enum(["once", "recurring", "forever"])
       .optional()
       .describe(
-        "Whether the discount continues on renewals of the purchased item. `once` applies only to the\npurchase or renewal that uses the coupon, `recurring` continues for `frequency_duration` billing\nperiods including the first, and `forever` continues on every renewal.",
+        "Whether the discount continues on renewals: `once` applies only to the purchase or renewal using the coupon, `recurring` for `frequency_duration` periods including the first, `forever` on every renewal.",
       ),
     frequency_duration: zod.int().min(1).optional(),
     id: zod.uuid(),
@@ -69,7 +69,7 @@ export const Discount = zod
     max_discount: Money.optional().describe("Caps a percentage discount."),
     currency: zod.string().optional(),
     applies_to: Applicability.describe(
-      "What it may be used for. Absent means it applies to anything on the account,\nincluding setup fees and traffic.",
+      "What it may pay for. Absent means anything on the account, including setup fees and usage.",
     ),
     first_purchase_only: zod
       .boolean()
@@ -82,7 +82,7 @@ export const Discount = zod
       .describe("Absent follows the coupon's own validity."),
   })
   .describe(
-    "A coupon held on this account for a period. Within the period it applies without a code to purchases and\nto metered usage that the coupon covers.",
+    "A coupon held by the account for a period, applying without a code to the purchases and metered usage it covers.",
   );
 
 export type Discount = zod.input<typeof Discount>;
