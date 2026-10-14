@@ -4,9 +4,17 @@
  * Leaflow Canopy API
  * Canopy model inference, API keys, model catalogue, service enablement and recorded usage.
  *
- * OpenAI-compatible project inference is served on this host at `/v1/chat/completions`,
- * `/v1/embeddings`, `/v1/models` and `/v1/models/{model}`. Use `https://canopy.leaflow.cloud/v1`
- * as the OpenAI SDK base URL. Chat completions support `stream=true` SSE.
+ * Project inference is served on this host in each provider's own protocol:
+ *
+ * - OpenAI: `/v1/chat/completions`, `/v1/responses` and `/v1/embeddings`; use
+ *   `https://canopy.leaflow.cloud/v1` as the OpenAI SDK base URL.
+ * - Anthropic: `/v1/messages`; use `https://canopy.leaflow.cloud` as the Anthropic SDK base URL.
+ * - Gemini: `/v1beta/models/{model}:generateContent` and `:streamGenerateContent`.
+ *
+ * Canopy does not convert between protocols. A request is accepted only for a model whose
+ * `supported_endpoints` lists the endpoint it was sent to, and it is forwarded unchanged except for
+ * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
+ * through as written; a model's `capabilities` lists the values its upstream accepts.
  *
  * Management operations use `/api/v1`. The management model catalogue includes pricing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
@@ -18,7 +26,7 @@
  * Management and project inference accept the same verified IAM scoped token. The token is the
  * sole billing project authority; `OpenAI-Project` and historical identity headers cannot
  * override it. These endpoints do not accept a Canopy API key. The separate API-key gateway
- * accepts Canopy API keys and supports OpenAI, Anthropic and Gemini request formats.
+ * accepts Canopy API keys and serves the same endpoints.
  *
  * ## Conventions
  *
@@ -39,6 +47,8 @@ import { CreateAPIKeyRequestBody } from "./validators/createAPIKeyRequestBody.zo
 import { CreateServiceRequestBody } from "./validators/createServiceRequestBody.zod.js";
 
 import { EmbeddingRequest } from "./validators/embeddingRequest.zod.js";
+
+import { NativeRequest } from "./validators/nativeRequest.zod.js";
 
 import { ResponseCreate } from "./validators/responseCreate.zod.js";
 
@@ -65,7 +75,7 @@ export const DeleteResponseParams = zod.strictObject({
 });
 
 /**
- * Authenticated project inference. Billing ownership comes only from the verified project token; no Canopy API key or project header is required.
+ * Authenticated project inference in the OpenAI Chat Completions protocol, forwarded unchanged to an upstream that speaks it. Billing ownership comes only from the verified project token.
  * @summary Create a chat completion
  */
 export const CreateChatCompletionBody = ChatCompletionRequest;
@@ -75,6 +85,36 @@ export const CreateChatCompletionBody = ChatCompletionRequest;
  * @summary Create embeddings
  */
 export const CreateEmbeddingsBody = EmbeddingRequest;
+
+/**
+ * Authenticated project inference in the Anthropic Messages protocol, forwarded unchanged to an upstream that speaks it. Accepts the `x-api-key` header as well as Authorization. Streams Anthropic SSE events when `stream` is true.
+ * @summary Create a message
+ */
+export const CreateMessageBody = NativeRequest;
+
+/**
+ * Authenticated project inference in the Gemini protocol, forwarded unchanged to an upstream that speaks it. Accepts the `x-goog-api-key` header as well as Authorization.
+ * @summary Generate content
+ */
+export const GenerateContentParams = zod.strictObject({
+  model: zod.string(),
+});
+
+export const GenerateContentBody = NativeRequest;
+
+/**
+ * The streaming form of generate-content. Use `alt=sse` for server-sent events.
+ * @summary Stream generated content
+ */
+export const StreamGenerateContentParams = zod.strictObject({
+  model: zod.string(),
+});
+
+export const StreamGenerateContentQueryParams = zod.strictObject({
+  alt: zod.enum(["sse"]).optional(),
+});
+
+export const StreamGenerateContentBody = NativeRequest;
 
 /**
  * @summary Get a callable model with capabilities and parameter limits

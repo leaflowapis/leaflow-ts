@@ -4,9 +4,17 @@
  * Leaflow Canopy API
  * Canopy model inference, API keys, model catalogue, service enablement and recorded usage.
  *
- * OpenAI-compatible project inference is served on this host at `/v1/chat/completions`,
- * `/v1/embeddings`, `/v1/models` and `/v1/models/{model}`. Use `https://canopy.leaflow.cloud/v1`
- * as the OpenAI SDK base URL. Chat completions support `stream=true` SSE.
+ * Project inference is served on this host in each provider's own protocol:
+ *
+ * - OpenAI: `/v1/chat/completions`, `/v1/responses` and `/v1/embeddings`; use
+ *   `https://canopy.leaflow.cloud/v1` as the OpenAI SDK base URL.
+ * - Anthropic: `/v1/messages`; use `https://canopy.leaflow.cloud` as the Anthropic SDK base URL.
+ * - Gemini: `/v1beta/models/{model}:generateContent` and `:streamGenerateContent`.
+ *
+ * Canopy does not convert between protocols. A request is accepted only for a model whose
+ * `supported_endpoints` lists the endpoint it was sent to, and it is forwarded unchanged except for
+ * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
+ * through as written; a model's `capabilities` lists the values its upstream accepts.
  *
  * Management operations use `/api/v1`. The management model catalogue includes pricing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
@@ -18,7 +26,7 @@
  * Management and project inference accept the same verified IAM scoped token. The token is the
  * sole billing project authority; `OpenAI-Project` and historical identity headers cannot
  * override it. These endpoints do not accept a Canopy API key. The separate API-key gateway
- * accepts Canopy API keys and supports OpenAI, Anthropic and Gemini request formats.
+ * accepts Canopy API keys and serves the same endpoints.
  *
  * ## Conventions
  *
@@ -32,21 +40,8 @@
  */
 export type ReasoningDiagnosticsRequested = { [key: string]: unknown };
 
-export type ReasoningDiagnosticsEffective = { [key: string]: unknown };
-
-export type ReasoningDiagnosticsTranslation =
-  (typeof ReasoningDiagnosticsTranslation)[keyof typeof ReasoningDiagnosticsTranslation];
-
-export const ReasoningDiagnosticsTranslation = {
-  translate: "translate",
-  passthrough: "passthrough",
-  strip: "strip",
-} as const;
-
 export interface ReasoningDiagnostics {
   requested: ReasoningDiagnosticsRequested;
-  effective?: ReasoningDiagnosticsEffective;
-  translation?: ReasoningDiagnosticsTranslation;
 }
 
 export type ChatCompletionRequestMessagesItem = { [key: string]: unknown };
@@ -117,7 +112,7 @@ export type ReasoningCapabilitiesBudgetTokens = {
 export interface ReasoningCapabilities {
   supported: boolean;
   /**
-   * Null means unknown; an empty array means effort is not configurable.
+   * The effort values the upstream accepts, sent through unchanged. Agents send low, medium or high. Null means unknown; an empty array means effort is not configurable.
    * @nullable
    */
   effort_levels: string[] | null;
@@ -152,6 +147,8 @@ export const ModelEndpoint = {
   "/v1/chat/completions": "/v1/chat/completions",
   "/v1/responses": "/v1/responses",
   "/v1/embeddings": "/v1/embeddings",
+  "/v1/messages": "/v1/messages",
+  "/v1beta/models/{model}:generateContent": "/v1beta/models/{model}:generateContent",
   "/v1/images/generations": "/v1/images/generations",
   "/v1/images/edits": "/v1/images/edits",
   "/v1/audio/transcriptions": "/v1/audio/transcriptions",
@@ -864,6 +861,20 @@ export interface ResponseDeleted {
   id: string;
   object: string;
   deleted: boolean;
+}
+
+/**
+ * A request body in the endpoint's own protocol. Canopy reads only the model name and forwards the rest unchanged.
+ */
+export interface NativeRequest {
+  [key: string]: unknown;
+}
+
+/**
+ * A response body in the endpoint's own protocol, as the upstream returned it.
+ */
+export interface NativeResponse {
+  [key: string]: unknown;
 }
 
 /**
@@ -4243,6 +4254,17 @@ export interface StatementSummary {
  * The request conflicts with the current state of the service. The codes are described where they apply.
  */
 export type ConflictResponse = Error;
+
+export type StreamGenerateContentParams = {
+  alt?: StreamGenerateContentAlt;
+};
+
+export type StreamGenerateContentAlt =
+  (typeof StreamGenerateContentAlt)[keyof typeof StreamGenerateContentAlt];
+
+export const StreamGenerateContentAlt = {
+  sse: "sse",
+} as const;
 
 export type ListApiKeysParams = {
   /**

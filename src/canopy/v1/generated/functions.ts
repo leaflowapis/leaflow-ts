@@ -4,9 +4,17 @@
  * Leaflow Canopy API
  * Canopy model inference, API keys, model catalogue, service enablement and recorded usage.
  *
- * OpenAI-compatible project inference is served on this host at `/v1/chat/completions`,
- * `/v1/embeddings`, `/v1/models` and `/v1/models/{model}`. Use `https://canopy.leaflow.cloud/v1`
- * as the OpenAI SDK base URL. Chat completions support `stream=true` SSE.
+ * Project inference is served on this host in each provider's own protocol:
+ *
+ * - OpenAI: `/v1/chat/completions`, `/v1/responses` and `/v1/embeddings`; use
+ *   `https://canopy.leaflow.cloud/v1` as the OpenAI SDK base URL.
+ * - Anthropic: `/v1/messages`; use `https://canopy.leaflow.cloud` as the Anthropic SDK base URL.
+ * - Gemini: `/v1beta/models/{model}:generateContent` and `:streamGenerateContent`.
+ *
+ * Canopy does not convert between protocols. A request is accepted only for a model whose
+ * `supported_endpoints` lists the endpoint it was sent to, and it is forwarded unchanged except for
+ * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
+ * through as written; a model's `capabilities` lists the values its upstream accepts.
  *
  * Management operations use `/api/v1`. The management model catalogue includes pricing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
@@ -18,7 +26,7 @@
  * Management and project inference accept the same verified IAM scoped token. The token is the
  * sole billing project authority; `OpenAI-Project` and historical identity headers cannot
  * override it. These endpoints do not accept a Canopy API key. The separate API-key gateway
- * accepts Canopy API keys and supports OpenAI, Anthropic and Gemini request formats.
+ * accepts Canopy API keys and serves the same endpoints.
  *
  * ## Conventions
  *
@@ -57,12 +65,15 @@ import type {
   ModelListResponseBody,
   ModelResource,
   ModelUsageListResponseBody,
+  NativeRequest,
+  NativeResponse,
   Quote,
   RequestResource,
   ResponseCreate,
   ResponseDeleted,
   ResponseResource,
   ServiceResource,
+  StreamGenerateContentParams,
   TotalsResource,
   UpdateAPIKeyRequestBody,
   UsageTimelineResponseBody,
@@ -303,7 +314,7 @@ export const getCreateChatCompletionUrl = () => {
 };
 
 /**
- * Authenticated project inference. Billing ownership comes only from the verified project token; no Canopy API key or project header is required.
+ * Authenticated project inference in the OpenAI Chat Completions protocol, forwarded unchanged to an upstream that speaks it. Billing ownership comes only from the verified project token.
  * @summary Create a chat completion
  */
 export const createChatCompletion = async (
@@ -337,11 +348,7 @@ export const createChatCompletion = async (
     body: JSON.stringify(chatCompletionRequest),
   });
 
-  const body = [204, 205, 304].includes(res.status)
-    ? null
-    : res.headers.get("content-type")?.includes("application/json")
-      ? JSON.parse(await res.text())
-      : await res.blob();
+  const body = [204, 205, 304].includes(res.status) ? null : res.headers.get("content-type")?.includes("application/json") ? JSON.parse(await res.text()) : await res.blob();
   const data: createChatCompletionResponse["data"] = body as createChatCompletionResponse["data"];
   return { data, status: res.status, headers: res.headers } as createChatCompletionResponse;
 };
@@ -410,6 +417,224 @@ export const createEmbeddings = async (
 
   const data: createEmbeddingsResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as createEmbeddingsResponse;
+};
+
+export type createMessageResponse200ApplicationJson = {
+  data: NativeResponse;
+  status: 200;
+};
+
+export type createMessageResponse200TextEventStream = {
+  data: Blob;
+  status: 200;
+};
+
+export type createMessageResponseDefault = {
+  data: InferenceError;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type createMessageResponseSuccess = (
+  | createMessageResponse200ApplicationJson
+  | createMessageResponse200TextEventStream
+) & {
+  headers: Headers;
+};
+export type createMessageResponseError = createMessageResponseDefault & {
+  headers: Headers;
+};
+
+export type createMessageResponse = createMessageResponseSuccess | createMessageResponseError;
+
+export const getCreateMessageUrl = () => {
+  return `https://canopy.leaflow.cloud/v1/messages`;
+};
+
+/**
+ * Authenticated project inference in the Anthropic Messages protocol, forwarded unchanged to an upstream that speaks it. Accepts the `x-api-key` header as well as Authorization. Streams Anthropic SSE events when `stream` is true.
+ * @summary Create a message
+ */
+export const createMessage = async (
+  nativeRequest: NativeRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createMessageResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateMessageUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(nativeRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: createMessageResponse["data"] = body as createMessageResponse["data"];
+  return { data, status: res.status, headers: res.headers } as createMessageResponse;
+};
+
+export type generateContentResponse200 = {
+  data: NativeResponse;
+  status: 200;
+};
+
+export type generateContentResponseDefault = {
+  data: InferenceError;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type generateContentResponseSuccess = generateContentResponse200 & {
+  headers: Headers;
+};
+export type generateContentResponseError = generateContentResponseDefault & {
+  headers: Headers;
+};
+
+export type generateContentResponse = generateContentResponseSuccess | generateContentResponseError;
+
+export const getGenerateContentUrl = (model: string) => {
+  return `https://canopy.leaflow.cloud/v1beta/models/${encodeURIComponent(String(model))}:generateContent`;
+};
+
+/**
+ * Authenticated project inference in the Gemini protocol, forwarded unchanged to an upstream that speaks it. Accepts the `x-goog-api-key` header as well as Authorization.
+ * @summary Generate content
+ */
+export const generateContent = async (
+  model: string,
+  nativeRequest: NativeRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<generateContentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getGenerateContentUrl(model), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(nativeRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: generateContentResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as generateContentResponse;
+};
+
+export type streamGenerateContentResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type streamGenerateContentResponseDefault = {
+  data: InferenceError;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type streamGenerateContentResponseSuccess = streamGenerateContentResponse200 & {
+  headers: Headers;
+};
+export type streamGenerateContentResponseError = streamGenerateContentResponseDefault & {
+  headers: Headers;
+};
+
+export type streamGenerateContentResponse =
+  | streamGenerateContentResponseSuccess
+  | streamGenerateContentResponseError;
+
+export const getStreamGenerateContentUrl = (
+  model: string,
+  params?: StreamGenerateContentParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://canopy.leaflow.cloud/v1beta/models/${encodeURIComponent(String(model))}:streamGenerateContent?${stringifiedParams}`
+    : `https://canopy.leaflow.cloud/v1beta/models/${encodeURIComponent(String(model))}:streamGenerateContent`;
+};
+
+/**
+ * The streaming form of generate-content. Use `alt=sse` for server-sent events.
+ * @summary Stream generated content
+ */
+export const streamGenerateContent = async (
+  model: string,
+  nativeRequest: NativeRequest,
+  params?: StreamGenerateContentParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<streamGenerateContentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getStreamGenerateContentUrl(model, params), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(nativeRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: streamGenerateContentResponse["data"] = body as streamGenerateContentResponse["data"];
+  return { data, status: res.status, headers: res.headers } as streamGenerateContentResponse;
 };
 
 export type listInferenceModelsResponse200 = {
