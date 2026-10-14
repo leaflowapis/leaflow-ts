@@ -37,6 +37,17 @@ export const ThreadTurnResource = zod
     threadId: zod.string(),
     type: TurnType,
     status: TurnStatus,
+    firstOrdinal: zod
+      .int()
+      .nullable()
+      .describe("The first item the turn wrote. Null before it has written one."),
+    lastOrdinal: zod.int().nullable().describe("The last item the turn wrote so far."),
+    preview: zod
+      .string()
+      .nullable()
+      .describe(
+        "The beginning of the message that started the turn. Null for compaction turns and turns started by the assistant itself.",
+      ),
     modelId: zod.string(),
     reasoningEffort: zod.union([ReasoningEffort, zod.null()]),
     approvalMode: ApprovalMode,

@@ -486,6 +486,13 @@ export const SearchThreadsRequestBodySort = {
   manual: "manual",
 } as const;
 
+export type SearchThreadsRequestBodyIncludeItem =
+  (typeof SearchThreadsRequestBodyIncludeItem)[keyof typeof SearchThreadsRequestBodyIncludeItem];
+
+export const SearchThreadsRequestBodyIncludeItem = {
+  counts: "counts",
+} as const;
+
 export interface SearchThreadsRequestBody {
   /**
    * Read these conversations, including subagents and archived ones. Cannot be combined with cursor.
@@ -530,6 +537,8 @@ export interface SearchThreadsRequestBody {
    * @maximum 200
    */
   limit?: number;
+  /** Optional parts of the response. `counts` adds `counts`. */
+  include?: SearchThreadsRequestBodyIncludeItem[];
 }
 
 /**
@@ -553,7 +562,8 @@ export interface ThreadListResponseBody {
    * @nullable
    */
   nextCursor: string | null;
-  counts: ThreadCountsResource;
+  /** Null unless `include` asked for it. */
+  counts: ThreadCountsResource | null;
 }
 
 export interface UpdateThreadRequestBody {
@@ -627,6 +637,21 @@ export interface ThreadTurnResource {
   threadId: string;
   type: TurnType;
   status: TurnStatus;
+  /**
+   * The first item the turn wrote. Null before it has written one.
+   * @nullable
+   */
+  firstOrdinal: number | null;
+  /**
+   * The last item the turn wrote so far.
+   * @nullable
+   */
+  lastOrdinal: number | null;
+  /**
+   * The beginning of the message that started the turn. Null for compaction turns and turns started by the assistant itself.
+   * @nullable
+   */
+  preview: string | null;
   modelId: string;
   reasoningEffort: ReasoningEffort | null;
   approvalMode: ApprovalMode;
@@ -693,35 +718,28 @@ export const ThreadItemResourceStatus = {
 } as const;
 
 /**
- * Who wrote an `external_message`: `subagent` for a subagent reporting to its parent,
- * `task` for a task, `channel` for a chat app.
- * @nullable
+ * `subagent` for a subagent reporting to its parent, `thread` for another of the person's
+ * conversations, `task` for a task, `channel` for a chat app.
  */
-export type ThreadItemResourceSourceType =
-  | (typeof ThreadItemResourceSourceType)[keyof typeof ThreadItemResourceSourceType]
-  | null;
+export type ItemSourceResourceType =
+  (typeof ItemSourceResourceType)[keyof typeof ItemSourceResourceType];
 
-export const ThreadItemResourceSourceType = {
+export const ItemSourceResourceType = {
   subagent: "subagent",
+  thread: "thread",
   task: "task",
   channel: "channel",
 } as const;
 
-/**
- * Whether the tool call needed a decision before it ran. Null for tool calls that need none.
- * `auto_approved` was approved by the automatic reviewer.
- * @nullable
- */
-export type ThreadItemResourceApprovalStatus =
-  | (typeof ThreadItemResourceApprovalStatus)[keyof typeof ThreadItemResourceApprovalStatus]
-  | null;
-
-export const ThreadItemResourceApprovalStatus = {
-  pending: "pending",
-  approved: "approved",
-  declined: "declined",
-  auto_approved: "auto_approved",
-} as const;
+export interface ItemSourceResource {
+  /**
+   * `subagent` for a subagent reporting to its parent, `thread` for another of the person's
+   * conversations, `task` for a task, `channel` for a chat app.
+   */
+  type: ItemSourceResourceType;
+  /** The conversation, task or channel the message came from. */
+  id: string;
+}
 
 export type PartResourceType = (typeof PartResourceType)[keyof typeof PartResourceType];
 
@@ -836,6 +854,24 @@ export interface PresentationResource {
   fileDiff: FileDiffResource | null;
 }
 
+/**
+ * Whether the call needed a decision before it ran. Null for calls that need none.
+ * `auto_approved` was approved by the automatic reviewer.
+ * @nullable
+ */
+export type ToolCallResourceApprovalStatus =
+  | (typeof ToolCallResourceApprovalStatus)[keyof typeof ToolCallResourceApprovalStatus]
+  | null;
+
+export const ToolCallResourceApprovalStatus = {
+  pending: "pending",
+  reviewing: "reviewing",
+  approved: "approved",
+  auto_approved: "auto_approved",
+  declined: "declined",
+  unreviewed: "unreviewed",
+} as const;
+
 export interface ChoiceResource {
   label: string;
   description: string;
@@ -851,12 +887,70 @@ export interface QuestionResource {
 }
 
 /**
+ * The answers given so far, by question id. Null for other calls.
+ * @nullable
+ */
+export type ToolCallResourceAnswers = { [key: string]: string } | null;
+
+export interface ToolCallResource {
+  /** The tool's group, for example `instance`, `leaflow`, `agent` or `client`. Empty for tools without one. */
+  namespace: string;
+  tool: string;
+  /** The arguments as JSON text. Cut in lists when long; then it is no longer valid JSON. */
+  arguments: string;
+  /**
+   * What the call acts on, for display, such as a file path or an instance name.
+   * @nullable
+   */
+  target: string | null;
+  /**
+   * A one-line description of what the call did.
+   * @nullable
+   */
+  detail: string | null;
+  presentation: PresentationResource | null;
+  /** @nullable */
+  durationMs: number | null;
+  /**
+   * Whether the call needed a decision before it ran. Null for calls that need none.
+   * `auto_approved` was approved by the automatic reviewer.
+   * @nullable
+   */
+  approvalStatus: ToolCallResourceApprovalStatus;
+  /** @nullable */
+  approvalReason: string | null;
+  /**
+   * When a person or the reviewer decided the call or answered its questions.
+   * @nullable
+   */
+  decidedAt: string | null;
+  /**
+   * The questions of an `ask` call. Null for other calls.
+   * @nullable
+   */
+  questions: QuestionResource[] | null;
+  /**
+   * The answers given so far, by question id. Null for other calls.
+   * @nullable
+   */
+  answers: ToolCallResourceAnswers;
+  /**
+   * How long an `ask` call waits before it continues with its default answers. Null when it waits indefinitely.
+   * @nullable
+   */
+  autoAnswerMs: number | null;
+}
+
+/**
  * One entry of the transcript. `type` determines which fields it carries.
  */
 export interface ThreadItemResource {
   id: string;
-  /** The position in the transcript. Never renumbered. */
-  ordinal: number;
+  /**
+   * The position in the transcript. Never renumbered. Null for a message waiting in the queue.
+   * @nullable
+   */
+  ordinal: number | null;
   /**
    * The turn that wrote this item. Null for messages waiting in the queue.
    * @nullable
@@ -867,17 +961,10 @@ export interface ThreadItemResource {
   status: ThreadItemResourceStatus;
   /** Left out of model requests since a revert. Shown, but marked. */
   reverted: boolean;
-  /**
-   * Who wrote an `external_message`: `subagent` for a subagent reporting to its parent,
-   * `task` for a task, `channel` for a chat app.
-   * @nullable
-   */
-  sourceType: ThreadItemResourceSourceType;
-  /**
-   * The subagent conversation, task or channel the message came from.
-   * @nullable
-   */
-  sourceId: string | null;
+  /** Part of the content was cut from this list; read the item for all of it. */
+  truncated: boolean;
+  /** Who wrote an `external_message`. Null for other items. */
+  source: ItemSourceResource | null;
   /**
    * The Canopy model that produced this item. Null for messages a person or another source sent.
    * @nullable
@@ -885,7 +972,8 @@ export interface ThreadItemResource {
   modelId: string | null;
   /**
    * The content, in the order it was written. Text arrives as `append` frames on the realtime
-   * stream. An attachment belongs where it was written, so render parts in order.
+   * stream. An attachment belongs where it was written, so render parts in order. For a tool
+   * call these are its output.
    */
   parts: PartResource[];
   attachments: AttachmentResource[];
@@ -894,49 +982,8 @@ export interface ThreadItemResource {
    * person wrote; render the message from `parts` and leave these out of the bubble.
    */
   clientContext: ClientContextPart[];
-  /**
-   * The tool's group, for example `instance`, `platform`, `agent` or `client`.
-   * @nullable
-   */
-  namespace: string | null;
-  /** @nullable */
-  tool: string | null;
-  /**
-   * The tool call's arguments as JSON text.
-   * @nullable
-   */
-  arguments: string | null;
-  /**
-   * What the tool call acts on, for display, such as a file path or an instance name.
-   * @nullable
-   */
-  target: string | null;
-  /**
-   * A one-line description of what the tool call did.
-   * @nullable
-   */
-  detail: string | null;
-  presentation: PresentationResource | null;
-  /** @nullable */
-  durationMs: number | null;
-  /**
-   * Whether the tool call needed a decision before it ran. Null for tool calls that need none.
-   * `auto_approved` was approved by the automatic reviewer.
-   * @nullable
-   */
-  approvalStatus: ThreadItemResourceApprovalStatus;
-  /** @nullable */
-  approvalReason: string | null;
-  /**
-   * The questions of an `ask` tool call. Null for other items.
-   * @nullable
-   */
-  questions: QuestionResource[] | null;
-  /**
-   * How long an `ask` tool call waits before it continues with its default answers. Null when it waits indefinitely.
-   * @nullable
-   */
-  autoAnswerMs: number | null;
+  /** The call, for a `tool_call` item. Null for other items. */
+  toolCall: ToolCallResource | null;
   createdAt: string;
 }
 
@@ -944,12 +991,22 @@ export interface ThreadItemListResponseBody {
   /** Oldest first. */
   items: ThreadItemResource[];
   /**
-   * Pass as `before` to read the page above. Null at the top.
+   * The first ordinal of the window; pass as `before` to read the window above. Null when the window is empty.
    * @nullable
    */
-  earlier: number | null;
+  startOrdinal: number | null;
   /**
-   * Subscribe to the conversation on /api/v1/realtime from this cursor to receive what is written after this page.
+   * The last ordinal of the window; pass as `after` to read the window below. Null when the window is empty.
+   * @nullable
+   */
+  endOrdinal: number | null;
+  hasEarlier: boolean;
+  hasLater: boolean;
+  /** Messages waiting for the assistant, in the order they were sent. Empty unless the window reaches the end. */
+  queued: ThreadItemResource[];
+  /**
+   * Subscribe to the conversation on /api/v1/realtime from this cursor to receive what is
+   * written after this window. Null unless the window reaches the end.
    * @nullable
    */
   streamCursor: string | null;
@@ -1065,7 +1122,7 @@ export interface CommandResultResource {
   name: string;
   /** The result as plain text. */
   message: string;
-  /** The conversation after the command, or the new conversation for /new. */
+  /** The conversation after the command. */
   thread: ThreadResource | null;
   /**
    * The turn the command started, for example the compaction turn of /compact.
@@ -2148,20 +2205,26 @@ export type ErrorResponse = Error;
 
 export type ListThreadItemsParams = {
   /**
-   * Return items with a smaller ordinal.
+   * Return the window ending just above this ordinal.
    * @minimum 0
    */
   before?: number;
   /**
-   * Return items with a greater ordinal. Cannot be combined with before.
+   * Return the window starting just below this ordinal.
    * @minimum 0
    */
   after?: number;
   /**
-   * @minimum 1
-   * @maximum 200
+   * Return a window containing this ordinal. Only one of before, after and around may be given.
+   * @minimum 0
    */
-  limit?: number;
+  around?: number;
+  /**
+   * How many turns a window holds at most.
+   * @minimum 1
+   * @maximum 50
+   */
+  turns?: number;
 };
 
 export type ListThreadTurnsParams = {

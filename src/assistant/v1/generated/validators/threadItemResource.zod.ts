@@ -25,14 +25,19 @@
 import * as zod from "zod";
 import { AttachmentResource } from "./attachmentResource.zod.js";
 import { ClientContextPart } from "./clientContextPart.zod.js";
+import { ItemSourceResource } from "./itemSourceResource.zod.js";
 import { PartResource } from "./partResource.zod.js";
-import { PresentationResource } from "./presentationResource.zod.js";
-import { QuestionResource } from "./questionResource.zod.js";
+import { ToolCallResource } from "./toolCallResource.zod.js";
 
 export const ThreadItemResource = zod
   .strictObject({
     id: zod.string(),
-    ordinal: zod.int().describe("The position in the transcript. Never renumbered."),
+    ordinal: zod
+      .int()
+      .nullable()
+      .describe(
+        "The position in the transcript. Never renumbered. Null for a message waiting in the queue.",
+      ),
     turnId: zod
       .string()
       .nullable()
@@ -55,21 +60,12 @@ export const ThreadItemResource = zod
     reverted: zod
       .boolean()
       .describe("Left out of model requests since a revert. Shown, but marked."),
-    sourceType: zod
-      .union([
-        zod.literal("subagent"),
-        zod.literal("task"),
-        zod.literal("channel"),
-        zod.literal(null),
-      ])
-      .nullable()
-      .describe(
-        "Who wrote an `external_message`: `subagent` for a subagent reporting to its parent,\n`task` for a task, `channel` for a chat app.",
-      ),
-    sourceId: zod
-      .string()
-      .nullable()
-      .describe("The subagent conversation, task or channel the message came from."),
+    truncated: zod
+      .boolean()
+      .describe("Part of the content was cut from this list; read the item for all of it."),
+    source: zod
+      .union([ItemSourceResource, zod.null()])
+      .describe("Who wrote an `external_message`. Null for other items."),
     modelId: zod
       .string()
       .nullable()
@@ -79,7 +75,7 @@ export const ThreadItemResource = zod
     parts: zod
       .array(PartResource)
       .describe(
-        "The content, in the order it was written. Text arrives as `append` frames on the realtime\nstream. An attachment belongs where it was written, so render parts in order.",
+        "The content, in the order it was written. Text arrives as `append` frames on the realtime\nstream. An attachment belongs where it was written, so render parts in order. For a tool\ncall these are its output.",
       ),
     attachments: zod.array(AttachmentResource),
     clientContext: zod
@@ -87,44 +83,9 @@ export const ThreadItemResource = zod
       .describe(
         "The `data-*` blocks the client attached to a user message. They are not part of what the\nperson wrote; render the message from `parts` and leave these out of the bubble.",
       ),
-    namespace: zod
-      .string()
-      .nullable()
-      .describe("The tool's group, for example `instance`, `platform`, `agent` or `client`."),
-    tool: zod.string().nullable(),
-    arguments: zod.string().nullable().describe("The tool call's arguments as JSON text."),
-    target: zod
-      .string()
-      .nullable()
-      .describe(
-        "What the tool call acts on, for display, such as a file path or an instance name.",
-      ),
-    detail: zod.string().nullable().describe("A one-line description of what the tool call did."),
-    presentation: zod.union([PresentationResource, zod.null()]),
-    durationMs: zod.int().nullable(),
-    approvalStatus: zod
-      .union([
-        zod.literal("pending"),
-        zod.literal("approved"),
-        zod.literal("declined"),
-        zod.literal("auto_approved"),
-        zod.literal(null),
-      ])
-      .nullable()
-      .describe(
-        "Whether the tool call needed a decision before it ran. Null for tool calls that need none.\n`auto_approved` was approved by the automatic reviewer.",
-      ),
-    approvalReason: zod.string().nullable(),
-    questions: zod
-      .array(QuestionResource)
-      .nullable()
-      .describe("The questions of an `ask` tool call. Null for other items."),
-    autoAnswerMs: zod
-      .int()
-      .nullable()
-      .describe(
-        "How long an `ask` tool call waits before it continues with its default answers. Null when it waits indefinitely.",
-      ),
+    toolCall: zod
+      .union([ToolCallResource, zod.null()])
+      .describe("The call, for a `tool_call` item. Null for other items."),
     createdAt: zod.iso.datetime({ offset: true }),
   })
   .describe("One entry of the transcript. `type` determines which fields it carries.");

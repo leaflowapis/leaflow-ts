@@ -89,6 +89,10 @@ export const SearchThreadsRequestBody = zod.strictObject({
     .min(1)
     .max(searchThreadsRequestBodyLimitMax)
     .default(searchThreadsRequestBodyLimitDefault),
+  include: zod
+    .array(zod.enum(["counts"]))
+    .optional()
+    .describe("Optional parts of the response. `counts` adds `counts`."),
 });
 
 export type SearchThreadsRequestBody = zod.input<typeof SearchThreadsRequestBody>;

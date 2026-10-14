@@ -27,15 +27,30 @@ import { ThreadItemResource } from "./threadItemResource.zod.js";
 
 export const ThreadItemListResponseBody = zod.strictObject({
   items: zod.array(ThreadItemResource).describe("Oldest first."),
-  earlier: zod
+  startOrdinal: zod
     .int()
     .nullable()
-    .describe("Pass as `before` to read the page above. Null at the top."),
+    .describe(
+      "The first ordinal of the window; pass as `before` to read the window above. Null when the window is empty.",
+    ),
+  endOrdinal: zod
+    .int()
+    .nullable()
+    .describe(
+      "The last ordinal of the window; pass as `after` to read the window below. Null when the window is empty.",
+    ),
+  hasEarlier: zod.boolean(),
+  hasLater: zod.boolean(),
+  queued: zod
+    .array(ThreadItemResource)
+    .describe(
+      "Messages waiting for the assistant, in the order they were sent. Empty unless the window reaches the end.",
+    ),
   streamCursor: zod
     .string()
     .nullable()
     .describe(
-      "Subscribe to the conversation on /api/v1/realtime from this cursor to receive what is written after this page.",
+      "Subscribe to the conversation on /api/v1/realtime from this cursor to receive what is\nwritten after this window. Null unless the window reaches the end.",
     ),
 });
 

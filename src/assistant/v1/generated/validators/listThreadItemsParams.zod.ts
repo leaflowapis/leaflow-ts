@@ -28,17 +28,20 @@ export const listThreadItemsParamsBeforeMin = 0;
 
 export const listThreadItemsParamsAfterMin = 0;
 
-export const listThreadItemsParamsLimitDefault = 100;
-export const listThreadItemsParamsLimitMax = 200;
+export const listThreadItemsParamsAroundMin = 0;
+
+export const listThreadItemsParamsTurnsDefault = 10;
+export const listThreadItemsParamsTurnsMax = 50;
 
 export const ListThreadItemsParams = zod.strictObject({
   before: zod.int().min(listThreadItemsParamsBeforeMin).optional(),
   after: zod.int().min(listThreadItemsParamsAfterMin).optional(),
-  limit: zod
+  around: zod.int().min(listThreadItemsParamsAroundMin).optional(),
+  turns: zod
     .int()
     .min(1)
-    .max(listThreadItemsParamsLimitMax)
-    .default(listThreadItemsParamsLimitDefault),
+    .max(listThreadItemsParamsTurnsMax)
+    .default(listThreadItemsParamsTurnsDefault),
 });
 
 export type ListThreadItemsParams = zod.input<typeof ListThreadItemsParams>;

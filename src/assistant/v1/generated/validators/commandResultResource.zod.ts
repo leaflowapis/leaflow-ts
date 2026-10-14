@@ -29,9 +29,7 @@ import { ThreadResource } from "./threadResource.zod.js";
 export const CommandResultResource = zod.strictObject({
   name: zod.string().describe("The command that ran, after resolving aliases."),
   message: zod.string().describe("The result as plain text."),
-  thread: zod
-    .union([ThreadResource, zod.null()])
-    .describe("The conversation after the command, or the new conversation for /new."),
+  thread: zod.union([ThreadResource, zod.null()]).describe("The conversation after the command."),
   turnId: zod
     .string()
     .nullable()

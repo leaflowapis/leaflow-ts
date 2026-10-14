@@ -255,6 +255,15 @@ export const routes = [
   {
     service: "assistant",
     contract: "assistant",
+    method: "GET",
+    path: "/api/v1/threads/{thread}/items/{item}",
+    operationId: "get-thread-item",
+    securityScheme: "ScopedToken",
+    upstreamUrl: "https://assistant.leaflow.cloud",
+  },
+  {
+    service: "assistant",
+    contract: "assistant",
     method: "POST",
     path: "/api/v1/threads/{thread}/messages",
     operationId: "send-message",

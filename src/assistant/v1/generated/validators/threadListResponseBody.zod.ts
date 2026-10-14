@@ -29,7 +29,9 @@ import { ThreadResource } from "./threadResource.zod.js";
 export const ThreadListResponseBody = zod.strictObject({
   threads: zod.array(ThreadResource),
   nextCursor: zod.string().nullable().describe("Null on the last page."),
-  counts: ThreadCountsResource,
+  counts: zod
+    .union([ThreadCountsResource, zod.null()])
+    .describe("Null unless `include` asked for it."),
 });
 
 export type ThreadListResponseBody = zod.input<typeof ThreadListResponseBody>;

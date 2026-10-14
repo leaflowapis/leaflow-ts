@@ -81,6 +81,7 @@ import type {
   TaskRunListResponseBody,
   TaskRunResource,
   ThreadItemListResponseBody,
+  ThreadItemResource,
   ThreadListResponseBody,
   ThreadResource,
   ThreadTurnListResponseBody,
@@ -246,6 +247,9 @@ export const getSearchThreadsUrl = () => {
  * Subagents are conversations too. They are excluded unless `parentId` or `role` asks for them.
  * `ids` reads a bounded batch, including subagents and archived conversations, and cannot be
  * combined with a cursor.
+ *
+ * Counts over everything the criteria match cost more than the page itself; ask for them with
+ * `include: [counts]`, typically on the first page only.
  * @summary Search conversations
  */
 export const searchThreads = async (
@@ -759,13 +763,21 @@ export const getListThreadItemsUrl = (thread: string, params?: ListThreadItemsPa
 };
 
 /**
- * The conversation's transcript, oldest first: messages, reasoning, tool calls and compaction
- * markers. Without `before` or `after` the latest page is returned.
+ * A window of the conversation's transcript, oldest first: messages, reasoning, tool calls and
+ * compaction markers. A window holds whole turns, so a turn's messages and tool calls arrive
+ * together; a single turn larger than the size limit is split across windows.
  *
- * Pass `earlier` from the response as `before` to read further up; null means the top has been
- * reached. `after` returns what was written after an ordinal, which a client uses to catch up
- * after a reconnect. Subscribe to `thread:{id}` on /api/v1/realtime with `streamCursor` to follow
- * what is written next.
+ * Without a position the window ends at the latest item. `before` reads the window above an
+ * ordinal and `after` the window below it; pass `startOrdinal` and `endOrdinal` from the response.
+ * `around` opens a window that contains an ordinal, for jumping to a turn from list-thread-turns or
+ * to a search result.
+ *
+ * Long reasoning, tool arguments and tool output are cut to a preview and marked `truncated`; read
+ * the item for all of it. Messages are never cut.
+ *
+ * When the window reaches the end, `queued` holds the messages waiting for the assistant and
+ * `streamCursor` is set: subscribe to `thread:{id}` on /api/v1/realtime from it to follow what is
+ * written next.
  * @summary List transcript items
  */
 export const listThreadItems = async (
@@ -783,6 +795,50 @@ export const listThreadItems = async (
 
   const data: listThreadItemsResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listThreadItemsResponse;
+};
+
+export type getThreadItemResponse200 = {
+  data: ThreadItemResource;
+  status: 200;
+};
+
+export type getThreadItemResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getThreadItemResponseSuccess = getThreadItemResponse200 & {
+  headers: Headers;
+};
+export type getThreadItemResponseError = getThreadItemResponseDefault & {
+  headers: Headers;
+};
+
+export type getThreadItemResponse = getThreadItemResponseSuccess | getThreadItemResponseError;
+
+export const getGetThreadItemUrl = (thread: string, item: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/items/${encodeURIComponent(String(item))}`;
+};
+
+/**
+ * One item in full, including what list-thread-items cut from it.
+ * @summary Get a transcript item
+ */
+export const getThreadItem = async (
+  thread: string,
+  item: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getThreadItemResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetThreadItemUrl(thread, item), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getThreadItemResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getThreadItemResponse;
 };
 
 export type sendMessageResponse202 = {
@@ -1102,6 +1158,9 @@ export const getListThreadTurnsUrl = (thread: string, params?: ListThreadTurnsPa
  * The conversation's turns, newest first, each with the model and reasoning effort it ran with,
  * how long it took and the tokens it used. Cache hit rate is `cachedInputTokens / inputTokens`.
  *
+ * Each turn names the ordinals it wrote and the message that started it, so a client can draw a
+ * timeline from this list and open a turn with list-thread-items `around`.
+ *
  * `ids` reads the turns behind a page of transcript items in one request and cannot be combined
  * with a cursor.
  * @summary List turns
@@ -1195,8 +1254,9 @@ export const getRunCommandUrl = (thread: string) => {
  * The result carries a plain-text `message`, which is what a chat app shows, and structured fields
  * for clients that render more, such as `status` for /status.
  *
- * Fails with 404 and code COMMAND_NOT_FOUND for an unknown command, and with 422 and code
- * COMMAND_ARGUMENTS_INVALID when the arguments do not fit.
+ * /new is carried out by the client, which opens an empty conversation, and fails here with 422
+ * and code COMMAND_CLIENT_ONLY. Fails with 404 and code COMMAND_NOT_FOUND for an unknown command,
+ * and with 422 and code COMMAND_ARGUMENTS_INVALID when the arguments do not fit.
  * @summary Run a command
  */
 export const runCommand = async (
