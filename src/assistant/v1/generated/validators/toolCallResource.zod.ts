@@ -44,7 +44,6 @@ export const ToolCallResource = zod.strictObject({
     .describe("What the call acts on, for display, such as a file path or an instance name."),
   detail: zod.string().nullable().describe("A one-line description of what the call did."),
   presentation: zod.union([PresentationResource, zod.null()]),
-  durationMs: zod.int().nullable(),
   approvalStatus: zod
     .union([
       zod.literal("pending"),

@@ -62,7 +62,9 @@ export const ThreadItemResource = zod
       .describe("Left out of model requests since a revert. Shown, but marked."),
     truncated: zod
       .boolean()
-      .describe("Part of the content was cut from this list; read the item for all of it."),
+      .describe(
+        "Long reasoning or tool arguments were cut from this list; read the item for all of it.",
+      ),
     source: zod
       .union([ItemSourceResource, zod.null()])
       .describe("Who wrote an `external_message`. Null for other items."),
@@ -72,10 +74,16 @@ export const ThreadItemResource = zod
       .describe(
         "The Canopy model that produced this item. Null for messages a person or another source sent.",
       ),
+    durationMs: zod
+      .int()
+      .nullable()
+      .describe(
+        "How long the reasoning or the tool call took. Null while it runs and for other items.",
+      ),
     parts: zod
       .array(PartResource)
       .describe(
-        "The content, in the order it was written. Text arrives as `append` frames on the realtime\nstream. An attachment belongs where it was written, so render parts in order. For a tool\ncall these are its output.",
+        "The content, in the order it was written. Text arrives as `append` frames on the realtime\nstream. An attachment belongs where it was written, so render parts in order. Empty for\ntool calls; their outcome is in `toolCall.detail` and `toolCall.presentation`.",
       ),
     attachments: zod.array(AttachmentResource),
     clientContext: zod

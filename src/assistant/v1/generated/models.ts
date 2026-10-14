@@ -909,8 +909,6 @@ export interface ToolCallResource {
    */
   detail: string | null;
   presentation: PresentationResource | null;
-  /** @nullable */
-  durationMs: number | null;
   /**
    * Whether the call needed a decision before it ran. Null for calls that need none.
    * `auto_approved` was approved by the automatic reviewer.
@@ -961,7 +959,7 @@ export interface ThreadItemResource {
   status: ThreadItemResourceStatus;
   /** Left out of model requests since a revert. Shown, but marked. */
   reverted: boolean;
-  /** Part of the content was cut from this list; read the item for all of it. */
+  /** Long reasoning or tool arguments were cut from this list; read the item for all of it. */
   truncated: boolean;
   /** Who wrote an `external_message`. Null for other items. */
   source: ItemSourceResource | null;
@@ -971,9 +969,14 @@ export interface ThreadItemResource {
    */
   modelId: string | null;
   /**
+   * How long the reasoning or the tool call took. Null while it runs and for other items.
+   * @nullable
+   */
+  durationMs: number | null;
+  /**
    * The content, in the order it was written. Text arrives as `append` frames on the realtime
-   * stream. An attachment belongs where it was written, so render parts in order. For a tool
-   * call these are its output.
+   * stream. An attachment belongs where it was written, so render parts in order. Empty for
+   * tool calls; their outcome is in `toolCall.detail` and `toolCall.presentation`.
    */
   parts: PartResource[];
   attachments: AttachmentResource[];
