@@ -1338,8 +1338,11 @@ export interface TaskRunResource {
    * @nullable
    */
   exitCode: number | null;
-  /** The end of a command's output. Empty for prompts. */
-  output: string;
+  /**
+   * The last 16 KiB of a command's output. Empty for prompts; null in lists, read the run for it.
+   * @nullable
+   */
+  output: string | null;
   /**
    * Why the run failed. Null unless status is failed.
    * @nullable

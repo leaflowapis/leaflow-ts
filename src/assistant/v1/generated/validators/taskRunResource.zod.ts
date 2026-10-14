@@ -31,7 +31,12 @@ export const TaskRunResource = zod.strictObject({
   startedAt: zod.iso.datetime({ offset: true }).nullable(),
   finishedAt: zod.iso.datetime({ offset: true }).nullable(),
   exitCode: zod.int().nullable().describe("For commands. Null until the command exits."),
-  output: zod.string().describe("The end of a command's output. Empty for prompts."),
+  output: zod
+    .string()
+    .nullable()
+    .describe(
+      "The last 16 KiB of a command's output. Empty for prompts; null in lists, read the run for it.",
+    ),
   errorCode: zod.string().nullable().describe("Why the run failed. Null unless status is failed."),
 });
 

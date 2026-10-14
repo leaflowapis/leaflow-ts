@@ -2197,7 +2197,7 @@ export const getListTaskRunsUrl = (task: string, params?: ListTaskRunsParams) =>
 };
 
 /**
- * Newest first.
+ * Newest first, without output; read a run with get-task-run for it.
  * @summary List a task's runs
  */
 export const listTaskRuns = async (
@@ -2215,6 +2215,50 @@ export const listTaskRuns = async (
 
   const data: listTaskRunsResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listTaskRunsResponse;
+};
+
+export type getTaskRunResponse200 = {
+  data: TaskRunResource;
+  status: 200;
+};
+
+export type getTaskRunResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getTaskRunResponseSuccess = getTaskRunResponse200 & {
+  headers: Headers;
+};
+export type getTaskRunResponseError = getTaskRunResponseDefault & {
+  headers: Headers;
+};
+
+export type getTaskRunResponse = getTaskRunResponseSuccess | getTaskRunResponseError;
+
+export const getGetTaskRunUrl = (task: string, run: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/tasks/${encodeURIComponent(String(task))}/runs/${encodeURIComponent(String(run))}`;
+};
+
+/**
+ * One run with the end of its output.
+ * @summary Get a task run
+ */
+export const getTaskRun = async (
+  task: string,
+  run: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getTaskRunResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetTaskRunUrl(task, run), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getTaskRunResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getTaskRunResponse;
 };
 
 export type getSettingsResponse200 = {

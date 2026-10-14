@@ -618,7 +618,7 @@ export const CancelTaskRunParams = zod.strictObject({
 });
 
 /**
- * Newest first.
+ * Newest first, without output; read a run with get-task-run for it.
  * @summary List a task's runs
  */
 export const listTaskRunsPathTaskMax = 64;
@@ -645,6 +645,19 @@ export const ListTaskRunsQueryParams = zod.strictObject({
     .max(listTaskRunsQueryLimitMax)
     .default(listTaskRunsQueryLimitDefault)
     .describe("Items returned in this page. Defaults to 50; at most 200."),
+});
+
+/**
+ * One run with the end of its output.
+ * @summary Get a task run
+ */
+export const getTaskRunPathTaskMax = 64;
+
+export const getTaskRunPathRunMax = 128;
+
+export const GetTaskRunParams = zod.strictObject({
+  task: zod.string().max(getTaskRunPathTaskMax).describe("A task id."),
+  run: zod.string().max(getTaskRunPathRunMax).describe("A task run id."),
 });
 
 /**
