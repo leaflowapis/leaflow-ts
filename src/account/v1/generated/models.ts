@@ -15,6 +15,10 @@
  * 3. Every other service is called with that scoped token.
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
+ *
+ * ## Project slugs
+ *
+ * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
  * OpenAPI spec version: 1.0.0
  */
 /**
@@ -362,6 +366,12 @@ export interface ProjectResource {
   deleted_at: string | null;
   description: string;
   id: string;
+  /**
+   * The label naming the project in its address. It equals `id` until a custom slug is chosen. A custom slug does not change once set, and stays with the project after deletion
+   * @minLength 1
+   * @maxLength 36
+   */
+  slug: string;
   name: string;
   updated_at: string;
 }
@@ -437,6 +447,30 @@ export interface CreateProjectRequestBody {
    * @maxLength 128
    */
   name: string;
+  /**
+   * A custom slug of 6 to 32 characters made of lower-case letters, digits and single hyphens, beginning with a letter and ending with a letter or digit. Omitted or empty, the slug is the new project's `id`, and a custom slug can be set once later
+   * @maxLength 32
+   */
+  slug?: string;
+}
+
+/**
+ * `available` when the slug can be chosen now, `reserved` when the name is reserved, and `taken` when a project, including a deleted one, holds it
+ */
+export type ProjectSlugAvailabilityResourceStatus =
+  (typeof ProjectSlugAvailabilityResourceStatus)[keyof typeof ProjectSlugAvailabilityResourceStatus];
+
+export const ProjectSlugAvailabilityResourceStatus = {
+  available: "available",
+  reserved: "reserved",
+  taken: "taken",
+} as const;
+
+export interface ProjectSlugAvailabilityResource {
+  /** The slug asked about */
+  slug: string;
+  /** `available` when the slug can be chosen now, `reserved` when the name is reserved, and `taken` when a project, including a deleted one, holds it */
+  status: ProjectSlugAvailabilityResourceStatus;
 }
 
 export interface ScopedTokenResponseBody {
@@ -514,7 +548,7 @@ export type ListProjectsParams = {
    */
   offset?: number;
   /**
-   * Matches against name or description
+   * Matches against name, slug or description, and against the id when it is a complete project id
    * @maxLength 128
    */
   keyword?: string;

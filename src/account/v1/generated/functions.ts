@@ -15,6 +15,10 @@
  * 3. Every other service is called with that scoped token.
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
+ *
+ * ## Project slugs
+ *
+ * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
  * OpenAPI spec version: 1.0.0
  */
 import type {
@@ -35,6 +39,7 @@ import type {
   LocaleOptionsResource,
   PreviewInvitationByTokenParams,
   ProjectAccessResource,
+  ProjectSlugAvailabilityResource,
   RegisterRequestBody,
   ScopedTokenResponseBody,
   SettingsResource,
@@ -921,6 +926,12 @@ export const getCreateProjectUrl = () => {
 
 /**
  * The caller becomes its owner. The project is created with the built-in `OWNER` and `ADMIN` roles and a `member` role carrying no permissions.
+ *
+ * A custom `slug` may be chosen here; without one the slug is the new project's `id`. A custom slug is refused with:
+ *
+ * - 400 `PROJECT_SLUG_INVALID` when it does not follow the format described on `slug`;
+ * - 422 `PROJECT_SLUG_RESERVED` when the name is reserved;
+ * - 409 `PROJECT_SLUG_TAKEN` when another project, including a deleted one, holds it.
  * @summary Create a project
  */
 export const createProject = async (
@@ -958,6 +969,150 @@ export const createProject = async (
 
   const data: createProjectResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as createProjectResponse;
+};
+
+export type getProjectBySlugResponse200 = {
+  data: ProjectAccessResource;
+  status: 200;
+};
+
+export type getProjectBySlugResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getProjectBySlugResponseSuccess = getProjectBySlugResponse200 & {
+  headers: Headers;
+};
+export type getProjectBySlugResponseError = getProjectBySlugResponseDefault & {
+  headers: Headers;
+};
+
+export type getProjectBySlugResponse =
+  | getProjectBySlugResponseSuccess
+  | getProjectBySlugResponseError;
+
+export const getGetProjectBySlugUrl = (slug: string) => {
+  return `https://account.leaflow.cloud/account/v1/projects/by-slug/${encodeURIComponent(String(slug))}`;
+};
+
+/**
+ * Returns a project the caller belongs to, found by an address label: a custom slug is compared exactly, and a label in the form of a project id finds the project with that id, whether or not it has since chosen a custom slug.
+ *
+ * A deleted project is returned, answering that it is gone. Fails with:
+ *
+ * - 400 `PROJECT_SLUG_INVALID` when the value cannot be a slug;
+ * - 404 `PROJECT_NOT_FOUND` when no project holds the slug;
+ * - 403 `PROJECT_MEMBERSHIP_REQUIRED` when the caller is not a member of the project.
+ * @summary Get a project by its slug
+ */
+export const getProjectBySlug = async (
+  slug: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getProjectBySlugResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetProjectBySlugUrl(slug), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getProjectBySlugResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getProjectBySlugResponse;
+};
+
+export type getProjectResponse200 = {
+  data: ProjectAccessResource;
+  status: 200;
+};
+
+export type getProjectResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getProjectResponseSuccess = getProjectResponse200 & {
+  headers: Headers;
+};
+export type getProjectResponseError = getProjectResponseDefault & {
+  headers: Headers;
+};
+
+export type getProjectResponse = getProjectResponseSuccess | getProjectResponseError;
+
+export const getGetProjectUrl = (projectId: string) => {
+  return `https://account.leaflow.cloud/account/v1/projects/${encodeURIComponent(String(projectId))}`;
+};
+
+/**
+ * Returns a project the caller belongs to. A deleted project is returned, answering that it is gone. Fails with:
+ *
+ * - 404 `PROJECT_NOT_FOUND` when no project has the id;
+ * - 403 `PROJECT_MEMBERSHIP_REQUIRED` when the caller is not a member of the project.
+ * @summary Get a project
+ */
+export const getProject = async (
+  projectId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getProjectResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetProjectUrl(projectId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getProjectResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getProjectResponse;
+};
+
+export type getProjectSlugAvailabilityResponse200 = {
+  data: ProjectSlugAvailabilityResource;
+  status: 200;
+};
+
+export type getProjectSlugAvailabilityResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getProjectSlugAvailabilityResponseSuccess = getProjectSlugAvailabilityResponse200 & {
+  headers: Headers;
+};
+export type getProjectSlugAvailabilityResponseError = getProjectSlugAvailabilityResponseDefault & {
+  headers: Headers;
+};
+
+export type getProjectSlugAvailabilityResponse =
+  | getProjectSlugAvailabilityResponseSuccess
+  | getProjectSlugAvailabilityResponseError;
+
+export const getGetProjectSlugAvailabilityUrl = (slug: string) => {
+  return `https://account.leaflow.cloud/account/v1/project-slugs/${encodeURIComponent(String(slug))}/availability`;
+};
+
+/**
+ * Reports whether a custom slug can be chosen now. Nothing is reserved by asking: the slug is claimed only by creating a project with it or by setting it, either of which may still fail with 409 `PROJECT_SLUG_TAKEN`.
+ *
+ * Fails with 400 `PROJECT_SLUG_INVALID` when the value does not follow the format of a custom slug.
+ * @summary Check whether a custom slug can be chosen
+ */
+export const getProjectSlugAvailability = async (
+  slug: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getProjectSlugAvailabilityResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetProjectSlugAvailabilityUrl(slug), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getProjectSlugAvailabilityResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getProjectSlugAvailabilityResponse;
 };
 
 export type createScopedTokenResponse201 = {

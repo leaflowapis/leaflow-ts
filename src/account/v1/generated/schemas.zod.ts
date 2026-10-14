@@ -15,6 +15,10 @@
  * 3. Every other service is called with that scoped token.
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
+ *
+ * ## Project slugs
+ *
+ * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -149,15 +153,62 @@ export const ListProjectsQueryParams = zod.strictObject({
     .string()
     .max(listProjectsQueryKeywordMax)
     .optional()
-    .describe("Matches against name or description"),
+    .describe(
+      "Matches against name, slug or description, and against the id when it is a complete project id",
+    ),
   include_deleted: zod.boolean().default(listProjectsQueryIncludeDeletedDefault),
 });
 
 /**
  * The caller becomes its owner. The project is created with the built-in `OWNER` and `ADMIN` roles and a `member` role carrying no permissions.
+ *
+ * A custom `slug` may be chosen here; without one the slug is the new project's `id`. A custom slug is refused with:
+ *
+ * - 400 `PROJECT_SLUG_INVALID` when it does not follow the format described on `slug`;
+ * - 422 `PROJECT_SLUG_RESERVED` when the name is reserved;
+ * - 409 `PROJECT_SLUG_TAKEN` when another project, including a deleted one, holds it.
  * @summary Create a project
  */
 export const CreateProjectBody = CreateProjectRequestBody;
+
+/**
+ * Returns a project the caller belongs to, found by an address label: a custom slug is compared exactly, and a label in the form of a project id finds the project with that id, whether or not it has since chosen a custom slug.
+ *
+ * A deleted project is returned, answering that it is gone. Fails with:
+ *
+ * - 400 `PROJECT_SLUG_INVALID` when the value cannot be a slug;
+ * - 404 `PROJECT_NOT_FOUND` when no project holds the slug;
+ * - 403 `PROJECT_MEMBERSHIP_REQUIRED` when the caller is not a member of the project.
+ * @summary Get a project by its slug
+ */
+export const getProjectBySlugPathSlugMax = 63;
+
+export const GetProjectBySlugParams = zod.strictObject({
+  slug: zod.string().min(1).max(getProjectBySlugPathSlugMax),
+});
+
+/**
+ * Returns a project the caller belongs to. A deleted project is returned, answering that it is gone. Fails with:
+ *
+ * - 404 `PROJECT_NOT_FOUND` when no project has the id;
+ * - 403 `PROJECT_MEMBERSHIP_REQUIRED` when the caller is not a member of the project.
+ * @summary Get a project
+ */
+export const GetProjectParams = zod.strictObject({
+  projectId: zod.uuid(),
+});
+
+/**
+ * Reports whether a custom slug can be chosen now. Nothing is reserved by asking: the slug is claimed only by creating a project with it or by setting it, either of which may still fail with 409 `PROJECT_SLUG_TAKEN`.
+ *
+ * Fails with 400 `PROJECT_SLUG_INVALID` when the value does not follow the format of a custom slug.
+ * @summary Check whether a custom slug can be chosen
+ */
+export const getProjectSlugAvailabilityPathSlugMax = 63;
+
+export const GetProjectSlugAvailabilityParams = zod.strictObject({
+  slug: zod.string().min(1).max(getProjectSlugAvailabilityPathSlugMax),
+});
 
 /**
  * Once a project has been chosen, exchange the access token for a scoped token for that project.

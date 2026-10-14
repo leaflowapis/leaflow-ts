@@ -15,6 +15,10 @@
  * 3. Every other service is called with that scoped token.
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
+ *
+ * ## Project slugs
+ *
+ * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -40,7 +44,9 @@ export const ListProjectsParams = zod.strictObject({
     .string()
     .max(listProjectsParamsKeywordMax)
     .optional()
-    .describe("Matches against name or description"),
+    .describe(
+      "Matches against name, slug or description, and against the id when it is a complete project id",
+    ),
   include_deleted: zod.boolean().default(listProjectsParamsIncludeDeletedDefault),
 });
 

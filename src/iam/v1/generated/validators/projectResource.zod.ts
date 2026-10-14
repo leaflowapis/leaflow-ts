@@ -15,6 +15,8 @@
 import * as zod from "zod";
 import { ProjectTraitResource } from "./projectTraitResource.zod.js";
 
+export const projectResourceSlugMax = 36;
+
 export const ProjectResource = zod.strictObject({
   traits: zod.array(ProjectTraitResource),
   deletion_requested_at: zod.iso.datetime({ offset: true }).nullable(),
@@ -26,6 +28,13 @@ export const ProjectResource = zod.strictObject({
     .describe("When the project was deleted"),
   description: zod.string(),
   id: zod.uuid(),
+  slug: zod
+    .string()
+    .min(1)
+    .max(projectResourceSlugMax)
+    .describe(
+      "The label naming the project in its address. It equals `id` until a custom slug is chosen. A custom slug does not change once set, and stays with the project after deletion",
+    ),
   name: zod.string(),
   updated_at: zod.iso.datetime({ offset: true }),
 });
