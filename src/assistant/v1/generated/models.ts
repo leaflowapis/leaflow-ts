@@ -15,8 +15,8 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -288,6 +288,11 @@ export interface ThreadResource {
   /** The assistant replied after the conversation was last marked read. */
   unread: boolean;
   archived: boolean;
+  /**
+   * How many messages the person has sent in this conversation, as listed by list-thread-messages.
+   * @minimum 0
+   */
+  messageCount: number;
   createdAt: string;
   /** The last activity. Renaming or moving the conversation does not change it. */
   updatedAt: string;
@@ -667,6 +672,14 @@ export interface ThreadTurnResource {
   toolCalls: number;
   /** Tokens used by every model request of this turn, including title generation, review and compaction. */
   usage: Usage;
+  /**
+   * An estimate of the output tokens of the model request in progress, which `usage` does not
+   * count yet. It grows about once a second while the model writes and returns to 0 when the
+   * request ends and its exact usage is added. Show `usage.outputTokens` plus this while the turn
+   * runs.
+   * @minimum 0
+   */
+  streamingOutputTokens: number;
   startedAt: string;
   /**
    * When the first output token arrived. Null until then.
@@ -872,6 +885,22 @@ export const ToolCallResourceApprovalStatus = {
   unreviewed: "unreviewed",
 } as const;
 
+/**
+ * Who decided the call. `user` is the person, in the console or a chat app; `auto_review` is
+ * the automatic reviewer; `policy` is the tool itself, which cannot be called this way. Null
+ * when nobody decided, including calls that needed no decision.
+ * @nullable
+ */
+export type ToolCallResourceApprovalSource =
+  | (typeof ToolCallResourceApprovalSource)[keyof typeof ToolCallResourceApprovalSource]
+  | null;
+
+export const ToolCallResourceApprovalSource = {
+  user: "user",
+  auto_review: "auto_review",
+  policy: "policy",
+} as const;
+
 export interface ChoiceResource {
   label: string;
   description: string;
@@ -917,6 +946,13 @@ export interface ToolCallResource {
   approvalStatus: ToolCallResourceApprovalStatus;
   /** @nullable */
   approvalReason: string | null;
+  /**
+   * Who decided the call. `user` is the person, in the console or a chat app; `auto_review` is
+   * the automatic reviewer; `policy` is the tool itself, which cannot be called this way. Null
+   * when nobody decided, including calls that needed no decision.
+   * @nullable
+   */
+  approvalSource: ToolCallResourceApprovalSource;
   /**
    * When a person or the reviewer decided the call or answered its questions.
    * @nullable
@@ -987,7 +1023,48 @@ export interface ThreadItemResource {
   clientContext: ClientContextPart[];
   /** The call, for a `tool_call` item. Null for other items. */
   toolCall: ToolCallResource | null;
+  /**
+   * The position of a `user_message` among the person's messages, from 1, as in
+   * list-thread-messages. Null for other items, and for messages that are reverted or waiting
+   * in the queue.
+   * @minimum 1
+   * @nullable
+   */
+  messageIndex: number | null;
   createdAt: string;
+}
+
+/**
+ * One message the person sent, as an entry of the conversation's outline.
+ */
+export interface ThreadMessageResource {
+  /** The transcript item. */
+  id: string;
+  /**
+   * The position among the person's messages, from 1.
+   * @minimum 1
+   */
+  index: number;
+  /** The item's position in the transcript, for list-thread-items `around`. */
+  ordinal: number;
+  turnId: string;
+  /** The beginning of the message's text, at most 120 characters. Empty for a message with only attachments. */
+  preview: string;
+  /**
+   * How many files the message carries.
+   * @minimum 0
+   */
+  attachments: number;
+  createdAt: string;
+}
+
+export interface ThreadMessageListResponseBody {
+  messages: ThreadMessageResource[];
+  /**
+   * How many messages the person has sent in this conversation, the same as the thread's `messageCount`.
+   * @minimum 0
+   */
+  total: number;
 }
 
 export interface ThreadItemListResponseBody {
@@ -1072,68 +1149,6 @@ export interface ToolResultRequestBody {
    * @maxLength 500
    */
   nextCursor?: string;
-}
-
-export interface CommandResource {
-  /** The command without the slash, for example `status`. */
-  name: string;
-  /** Other names that run the same command. */
-  aliases: string[];
-  description: string;
-  /** How to write the arguments, for example `<model id>`. Empty when the command takes none. */
-  argumentHint: string;
-}
-
-export interface CommandListResponseBody {
-  commands: CommandResource[];
-}
-
-export interface RunCommandRequestBody {
-  /**
-   * The command or one of its aliases, without the slash.
-   * @minLength 1
-   * @maxLength 32
-   */
-  name: string;
-  /**
-   * Everything typed after the command name.
-   * @maxLength 2000
-   */
-  arguments?: string;
-}
-
-/**
- * The conversation's configuration and resource use, as shown by /status.
- */
-export interface StatusReportResource {
-  threadId: string;
-  modelId: string;
-  /** The model's display name in the Canopy catalogue. Falls back to modelId. */
-  modelName: string;
-  reasoningEffort: ReasoningEffort | null;
-  approvalMode: ApprovalMode;
-  status: ThreadStatus;
-  context: ContextUsageResource;
-  /** Token usage over the whole conversation. */
-  usage: Usage;
-  /** The most recent turn with its own usage. Null before the first message. */
-  lastTurn: ThreadTurnResource | null;
-}
-
-export interface CommandResultResource {
-  /** The command that ran, after resolving aliases. */
-  name: string;
-  /** The result as plain text. */
-  message: string;
-  /** The conversation after the command. */
-  thread: ThreadResource | null;
-  /**
-   * The turn the command started, for example the compaction turn of /compact.
-   * @nullable
-   */
-  turnId: string | null;
-  /** Set by /status. */
-  status: StatusReportResource | null;
 }
 
 /**
@@ -1328,6 +1343,19 @@ export const TaskRunResourceStatus = {
   timed_out: "timed_out",
 } as const;
 
+/**
+ * How the run started: `schedule` by the task's own trigger, including a task set to run now;
+ * `manual` by a person running it outside its schedule; `assistant` by the assistant.
+ */
+export type TaskRunResourceTrigger =
+  (typeof TaskRunResourceTrigger)[keyof typeof TaskRunResourceTrigger];
+
+export const TaskRunResourceTrigger = {
+  schedule: "schedule",
+  manual: "manual",
+  assistant: "assistant",
+} as const;
+
 export interface TaskRunResource {
   id: string;
   taskId: string;
@@ -1351,6 +1379,11 @@ export interface TaskRunResource {
    * @nullable
    */
   errorCode: string | null;
+  /**
+   * How the run started: `schedule` by the task's own trigger, including a task set to run now;
+   * `manual` by a person running it outside its schedule; `assistant` by the assistant.
+   */
+  trigger: TaskRunResourceTrigger;
 }
 
 export interface TaskResource {
@@ -2231,6 +2264,21 @@ export type ListThreadItemsParams = {
    * @maximum 50
    */
   turns?: number;
+};
+
+export type ListThreadMessagesParams = {
+  /**
+   * Items to skip. Defaults to 0; at most 10000.
+   * @minimum 0
+   * @maximum 10000
+   */
+  offset?: number;
+  /**
+   * Items returned in this page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
 };
 
 export type ListThreadTurnsParams = {

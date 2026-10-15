@@ -15,8 +15,8 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -34,6 +34,8 @@ import { TodoResource } from "./todoResource.zod.js";
 import { Usage } from "./usage.zod.js";
 
 export const threadResourceOrderVersionMin = 0;
+
+export const threadResourceMessageCountMin = 0;
 
 export const ThreadResource = zod
   .strictObject({
@@ -102,6 +104,12 @@ export const ThreadResource = zod
       .boolean()
       .describe("The assistant replied after the conversation was last marked read."),
     archived: zod.boolean(),
+    messageCount: zod
+      .int()
+      .min(threadResourceMessageCountMin)
+      .describe(
+        "How many messages the person has sent in this conversation, as listed by list-thread-messages.",
+      ),
     createdAt: zod.iso.datetime({ offset: true }),
     updatedAt: zod.iso
       .datetime({ offset: true })

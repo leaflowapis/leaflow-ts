@@ -15,8 +15,8 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -29,8 +29,6 @@ import type {
   ChannelResource,
   ChannelWithSecretResponseBody,
   CheckSenderParams,
-  CommandListResponseBody,
-  CommandResultResource,
   CompleteUploadRequestBody,
   CreateChannelRequestBody,
   CreateFolderRequestBody,
@@ -49,6 +47,7 @@ import type {
   ListChannelsParams,
   ListTaskRunsParams,
   ListThreadItemsParams,
+  ListThreadMessagesParams,
   ListThreadTurnsParams,
   LoginResource,
   MemoryListResponseBody,
@@ -65,7 +64,6 @@ import type {
   RevertRequestBody,
   RevertedCountResponseBody,
   RotateSecretRequestBody,
-  RunCommandRequestBody,
   SearchTasksRequestBody,
   SearchThreadsRequestBody,
   SendMessageRequestBody,
@@ -83,6 +81,7 @@ import type {
   ThreadItemListResponseBody,
   ThreadItemResource,
   ThreadListResponseBody,
+  ThreadMessageListResponseBody,
   ThreadResource,
   ThreadTurnListResponseBody,
   ToolResultRequestBody,
@@ -841,6 +840,71 @@ export const getThreadItem = async (
   return { data, status: res.status, headers: res.headers } as getThreadItemResponse;
 };
 
+export type listThreadMessagesResponse200 = {
+  data: ThreadMessageListResponseBody;
+  status: 200;
+};
+
+export type listThreadMessagesResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listThreadMessagesResponseSuccess = listThreadMessagesResponse200 & {
+  headers: Headers;
+};
+export type listThreadMessagesResponseError = listThreadMessagesResponseDefault & {
+  headers: Headers;
+};
+
+export type listThreadMessagesResponse =
+  | listThreadMessagesResponseSuccess
+  | listThreadMessagesResponseError;
+
+export const getListThreadMessagesUrl = (thread: string, params?: ListThreadMessagesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/messages?${stringifiedParams}`
+    : `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/messages`;
+};
+
+/**
+ * An outline of the messages the person sent in this conversation, from the console or a chat
+ * app, oldest first: what a timeline needs to place and preview every message without reading
+ * the transcript. Replies, tool calls and messages from subagents, tasks or other conversations
+ * are not included, nor are reverted messages or messages waiting in the queue.
+ *
+ * `index` is the message's position, from 1, and matches `messageIndex` on the transcript item.
+ * Read the message N with `offset` N-1. Open it in the transcript with list-thread-items
+ * `around` its `ordinal`. `total` equals the thread's `messageCount`.
+ * @summary List the person's messages
+ */
+export const listThreadMessages = async (
+  thread: string,
+  params?: ListThreadMessagesParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listThreadMessagesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListThreadMessagesUrl(thread, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listThreadMessagesResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listThreadMessagesResponse;
+};
+
 export type sendMessageResponse202 = {
   data: SendMessageResponseBody;
   status: 202;
@@ -1180,121 +1244,6 @@ export const listThreadTurns = async (
 
   const data: listThreadTurnsResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listThreadTurnsResponse;
-};
-
-export type listCommandsResponse200 = {
-  data: CommandListResponseBody;
-  status: 200;
-};
-
-export type listCommandsResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type listCommandsResponseSuccess = listCommandsResponse200 & {
-  headers: Headers;
-};
-export type listCommandsResponseError = listCommandsResponseDefault & {
-  headers: Headers;
-};
-
-export type listCommandsResponse = listCommandsResponseSuccess | listCommandsResponseError;
-
-export const getListCommandsUrl = () => {
-  return `https://assistant.leaflow.cloud/api/v1/commands`;
-};
-
-/**
- * The slash commands a person can type in a conversation, such as /status or /compact. The same
- * commands work in the console and in chat apps, so a client builds its command menu from this
- * list.
- * @summary List commands
- */
-export const listCommands = async (
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<listCommandsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListCommandsUrl(), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: listCommandsResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listCommandsResponse;
-};
-
-export type runCommandResponse200 = {
-  data: CommandResultResource;
-  status: 200;
-};
-
-export type runCommandResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type runCommandResponseSuccess = runCommandResponse200 & {
-  headers: Headers;
-};
-export type runCommandResponseError = runCommandResponseDefault & {
-  headers: Headers;
-};
-
-export type runCommandResponse = runCommandResponseSuccess | runCommandResponseError;
-
-export const getRunCommandUrl = (thread: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/commands`;
-};
-
-/**
- * Runs a slash command against the conversation. Commands act directly and never reach the model.
- * The result carries a plain-text `message`, which is what a chat app shows, and structured fields
- * for clients that render more, such as `status` for /status.
- *
- * /new is carried out by the client, which opens an empty conversation, and fails here with 422
- * and code COMMAND_CLIENT_ONLY. Fails with 404 and code COMMAND_NOT_FOUND for an unknown command,
- * and with 422 and code COMMAND_ARGUMENTS_INVALID when the arguments do not fit.
- * @summary Run a command
- */
-export const runCommand = async (
-  thread: string,
-  runCommandRequestBody: RunCommandRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<runCommandResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getRunCommandUrl(thread), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(runCommandRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: runCommandResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as runCommandResponse;
 };
 
 export type listFoldersResponse200 = {

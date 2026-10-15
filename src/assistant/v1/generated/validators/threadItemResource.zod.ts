@@ -15,8 +15,8 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -94,6 +94,13 @@ export const ThreadItemResource = zod
     toolCall: zod
       .union([ToolCallResource, zod.null()])
       .describe("The call, for a `tool_call` item. Null for other items."),
+    messageIndex: zod
+      .int()
+      .min(1)
+      .nullable()
+      .describe(
+        "The position of a `user_message` among the person's messages, from 1, as in\nlist-thread-messages. Null for other items, and for messages that are reverted or waiting\nin the queue.",
+      ),
     createdAt: zod.iso.datetime({ offset: true }),
   })
   .describe("One entry of the transcript. `type` determines which fields it carries.");

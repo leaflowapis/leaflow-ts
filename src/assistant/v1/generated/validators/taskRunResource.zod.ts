@@ -15,8 +15,8 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -38,6 +38,11 @@ export const TaskRunResource = zod.strictObject({
       "The last 16 KiB of a command's output. Empty for prompts; null in lists, read the run for it.",
     ),
   errorCode: zod.string().nullable().describe("Why the run failed. Null unless status is failed."),
+  trigger: zod
+    .enum(["schedule", "manual", "assistant"])
+    .describe(
+      "How the run started: `schedule` by the task's own trigger, including a task set to run now;\n`manual` by a person running it outside its schedule; `assistant` by the assistant.",
+    ),
 });
 
 export type TaskRunResource = zod.input<typeof TaskRunResource>;

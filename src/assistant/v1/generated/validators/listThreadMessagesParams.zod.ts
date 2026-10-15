@@ -15,8 +15,8 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -24,16 +24,25 @@
  */
 import * as zod from "zod";
 
-export const CommandResource = zod.strictObject({
-  name: zod.string().describe("The command without the slash, for example `status`."),
-  aliases: zod.array(zod.string()).describe("Other names that run the same command."),
-  description: zod.string(),
-  argumentHint: zod
-    .string()
-    .describe(
-      "How to write the arguments, for example `<model id>`. Empty when the command takes none.",
-    ),
+export const listThreadMessagesParamsOffsetDefault = 0;
+export const listThreadMessagesParamsOffsetMin = 0;
+export const listThreadMessagesParamsOffsetMax = 10000;
+
+export const listThreadMessagesParamsLimitDefault = 50;
+export const listThreadMessagesParamsLimitMax = 200;
+
+export const ListThreadMessagesParams = zod.strictObject({
+  offset: zod
+    .int()
+    .min(listThreadMessagesParamsOffsetMin)
+    .max(listThreadMessagesParamsOffsetMax)
+    .default(listThreadMessagesParamsOffsetDefault),
+  limit: zod
+    .int()
+    .min(1)
+    .max(listThreadMessagesParamsLimitMax)
+    .default(listThreadMessagesParamsLimitDefault),
 });
 
-export type CommandResource = zod.input<typeof CommandResource>;
-export type CommandResourceOutput = zod.output<typeof CommandResource>;
+export type ListThreadMessagesParams = zod.input<typeof ListThreadMessagesParams>;
+export type ListThreadMessagesParamsOutput = zod.output<typeof ListThreadMessagesParams>;

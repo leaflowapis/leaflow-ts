@@ -15,27 +15,27 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { StatusReportResource } from "./statusReportResource.zod.js";
-import { ThreadResource } from "./threadResource.zod.js";
+import { ThreadMessageResource } from "./threadMessageResource.zod.js";
 
-export const CommandResultResource = zod.strictObject({
-  name: zod.string().describe("The command that ran, after resolving aliases."),
-  message: zod.string().describe("The result as plain text."),
-  thread: zod.union([ThreadResource, zod.null()]).describe("The conversation after the command."),
-  turnId: zod
-    .string()
-    .nullable()
-    .describe("The turn the command started, for example the compaction turn of /compact."),
-  status: zod.union([StatusReportResource, zod.null()]).describe("Set by /status."),
+export const threadMessageListResponseBodyTotalMin = 0;
+
+export const ThreadMessageListResponseBody = zod.strictObject({
+  messages: zod.array(ThreadMessageResource),
+  total: zod
+    .int()
+    .min(threadMessageListResponseBodyTotalMin)
+    .describe(
+      "How many messages the person has sent in this conversation, the same as the thread's `messageCount`.",
+    ),
 });
 
-export type CommandResultResource = zod.input<typeof CommandResultResource>;
-export type CommandResultResourceOutput = zod.output<typeof CommandResultResource>;
+export type ThreadMessageListResponseBody = zod.input<typeof ThreadMessageListResponseBody>;
+export type ThreadMessageListResponseBodyOutput = zod.output<typeof ThreadMessageListResponseBody>;

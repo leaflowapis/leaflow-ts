@@ -15,8 +15,8 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -24,22 +24,28 @@
  */
 import * as zod from "zod";
 
-export const runCommandRequestBodyNameMax = 32;
+export const threadMessageResourceAttachmentsMin = 0;
 
-export const runCommandRequestBodyArgumentsMax = 2000;
+export const ThreadMessageResource = zod
+  .strictObject({
+    id: zod.string().describe("The transcript item."),
+    index: zod.int().min(1).describe("The position among the person's messages, from 1."),
+    ordinal: zod
+      .int()
+      .describe("The item's position in the transcript, for list-thread-items `around`."),
+    turnId: zod.string(),
+    preview: zod
+      .string()
+      .describe(
+        "The beginning of the message's text, at most 120 characters. Empty for a message with only attachments.",
+      ),
+    attachments: zod
+      .int()
+      .min(threadMessageResourceAttachmentsMin)
+      .describe("How many files the message carries."),
+    createdAt: zod.iso.datetime({ offset: true }),
+  })
+  .describe("One message the person sent, as an entry of the conversation's outline.");
 
-export const RunCommandRequestBody = zod.strictObject({
-  name: zod
-    .string()
-    .min(1)
-    .max(runCommandRequestBodyNameMax)
-    .describe("The command or one of its aliases, without the slash."),
-  arguments: zod
-    .string()
-    .max(runCommandRequestBodyArgumentsMax)
-    .optional()
-    .describe("Everything typed after the command name."),
-});
-
-export type RunCommandRequestBody = zod.input<typeof RunCommandRequestBody>;
-export type RunCommandRequestBodyOutput = zod.output<typeof RunCommandRequestBody>;
+export type ThreadMessageResource = zod.input<typeof ThreadMessageResource>;
+export type ThreadMessageResourceOutput = zod.output<typeof ThreadMessageResource>;

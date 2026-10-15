@@ -15,8 +15,8 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -49,8 +49,6 @@ import { ResumeThreadRequestBody } from "./validators/resumeThreadRequestBody.zo
 import { RevertRequestBody } from "./validators/revertRequestBody.zod.js";
 
 import { RotateSecretRequestBody } from "./validators/rotateSecretRequestBody.zod.js";
-
-import { RunCommandRequestBody } from "./validators/runCommandRequestBody.zod.js";
 
 import { SendMessageRequestBody } from "./validators/sendMessageRequestBody.zod.js";
 
@@ -305,6 +303,48 @@ export const GetThreadItemParams = zod.strictObject({
 });
 
 /**
+ * An outline of the messages the person sent in this conversation, from the console or a chat
+ * app, oldest first: what a timeline needs to place and preview every message without reading
+ * the transcript. Replies, tool calls and messages from subagents, tasks or other conversations
+ * are not included, nor are reverted messages or messages waiting in the queue.
+ *
+ * `index` is the message's position, from 1, and matches `messageIndex` on the transcript item.
+ * Read the message N with `offset` N-1. Open it in the transcript with list-thread-items
+ * `around` its `ordinal`. `total` equals the thread's `messageCount`.
+ * @summary List the person's messages
+ */
+export const listThreadMessagesPathThreadMax = 64;
+
+export const ListThreadMessagesParams = zod.strictObject({
+  thread: zod
+    .string()
+    .max(listThreadMessagesPathThreadMax)
+    .describe("A thread id. Subagents are threads as well."),
+});
+
+export const listThreadMessagesQueryOffsetDefault = 0;
+export const listThreadMessagesQueryOffsetMin = 0;
+export const listThreadMessagesQueryOffsetMax = 10000;
+
+export const listThreadMessagesQueryLimitDefault = 50;
+export const listThreadMessagesQueryLimitMax = 200;
+
+export const ListThreadMessagesQueryParams = zod.strictObject({
+  offset: zod
+    .int()
+    .min(listThreadMessagesQueryOffsetMin)
+    .max(listThreadMessagesQueryOffsetMax)
+    .default(listThreadMessagesQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
+  limit: zod
+    .int()
+    .min(1)
+    .max(listThreadMessagesQueryLimitMax)
+    .default(listThreadMessagesQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
+});
+
+/**
  * Starts a turn and returns at once; a turn can run for tens of minutes and its progress arrives
  * on /api/v1/realtime. Sending while the assistant is working is allowed: the message is queued
  * and read at the next step of the running turn, and `queued` is true.
@@ -426,27 +466,6 @@ export const ListThreadTurnsQueryParams = zod.strictObject({
     .default(listThreadTurnsQueryLimitDefault)
     .describe("Items returned in this page. Defaults to 50; at most 200."),
 });
-
-/**
- * Runs a slash command against the conversation. Commands act directly and never reach the model.
- * The result carries a plain-text `message`, which is what a chat app shows, and structured fields
- * for clients that render more, such as `status` for /status.
- *
- * /new is carried out by the client, which opens an empty conversation, and fails here with 422
- * and code COMMAND_CLIENT_ONLY. Fails with 404 and code COMMAND_NOT_FOUND for an unknown command,
- * and with 422 and code COMMAND_ARGUMENTS_INVALID when the arguments do not fit.
- * @summary Run a command
- */
-export const runCommandPathThreadMax = 64;
-
-export const RunCommandParams = zod.strictObject({
-  thread: zod
-    .string()
-    .max(runCommandPathThreadMax)
-    .describe("A thread id. Subagents are threads as well."),
-});
-
-export const RunCommandBody = RunCommandRequestBody;
 
 /**
  * A folder groups conversations on the board and does nothing else: the assistant is never told

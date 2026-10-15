@@ -15,8 +15,8 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. Slash commands such as /status and
- * /compact are listed by list-commands and work the same in the console and in chat apps.
+ * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
+ * person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -30,6 +30,8 @@ import { TurnType } from "./turnType.zod.js";
 import { Usage } from "./usage.zod.js";
 
 export const threadTurnResourceToolCallsMin = 0;
+
+export const threadTurnResourceStreamingOutputTokensMin = 0;
 
 export const ThreadTurnResource = zod
   .strictObject({
@@ -62,6 +64,12 @@ export const ThreadTurnResource = zod
     usage: Usage.describe(
       "Tokens used by every model request of this turn, including title generation, review and compaction.",
     ),
+    streamingOutputTokens: zod
+      .int()
+      .min(threadTurnResourceStreamingOutputTokensMin)
+      .describe(
+        "An estimate of the output tokens of the model request in progress, which `usage` does not\ncount yet. It grows about once a second while the model writes and returns to 0 when the\nrequest ends and its exact usage is added. Show `usage.outputTokens` plus this while the turn\nruns.",
+      ),
     startedAt: zod.iso.datetime({ offset: true }),
     firstTokenAt: zod.iso
       .datetime({ offset: true })
