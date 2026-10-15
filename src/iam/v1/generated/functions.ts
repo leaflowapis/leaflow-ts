@@ -42,6 +42,7 @@ import type {
   SSHKeyResource,
   SetMemberPermissionsRequestBody,
   SetMemberRolesRequestBody,
+  SetProjectSlugRequestBody,
   TransferOwnershipRequestBody,
   UpdatePolicyRequestBody,
   UpdateProjectRequestBody,
@@ -198,6 +199,7 @@ export const getUpdateProjectUrl = () => {
 };
 
 /**
+ * The slug is not affected; it is set through `PUT /api/v1/project/slug`.
  * @summary Update the name and description of a project
  */
 export const updateProject = async (
@@ -277,6 +279,79 @@ export const deleteProject = async (
 
   const data: deleteProjectResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as deleteProjectResponse;
+};
+
+export type setProjectSlugResponse200 = {
+  data: ProjectAccessResource;
+  status: 200;
+};
+
+export type setProjectSlugResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type setProjectSlugResponseSuccess = setProjectSlugResponse200 & {
+  headers: Headers;
+};
+export type setProjectSlugResponseError = setProjectSlugResponseDefault & {
+  headers: Headers;
+};
+
+export type setProjectSlugResponse = setProjectSlugResponseSuccess | setProjectSlugResponseError;
+
+export const getSetProjectSlugUrl = () => {
+  return `https://iam.leaflow.cloud/api/v1/project/slug`;
+};
+
+/**
+ * Replaces the default slug, which is the project's `id`, with a custom one. Only the owner can do this, and only once: a custom slug cannot be changed or removed afterwards. The address under the `id` keeps working.
+ *
+ * Setting the slug the project already holds succeeds without change. Fails with:
+ *
+ * - 400 `PROJECT_SLUG_INVALID` when the slug does not follow the format described on `slug`;
+ * - 422 `PROJECT_SLUG_RESERVED` when the name is reserved;
+ * - 409 `PROJECT_SLUG_TAKEN` when another project, including a deleted one, holds it;
+ * - 412 `PROJECT_SLUG_ALREADY_SET` when the project already holds a different custom slug;
+ * - 403 `PROJECT_PERMISSION_DENIED` when the caller is not the owner;
+ * - 429 `PROJECT_SLUG_CLAIM_RATE_LIMITED` when the caller has attempted to set custom slugs too often. Attempts count whether or not they succeed, and `meta.retry_after_seconds` on the error states how many seconds to wait before retrying.
+ * @summary Set the custom slug of a project
+ */
+export const setProjectSlug = async (
+  setProjectSlugRequestBody: SetProjectSlugRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setProjectSlugResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getSetProjectSlugUrl(), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(setProjectSlugRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setProjectSlugResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as setProjectSlugResponse;
 };
 
 export type getProjectMembershipResponse200 = {

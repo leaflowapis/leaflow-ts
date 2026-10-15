@@ -130,6 +130,12 @@ export interface ProjectResource {
   deleted_at: string | null;
   description: string;
   id: string;
+  /**
+   * The label naming the project in its address. It equals `id` until a custom slug is chosen. A custom slug does not change once set, and stays with the project after deletion
+   * @minLength 1
+   * @maxLength 36
+   */
+  slug: string;
   name: string;
   updated_at: string;
 }
@@ -144,6 +150,15 @@ export interface UpdateProjectRequestBody {
   description?: string;
   /** @maxLength 128 */
   name?: string;
+}
+
+export interface SetProjectSlugRequestBody {
+  /**
+   * 6 to 32 characters made of lower-case letters, digits and single hyphens, beginning with a letter and ending with a letter or digit
+   * @minLength 6
+   * @maxLength 32
+   */
+  slug: string;
 }
 
 export interface QuotaResource {

@@ -15,6 +15,12 @@
  * 3. Every other service is called with that scoped token.
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
+ *
+ * ## Project slugs
+ *
+ * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
+ *
+ * Looking up slugs and claiming custom slugs are rate limited per account. A request over the limit fails with 429, and `meta.retry_after_seconds` on the error states how many seconds to wait before retrying.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -23,9 +29,18 @@ export const createProjectRequestBodyDescriptionMax = 2000;
 
 export const createProjectRequestBodyNameMax = 128;
 
+export const createProjectRequestBodySlugMax = 32;
+
 export const CreateProjectRequestBody = zod.strictObject({
   description: zod.string().max(createProjectRequestBodyDescriptionMax).optional(),
   name: zod.string().min(1).max(createProjectRequestBodyNameMax),
+  slug: zod
+    .string()
+    .max(createProjectRequestBodySlugMax)
+    .optional()
+    .describe(
+      "A custom slug of 6 to 32 characters made of lower-case letters, digits and single hyphens, beginning with a letter and ending with a letter or digit. Omitted or empty, the slug is the new project's `id`, and a custom slug can be set once later",
+    ),
 });
 
 export type CreateProjectRequestBody = zod.input<typeof CreateProjectRequestBody>;

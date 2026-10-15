@@ -30,6 +30,8 @@ import { SetMemberPermissionsRequestBody } from "./validators/setMemberPermissio
 
 import { SetMemberRolesRequestBody } from "./validators/setMemberRolesRequestBody.zod.js";
 
+import { SetProjectSlugRequestBody } from "./validators/setProjectSlugRequestBody.zod.js";
+
 import { TransferOwnershipRequestBody } from "./validators/transferOwnershipRequestBody.zod.js";
 
 import { UpdatePolicyRequestBody } from "./validators/updatePolicyRequestBody.zod.js";
@@ -39,9 +41,25 @@ import { UpdateProjectRequestBody } from "./validators/updateProjectRequestBody.
 import { UpdateRoleRequestBody } from "./validators/updateRoleRequestBody.zod.js";
 
 /**
+ * The slug is not affected; it is set through `PUT /api/v1/project/slug`.
  * @summary Update the name and description of a project
  */
 export const UpdateProjectBody = UpdateProjectRequestBody;
+
+/**
+ * Replaces the default slug, which is the project's `id`, with a custom one. Only the owner can do this, and only once: a custom slug cannot be changed or removed afterwards. The address under the `id` keeps working.
+ *
+ * Setting the slug the project already holds succeeds without change. Fails with:
+ *
+ * - 400 `PROJECT_SLUG_INVALID` when the slug does not follow the format described on `slug`;
+ * - 422 `PROJECT_SLUG_RESERVED` when the name is reserved;
+ * - 409 `PROJECT_SLUG_TAKEN` when another project, including a deleted one, holds it;
+ * - 412 `PROJECT_SLUG_ALREADY_SET` when the project already holds a different custom slug;
+ * - 403 `PROJECT_PERMISSION_DENIED` when the caller is not the owner;
+ * - 429 `PROJECT_SLUG_CLAIM_RATE_LIMITED` when the caller has attempted to set custom slugs too often. Attempts count whether or not they succeed, and `meta.retry_after_seconds` on the error states how many seconds to wait before retrying.
+ * @summary Set the custom slug of a project
+ */
+export const SetProjectSlugBody = SetProjectSlugRequestBody;
 
 /**
  * Visible to any member, on the same rule as the member list. Who has been invited is part of who is in the project.
