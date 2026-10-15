@@ -138,6 +138,15 @@ export const routes = [
   {
     service: "account",
     contract: "account",
+    method: "QUERY",
+    path: "/account/v1/projects",
+    operationId: "search-projects",
+    securityScheme: "AccessToken",
+    upstreamUrl: "https://account.leaflow.cloud",
+  },
+  {
+    service: "account",
+    contract: "account",
     method: "POST",
     path: "/account/v1/projects",
     operationId: "create-project",

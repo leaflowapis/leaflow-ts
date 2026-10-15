@@ -10,7 +10,7 @@
  *
  * ## Entering a project
  *
- * 1. `GET /account/v1/projects` lists the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
+ * 1. `QUERY /account/v1/projects` searches the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
  * 2. `POST /account/v1/projects/{projectId}/scoped-tokens` returns a scoped token for the project chosen.
  * 3. Every other service is called with that scoped token.
  *
@@ -40,10 +40,12 @@ import type {
   ListProjectsParams,
   LocaleOptionsResource,
   PreviewInvitationByTokenParams,
+  ProjectAccessList,
   ProjectAccessResource,
   ProjectSlugAvailabilityResource,
   RegisterRequestBody,
   ScopedTokenResponseBody,
+  SearchProjectsRequestBody,
   SettingsResource,
   SubmitIdentityVerificationRequestBody,
   UpdateAccountRequestBody,
@@ -884,7 +886,8 @@ export const getListProjectsUrl = (params?: ListProjectsParams) => {
 };
 
 /**
- * Deleted projects are excluded unless `status=DELETED` asks for them by name.
+ * Superseded by `QUERY /account/v1/projects`, which filters by status and pages by page number. Projects whose deletion has finished are excluded unless `include_deleted` is true; projects being deleted are included.
+ * @deprecated
  * @summary List the projects the caller belongs to
  */
 export const listProjects = async (
@@ -901,6 +904,70 @@ export const listProjects = async (
 
   const data: listProjectsResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listProjectsResponse;
+};
+
+export type searchProjectsResponse200 = {
+  data: ProjectAccessList;
+  status: 200;
+};
+
+export type searchProjectsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type searchProjectsResponseSuccess = searchProjectsResponse200 & {
+  headers: Headers;
+};
+export type searchProjectsResponseError = searchProjectsResponseDefault & {
+  headers: Headers;
+};
+
+export type searchProjectsResponse = searchProjectsResponseSuccess | searchProjectsResponseError;
+
+export const getSearchProjectsUrl = () => {
+  return `https://account.leaflow.cloud/account/v1/projects`;
+};
+
+/**
+ * Projects the caller belongs to, most recently created first. The conditions in the body are combined with AND. Without `statuses`, only active projects are returned; projects being deleted and deleted projects are returned only when asked for by status.
+ * @summary Search the projects the caller belongs to
+ */
+export const searchProjects = async (
+  searchProjectsRequestBody: SearchProjectsRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<searchProjectsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getSearchProjectsUrl(), {
+    ...options,
+    method: "QUERY",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(searchProjectsRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: searchProjectsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as searchProjectsResponse;
 };
 
 export type createProjectResponse201 = {

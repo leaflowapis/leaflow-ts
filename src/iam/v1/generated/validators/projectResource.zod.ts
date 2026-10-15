@@ -35,6 +35,11 @@ export const ProjectResource = zod.strictObject({
     .describe(
       "The label naming the project in its address. It equals `id` until a custom slug is chosen. A custom slug does not change once set, and stays with the project after deletion",
     ),
+  status: zod
+    .enum(["active", "deleting", "deleted"])
+    .describe(
+      "`active` until deletion is requested; `deleting` while the resources under the project are being removed, when `deletion_requested_at` is set; `deleted` once removal has finished, when `deleted_at` is set",
+    ),
   name: zod.string(),
   updated_at: zod.iso.datetime({ offset: true }),
 });

@@ -10,7 +10,7 @@
  *
  * ## Entering a project
  *
- * 1. `GET /account/v1/projects` lists the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
+ * 1. `QUERY /account/v1/projects` searches the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
  * 2. `POST /account/v1/projects/{projectId}/scoped-tokens` returns a scoped token for the project chosen.
  * 3. Every other service is called with that scoped token.
  *

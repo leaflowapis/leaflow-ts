@@ -10,7 +10,7 @@
  *
  * ## Entering a project
  *
- * 1. `GET /account/v1/projects` lists the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
+ * 1. `QUERY /account/v1/projects` searches the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
  * 2. `POST /account/v1/projects/{projectId}/scoped-tokens` returns a scoped token for the project chosen.
  * 3. Every other service is called with that scoped token.
  *
@@ -24,6 +24,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { ProjectStatus } from "./projectStatus.zod.js";
 import { ProjectTraitResource } from "./projectTraitResource.zod.js";
 
 export const projectResourceSlugMax = 36;
@@ -46,6 +47,7 @@ export const ProjectResource = zod.strictObject({
     .describe(
       "The label naming the project in its address. It equals `id` until a custom slug is chosen. A custom slug does not change once set, and stays with the project after deletion",
     ),
+  status: ProjectStatus,
   name: zod.string(),
   updated_at: zod.iso.datetime({ offset: true }),
 });

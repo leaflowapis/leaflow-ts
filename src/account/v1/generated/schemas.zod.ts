@@ -10,7 +10,7 @@
  *
  * ## Entering a project
  *
- * 1. `GET /account/v1/projects` lists the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
+ * 1. `QUERY /account/v1/projects` searches the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
  * 2. `POST /account/v1/projects/{projectId}/scoped-tokens` returns a scoped token for the project chosen.
  * 3. Every other service is called with that scoped token.
  *
@@ -124,7 +124,8 @@ export const AcceptInvitationParams = zod.strictObject({
 });
 
 /**
- * Deleted projects are excluded unless `status=DELETED` asks for them by name.
+ * Superseded by `QUERY /account/v1/projects`, which filters by status and pages by page number. Projects whose deletion has finished are excluded unless `include_deleted` is true; projects being deleted are included.
+ * @deprecated
  * @summary List the projects the caller belongs to
  */
 export const listProjectsQueryLimitDefault = 50;

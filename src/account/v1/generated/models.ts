@@ -10,7 +10,7 @@
  *
  * ## Entering a project
  *
- * 1. `GET /account/v1/projects` lists the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
+ * 1. `QUERY /account/v1/projects` searches the projects the caller belongs to. The first call registers the account, taking the name and email address from the sign-in claims.
  * 2. `POST /account/v1/projects/{projectId}/scoped-tokens` returns a scoped token for the project chosen.
  * 3. Every other service is called with that scoped token.
  *
@@ -355,6 +355,17 @@ export interface ProjectTraitResource {
   reason: string;
 }
 
+/**
+ * `active` until deletion is requested; `deleting` while the resources under the project are being removed, when `deletion_requested_at` is set; `deleted` once removal has finished, when `deleted_at` is set
+ */
+export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus];
+
+export const ProjectStatus = {
+  active: "active",
+  deleting: "deleting",
+  deleted: "deleted",
+} as const;
+
 export interface ProjectResource {
   traits: ProjectTraitResource[];
   /** @nullable */
@@ -374,6 +385,7 @@ export interface ProjectResource {
    * @maxLength 36
    */
   slug: string;
+  status: ProjectStatus;
   name: string;
   updated_at: string;
 }
@@ -456,6 +468,48 @@ export interface CreateProjectRequestBody {
   slug?: string;
 }
 
+export interface SearchProjectsRequestBody {
+  /**
+   * Matches against name, slug or description, and against the id when it is a complete project id
+   * @maxLength 128
+   */
+  keyword?: string;
+  /**
+   * The statuses to include. Omitted, only `active` projects are returned
+   * @minItems 1
+   */
+  statuses?: ProjectStatus[];
+  /**
+   * 1-based page number. Defaults to 1
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+}
+
+/**
+ * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
+ */
+export interface OffsetPagination {
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+  /** @minimum 0 */
+  total_count?: number;
+}
+
+export interface ProjectAccessList {
+  items: ProjectAccessResource[];
+  pagination: OffsetPagination;
+}
+
 /**
  * `available` when the slug can be chosen now, `reserved` when the name is reserved, and `taken` when a project, including a deleted one, holds it
  */
@@ -488,18 +542,6 @@ export interface ScopedTokenResponseBody {
   token: string;
   /** Always `Bearer` */
   token_type: string;
-}
-
-/**
- * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
- */
-export interface OffsetPagination {
-  /** @minimum 1 */
-  page: number;
-  /** @minimum 1 */
-  page_size: number;
-  /** @minimum 0 */
-  total_count?: number;
 }
 
 /**

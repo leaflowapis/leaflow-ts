@@ -117,6 +117,18 @@ export interface ProjectTraitResource {
   reason: string;
 }
 
+/**
+ * `active` until deletion is requested; `deleting` while the resources under the project are being removed, when `deletion_requested_at` is set; `deleted` once removal has finished, when `deleted_at` is set
+ */
+export type ProjectResourceStatus =
+  (typeof ProjectResourceStatus)[keyof typeof ProjectResourceStatus];
+
+export const ProjectResourceStatus = {
+  active: "active",
+  deleting: "deleting",
+  deleted: "deleted",
+} as const;
+
 export interface ProjectResource {
   traits: ProjectTraitResource[];
   /** @nullable */
@@ -136,6 +148,8 @@ export interface ProjectResource {
    * @maxLength 36
    */
   slug: string;
+  /** `active` until deletion is requested; `deleting` while the resources under the project are being removed, when `deletion_requested_at` is set; `deleted` once removal has finished, when `deleted_at` is set */
+  status: ProjectResourceStatus;
   name: string;
   updated_at: string;
 }
