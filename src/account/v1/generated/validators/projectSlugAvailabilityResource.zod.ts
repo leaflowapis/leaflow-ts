@@ -19,6 +19,8 @@
  * ## Project slugs
  *
  * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
+ *
+ * Looking up slugs and claiming custom slugs are rate limited per account. A request over the limit fails with 429, and `meta.retry_after_seconds` on the error states how many seconds to wait before retrying.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";

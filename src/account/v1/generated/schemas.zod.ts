@@ -19,6 +19,8 @@
  * ## Project slugs
  *
  * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
+ *
+ * Looking up slugs and claiming custom slugs are rate limited per account. A request over the limit fails with 429, and `meta.retry_after_seconds` on the error states how many seconds to wait before retrying.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -166,7 +168,8 @@ export const ListProjectsQueryParams = zod.strictObject({
  *
  * - 400 `PROJECT_SLUG_INVALID` when it does not follow the format described on `slug`;
  * - 422 `PROJECT_SLUG_RESERVED` when the name is reserved;
- * - 409 `PROJECT_SLUG_TAKEN` when another project, including a deleted one, holds it.
+ * - 409 `PROJECT_SLUG_TAKEN` when another project, including a deleted one, holds it;
+ * - 429 `PROJECT_SLUG_CLAIM_RATE_LIMITED` when the account has attempted to claim custom slugs too often. Attempts count whether or not they succeed; creating a project without a custom slug does not count.
  * @summary Create a project
  */
 export const CreateProjectBody = CreateProjectRequestBody;
@@ -178,7 +181,8 @@ export const CreateProjectBody = CreateProjectRequestBody;
  *
  * - 400 `PROJECT_SLUG_INVALID` when the value cannot be a slug;
  * - 404 `PROJECT_NOT_FOUND` when no project holds the slug;
- * - 403 `PROJECT_MEMBERSHIP_REQUIRED` when the caller is not a member of the project.
+ * - 403 `PROJECT_MEMBERSHIP_REQUIRED` when the caller is not a member of the project;
+ * - 429 `PROJECT_SLUG_LOOKUP_RATE_LIMITED` when the account has looked up slugs too often. This operation shares its limit with `GET /account/v1/project-slugs/{slug}/availability`.
  * @summary Get a project by its slug
  */
 export const getProjectBySlugPathSlugMax = 63;
@@ -201,7 +205,10 @@ export const GetProjectParams = zod.strictObject({
 /**
  * Reports whether a custom slug can be chosen now. Nothing is reserved by asking: the slug is claimed only by creating a project with it or by setting it, either of which may still fail with 409 `PROJECT_SLUG_TAKEN`.
  *
- * Fails with 400 `PROJECT_SLUG_INVALID` when the value does not follow the format of a custom slug.
+ * Fails with:
+ *
+ * - 400 `PROJECT_SLUG_INVALID` when the value does not follow the format of a custom slug;
+ * - 429 `PROJECT_SLUG_LOOKUP_RATE_LIMITED` when the account has looked up slugs too often. This operation shares its limit with `GET /account/v1/projects/by-slug/{slug}`.
  * @summary Check whether a custom slug can be chosen
  */
 export const getProjectSlugAvailabilityPathSlugMax = 63;
