@@ -32,6 +32,7 @@
  */
 import * as zod from "zod";
 import { AccountIdentity } from "./accountIdentity.zod.js";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { PriceType } from "./priceType.zod.js";
@@ -41,7 +42,6 @@ import { RefundPolicy } from "./refundPolicy.zod.js";
 import { ScheduledChange } from "./scheduledChange.zod.js";
 import { SubscriptionCancellation } from "./subscriptionCancellation.zod.js";
 import { SubscriptionRestriction } from "./subscriptionRestriction.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const subscriptionDiscountedRenewalsRemainingMin = 0;
@@ -70,8 +70,22 @@ export const Subscription = zod
       .describe(
         "The whole licensed subscription's renewal amount, after continuing discounts and before tax. A pending subscription shows base terms until paying the order fixes any new discount. Absent for metered and one-time subscriptions.",
       ),
-    termination_policy: TerminationPolicy.optional(),
+    cancellation_policy: CancellationPolicy.optional(),
     refund_policy: RefundPolicy.optional(),
+    short_rate_multiplier: zod
+      .string()
+      .optional()
+      .describe("Refund policy `short_rate` only, as on the price bought."),
+    short_rate_threshold_seconds: zod
+      .int()
+      .optional()
+      .describe("Refund policy `short_rate` only, as on the price bought."),
+    monthly_list_amount: zod
+      .string()
+      .optional()
+      .describe(
+        "Licensed recurring only, the `monthly_list_amount` that a renewal at the agreed amount keeps; see the order item.",
+      ),
     order_item_id: zod.uuid().optional(),
     coupon_id: zod.uuid().optional(),
     coupon: ObjectIdentity.optional(),

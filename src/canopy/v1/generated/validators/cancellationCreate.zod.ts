@@ -31,8 +31,8 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { Money } from "./money.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
 export const cancellationCreateSubscriptionIdsMax = 50;
 
@@ -47,7 +47,7 @@ export const CancellationCreate = zod.strictObject({
     .min(1)
     .max(cancellationCreateSubscriptionIdsMax)
     .describe("As in the quote."),
-  mode: TerminationPolicy,
+  mode: CancellationPolicy,
   proration_date: zod.iso
     .datetime({ offset: true })
     .optional()

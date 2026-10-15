@@ -6,23 +6,37 @@
  * OpenAPI spec version: v1
  */
 /**
- * Whether a delivered purchase may end immediately or only at the end of its paid term; refunds follow the refund policy. When absent, no termination terms were agreed.
+ * Whether a cancellation of a delivered purchase may take effect immediately or only at the end of its paid term; refunds follow the refund policy. When absent, no cancellation terms were agreed.
  */
-export type TerminationPolicy = (typeof TerminationPolicy)[keyof typeof TerminationPolicy];
+export type CancellationPolicy = (typeof CancellationPolicy)[keyof typeof CancellationPolicy];
 
-export const TerminationPolicy = {
+export const CancellationPolicy = {
   immediate: "immediate",
   period_end: "period_end",
 } as const;
 
 /**
- * `none` refunds nothing. `prorated` refunds the amount paid for the current period minus the value of the time used, never below zero or above what remains unrefunded. Time used runs from the period start to the effective cancellation and is valued at prices frozen on the order item: each full calendar month at `refund_monthly_amount`, the rest at `refund_hourly_amount` or, without it, at the monthly price by the second. When the plan has no licensed period shorter than the one bought, time used is valued pro rata at the price paid. Discounts and setup fees are not refunded. Refunds return to the original payment sources, with tax refunded in proportion.
+ * `none` refunds nothing.
+ *
+ * `prorated` refunds the amount paid for the current period minus the value of the time used, never below zero
+ * or above what remains unrefunded. Time used runs from the period start to the effective cancellation, by the
+ * second. Each whole month from the period start is valued at the order item's `monthly_list_amount`, and the
+ * remainder at that amount in proportion to the length of the month it falls in; without `monthly_list_amount`,
+ * time used is valued at the amount paid in proportion to the length of the period. A renewal starts a new
+ * period, and an immediate change starts one at the change. Discounts and setup fees are not refunded. Refunds
+ * return to the original payment sources, with tax refunded in proportion.
+ *
+ * `short_rate` refunds as `prorated`, except that when the cancellation takes effect less than
+ * `short_rate_threshold_seconds` after the period start, the value of the time used is multiplied by
+ * `short_rate_multiplier`, up to `monthly_list_amount` for each month begun or, without `monthly_list_amount`,
+ * up to the amount paid.
  */
 export type RefundPolicy = (typeof RefundPolicy)[keyof typeof RefundPolicy];
 
 export const RefundPolicy = {
   none: "none",
   prorated: "prorated",
+  short_rate: "short_rate",
 } as const;
 
 export interface OrderCancel {
@@ -46,8 +60,8 @@ export const QuoteRenewalInterval = {
  * Price renewing a licensed subscription. Give `price_id`, or `interval` with
  * `interval_count`, to renew for another term at the price currently sold for it. Naming
  * the current term, or giving neither, renews at the agreed amount. A term sold at several
- * prices that differ in termination policy is refused with 409
- * `BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `termination_policy` or `price_id` is given.
+ * prices that differ in cancellation policy is refused with 409
+ * `BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` or `price_id` is given.
  */
 export interface QuoteRenewal {
   subscription_id: string;
@@ -55,8 +69,8 @@ export interface QuoteRenewal {
   interval?: QuoteRenewalInterval;
   /** @minimum 1 */
   interval_count?: number;
-  /** With `interval` and `interval_count`, chooses among prices of that term that differ in termination policy. */
-  termination_policy?: TerminationPolicy;
+  /** With `interval` and `interval_count`, chooses among prices of that term that differ in cancellation policy. */
+  cancellation_policy?: CancellationPolicy;
   /**
    * How many consecutive periods to renew for.
    * @minimum 1
@@ -235,6 +249,7 @@ export interface CancellationRefundPreviewItem {
   /** Whether automatic renewal is on now. Creating the cancellation turns it off; withdrawing it turns it back on for a metered subscription but not for a licensed one. */
   auto_renew: boolean;
   unused_amount: Money;
+  short_rate_surcharge_amount: Money;
   refundable_amount: Money;
   refund_amount: Money;
   credit_amount: Money;
@@ -246,8 +261,9 @@ export interface CancellationRefundPreviewItem {
  * What the cancellation would return, per subscription and in total, as of now. Give `proration_date` and
  * `refundable_amount` when creating the cancellation.
  *
- * - `unused_amount`: before tax, the amount paid for the current periods minus the value of the time used,
- *   valued as refund policy `prorated` describes, whatever the refund terms say.
+ * - `unused_amount`: before tax, the amount paid for the current periods in proportion to the time remaining.
+ * - `short_rate_surcharge_amount`: before tax, the part of `forfeited_amount` due to the short rate of the
+ *   refund policy.
  * - `refundable_amount`: what is returned the way it was paid, tax included; `refund_amount` plus
  *   `credit_amount`.
  * - `refund_amount`: the part returned to the balance or the payment method.
@@ -258,13 +274,14 @@ export interface CancellationRefundPreviewItem {
  * Metered and one-time subscriptions show zero; their usage until release is charged as usual.
  */
 export interface CancellationRefundPreview {
-  mode: TerminationPolicy;
+  mode: CancellationPolicy;
   /** For `period_end`, when release begins, the end of the paid terms. */
   scheduled_at?: string;
   /** For `immediate`, the second the refund is computed as of. Give it when creating the cancellation. */
   proration_date?: string;
   currency: string;
   unused_amount: Money;
+  short_rate_surcharge_amount: Money;
   refundable_amount: Money;
   refund_amount: Money;
   credit_amount: Money;
@@ -274,7 +291,7 @@ export interface CancellationRefundPreview {
 }
 
 /**
- * An estimated refund to the original payment sources. Before acceptance, cancellation returns the collected amount. For delivered service, only value paid by this order is included; renewals are evaluated with their own orders under the agreed termination terms. Nothing is refunded by the quote; the amount is fixed when cancellation or termination is confirmed.
+ * An estimated refund to the original payment sources. Before acceptance, cancellation returns the collected amount. For delivered service, only value paid by this order is included; renewals are evaluated with their own orders under the agreed cancellation terms. Nothing is refunded by the quote; the amount is fixed when cancellation or termination is confirmed.
  */
 export interface OrderRefundQuote {
   order_id: string;
@@ -315,7 +332,7 @@ export interface QuoteCancellation {
    * @maxItems 50
    */
   subscription_ids: string[];
-  mode: TerminationPolicy;
+  mode: CancellationPolicy;
 }
 
 export interface CancellationCreate {
@@ -325,7 +342,7 @@ export interface CancellationCreate {
    * @maxItems 50
    */
   subscription_ids: string[];
-  mode: TerminationPolicy;
+  mode: CancellationPolicy;
   /** For `immediate`, the quote's `proration_date`: a whole second, not in the future and at most ten minutes old; the refund is computed as of it. Now when omitted. */
   proration_date?: string;
   /** The quote's `refundable_amount`; the cancellation is refused when the refund differs. */
@@ -414,7 +431,7 @@ export interface CancellationItem {
 export interface Cancellation {
   id: string;
   status: CancellationStatus;
-  mode: TerminationPolicy;
+  mode: CancellationPolicy;
   scheduled_at?: string;
   /** For `immediate`, the second the refund is computed as of. */
   proration_date?: string;
@@ -1469,9 +1486,11 @@ export const RefundStatus = {
  * - `change_expired`: a scheduled change could not take effect in time.
  * - `subscription_canceled`: the unused value of a canceled subscription, under its refund terms.
  * - `future_period_canceled`: a renewal that had not started was withdrawn.
- * - `downgrade_difference`: after a downgrade, the remaining paid value, valued as refund policy `prorated`
- *   describes, minus the new configuration's cost for the remaining time at the change item's
- *   `refund_monthly_amount` and `refund_hourly_amount`.
+ * - `downgrade_difference`: after a downgrade, the remaining paid value, valued under each paid period's refund
+ *   policy and as `prorated` where that policy is `none`, minus the new configuration's value for the remaining
+ *   time: each whole month at the change item's `monthly_list_amount` and the remainder in proportion to the
+ *   length of the month it falls in, or without `monthly_list_amount`, the new period price in proportion to the
+ *   remaining time.
  * - `usage_true_up`: usage priced over the whole month cost less than was charged.
  * - `payment_not_applied`: a payment arrived after its invoice could no longer be paid.
  * - `operator`: made by the platform operator.
@@ -1709,8 +1728,14 @@ export interface Subscription {
   interval_count?: number;
   /** The whole licensed subscription's renewal amount, after continuing discounts and before tax. A pending subscription shows base terms until paying the order fixes any new discount. Absent for metered and one-time subscriptions. */
   recurring_amount?: string;
-  termination_policy?: TerminationPolicy;
+  cancellation_policy?: CancellationPolicy;
   refund_policy?: RefundPolicy;
+  /** Refund policy `short_rate` only, as on the price bought. */
+  short_rate_multiplier?: string;
+  /** Refund policy `short_rate` only, as on the price bought. */
+  short_rate_threshold_seconds?: number;
+  /** Licensed recurring only, the `monthly_list_amount` that a renewal at the agreed amount keeps; see the order item. */
+  monthly_list_amount?: string;
   order_item_id?: string;
   coupon_id?: string;
   coupon?: ObjectIdentity;
@@ -1787,8 +1812,12 @@ export const RenewalPriceInterval = {
 } as const;
 
 export interface RenewalPrice {
-  termination_policy?: TerminationPolicy;
+  cancellation_policy?: CancellationPolicy;
   refund_policy?: RefundPolicy;
+  /** Refund policy `short_rate` only. */
+  short_rate_multiplier?: string;
+  /** Refund policy `short_rate` only. */
+  short_rate_threshold_seconds?: number;
   price_id: string;
   /** How many periods one renewal covers. */
   interval_count: number;
@@ -1831,8 +1860,8 @@ export interface RenewRequest {
    * Leaving both out renews at the price this item already bills at, which a later price
    * change does not affect. Naming a term that differs from the current one is a fresh
    * choice, so it is bought at today's price. Naming the current term changes nothing. A
-   * term sold at several prices that differ in termination policy is refused with 409
-   * `BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `termination_policy` is given.
+   * term sold at several prices that differ in cancellation policy is refused with 409
+   * `BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` is given.
    *
    * List the terms on offer with the renewal prices operation.
    * @minimum 1
@@ -1840,8 +1869,8 @@ export interface RenewRequest {
   interval_count?: number;
   /** The unit interval_count counts in. */
   interval?: RenewRequestInterval;
-  /** With `interval` and `interval_count`, chooses among prices of that term that differ in termination policy. */
-  termination_policy?: TerminationPolicy;
+  /** With `interval` and `interval_count`, chooses among prices of that term that differ in cancellation policy. */
+  cancellation_policy?: CancellationPolicy;
   payment_method_id?: string;
   /** Whether to pay from the balance, with or without `payment_method_id`. */
   use_balance?: boolean;
@@ -1881,7 +1910,7 @@ export interface RenewalOrderRequest {
   /** As in renewing. */
   interval?: RenewalOrderRequestInterval;
   /** As in renewing. */
-  termination_policy?: TerminationPolicy;
+  cancellation_policy?: CancellationPolicy;
 }
 
 export interface AutoRenewSet {
@@ -2003,18 +2032,23 @@ export interface OrderItem {
   interval: OrderItemInterval;
   /** @minimum 1 */
   interval_count?: number;
-  termination_policy?: TerminationPolicy;
+  cancellation_policy?: CancellationPolicy;
   refund_policy?: RefundPolicy;
   /**
-   * Recurring licensed items only: the plan's one-month licensed price for this item's quantity, before tax and frozen at purchase, used to value time under a prorated refund or a downgrade. Null when the plan has no licensed period shorter than the one bought.
+   * Recurring licensed items only: a month at list price for this item's quantity, before tax and discounts, which values time under a refund or a downgrade. It is the monthly amount of the shortest period the plan sells, not longer than the one bought, at the item's dimensions, fixed at purchase; a renewal at the agreed amount keeps the previous value. Null when time used is valued at the amount paid, as for a daily period.
    * @nullable
    */
-  refund_monthly_amount?: string | null;
+  monthly_list_amount?: string | null;
   /**
-   * Recurring licensed items only, the plan's metered hourly price for this item's quantity before tax, frozen at purchase, used for time used short of a full month. Null when the licensed price has no meter.
+   * Refund policy `short_rate` only, as on the price when bought.
    * @nullable
    */
-  refund_hourly_amount?: string | null;
+  short_rate_multiplier?: string | null;
+  /**
+   * Refund policy `short_rate` only, as on the price when bought.
+   * @nullable
+   */
+  short_rate_threshold_seconds?: number | null;
   recurring_amount?: string;
   setup_amount?: string;
   type: PriceType;
@@ -2376,8 +2410,12 @@ export interface Price {
   unit_quantity: string;
   /** False once archived. An archived price cannot be bought until it is active again. */
   active: boolean;
-  termination_policy?: TerminationPolicy;
+  cancellation_policy?: CancellationPolicy;
   refund_policy?: RefundPolicy;
+  /** Refund policy `short_rate` only, the factor applied to the value of the time used when a cancellation takes effect less than `short_rate_threshold_seconds` after the period start. */
+  short_rate_multiplier?: string;
+  /** Refund policy `short_rate` only, how long after the period start `short_rate_multiplier` applies. */
+  short_rate_threshold_seconds?: number;
   product_id?: ProductID;
   id: string;
   plan_id: string;
@@ -2511,7 +2549,7 @@ export interface QuoteItemInput {
   /** @minimum 1 */
   interval_count?: number;
   /** Selects among licensed prices with otherwise identical billing terms. Ambiguous terms are refused instead of choosing a price arbitrarily. */
-  termination_policy?: TerminationPolicy;
+  cancellation_policy?: CancellationPolicy;
   /** @pattern ^(?:(?:[1-9][0-9]{0,27}|0(?:[1-9][0-9]{0,26}|0(?:[1-9][0-9]{0,25}|0(?:[1-9][0-9]{0,24}|0(?:[1-9][0-9]{0,23}|0(?:[1-9][0-9]{0,22}|0(?:[1-9][0-9]{0,21}|0(?:[1-9][0-9]{0,20}|0(?:[1-9][0-9]{0,19}|0(?:[1-9][0-9]{0,18}|0(?:[1-9][0-9]{0,17}|0(?:[1-9][0-9]{0,16}|0(?:[1-9][0-9]{0,15}|0(?:[1-9][0-9]{0,14}|0(?:[1-9][0-9]{0,13}|0(?:[1-9][0-9]{0,12}|0(?:[1-9][0-9]{0,11}|0(?:[1-9][0-9]{0,10}|0(?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9])))))))))))))))))))))))))))([.][0-9]{1,10})?|0{1,28}[.](?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))$ */
   quantity: string;
   meter_id?: string;
@@ -2928,7 +2966,7 @@ export interface ContactList {
 }
 
 export interface CancelSubscriptionRequest {
-  mode: TerminationPolicy;
+  mode: CancellationPolicy;
   /** For immediate cancellation, the quoted whole-second refund basis. Now when omitted. */
   proration_date?: string;
   /** The cancellation quote's refundable amount, including an explicit zero. */

@@ -31,7 +31,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 
 export const quoteCancellationSubscriptionIdsMax = 50;
 
@@ -44,7 +44,7 @@ export const QuoteCancellation = zod
       .describe(
         "The subscriptions to end together, all of one service, including every subscription released with a resource.",
       ),
-    mode: TerminationPolicy,
+    mode: CancellationPolicy,
   })
   .describe(
     "A cancellation to quote: what ending these subscriptions together would return, for one mode; quote `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).",

@@ -6,8 +6,8 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { Money } from "./money.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
 export const cancelSubscriptionRequestExpectedRefundableAmountTwoRegExp = new RegExp(
   "^[0-9]{1,15}([.][0-9]{1,10})?$",
@@ -15,7 +15,7 @@ export const cancelSubscriptionRequestExpectedRefundableAmountTwoRegExp = new Re
 export const cancelSubscriptionRequestReasonMax = 1024;
 
 export const CancelSubscriptionRequest = zod.strictObject({
-  mode: TerminationPolicy,
+  mode: CancellationPolicy,
   proration_date: zod.iso
     .datetime({ offset: true })
     .optional()

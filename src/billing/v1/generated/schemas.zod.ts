@@ -1025,7 +1025,7 @@ export const ListCancellationsQueryParams = zod.strictObject({
  *   the subscriptions do not share one service, project, account and currency;
  * - 409 `BILLING_CANCELLATION_CONFLICT` when a subscription has not started or has ended;
  * - 422 `BILLING_CANCELLATION_MODE_FIXED` when `mode` is not allowed, and `BILLING_CANCELLATION_TERMS_UNSET`
- *   when a licensed subscription has no termination terms, both with `meta.subscription_id`;
+ *   when a licensed subscription has no cancellation terms, both with `meta.subscription_id`;
  * - 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when, for `period_end`, the paid terms end at different times;
  * - 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled
  *   (`meta.cancellation_id`) or reclaimed (`meta.reason` `reclaim_requested`), or has a paid change waiting to

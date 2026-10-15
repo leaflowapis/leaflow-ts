@@ -7,13 +7,13 @@
  */
 import * as zod from "zod";
 import { BillingScheme } from "./billingScheme.zod.js";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { Money } from "./money.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 import { Tier } from "./tier.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
@@ -33,8 +33,20 @@ export const Price = zod.strictObject({
   active: zod
     .boolean()
     .describe("False once archived. An archived price cannot be bought until it is active again."),
-  termination_policy: TerminationPolicy.optional(),
+  cancellation_policy: CancellationPolicy.optional(),
   refund_policy: RefundPolicy.optional(),
+  short_rate_multiplier: zod
+    .string()
+    .optional()
+    .describe(
+      "Refund policy `short_rate` only, the factor applied to the value of the time used when a cancellation takes effect less than `short_rate_threshold_seconds` after the period start.",
+    ),
+  short_rate_threshold_seconds: zod
+    .int()
+    .optional()
+    .describe(
+      "Refund policy `short_rate` only, how long after the period start `short_rate_multiplier` applies.",
+    ),
   product_id: ProductID.optional(),
   id: zod.uuid(),
   plan_id: zod.uuid(),
