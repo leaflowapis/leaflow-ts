@@ -16,6 +16,11 @@ export const BillingAccount = zod.strictObject({
   name: zod.string().optional().describe("Your name for the account."),
   currency: zod.string().describe("Fixed when the account was opened."),
   status: zod.enum(["active", "suspended", "closed"]),
+  suspended_by: zod
+    .enum(["none", "owner", "operator"])
+    .describe(
+      "Who suspended the account: `owner` (you), `operator` (Leaflow), or `none` while it is not suspended. Only a suspension by `owner` can be resumed by you.",
+    ),
   grace_amount: zod
     .string()
     .optional()

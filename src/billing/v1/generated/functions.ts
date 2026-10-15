@@ -1029,6 +1029,101 @@ export const updateBillingAccount = async (
   return { data, status: res.status, headers: res.headers } as updateBillingAccountResponse;
 };
 
+export type suspendBillingAccountResponse200 = {
+  data: BillingAccount;
+  status: 200;
+};
+
+export type suspendBillingAccountResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type suspendBillingAccountResponseSuccess = suspendBillingAccountResponse200 & {
+  headers: Headers;
+};
+export type suspendBillingAccountResponseError = suspendBillingAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type suspendBillingAccountResponse =
+  | suspendBillingAccountResponseSuccess
+  | suspendBillingAccountResponseError;
+
+export const getSuspendBillingAccountUrl = (accountId: number) => {
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/suspend`;
+};
+
+/**
+ * Suspends your active billing account without closing it, also while it is in arrears. While suspended, it
+ * accepts no new purchases, renewals or project links, and the services it pays for start no new resources;
+ * running services, their charges and the handling of arrears continue, and you can still top up and pay
+ * invoices. Resume it yourself; one suspended by Leaflow can only be resumed by Leaflow. Does not create a
+ * resource.
+ * @summary Suspend billing account
+ */
+export const suspendBillingAccount = async (
+  accountId: number,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<suspendBillingAccountResponse> => {
+  const res = await (fetchFn ?? fetch)(getSuspendBillingAccountUrl(accountId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: suspendBillingAccountResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as suspendBillingAccountResponse;
+};
+
+export type resumeBillingAccountResponse200 = {
+  data: BillingAccount;
+  status: 200;
+};
+
+export type resumeBillingAccountResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type resumeBillingAccountResponseSuccess = resumeBillingAccountResponse200 & {
+  headers: Headers;
+};
+export type resumeBillingAccountResponseError = resumeBillingAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type resumeBillingAccountResponse =
+  | resumeBillingAccountResponseSuccess
+  | resumeBillingAccountResponseError;
+
+export const getResumeBillingAccountUrl = (accountId: number) => {
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/resume`;
+};
+
+/**
+ * Resumes a billing account you suspended. Refused with `BILLING_ACCOUNT_SUSPENDED_BY_OPERATOR` when Leaflow
+ * suspended it. Does not create a resource.
+ * @summary Resume billing account
+ */
+export const resumeBillingAccount = async (
+  accountId: number,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<resumeBillingAccountResponse> => {
+  const res = await (fetchFn ?? fetch)(getResumeBillingAccountUrl(accountId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resumeBillingAccountResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as resumeBillingAccountResponse;
+};
+
 export type getAccountBalanceResponse200 = {
   data: AccountBalance;
   status: 200;

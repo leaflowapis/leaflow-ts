@@ -788,6 +788,18 @@ export const BillingAccountStatus = {
   closed: "closed",
 } as const;
 
+/**
+ * Who suspended the account: `owner` (you), `operator` (Leaflow), or `none` while it is not suspended. Only a suspension by `owner` can be resumed by you.
+ */
+export type BillingAccountSuspendedBy =
+  (typeof BillingAccountSuspendedBy)[keyof typeof BillingAccountSuspendedBy];
+
+export const BillingAccountSuspendedBy = {
+  none: "none",
+  owner: "owner",
+  operator: "operator",
+} as const;
+
 export interface BillingAccount {
   /**
    * The active contact used for invoices, of this account; null clears it.
@@ -800,6 +812,8 @@ export interface BillingAccount {
   /** Fixed when the account was opened. */
   currency: string;
   status: BillingAccountStatus;
+  /** Who suspended the account: `owner` (you), `operator` (Leaflow), or `none` while it is not suspended. Only a suspension by `owner` can be resumed by you. */
+  suspended_by: BillingAccountSuspendedBy;
   /** How far past the suspension threshold the account may go before its resources are suspended; `0` means none. */
   grace_amount?: string;
   /** How long the account has to top up after crossing the suspension threshold, in seconds; `0` means none. Grace ends when this or grace_amount runs out. */

@@ -251,6 +251,27 @@ export const UpdateBillingAccountParams = zod.strictObject({
 export const UpdateBillingAccountBody = BillingAccountUpdate;
 
 /**
+ * Suspends your active billing account without closing it, also while it is in arrears. While suspended, it
+ * accepts no new purchases, renewals or project links, and the services it pays for start no new resources;
+ * running services, their charges and the handling of arrears continue, and you can still top up and pay
+ * invoices. Resume it yourself; one suspended by Leaflow can only be resumed by Leaflow. Does not create a
+ * resource.
+ * @summary Suspend billing account
+ */
+export const SuspendBillingAccountParams = zod.strictObject({
+  accountId: zod.int(),
+});
+
+/**
+ * Resumes a billing account you suspended. Refused with `BILLING_ACCOUNT_SUSPENDED_BY_OPERATOR` when Leaflow
+ * suspended it. Does not create a resource.
+ * @summary Resume billing account
+ */
+export const ResumeBillingAccountParams = zod.strictObject({
+  accountId: zod.int(),
+});
+
+/**
  * The balance of your account, with credit groups, unpaid invoice amounts, unbilled estimates and pending returns. Returns 404 for a missing account and 403 for another user's account.
  * @summary Get account balance
  */
