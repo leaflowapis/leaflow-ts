@@ -6,13 +6,15 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { Money } from "./money.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
 export const RenewalPrice = zod.strictObject({
-  termination_policy: TerminationPolicy.optional(),
+  cancellation_policy: CancellationPolicy.optional(),
   refund_policy: RefundPolicy.optional(),
+  short_rate_multiplier: zod.string().optional().describe("Refund policy `short_rate` only."),
+  short_rate_threshold_seconds: zod.int().optional().describe("Refund policy `short_rate` only."),
   price_id: zod.uuid(),
   interval_count: zod.int().describe("How many periods one renewal covers."),
   interval: zod.enum(["day", "month", "year"]),

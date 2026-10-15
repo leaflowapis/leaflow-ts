@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 
 export const renewRequestPeriodsDefault = 1;
 
@@ -31,14 +31,14 @@ export const RenewRequest = zod.strictObject({
     .min(1)
     .optional()
     .describe(
-      "Renew for a term of this length instead, at the price currently sold for it. Give\n`interval` with it.\n\nLeaving both out renews at the price this item already bills at, which a later price\nchange does not affect. Naming a term that differs from the current one is a fresh\nchoice, so it is bought at today's price. Naming the current term changes nothing. A\nterm sold at several prices that differ in termination policy is refused with 409\n`BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `termination_policy` is given.\n\nList the terms on offer with the renewal prices operation.",
+      "Renew for a term of this length instead, at the price currently sold for it. Give\n`interval` with it.\n\nLeaving both out renews at the price this item already bills at, which a later price\nchange does not affect. Naming a term that differs from the current one is a fresh\nchoice, so it is bought at today's price. Naming the current term changes nothing. A\nterm sold at several prices that differ in cancellation policy is refused with 409\n`BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` is given.\n\nList the terms on offer with the renewal prices operation.",
     ),
   interval: zod
     .enum(["day", "month", "year"])
     .optional()
     .describe("The unit interval_count counts in."),
-  termination_policy: TerminationPolicy.optional().describe(
-    "With `interval` and `interval_count`, chooses among prices of that term that differ in termination policy.",
+  cancellation_policy: CancellationPolicy.optional().describe(
+    "With `interval` and `interval_count`, chooses among prices of that term that differ in cancellation policy.",
   ),
   payment_method_id: zod.uuid().optional(),
   use_balance: zod

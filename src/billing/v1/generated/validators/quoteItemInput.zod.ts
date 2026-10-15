@@ -6,9 +6,9 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { ProductID } from "./productID.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const quoteItemInputPriceLookupKeyMax = 128;
@@ -35,7 +35,7 @@ export const QuoteItemInput = zod
     ),
     interval: zod.enum(["none", "day", "month", "year"]).optional(),
     interval_count: zod.int().min(1).optional(),
-    termination_policy: TerminationPolicy.optional().describe(
+    cancellation_policy: CancellationPolicy.optional().describe(
       "Selects among licensed prices with otherwise identical billing terms. Ambiguous terms are refused instead of choosing a price arbitrarily.",
     ),
     quantity: zod.string().regex(quoteItemInputQuantityRegExp),

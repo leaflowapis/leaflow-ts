@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 
 export const renewalOrderRequestPeriodsDefault = 1;
 
@@ -24,7 +24,7 @@ export const RenewalOrderRequest = zod
       .describe("As in renewing."),
     interval_count: zod.int().min(1).optional().describe("As in renewing."),
     interval: zod.enum(["day", "month", "year"]).optional().describe("As in renewing."),
-    termination_policy: TerminationPolicy.optional().describe("As in renewing."),
+    cancellation_policy: CancellationPolicy.optional().describe("As in renewing."),
   })
   .describe("The renewal's periods and price, chosen as in renewing.");
 

@@ -39,13 +39,13 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { CancellationRefundPreviewItem } from "./cancellationRefundPreviewItem.zod.js";
 import { Money } from "./money.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
 export const CancellationRefundPreview = zod
   .strictObject({
-    mode: TerminationPolicy,
+    mode: CancellationPolicy,
     scheduled_at: zod.iso
       .datetime({ offset: true })
       .optional()
@@ -58,6 +58,7 @@ export const CancellationRefundPreview = zod
       ),
     currency: zod.string(),
     unused_amount: Money,
+    short_rate_surcharge_amount: Money,
     refundable_amount: Money,
     refund_amount: Money,
     credit_amount: Money,
@@ -66,7 +67,7 @@ export const CancellationRefundPreview = zod
     items: zod.array(CancellationRefundPreviewItem),
   })
   .describe(
-    "What the cancellation would return, per subscription and in total, as of now. Give `proration_date` and\n`refundable_amount` when creating the cancellation.\n\n- `unused_amount`: before tax, the amount paid for the current periods minus the value of the time used,\n  valued as refund policy `prorated` describes, whatever the refund terms say.\n- `refundable_amount`: what is returned the way it was paid, tax included; `refund_amount` plus\n  `credit_amount`.\n- `refund_amount`: the part returned to the balance or the payment method.\n- `credit_amount`: the part restored to the credit grants that paid.\n- `tax_amount`: the tax included in `refundable_amount`.\n- `forfeited_amount`: before tax, the part of `unused_amount` the refund terms do not return.\n\nMetered and one-time subscriptions show zero; their usage until release is charged as usual.",
+    "What the cancellation would return, per subscription and in total, as of now. Give `proration_date` and\n`refundable_amount` when creating the cancellation.\n\n- `unused_amount`: before tax, the amount paid for the current periods in proportion to the time remaining.\n- `short_rate_surcharge_amount`: before tax, the part of `forfeited_amount` due to the short rate of the\n  refund policy.\n- `refundable_amount`: what is returned the way it was paid, tax included; `refund_amount` plus\n  `credit_amount`.\n- `refund_amount`: the part returned to the balance or the payment method.\n- `credit_amount`: the part restored to the credit grants that paid.\n- `tax_amount`: the tax included in `refundable_amount`.\n- `forfeited_amount`: before tax, the part of `unused_amount` the refund terms do not return.\n\nMetered and one-time subscriptions show zero; their usage until release is charged as usual.",
   );
 
 export type CancellationRefundPreview = zod.input<typeof CancellationRefundPreview>;

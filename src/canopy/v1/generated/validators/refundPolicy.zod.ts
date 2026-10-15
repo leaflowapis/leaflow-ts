@@ -41,9 +41,9 @@
 import * as zod from "zod";
 
 export const RefundPolicy = zod
-  .enum(["none", "prorated"])
+  .enum(["none", "prorated", "short_rate"])
   .describe(
-    "`none` refunds nothing. `prorated` refunds the amount paid for the current period minus the value of the time used, never below zero or above what remains unrefunded. Time used runs from the period start to the effective cancellation and is valued at prices frozen on the order item: each full calendar month at `refund_monthly_amount`, the rest at `refund_hourly_amount` or, without it, at the monthly price by the second. When the plan has no licensed period shorter than the one bought, time used is valued pro rata at the price paid. Discounts and setup fees are not refunded. Refunds return to the original payment sources, with tax refunded in proportion.",
+    "`none` refunds nothing.\n\n`prorated` refunds the amount paid for the current period minus the value of the time used, never below zero\nor above what remains unrefunded. Time used runs from the period start to the effective cancellation, by the\nsecond. Each whole month from the period start is valued at the order item's `monthly_list_amount`, and the\nremainder at that amount in proportion to the length of the month it falls in; without `monthly_list_amount`,\ntime used is valued at the amount paid in proportion to the length of the period. A renewal starts a new\nperiod, and an immediate change starts one at the change. Discounts and setup fees are not refunded. Refunds\nreturn to the original payment sources, with tax refunded in proportion.\n\n`short_rate` refunds as `prorated`, except that when the cancellation takes effect less than\n`short_rate_threshold_seconds` after the period start, the value of the time used is multiplied by\n`short_rate_multiplier`, up to `monthly_list_amount` for each month begun or, without `monthly_list_amount`,\nup to the amount paid.",
   );
 
 export type RefundPolicy = zod.input<typeof RefundPolicy>;

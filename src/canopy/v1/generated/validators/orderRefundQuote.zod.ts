@@ -50,7 +50,7 @@ export const OrderRefundQuote = zod
     currency: zod.string(),
   })
   .describe(
-    "An estimated refund to the original payment sources. Before acceptance, cancellation returns the collected amount. For delivered service, only value paid by this order is included; renewals are evaluated with their own orders under the agreed termination terms. Nothing is refunded by the quote; the amount is fixed when cancellation or termination is confirmed.",
+    "An estimated refund to the original payment sources. Before acceptance, cancellation returns the collected amount. For delivered service, only value paid by this order is included; renewals are evaluated with their own orders under the agreed cancellation terms. Nothing is refunded by the quote; the amount is fixed when cancellation or termination is confirmed.",
   );
 
 export type OrderRefundQuote = zod.input<typeof OrderRefundQuote>;

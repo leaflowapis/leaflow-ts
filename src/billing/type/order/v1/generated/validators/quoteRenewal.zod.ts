@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 
 export const quoteRenewalPeriodsDefault = 1;
 export const quoteRenewalPeriodsMax = 100;
@@ -17,8 +17,8 @@ export const QuoteRenewal = zod
     price_id: zod.uuid().optional(),
     interval: zod.enum(["day", "month", "year"]).optional(),
     interval_count: zod.int().min(1).optional(),
-    termination_policy: TerminationPolicy.optional().describe(
-      "With `interval` and `interval_count`, chooses among prices of that term that differ in termination policy.",
+    cancellation_policy: CancellationPolicy.optional().describe(
+      "With `interval` and `interval_count`, chooses among prices of that term that differ in cancellation policy.",
     ),
     periods: zod
       .int()
@@ -28,7 +28,7 @@ export const QuoteRenewal = zod
       .describe("How many consecutive periods to renew for."),
   })
   .describe(
-    "Price renewing a licensed subscription. Give `price_id`, or `interval` with\n`interval_count`, to renew for another term at the price currently sold for it. Naming\nthe current term, or giving neither, renews at the agreed amount. A term sold at several\nprices that differ in termination policy is refused with 409\n`BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `termination_policy` or `price_id` is given.",
+    "Price renewing a licensed subscription. Give `price_id`, or `interval` with\n`interval_count`, to renew for another term at the price currently sold for it. Naming\nthe current term, or giving neither, renews at the agreed amount. A term sold at several\nprices that differ in cancellation policy is refused with 409\n`BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` or `price_id` is given.",
   );
 
 export type QuoteRenewal = zod.input<typeof QuoteRenewal>;

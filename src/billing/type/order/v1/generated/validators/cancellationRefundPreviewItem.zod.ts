@@ -30,6 +30,7 @@ export const CancellationRefundPreviewItem = zod
         "Whether automatic renewal is on now. Creating the cancellation turns it off; withdrawing it turns it back on for a metered subscription but not for a licensed one.",
       ),
     unused_amount: Money,
+    short_rate_surcharge_amount: Money,
     refundable_amount: Money,
     refund_amount: Money,
     credit_amount: Money,

@@ -40,11 +40,11 @@
  */
 import * as zod from "zod";
 
-export const TerminationPolicy = zod
+export const CancellationPolicy = zod
   .enum(["immediate", "period_end"])
   .describe(
-    "Whether a delivered purchase may end immediately or only at the end of its paid term; refunds follow the refund policy. When absent, no termination terms were agreed.",
+    "Whether a cancellation of a delivered purchase may take effect immediately or only at the end of its paid term; refunds follow the refund policy. When absent, no cancellation terms were agreed.",
   );
 
-export type TerminationPolicy = zod.input<typeof TerminationPolicy>;
-export type TerminationPolicyOutput = zod.output<typeof TerminationPolicy>;
+export type CancellationPolicy = zod.input<typeof CancellationPolicy>;
+export type CancellationPolicyOutput = zod.output<typeof CancellationPolicy>;

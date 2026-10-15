@@ -6,13 +6,13 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { Money } from "./money.zod.js";
 import { OrderItemStatus } from "./orderItemStatus.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const orderItemPositionMin = 0;
@@ -39,20 +39,22 @@ export const OrderItem = zod
       ),
     interval: zod.enum(["none", "day", "month", "year"]),
     interval_count: zod.int().min(1).optional(),
-    termination_policy: TerminationPolicy.optional(),
+    cancellation_policy: CancellationPolicy.optional(),
     refund_policy: RefundPolicy.optional(),
-    refund_monthly_amount: zod
+    monthly_list_amount: zod
       .string()
       .nullish()
       .describe(
-        "Recurring licensed items only: the plan's one-month licensed price for this item's quantity, before tax and frozen at purchase, used to value time under a prorated refund or a downgrade. Null when the plan has no licensed period shorter than the one bought.",
+        "Recurring licensed items only: a month at list price for this item's quantity, before tax and discounts, which values time under a refund or a downgrade. It is the monthly amount of the shortest period the plan sells, not longer than the one bought, at the item's dimensions, fixed at purchase; a renewal at the agreed amount keeps the previous value. Null when time used is valued at the amount paid, as for a daily period.",
       ),
-    refund_hourly_amount: zod
+    short_rate_multiplier: zod
       .string()
       .nullish()
-      .describe(
-        "Recurring licensed items only, the plan's metered hourly price for this item's quantity before tax, frozen at purchase, used for time used short of a full month. Null when the licensed price has no meter.",
-      ),
+      .describe("Refund policy `short_rate` only, as on the price when bought."),
+    short_rate_threshold_seconds: zod
+      .int()
+      .nullish()
+      .describe("Refund policy `short_rate` only, as on the price when bought."),
     recurring_amount: zod.string().optional(),
     setup_amount: zod.string().optional(),
     type: PriceType,

@@ -40,14 +40,14 @@
  */
 import * as zod from "zod";
 import { CancellationItem } from "./cancellationItem.zod.js";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { Money } from "./money.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
 export const Cancellation = zod
   .strictObject({
     id: zod.uuid(),
     status: zod.enum(["requested", "scheduled", "releasing", "completed", "canceled", "failed"]),
-    mode: TerminationPolicy,
+    mode: CancellationPolicy,
     scheduled_at: zod.iso.datetime({ offset: true }).optional(),
     proration_date: zod.iso
       .datetime({ offset: true })
