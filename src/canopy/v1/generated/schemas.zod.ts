@@ -233,6 +233,8 @@ export const GetModelParams = zod.strictObject({
  */
 export const listRequestsQueryModelIdMax = 128;
 
+export const listRequestsQuerySourceMax = 64;
+
 export const listRequestsQueryLimitDefault = 50;
 export const listRequestsQueryLimitMax = 200;
 
@@ -255,6 +257,14 @@ export const ListRequestsQueryParams = zod.strictObject({
     .enum(["in_flight", "succeeded", "refused", "upstream_failed", "client_aborted"])
     .optional()
     .describe("Restricts the result to the specified status"),
+  source: zod
+    .string()
+    .min(1)
+    .max(listRequestsQuerySourceMax)
+    .optional()
+    .describe(
+      "Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded",
+    ),
   limit: zod
     .int()
     .min(1)
@@ -314,6 +324,8 @@ export const ListUsageByApiKeyQueryParams = zod.strictObject({
  */
 export const listUsageByModelQueryModelIdMax = 128;
 
+export const listUsageByModelQuerySourceMax = 64;
+
 export const ListUsageByModelQueryParams = zod.strictObject({
   from: zod.iso
     .datetime({ offset: true })
@@ -331,6 +343,14 @@ export const ListUsageByModelQueryParams = zod.strictObject({
     .enum(["in_flight", "succeeded", "refused", "upstream_failed", "client_aborted"])
     .optional()
     .describe("Restricts the result to the specified status"),
+  source: zod
+    .string()
+    .min(1)
+    .max(listUsageByModelQuerySourceMax)
+    .optional()
+    .describe(
+      "Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded",
+    ),
 });
 
 /**
@@ -340,6 +360,8 @@ export const ListUsageByModelQueryParams = zod.strictObject({
  * @summary Get total usage
  */
 export const getUsageSummaryQueryModelIdMax = 128;
+
+export const getUsageSummaryQuerySourceMax = 64;
 
 export const GetUsageSummaryQueryParams = zod.strictObject({
   from: zod.iso
@@ -358,6 +380,14 @@ export const GetUsageSummaryQueryParams = zod.strictObject({
     .enum(["in_flight", "succeeded", "refused", "upstream_failed", "client_aborted"])
     .optional()
     .describe("Restricts the result to the specified status"),
+  source: zod
+    .string()
+    .min(1)
+    .max(getUsageSummaryQuerySourceMax)
+    .optional()
+    .describe(
+      "Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded",
+    ),
 });
 
 /**
@@ -367,6 +397,8 @@ export const GetUsageSummaryQueryParams = zod.strictObject({
  * @summary Get a usage series
  */
 export const getUsageTimelineQueryModelIdMax = 128;
+
+export const getUsageTimelineQuerySourceMax = 64;
 
 export const getUsageTimelineQueryBucketDefault = `1h`;
 export const getUsageTimelineQueryBucketMax = 16;
@@ -388,6 +420,14 @@ export const GetUsageTimelineQueryParams = zod.strictObject({
     .enum(["in_flight", "succeeded", "refused", "upstream_failed", "client_aborted"])
     .optional()
     .describe("Restricts the result to the specified status"),
+  source: zod
+    .string()
+    .min(1)
+    .max(getUsageTimelineQuerySourceMax)
+    .optional()
+    .describe(
+      "Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded",
+    ),
   bucket: zod
     .string()
     .max(getUsageTimelineQueryBucketMax)

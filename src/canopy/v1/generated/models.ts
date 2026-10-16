@@ -460,7 +460,7 @@ export const RequestResourceUsageSource = {
 
 export interface RequestResource {
   /**
-   * Null for a request made by an internal service directly for the project.
+   * Null for a request that did not come through one of the project's API keys.
    * @nullable
    */
   api_key_id: string | null;
@@ -480,6 +480,12 @@ export interface RequestResource {
   output_tokens: number;
   reasoning_tokens: number;
   retries: number;
+  /**
+   * Who made the request. `api_key` means one of the project's API keys and `project_token` a project access token on the OpenAI-compatible endpoints; any other value names the Leaflow service that made it on the project's behalf, such as `assistant`, and more services may appear. Null for requests recorded before sources were tracked
+   * @maxLength 64
+   * @nullable
+   */
+  source: string | null;
   started_at: string;
   status: RequestResourceStatus;
   stream: boolean;
@@ -3980,6 +3986,12 @@ export type ListRequestsParams = {
    */
   status?: ListRequestsStatus;
   /**
+   * Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded
+   * @minLength 1
+   * @maxLength 64
+   */
+  source?: string;
+  /**
    * Items returned in this page. Defaults to 50; at most 200.
    * @minimum 1
    * @maximum 200
@@ -4060,6 +4072,12 @@ export type ListUsageByModelParams = {
    * Restricts the result to the specified status
    */
   status?: ListUsageByModelStatus;
+  /**
+   * Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded
+   * @minLength 1
+   * @maxLength 64
+   */
+  source?: string;
 };
 
 export type ListUsageByModelStatus =
@@ -4095,6 +4113,12 @@ export type GetUsageSummaryParams = {
    * Restricts the result to the specified status
    */
   status?: GetUsageSummaryStatus;
+  /**
+   * Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded
+   * @minLength 1
+   * @maxLength 64
+   */
+  source?: string;
 };
 
 export type GetUsageSummaryStatus =
@@ -4130,6 +4154,12 @@ export type GetUsageTimelineParams = {
    * Restricts the result to the specified status
    */
   status?: GetUsageTimelineStatus;
+  /**
+   * Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded
+   * @minLength 1
+   * @maxLength 64
+   */
+  source?: string;
   /**
    * The length of each bucket, written as a duration such as 1h or 24h. The number of buckets is limited to 100
    * @maxLength 16

@@ -42,6 +42,8 @@ import * as zod from "zod";
 
 export const getUsageTimelineParamsModelIdMax = 128;
 
+export const getUsageTimelineParamsSourceMax = 64;
+
 export const getUsageTimelineParamsBucketDefault = `1h`;
 export const getUsageTimelineParamsBucketMax = 16;
 
@@ -62,6 +64,14 @@ export const GetUsageTimelineParams = zod.strictObject({
     .enum(["in_flight", "succeeded", "refused", "upstream_failed", "client_aborted"])
     .optional()
     .describe("Restricts the result to the specified status"),
+  source: zod
+    .string()
+    .min(1)
+    .max(getUsageTimelineParamsSourceMax)
+    .optional()
+    .describe(
+      "Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded",
+    ),
   bucket: zod
     .string()
     .max(getUsageTimelineParamsBucketMax)

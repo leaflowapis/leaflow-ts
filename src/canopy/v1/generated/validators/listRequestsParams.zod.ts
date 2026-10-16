@@ -42,6 +42,8 @@ import * as zod from "zod";
 
 export const listRequestsParamsModelIdMax = 128;
 
+export const listRequestsParamsSourceMax = 64;
+
 export const listRequestsParamsLimitDefault = 50;
 export const listRequestsParamsLimitMax = 200;
 
@@ -64,6 +66,14 @@ export const ListRequestsParams = zod.strictObject({
     .enum(["in_flight", "succeeded", "refused", "upstream_failed", "client_aborted"])
     .optional()
     .describe("Restricts the result to the specified status"),
+  source: zod
+    .string()
+    .min(1)
+    .max(listRequestsParamsSourceMax)
+    .optional()
+    .describe(
+      "Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded",
+    ),
   limit: zod.int().min(1).max(listRequestsParamsLimitMax).default(listRequestsParamsLimitDefault),
   cursor: zod.string().min(1).max(listRequestsParamsCursorMax).optional(),
 });

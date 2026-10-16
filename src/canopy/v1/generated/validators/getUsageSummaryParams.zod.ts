@@ -42,6 +42,8 @@ import * as zod from "zod";
 
 export const getUsageSummaryParamsModelIdMax = 128;
 
+export const getUsageSummaryParamsSourceMax = 64;
+
 export const GetUsageSummaryParams = zod.strictObject({
   from: zod.iso
     .datetime({ offset: true })
@@ -59,6 +61,14 @@ export const GetUsageSummaryParams = zod.strictObject({
     .enum(["in_flight", "succeeded", "refused", "upstream_failed", "client_aborted"])
     .optional()
     .describe("Restricts the result to the specified status"),
+  source: zod
+    .string()
+    .min(1)
+    .max(getUsageSummaryParamsSourceMax)
+    .optional()
+    .describe(
+      "Restricts the result to requests from the specified source, as reported in a request's `source`. Requests recorded before sources were tracked have none and are excluded",
+    ),
 });
 
 export type GetUsageSummaryParams = zod.input<typeof GetUsageSummaryParams>;

@@ -41,11 +41,13 @@
 import * as zod from "zod";
 import { ReasoningDiagnostics } from "./reasoningDiagnostics.zod.js";
 
+export const requestResourceSourceMax = 64;
+
 export const RequestResource = zod.strictObject({
   api_key_id: zod
     .uuid()
     .nullable()
-    .describe("Null for a request made by an internal service directly for the project."),
+    .describe("Null for a request that did not come through one of the project's API keys."),
   cache_read_tokens: zod
     .int()
     .describe(
@@ -61,6 +63,13 @@ export const RequestResource = zod.strictObject({
   output_tokens: zod.int(),
   reasoning_tokens: zod.int(),
   retries: zod.int(),
+  source: zod
+    .string()
+    .max(requestResourceSourceMax)
+    .nullable()
+    .describe(
+      "Who made the request. `api_key` means one of the project's API keys and `project_token` a project access token on the OpenAI-compatible endpoints; any other value names the Leaflow service that made it on the project's behalf, such as `assistant`, and more services may appear. Null for requests recorded before sources were tracked",
+    ),
   started_at: zod.iso.datetime({ offset: true }),
   status: zod.enum(["in_flight", "succeeded", "refused", "upstream_failed", "client_aborted"]),
   stream: zod.boolean(),
