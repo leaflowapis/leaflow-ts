@@ -32,7 +32,7 @@
  *
  * - **The plaintext of an API key is returned once.** The `secret` appears in the response that issues it and is returned by no other endpoint. A key that has been lost has to be revoked and reissued.
  * - **Disabling and revoking are distinct.** A disabled key may be enabled again at any time, while a revocation is irreversible and is intended for a key that has been exposed. Neither removes the record, and the usage the key accrued remains readable.
- * - **A usage query must carry a time range**, spanning no more than 31 days. `from` and `to` carry a timezone offset, which the server does not infer.
+ * - **A usage query must carry a time range**, spanning no more than 31 days, or 400 days for the usage timeline. `from` and `to` carry a timezone offset, which the server does not infer.
  * - **The request and response bodies do not appear in the ledger.** They are not recorded. Quote the `upstream_request_id` from the response when reporting a problem.
  * - **Usage may be estimated.** The upstream provider does not report usage on every request. Where it does not, `usage_source` is `estimated` and the figures are derived from the character classes of the payload, to within roughly fifteen per cent.
  * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates stated in each model's `pricing`.
@@ -77,7 +77,7 @@ export const GetUsageTimelineParams = zod.strictObject({
     .max(getUsageTimelineParamsBucketMax)
     .default(getUsageTimelineParamsBucketDefault)
     .describe(
-      "The length of each bucket, written as a duration such as 1h or 24h. The number of buckets is limited to 100",
+      "The length of each bucket, written as a duration such as 1h or 24h. The number of buckets is limited to 400",
     ),
 });
 
