@@ -1340,6 +1340,40 @@ export interface AccountBalance {
 }
 
 /**
+ * `ARREARS`: the balance is negative. `PROJECTS_ASSIGNED`: the account still pays for a project, yours or anyone
+ * else's. `ACTIVE_SUBSCRIPTION`: a subscription it bought has not ended. `OPEN_ORDER`: an order is not finished.
+ * `UNPAID_INVOICE`: an issued invoice is not settled. `UNBILLED_USAGE`: usage has not been invoiced yet; it is
+ * invoiced in the next billing run. `PENDING_TRANSACTION`: a top-up, refund or withdrawal is still pending.
+ */
+export type AccountDeletionObjection =
+  (typeof AccountDeletionObjection)[keyof typeof AccountDeletionObjection];
+
+export const AccountDeletionObjection = {
+  ARREARS: "ARREARS",
+  PROJECTS_ASSIGNED: "PROJECTS_ASSIGNED",
+  ACTIVE_SUBSCRIPTION: "ACTIVE_SUBSCRIPTION",
+  OPEN_ORDER: "OPEN_ORDER",
+  UNPAID_INVOICE: "UNPAID_INVOICE",
+  UNBILLED_USAGE: "UNBILLED_USAGE",
+  PENDING_TRANSACTION: "PENDING_TRANSACTION",
+} as const;
+
+export interface AccountDeletionReadinessItem {
+  account: BillingAccount;
+  /** Topped-up funds, in the account's currency, forfeited when it closes. Negative means arrears. */
+  balance: Money;
+  /** Remaining credit, in the account's currency, forfeited when it closes. */
+  credits: Money;
+  /** What stops this account from closing; empty when it can close. */
+  objections: AccountDeletionObjection[];
+}
+
+export interface AccountDeletionReadiness {
+  /** Every billing account you own that is not closed; empty when you own none. */
+  accounts: AccountDeletionReadinessItem[];
+}
+
+/**
  * A project's assignment to a billing account from effective_from until effective_to; an open assignment has no end.
  */
 export interface ProjectAssignment {

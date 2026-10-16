@@ -27,6 +27,7 @@ import type {
   AcceptConsentsRequestBody,
   AcceptInvitationByTokenRequestBody,
   AcceptedInvitationResponseBody,
+  AccountDeletionResource,
   AccountResource,
   AgreementListResponseBody,
   ConsentListResponseBody,
@@ -44,6 +45,7 @@ import type {
   ProjectAccessResource,
   ProjectSlugAvailabilityResource,
   RegisterRequestBody,
+  RequestAccountDeletionRequestBody,
   ScopedTokenResponseBody,
   SearchProjectsRequestBody,
   SettingsResource,
@@ -365,7 +367,7 @@ export const getRegisterUrl = () => {
 /**
  * Call this after signing in at auth.leaflow.net, carrying the access token. The name and email address are taken from the sign-in claims and are not read from the request body.
  *
- * `consents` must cover every agreement returned by `GET /account/v1/agreements`, at the same versions. A missing agreement answers 400 and a stale version answers 409, in which case fetch the list again. An account that already exists answers 409.
+ * `consents` must cover every agreement returned by `GET /account/v1/agreements`, at the same versions. A missing agreement answers 400 and a stale version answers 409, in which case fetch the list again. An account that already exists answers 409, and one that has been deleted answers 410 `USER_DELETED`: the same sign-in cannot register again.
  * @summary Register an account
  */
 export const register = async (
@@ -430,6 +432,8 @@ export const getGetAccountUrl = () => {
 
 /**
  * `pending_agreements` holds the agreements not yet consented to. While it is not empty, obtain consent and call `POST /account/v1/me/consents`.
+ *
+ * `status` is `DELETING` while a deletion is open; see `GET /account/v1/me/deletion`. A deleted account answers 410 `USER_DELETED`.
  * @summary Get the current account
  */
 export const getAccount = async (
@@ -509,6 +513,169 @@ export const updateAccount = async (
 
   const data: updateAccountResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as updateAccountResponse;
+};
+
+export type getAccountDeletionResponse200 = {
+  data: AccountDeletionResource;
+  status: 200;
+};
+
+export type getAccountDeletionResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getAccountDeletionResponseSuccess = getAccountDeletionResponse200 & {
+  headers: Headers;
+};
+export type getAccountDeletionResponseError = getAccountDeletionResponseDefault & {
+  headers: Headers;
+};
+
+export type getAccountDeletionResponse =
+  | getAccountDeletionResponseSuccess
+  | getAccountDeletionResponseError;
+
+export const getGetAccountDeletionUrl = () => {
+  return `https://account.leaflow.cloud/account/v1/me/deletion`;
+};
+
+/**
+ * `state` is `none` while no deletion is open. `blocking_projects` lists the projects the caller still owns; a deletion cannot be requested while it is not empty, so each of them must be transferred or deleted first.
+ *
+ * Conditions held by other services, such as an unpaid balance or a billing account still paying for a project, are not listed here. Read them from those services before requesting; they are checked again after the request, and a refusal shows up in `rejected_at` and `objections`.
+ * @summary Get the deletion of the current account
+ */
+export const getAccountDeletion = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAccountDeletionResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetAccountDeletionUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAccountDeletionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getAccountDeletionResponse;
+};
+
+export type requestAccountDeletionResponse202 = {
+  data: AccountDeletionResource;
+  status: 202;
+};
+
+export type requestAccountDeletionResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 202>;
+};
+
+export type requestAccountDeletionResponseSuccess = requestAccountDeletionResponse202 & {
+  headers: Headers;
+};
+export type requestAccountDeletionResponseError = requestAccountDeletionResponseDefault & {
+  headers: Headers;
+};
+
+export type requestAccountDeletionResponse =
+  | requestAccountDeletionResponseSuccess
+  | requestAccountDeletionResponseError;
+
+export const getRequestAccountDeletionUrl = () => {
+  return `https://account.leaflow.cloud/account/v1/me/deletion`;
+};
+
+/**
+ * The account is frozen at once: it can no longer enter a project or change anything in one. The answer is 202 with `state` `checking` while the services holding data for the account are asked whether it can be closed. Poll `GET /account/v1/me/deletion` until `state` leaves `checking`, which normally takes a few seconds.
+ *
+ * - If any service refuses, the account returns to use, `state` becomes `none`, and `rejected_at` and `objections` say why.
+ * - Otherwise `state` becomes `scheduled`, and the account is deleted at `scheduled_at`, fifteen days after the request. The conditions are checked once more at that time.
+ *
+ * The deletion can be cancelled with `DELETE /account/v1/me/deletion` until `scheduled_at`, and not after. Once carried out it cannot be undone, and the same sign-in cannot register again. Any remaining balance and prepaid benefits are forfeited, which `acknowledge_forfeiture` confirms.
+ *
+ * Requesting again while a deletion is open returns it unchanged. Fails with 412 `USER_OWNS_PROJECTS` while `blocking_projects` is not empty, and with 401 `INSUFFICIENT_USER_AUTHENTICATION` unless the caller signed in within the last `meta.max_age` seconds; sign in again with that `max_age` and retry.
+ * @summary Request deletion of the current account
+ */
+export const requestAccountDeletion = async (
+  requestAccountDeletionRequestBody: RequestAccountDeletionRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<requestAccountDeletionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getRequestAccountDeletionUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(requestAccountDeletionRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: requestAccountDeletionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as requestAccountDeletionResponse;
+};
+
+export type cancelAccountDeletionResponse200 = {
+  data: AccountDeletionResource;
+  status: 200;
+};
+
+export type cancelAccountDeletionResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type cancelAccountDeletionResponseSuccess = cancelAccountDeletionResponse200 & {
+  headers: Headers;
+};
+export type cancelAccountDeletionResponseError = cancelAccountDeletionResponseDefault & {
+  headers: Headers;
+};
+
+export type cancelAccountDeletionResponse =
+  | cancelAccountDeletionResponseSuccess
+  | cancelAccountDeletionResponseError;
+
+export const getCancelAccountDeletionUrl = () => {
+  return `https://account.leaflow.cloud/account/v1/me/deletion`;
+};
+
+/**
+ * Returns the account to use. Cancelling when no deletion is open returns `state` `none`. Fails with 409 `ACCOUNT_DELETION_NOT_CANCELLABLE` once `scheduled_at` has passed.
+ * @summary Cancel the deletion of the current account
+ */
+export const cancelAccountDeletion = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<cancelAccountDeletionResponse> => {
+  const res = await (fetchFn ?? fetch)(getCancelAccountDeletionUrl(), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelAccountDeletionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as cancelAccountDeletionResponse;
 };
 
 export type getIdentityVerificationResponse200 = {

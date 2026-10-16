@@ -33,6 +33,8 @@ import { CreateProjectRequestBody } from "./validators/createProjectRequestBody.
 
 import { RegisterRequestBody } from "./validators/registerRequestBody.zod.js";
 
+import { RequestAccountDeletionRequestBody } from "./validators/requestAccountDeletionRequestBody.zod.js";
+
 import { SubmitIdentityVerificationRequestBody } from "./validators/submitIdentityVerificationRequestBody.zod.js";
 
 import { UpdateAccountRequestBody } from "./validators/updateAccountRequestBody.zod.js";
@@ -48,7 +50,7 @@ export const AcceptAgreementsBody = AcceptConsentsRequestBody;
 /**
  * Call this after signing in at auth.leaflow.net, carrying the access token. The name and email address are taken from the sign-in claims and are not read from the request body.
  *
- * `consents` must cover every agreement returned by `GET /account/v1/agreements`, at the same versions. A missing agreement answers 400 and a stale version answers 409, in which case fetch the list again. An account that already exists answers 409.
+ * `consents` must cover every agreement returned by `GET /account/v1/agreements`, at the same versions. A missing agreement answers 400 and a stale version answers 409, in which case fetch the list again. An account that already exists answers 409, and one that has been deleted answers 410 `USER_DELETED`: the same sign-in cannot register again.
  * @summary Register an account
  */
 export const RegisterBody = RegisterRequestBody;
@@ -58,6 +60,19 @@ export const RegisterBody = RegisterRequestBody;
  * @summary Update the country and language of the current account
  */
 export const UpdateAccountBody = UpdateAccountRequestBody;
+
+/**
+ * The account is frozen at once: it can no longer enter a project or change anything in one. The answer is 202 with `state` `checking` while the services holding data for the account are asked whether it can be closed. Poll `GET /account/v1/me/deletion` until `state` leaves `checking`, which normally takes a few seconds.
+ *
+ * - If any service refuses, the account returns to use, `state` becomes `none`, and `rejected_at` and `objections` say why.
+ * - Otherwise `state` becomes `scheduled`, and the account is deleted at `scheduled_at`, fifteen days after the request. The conditions are checked once more at that time.
+ *
+ * The deletion can be cancelled with `DELETE /account/v1/me/deletion` until `scheduled_at`, and not after. Once carried out it cannot be undone, and the same sign-in cannot register again. Any remaining balance and prepaid benefits are forfeited, which `acknowledge_forfeiture` confirms.
+ *
+ * Requesting again while a deletion is open returns it unchanged. Fails with 412 `USER_OWNS_PROJECTS` while `blocking_projects` is not empty, and with 401 `INSUFFICIENT_USER_AUTHENTICATION` unless the caller signed in within the last `meta.max_age` seconds; sign in again with that `max_age` and retry.
+ * @summary Request deletion of the current account
+ */
+export const RequestAccountDeletionBody = RequestAccountDeletionRequestBody;
 
 /**
  * A submission awaiting review, and an account already verified, are both refused. A rejected submission may be corrected and sent again.

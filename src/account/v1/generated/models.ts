@@ -184,6 +184,106 @@ export interface AccountResource {
 }
 
 /**
+ * `none` while no deletion is open. `checking` while the services holding data for the account are asked whether it can be closed. `scheduled` once they agree; it is carried out at `scheduled_at` and can be cancelled until then. `executing` once `scheduled_at` has passed; it can no longer be cancelled
+ */
+export type AccountDeletionState = (typeof AccountDeletionState)[keyof typeof AccountDeletionState];
+
+export const AccountDeletionState = {
+  none: "none",
+  checking: "checking",
+  scheduled: "scheduled",
+  executing: "executing",
+} as const;
+
+export type ProjectTraitResourceEffect =
+  (typeof ProjectTraitResourceEffect)[keyof typeof ProjectTraitResourceEffect];
+
+export const ProjectTraitResourceEffect = {
+  NoWrite: "NoWrite",
+  NoAccess: "NoAccess",
+} as const;
+
+export interface ProjectTraitResource {
+  key: string;
+  value: string;
+  effect: ProjectTraitResourceEffect;
+  reason: string;
+}
+
+/**
+ * `active` until deletion is requested; `deleting` while the resources under the project are being removed, when `deletion_requested_at` is set; `deleted` once removal has finished, when `deleted_at` is set
+ */
+export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus];
+
+export const ProjectStatus = {
+  active: "active",
+  deleting: "deleting",
+  deleted: "deleted",
+} as const;
+
+export interface ProjectResource {
+  traits: ProjectTraitResource[];
+  /** @nullable */
+  deletion_requested_at: string | null;
+  created_at: string;
+  created_by: string;
+  /**
+   * When the project was deleted
+   * @nullable
+   */
+  deleted_at: string | null;
+  description: string;
+  id: string;
+  /**
+   * The label naming the project in its address. It equals `id` until a custom slug is chosen. A custom slug does not change once set, and stays with the project after deletion
+   * @minLength 1
+   * @maxLength 36
+   */
+  slug: string;
+  status: ProjectStatus;
+  name: string;
+  updated_at: string;
+}
+
+export interface AccountDeletionObjectionResource {
+  /** The service that refused, such as `billing` */
+  service: string;
+  /** A stable code defined by that service, such as `ARREARS`. The service documents what each code means and how to resolve it */
+  code: string;
+}
+
+export interface AccountDeletionResource {
+  state: AccountDeletionState;
+  /**
+   * Null while `state` is `none`
+   * @nullable
+   */
+  requested_at: string | null;
+  /**
+   * When the deletion is carried out. Null while `state` is `none`
+   * @nullable
+   */
+  scheduled_at: string | null;
+  /** True when an operator requested the deletion rather than the account holder. False while `state` is `none` */
+  requested_by_operator: boolean;
+  /** Projects the caller owns that are not being deleted. A deletion cannot be requested while this is not empty */
+  blocking_projects: ProjectResource[];
+  /**
+   * When the most recent request was turned down. Null unless the most recent request was turned down
+   * @nullable
+   */
+  rejected_at: string | null;
+  /** Why the most recent request was turned down. Empty unless `rejected_at` is set */
+  objections: AccountDeletionObjectionResource[];
+}
+
+export const RequestAccountDeletionRequestBodyValue = {
+  /** Must be true. Confirms that any remaining balance and prepaid benefits are forfeited when the deletion is carried out */
+  acknowledge_forfeiture: true,
+} as const;
+export type RequestAccountDeletionRequestBody = typeof RequestAccountDeletionRequestBodyValue;
+
+/**
  * The language used for the interface and for email. It is independent of `country`, and neither can be inferred from the other
  */
 export type Locale = (typeof Locale)[keyof typeof Locale];
@@ -338,56 +438,6 @@ export interface AcceptInvitationByTokenRequestBody {
    * @maxLength 128
    */
   token: string;
-}
-
-export type ProjectTraitResourceEffect =
-  (typeof ProjectTraitResourceEffect)[keyof typeof ProjectTraitResourceEffect];
-
-export const ProjectTraitResourceEffect = {
-  NoWrite: "NoWrite",
-  NoAccess: "NoAccess",
-} as const;
-
-export interface ProjectTraitResource {
-  key: string;
-  value: string;
-  effect: ProjectTraitResourceEffect;
-  reason: string;
-}
-
-/**
- * `active` until deletion is requested; `deleting` while the resources under the project are being removed, when `deletion_requested_at` is set; `deleted` once removal has finished, when `deleted_at` is set
- */
-export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus];
-
-export const ProjectStatus = {
-  active: "active",
-  deleting: "deleting",
-  deleted: "deleted",
-} as const;
-
-export interface ProjectResource {
-  traits: ProjectTraitResource[];
-  /** @nullable */
-  deletion_requested_at: string | null;
-  created_at: string;
-  created_by: string;
-  /**
-   * When the project was deleted
-   * @nullable
-   */
-  deleted_at: string | null;
-  description: string;
-  id: string;
-  /**
-   * The label naming the project in its address. It equals `id` until a custom slug is chosen. A custom slug does not change once set, and stays with the project after deletion
-   * @minLength 1
-   * @maxLength 36
-   */
-  slug: string;
-  status: ProjectStatus;
-  name: string;
-  updated_at: string;
 }
 
 export interface AcceptedInvitationResponseBody {

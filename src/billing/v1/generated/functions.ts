@@ -7,6 +7,7 @@
  */
 import type {
   AccountBalance,
+  AccountDeletionReadiness,
   ActiveResourceList,
   AllowanceList,
   AutoRenewSet,
@@ -1225,6 +1226,56 @@ export const listPaymentOptions = async (
 
   const data: listPaymentOptionsResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listPaymentOptionsResponse;
+};
+
+export type getAccountDeletionReadinessResponse200 = {
+  data: AccountDeletionReadiness;
+  status: 200;
+};
+
+export type getAccountDeletionReadinessResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getAccountDeletionReadinessResponseSuccess = getAccountDeletionReadinessResponse200 & {
+  headers: Headers;
+};
+export type getAccountDeletionReadinessResponseError =
+  getAccountDeletionReadinessResponseDefault & {
+    headers: Headers;
+  };
+
+export type getAccountDeletionReadinessResponse =
+  | getAccountDeletionReadinessResponseSuccess
+  | getAccountDeletionReadinessResponseError;
+
+export const getGetAccountDeletionReadinessUrl = () => {
+  return `https://billing.leaflow.cloud/api/v1/account-deletion/readiness`;
+};
+
+/**
+ * Lists every billing account you own that is not closed, with what stops each from closing. Deleting your Leaflow
+ * account closes all of them and is refused while any lists an objection. Balance and credits left on them are
+ * forfeited when they close; the accounts and their records are kept, closed.
+ *
+ * A preview that holds nothing: the same check runs again when you request deletion and once more when the grace
+ * period ends.
+ * @summary Check billing accounts before deleting your Leaflow account
+ */
+export const getAccountDeletionReadiness = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAccountDeletionReadinessResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetAccountDeletionReadinessUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAccountDeletionReadinessResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getAccountDeletionReadinessResponse;
 };
 
 export type listProjectAssignmentsResponse200 = {
