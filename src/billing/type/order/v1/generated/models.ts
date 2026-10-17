@@ -1492,14 +1492,16 @@ export interface Invoice {
   tax_amount?: Money;
   /** Successful credit-grant payments, included in amount_paid; they do not reduce the receivable or tax base. */
   credit_applied?: Money;
-  /** Subtotal less discount plus tax. Balance and credit grants pay it; they do not reduce it. */
+  /** Subtotal less discount plus tax. Balance and credit grants pay it plus rounding_amount; they do not reduce it. */
   total: Money;
+  /** Added to total to round the amount payable to the currency's minor unit; negative when rounded down. The rounding of a usage invoice carries over to the next invoice of the same billing period. */
+  rounding_amount: Money;
   amount_paid?: Money;
   /** Issued credit notes that reduced unpaid receivables; the original invoice total is unchanged. */
   pre_payment_credit_notes_amount: Money;
   /** Issued credit notes against payments already received; their refunds may not have completed. */
   post_payment_credit_notes_amount: Money;
-  /** What is still collectible after unpaid credit notes and successful payments; never below zero. Zero for a draft, whose total is the base price, and for a paid or void invoice. */
+  /** What is still collectible from total plus rounding_amount after unpaid credit notes and successful payments; never below zero. Zero for a draft, whose total is the base price, and for a paid or void invoice. */
   amount_due: Money;
   /** @nullable */
   period_start?: string | null;
@@ -1528,16 +1530,6 @@ export interface InvoiceList {
   items: Invoice[];
   pagination: OffsetPagination;
 }
-
-export type InvoiceItemType = (typeof InvoiceItemType)[keyof typeof InvoiceItemType];
-
-export const InvoiceItemType = {
-  usage: "usage",
-  subscription: "subscription",
-  one_time: "one_time",
-  setup: "setup",
-  adjustment: "adjustment",
-} as const;
 
 /**
  * For a usage line, the values of its meter's presentation dimensions, such as the model and token kind. Empty for other lines.
@@ -1580,7 +1572,6 @@ export interface InvoiceItem {
   /** The part of tax_amount already included in amount. */
   tax_included_amount?: string;
   id: string;
-  type?: InvoiceItemType;
   /** @nullable */
   project_id?: string | null;
   /** The project the charge was for and its current name. Absent when the line has no project or the project cannot be read; `project_id` still identifies it. */
@@ -1596,6 +1587,10 @@ export interface InvoiceItem {
   /** The quantity `unit_amount` prices, such as 1000000 tokens or 3600 seconds: `amount` is `quantity` × `unit_amount` ÷ `unit_quantity`. Present together with `unit_amount`. */
   unit_quantity?: string;
   amount: Money;
+  /** This line's share of the invoice's rounding_amount. The line's net amount is amount - discount_amount + tax_amount - tax_included_amount + rounding_amount. */
+  rounding_amount: Money;
+  /** Usage charges billed on this line; zero for other lines. */
+  usage_charge_count: number;
   currency: string;
   /** @nullable */
   period_start?: string | null;
@@ -3045,6 +3040,8 @@ export interface StatementAmounts {
   discount_amount: Money;
   tax_amount: Money;
   total: Money;
+  /** Added to total to round the invoiced amount to the currency's minor unit. Zero for an open statement's estimate. */
+  rounding_amount: Money;
 }
 
 /**

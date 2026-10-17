@@ -57,7 +57,6 @@ export const InvoiceItem = zod.strictObject({
     .optional()
     .describe("The part of tax_amount already included in amount."),
   id: zod.uuid(),
-  type: zod.enum(["usage", "subscription", "one_time", "setup", "adjustment"]).optional(),
   project_id: zod.uuid().nullish(),
   project: zod
     .union([NamedIdentity, zod.null()])
@@ -81,6 +80,12 @@ export const InvoiceItem = zod.strictObject({
       "The quantity `unit_amount` prices, such as 1000000 tokens or 3600 seconds: `amount` is `quantity` × `unit_amount` ÷ `unit_quantity`. Present together with `unit_amount`.",
     ),
   amount: Money,
+  rounding_amount: Money.describe(
+    "This line's share of the invoice's rounding_amount. The line's net amount is amount - discount_amount + tax_amount - tax_included_amount + rounding_amount.",
+  ),
+  usage_charge_count: zod
+    .int()
+    .describe("Usage charges billed on this line; zero for other lines."),
   currency: zod.string(),
   period_start: zod.iso.datetime({ offset: true }).nullish(),
   period_end: zod.iso.datetime({ offset: true }).nullish(),

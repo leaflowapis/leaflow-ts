@@ -46,6 +46,9 @@ export const StatementAmounts = zod.strictObject({
   discount_amount: Money,
   tax_amount: Money,
   total: Money,
+  rounding_amount: Money.describe(
+    "Added to total to round the invoiced amount to the currency's minor unit. Zero for an open statement's estimate.",
+  ),
 });
 
 export type StatementAmounts = zod.input<typeof StatementAmounts>;

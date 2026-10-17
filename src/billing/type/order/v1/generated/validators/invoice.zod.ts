@@ -32,7 +32,10 @@ export const Invoice = zod.strictObject({
     "Successful credit-grant payments, included in amount_paid; they do not reduce the receivable or tax base.",
   ),
   total: Money.describe(
-    "Subtotal less discount plus tax. Balance and credit grants pay it; they do not reduce it.",
+    "Subtotal less discount plus tax. Balance and credit grants pay it plus rounding_amount; they do not reduce it.",
+  ),
+  rounding_amount: Money.describe(
+    "Added to total to round the amount payable to the currency's minor unit; negative when rounded down. The rounding of a usage invoice carries over to the next invoice of the same billing period.",
   ),
   amount_paid: Money.optional(),
   pre_payment_credit_notes_amount: Money.describe(
@@ -42,7 +45,7 @@ export const Invoice = zod.strictObject({
     "Issued credit notes against payments already received; their refunds may not have completed.",
   ),
   amount_due: Money.describe(
-    "What is still collectible after unpaid credit notes and successful payments; never below zero. Zero for a draft, whose total is the base price, and for a paid or void invoice.",
+    "What is still collectible from total plus rounding_amount after unpaid credit notes and successful payments; never below zero. Zero for a draft, whose total is the base price, and for a paid or void invoice.",
   ),
   period_start: zod.iso.datetime({ offset: true }).nullish(),
   period_end: zod.iso.datetime({ offset: true }).nullish().describe("Exclusive."),
