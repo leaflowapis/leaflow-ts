@@ -59,12 +59,15 @@ export default defineConfig(
               for (const [method, operation] of Object.entries(item)) {
                 if (!isVerb(method)) continue;
                 const security = operation.security ?? document.security ?? [];
-                if (security.length > 1 || Object.keys(security[0] ?? {}).length > 1) {
+                // 凭据可选写作一个空要求加一个方案：网关有会话时带上凭据，没有时匿名转发。
+                const required = security.filter((entry) => Object.keys(entry).length > 0);
+                const optional = security.length === 2 && required.length === 1;
+                if ((security.length > 1 && !optional) || Object.keys(required[0] ?? {}).length > 1) {
                   throw new Error(
                     `Gateway authentication is ambiguous: ${module} ${method} ${path}`,
                   );
                 }
-                const scheme = Object.keys(security[0] ?? {})[0];
+                const scheme = Object.keys(required[0] ?? {})[0];
                 routes.push({
                   service: module.split("/")[0],
                   contract: module.replace(/\/v\d+$/, ""),
@@ -72,6 +75,7 @@ export default defineConfig(
                   path,
                   operationId: operation.operationId,
                   securityScheme: scheme ? (schemes[scheme] ?? scheme) : null,
+                  ...(optional ? { securityOptional: true } : {}),
                   upstreamUrl:
                     (operation.servers ?? item.servers ?? document.servers)?.[0]?.url ?? null,
                 });

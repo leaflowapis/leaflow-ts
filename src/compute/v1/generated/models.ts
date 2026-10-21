@@ -10,11 +10,11 @@
  *
  * ## Conventions
  *
- * - **Purchases.** A purchase that creates resources returns them together with a PlacedOrder. They are readable at once and start as `pending`: the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the order in Billing for checkout and payment progress.
+ * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the Checkout Session and the order in Billing for checkout and payment progress.
  * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the licensed and metered options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
- * - **Checkout.** Omit `checkout` for automatic checkout, which pays from eligible credit grants and balance when the order is placed; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` and nothing is created until checkout is confirmed and paid through Billing. An order whose total is zero, such as a metered purchase with nothing due now, completes checkout at placement in either mode and proceeds to provisioning.
- * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its order is placed until it is applied or its order is canceled, including while it awaits checkout. Renaming and replacing labels or notes are not operations and are accepted at any time.
- * - **Billing relationships.** A purchased resource records its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
+ * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid.
+ * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time.
+ * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
  * - **Availability zones.** A disk and an instance must reside in the same availability zone to be attached. Instance types and disk types are each bound to one availability zone, so choosing a type determines the zone.
  * - **IPv6 is not sold separately.** Once enabled on a private network, IPv6 addresses are assigned to the instances in that network automatically; they can be neither requested nor released individually.
  * - **Floating IPs have a cooldown period.** A released address is neither available for re-allocation nor handed to another user for some time, so that DNS records and allow-lists still pointing at it do not break immediately.
@@ -243,13 +243,13 @@ export interface BillingChoice {
 }
 
 /**
- * automatic applies the best applicable account discount, issues the invoice and pays it from eligible
- * credit grants and available balance at placement. Insufficient funds fail the purchase with HTTP 422
- * BILLING_INSUFFICIENT_FUNDS; no Billing order, charge or discount redemption is committed.
- * deferred places the order with a draft invoice at base prices and collects nothing. Paying that
- * invoice through Billing applies a promotion code or the best applicable account discount, issues the
- * invoice and collects it; an order still unpaid at its deadline expires. A zero-total invoice is issued
- * and paid at placement in either mode.
+ * automatic completes checkout with the purchase: the best applicable account discount is applied, and the
+ * order is created with its invoice issued and paid from eligible credit grants and available balance.
+ * Insufficient funds fail the purchase with HTTP 422 BILLING_INSUFFICIENT_FUNDS; no Billing order, charge or
+ * discount redemption is committed.
+ * deferred creates an open Billing Checkout Session and charges nothing, even for a zero total. The customer
+ * completes it through Billing, where a promotion code can be applied, and then pays the issued invoice; a
+ * session not completed by its deadline expires.
  */
 export type CheckoutMode = (typeof CheckoutMode)[keyof typeof CheckoutMode];
 
@@ -272,10 +272,11 @@ export const CheckoutMode = {
 export type Money = string;
 
 /**
- * Shared checkout choices for a product purchase. Omitting this object or mode selects
- * automatic checkout. Each purchase creates its own order. Promotion codes are supplied only to
- * Billing quote and payment operations. A service may retain a failed creation record when Billing
- * refuses a purchase; no infrastructure is created for that refusal.
+ * Shared checkout choices for a product purchase. The service may set them or forward its client's
+ * choices unchanged; it does not need to read them, and Billing validates them. Omitting this object or
+ * mode selects automatic checkout. Each purchase creates its own Checkout Session. Promotion codes are supplied
+ * only to Billing. A service may retain a failed creation record when Billing refuses a purchase; no
+ * infrastructure is created for that refusal.
  */
 export interface CheckoutOptions {
   mode?: CheckoutMode;
@@ -283,9 +284,16 @@ export interface CheckoutOptions {
    * Expected invoice total after discounts and tax, before applying credit grants or balance.
    * A different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.
    * Accepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred
-   * checkout, give the expected amount when paying the invoice through Billing.
+   * checkout, give the expected amount when completing it through Billing.
    */
   expected_amount?: Money & string;
+  /**
+   * Where the client goes after the customer finishes a deferred checkout. Any absolute URI with a
+   * scheme, including mobile and desktop application schemes. Billing stores it without checking the
+   * target; each client validates its own.
+   * @maxLength 2048
+   */
+  return_url?: string;
 }
 
 export interface RestoreBackupRequestBody {
@@ -339,7 +347,7 @@ export const DiskResourceAccessState = {
 } as const;
 
 /**
- * Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this disk is refunded.
+ * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this disk is refunded.
  * @nullable
  */
 export type DiskResourceFailureReason =
@@ -347,6 +355,7 @@ export type DiskResourceFailureReason =
   | null;
 
 export const DiskResourceFailureReason = {
+  checkout_expired: "checkout_expired",
   order_declined: "order_declined",
   order_canceled: "order_canceled",
   order_expired: "order_expired",
@@ -475,6 +484,11 @@ export interface DiskResource {
    */
   order_item_id: string | null;
   /**
+   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
+   * @nullable
+   */
+  checkout_session_id: string | null;
+  /**
    * The Billing subscription associated with this resource. It may still be pending; its
    * presence does not imply delivery or metering. Null when no subscription is associated.
    * @nullable
@@ -487,7 +501,7 @@ export interface DiskResource {
   /** @nullable */
   access_state: DiskResourceAccessState;
   /**
-   * Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this disk is refunded.
+   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this disk is refunded.
    * @nullable
    */
   failure_reason: DiskResourceFailureReason;
@@ -706,7 +720,7 @@ export const ImageResourceAccessState = {
 } as const;
 
 /**
- * Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
+ * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
  * @nullable
  */
 export type ImageResourceFailureReason =
@@ -714,6 +728,7 @@ export type ImageResourceFailureReason =
   | null;
 
 export const ImageResourceFailureReason = {
+  checkout_expired: "checkout_expired",
   order_declined: "order_declined",
   order_canceled: "order_canceled",
   order_expired: "order_expired",
@@ -786,6 +801,11 @@ export interface ImageResource {
    */
   order_item_id: string | null;
   /**
+   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
+   * @nullable
+   */
+  checkout_session_id: string | null;
+  /**
    * The Billing subscription associated with this resource. It may still be pending; its
    * presence does not imply delivery or metering. Null when no subscription is associated.
    * @nullable
@@ -798,7 +818,7 @@ export interface ImageResource {
   /** @nullable */
   access_state: ImageResourceAccessState;
   /**
-   * Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
+   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
    * @nullable
    */
   failure_reason: ImageResourceFailureReason;
@@ -927,7 +947,7 @@ export interface ResizeDiskRequestBody {
    */
   size_gb: number;
   checkout?: CheckoutOptions;
-  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
 }
 
@@ -968,7 +988,7 @@ export const FloatingIPResourceAccessState = {
 } as const;
 
 /**
- * Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this floating IP is refunded.
+ * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this floating IP is refunded.
  * @nullable
  */
 export type FloatingIPResourceFailureReason =
@@ -976,6 +996,7 @@ export type FloatingIPResourceFailureReason =
   | null;
 
 export const FloatingIPResourceFailureReason = {
+  checkout_expired: "checkout_expired",
   order_declined: "order_declined",
   order_canceled: "order_canceled",
   order_expired: "order_expired",
@@ -1052,6 +1073,11 @@ export interface FloatingIPResource {
    */
   order_item_id: string | null;
   /**
+   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
+   * @nullable
+   */
+  checkout_session_id: string | null;
+  /**
    * The Billing subscription associated with this resource. It may still be pending; its
    * presence does not imply delivery or metering. Null when no subscription is associated.
    * @nullable
@@ -1064,7 +1090,7 @@ export interface FloatingIPResource {
   /** @nullable */
   access_state: FloatingIPResourceAccessState;
   /**
-   * Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this floating IP is refunded.
+   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this floating IP is refunded.
    * @nullable
    */
   failure_reason: FloatingIPResourceFailureReason;
@@ -1120,7 +1146,7 @@ export interface SetFloatingIPBandwidthRequestBody {
    */
   bandwidth_mbps: number;
   checkout?: CheckoutOptions;
-  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
 }
 
@@ -1157,7 +1183,7 @@ export const InstanceResourceStatus = {
 } as const;
 
 /**
- * Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this instance is refunded.
+ * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this instance is refunded.
  * @nullable
  */
 export type InstanceResourceFailureReason =
@@ -1165,6 +1191,7 @@ export type InstanceResourceFailureReason =
   | null;
 
 export const InstanceResourceFailureReason = {
+  checkout_expired: "checkout_expired",
   order_declined: "order_declined",
   order_canceled: "order_canceled",
   order_expired: "order_expired",
@@ -1302,7 +1329,7 @@ export interface InstanceResource {
   observed_at: string | null;
   restrictions: InstanceRestriction[];
   /**
-   * Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this instance is refunded.
+   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this instance is refunded.
    * @nullable
    */
   failure_reason: InstanceResourceFailureReason;
@@ -1315,6 +1342,11 @@ export interface InstanceResource {
    * @nullable
    */
   order_item_id: string | null;
+  /**
+   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
+   * @nullable
+   */
+  checkout_session_id: string | null;
   /**
    * The Billing subscription associated with this resource. It may still be pending; its
    * presence does not imply delivery or metering. Null when no subscription is associated.
@@ -1569,7 +1601,7 @@ export interface ResizeInstanceRequestBody {
    */
   instance_type_id: string;
   checkout?: CheckoutOptions;
-  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
 }
 
@@ -2058,7 +2090,7 @@ export const SnapshotQuotaStatus = {
 
 /**
  * Why the first purchase failed; null unless status is failed. A failed change leaves the current
- * limit in force and clears pending_limit; its order shows the outcome.
+ * limit in force and clears pending_limit; its Checkout Session or order shows the outcome.
  * @nullable
  */
 export type SnapshotQuotaFailureReason =
@@ -2066,6 +2098,7 @@ export type SnapshotQuotaFailureReason =
   | null;
 
 export const SnapshotQuotaFailureReason = {
+  checkout_expired: "checkout_expired",
   order_declined: "order_declined",
   order_canceled: "order_canceled",
   order_expired: "order_expired",
@@ -2103,7 +2136,7 @@ export interface SnapshotQuota {
    */
   available: number;
   /**
-   * The order establishing the currently associated quota purchase, including an initial pending purchase.
+   * The order establishing the currently associated quota purchase, including an initial pending purchase once its checkout completes.
    * @nullable
    */
   order_id: string | null;
@@ -2125,13 +2158,18 @@ export interface SnapshotQuota {
    */
   pending_limit: number | null;
   /**
-   * Order for the pending initial purchase or change; null when none is pending.
+   * Checkout Session of the pending initial purchase or change; null when none is pending.
+   * @nullable
+   */
+  pending_checkout_session_id: string | null;
+  /**
+   * Order for the pending initial purchase or change once its checkout completes; null otherwise.
    * @nullable
    */
   pending_order_id: string | null;
   /**
    * Why the first purchase failed; null unless status is failed. A failed change leaves the current
-   * limit in force and clears pending_limit; its order shows the outcome.
+   * limit in force and clears pending_limit; its Checkout Session or order shows the outcome.
    * @nullable
    */
   failure_reason: SnapshotQuotaFailureReason;
@@ -2147,26 +2185,19 @@ export interface SetSnapshotQuotaRequestBody {
   limit: number;
   billing: BillingChoice;
   checkout?: CheckoutOptions;
-  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
-}
-
-/**
- * Identifies the purchase. Read the order for purchase progress and its invoice for amounts and payment status.
- */
-export interface PlacedOrder {
-  /**
-   * The invoice for this purchase, which may still be a draft awaiting checkout. Null when no invoice has been created. Its presence or absence does not establish whether delivery may begin.
-   * @nullable
-   */
-  invoice_id: string | null;
-  /** The order, including for purchases without an immediate charge. Payment alone does not imply that the service has completed delivery. */
-  order_id: string;
 }
 
 export interface SetSnapshotQuotaResponseBody {
   snapshot_quota: SnapshotQuota;
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
 }
 
 /**
@@ -2279,7 +2310,7 @@ export const BackupServiceStatus = {
 } as const;
 
 /**
- * Why the purchase failed; null unless `status` is `failed`. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
+ * Why the purchase failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
  * @nullable
  */
 export type BackupServiceFailureReason =
@@ -2287,6 +2318,7 @@ export type BackupServiceFailureReason =
   | null;
 
 export const BackupServiceFailureReason = {
+  checkout_expired: "checkout_expired",
   order_declined: "order_declined",
   order_canceled: "order_canceled",
   order_expired: "order_expired",
@@ -2301,17 +2333,22 @@ export interface BackupService {
   /** `inactive` has never been activated or its subscription has ended; `pending` awaits acceptance of its order; `provisioning` is being activated; `active` accepts new backups; `suspended` refuses new backups and keeps existing ones; `failed` means the activation failed, as `failure_reason` states. */
   status: BackupServiceStatus;
   /**
-   * Why the purchase failed; null unless `status` is `failed`. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
+   * Why the purchase failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
    * @nullable
    */
   failure_reason: BackupServiceFailureReason;
   /**
-   * The order that activated the service; null before an activation is requested.
+   * The Checkout Session of the activation; null before an activation is requested.
+   * @nullable
+   */
+  checkout_session_id: string | null;
+  /**
+   * The order that activated the service; null until the activation's checkout completes.
    * @nullable
    */
   order_id: string | null;
   /**
-   * The Billing subscription that backup usage is billed under; null before an activation is requested.
+   * The Billing subscription that backup usage is billed under; null until the activation's checkout completes.
    * @nullable
    */
   subscription_id: string | null;
@@ -2339,7 +2376,13 @@ export interface CreateBackupServiceRequestBody {
 
 export interface CreateBackupServiceResponseBody {
   backup_service: BackupService;
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
 }
 
 /**
@@ -2357,7 +2400,7 @@ export const BackupCapacityPackStatus = {
 } as const;
 
 /**
- * Why the purchase failed; null unless `status` is `failed`. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
+ * Why the purchase failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
  * @nullable
  */
 export type BackupCapacityPackFailureReason =
@@ -2365,6 +2408,7 @@ export type BackupCapacityPackFailureReason =
   | null;
 
 export const BackupCapacityPackFailureReason = {
+  checkout_expired: "checkout_expired",
   order_declined: "order_declined",
   order_canceled: "order_canceled",
   order_expired: "order_expired",
@@ -2382,11 +2426,20 @@ export interface BackupCapacityPack {
   /** `pending` awaits acceptance of its order; `provisioning` is being applied; `active` covers backup capacity; `ended` no longer does because its subscription has ended; `failed` means the purchase failed, as `failure_reason` states. */
   status: BackupCapacityPackStatus;
   /**
-   * Why the purchase failed; null unless `status` is `failed`. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
+   * Why the purchase failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means it failed after the order was accepted, and its charge is refunded.
    * @nullable
    */
   failure_reason: BackupCapacityPackFailureReason;
-  order_id: string;
+  /**
+   * The Billing Checkout Session that bought the pack. Null when the pack was not bought through one.
+   * @nullable
+   */
+  checkout_session_id: string | null;
+  /**
+   * Null until the pack's checkout completes.
+   * @nullable
+   */
+  order_id: string | null;
   /**
    * The pack's Billing subscription, through which it is renewed or canceled.
    * @nullable
@@ -2411,7 +2464,13 @@ export interface CreateBackupCapacityPackRequestBody {
 
 export interface CreateBackupCapacityPackResponseBody {
   backup_capacity_pack: BackupCapacityPack;
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
 }
 
 /**
@@ -2591,6 +2650,16 @@ export interface SetFloatingIPBandwidthQuoteRequestBody {
 }
 
 /**
+ * `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without a billing account, which leaves out tax that would be added; tax already contained in a price is included.
+ */
+export type QuoteTaxStatus = (typeof QuoteTaxStatus)[keyof typeof QuoteTaxStatus];
+
+export const QuoteTaxStatus = {
+  complete: "complete",
+  requires_location_inputs: "requires_location_inputs",
+} as const;
+
+/**
  * Account funding for this purchase, calculated by Billing. Amounts use the enclosing response currency.
  * Credit eligibility and all purchase requirements are already evaluated. Nothing is charged or reserved.
  * A licensed purchase may instead be paid with an online payment method.
@@ -2611,12 +2680,77 @@ export interface Funds {
 }
 
 /**
+ * one_time or recurring.
+ */
+export type QuoteItemType = (typeof QuoteItemType)[keyof typeof QuoteItemType];
+
+export const QuoteItemType = {
+  one_time: "one_time",
+  recurring: "recurring",
+} as const;
+
+/**
+ * licensed or metered.
+ */
+export type QuoteItemUsageType = (typeof QuoteItemUsageType)[keyof typeof QuoteItemUsageType];
+
+export const QuoteItemUsageType = {
+  licensed: "licensed",
+  metered: "metered",
+} as const;
+
+/**
+ * The billing period of a recurring licensed line; `none` otherwise.
+ */
+export type QuoteItemInterval = (typeof QuoteItemInterval)[keyof typeof QuoteItemInterval];
+
+export const QuoteItemInterval = {
+  none: "none",
+  day: "day",
+  month: "month",
+  year: "year",
+} as const;
+
+/**
+ * The dimension values the line is priced at, such as region and instance type.
+ */
+export type QuoteItemDimensions = { [key: string]: string };
+
+/**
  * One calculated purchase line. Fixed purchase amounts are rounded as checkout rounds them.
  * A line without an immediate charge has zero checkout amounts. unit_amount remains null when
  * no single unit price applies; an unrequested usage estimate remains null.
  */
 export interface QuoteItem {
+  product_id: string;
+  plan_id: string;
   plan_name: string;
+  /**
+   * The price the line is priced at, including one Billing selected. With quantity and dimensions it
+   * prices the same line in Billing's own quote, for example with a promotion code.
+   */
+  price_id: string;
+  /** The dimension values the line is priced at, such as region and instance type. */
+  dimensions: QuoteItemDimensions;
+  /** one_time or recurring. */
+  type: QuoteItemType;
+  /** licensed or metered. */
+  usage_type: QuoteItemUsageType;
+  /** The billing period of a recurring licensed line; `none` otherwise. */
+  interval: QuoteItemInterval;
+  /**
+   * Periods per billing cycle of a recurring licensed line; null otherwise.
+   * @minimum 1
+   * @nullable
+   */
+  interval_count: number | null;
+  /** The setup charge already included in amount; null when none applies. */
+  setup_amount: Money | null;
+  /**
+   * Recurring licensed lines only; null otherwise. What each later period renews at, before discounts
+   * and tax, which differs from amount when the first period is priced differently.
+   */
+  recurring_amount: Money | null;
   /**
    * Unit price before discounts, with tax included only where the price includes it. Null when
    * no single unit price applies, such as tiered or multiple-rate pricing or an immediate change.
@@ -2649,14 +2783,18 @@ export interface QuoteItem {
 /**
  * A price preview for the purchase described by a service, calculated by Billing. Nothing is saved,
  * charged or reserved, and no discount redemption is consumed. Account discounts and tax are
- * evaluated as for automatic checkout. Promotion codes are evaluated through Billing quote operations.
+ * evaluated as for automatic checkout. Promotion codes are evaluated by Billing at checkout, not here.
  * All amounts use currency. This preview does not lock prices or guarantee discount availability.
  * Success includes complete checkout amounts and every requested usage estimate. If any item or
  * requested usage estimate cannot be calculated, the operation returns its existing structured
- * error response; it never returns a partial quote with HTTP 200.
+ * error response; it never returns a partial quote with HTTP 200. A quote without a billing account
+ * has no funds and no account discount, and leaves out tax that would be added.
  */
 export interface Quote {
-  funds: Funds;
+  /** Null for a quote without a billing account. */
+  funds: Funds | null;
+  /** `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without a billing account, which leaves out tax that would be added; tax already contained in a price is included. */
+  tax_status: QuoteTaxStatus;
   /** One line for each item the purchase would order, in the order it would order them. */
   items: QuoteItem[];
   /**
@@ -2693,54 +2831,90 @@ export interface Quote {
 }
 
 /**
- * The new disk, `pending` until its order is accepted, and the order. Also returned for a disk restored
+ * The new disk, `pending` until its order is accepted, and its Checkout Session. Also returned for a disk restored
  * from a backup.
  */
 export interface CreateDiskResponseBody {
   disk: DiskResource;
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
 }
 
 /**
- * The new private image, `pending` until its order is accepted, and the order.
+ * The new private image, `pending` until its order is accepted, and its Checkout Session.
  */
 export interface CreateImageResponseBody {
   image: ImageResource;
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
 }
 
 /**
- * The new floating IP, `pending` until its order is accepted, and the order. `address` is null until
+ * The new floating IP, `pending` until its order is accepted, and its Checkout Session. `address` is null until
  * the address is allocated.
  */
 export interface AllocateFloatingIPResponseBody {
   floating_ip: FloatingIPResource;
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
 }
 
 /**
- * The disk, still at its current size, and the order for the resize.
+ * The disk, still at its current size, and the Checkout Session for the resize.
  */
 export interface ResizeDiskResponseBody {
   disk: DiskResource;
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
 }
 
 /**
- * The instance, still on its current type, and the order for the resize. The instance keeps its ID, and
+ * The instance, still on its current type, and the Checkout Session for the resize. The instance keeps its ID, and
  * its current subscription remains in force until the resize is applied.
  */
 export interface ResizeInstanceResponseBody {
   instance: InstanceResource;
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
 }
 
 /**
- * The floating IP, still at its current bandwidth, and the order for the change.
+ * The floating IP, still at its current bandwidth, and the Checkout Session for the change.
  */
 export interface SetFloatingIPBandwidthResponseBody {
   floating_ip: FloatingIPResource;
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
 }
 
 export interface PowerRequest {
@@ -2759,7 +2933,7 @@ export interface PortAttachmentList {
 }
 
 /**
- * The new instances, `pending` until their order is accepted, and the order they share.
+ * The new instances, `pending` until their order is accepted, and the Checkout Session they share.
  */
 export interface LaunchInstanceResponseBody {
   /**
@@ -2769,7 +2943,13 @@ export interface LaunchInstanceResponseBody {
    * @maxItems 20
    */
   instances: InstanceResource[];
-  order: PlacedOrder;
+  /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
+  /**
+   * The order created when checkout completes, at once for automatic checkout; null until then.
+   * @nullable
+   */
+  order_id: string | null;
   /**
    * Generated login password, returned only by this response. Null when no password was generated.
    * @nullable

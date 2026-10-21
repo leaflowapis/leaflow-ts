@@ -6,38 +6,43 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { CancellationRefundPreview } from "./cancellationRefundPreview.zod.js";
 import { Funds } from "./funds.zod.js";
 import { Money } from "./money.zod.js";
-import { OrderRefundQuote } from "./orderRefundQuote.zod.js";
 import { QuotedDiscount } from "./quotedDiscount.zod.js";
 import { QuoteItem } from "./quoteItem.zod.js";
 import { QuoteRenewalResult } from "./quoteRenewalResult.zod.js";
 
 export const Quote = zod
   .strictObject({
-    funds: Funds.optional().describe(
-      "Account funds for an existing-order checkout quote. Absent for usage estimates, refunds and cancellations.",
-    ),
+    funds: zod
+      .union([Funds, zod.null()])
+      .describe("Account funds for the quoted purchase. Null without an account."),
     subtotal: Money,
     discount_amount: Money,
     tax_amount: Money,
     discount: zod
       .union([QuotedDiscount, zod.null()])
       .describe(
-        "The discount a purchase or order would get, not yet applied. Null when there is none, and for renewals and cancellations. A confirmed order reports its recorded discount.",
+        "The discount a purchase would get, not yet applied. Null when there is none, and for renewals.",
       ),
     items: zod.array(QuoteItem),
     renewals: zod.array(QuoteRenewalResult),
-    cancellation: CancellationRefundPreview.optional().describe(
-      "What the cancellation requested would return. Present only when one was requested.",
-    ),
     total: Money,
     currency: zod.string(),
-    refund: OrderRefundQuote.optional().describe("Present when an order refund was requested."),
+    proration_date: zod.iso
+      .datetime({ offset: true })
+      .nullable()
+      .describe(
+        "Immediate changes only; null otherwise. The instant the change is priced from; pass it when confirming the Checkout Session so it is priced from the same instant.",
+      ),
+    tax_status: zod
+      .enum(["complete", "requires_location_inputs"])
+      .describe(
+        "`complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without an account, which leaves out tax that would be added; tax already contained in a price is included.",
+      ),
   })
   .describe(
-    "A complete calculation in the billing account's currency; nothing is saved or reserved. The request fails if any item cannot be priced. Usage estimates are included in totals but are not collected at checkout; only an existing-order quote gives that order's checkout amount.",
+    "A complete calculation in `currency`; nothing is saved or reserved. The request fails if any item cannot be priced. A Checkout Session quote gives what completing the session would invoice.",
   );
 
 export type Quote = zod.input<typeof Quote>;

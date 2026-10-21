@@ -10,11 +10,11 @@
  *
  * ## Conventions
  *
- * - **Purchases.** A purchase that creates resources returns them together with a PlacedOrder. They are readable at once and start as `pending`: the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the order in Billing for checkout and payment progress.
+ * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the Checkout Session and the order in Billing for checkout and payment progress.
  * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the licensed and metered options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
- * - **Checkout.** Omit `checkout` for automatic checkout, which pays from eligible credit grants and balance when the order is placed; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` and nothing is created until checkout is confirmed and paid through Billing. An order whose total is zero, such as a metered purchase with nothing due now, completes checkout at placement in either mode and proceeds to provisioning.
- * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its order is placed until it is applied or its order is canceled, including while it awaits checkout. Renaming and replacing labels or notes are not operations and are accepted at any time.
- * - **Billing relationships.** A purchased resource records its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
+ * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid.
+ * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time.
+ * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
  * - **Availability zones.** A disk and an instance must reside in the same availability zone to be attached. Instance types and disk types are each bound to one availability zone, so choosing a type determines the zone.
  * - **IPv6 is not sold separately.** Once enabled on a private network, IPv6 addresses are assigned to the instances in that network automatically; they can be neither requested nor released individually.
  * - **Floating IPs have a cooldown period.** A released address is neither available for re-allocation nor handed to another user for some time, so that DNS records and allow-lists still pointing at it do not break immediately.
@@ -515,7 +515,7 @@ export const getRestoreBackupUrl = (backupId: string) => {
 /**
  * Restores onto a **newly created** disk. The source disk is unaffected and need not still exist.
  *
- * The target disk type may belong to another availability zone of the same region, and its capacity must not be smaller than the backup. Returns the new disk as `pending` with its order; it cannot be attached until it is `available`.
+ * The target disk type may belong to another availability zone of the same region, and its capacity must not be smaller than the backup. Returns the new disk as `pending` with its Checkout Session; it cannot be attached until it is `available`.
  * @summary Restore from a backup
  */
 export const restoreBackup = async (
@@ -821,7 +821,7 @@ export const getCreateImageUrl = () => {
 /**
  * Creates a private image of this project from the system disk of the instance; data disks are not included. The resulting image can create instances and rebuild them, and remains usable after the source instance is released.
  *
- * **The image reflects the moment the capture started. Later changes to the instance are not included.** The image is returned as `pending` with its order, and the capture starts only once the order is accepted.
+ * **The image reflects the moment the capture started. Later changes to the instance are not included.** The image is returned as `pending` with its Checkout Session, and the capture starts only once the order is accepted.
  *
  * The capture then has two phases, reported by the status of the image:
  *
@@ -1665,7 +1665,7 @@ export const getResizeDiskUrl = (diskId: string) => {
 };
 
 /**
- * Capacity can only be increased; shrinking is not supported. Returns the disk with the order for the resize, which keeps the disk's usage type and period. The disk shows the `resize` operation until the resize is applied or its order is canceled, including while the order awaits checkout, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The disk keeps its current size until the resize is applied; once `size_gb` shows the new size, extend the file system inside the instance. If the order is not accepted or the resize fails, the disk keeps its size and the order shows the outcome.
+ * Capacity can only be increased; shrinking is not supported. Returns the disk with the Checkout Session for the resize, which keeps the disk's usage type and period. The disk shows the `resize` operation until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The disk keeps its current size until the resize is applied; once `size_gb` shows the new size, extend the file system inside the instance. If checkout is not completed, the order is not accepted or the resize fails, the disk keeps its size and Billing shows the outcome.
  *
  * **An attached data disk whose performance scales with its size must be detached before it is resized.** The performance of an attached disk does not change until the disk is detached and attached again, so such a request is refused with `DISK_RESIZE_NEEDS_DETACH` rather than providing the new capacity at the performance of the previous size. Detach the disk, resize it, and attach it again.
  *
@@ -1951,11 +1951,11 @@ export const getAllocateFloatingIpUrl = () => {
 /**
  * If the private network is not yet connected to the internet, connectivity is established as part of this call.
  *
- * Returns the floating IP as `pending` with its order; `address` is null until the address is allocated after the order is accepted. A requested `address` is not held while pending; if it is no longer available then, the floating IP ends `failed` with `provisioning_failed` and its charge is refunded.
+ * Returns the floating IP as `pending` with its Checkout Session; `address` is null until the address is allocated after the order is accepted. A requested `address` is not held while pending; if it is no longer available then, the floating IP ends `failed` with `provisioning_failed` and its charge is refunded.
  *
  * IPv6 is not requested through this endpoint. IPv6 addresses are assigned to instances by the private network; enable IPv6 on that network instead.
  *
- * Refused with `PRIVATE_NETWORK_UNAVAILABLE`, before any order is created, when the private network's `status` is not `available`. `meta.private_network_id` names it.
+ * Refused with `PRIVATE_NETWORK_UNAVAILABLE`, before any Checkout Session is created, when the private network's `status` is not `available`. `meta.private_network_id` names it.
  * @summary Allocate a floating IP
  */
 export const allocateFloatingIp = async (
@@ -2200,7 +2200,7 @@ export const getSetFloatingIpBandwidthUrl = (floatingIpId: string) => {
 };
 
 /**
- * Changes the bandwidth of this floating IP through an order that keeps its usage type and period; no separate bandwidth resource is created. The limit applies to inbound and outbound traffic alike. The floating IP shows the `set_bandwidth` operation until the change is applied or its order is canceled, including while the order awaits checkout, so other operations and a second change are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The current limit stays in effect until the change is applied. If the order is not accepted or the change fails, `bandwidth_mbps` keeps its value and the order shows the outcome.
+ * Changes the bandwidth of this floating IP through an order that keeps its usage type and period; no separate bandwidth resource is created. The limit applies to inbound and outbound traffic alike. The floating IP shows the `set_bandwidth` operation until the change is applied, its Checkout Session expires or its order is canceled, so other operations and a second change are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The current limit stays in effect until the change is applied. If checkout is not completed, the order is not accepted or the change fails, `bandwidth_mbps` keeps its value and Billing shows the outcome.
  *
  * While the address is bound to an instance, the limit must not exceed the `max_bandwidth_mbps` of that instance's type; a higher limit is refused with `INSTANCE_BANDWIDTH_CEILING`. The limit of an address that is not bound is checked when the address is bound to an instance.
  * @summary Set the bandwidth limit
@@ -2536,15 +2536,15 @@ export const getLaunchInstanceUrl = () => {
 };
 
 /**
- * Creates a Billing order, including for metered pricing, and returns one `pending` instance per requested instance with the order. `billing` applies to the instance, its system disk and its floating IP alike. A pending instance has no virtual machine, system disk or address, and is not metered.
+ * Creates a Billing Checkout Session, including for metered pricing, and returns one `pending` instance per requested instance with it. `billing` applies to the instance, its system disk and its floating IP alike. A pending instance has no virtual machine, system disk or address, and is not metered.
  *
- * Creation starts once Billing accepts the order: the instance becomes `provisioning`, then `active`. With automatic checkout, insufficient funds refuse the request and nothing is created. With deferred checkout and an amount due, the instances stay `pending` until checkout is confirmed and paid through Billing; a canceled or expired order leaves them `failed` with `order_canceled` or `order_expired`. Do not submit another creation request after paying. After an uncertain response, look the order up before submitting again.
+ * Creation starts once Billing accepts the order: the instance becomes `provisioning`, then `active`. With automatic checkout, insufficient funds refuse the request and nothing is created. With deferred checkout, the instances stay `pending` until the customer completes checkout in Billing and the order is paid; an expired Checkout Session, or a canceled or expired order, leaves them `failed` with `checkout_expired`, `order_canceled` or `order_expired`. Do not submit another creation request after paying. After an uncertain response, look the Checkout Session up in Billing before submitting again.
  *
  * Choose an image or existing disk through boot_disk, and exactly one of port_id or subnet_id. Existing ports, boot disks or floating IPs require count=1. They are not held while the instance is pending; if one is no longer usable when the order is accepted, the instance ends `failed` with `provisioning_failed`. Image boots require boot_disk; existing disks retain their own subscription. Instances, disks and public IPs keep their own subscription items on the same order.
  *
  * Instances of one request succeed or fail individually. Each instance, with its system disk, network interface and floating IP, is created or fails as a whole. Instances that were created are kept; each failed instance ends `failed` with `provisioning_failed`, its part of the order is refunded, and the order then ends `partially_completed`. Each instance is named after this request with a number appended.
  *
- * The network is checked before the order is created, and a request it refuses orders and charges nothing. It is refused with `PRIVATE_NETWORK_UNAVAILABLE` when the private network's `status` is not `available`, `SUBNET_UNAVAILABLE` or `SECURITY_GROUP_UNAVAILABLE` when the subnet or a security group is not ready, `SECURITY_GROUP_OTHER_PRIVATE_NETWORK` when a security group belongs to another private network, and `PORT_UNAVAILABLE` when the port's `status` is not `available`. `meta` names the resource.
+ * The network is checked before the Checkout Session is created, and a request it refuses orders and charges nothing. It is refused with `PRIVATE_NETWORK_UNAVAILABLE` when the private network's `status` is not `available`, `SUBNET_UNAVAILABLE` or `SECURITY_GROUP_UNAVAILABLE` when the subnet or a security group is not ready, `SECURITY_GROUP_OTHER_PRIVATE_NETWORK` when a security group belongs to another private network, and `PORT_UNAVAILABLE` when the port's `status` is not `available`. `meta` names the resource.
  * @summary Create instances
  */
 export const launchInstance = async (
@@ -3425,9 +3425,9 @@ export const getResizeInstanceUrl = (instanceId: string) => {
 };
 
 /**
- * Creates a Billing change order, including for metered pricing, and returns the instance with the order. The instance keeps its usage type and period, priced with the target type's matching option; a target type without that option is refused with 409 `BILLING_OPTION_UNAVAILABLE`. Do not submit a new purchase after paying. After an uncertain response, look the order up before submitting again.
+ * Creates a Billing Checkout Session for the change, including for metered pricing, and returns the instance with it. The instance keeps its usage type and period, priced with the target type's matching option; a target type without that option is refused with 409 `BILLING_OPTION_UNAVAILABLE`. Do not submit a new purchase after paying. After an uncertain response, look the Checkout Session up in Billing before submitting again.
  *
- * The instance shows the `resize` operation until the resize is applied or its order is canceled, including while the order awaits checkout, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. It keeps its current type until the resize is applied; the new type takes effect, and is billed from then on, when `instance_type_id` shows it. If the order is not accepted or the resize fails, the instance keeps its current type and the order shows the outcome. A completed resize is final and cannot be reverted; to return to the previous type, submit another resize.
+ * The instance shows the `resize` operation until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. It keeps its current type until the resize is applied; the new type takes effect, and is billed from then on, when `instance_type_id` shows it. If checkout is not completed, the order is not accepted or the resize fails, the instance keeps its current type and Billing shows the outcome. A completed resize is final and cannot be reverted; to return to the previous type, submit another resize.
  * @summary Resize an instance
  */
 export const resizeInstance = async (
@@ -5771,12 +5771,12 @@ export const getSetSnapshotQuotaUrl = (regionId: string) => {
  * billing chooses one of the quota's pricing options; a change of an existing purchase keeps its
  * usage type and period, and billing must name that option. The purchased quantity is this count.
  *
- * Returns the quota with the order. pending_limit records the target while the current limit stays
+ * Returns the quota with the Checkout Session. pending_limit records the target while the current limit stays
  * in force; the new limit applies once the order is accepted and the quota is activated. Snapshots
  * create no further orders or subscriptions, and deleting one frees a slot without refunding the
  * quota purchase.
  *
- * Repeating the same target and billing choice while its purchase is pending returns the same order. A
+ * Repeating the same target and billing choice while its purchase is pending returns the same Checkout Session. A
  * conflicting pending purchase is refused with SNAPSHOT_QUOTA_CHANGE_PENDING. An already effective
  * identical target and billing choice returns its existing purchase without charging again; renewing its
  * term is a separate Billing renewal operation. A requested limit below used is refused with
@@ -5977,7 +5977,7 @@ export const getCreateBackupServiceUrl = (regionId: string) => {
 };
 
 /**
- * Purchases the backup service for this project and region. The service itself has no charge; backups are metered under it by retained capacity. It takes no billing choice. Returns the service as `pending` with its order; it becomes `active` once the order is accepted.
+ * Purchases the backup service for this project and region. The service itself has no charge; backups are metered under it by retained capacity. It takes no billing choice. Returns the service as `pending` with its Checkout Session; it becomes `active` once the order is accepted.
  *
  * Refused with 409 `BACKUP_SERVICE_EXISTS` while an activation is pending or the service is active or suspended.
  * @summary Activate the backup service in a region
@@ -6170,7 +6170,7 @@ export const getCreateBackupCapacityPackUrl = (regionId: string) => {
 /**
  * Purchases a capacity pack, backup capacity for this project and region bought in advance by month or year: `billing` must be licensed with a period, as offered in the backup service's `capacity_pack_pricing`. Compute applies the coverage: each hour, retained backup capacity up to the total `capacity_gib` of the packs active in the region is covered, and Compute meters only the excess on the backup service's subscription. A pack is not a Billing allowance or credit; Billing takes its order and payment and handles its renewal and cancellation through the pack's subscription.
  *
- * Returns the pack as `pending` with its order; it applies once the order is accepted. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` and `meta.region_id` when the region's backup service is not active.
+ * Returns the pack as `pending` with its Checkout Session; it applies once the order is accepted. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` and `meta.region_id` when the region's backup service is not active.
  * @summary Buy a backup capacity pack
  */
 export const createBackupCapacityPack = async (

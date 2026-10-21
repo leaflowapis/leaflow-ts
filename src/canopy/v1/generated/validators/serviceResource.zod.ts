@@ -45,10 +45,11 @@ export const ServiceResource = zod
     status: zod
       .enum(["inactive", "pending", "active", "failed"])
       .describe(
-        "`inactive` has never been enabled or its subscription has ended; `pending` awaits acceptance of its order; `active` accepts requests on the forwarding endpoints; `failed` means the enablement failed, as `failure_reason` states. An `inactive` or `failed` service can be enabled again.",
+        "`inactive` has never been enabled or its subscription has ended; `pending` awaits completion of its checkout and acceptance of its order; `active` accepts requests on the forwarding endpoints; `failed` means the enablement failed, as `failure_reason` states. An `inactive` or `failed` service can be enabled again.",
       ),
     failure_reason: zod
       .union([
+        zod.literal("checkout_expired"),
         zod.literal("order_declined"),
         zod.literal("order_canceled"),
         zod.literal("order_expired"),
@@ -56,19 +57,23 @@ export const ServiceResource = zod
       ])
       .nullable()
       .describe(
-        "Why the enablement failed; null unless `status` is `failed`. `order_declined` means Billing did not accept the order, for example because the billing account is suspended; `order_canceled` means the order was withdrawn; `order_expired` means it was not paid in time.",
+        "Why the enablement failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired; `order_declined` means Billing did not accept the order, for example because the billing account is suspended; `order_canceled` means the order was withdrawn; `order_expired` means it was not paid in time.",
       ),
+    checkout_session_id: zod
+      .uuid()
+      .nullable()
+      .describe("The Checkout Session of the latest enablement; null before any enablement."),
     order_id: zod
       .uuid()
       .nullable()
       .describe(
-        "The order that enabled the service, or that the latest enablement placed; null before any enablement.",
+        "The order that enabled the service, or that the latest enablement's checkout created; null before checkout completes.",
       ),
     subscription_id: zod
       .uuid()
       .nullable()
       .describe(
-        "The Billing subscription that requests are billed under; null before any enablement.",
+        "The Billing subscription that requests are billed under; null until an enablement's checkout completes.",
       ),
     activated_at: zod.iso
       .datetime({ offset: true })

@@ -6,6 +6,16 @@
  * OpenAPI spec version: v1
  */
 /**
+ * `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without a billing account, which leaves out tax that would be added; tax already contained in a price is included.
+ */
+export type QuoteTaxStatus = (typeof QuoteTaxStatus)[keyof typeof QuoteTaxStatus];
+
+export const QuoteTaxStatus = {
+  complete: "complete",
+  requires_location_inputs: "requires_location_inputs",
+} as const;
+
+/**
  * A decimal string, in the currency stated alongside it.
  *
  * **The currency is not part of this type.** It is carried by a `currency` field next to the
@@ -39,12 +49,77 @@ export interface Funds {
 }
 
 /**
+ * one_time or recurring.
+ */
+export type QuoteItemType = (typeof QuoteItemType)[keyof typeof QuoteItemType];
+
+export const QuoteItemType = {
+  one_time: "one_time",
+  recurring: "recurring",
+} as const;
+
+/**
+ * licensed or metered.
+ */
+export type QuoteItemUsageType = (typeof QuoteItemUsageType)[keyof typeof QuoteItemUsageType];
+
+export const QuoteItemUsageType = {
+  licensed: "licensed",
+  metered: "metered",
+} as const;
+
+/**
+ * The billing period of a recurring licensed line; `none` otherwise.
+ */
+export type QuoteItemInterval = (typeof QuoteItemInterval)[keyof typeof QuoteItemInterval];
+
+export const QuoteItemInterval = {
+  none: "none",
+  day: "day",
+  month: "month",
+  year: "year",
+} as const;
+
+/**
+ * The dimension values the line is priced at, such as region and instance type.
+ */
+export type QuoteItemDimensions = { [key: string]: string };
+
+/**
  * One calculated purchase line. Fixed purchase amounts are rounded as checkout rounds them.
  * A line without an immediate charge has zero checkout amounts. unit_amount remains null when
  * no single unit price applies; an unrequested usage estimate remains null.
  */
 export interface QuoteItem {
+  product_id: string;
+  plan_id: string;
   plan_name: string;
+  /**
+   * The price the line is priced at, including one Billing selected. With quantity and dimensions it
+   * prices the same line in Billing's own quote, for example with a promotion code.
+   */
+  price_id: string;
+  /** The dimension values the line is priced at, such as region and instance type. */
+  dimensions: QuoteItemDimensions;
+  /** one_time or recurring. */
+  type: QuoteItemType;
+  /** licensed or metered. */
+  usage_type: QuoteItemUsageType;
+  /** The billing period of a recurring licensed line; `none` otherwise. */
+  interval: QuoteItemInterval;
+  /**
+   * Periods per billing cycle of a recurring licensed line; null otherwise.
+   * @minimum 1
+   * @nullable
+   */
+  interval_count: number | null;
+  /** The setup charge already included in amount; null when none applies. */
+  setup_amount: Money | null;
+  /**
+   * Recurring licensed lines only; null otherwise. What each later period renews at, before discounts
+   * and tax, which differs from amount when the first period is priced differently.
+   */
+  recurring_amount: Money | null;
   /**
    * Unit price before discounts, with tax included only where the price includes it. Null when
    * no single unit price applies, such as tiered or multiple-rate pricing or an immediate change.
@@ -77,14 +152,18 @@ export interface QuoteItem {
 /**
  * A price preview for the purchase described by a service, calculated by Billing. Nothing is saved,
  * charged or reserved, and no discount redemption is consumed. Account discounts and tax are
- * evaluated as for automatic checkout. Promotion codes are evaluated through Billing quote operations.
+ * evaluated as for automatic checkout. Promotion codes are evaluated by Billing at checkout, not here.
  * All amounts use currency. This preview does not lock prices or guarantee discount availability.
  * Success includes complete checkout amounts and every requested usage estimate. If any item or
  * requested usage estimate cannot be calculated, the operation returns its existing structured
- * error response; it never returns a partial quote with HTTP 200.
+ * error response; it never returns a partial quote with HTTP 200. A quote without a billing account
+ * has no funds and no account discount, and leaves out tax that would be added.
  */
 export interface Quote {
-  funds: Funds;
+  /** Null for a quote without a billing account. */
+  funds: Funds | null;
+  /** `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without a billing account, which leaves out tax that would be added; tax already contained in a price is included. */
+  tax_status: QuoteTaxStatus;
   /** One line for each item the purchase would order, in the order it would order them. */
   items: QuoteItem[];
   /**

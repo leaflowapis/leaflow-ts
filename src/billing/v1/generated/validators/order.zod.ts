@@ -45,7 +45,7 @@ export const Order = zod
       .int()
       .optional()
       .describe(
-        "The billing account the order was placed with, unchanged when the project is later linked to another account. While it is suspended or closed, the order cannot be accepted, and a period-end change's invoice is not issued and the change is called off when the current period ends; such requests fail with `BILLING_ACCOUNT_UNAVAILABLE`.",
+        "The billing account the order was placed with, unchanged when the project is later linked to another account. While it is suspended or closed, the order cannot be accepted, and a period-end change is called off when the current period ends; such requests fail with `BILLING_ACCOUNT_UNAVAILABLE`.",
       ),
     currency: zod.string(),
     type: zod
@@ -58,23 +58,23 @@ export const Order = zod
       .enum(["none", "immediate", "period_end"])
       .optional()
       .describe(
-        "When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced shortly before the current paid period ends and starts when it ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual. A renewal in the meantime moves the change to the end of the renewed period.",
+        "When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced when the order is created and starts when the current paid period ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual.",
       ),
     expires_at: zod.iso
       .datetime({ offset: true })
       .nullish()
       .describe("Acceptance deadline; a pending order expires after it."),
-    checkout_confirmed_at: zod.iso
-      .datetime({ offset: true })
+    checkout_session_id: zod
+      .uuid()
       .nullish()
       .describe(
-        "When the discount and amount were fixed: at placement for automatic checkout or a zero total, otherwise when the invoice was first paid. Null while a deferred order awaits payment.",
+        "The Checkout Session that created the order. Null for orders Billing creates itself, such as automatic renewals.",
       ),
     created_at: zod.iso.datetime({ offset: true }),
     items: zod.array(OrderItem).describe("What was bought."),
   })
   .describe(
-    "A recorded purchase with its invoice from placement; a zero-total invoice, such as for a metered purchase, is issued and paid at placement in either checkout mode. Until checkout_confirmed_at is set, the invoice is a draft at base prices: paying it fixes the discount and amount, issues it and collects it, and the order cannot be accepted before then. Coupon fields describe the discount fixed then and are absent before. Payment and acceptance do not mean the resources were delivered.",
+    "A recorded purchase, created with its invoice issued when its Checkout Session completes or when Billing renews a subscription. A zero-total invoice, such as for a metered purchase, is paid at once. Coupon fields describe the discount applied then. Payment and acceptance do not mean the resources were delivered.",
   );
 
 export type Order = zod.input<typeof Order>;

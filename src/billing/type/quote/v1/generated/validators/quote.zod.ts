@@ -12,7 +12,12 @@ import { QuoteItem } from "./quoteItem.zod.js";
 
 export const Quote = zod
   .strictObject({
-    funds: Funds,
+    funds: zod.union([Funds, zod.null()]).describe("Null for a quote without a billing account."),
+    tax_status: zod
+      .enum(["complete", "requires_location_inputs"])
+      .describe(
+        "`complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without a billing account, which leaves out tax that would be added; tax already contained in a price is included.",
+      ),
     items: zod
       .array(QuoteItem)
       .describe(
@@ -45,7 +50,7 @@ export const Quote = zod
       ),
   })
   .describe(
-    "A price preview for the purchase described by a service, calculated by Billing. Nothing is saved,\ncharged or reserved, and no discount redemption is consumed. Account discounts and tax are\nevaluated as for automatic checkout. Promotion codes are evaluated through Billing quote operations.\nAll amounts use currency. This preview does not lock prices or guarantee discount availability.\nSuccess includes complete checkout amounts and every requested usage estimate. If any item or\nrequested usage estimate cannot be calculated, the operation returns its existing structured\nerror response; it never returns a partial quote with HTTP 200.",
+    "A price preview for the purchase described by a service, calculated by Billing. Nothing is saved,\ncharged or reserved, and no discount redemption is consumed. Account discounts and tax are\nevaluated as for automatic checkout. Promotion codes are evaluated by Billing at checkout, not here.\nAll amounts use currency. This preview does not lock prices or guarantee discount availability.\nSuccess includes complete checkout amounts and every requested usage estimate. If any item or\nrequested usage estimate cannot be calculated, the operation returns its existing structured\nerror response; it never returns a partial quote with HTTP 200. A quote without a billing account\nhas no funds and no account discount, and leaves out tax that would be added.",
   );
 
 export type Quote = zod.input<typeof Quote>;

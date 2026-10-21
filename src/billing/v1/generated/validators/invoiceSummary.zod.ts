@@ -42,7 +42,7 @@ export const InvoiceSummary = zod
     due_at: zod.iso.datetime({ offset: true }).optional(),
   })
   .describe(
-    "An order's invoice amounts, without contact details or payment methods. A draft shows base prices until it is paid, when the discount is applied and it is issued; a zero-total invoice is issued and paid at placement.",
+    "An order's invoice amounts, without contact details or payment methods, issued when the order is created; a zero-total invoice is paid at once.",
   );
 
 export type InvoiceSummary = zod.input<typeof InvoiceSummary>;

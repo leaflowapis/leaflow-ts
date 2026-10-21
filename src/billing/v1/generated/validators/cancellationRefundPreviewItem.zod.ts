@@ -37,7 +37,7 @@ export const CancellationRefundPreviewItem = zod
     tax_amount: Money,
     forfeited_amount: Money,
   })
-  .describe("One subscription of the quoted cancellation.");
+  .describe("One subscription of the previewed cancellation.");
 
 export type CancellationRefundPreviewItem = zod.input<typeof CancellationRefundPreviewItem>;
 export type CancellationRefundPreviewItemOutput = zod.output<typeof CancellationRefundPreviewItem>;

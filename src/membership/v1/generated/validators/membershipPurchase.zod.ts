@@ -7,14 +7,23 @@
  */
 import * as zod from "zod";
 import { Membership } from "./membership.zod.js";
-import { PlacedOrder } from "./placedOrder.zod.js";
 
 export const MembershipPurchase = zod
   .strictObject({
     membership: Membership,
-    order: PlacedOrder,
+    checkout_session_id: zod
+      .uuid()
+      .describe(
+        "The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing.",
+      ),
+    order_id: zod
+      .uuid()
+      .nullable()
+      .describe(
+        "The order created when checkout completes, at once for automatic checkout; null until then.",
+      ),
   })
-  .describe("The membership and its Billing purchase order.");
+  .describe("The membership and its Billing Checkout Session.");
 
 export type MembershipPurchase = zod.input<typeof MembershipPurchase>;
 export type MembershipPurchaseOutput = zod.output<typeof MembershipPurchase>;

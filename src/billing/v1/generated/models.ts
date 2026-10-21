@@ -129,32 +129,103 @@ export interface QuoteRenewalResult {
 }
 
 /**
- * One fully calculated purchase, estimated metered usage or recorded order item. Amounts use the
- * billing-account currency. An item with no immediate charge has zero checkout amounts.
+ * The billing period of a recurring licensed line; `none` otherwise.
+ */
+export type QuoteItemInterval = (typeof QuoteItemInterval)[keyof typeof QuoteItemInterval];
+
+export const QuoteItemInterval = {
+  none: "none",
+  day: "day",
+  month: "month",
+  year: "year",
+} as const;
+
+/**
+ * The dimension values the line is priced at.
+ */
+export type QuoteItemDimensions = { [key: string]: string };
+
+/**
+ * The platform service's fixed identifier, such as compute, canopy or assistant.
+ * @minLength 1
+ * @maxLength 64
+ * @pattern ^[a-z][a-z0-9]*(-[a-z0-9]+)*$
+ */
+export type ProductID = string;
+
+/**
+ * `one_time` charges once when bought. `recurring` charges again for every period, or for usage as it is settled.
+ */
+export type PriceType = (typeof PriceType)[keyof typeof PriceType];
+
+export const PriceType = {
+  one_time: "one_time",
+  recurring: "recurring",
+} as const;
+
+/**
+ * `licensed` charges for the quantity bought, each period paid before it starts. `metered` charges for the usage
+ * reported, after it is settled; a metered subscription lasts until it is canceled. A one-time price is licensed.
+ */
+export type UsageType = (typeof UsageType)[keyof typeof UsageType];
+
+export const UsageType = {
+  licensed: "licensed",
+  metered: "metered",
+} as const;
+
+/**
+ * One fully calculated purchase line. An item with no immediate charge, such as a metered purchase, has zero checkout amounts.
  */
 export interface QuoteItem {
   tax_amount: Money;
   tax_included_amount: Money;
   /**
-   * The zero-based request line index, or the recorded order item's position for an order quote.
+   * The zero-based request line index, or the item's position for a Checkout Session quote.
    * @minimum 0
    */
   index: number;
-  /** Present for an existing order quote; identifies the recorded item being priced. */
-  order_item_id?: string;
+  product_id: ProductID;
+  plan_id: string;
   /** The selected price, also when the request identified it indirectly. */
   price_id: string;
   plan_name: string;
+  type: PriceType;
+  usage_type: UsageType;
+  /** The billing period of a recurring licensed line; `none` otherwise. */
+  interval: QuoteItemInterval;
+  /**
+   * Periods per billing cycle of a recurring licensed line; null otherwise.
+   * @minimum 1
+   * @nullable
+   */
+  interval_count: number | null;
+  /** The dimension values the line is priced at. */
+  dimensions: QuoteItemDimensions;
+  /** The setup charge already included in `amount`; null when none applies. */
+  setup_amount: Money | null;
+  /** Recurring licensed lines only; null otherwise. What each later period renews at, before discounts and tax, which differs from `amount` when the first period is priced differently. `discount` says whether its discount continues on renewals. */
+  recurring_amount: Money | null;
   /** Unit price before discounts. Null when no single unit price applies, such as tiered or multiple-rate pricing. */
   unit_amount: Money | null;
-  /** The quantity priced; with duration_seconds, quantity times the duration. */
+  /** The quantity priced. */
   quantity: string;
-  /** Amount before discounts and including any setup charge. For requested future usage this is an estimate, not a collectible checkout amount. */
+  /** Amount before discounts and including any setup charge. */
   amount: Money;
   discount_amount: Money;
   total: Money;
   currency: string;
 }
+
+/**
+ * `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without an account, which leaves out tax that would be added; tax already contained in a price is included.
+ */
+export type QuoteTaxStatus = (typeof QuoteTaxStatus)[keyof typeof QuoteTaxStatus];
+
+export const QuoteTaxStatus = {
+  complete: "complete",
+  requires_location_inputs: "requires_location_inputs",
+} as const;
 
 /**
  * Account funding for this purchase, calculated by Billing. Amounts use the enclosing response currency.
@@ -184,6 +255,29 @@ export const QuotedDiscountType = {
 } as const;
 
 /**
+ * Whether the discount continues on renewals of what is bought: `once` applies only to this purchase, `recurring` for `frequency_duration` periods including the first, `forever` on every renewal.
+ */
+export type QuotedDiscountFrequency =
+  (typeof QuotedDiscountFrequency)[keyof typeof QuotedDiscountFrequency];
+
+export const QuotedDiscountFrequency = {
+  once: "once",
+  recurring: "recurring",
+  forever: "forever",
+} as const;
+
+/**
+ * `confirmed`: every condition of the discount holds for the billing account. `unverified`: a quote without an account, where conditions that depend on the account, such as a first purchase or a per-account limit, are checked only when a Checkout Session is completed.
+ */
+export type QuotedDiscountEligibility =
+  (typeof QuotedDiscountEligibility)[keyof typeof QuotedDiscountEligibility];
+
+export const QuotedDiscountEligibility = {
+  confirmed: "confirmed",
+  unverified: "unverified",
+} as const;
+
+/**
  * The discount selected for this calculation, not applied and not reserved. Amounts are on the quote and its lines.
  */
 export interface QuotedDiscount {
@@ -196,6 +290,58 @@ export interface QuotedDiscount {
    * @nullable
    */
   promotion_code: string | null;
+  /** Whether the discount continues on renewals of what is bought: `once` applies only to this purchase, `recurring` for `frequency_duration` periods including the first, `forever` on every renewal. */
+  frequency: QuotedDiscountFrequency;
+  /**
+   * For `recurring`, the periods the discount lasts; null otherwise.
+   * @minimum 1
+   * @nullable
+   */
+  frequency_duration: number | null;
+  /** `confirmed`: every condition of the discount holds for the billing account. `unverified`: a quote without an account, where conditions that depend on the account, such as a first purchase or a per-account limit, are checked only when a Checkout Session is completed. */
+  eligibility: QuotedDiscountEligibility;
+}
+
+/**
+ * A complete calculation in `currency`; nothing is saved or reserved. The request fails if any item cannot be priced. A Checkout Session quote gives what completing the session would invoice.
+ */
+export interface Quote {
+  /** Account funds for the quoted purchase. Null without an account. */
+  funds: Funds | null;
+  subtotal: Money;
+  discount_amount: Money;
+  tax_amount: Money;
+  /** The discount a purchase would get, not yet applied. Null when there is none, and for renewals. */
+  discount: QuotedDiscount | null;
+  items: QuoteItem[];
+  renewals: QuoteRenewalResult[];
+  total: Money;
+  currency: string;
+  /**
+   * Immediate changes only; null otherwise. The instant the change is priced from; pass it when confirming the Checkout Session so it is priced from the same instant.
+   * @nullable
+   */
+  proration_date: string | null;
+  /** `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without an account, which leaves out tax that would be added; tax already contained in a price is included. */
+  tax_status: QuoteTaxStatus;
+}
+
+/**
+ * What ending these subscriptions together would return, for one mode; preview `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).
+ */
+export interface CancellationPreviewRequest {
+  /**
+   * A billing account you own that currently pays for every subscription.
+   * @minimum 1
+   */
+  billing_account_id: number;
+  /**
+   * The subscriptions to end together, all of one service, including every subscription released with a resource.
+   * @minItems 1
+   * @maxItems 50
+   */
+  subscription_ids: string[];
+  mode: CancellationPolicy;
 }
 
 /**
@@ -215,28 +361,7 @@ export interface NamedIdentity {
 }
 
 /**
- * `one_time` charges once when bought. `recurring` charges again for every period, or for usage as it is settled.
- */
-export type PriceType = (typeof PriceType)[keyof typeof PriceType];
-
-export const PriceType = {
-  one_time: "one_time",
-  recurring: "recurring",
-} as const;
-
-/**
- * `licensed` charges for the quantity bought, each period paid before it starts. `metered` charges for the usage
- * reported, after it is settled; a metered subscription lasts until it is canceled. A one-time price is licensed.
- */
-export type UsageType = (typeof UsageType)[keyof typeof UsageType];
-
-export const UsageType = {
-  licensed: "licensed",
-  metered: "metered",
-} as const;
-
-/**
- * One subscription of the quoted cancellation.
+ * One subscription of the previewed cancellation.
  */
 export interface CancellationRefundPreviewItem {
   subscription_id: string;
@@ -288,51 +413,6 @@ export interface CancellationRefundPreview {
   tax_amount: Money;
   forfeited_amount: Money;
   items: CancellationRefundPreviewItem[];
-}
-
-/**
- * An estimated refund to the original payment sources. Before acceptance, cancellation returns the collected amount. For delivered service, only value paid by this order is included; renewals are evaluated with their own orders under the agreed cancellation terms. Nothing is refunded by the quote; the amount is fixed when cancellation or termination is confirmed.
- */
-export interface OrderRefundQuote {
-  order_id: string;
-  refundable_amount: Money;
-  refund_amount: Money;
-  credit_amount: Money;
-  currency: string;
-}
-
-/**
- * A complete calculation in the billing account's currency; nothing is saved or reserved. The request fails if any item cannot be priced. Usage estimates are included in totals but are not collected at checkout; only an existing-order quote gives that order's checkout amount.
- */
-export interface Quote {
-  /** Account funds for an existing-order checkout quote. Absent for usage estimates, refunds and cancellations. */
-  funds?: Funds;
-  subtotal: Money;
-  discount_amount: Money;
-  tax_amount: Money;
-  /** The discount a purchase or order would get, not yet applied. Null when there is none, and for renewals and cancellations. A confirmed order reports its recorded discount. */
-  discount: QuotedDiscount | null;
-  items: QuoteItem[];
-  renewals: QuoteRenewalResult[];
-  /** What the cancellation requested would return. Present only when one was requested. */
-  cancellation?: CancellationRefundPreview;
-  total: Money;
-  currency: string;
-  /** Present when an order refund was requested. */
-  refund?: OrderRefundQuote;
-}
-
-/**
- * A cancellation to quote: what ending these subscriptions together would return, for one mode; quote `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).
- */
-export interface QuoteCancellation {
-  /**
-   * The subscriptions to end together, all of one service, including every subscription released with a resource.
-   * @minItems 1
-   * @maxItems 50
-   */
-  subscription_ids: string[];
-  mode: CancellationPolicy;
 }
 
 export interface CancellationCreate {
@@ -525,14 +605,6 @@ export interface Error {
   meta?: ErrorMeta;
   status: number;
 }
-
-/**
- * The platform service's fixed identifier, such as compute, canopy or assistant.
- * @minLength 1
- * @maxLength 64
- * @pattern ^[a-z][a-z0-9]*(-[a-z0-9]+)*$
- */
-export type ProductID = string;
 
 export interface Product {
   id: ProductID;
@@ -1033,14 +1105,6 @@ export interface PayInvoiceRequest {
   /** Apply eligible, unexpired credit grants before the balance. Grants are never converted into balance. */
   use_credits?: boolean;
   return_url?: string;
-  /**
-   * The code to apply while the order's terms are not fixed. Omit to apply the best applicable account discount, or to keep the discount already recorded.
-   * @minLength 1
-   * @maxLength 64
-   */
-  promotion_code?: string;
-  /** The invoice total to expect, after discounts and tax and before credit grants or balance, as the payment preview or an order quote gave it. A different total fails with `BILLING_AMOUNT_CHANGED` and nothing is charged. Omit to skip the check; zero is checked. */
-  expected_amount?: Money & string;
 }
 
 /**
@@ -1203,12 +1267,11 @@ export interface PaymentResult {
 }
 
 /**
- * `draft`: not yet issued; an order's draft invoice shows base prices until it is paid, when the discount is applied and it is issued. Other drafts are visible only to operators. `open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage not yet invoiced is not on any invoice.
+ * `open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage not yet invoiced is not on any invoice.
  */
 export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
 
 export const InvoiceStatus = {
-  draft: "draft",
   open: "open",
   paid: "paid",
   void: "void",
@@ -1273,7 +1336,7 @@ export interface Invoice {
   pre_payment_credit_notes_amount: Money;
   /** Issued credit notes against payments already received; their refunds may not have completed. */
   post_payment_credit_notes_amount: Money;
-  /** What is still collectible from total plus rounding_amount after unpaid credit notes and successful payments; never below zero. Zero for a draft, whose total is the base price, and for a paid or void invoice. */
+  /** What is still collectible from total plus rounding_amount after unpaid credit notes and successful payments; never below zero. Zero for a paid or void invoice. */
   amount_due: Money;
   /** @nullable */
   period_start?: string | null;
@@ -1922,24 +1985,186 @@ export interface RenewRequest {
   return_url?: string;
 }
 
+export interface AutoRenewSet {
+  auto_renew: boolean;
+}
+
+/**
+ * `open`: waiting for you to complete checkout; nothing is ordered, invoiced or reserved. `complete`: the order and its issued invoice exist; read the order for payment and delivery. `expired`: ended without an order.
+ */
+export type CheckoutSessionStatus =
+  (typeof CheckoutSessionStatus)[keyof typeof CheckoutSessionStatus];
+
+export const CheckoutSessionStatus = {
+  open: "open",
+  complete: "complete",
+  expired: "expired",
+} as const;
+
+/**
+ * `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms.
+ */
+export type CheckoutSessionType = (typeof CheckoutSessionType)[keyof typeof CheckoutSessionType];
+
+export const CheckoutSessionType = {
+  new: "new",
+  renew: "renew",
+  modify: "modify",
+} as const;
+
+/**
+ * When a change takes effect, as on the order it creates; `none` for anything that is not a change.
+ */
+export type CheckoutSessionChangeEffective =
+  (typeof CheckoutSessionChangeEffective)[keyof typeof CheckoutSessionChangeEffective];
+
+export const CheckoutSessionChangeEffective = {
+  none: "none",
+  immediate: "immediate",
+  period_end: "period_end",
+} as const;
+
+/**
+ * automatic completes checkout with the purchase: the best applicable account discount is applied, and the
+ * order is created with its invoice issued and paid from eligible credit grants and available balance.
+ * Insufficient funds fail the purchase with HTTP 422 BILLING_INSUFFICIENT_FUNDS; no Billing order, charge or
+ * discount redemption is committed.
+ * deferred creates an open Billing Checkout Session and charges nothing, even for a zero total. The customer
+ * completes it through Billing, where a promotion code can be applied, and then pays the issued invoice; a
+ * session not completed by its deadline expires.
+ */
+export type CheckoutMode = (typeof CheckoutMode)[keyof typeof CheckoutMode];
+
+export const CheckoutMode = {
+  automatic: "automatic",
+  deferred: "deferred",
+} as const;
+
+/**
+ * Shared checkout choices for a product purchase. The service may set them or forward its client's
+ * choices unchanged; it does not need to read them, and Billing validates them. Omitting this object or
+ * mode selects automatic checkout. Each purchase creates its own Checkout Session. Promotion codes are supplied
+ * only to Billing. A service may retain a failed creation record when Billing refuses a purchase; no
+ * infrastructure is created for that refusal.
+ */
+export interface CheckoutOptions {
+  mode?: CheckoutMode;
+  /**
+   * Expected invoice total after discounts and tax, before applying credit grants or balance.
+   * A different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.
+   * Accepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred
+   * checkout, give the expected amount when completing it through Billing.
+   */
+  expected_amount?: Money & string;
+  /**
+   * Where the client goes after the customer finishes a deferred checkout. Any absolute URI with a
+   * scheme, including mobile and desktop application schemes. Billing stores it without checking the
+   * target; each client validates its own.
+   * @maxLength 2048
+   */
+  return_url?: string;
+}
+
+/**
+ * A purchase waiting for you to complete checkout. Completing it applies the discount and creates the order with its invoice issued; the order carries the session's ID.
+ */
+export interface CheckoutSession {
+  id: string;
+  product_id: ProductID;
+  billing_account_id: number;
+  account: AccountIdentity;
+  /**
+   * The project the purchase is for. Null for an account-level purchase, such as a membership.
+   * @nullable
+   */
+  project_id: string | null;
+  /** The project and its current name. Null for an account-level purchase or when the project cannot be read; `project_id` still identifies it. */
+  project: NamedIdentity | null;
+  /** `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms. */
+  type: CheckoutSessionType;
+  /** When a change takes effect, as on the order it creates; `none` for anything that is not a change. */
+  change_effective: CheckoutSessionChangeEffective;
+  status: CheckoutSessionStatus;
+  currency: string;
+  /** The checkout choices as the purchase gave them. Billing does not check `return_url`; validate it before navigating. */
+  checkout: CheckoutOptions;
+  /** When an open session expires. The order a complete session created has its own payment deadline. */
+  expires_at: string;
+  created_at: string;
+  /** @nullable */
+  completed_at: string | null;
+  /** @nullable */
+  expired_at: string | null;
+  /**
+   * The order created when the session completed. Null otherwise.
+   * @nullable
+   */
+  order_id: string | null;
+}
+
+export interface CheckoutSessionList {
+  items: CheckoutSession[];
+  pagination: OffsetPagination;
+}
+
+/**
+ * The dimension values of what is bought, such as region and instance type.
+ */
+export type CheckoutSessionItemDimensions = { [key: string]: string };
+
+/**
+ * One item of the session. It becomes the order item at the same position; its price is chosen when checkout completes.
+ */
+export interface CheckoutSessionItem {
+  /** @minimum 0 */
+  position: number;
+  plan_id: string;
+  plan_name: string;
+  /**
+   * The price the item named. Null when Billing selects it by billing terms or from the subscription being changed or renewed.
+   * @nullable
+   */
+  price_id: string | null;
+  quantity: string;
+  /** The dimension values of what is bought, such as region and instance type. */
+  dimensions: CheckoutSessionItemDimensions;
+  /**
+   * The subscription changed or renewed. Null for a new purchase.
+   * @nullable
+   */
+  subscription_id: string | null;
+  /**
+   * Renewals only; null otherwise. How many consecutive periods are renewed.
+   * @minimum 1
+   * @nullable
+   */
+  periods: number | null;
+}
+
+export interface CheckoutSessionItemList {
+  items: CheckoutSessionItem[];
+  pagination: OffsetPagination;
+}
+
 /**
  * As in renewing.
  */
-export type RenewalOrderRequestInterval =
-  (typeof RenewalOrderRequestInterval)[keyof typeof RenewalOrderRequestInterval];
+export type CheckoutSessionCreateInterval =
+  (typeof CheckoutSessionCreateInterval)[keyof typeof CheckoutSessionCreateInterval];
 
-export const RenewalOrderRequestInterval = {
+export const CheckoutSessionCreateInterval = {
   day: "day",
   month: "month",
   year: "year",
 } as const;
 
 /**
- * The renewal's periods and price, chosen as in renewing.
+ * The subscription to renew, and its periods and price chosen as in renewing.
  */
-export interface RenewalOrderRequest {
-  /** The order ID, chosen by the caller. Creating it again conflicts; read the order after an unknown outcome. */
-  order_id: string;
+export interface CheckoutSessionCreate {
+  /** Chosen by the caller. Creating it again conflicts; read the session after an unknown outcome. */
+  checkout_session_id: string;
+  subscription_id: string;
   /**
    * As in renewing.
    * @minimum 1
@@ -1951,51 +2176,26 @@ export interface RenewalOrderRequest {
    */
   interval_count?: number;
   /** As in renewing. */
-  interval?: RenewalOrderRequestInterval;
+  interval?: CheckoutSessionCreateInterval;
   /** As in renewing. */
   cancellation_policy?: CancellationPolicy;
 }
 
-export interface AutoRenewSet {
-  auto_renew: boolean;
+export interface CheckoutSessionConfirm {
+  /**
+   * As quoted. Omit to apply the best applicable account discount.
+   * @minLength 1
+   * @maxLength 64
+   */
+  promotion_code?: string;
+  /** The quote's `total`, after discounts and tax and before credit grants or balance. */
+  expected_amount: Money & string;
+  /** Immediate changes only. The quote's `proration_date`; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. Defaults to the time of the request. */
+  proration_date?: string;
 }
 
 /**
- * `pending`: waiting to be set up. `completed`: set up, as confirmed by the service. `failed`: not set up; its amount was refunded to the original payment sources. `canceled`: withdrawn without delivery; any collected amount is returned. A completed item ends when its subscription is canceled.
- */
-export type OrderItemStatus = (typeof OrderItemStatus)[keyof typeof OrderItemStatus];
-
-export const OrderItemStatus = {
-  pending: "pending",
-  completed: "completed",
-  failed: "failed",
-  canceled: "canceled",
-} as const;
-
-/**
- * `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms.
- */
-export type OrderType = (typeof OrderType)[keyof typeof OrderType];
-
-export const OrderType = {
-  new: "new",
-  renew: "renew",
-  modify: "modify",
-} as const;
-
-/**
- * When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced shortly before the current paid period ends and starts when it ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual. A renewal in the meantime moves the change to the end of the renewed period.
- */
-export type OrderChangeEffective = (typeof OrderChangeEffective)[keyof typeof OrderChangeEffective];
-
-export const OrderChangeEffective = {
-  none: "none",
-  immediate: "immediate",
-  period_end: "period_end",
-} as const;
-
-/**
- * An order's invoice amounts, without contact details or payment methods. A draft shows base prices until it is paid, when the discount is applied and it is issued; a zero-total invoice is issued and paid at placement.
+ * An order's invoice amounts, without contact details or payment methods, issued when the order is created; a zero-total invoice is paid at once.
  */
 export interface InvoiceSummary {
   id: string;
@@ -2043,6 +2243,28 @@ export interface PaidWith {
   last4?: string;
 }
 
+/**
+ * `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms.
+ */
+export type OrderType = (typeof OrderType)[keyof typeof OrderType];
+
+export const OrderType = {
+  new: "new",
+  renew: "renew",
+  modify: "modify",
+} as const;
+
+/**
+ * When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced when the order is created and starts when the current paid period ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual.
+ */
+export type OrderChangeEffective = (typeof OrderChangeEffective)[keyof typeof OrderChangeEffective];
+
+export const OrderChangeEffective = {
+  none: "none",
+  immediate: "immediate",
+  period_end: "period_end",
+} as const;
+
 export type OrderItemInterval = (typeof OrderItemInterval)[keyof typeof OrderItemInterval];
 
 export const OrderItemInterval = {
@@ -2050,6 +2272,18 @@ export const OrderItemInterval = {
   day: "day",
   month: "month",
   year: "year",
+} as const;
+
+/**
+ * `pending`: waiting to be set up. `completed`: set up, as confirmed by the service. `failed`: not set up; its amount was refunded to the original payment sources. `canceled`: withdrawn without delivery; any collected amount is returned. A completed item ends when its subscription is canceled.
+ */
+export type OrderItemStatus = (typeof OrderItemStatus)[keyof typeof OrderItemStatus];
+
+export const OrderItemStatus = {
+  pending: "pending",
+  completed: "completed",
+  failed: "failed",
+  canceled: "canceled",
 } as const;
 
 export type OrderItemConfiguration = { [key: string]: unknown };
@@ -2143,7 +2377,7 @@ export interface OrderItem {
 }
 
 /**
- * A recorded purchase with its invoice from placement; a zero-total invoice, such as for a metered purchase, is issued and paid at placement in either checkout mode. Until checkout_confirmed_at is set, the invoice is a draft at base prices: paying it fixes the discount and amount, issues it and collects it, and the order cannot be accepted before then. Coupon fields describe the discount fixed then and are absent before. Payment and acceptance do not mean the resources were delivered.
+ * A recorded purchase, created with its invoice issued when its Checkout Session completes or when Billing renews a subscription. A zero-total invoice, such as for a metered purchase, is paid at once. Coupon fields describe the discount applied then. Payment and acceptance do not mean the resources were delivered.
  */
 export interface Order {
   coupon_id?: string;
@@ -2166,13 +2400,13 @@ export interface Order {
   project_id?: string | null;
   /** The project and its current name. Absent for an account-level purchase or when the project cannot be read; `project_id` still identifies it. */
   project?: NamedIdentity | null;
-  /** The billing account the order was placed with, unchanged when the project is later linked to another account. While it is suspended or closed, the order cannot be accepted, and a period-end change's invoice is not issued and the change is called off when the current period ends; such requests fail with `BILLING_ACCOUNT_UNAVAILABLE`. */
+  /** The billing account the order was placed with, unchanged when the project is later linked to another account. While it is suspended or closed, the order cannot be accepted, and a period-end change is called off when the current period ends; such requests fail with `BILLING_ACCOUNT_UNAVAILABLE`. */
   billing_account_id?: number;
   currency: string;
   /** `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms. */
   type: OrderType;
   status: OrderStatus;
-  /** When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced shortly before the current paid period ends and starts when it ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual. A renewal in the meantime moves the change to the end of the renewed period. */
+  /** When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced when the order is created and starts when the current paid period ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual. */
   change_effective?: OrderChangeEffective;
   /**
    * Acceptance deadline; a pending order expires after it.
@@ -2180,13 +2414,21 @@ export interface Order {
    */
   expires_at?: string | null;
   /**
-   * When the discount and amount were fixed: at placement for automatic checkout or a zero total, otherwise when the invoice was first paid. Null while a deferred order awaits payment.
+   * The Checkout Session that created the order. Null for orders Billing creates itself, such as automatic renewals.
    * @nullable
    */
-  checkout_confirmed_at?: string | null;
+  checkout_session_id?: string | null;
   created_at: string;
   /** What was bought. */
   items: OrderItem[];
+}
+
+/**
+ * The complete session and the order it created.
+ */
+export interface CheckoutSessionResult {
+  checkout_session: CheckoutSession;
+  order: Order;
 }
 
 export interface OrderList {
@@ -2563,12 +2805,12 @@ export const QuoteItemInputInterval = {
 } as const;
 
 /**
- * The dimension values the rate depends on, such as region, instance type or token kind: those of the usage for a metered estimate, and those of what is bought for a licensed price on a rate card. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero.
+ * The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero.
  */
 export type QuoteItemInputDimensions = { [key: string]: string };
 
 /**
- * Identify a price, or select one for a plan; give each resource's ID or lookup key, never both, and product_id with lookup keys. For a metered price, a meter or duration_seconds requests a usage estimate, which cannot be combined with a promotion code and is not a checkout amount. Without one, a metered item includes only any setup charge.
+ * Identify a price, or select one for a plan; give each resource's ID or lookup key, never both, and product_id with lookup keys. A metered item includes only any setup charge; its usage is estimated with `estimate-usage`.
  */
 export interface QuoteItemInput {
   /**
@@ -2595,16 +2837,8 @@ export interface QuoteItemInput {
   cancellation_policy?: CancellationPolicy;
   /** @pattern ^(?:(?:[1-9][0-9]{0,27}|0(?:[1-9][0-9]{0,26}|0(?:[1-9][0-9]{0,25}|0(?:[1-9][0-9]{0,24}|0(?:[1-9][0-9]{0,23}|0(?:[1-9][0-9]{0,22}|0(?:[1-9][0-9]{0,21}|0(?:[1-9][0-9]{0,20}|0(?:[1-9][0-9]{0,19}|0(?:[1-9][0-9]{0,18}|0(?:[1-9][0-9]{0,17}|0(?:[1-9][0-9]{0,16}|0(?:[1-9][0-9]{0,15}|0(?:[1-9][0-9]{0,14}|0(?:[1-9][0-9]{0,13}|0(?:[1-9][0-9]{0,12}|0(?:[1-9][0-9]{0,11}|0(?:[1-9][0-9]{0,10}|0(?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9])))))))))))))))))))))))))))([.][0-9]{1,10})?|0{1,28}[.](?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))$ */
   quantity: string;
-  meter_id?: string;
-  /**
-   * @minLength 1
-   * @maxLength 128
-   */
-  meter_lookup_key?: string;
-  /** The dimension values the rate depends on, such as region, instance type or token kind: those of the usage for a metered estimate, and those of what is bought for a licensed price on a rate card. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero. */
+  /** The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero. */
   dimensions?: QuoteItemInputDimensions;
-  /** For a metered estimate, how long to price for, in seconds; the priced quantity is `quantity` times this duration. */
-  duration_seconds?: number;
 }
 
 /**
@@ -2681,48 +2915,133 @@ export interface ActiveResourceList {
 }
 
 /**
- * An estimate of the refundable value of an order or selected items; nothing is canceled or refunded.
+ * An estimated refund to the original payment sources. Before acceptance, cancellation returns the collected amount. For delivered service, only value paid by this order is included; renewals are evaluated with their own orders under the agreed cancellation terms. Nothing is refunded by the quote; the amount is fixed when cancellation or termination is confirmed.
  */
-export interface OrderRefundQuoteInput {
+export interface OrderRefundPreview {
   order_id: string;
-  /**
-   * Estimate only these items. Omit to estimate the whole order. Every item must belong to the order.
-   * @minItems 1
-   * @maxItems 100
-   */
-  order_item_ids?: string[];
+  refundable_amount: Money;
+  refund_amount: Money;
+  credit_amount: Money;
+  currency: string;
 }
 
 /**
- * Quote exactly one target for the billing account: proposed items, an existing order, renewals, a cancellation or an order refund. Promotion codes apply only to proposed items or an existing order. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.
+ * The dimension values of the usage, such as region or token kind. Every key the meter declares must be given; a combination no rate covers is refused rather than priced at zero.
+ */
+export type UsageEstimateInputDimensions = { [key: string]: string };
+
+/**
+ * Future usage of one metered price. Give the price, or the plan to use its metered price in the currency, and the meter that measures the usage; give each resource's ID or lookup key, never both, and product_id with lookup keys.
+ */
+export interface UsageEstimateInput {
+  product_id?: ProductID;
+  plan_id?: string;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  plan_lookup_key?: string;
+  price_id?: string;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  price_lookup_key?: string;
+  meter_id?: string;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  meter_lookup_key?: string;
+  /** The dimension values of the usage, such as region or token kind. Every key the meter declares must be given; a combination no rate covers is refused rather than priced at zero. */
+  dimensions?: UsageEstimateInputDimensions;
+  /**
+   * Decimal string. Positive.
+   * @pattern ^[0-9]{1,28}([.][0-9]{1,10})?$
+   */
+  quantity: string;
+  /**
+   * For a duration meter, how long the quantity is held; the priced quantity is `quantity` times this duration.
+   * @minimum 1
+   */
+  duration_seconds?: number;
+}
+
+export interface UsageEstimateRequest {
+  /**
+   * The ISO 4217 currency to price in.
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency: string;
+  /**
+   * @minItems 1
+   * @maxItems 100
+   */
+  items: UsageEstimateInput[];
+}
+
+export interface UsageEstimateItem {
+  /**
+   * The zero-based request item this answers.
+   * @minimum 0
+   */
+  index: number;
+  price_id: string;
+  meter_id: string;
+  /** The quantity priced. */
+  quantity: string;
+  /** Null when the matched rates do not have a single unit price, for example a tiered rate. */
+  unit_amount: Money | null;
+  /**
+   * The quantity unit_amount is for; null with unit_amount.
+   * @nullable
+   */
+  unit_quantity: string | null;
+  /** Before discounts and tax, unrounded. */
+  amount: Money;
+}
+
+export interface UsageEstimate {
+  currency: string;
+  /** The sum of the items' amounts. */
+  amount: Money;
+  /** One per request item, in request order. */
+  items: UsageEstimateItem[];
+}
+
+/**
+ * Quote proposed items or renewals, not both. Give exactly one of `billing_account_id` and `currency`; renewals need the account. Promotion codes apply only to proposed items. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.
  */
 export interface QuoteRequest {
   /**
-   * The billing account to price for; it must be yours. Existing orders must have been placed with it, and renewals and cancellations must currently be paid by it.
+   * The billing account to price for; it must be yours, and an access token is required. Renewals must currently be paid by it.
    * @minimum 1
    */
-  billing_account_id: number;
+  billing_account_id?: number;
   /**
-   * A proposed purchase priced in the account's currency. Metered items may include usage estimates, which are not checkout amounts.
+   * The ISO 4217 currency to price in without an account.
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency?: string;
+  /**
+   * A proposed purchase.
    * @minItems 1
    * @maxItems 100
    */
   items?: QuoteItemInput[];
-  /** Preview paying this order. Its recorded terms supply every line, and an order whose terms are fixed returns its recorded amounts. The order does not change. */
-  order_id?: string;
   /**
-   * Preview renewing these subscriptions, each at most once; each entry is a separate renewal order. To preview a promotion code, create a renewal order and quote it by order_id.
+   * Preview renewing these subscriptions, each at most once; each entry is a separate renewal order. To apply a promotion code, create a renewal Checkout Session and quote it.
    * @minItems 1
    * @maxItems 100
    */
   renewals?: QuoteRenewal[];
-  cancellation?: QuoteCancellation;
   /**
    * @minLength 1
    * @maxLength 64
    */
   promotion_code?: string;
-  refund?: OrderRefundQuoteInput;
 }
 
 /**
@@ -3330,12 +3649,6 @@ export type ListPaymentMethodsParams = {
 
 export type PreviewInvoicePaymentParams = {
   /**
-   * As in paying; used only while the order's terms are not fixed.
-   * @minLength 1
-   * @maxLength 64
-   */
-  promotion_code?: string;
-  /**
    * As in paying. True when omitted.
    */
   use_balance?: boolean;
@@ -3692,6 +4005,55 @@ export const ListAllowancesStatus = {
   voided: "voided",
 } as const;
 
+export type ListCheckoutSessionsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+  /**
+   * Only this account of yours; all when omitted.
+   */
+  billing_account_id?: AccountIdQueryParameter;
+  status?: CheckoutSessionStatus;
+  /**
+   * Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.
+   * @minItems 1
+   * @maxItems 100
+   */
+  project_ids?: ProjectIdsQueryParameter;
+};
+
+export type ListCheckoutSessionItemsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+};
+
+export type GetCheckoutSessionQuoteParams = {
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  promotion_code?: string;
+};
+
 export type ListOrdersParams = {
   /**
    * 1-based page number. Defaults to 1.
@@ -3721,6 +4083,15 @@ export type ListOrdersParams = {
    * @maxItems 100
    */
   project_ids?: ProjectIdsQueryParameter;
+};
+
+export type PreviewOrderRefundParams = {
+  /**
+   * Only these items of the order. Omit for the whole order.
+   * @minItems 1
+   * @maxItems 100
+   */
+  order_item_ids?: string[];
 };
 
 export type ListOrderItemsParams = {

@@ -19,6 +19,21 @@ export const QuotedDiscount = zod
       .max(quotedDiscountPromotionCodeMax)
       .nullable()
       .describe("Code text for a promotion_code discount; null for an account_discount."),
+    frequency: zod
+      .enum(["once", "recurring", "forever"])
+      .describe(
+        "Whether the discount continues on renewals of what is bought: `once` applies only to this purchase, `recurring` for `frequency_duration` periods including the first, `forever` on every renewal.",
+      ),
+    frequency_duration: zod
+      .int()
+      .min(1)
+      .nullable()
+      .describe("For `recurring`, the periods the discount lasts; null otherwise."),
+    eligibility: zod
+      .enum(["confirmed", "unverified"])
+      .describe(
+        "`confirmed`: every condition of the discount holds for the billing account. `unverified`: a quote without an account, where conditions that depend on the account, such as a first purchase or a per-account limit, are checked only when a Checkout Session is completed.",
+      ),
   })
   .describe(
     "The discount selected for this calculation, not applied and not reserved. Amounts are on the quote and its lines.",

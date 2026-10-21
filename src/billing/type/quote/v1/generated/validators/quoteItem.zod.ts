@@ -10,7 +10,35 @@ import { Money } from "./money.zod.js";
 
 export const QuoteItem = zod
   .strictObject({
+    product_id: zod.string(),
+    plan_id: zod.uuid(),
     plan_name: zod.string(),
+    price_id: zod
+      .uuid()
+      .describe(
+        "The price the line is priced at, including one Billing selected. With quantity and dimensions it\nprices the same line in Billing's own quote, for example with a promotion code.",
+      ),
+    dimensions: zod
+      .record(zod.string(), zod.string())
+      .describe("The dimension values the line is priced at, such as region and instance type."),
+    type: zod.enum(["one_time", "recurring"]).describe("one_time or recurring."),
+    usage_type: zod.enum(["licensed", "metered"]).describe("licensed or metered."),
+    interval: zod
+      .enum(["none", "day", "month", "year"])
+      .describe("The billing period of a recurring licensed line; `none` otherwise."),
+    interval_count: zod
+      .int()
+      .min(1)
+      .nullable()
+      .describe("Periods per billing cycle of a recurring licensed line; null otherwise."),
+    setup_amount: zod
+      .union([Money, zod.null()])
+      .describe("The setup charge already included in amount; null when none applies."),
+    recurring_amount: zod
+      .union([Money, zod.null()])
+      .describe(
+        "Recurring licensed lines only; null otherwise. What each later period renews at, before discounts\nand tax, which differs from amount when the first period is priced differently.",
+      ),
     unit_amount: zod
       .union([Money, zod.null()])
       .describe(

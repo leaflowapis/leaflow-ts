@@ -19,6 +19,14 @@ import type {
   Cancellation,
   CancellationCreate,
   CancellationList,
+  CancellationPreviewRequest,
+  CancellationRefundPreview,
+  CheckoutSession,
+  CheckoutSessionConfirm,
+  CheckoutSessionCreate,
+  CheckoutSessionItemList,
+  CheckoutSessionList,
+  CheckoutSessionResult,
   Contact,
   ContactCreate,
   ContactList,
@@ -33,6 +41,7 @@ import type {
   Error,
   ErrorResponse,
   FeatureGrantList,
+  GetCheckoutSessionQuoteParams,
   GetPlanHeaders,
   GetPriceHeaders,
   GetProductHeaders,
@@ -45,6 +54,8 @@ import type {
   ListAllowancesParams,
   ListBillingAccountsParams,
   ListCancellationsParams,
+  ListCheckoutSessionItemsParams,
+  ListCheckoutSessionsParams,
   ListContactsParams,
   ListCreditGrantsParams,
   ListCreditNoteItemsParams,
@@ -86,6 +97,7 @@ import type {
   OrderCancel,
   OrderItemList,
   OrderList,
+  OrderRefundPreview,
   PayInvoiceRequest,
   PayTogetherRequest,
   PaymentMethod,
@@ -98,6 +110,7 @@ import type {
   Plan,
   PlanList,
   PreviewInvoicePaymentParams,
+  PreviewOrderRefundParams,
   Price,
   PriceList,
   Product,
@@ -110,7 +123,6 @@ import type {
   RateList,
   RefundList,
   RenewRequest,
-  RenewalOrderRequest,
   RenewalPriceList,
   SetProjectAssignmentRequest,
   SpendRowList,
@@ -124,6 +136,8 @@ import type {
   TopUpList,
   TransactionList,
   UsageChargeList,
+  UsageEstimate,
+  UsageEstimateRequest,
   Withdrawal,
   WithdrawalCreate,
   WithdrawalItemList,
@@ -1954,15 +1968,9 @@ export const getPayInvoiceUrl = (invoiceId: string) => {
 
 /**
  * Pays the invoice from eligible credit grants and balance as requested, and collects the remainder through the
- * selected gateway and method. Without a gateway, insufficient funds fail and no online payment starts.
- *
- * The draft invoice of a deferred order is priced on its first payment: promotion_code, or otherwise the best
- * applicable account discount, is applied, the total is compared with expected_amount, and the invoice is issued
- * before collection. An invalid or inapplicable code fails, and a total other than expected_amount fails with
- * `BILLING_AMOUNT_CHANGED`; neither changes anything. Once fixed, the terms stay fixed even if collection does
- * not complete, and a different promotion_code is refused with `BILLING_ORDER_CHECKOUT_CONFLICT`. A deferred
- * period-end change can be paid only once its first period is due to be invoiced; earlier attempts fail with
- * `BILLING_CHANGE_NOT_INVOICED`.
+ * selected gateway and method. Without a gateway, insufficient funds fail and no online payment starts. The
+ * invoice's amounts and discount were fixed when it was issued and are not changed by paying; promotion codes
+ * are applied when completing a Checkout Session.
  *
  * Returns a payment action when the customer must act; requires_action and processing are not paid. An
  * unresolved online payment with the same gateway, method and saved payment method is reused, and retries never
@@ -2064,8 +2072,6 @@ export const getPreviewInvoicePaymentUrl = (
  * straight afterwards takes exactly these amounts unless the account's funds change in between.
  * Nothing is charged, reserved or created.
  *
- * A draft order invoice is priced as paying it with the same promotion_code would price it.
- *
  * Refused with the same errors as paying, except that insufficient funds are not an error here:
  * they show as a `gateway_amount` above zero.
  * @summary Preview invoice payment
@@ -2112,15 +2118,13 @@ export const getPayTogetherUrl = () => {
 
 /**
  * Pays outstanding invoices, including those of the listed orders, from eligible credit grants and then balance,
- * without a payment gateway. The draft invoice of a deferred order takes the best applicable account discount
- * and is issued first, staying issued if payment fails; pay it alone to use a promotion code.
+ * without a payment gateway.
  *
  * All invoices are paid or none: insufficient funds fail with `BILLING_INSUFFICIENT_FUNDS`, and a total other
  * than expected_amount fails with `BILLING_AMOUNT_CHANGED`, charging nothing. Paid invoices are not charged
  * again. An earlier online payment for one of the invoices is canceled first; one the gateway is still
  * processing is refused with `BILLING_PAYMENT_PENDING` and `meta.transaction_id`. Also refused with
- * `BILLING_INVOICE_NOT_PAYABLE` for a void invoice; `BILLING_CHANGE_NOT_INVOICED` for a period-end change not
- * yet due; `BILLING_ORDER_FAILED`, `BILLING_ORDER_CANCELED` or `BILLING_ORDER_EXPIRED` for an order in that
+ * `BILLING_INVOICE_NOT_PAYABLE` for a void invoice; `BILLING_ORDER_FAILED`, `BILLING_ORDER_CANCELED` or `BILLING_ORDER_EXPIRED` for an order in that
  * state; and `BILLING_INVOICE_NOT_PAYABLE` with `meta.reason` `subscription_canceling`,
  * `subscription_reclaiming` or `subscription_ended` for a renewal invoice of a subscription being canceled,
  * being reclaimed or ended.
@@ -2265,7 +2269,7 @@ export const getListInvoicesUrl = (params?: ListInvoicesParams) => {
 };
 
 /**
- * Issued invoices of your billing accounts. Drafts are not listed; an order's draft invoice is reached through its order. Top-ups have no invoices.
+ * Issued invoices of your billing accounts. Top-ups have no invoices.
  * @summary List invoices
  */
 export const listInvoices = async (
@@ -2308,7 +2312,7 @@ export const getGetInvoiceUrl = (invoiceId: string) => {
 };
 
 /**
- * An invoice of your billing account, issued or an order's draft, with its amounts, tax lines and payment state. A missing invoice or another draft returns 404; an invoice of another user's account returns 403.
+ * An issued invoice of your billing account, with its amounts, tax lines and payment state. A missing or unissued invoice returns 404; an invoice of another user's account returns 403.
  * @summary Get invoice
  */
 export const getInvoice = async (
@@ -2365,7 +2369,7 @@ export const getListInvoiceItemsUrl = (invoiceId: string, params?: ListInvoiceIt
 };
 
 /**
- * Lines of an invoice of your billing account, issued or an order's draft, with their service periods and projects. A missing invoice or another draft returns 404; an invoice of another user's account returns 403.
+ * Lines of an issued invoice of your billing account, with their service periods and projects. A missing or unissued invoice returns 404; an invoice of another user's account returns 403.
  * @summary List invoice items
  */
 export const listInvoiceItems = async (
@@ -3071,13 +3075,17 @@ export const getGetQuoteUrl = () => {
 };
 
 /**
- * Calculates exactly one target for a billing account you own: proposed items, an existing order, renewals, a
- * cancellation or an order refund. Nothing is saved, reserved or redeemed.
+ * Calculates what a proposed purchase, or the renewal of your subscriptions, would invoice now, and what each
+ * purchased line renews at. Nothing is saved, reserved or redeemed.
  *
- * Existing orders use their recorded account and terms; renewals and cancellations use the account currently
- * paying for each subscription. Every target must belong to the requested account; a project token does not
- * authorize a quote. An existing order's total is the expected_amount for paying its invoice. Usage estimates
- * are not checkout amounts.
+ * With `billing_account_id`, the quote is for a billing account you own: its currency, account discounts,
+ * tax and funds apply, renewals use the account currently paying for each subscription, and an access token
+ * is required. Without it, proposed items are priced in `currency` for anyone, signed in or not: no account
+ * discount or funds apply, and `tax_status` is `requires_location_inputs`.
+ *
+ * A promotion code is evaluated without being applied. It is applied only when a Checkout Session is completed
+ * with it; conditions that depend on the account, such as a first purchase, are checked only with an account
+ * and otherwise reported as `unverified`. Future usage of metered prices is estimated with `estimate-usage`.
  * @summary Get a quote
  */
 export const getQuote = async (
@@ -3115,6 +3123,73 @@ export const getQuote = async (
 
   const data: getQuoteResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as getQuoteResponse;
+};
+
+export type estimateUsageResponse200 = {
+  data: UsageEstimate;
+  status: 200;
+};
+
+export type estimateUsageResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type estimateUsageResponseSuccess = estimateUsageResponse200 & {
+  headers: Headers;
+};
+export type estimateUsageResponseError = estimateUsageResponseDefault & {
+  headers: Headers;
+};
+
+export type estimateUsageResponse = estimateUsageResponseSuccess | estimateUsageResponseError;
+
+export const getEstimateUsageUrl = () => {
+  return `https://billing.leaflow.cloud/api/v1/usage-estimates`;
+};
+
+/**
+ * Estimates what future usage of metered prices would cost in `currency` at current rates, for anyone, signed in
+ * or not. Nothing is saved. Graduated and volume tiers apply to the estimated quantity alone, while actual charges
+ * follow each month's whole usage, and the amounts are before discounts and tax. Estimates are not collected at
+ * checkout. An item that cannot be priced fails the whole request.
+ * @summary Estimate usage
+ */
+export const estimateUsage = async (
+  usageEstimateRequest: UsageEstimateRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<estimateUsageResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getEstimateUsageUrl(), {
+    ...options,
+    method: "QUERY",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(usageEstimateRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: estimateUsageResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as estimateUsageResponse;
 };
 
 export type listCancellationsResponse200 = {
@@ -3275,6 +3350,72 @@ export const createCancellation = async (
 
   const data: createCancellationResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as createCancellationResponse;
+};
+
+export type previewCancellationResponse200 = {
+  data: CancellationRefundPreview;
+  status: 200;
+};
+
+export type previewCancellationResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type previewCancellationResponseSuccess = previewCancellationResponse200 & {
+  headers: Headers;
+};
+export type previewCancellationResponseError = previewCancellationResponseDefault & {
+  headers: Headers;
+};
+
+export type previewCancellationResponse =
+  | previewCancellationResponseSuccess
+  | previewCancellationResponseError;
+
+export const getPreviewCancellationUrl = () => {
+  return `https://billing.leaflow.cloud/api/v1/cancellations/preview`;
+};
+
+/**
+ * What creating the cancellation now would return, per subscription and in total. Nothing is canceled, ended or refunded. Refused as creating it would be, except that nothing is recorded.
+ * @summary Preview a cancellation
+ */
+export const previewCancellation = async (
+  cancellationPreviewRequest: CancellationPreviewRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<previewCancellationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getPreviewCancellationUrl(), {
+    ...options,
+    method: "QUERY",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(cancellationPreviewRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: previewCancellationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as previewCancellationResponse;
 };
 
 export type getCancellationResponse200 = {
@@ -3466,7 +3607,7 @@ export const getRenewSubscriptionUrl = (subscriptionId: string) => {
  *
  * Without `payment_method_id`, the renewal is paid from credit grants and balance as `use_credits` and
  * `use_balance` allow; when they cannot cover it, the request fails with `BILLING_INSUFFICIENT_FUNDS` and no
- * order is left. To pay another way, create a renewal order and pay its invoice.
+ * order is left. To apply a promotion code or pay later, create a renewal Checkout Session.
  *
  * Keep order_id and read the order after an unknown outcome; creating it again conflicts.
  * @summary Renew subscription
@@ -3507,88 +3648,6 @@ export const renewSubscription = async (
 
   const data: renewSubscriptionResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as renewSubscriptionResponse;
-};
-
-export type createRenewalOrderResponse200 = {
-  data: Order;
-  status: 200;
-};
-
-export type createRenewalOrderResponse409 = {
-  data: Error;
-  status: 409;
-};
-
-export type createRenewalOrderResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createRenewalOrderResponseSuccess = createRenewalOrderResponse200 & {
-  headers: Headers;
-};
-export type createRenewalOrderResponseError = (
-  | createRenewalOrderResponse409
-  | createRenewalOrderResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createRenewalOrderResponse =
-  | createRenewalOrderResponseSuccess
-  | createRenewalOrderResponseError;
-
-export const getCreateRenewalOrderUrl = (subscriptionId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/renewal-orders`;
-};
-
-/**
- * Places a renewal order with a draft invoice, without applying a new discount or charging anything. Pay its
- * invoice to renew; a promotion code can be applied when paying. Existing subscription discounts are kept.
- * Periods and price are chosen as for renewing. The order can be paid until the current paid period ends, and
- * never after the end of the first period it renews; unpaid by then, it is canceled. While auto-renew is on, the
- * renewal due at the end of the period pays this order instead of placing another, applying an applicable
- * account discount first if its terms are not fixed yet.
- *
- * Keep `order_id` and read the order after an unknown outcome; creating it again conflicts.
- * @summary Create renewal order
- */
-export const createRenewalOrder = async (
-  subscriptionId: string,
-  renewalOrderRequest: RenewalOrderRequest,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createRenewalOrderResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateRenewalOrderUrl(subscriptionId), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(renewalOrderRequest),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createRenewalOrderResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createRenewalOrderResponse;
 };
 
 export type setAutoRenewResponse200 = {
@@ -3711,6 +3770,453 @@ export const listAllowances = async (
   return { data, status: res.status, headers: res.headers } as listAllowancesResponse;
 };
 
+export type listCheckoutSessionsResponse200 = {
+  data: CheckoutSessionList;
+  status: 200;
+};
+
+export type listCheckoutSessionsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listCheckoutSessionsResponseSuccess = listCheckoutSessionsResponse200 & {
+  headers: Headers;
+};
+export type listCheckoutSessionsResponseError = listCheckoutSessionsResponseDefault & {
+  headers: Headers;
+};
+
+export type listCheckoutSessionsResponse =
+  | listCheckoutSessionsResponseSuccess
+  | listCheckoutSessionsResponseError;
+
+export const getListCheckoutSessionsUrl = (params?: ListCheckoutSessionsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/checkout-sessions?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/checkout-sessions`;
+};
+
+/**
+ * Checkout Sessions of your billing accounts, newest first. An open session is a purchase waiting for you to complete checkout.
+ * @summary List Checkout Sessions
+ */
+export const listCheckoutSessions = async (
+  params?: ListCheckoutSessionsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listCheckoutSessionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListCheckoutSessionsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCheckoutSessionsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listCheckoutSessionsResponse;
+};
+
+export type createCheckoutSessionResponse201 = {
+  data: CheckoutSession;
+  status: 201;
+};
+
+export type createCheckoutSessionResponse409 = {
+  data: Error;
+  status: 409;
+};
+
+export type createCheckoutSessionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 201 | 409>;
+};
+
+export type createCheckoutSessionResponseSuccess = createCheckoutSessionResponse201 & {
+  headers: Headers;
+};
+export type createCheckoutSessionResponseError = (
+  | createCheckoutSessionResponse409
+  | createCheckoutSessionResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type createCheckoutSessionResponse =
+  | createCheckoutSessionResponseSuccess
+  | createCheckoutSessionResponseError;
+
+export const getCreateCheckoutSessionUrl = () => {
+  return `https://billing.leaflow.cloud/api/v1/checkout-sessions`;
+};
+
+/**
+ * Opens a Checkout Session renewing one of your licensed subscriptions, with periods and price chosen as in
+ * renewing. Nothing is charged until you complete it, when a promotion code can be applied; it then renews from
+ * the subscription's current_term_end at that time. To renew at once from credit grants, balance or a payment
+ * method, renew the subscription instead. Purchases and changes of a service's resources are created through
+ * that service.
+ *
+ * Keep `checkout_session_id` and read the session after an unknown outcome; creating it again conflicts.
+ * @summary Create a renewal Checkout Session
+ */
+export const createCheckoutSession = async (
+  checkoutSessionCreate: CheckoutSessionCreate,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createCheckoutSessionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateCheckoutSessionUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(checkoutSessionCreate),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createCheckoutSessionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createCheckoutSessionResponse;
+};
+
+export type getCheckoutSessionResponse200 = {
+  data: CheckoutSession;
+  status: 200;
+};
+
+export type getCheckoutSessionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getCheckoutSessionResponseSuccess = getCheckoutSessionResponse200 & {
+  headers: Headers;
+};
+export type getCheckoutSessionResponseError = getCheckoutSessionResponseDefault & {
+  headers: Headers;
+};
+
+export type getCheckoutSessionResponse =
+  | getCheckoutSessionResponseSuccess
+  | getCheckoutSessionResponseError;
+
+export const getGetCheckoutSessionUrl = (checkoutSessionId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}`;
+};
+
+/**
+ * A Checkout Session of your billing account. Poll it to follow checkout; once it is complete, read its order for payment and delivery. An unknown session returns 404; another account's session returns 403.
+ * @summary Get a Checkout Session
+ */
+export const getCheckoutSession = async (
+  checkoutSessionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCheckoutSessionResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCheckoutSessionUrl(checkoutSessionId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCheckoutSessionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getCheckoutSessionResponse;
+};
+
+export type listCheckoutSessionItemsResponse200 = {
+  data: CheckoutSessionItemList;
+  status: 200;
+};
+
+export type listCheckoutSessionItemsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listCheckoutSessionItemsResponseSuccess = listCheckoutSessionItemsResponse200 & {
+  headers: Headers;
+};
+export type listCheckoutSessionItemsResponseError = listCheckoutSessionItemsResponseDefault & {
+  headers: Headers;
+};
+
+export type listCheckoutSessionItemsResponse =
+  | listCheckoutSessionItemsResponseSuccess
+  | listCheckoutSessionItemsResponseError;
+
+export const getListCheckoutSessionItemsUrl = (
+  checkoutSessionId: string,
+  params?: ListCheckoutSessionItemsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}/items?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}/items`;
+};
+
+/**
+ * What the session buys, by position. Prices and amounts are in its quote.
+ * @summary List Checkout Session items
+ */
+export const listCheckoutSessionItems = async (
+  checkoutSessionId: string,
+  params?: ListCheckoutSessionItemsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listCheckoutSessionItemsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListCheckoutSessionItemsUrl(checkoutSessionId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCheckoutSessionItemsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listCheckoutSessionItemsResponse;
+};
+
+export type getCheckoutSessionQuoteResponse200 = {
+  data: Quote;
+  status: 200;
+};
+
+export type getCheckoutSessionQuoteResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getCheckoutSessionQuoteResponseSuccess = getCheckoutSessionQuoteResponse200 & {
+  headers: Headers;
+};
+export type getCheckoutSessionQuoteResponseError = getCheckoutSessionQuoteResponseDefault & {
+  headers: Headers;
+};
+
+export type getCheckoutSessionQuoteResponse =
+  | getCheckoutSessionQuoteResponseSuccess
+  | getCheckoutSessionQuoteResponseError;
+
+export const getGetCheckoutSessionQuoteUrl = (
+  checkoutSessionId: string,
+  params?: GetCheckoutSessionQuoteParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}/quote?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}/quote`;
+};
+
+/**
+ * What completing this open session now would invoice, with `promotion_code` or otherwise the best applicable
+ * account discount, and the account funds available for it. Nothing is applied, reserved or redeemed. An invalid
+ * or inapplicable code fails the request without changing the session.
+ *
+ * Complete the session with the returned `total` as `expected_amount`, the same `promotion_code` and, for an
+ * immediate change, the returned `proration_date`. An expired session is refused with
+ * `BILLING_CHECKOUT_SESSION_EXPIRED`, and a complete one with `BILLING_CHECKOUT_SESSION_COMPLETE`; read its order
+ * instead.
+ * @summary Quote a Checkout Session
+ */
+export const getCheckoutSessionQuote = async (
+  checkoutSessionId: string,
+  params?: GetCheckoutSessionQuoteParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCheckoutSessionQuoteResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCheckoutSessionQuoteUrl(checkoutSessionId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCheckoutSessionQuoteResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getCheckoutSessionQuoteResponse;
+};
+
+export type confirmCheckoutSessionResponse200 = {
+  data: CheckoutSessionResult;
+  status: 200;
+};
+
+export type confirmCheckoutSessionResponse409 = {
+  data: Error;
+  status: 409;
+};
+
+export type confirmCheckoutSessionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 409>;
+};
+
+export type confirmCheckoutSessionResponseSuccess = confirmCheckoutSessionResponse200 & {
+  headers: Headers;
+};
+export type confirmCheckoutSessionResponseError = (
+  | confirmCheckoutSessionResponse409
+  | confirmCheckoutSessionResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type confirmCheckoutSessionResponse =
+  | confirmCheckoutSessionResponseSuccess
+  | confirmCheckoutSessionResponseError;
+
+export const getConfirmCheckoutSessionUrl = (checkoutSessionId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}/confirm`;
+};
+
+/**
+ * Completes an open session: applies `promotion_code`, or otherwise the best applicable account discount, checks
+ * the total against `expected_amount` and creates the order with its invoice issued. A zero-total invoice is paid
+ * at once; otherwise pay the invoice next. A failed payment leaves the order and its terms as they are, and the
+ * invoice can be paid again until the order expires. Nothing is created when the code is invalid or
+ * inapplicable or the total differs, which fails with `BILLING_AMOUNT_CHANGED`.
+ *
+ * Confirming a complete session again with the same terms returns it with its order; different terms are refused
+ * with `BILLING_CHECKOUT_SESSION_COMPLETE`. An expired session is refused with `BILLING_CHECKOUT_SESSION_EXPIRED`.
+ * The order is delivered by the service that owns it once paid; confirmation alone does not mean delivery.
+ * @summary Confirm a Checkout Session
+ */
+export const confirmCheckoutSession = async (
+  checkoutSessionId: string,
+  checkoutSessionConfirm: CheckoutSessionConfirm,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<confirmCheckoutSessionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getConfirmCheckoutSessionUrl(checkoutSessionId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(checkoutSessionConfirm),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: confirmCheckoutSessionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as confirmCheckoutSessionResponse;
+};
+
+export type expireCheckoutSessionResponse200 = {
+  data: CheckoutSession;
+  status: 200;
+};
+
+export type expireCheckoutSessionResponse409 = {
+  data: Error;
+  status: 409;
+};
+
+export type expireCheckoutSessionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 409>;
+};
+
+export type expireCheckoutSessionResponseSuccess = expireCheckoutSessionResponse200 & {
+  headers: Headers;
+};
+export type expireCheckoutSessionResponseError = (
+  | expireCheckoutSessionResponse409
+  | expireCheckoutSessionResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type expireCheckoutSessionResponse =
+  | expireCheckoutSessionResponseSuccess
+  | expireCheckoutSessionResponseError;
+
+export const getExpireCheckoutSessionUrl = (checkoutSessionId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}/expire`;
+};
+
+/**
+ * Ends an open session without an order; the service that created it releases what it was holding for the purchase. An expired session is returned unchanged.
+ * @summary Expire a Checkout Session
+ */
+export const expireCheckoutSession = async (
+  checkoutSessionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<expireCheckoutSessionResponse> => {
+  const res = await (fetchFn ?? fetch)(getExpireCheckoutSessionUrl(checkoutSessionId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: expireCheckoutSessionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as expireCheckoutSessionResponse;
+};
+
 export type listOrdersResponse200 = {
   data: OrderList;
   status: 200;
@@ -3809,6 +4315,64 @@ export const getOrder = async (
   return { data, status: res.status, headers: res.headers } as getOrderResponse;
 };
 
+export type previewOrderRefundResponse200 = {
+  data: OrderRefundPreview;
+  status: 200;
+};
+
+export type previewOrderRefundResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type previewOrderRefundResponseSuccess = previewOrderRefundResponse200 & {
+  headers: Headers;
+};
+export type previewOrderRefundResponseError = previewOrderRefundResponseDefault & {
+  headers: Headers;
+};
+
+export type previewOrderRefundResponse =
+  | previewOrderRefundResponseSuccess
+  | previewOrderRefundResponseError;
+
+export const getPreviewOrderRefundUrl = (orderId: string, params?: PreviewOrderRefundParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://billing.leaflow.cloud/api/v1/orders/${encodeURIComponent(String(orderId))}/refund-preview?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/orders/${encodeURIComponent(String(orderId))}/refund-preview`;
+};
+
+/**
+ * What canceling the listed items, or the whole order, would refund to the original payment sources. Nothing is canceled or refunded.
+ * @summary Preview an order refund
+ */
+export const previewOrderRefund = async (
+  orderId: string,
+  params?: PreviewOrderRefundParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<previewOrderRefundResponse> => {
+  const res = await (fetchFn ?? fetch)(getPreviewOrderRefundUrl(orderId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: previewOrderRefundResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as previewOrderRefundResponse;
+};
+
 export type cancelOrderResponse200 = {
   data: Order;
   status: 200;
@@ -3843,14 +4407,13 @@ export const getCancelOrderUrl = (orderId: string) => {
  * refunded; failed items keep their outcome. The order stays pending while any item is pending, and its final
  * status follows its items.
  *
- * Once the order's terms are fixed, the canceled items keep their agreed amounts and discounts: credit notes
- * reduce the issued invoice, and collected amounts return to their original payment sources, possibly
- * asynchronously. While a deferred order's terms are not fixed, the remaining items are priced again. An online
+ * The canceled items keep their agreed amounts and discounts: credit notes reduce the issued invoice, and
+ * collected amounts return to their original payment sources, possibly asynchronously. An online
  * payment waiting for the payer is canceled with the order; one the gateway is processing is refused with
  * `BILLING_PAYMENT_PENDING` and `meta.transaction_id`. Repeating the cancellation does not refund twice.
  *
  * An accepted order is canceled by its owning service, and delivered items through subscription cancellation.
- * Refunds are quoted with the quote operation's `refund` target.
+ * Refunds are previewed with `preview-order-refund`.
  * @summary Cancel order
  */
 export const cancelOrder = async (

@@ -7,6 +7,9 @@
  */
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
+import { PriceType } from "./priceType.zod.js";
+import { ProductID } from "./productID.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const quoteItemIndexMin = 0;
 
@@ -18,33 +21,48 @@ export const QuoteItem = zod
       .int()
       .min(quoteItemIndexMin)
       .describe(
-        "The zero-based request line index, or the recorded order item's position for an order quote.",
+        "The zero-based request line index, or the item's position for a Checkout Session quote.",
       ),
-    order_item_id: zod
-      .uuid()
-      .optional()
-      .describe("Present for an existing order quote; identifies the recorded item being priced."),
+    product_id: ProductID,
+    plan_id: zod.uuid(),
     price_id: zod
       .uuid()
       .describe("The selected price, also when the request identified it indirectly."),
     plan_name: zod.string(),
+    type: PriceType,
+    usage_type: UsageType,
+    interval: zod
+      .enum(["none", "day", "month", "year"])
+      .describe("The billing period of a recurring licensed line; `none` otherwise."),
+    interval_count: zod
+      .int()
+      .min(1)
+      .nullable()
+      .describe("Periods per billing cycle of a recurring licensed line; null otherwise."),
+    dimensions: zod
+      .record(zod.string(), zod.string())
+      .describe("The dimension values the line is priced at."),
+    setup_amount: zod
+      .union([Money, zod.null()])
+      .describe("The setup charge already included in `amount`; null when none applies."),
+    recurring_amount: zod
+      .union([Money, zod.null()])
+      .describe(
+        "Recurring licensed lines only; null otherwise. What each later period renews at, before discounts and tax, which differs from `amount` when the first period is priced differently. `discount` says whether its discount continues on renewals.",
+      ),
     unit_amount: zod
       .union([Money, zod.null()])
       .describe(
         "Unit price before discounts. Null when no single unit price applies, such as tiered or multiple-rate pricing.",
       ),
-    quantity: zod
-      .string()
-      .describe("The quantity priced; with duration_seconds, quantity times the duration."),
-    amount: Money.describe(
-      "Amount before discounts and including any setup charge. For requested future usage this is an estimate, not a collectible checkout amount.",
-    ),
+    quantity: zod.string().describe("The quantity priced."),
+    amount: Money.describe("Amount before discounts and including any setup charge."),
     discount_amount: Money,
     total: Money,
     currency: zod.string(),
   })
   .describe(
-    "One fully calculated purchase, estimated metered usage or recorded order item. Amounts use the\nbilling-account currency. An item with no immediate charge has zero checkout amounts.",
+    "One fully calculated purchase line. An item with no immediate charge, such as a metered purchase, has zero checkout amounts.",
   );
 
 export type QuoteItem = zod.input<typeof QuoteItem>;

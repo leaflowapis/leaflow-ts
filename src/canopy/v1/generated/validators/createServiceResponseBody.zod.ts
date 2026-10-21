@@ -39,15 +39,24 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { PlacedOrder } from "./placedOrder.zod.js";
 import { ServiceResource } from "./serviceResource.zod.js";
 
 export const CreateServiceResponseBody = zod
   .strictObject({
     service: ServiceResource,
-    order: PlacedOrder,
+    checkout_session_id: zod
+      .uuid()
+      .describe(
+        "The Billing Checkout Session of this enablement. With deferred checkout, the customer completes it in Billing.",
+      ),
+    order_id: zod
+      .uuid()
+      .nullable()
+      .describe(
+        "The order created when checkout completes, at once for automatic checkout; null until then.",
+      ),
   })
-  .describe("The service, `pending` until its order is accepted, and the order.");
+  .describe("The service, `pending` until its order is accepted, and its Checkout Session.");
 
 export type CreateServiceResponseBody = zod.input<typeof CreateServiceResponseBody>;
 export type CreateServiceResponseBodyOutput = zod.output<typeof CreateServiceResponseBody>;

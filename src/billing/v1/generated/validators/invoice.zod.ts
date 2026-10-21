@@ -45,7 +45,7 @@ export const Invoice = zod.strictObject({
     "Issued credit notes against payments already received; their refunds may not have completed.",
   ),
   amount_due: Money.describe(
-    "What is still collectible from total plus rounding_amount after unpaid credit notes and successful payments; never below zero. Zero for a draft, whose total is the base price, and for a paid or void invoice.",
+    "What is still collectible from total plus rounding_amount after unpaid credit notes and successful payments; never below zero. Zero for a paid or void invoice.",
   ),
   period_start: zod.iso.datetime({ offset: true }).nullish(),
   period_end: zod.iso.datetime({ offset: true }).nullish().describe("Exclusive."),

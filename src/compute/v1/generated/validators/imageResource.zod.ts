@@ -10,11 +10,11 @@
  *
  * ## Conventions
  *
- * - **Purchases.** A purchase that creates resources returns them together with a PlacedOrder. They are readable at once and start as `pending`: the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the order in Billing for checkout and payment progress.
+ * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the Checkout Session and the order in Billing for checkout and payment progress.
  * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the licensed and metered options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
- * - **Checkout.** Omit `checkout` for automatic checkout, which pays from eligible credit grants and balance when the order is placed; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` and nothing is created until checkout is confirmed and paid through Billing. An order whose total is zero, such as a metered purchase with nothing due now, completes checkout at placement in either mode and proceeds to provisioning.
- * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its order is placed until it is applied or its order is canceled, including while it awaits checkout. Renaming and replacing labels or notes are not operations and are accepted at any time.
- * - **Billing relationships.** A purchased resource records its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
+ * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid.
+ * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time.
+ * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
  * - **Availability zones.** A disk and an instance must reside in the same availability zone to be attached. Instance types and disk types are each bound to one availability zone, so choosing a type determines the zone.
  * - **IPv6 is not sold separately.** Once enabled on a private network, IPv6 addresses are assigned to the instances in that network automatically; they can be neither requested nor released individually.
  * - **Floating IPs have a cooldown period.** A released address is neither available for re-allocation nor handed to another user for some time, so that DNS records and allow-lists still pointing at it do not break immediately.
@@ -90,6 +90,12 @@ export const ImageResource = zod
     created_at: zod.iso.datetime({ offset: true }),
     order_id: zod.uuid().nullable(),
     order_item_id: zod.uuid().nullable().describe("The Billing order item for this resource."),
+    checkout_session_id: zod
+      .uuid()
+      .nullable()
+      .describe(
+        "The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.",
+      ),
     subscription_id: zod
       .uuid()
       .nullable()
@@ -117,6 +123,7 @@ export const ImageResource = zod
       .nullable(),
     failure_reason: zod
       .union([
+        zod.literal("checkout_expired"),
         zod.literal("order_declined"),
         zod.literal("order_canceled"),
         zod.literal("order_expired"),
@@ -125,7 +132,7 @@ export const ImageResource = zod
       ])
       .nullable()
       .describe(
-        "Why creation failed; null unless `status` is `failed`. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.",
+        "Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.",
       ),
     operation: zod
       .union([ImageOperation, zod.null()])

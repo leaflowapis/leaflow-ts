@@ -18,7 +18,6 @@ export const quoteItemInputPlanLookupKeyMax = 128;
 export const quoteItemInputQuantityRegExp = new RegExp(
   "^(?:(?:[1-9][0-9]{0,27}|0(?:[1-9][0-9]{0,26}|0(?:[1-9][0-9]{0,25}|0(?:[1-9][0-9]{0,24}|0(?:[1-9][0-9]{0,23}|0(?:[1-9][0-9]{0,22}|0(?:[1-9][0-9]{0,21}|0(?:[1-9][0-9]{0,20}|0(?:[1-9][0-9]{0,19}|0(?:[1-9][0-9]{0,18}|0(?:[1-9][0-9]{0,17}|0(?:[1-9][0-9]{0,16}|0(?:[1-9][0-9]{0,15}|0(?:[1-9][0-9]{0,14}|0(?:[1-9][0-9]{0,13}|0(?:[1-9][0-9]{0,12}|0(?:[1-9][0-9]{0,11}|0(?:[1-9][0-9]{0,10}|0(?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9])))))))))))))))))))))))))))([.][0-9]{1,10})?|0{1,28}[.](?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))$",
 );
-export const quoteItemInputMeterLookupKeyMax = 128;
 
 export const QuoteItemInput = zod
   .strictObject({
@@ -39,23 +38,15 @@ export const QuoteItemInput = zod
       "Selects among licensed prices with otherwise identical billing terms. Ambiguous terms are refused instead of choosing a price arbitrarily.",
     ),
     quantity: zod.string().regex(quoteItemInputQuantityRegExp),
-    meter_id: zod.uuid().optional(),
-    meter_lookup_key: zod.string().min(1).max(quoteItemInputMeterLookupKeyMax).optional(),
     dimensions: zod
       .record(zod.string(), zod.string())
       .optional()
       .describe(
-        "The dimension values the rate depends on, such as region, instance type or token kind: those of the usage for a metered estimate, and those of what is bought for a licensed price on a rate card. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero.",
-      ),
-    duration_seconds: zod
-      .int()
-      .optional()
-      .describe(
-        "For a metered estimate, how long to price for, in seconds; the priced quantity is `quantity` times this duration.",
+        "The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero.",
       ),
   })
   .describe(
-    "Identify a price, or select one for a plan; give each resource's ID or lookup key, never both, and product_id with lookup keys. For a metered price, a meter or duration_seconds requests a usage estimate, which cannot be combined with a promotion code and is not a checkout amount. Without one, a metered item includes only any setup charge.",
+    "Identify a price, or select one for a plan; give each resource's ID or lookup key, never both, and product_id with lookup keys. A metered item includes only any setup charge; its usage is estimated with `estimate-usage`.",
   );
 
 export type QuoteItemInput = zod.input<typeof QuoteItemInput>;

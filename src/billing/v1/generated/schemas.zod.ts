@@ -17,6 +17,10 @@ import { CancelSubscriptionRequest } from "./validators/cancelSubscriptionReques
 
 import { CancellationCreate } from "./validators/cancellationCreate.zod.js";
 
+import { CheckoutSessionConfirm } from "./validators/checkoutSessionConfirm.zod.js";
+
+import { CheckoutSessionCreate } from "./validators/checkoutSessionCreate.zod.js";
+
 import { ContactCreate } from "./validators/contactCreate.zod.js";
 
 import { ContactUpdate } from "./validators/contactUpdate.zod.js";
@@ -30,8 +34,6 @@ import { PayTogetherRequest } from "./validators/payTogetherRequest.zod.js";
 import { PaymentMethodSetup } from "./validators/paymentMethodSetup.zod.js";
 
 import { RenewRequest } from "./validators/renewRequest.zod.js";
-
-import { RenewalOrderRequest } from "./validators/renewalOrderRequest.zod.js";
 
 import { SetProjectAssignmentRequest } from "./validators/setProjectAssignmentRequest.zod.js";
 
@@ -487,15 +489,9 @@ export const DeletePaymentMethodParams = zod.strictObject({
 
 /**
  * Pays the invoice from eligible credit grants and balance as requested, and collects the remainder through the
- * selected gateway and method. Without a gateway, insufficient funds fail and no online payment starts.
- *
- * The draft invoice of a deferred order is priced on its first payment: promotion_code, or otherwise the best
- * applicable account discount, is applied, the total is compared with expected_amount, and the invoice is issued
- * before collection. An invalid or inapplicable code fails, and a total other than expected_amount fails with
- * `BILLING_AMOUNT_CHANGED`; neither changes anything. Once fixed, the terms stay fixed even if collection does
- * not complete, and a different promotion_code is refused with `BILLING_ORDER_CHECKOUT_CONFLICT`. A deferred
- * period-end change can be paid only once its first period is due to be invoiced; earlier attempts fail with
- * `BILLING_CHANGE_NOT_INVOICED`.
+ * selected gateway and method. Without a gateway, insufficient funds fail and no online payment starts. The
+ * invoice's amounts and discount were fixed when it was issued and are not changed by paying; promotion codes
+ * are applied when completing a Checkout Session.
  *
  * Returns a payment action when the customer must act; requires_action and processing are not paid. An
  * unresolved online payment with the same gateway, method and saved payment method is reused, and retries never
@@ -525,8 +521,6 @@ export const PayInvoiceBody = PayInvoiceRequest;
  * straight afterwards takes exactly these amounts unless the account's funds change in between.
  * Nothing is charged, reserved or created.
  *
- * A draft order invoice is priced as paying it with the same promotion_code would price it.
- *
  * Refused with the same errors as paying, except that insufficient funds are not an error here:
  * they show as a `gateway_amount` above zero.
  * @summary Preview invoice payment
@@ -535,18 +529,10 @@ export const PreviewInvoicePaymentParams = zod.strictObject({
   invoiceId: zod.uuid(),
 });
 
-export const previewInvoicePaymentQueryPromotionCodeMax = 64;
-
 export const previewInvoicePaymentQueryUseBalanceDefault = true;
 export const previewInvoicePaymentQueryUseCreditsDefault = true;
 
 export const PreviewInvoicePaymentQueryParams = zod.strictObject({
-  promotion_code: zod
-    .string()
-    .min(1)
-    .max(previewInvoicePaymentQueryPromotionCodeMax)
-    .optional()
-    .describe("As in paying; used only while the order's terms are not fixed."),
   use_balance: zod
     .boolean()
     .default(previewInvoicePaymentQueryUseBalanceDefault)
@@ -559,15 +545,13 @@ export const PreviewInvoicePaymentQueryParams = zod.strictObject({
 
 /**
  * Pays outstanding invoices, including those of the listed orders, from eligible credit grants and then balance,
- * without a payment gateway. The draft invoice of a deferred order takes the best applicable account discount
- * and is issued first, staying issued if payment fails; pay it alone to use a promotion code.
+ * without a payment gateway.
  *
  * All invoices are paid or none: insufficient funds fail with `BILLING_INSUFFICIENT_FUNDS`, and a total other
  * than expected_amount fails with `BILLING_AMOUNT_CHANGED`, charging nothing. Paid invoices are not charged
  * again. An earlier online payment for one of the invoices is canceled first; one the gateway is still
  * processing is refused with `BILLING_PAYMENT_PENDING` and `meta.transaction_id`. Also refused with
- * `BILLING_INVOICE_NOT_PAYABLE` for a void invoice; `BILLING_CHANGE_NOT_INVOICED` for a period-end change not
- * yet due; `BILLING_ORDER_FAILED`, `BILLING_ORDER_CANCELED` or `BILLING_ORDER_EXPIRED` for an order in that
+ * `BILLING_INVOICE_NOT_PAYABLE` for a void invoice; `BILLING_ORDER_FAILED`, `BILLING_ORDER_CANCELED` or `BILLING_ORDER_EXPIRED` for an order in that
  * state; and `BILLING_INVOICE_NOT_PAYABLE` with `meta.reason` `subscription_canceling`,
  * `subscription_reclaiming` or `subscription_ended` for a renewal invoice of a subscription being canceled,
  * being reclaimed or ended.
@@ -576,7 +560,7 @@ export const PreviewInvoicePaymentQueryParams = zod.strictObject({
 export const PayTogetherBody = PayTogetherRequest;
 
 /**
- * Issued invoices of your billing accounts. Drafts are not listed; an order's draft invoice is reached through its order. Top-ups have no invoices.
+ * Issued invoices of your billing accounts. Top-ups have no invoices.
  * @summary List invoices
  */
 export const listInvoicesQueryPageDefault = 1;
@@ -603,10 +587,10 @@ export const ListInvoicesQueryParams = zod.strictObject({
     .optional()
     .describe("Only this account of yours; all when omitted."),
   status: zod
-    .enum(["draft", "open", "paid", "void"])
+    .enum(["open", "paid", "void"])
     .optional()
     .describe(
-      "`draft`: not yet issued; an order's draft invoice shows base prices until it is paid, when the discount is applied and it is issued. Other drafts are visible only to operators. `open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage not yet invoiced is not on any invoice.",
+      "`open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage not yet invoiced is not on any invoice.",
     ),
   subscription_id: zod
     .uuid()
@@ -619,7 +603,7 @@ export const ListInvoicesQueryParams = zod.strictObject({
 });
 
 /**
- * An invoice of your billing account, issued or an order's draft, with its amounts, tax lines and payment state. A missing invoice or another draft returns 404; an invoice of another user's account returns 403.
+ * An issued invoice of your billing account, with its amounts, tax lines and payment state. A missing or unissued invoice returns 404; an invoice of another user's account returns 403.
  * @summary Get invoice
  */
 export const GetInvoiceParams = zod.strictObject({
@@ -627,7 +611,7 @@ export const GetInvoiceParams = zod.strictObject({
 });
 
 /**
- * Lines of an invoice of your billing account, issued or an order's draft, with their service periods and projects. A missing invoice or another draft returns 404; an invoice of another user's account returns 403.
+ * Lines of an issued invoice of your billing account, with their service periods and projects. A missing or unissued invoice returns 404; an invoice of another user's account returns 403.
  * @summary List invoice items
  */
 export const ListInvoiceItemsParams = zod.strictObject({
@@ -1114,7 +1098,7 @@ export const ListRenewalPricesQueryParams = zod.strictObject({
  *
  * Without `payment_method_id`, the renewal is paid from credit grants and balance as `use_credits` and
  * `use_balance` allow; when they cannot cover it, the request fails with `BILLING_INSUFFICIENT_FUNDS` and no
- * order is left. To pay another way, create a renewal order and pay its invoice.
+ * order is left. To apply a promotion code or pay later, create a renewal Checkout Session.
  *
  * Keep order_id and read the order after an unknown outcome; creating it again conflicts.
  * @summary Renew subscription
@@ -1124,23 +1108,6 @@ export const RenewSubscriptionParams = zod.strictObject({
 });
 
 export const RenewSubscriptionBody = RenewRequest;
-
-/**
- * Places a renewal order with a draft invoice, without applying a new discount or charging anything. Pay its
- * invoice to renew; a promotion code can be applied when paying. Existing subscription discounts are kept.
- * Periods and price are chosen as for renewing. The order can be paid until the current paid period ends, and
- * never after the end of the first period it renews; unpaid by then, it is canceled. While auto-renew is on, the
- * renewal due at the end of the period pays this order instead of placing another, applying an applicable
- * account discount first if its terms are not fixed yet.
- *
- * Keep `order_id` and read the order after an unknown outcome; creating it again conflicts.
- * @summary Create renewal order
- */
-export const CreateRenewalOrderParams = zod.strictObject({
-  subscriptionId: zod.uuid(),
-});
-
-export const CreateRenewalOrderBody = RenewalOrderRequest;
 
 /**
  * Turns automatic renewal of an active or suspended licensed subscription on or off. Turning it off does not shorten current_term_end and still allows manual renewal. Refused with 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_INACTIVE` for a pending or provisioning subscription, 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_FIXED` for a metered subscription, which continues until it is canceled, and 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` with `meta.cancellation_id` while a cancellation is open: creating it turned renewal off, and withdrawing it does not turn renewal back on.
@@ -1204,6 +1171,147 @@ export const ListAllowancesQueryParams = zod.strictObject({
 });
 
 /**
+ * Checkout Sessions of your billing accounts, newest first. An open session is a purchase waiting for you to complete checkout.
+ * @summary List Checkout Sessions
+ */
+export const listCheckoutSessionsQueryPageDefault = 1;
+export const listCheckoutSessionsQueryPageMax = 2147483647;
+
+export const listCheckoutSessionsQueryPageSizeDefault = 50;
+export const listCheckoutSessionsQueryPageSizeMax = 200;
+
+export const listCheckoutSessionsQueryProjectIdsMax = 100;
+
+export const ListCheckoutSessionsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listCheckoutSessionsQueryPageMax)
+    .default(listCheckoutSessionsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listCheckoutSessionsQueryPageSizeMax)
+    .default(listCheckoutSessionsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+  billing_account_id: zod
+    .int()
+    .optional()
+    .describe("Only this account of yours; all when omitted."),
+  status: zod
+    .enum(["open", "complete", "expired"])
+    .optional()
+    .describe(
+      "`open`: waiting for you to complete checkout; nothing is ordered, invoiced or reserved. `complete`: the order and its issued invoice exist; read the order for payment and delivery. `expired`: ended without an order.",
+    ),
+  project_ids: zod
+    .array(zod.uuid())
+    .min(1)
+    .max(listCheckoutSessionsQueryProjectIdsMax)
+    .optional()
+    .describe(
+      "Only records of these projects. Omit for all projects and account-level records. It does not grant access to other billing accounts.",
+    ),
+});
+
+/**
+ * Opens a Checkout Session renewing one of your licensed subscriptions, with periods and price chosen as in
+ * renewing. Nothing is charged until you complete it, when a promotion code can be applied; it then renews from
+ * the subscription's current_term_end at that time. To renew at once from credit grants, balance or a payment
+ * method, renew the subscription instead. Purchases and changes of a service's resources are created through
+ * that service.
+ *
+ * Keep `checkout_session_id` and read the session after an unknown outcome; creating it again conflicts.
+ * @summary Create a renewal Checkout Session
+ */
+export const CreateCheckoutSessionBody = CheckoutSessionCreate;
+
+/**
+ * A Checkout Session of your billing account. Poll it to follow checkout; once it is complete, read its order for payment and delivery. An unknown session returns 404; another account's session returns 403.
+ * @summary Get a Checkout Session
+ */
+export const GetCheckoutSessionParams = zod.strictObject({
+  checkoutSessionId: zod.uuid(),
+});
+
+/**
+ * What the session buys, by position. Prices and amounts are in its quote.
+ * @summary List Checkout Session items
+ */
+export const ListCheckoutSessionItemsParams = zod.strictObject({
+  checkoutSessionId: zod.uuid(),
+});
+
+export const listCheckoutSessionItemsQueryPageDefault = 1;
+export const listCheckoutSessionItemsQueryPageMax = 2147483647;
+
+export const listCheckoutSessionItemsQueryPageSizeDefault = 50;
+export const listCheckoutSessionItemsQueryPageSizeMax = 200;
+
+export const ListCheckoutSessionItemsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listCheckoutSessionItemsQueryPageMax)
+    .default(listCheckoutSessionItemsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listCheckoutSessionItemsQueryPageSizeMax)
+    .default(listCheckoutSessionItemsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
+
+/**
+ * What completing this open session now would invoice, with `promotion_code` or otherwise the best applicable
+ * account discount, and the account funds available for it. Nothing is applied, reserved or redeemed. An invalid
+ * or inapplicable code fails the request without changing the session.
+ *
+ * Complete the session with the returned `total` as `expected_amount`, the same `promotion_code` and, for an
+ * immediate change, the returned `proration_date`. An expired session is refused with
+ * `BILLING_CHECKOUT_SESSION_EXPIRED`, and a complete one with `BILLING_CHECKOUT_SESSION_COMPLETE`; read its order
+ * instead.
+ * @summary Quote a Checkout Session
+ */
+export const GetCheckoutSessionQuoteParams = zod.strictObject({
+  checkoutSessionId: zod.uuid(),
+});
+
+export const getCheckoutSessionQuoteQueryPromotionCodeMax = 64;
+
+export const GetCheckoutSessionQuoteQueryParams = zod.strictObject({
+  promotion_code: zod.string().min(1).max(getCheckoutSessionQuoteQueryPromotionCodeMax).optional(),
+});
+
+/**
+ * Completes an open session: applies `promotion_code`, or otherwise the best applicable account discount, checks
+ * the total against `expected_amount` and creates the order with its invoice issued. A zero-total invoice is paid
+ * at once; otherwise pay the invoice next. A failed payment leaves the order and its terms as they are, and the
+ * invoice can be paid again until the order expires. Nothing is created when the code is invalid or
+ * inapplicable or the total differs, which fails with `BILLING_AMOUNT_CHANGED`.
+ *
+ * Confirming a complete session again with the same terms returns it with its order; different terms are refused
+ * with `BILLING_CHECKOUT_SESSION_COMPLETE`. An expired session is refused with `BILLING_CHECKOUT_SESSION_EXPIRED`.
+ * The order is delivered by the service that owns it once paid; confirmation alone does not mean delivery.
+ * @summary Confirm a Checkout Session
+ */
+export const ConfirmCheckoutSessionParams = zod.strictObject({
+  checkoutSessionId: zod.uuid(),
+});
+
+export const ConfirmCheckoutSessionBody = CheckoutSessionConfirm;
+
+/**
+ * Ends an open session without an order; the service that created it releases what it was holding for the purchase. An expired session is returned unchanged.
+ * @summary Expire a Checkout Session
+ */
+export const ExpireCheckoutSessionParams = zod.strictObject({
+  checkoutSessionId: zod.uuid(),
+});
+
+/**
  * Orders with their status and invoice amounts. A pending order is not yet accepted and can expire at expires_at; its invoice shows whether payment is needed. Accepted does not mean delivered.
  * @summary List orders
  */
@@ -1259,19 +1367,37 @@ export const GetOrderParams = zod.strictObject({
 });
 
 /**
+ * What canceling the listed items, or the whole order, would refund to the original payment sources. Nothing is canceled or refunded.
+ * @summary Preview an order refund
+ */
+export const PreviewOrderRefundParams = zod.strictObject({
+  orderId: zod.uuid(),
+});
+
+export const previewOrderRefundQueryOrderItemIdsMax = 100;
+
+export const PreviewOrderRefundQueryParams = zod.strictObject({
+  order_item_ids: zod
+    .array(zod.uuid())
+    .min(1)
+    .max(previewOrderRefundQueryOrderItemIdsMax)
+    .optional()
+    .describe("Only these items of the order. Omit for the whole order."),
+});
+
+/**
  * Cancels the selected undelivered items of an order that has not been accepted, without recording a delivery
  * failure. Omit order_item_ids to select every pending item. Delivered items stay delivered and are not
  * refunded; failed items keep their outcome. The order stays pending while any item is pending, and its final
  * status follows its items.
  *
- * Once the order's terms are fixed, the canceled items keep their agreed amounts and discounts: credit notes
- * reduce the issued invoice, and collected amounts return to their original payment sources, possibly
- * asynchronously. While a deferred order's terms are not fixed, the remaining items are priced again. An online
+ * The canceled items keep their agreed amounts and discounts: credit notes reduce the issued invoice, and
+ * collected amounts return to their original payment sources, possibly asynchronously. An online
  * payment waiting for the payer is canceled with the order; one the gateway is processing is refused with
  * `BILLING_PAYMENT_PENDING` and `meta.transaction_id`. Repeating the cancellation does not refund twice.
  *
  * An accepted order is canceled by its owning service, and delivered items through subscription cancellation.
- * Refunds are quoted with the quote operation's `refund` target.
+ * Refunds are previewed with `preview-order-refund`.
  * @summary Cancel order
  */
 export const CancelOrderParams = zod.strictObject({

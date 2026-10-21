@@ -44,6 +44,7 @@ import { Money } from "./money.zod.js";
 
 export const checkoutOptionsModeDefault = `automatic`;
 export const checkoutOptionsExpectedAmountTwoRegExp = new RegExp("^[0-9]{1,15}([.][0-9]{1,10})?$");
+export const checkoutOptionsReturnUrlMax = 2048;
 
 export const CheckoutOptions = zod
   .strictObject({
@@ -51,11 +52,18 @@ export const CheckoutOptions = zod
     expected_amount: Money.and(zod.string().regex(checkoutOptionsExpectedAmountTwoRegExp))
       .optional()
       .describe(
-        "Expected invoice total after discounts and tax, before applying credit grants or balance.\nA different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.\nAccepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred\ncheckout, give the expected amount when paying the invoice through Billing.",
+        "Expected invoice total after discounts and tax, before applying credit grants or balance.\nA different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.\nAccepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred\ncheckout, give the expected amount when completing it through Billing.",
+      ),
+    return_url: zod
+      .url()
+      .max(checkoutOptionsReturnUrlMax)
+      .optional()
+      .describe(
+        "Where the client goes after the customer finishes a deferred checkout. Any absolute URI with a\nscheme, including mobile and desktop application schemes. Billing stores it without checking the\ntarget; each client validates its own.",
       ),
   })
   .describe(
-    "Shared checkout choices for a product purchase. Omitting this object or mode selects\nautomatic checkout. Each purchase creates its own order. Promotion codes are supplied only to\nBilling quote and payment operations. A service may retain a failed creation record when Billing\nrefuses a purchase; no infrastructure is created for that refusal.",
+    "Shared checkout choices for a product purchase. The service may set them or forward its client's\nchoices unchanged; it does not need to read them, and Billing validates them. Omitting this object or\nmode selects automatic checkout. Each purchase creates its own Checkout Session. Promotion codes are supplied\nonly to Billing. A service may retain a failed creation record when Billing refuses a purchase; no\ninfrastructure is created for that refusal.",
   );
 
 export type CheckoutOptions = zod.input<typeof CheckoutOptions>;

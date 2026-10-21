@@ -10,7 +10,7 @@ import * as zod from "zod";
 export const CheckoutMode = zod
   .enum(["automatic", "deferred"])
   .describe(
-    "automatic applies the best applicable account discount, issues the invoice and pays it from eligible\ncredit grants and available balance at placement. Insufficient funds fail the purchase with HTTP 422\nBILLING_INSUFFICIENT_FUNDS; no Billing order, charge or discount redemption is committed.\ndeferred places the order with a draft invoice at base prices and collects nothing. Paying that\ninvoice through Billing applies a promotion code or the best applicable account discount, issues the\ninvoice and collects it; an order still unpaid at its deadline expires. A zero-total invoice is issued\nand paid at placement in either mode.",
+    "automatic completes checkout with the purchase: the best applicable account discount is applied, and the\norder is created with its invoice issued and paid from eligible credit grants and available balance.\nInsufficient funds fail the purchase with HTTP 422 BILLING_INSUFFICIENT_FUNDS; no Billing order, charge or\ndiscount redemption is committed.\ndeferred creates an open Billing Checkout Session and charges nothing, even for a zero total. The customer\ncompletes it through Billing, where a promotion code can be applied, and then pays the issued invoice; a\nsession not completed by its deadline expires.",
   );
 
 export type CheckoutMode = zod.input<typeof CheckoutMode>;

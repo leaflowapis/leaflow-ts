@@ -6,13 +6,13 @@
  * OpenAPI spec version: v1
  */
 /**
- * automatic applies the best applicable account discount, issues the invoice and pays it from eligible
- * credit grants and available balance at placement. Insufficient funds fail the purchase with HTTP 422
- * BILLING_INSUFFICIENT_FUNDS; no Billing order, charge or discount redemption is committed.
- * deferred places the order with a draft invoice at base prices and collects nothing. Paying that
- * invoice through Billing applies a promotion code or the best applicable account discount, issues the
- * invoice and collects it; an order still unpaid at its deadline expires. A zero-total invoice is issued
- * and paid at placement in either mode.
+ * automatic completes checkout with the purchase: the best applicable account discount is applied, and the
+ * order is created with its invoice issued and paid from eligible credit grants and available balance.
+ * Insufficient funds fail the purchase with HTTP 422 BILLING_INSUFFICIENT_FUNDS; no Billing order, charge or
+ * discount redemption is committed.
+ * deferred creates an open Billing Checkout Session and charges nothing, even for a zero total. The customer
+ * completes it through Billing, where a promotion code can be applied, and then pays the issued invoice; a
+ * session not completed by its deadline expires.
  */
 export type CheckoutMode = (typeof CheckoutMode)[keyof typeof CheckoutMode];
 
@@ -35,10 +35,11 @@ export const CheckoutMode = {
 export type Money = string;
 
 /**
- * Shared checkout choices for a product purchase. Omitting this object or mode selects
- * automatic checkout. Each purchase creates its own order. Promotion codes are supplied only to
- * Billing quote and payment operations. A service may retain a failed creation record when Billing
- * refuses a purchase; no infrastructure is created for that refusal.
+ * Shared checkout choices for a product purchase. The service may set them or forward its client's
+ * choices unchanged; it does not need to read them, and Billing validates them. Omitting this object or
+ * mode selects automatic checkout. Each purchase creates its own Checkout Session. Promotion codes are supplied
+ * only to Billing. A service may retain a failed creation record when Billing refuses a purchase; no
+ * infrastructure is created for that refusal.
  */
 export interface CheckoutOptions {
   mode?: CheckoutMode;
@@ -46,7 +47,14 @@ export interface CheckoutOptions {
    * Expected invoice total after discounts and tax, before applying credit grants or balance.
    * A different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.
    * Accepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred
-   * checkout, give the expected amount when paying the invoice through Billing.
+   * checkout, give the expected amount when completing it through Billing.
    */
   expected_amount?: Money & string;
+  /**
+   * Where the client goes after the customer finishes a deferred checkout. Any absolute URI with a
+   * scheme, including mobile and desktop application schemes. Billing stores it without checking the
+   * target; each client validates its own.
+   * @maxLength 2048
+   */
+  return_url?: string;
 }

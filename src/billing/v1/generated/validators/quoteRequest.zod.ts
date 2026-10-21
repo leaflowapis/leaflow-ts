@@ -6,10 +6,11 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { OrderRefundQuoteInput } from "./orderRefundQuoteInput.zod.js";
-import { QuoteCancellation } from "./quoteCancellation.zod.js";
 import { QuoteItemInput } from "./quoteItemInput.zod.js";
 import { QuoteRenewal } from "./quoteRenewal.zod.js";
+
+export const quoteRequestCurrencyMin = 3;
+export const quoteRequestCurrencyMax = 3;
 
 export const quoteRequestItemsMax = 100;
 
@@ -22,37 +23,34 @@ export const QuoteRequest = zod
     billing_account_id: zod
       .int()
       .min(1)
+      .optional()
       .describe(
-        "The billing account to price for; it must be yours. Existing orders must have been placed with it, and renewals and cancellations must currently be paid by it.",
+        "The billing account to price for; it must be yours, and an access token is required. Renewals must currently be paid by it.",
       ),
+    currency: zod
+      .string()
+      .min(quoteRequestCurrencyMin)
+      .max(quoteRequestCurrencyMax)
+      .optional()
+      .describe("The ISO 4217 currency to price in without an account."),
     items: zod
       .array(QuoteItemInput)
       .min(1)
       .max(quoteRequestItemsMax)
       .optional()
-      .describe(
-        "A proposed purchase priced in the account's currency. Metered items may include usage estimates, which are not checkout amounts.",
-      ),
-    order_id: zod
-      .uuid()
-      .optional()
-      .describe(
-        "Preview paying this order. Its recorded terms supply every line, and an order whose terms are fixed returns its recorded amounts. The order does not change.",
-      ),
+      .describe("A proposed purchase."),
     renewals: zod
       .array(QuoteRenewal)
       .min(1)
       .max(quoteRequestRenewalsMax)
       .optional()
       .describe(
-        "Preview renewing these subscriptions, each at most once; each entry is a separate renewal order. To preview a promotion code, create a renewal order and quote it by order_id.",
+        "Preview renewing these subscriptions, each at most once; each entry is a separate renewal order. To apply a promotion code, create a renewal Checkout Session and quote it.",
       ),
-    cancellation: QuoteCancellation.optional(),
     promotion_code: zod.string().min(1).max(quoteRequestPromotionCodeMax).optional(),
-    refund: OrderRefundQuoteInput.optional(),
   })
   .describe(
-    "Quote exactly one target for the billing account: proposed items, an existing order, renewals, a cancellation or an order refund. Promotion codes apply only to proposed items or an existing order. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.",
+    "Quote proposed items or renewals, not both. Give exactly one of `billing_account_id` and `currency`; renewals need the account. Promotion codes apply only to proposed items. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.",
   );
 
 export type QuoteRequest = zod.input<typeof QuoteRequest>;
