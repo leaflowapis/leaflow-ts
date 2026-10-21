@@ -133,6 +133,8 @@ export default defineConfig(
                   const value = property.initializer;
                   if (ts.isStringLiteral(value)) return [property.name.text, value.text];
                   if (value.kind === ts.SyntaxKind.NullKeyword) return [property.name.text, null];
+                  if (value.kind === ts.SyntaxKind.TrueKeyword) return [property.name.text, true];
+                  if (value.kind === ts.SyntaxKind.FalseKeyword) return [property.name.text, false];
                   throw new Error("Unexpected generated route value");
                 }),
               ),
