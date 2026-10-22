@@ -69,6 +69,12 @@ export const ServiceResource = zod
       .describe(
         "The order that enabled the service, or that the latest enablement's checkout created; null before checkout completes.",
       ),
+    plan_id: zod
+      .uuid()
+      .nullable()
+      .describe(
+        "The Billing plan the service is sold under; null where the service is not sold. Price enabling it with Billing's quote, giving this plan with the `recurring` price type, the `metered` usage type and a quantity of 1; token usage is priced per model, as each model's `pricing` states.",
+      ),
     subscription_id: zod
       .uuid()
       .nullable()

@@ -9,6 +9,7 @@ import * as zod from "zod";
 import { Money } from "./money.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { ProductID } from "./productID.zod.js";
+import { QuoteDowngradeRefund } from "./quoteDowngradeRefund.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const quoteItemIndexMin = 0;
@@ -21,8 +22,12 @@ export const QuoteItem = zod
       .int()
       .min(quoteItemIndexMin)
       .describe(
-        "The zero-based request line index, or the item's position for a Checkout Session quote.",
+        "The zero-based index of the item or change in the request, or the item's position for a Checkout Session quote.",
       ),
+    subscription_id: zod
+      .uuid()
+      .nullable()
+      .describe("The subscription changed; null for a new purchase."),
     product_id: ProductID,
     plan_id: zod.uuid(),
     price_id: zod
@@ -58,6 +63,21 @@ export const QuoteItem = zod
     quantity: zod.string().describe("The quantity priced."),
     amount: Money.describe("Amount before discounts and including any setup charge."),
     discount_amount: Money,
+    remaining_amount: zod
+      .union([Money, zod.null()])
+      .describe(
+        "Immediate changes only; null otherwise. Before tax, the new terms for the time from `proration_date` to the end of the paid period. An upgrade invoices `remaining_amount` minus `unused_amount`.",
+      ),
+    unused_amount: zod
+      .union([Money, zod.null()])
+      .describe(
+        "Immediate changes only; null otherwise. Before tax, for an upgrade or an unchanged period price, the amount paid for that time, up to the new terms' value for the same time; for a downgrade, the remaining value of what was paid, under the refund terms of each paid period.",
+      ),
+    downgrade_refund: zod
+      .union([QuoteDowngradeRefund, zod.null()])
+      .describe(
+        "Immediate downgrades only, when `unused_amount` exceeds `remaining_amount`; null otherwise.",
+      ),
     total: Money,
     currency: zod.string(),
   })

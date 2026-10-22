@@ -398,6 +398,23 @@ export interface MembershipCreate {
   checkout?: CheckoutOptions;
 }
 
+/**
+ * A tier the membership can be upgraded to.
+ */
+export interface UpgradeOption {
+  plan: PlanSummary;
+  /**
+   * The Billing price the upgrade is ordered at, in the membership's currency. Null when the tier cannot be upgraded to now, because it has no price for the membership's currency and billing interval; `upgrade-membership` then returns 422 MEMBERSHIP_UPGRADE_UNAVAILABLE.
+   * @nullable
+   */
+  price_id: string | null;
+}
+
+export interface UpgradeOptionList {
+  items: UpgradeOption[];
+  pagination: OffsetPagination;
+}
+
 export interface MembershipUpgrade {
   /** A higher-ranked target tier. */
   plan_id: string;
@@ -476,6 +493,21 @@ export type ListMembershipsParams = {
 };
 
 export type ListMembershipPeriodsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+};
+
+export type ListMembershipUpgradeOptionsParams = {
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1

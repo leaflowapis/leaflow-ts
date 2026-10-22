@@ -175,16 +175,31 @@ export const UsageType = {
 } as const;
 
 /**
+ * What an immediate downgrade would refund, estimated as of `proration_date`. The refund itself is determined when the change takes effect.
+ */
+export interface QuoteDowngradeRefund {
+  /** Returned to the original payment sources, tax paid on it included. */
+  refundable_amount: Money;
+  /** Before tax, the part of the excess that the subscription's refund terms do not return. */
+  forfeited_amount: Money;
+}
+
+/**
  * One fully calculated purchase line. An item with no immediate charge, such as a metered purchase, has zero checkout amounts.
  */
 export interface QuoteItem {
   tax_amount: Money;
   tax_included_amount: Money;
   /**
-   * The zero-based request line index, or the item's position for a Checkout Session quote.
+   * The zero-based index of the item or change in the request, or the item's position for a Checkout Session quote.
    * @minimum 0
    */
   index: number;
+  /**
+   * The subscription changed; null for a new purchase.
+   * @nullable
+   */
+  subscription_id: string | null;
   product_id: ProductID;
   plan_id: string;
   /** The selected price, also when the request identified it indirectly. */
@@ -213,12 +228,18 @@ export interface QuoteItem {
   /** Amount before discounts and including any setup charge. */
   amount: Money;
   discount_amount: Money;
+  /** Immediate changes only; null otherwise. Before tax, the new terms for the time from `proration_date` to the end of the paid period. An upgrade invoices `remaining_amount` minus `unused_amount`. */
+  remaining_amount: Money | null;
+  /** Immediate changes only; null otherwise. Before tax, for an upgrade or an unchanged period price, the amount paid for that time, up to the new terms' value for the same time; for a downgrade, the remaining value of what was paid, under the refund terms of each paid period. */
+  unused_amount: Money | null;
+  /** Immediate downgrades only, when `unused_amount` exceeds `remaining_amount`; null otherwise. */
+  downgrade_refund: QuoteDowngradeRefund | null;
   total: Money;
   currency: string;
 }
 
 /**
- * `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without an account, which leaves out tax that would be added; tax already contained in a price is included.
+ * `complete`: tax is calculated for the billing account's invoice contact, or for `address` without an account. `requires_location_inputs`: a quote without an account or `address`, which leaves out tax that would be added; tax already contained in a price is included.
  */
 export type QuoteTaxStatus = (typeof QuoteTaxStatus)[keyof typeof QuoteTaxStatus];
 
@@ -322,7 +343,7 @@ export interface Quote {
    * @nullable
    */
   proration_date: string | null;
-  /** `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without an account, which leaves out tax that would be added; tax already contained in a price is included. */
+  /** `complete`: tax is calculated for the billing account's invoice contact, or for `address` without an account. `requires_location_inputs`: a quote without an account or `address`, which leaves out tax that would be added; tax already contained in a price is included. */
   tax_status: QuoteTaxStatus;
 }
 
@@ -3011,7 +3032,83 @@ export interface UsageEstimate {
 }
 
 /**
- * Quote proposed items or renewals, not both. Give exactly one of `billing_account_id` and `currency`; renewals need the account. Promotion codes apply only to proposed items. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.
+ * When the changes take effect; defaults to `immediate`. `immediate` prices the rest of the paid period from `proration_date`, charging an upgrade the difference and showing what a downgrade refunds. `period_end` prices the first period at the new terms, which replaces the renewal when the paid period ends.
+ */
+export type QuoteRequestChangeEffective =
+  (typeof QuoteRequestChangeEffective)[keyof typeof QuoteRequestChangeEffective];
+
+export const QuoteRequestChangeEffective = {
+  immediate: "immediate",
+  period_end: "period_end",
+} as const;
+
+export type QuoteChangeInputInterval =
+  (typeof QuoteChangeInputInterval)[keyof typeof QuoteChangeInputInterval];
+
+export const QuoteChangeInputInterval = {
+  none: "none",
+  day: "day",
+  month: "month",
+  year: "year",
+} as const;
+
+/**
+ * The dimension values after the change, given in full; omit to keep the subscription's.
+ */
+export type QuoteChangeInputDimensions = { [key: string]: string };
+
+/**
+ * The new terms of one subscription. Identify the price, or the plan to select one from, as for a proposed item. Without a price or billing terms, the plan's price with the subscription's price type, usage type, interval, interval count and cancellation policy is selected. Omitted dimensions keep the subscription's.
+ */
+export interface QuoteChangeInput {
+  subscription_id: string;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  price_lookup_key?: string;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  plan_lookup_key?: string;
+  price_id?: string;
+  product_id?: ProductID;
+  plan_id?: string;
+  /** Selects the price type instead of keeping the subscription's. */
+  price_type?: PriceType;
+  /** Selects the usage type instead of keeping the subscription's. */
+  usage_type?: UsageType;
+  interval?: QuoteChangeInputInterval;
+  /** @minimum 1 */
+  interval_count?: number;
+  /** Selects among licensed prices with otherwise identical billing terms. */
+  cancellation_policy?: CancellationPolicy;
+  /**
+   * The quantity after the change.
+   * @pattern ^(?:(?:[1-9][0-9]{0,27}|0(?:[1-9][0-9]{0,26}|0(?:[1-9][0-9]{0,25}|0(?:[1-9][0-9]{0,24}|0(?:[1-9][0-9]{0,23}|0(?:[1-9][0-9]{0,22}|0(?:[1-9][0-9]{0,21}|0(?:[1-9][0-9]{0,20}|0(?:[1-9][0-9]{0,19}|0(?:[1-9][0-9]{0,18}|0(?:[1-9][0-9]{0,17}|0(?:[1-9][0-9]{0,16}|0(?:[1-9][0-9]{0,15}|0(?:[1-9][0-9]{0,14}|0(?:[1-9][0-9]{0,13}|0(?:[1-9][0-9]{0,12}|0(?:[1-9][0-9]{0,11}|0(?:[1-9][0-9]{0,10}|0(?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9])))))))))))))))))))))))))))([.][0-9]{1,10})?|0{1,28}[.](?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))$
+   */
+  quantity: string;
+  /** The dimension values after the change, given in full; omit to keep the subscription's. */
+  dimensions?: QuoteChangeInputDimensions;
+}
+
+export interface QuoteAddress {
+  /**
+   * ISO 3166-1 alpha-2, two uppercase letters.
+   * @pattern ^[A-Z]{2}$
+   */
+  country: string;
+  /**
+   * The state or province, as the tax rates name it.
+   * @minLength 1
+   * @maxLength 128
+   */
+  state?: string;
+}
+
+/**
+ * Quote proposed items, changes or renewals: exactly one of them. Give exactly one of `billing_account_id` and `currency`; changes and renewals need the account. Promotion codes apply to proposed items and changes. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.
  */
 export interface QuoteRequest {
   /**
@@ -3037,6 +3134,16 @@ export interface QuoteRequest {
    * @maxItems 100
    */
   renewals?: QuoteRenewal[];
+  /**
+   * Preview changing these subscriptions in one order, each at most once. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account or a member of the subscription's project; all must belong to the same project, or all to no project.
+   * @minItems 1
+   * @maxItems 100
+   */
+  changes?: QuoteChangeInput[];
+  /** When the changes take effect; defaults to `immediate`. `immediate` prices the rest of the paid period from `proration_date`, charging an upgrade the difference and showing what a downgrade refunds. `period_end` prices the first period at the new terms, which replaces the renewal when the paid period ends. */
+  change_effective?: QuoteRequestChangeEffective;
+  /** Only with `currency`. Where the customer is, to include the tax that would be added there for a customer who is not tax exempt; `tax_status` is then `complete`. Refused with `billing_account_id`, whose invoice contact decides tax. */
+  address?: QuoteAddress;
   /**
    * @minLength 1
    * @maxLength 64
@@ -3325,6 +3432,71 @@ export interface ContactUpdate {
 export interface ContactList {
   items: Contact[];
   pagination: OffsetPagination;
+}
+
+/**
+ * Conditions combined with AND.
+ */
+export interface PriceSearch {
+  /**
+   * ISO 4217, three uppercase letters.
+   * @minLength 3
+   * @maxLength 3
+   */
+  currency: string;
+  /**
+   * Only prices of these plans.
+   * @minItems 1
+   * @maxItems 200
+   */
+  plan_ids?: string[];
+  product_id?: ProductID;
+  /** Narrows to one price type. */
+  type?: PriceType;
+  /** Narrows to one usage type. */
+  usage_type?: UsageType;
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+}
+
+export type RateSearchDimensionsItem = { [key: string]: string };
+
+/**
+ * Conditions combined with AND.
+ */
+export interface RateSearch {
+  /** Only rates on this meter. */
+  meter_id?: string;
+  /** Rates in effect at this moment; defaults to now. */
+  at?: string;
+  /**
+   * Only rates whose dimension values are exactly one of these sets, given as on order lines and usage. A set no rate has matches nothing.
+   * @minItems 1
+   * @maxItems 200
+   */
+  dimensions?: RateSearchDimensionsItem[];
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
 }
 
 export interface CancelSubscriptionRequest {

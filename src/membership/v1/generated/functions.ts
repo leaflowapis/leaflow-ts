@@ -9,6 +9,7 @@ import type {
   ErrorResponse,
   GetPlanParams,
   ListMembershipPeriodsParams,
+  ListMembershipUpgradeOptionsParams,
   ListMembershipsParams,
   ListPlansParams,
   Membership,
@@ -20,6 +21,7 @@ import type {
   PeriodList,
   Plan,
   PlanList,
+  UpgradeOptionList,
 } from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
@@ -397,6 +399,69 @@ export const listMembershipPeriods = async (
 
   const data: listMembershipPeriodsResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listMembershipPeriodsResponse;
+};
+
+export type listMembershipUpgradeOptionsResponse200 = {
+  data: UpgradeOptionList;
+  status: 200;
+};
+
+export type listMembershipUpgradeOptionsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listMembershipUpgradeOptionsResponseSuccess =
+  listMembershipUpgradeOptionsResponse200 & {
+    headers: Headers;
+  };
+export type listMembershipUpgradeOptionsResponseError =
+  listMembershipUpgradeOptionsResponseDefault & {
+    headers: Headers;
+  };
+
+export type listMembershipUpgradeOptionsResponse =
+  | listMembershipUpgradeOptionsResponseSuccess
+  | listMembershipUpgradeOptionsResponseError;
+
+export const getListMembershipUpgradeOptionsUrl = (
+  membershipId: string,
+  params?: ListMembershipUpgradeOptionsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://membership.leaflow.cloud/api/v1/memberships/${encodeURIComponent(String(membershipId))}/upgrade-options?${stringifiedParams}`
+    : `https://membership.leaflow.cloud/api/v1/memberships/${encodeURIComponent(String(membershipId))}/upgrade-options`;
+};
+
+/**
+ * Lists the higher tiers on sale that the membership's tier has an upgrade path to, lowest rank first, with the Billing price `upgrade-membership` would order for each. Price an upgrade before making it with Billing's quote, giving that price with a quantity of 1; a promotion code can be checked there as well. Returns 409 MEMBERSHIP_NOT_ACTIVE or MEMBERSHIP_CHANGE_PENDING when the membership cannot be changed.
+ * @summary List upgrade options
+ */
+export const listMembershipUpgradeOptions = async (
+  membershipId: string,
+  params?: ListMembershipUpgradeOptionsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listMembershipUpgradeOptionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListMembershipUpgradeOptionsUrl(membershipId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listMembershipUpgradeOptionsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listMembershipUpgradeOptionsResponse;
 };
 
 export type upgradeMembershipResponse201 = {

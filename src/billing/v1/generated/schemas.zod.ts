@@ -1820,6 +1820,17 @@ export const ListRatesHeader = zod.strictObject({
 });
 
 /**
+ * Rules of a public rate card that meet every condition in the body, as `list-rates` lists them, for anyone,
+ * signed in or not; contract cards are not readable here. Use it to read the rates at the dimension values of the
+ * items on a page, such as each region and machine type offered, and match each rate to its price by meter,
+ * usage type, interval and dimensions.
+ * @summary Search catalog rates
+ */
+export const SearchRatesParams = zod.strictObject({
+  rateCardId: zod.uuid(),
+});
+
+/**
  * Continuous metering registrations paid for by your billing accounts; members of a project list its registrations with `project_ids`. Their state does not describe the resource's runtime.
  * @summary List active resources
  */

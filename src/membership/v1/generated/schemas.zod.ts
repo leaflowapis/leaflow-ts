@@ -136,6 +136,35 @@ export const ListMembershipPeriodsQueryParams = zod.strictObject({
 });
 
 /**
+ * Lists the higher tiers on sale that the membership's tier has an upgrade path to, lowest rank first, with the Billing price `upgrade-membership` would order for each. Price an upgrade before making it with Billing's quote, giving that price with a quantity of 1; a promotion code can be checked there as well. Returns 409 MEMBERSHIP_NOT_ACTIVE or MEMBERSHIP_CHANGE_PENDING when the membership cannot be changed.
+ * @summary List upgrade options
+ */
+export const ListMembershipUpgradeOptionsParams = zod.strictObject({
+  membershipId: zod.uuid(),
+});
+
+export const listMembershipUpgradeOptionsQueryPageDefault = 1;
+export const listMembershipUpgradeOptionsQueryPageMax = 2147483647;
+
+export const listMembershipUpgradeOptionsQueryPageSizeDefault = 50;
+export const listMembershipUpgradeOptionsQueryPageSizeMax = 200;
+
+export const ListMembershipUpgradeOptionsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listMembershipUpgradeOptionsQueryPageMax)
+    .default(listMembershipUpgradeOptionsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listMembershipUpgradeOptionsQueryPageSizeMax)
+    .default(listMembershipUpgradeOptionsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
+
+/**
  * Creates a Billing Checkout Session for the full-period price difference. The upgrade takes effect after payment, benefit issuance and delivery confirmation; renewal uses the target tier. Returns 409 MEMBERSHIP_NOT_ACTIVE or MEMBERSHIP_CHANGE_PENDING, or 422 MEMBERSHIP_UPGRADE_UNAVAILABLE. Returns 403 MEMBERSHIP_ACCOUNT_DELETING while the caller's account deletion is pending, or 403 MEMBERSHIP_ACCOUNT_UNUSABLE when the account is deleted, suspended or banned.
  * @summary Upgrade a membership
  */

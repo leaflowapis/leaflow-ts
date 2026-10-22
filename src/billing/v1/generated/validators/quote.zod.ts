@@ -38,7 +38,7 @@ export const Quote = zod
     tax_status: zod
       .enum(["complete", "requires_location_inputs"])
       .describe(
-        "`complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without an account, which leaves out tax that would be added; tax already contained in a price is included.",
+        "`complete`: tax is calculated for the billing account's invoice contact, or for `address` without an account. `requires_location_inputs`: a quote without an account or `address`, which leaves out tax that would be added; tax already contained in a price is included.",
       ),
   })
   .describe(

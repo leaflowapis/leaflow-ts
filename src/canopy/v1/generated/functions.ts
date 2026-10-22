@@ -67,7 +67,6 @@ import type {
   ModelUsageListResponseBody,
   NativeRequest,
   NativeResponse,
-  Quote,
   RequestResource,
   ResponseCreate,
   ResponseDeleted,
@@ -1396,60 +1395,6 @@ export const createService = async (
 
   const data: createServiceResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as createServiceResponse;
-};
-
-export type createServiceQuoteResponse200 = {
-  data: Quote;
-  status: 200;
-};
-
-export type createServiceQuoteResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type createServiceQuoteResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createServiceQuoteResponseSuccess = createServiceQuoteResponse200 & {
-  headers: Headers;
-};
-export type createServiceQuoteResponseError = (
-  | createServiceQuoteResponse409
-  | createServiceQuoteResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createServiceQuoteResponse =
-  | createServiceQuoteResponseSuccess
-  | createServiceQuoteResponseError;
-
-export const getCreateServiceQuoteUrl = () => {
-  return `https://canopy.leaflow.cloud/api/v1/service/quote`;
-};
-
-/**
- * Prices what `create-service` would order, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount.
- *
- * Token usage is priced per model, as each model's `pricing` states, and is neither part of `total` nor projected: `estimated_usage_amount` is null. A request the purchase would refuse is refused the same way.
- * @summary Quote enabling the model platform service
- */
-export const createServiceQuote = async (
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createServiceQuoteResponse> => {
-  const res = await (fetchFn ?? fetch)(getCreateServiceQuoteUrl(), {
-    ...options,
-    method: "POST",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createServiceQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createServiceQuoteResponse;
 };
 
 export type listUsageByApiKeyResponse200 = {
