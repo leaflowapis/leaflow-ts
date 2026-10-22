@@ -32,7 +32,7 @@ export const CancellationCreate = zod.strictObject({
   expected_refundable_amount: Money.and(
     zod.string().regex(cancellationCreateExpectedRefundableAmountTwoRegExp),
   ).describe(
-    "The quote's `refundable_amount`; the cancellation is refused when the refund differs.",
+    "The quote's `cancellation.refundable_amount`; the cancellation is refused when the refund differs.",
   ),
   reason: zod
     .string()

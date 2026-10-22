@@ -11,7 +11,7 @@ import { NamedIdentity } from "./namedIdentity.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
-export const CancellationRefundPreviewItem = zod
+export const QuoteCancellationItem = zod
   .strictObject({
     subscription_id: zod.uuid(),
     plan_id: zod.uuid(),
@@ -37,7 +37,7 @@ export const CancellationRefundPreviewItem = zod
     tax_amount: Money,
     forfeited_amount: Money,
   })
-  .describe("One subscription of the previewed cancellation.");
+  .describe("One subscription of the quoted cancellation.");
 
-export type CancellationRefundPreviewItem = zod.input<typeof CancellationRefundPreviewItem>;
-export type CancellationRefundPreviewItemOutput = zod.output<typeof CancellationRefundPreviewItem>;
+export type QuoteCancellationItem = zod.input<typeof QuoteCancellationItem>;
+export type QuoteCancellationItemOutput = zod.output<typeof QuoteCancellationItem>;

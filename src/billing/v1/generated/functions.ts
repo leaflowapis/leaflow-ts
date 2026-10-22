@@ -19,8 +19,6 @@ import type {
   Cancellation,
   CancellationCreate,
   CancellationList,
-  CancellationPreviewRequest,
-  CancellationRefundPreview,
   CheckoutSession,
   CheckoutSessionConfirm,
   CheckoutSessionCreate,
@@ -3079,7 +3077,8 @@ export const getGetQuoteUrl = () => {
 
 /**
  * Calculates what a proposed purchase, a change of your subscriptions or their renewal would invoice now, and
- * what each purchased or changed line renews at. Nothing is saved, reserved or redeemed.
+ * what each purchased or changed line renews at, or what ending subscriptions would return. Nothing is saved,
+ * reserved, redeemed or canceled.
  *
  * With `billing_account_id`, the quote is for that billing account: its currency, account discounts,
  * tax and funds apply, changes and renewals use the account currently paying for each subscription, and an
@@ -3359,72 +3358,6 @@ export const createCancellation = async (
 
   const data: createCancellationResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as createCancellationResponse;
-};
-
-export type previewCancellationResponse200 = {
-  data: CancellationRefundPreview;
-  status: 200;
-};
-
-export type previewCancellationResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type previewCancellationResponseSuccess = previewCancellationResponse200 & {
-  headers: Headers;
-};
-export type previewCancellationResponseError = previewCancellationResponseDefault & {
-  headers: Headers;
-};
-
-export type previewCancellationResponse =
-  | previewCancellationResponseSuccess
-  | previewCancellationResponseError;
-
-export const getPreviewCancellationUrl = () => {
-  return `https://billing.leaflow.cloud/api/v1/cancellations/preview`;
-};
-
-/**
- * What creating the cancellation now would return, per subscription and in total. Nothing is canceled, ended or refunded. Open to the owner of the subscriptions' current billing account and to members of their project; refused for the same states as creating it.
- * @summary Preview a cancellation
- */
-export const previewCancellation = async (
-  cancellationPreviewRequest: CancellationPreviewRequest,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<previewCancellationResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getPreviewCancellationUrl(), {
-    ...options,
-    method: "QUERY",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(cancellationPreviewRequest),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: previewCancellationResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as previewCancellationResponse;
 };
 
 export type getCancellationResponse200 = {

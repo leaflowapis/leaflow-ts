@@ -8,26 +8,22 @@
 import * as zod from "zod";
 import { CancellationMode } from "./cancellationMode.zod.js";
 
-export const cancellationPreviewRequestSubscriptionIdsMax = 50;
+export const quoteCancellationSubscriptionIdsMax = 50;
 
-export const CancellationPreviewRequest = zod
+export const QuoteCancellation = zod
   .strictObject({
-    billing_account_id: zod
-      .int()
-      .min(1)
-      .describe("A billing account you own that currently pays for every subscription."),
     subscription_ids: zod
       .array(zod.uuid())
       .min(1)
-      .max(cancellationPreviewRequestSubscriptionIdsMax)
+      .max(quoteCancellationSubscriptionIdsMax)
       .describe(
         "The subscriptions to end together, all of one service, including every subscription released with a resource.",
       ),
     mode: CancellationMode,
   })
   .describe(
-    "What ending these subscriptions together would return, for one mode; preview `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).",
+    "Preview ending these subscriptions together in one mode; quote `immediate` and `period_end` separately to\ncompare. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account\nor a member of the subscriptions' project. Refused as creating the cancellation would be, including 409\n`BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`),\nis being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).",
   );
 
-export type CancellationPreviewRequest = zod.input<typeof CancellationPreviewRequest>;
-export type CancellationPreviewRequestOutput = zod.output<typeof CancellationPreviewRequest>;
+export type QuoteCancellation = zod.input<typeof QuoteCancellation>;
+export type QuoteCancellationOutput = zod.output<typeof QuoteCancellation>;

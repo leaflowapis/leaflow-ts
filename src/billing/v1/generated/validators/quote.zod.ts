@@ -8,6 +8,7 @@
 import * as zod from "zod";
 import { Funds } from "./funds.zod.js";
 import { Money } from "./money.zod.js";
+import { QuoteCancellationResult } from "./quoteCancellationResult.zod.js";
 import { QuotedDiscount } from "./quotedDiscount.zod.js";
 import { QuoteItem } from "./quoteItem.zod.js";
 import { QuoteRenewalResult } from "./quoteRenewalResult.zod.js";
@@ -16,24 +17,31 @@ export const Quote = zod
   .strictObject({
     funds: zod
       .union([Funds, zod.null()])
-      .describe("Account funds for the quoted purchase. Null without an account."),
+      .describe(
+        "Account funds for the quoted purchase. Null without an account, and for a cancellation.",
+      ),
     subtotal: Money,
     discount_amount: Money,
     tax_amount: Money,
     discount: zod
       .union([QuotedDiscount, zod.null()])
       .describe(
-        "The discount a purchase would get, not yet applied. Null when there is none, and for renewals.",
+        "The discount a purchase would get, not yet applied. Null when there is none, and for renewals and a cancellation.",
       ),
     items: zod.array(QuoteItem),
     renewals: zod.array(QuoteRenewalResult),
+    cancellation: zod
+      .union([QuoteCancellationResult, zod.null()])
+      .describe(
+        "What the cancellation would return. Null unless the request quotes a cancellation.",
+      ),
     total: Money,
     currency: zod.string(),
     proration_date: zod.iso
       .datetime({ offset: true })
       .nullable()
       .describe(
-        "Immediate changes only; null otherwise. The instant the change is priced from; pass it when confirming the Checkout Session so it is priced from the same instant.",
+        "Immediate changes and immediate cancellations only; null otherwise. The instant the change or the refund is priced from; pass it when confirming the Checkout Session or creating the cancellation so it is priced from the same instant.",
       ),
     tax_status: zod
       .enum(["complete", "requires_location_inputs"])

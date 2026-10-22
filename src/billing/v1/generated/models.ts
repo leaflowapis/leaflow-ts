@@ -324,30 +324,6 @@ export interface QuotedDiscount {
 }
 
 /**
- * A complete calculation in `currency`; nothing is saved or reserved. The request fails if any item cannot be priced. A Checkout Session quote gives what completing the session would invoice.
- */
-export interface Quote {
-  /** Account funds for the quoted purchase. Null without an account. */
-  funds: Funds | null;
-  subtotal: Money;
-  discount_amount: Money;
-  tax_amount: Money;
-  /** The discount a purchase would get, not yet applied. Null when there is none, and for renewals. */
-  discount: QuotedDiscount | null;
-  items: QuoteItem[];
-  renewals: QuoteRenewalResult[];
-  total: Money;
-  currency: string;
-  /**
-   * Immediate changes only; null otherwise. The instant the change is priced from; pass it when confirming the Checkout Session so it is priced from the same instant.
-   * @nullable
-   */
-  proration_date: string | null;
-  /** `complete`: tax is calculated for the billing account's invoice contact, or for `address` without an account. `requires_location_inputs`: a quote without an account or `address`, which leaves out tax that would be added; tax already contained in a price is included. */
-  tax_status: QuoteTaxStatus;
-}
-
-/**
  * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
  * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
  * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
@@ -360,24 +336,6 @@ export const CancellationMode = {
   immediate: "immediate",
   period_end: "period_end",
 } as const;
-
-/**
- * What ending these subscriptions together would return, for one mode; preview `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).
- */
-export interface CancellationPreviewRequest {
-  /**
-   * A billing account you own that currently pays for every subscription.
-   * @minimum 1
-   */
-  billing_account_id: number;
-  /**
-   * The subscriptions to end together, all of one service, including every subscription released with a resource.
-   * @minItems 1
-   * @maxItems 50
-   */
-  subscription_ids: string[];
-  mode: CancellationMode;
-}
 
 /**
  * Which object this is, together with what a person currently calls it.
@@ -396,9 +354,9 @@ export interface NamedIdentity {
 }
 
 /**
- * One subscription of the previewed cancellation.
+ * One subscription of the quoted cancellation.
  */
-export interface CancellationRefundPreviewItem {
+export interface QuoteCancellationItem {
   subscription_id: string;
   plan_id: string;
   plan_name: string;
@@ -418,8 +376,8 @@ export interface CancellationRefundPreviewItem {
 }
 
 /**
- * What the cancellation would return, per subscription and in total, as of now. Give `proration_date` and
- * `refundable_amount` when creating the cancellation.
+ * What the cancellation would return, per subscription and in total, as of the quote's `proration_date` for
+ * `immediate`. Give that `proration_date` and `refundable_amount` when creating the cancellation.
  *
  * - `unused_amount`: before tax, the amount paid for the current periods in proportion to the time remaining.
  * - `short_rate_surcharge_amount`: before tax, the part of `forfeited_amount` due to the short rate of the
@@ -433,13 +391,10 @@ export interface CancellationRefundPreviewItem {
  *
  * Metered and one-time subscriptions show zero; their usage until release is charged as usual.
  */
-export interface CancellationRefundPreview {
+export interface QuoteCancellationResult {
   mode: CancellationMode;
   /** For `period_end`, when release begins, the end of the paid terms. */
   scheduled_at?: string;
-  /** For `immediate`, the second the refund is computed as of. Give it when creating the cancellation. */
-  proration_date?: string;
-  currency: string;
   unused_amount: Money;
   short_rate_surcharge_amount: Money;
   refundable_amount: Money;
@@ -447,7 +402,50 @@ export interface CancellationRefundPreview {
   credit_amount: Money;
   tax_amount: Money;
   forfeited_amount: Money;
-  items: CancellationRefundPreviewItem[];
+  items: QuoteCancellationItem[];
+}
+
+/**
+ * A complete calculation in `currency`; nothing is saved or reserved. The request fails if any item cannot be priced. A Checkout Session quote gives what completing the session would invoice.
+ */
+export interface Quote {
+  /** Account funds for the quoted purchase. Null without an account, and for a cancellation. */
+  funds: Funds | null;
+  subtotal: Money;
+  discount_amount: Money;
+  tax_amount: Money;
+  /** The discount a purchase would get, not yet applied. Null when there is none, and for renewals and a cancellation. */
+  discount: QuotedDiscount | null;
+  items: QuoteItem[];
+  renewals: QuoteRenewalResult[];
+  /** What the cancellation would return. Null unless the request quotes a cancellation. */
+  cancellation: QuoteCancellationResult | null;
+  total: Money;
+  currency: string;
+  /**
+   * Immediate changes and immediate cancellations only; null otherwise. The instant the change or the refund is priced from; pass it when confirming the Checkout Session or creating the cancellation so it is priced from the same instant.
+   * @nullable
+   */
+  proration_date: string | null;
+  /** `complete`: tax is calculated for the billing account's invoice contact, or for `address` without an account. `requires_location_inputs`: a quote without an account or `address`, which leaves out tax that would be added; tax already contained in a price is included. */
+  tax_status: QuoteTaxStatus;
+}
+
+/**
+ * Preview ending these subscriptions together in one mode; quote `immediate` and `period_end` separately to
+ * compare. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account
+ * or a member of the subscriptions' project. Refused as creating the cancellation would be, including 409
+ * `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`),
+ * is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).
+ */
+export interface QuoteCancellation {
+  /**
+   * The subscriptions to end together, all of one service, including every subscription released with a resource.
+   * @minItems 1
+   * @maxItems 50
+   */
+  subscription_ids: string[];
+  mode: CancellationMode;
 }
 
 export interface CancellationCreate {
@@ -460,7 +458,7 @@ export interface CancellationCreate {
   mode: CancellationMode;
   /** For `immediate`, the quote's `proration_date`: a whole second, not in the future and at most ten minutes old; the refund is computed as of it. Now when omitted. */
   proration_date?: string;
-  /** The quote's `refundable_amount`; the cancellation is refused when the refund differs. */
+  /** The quote's `cancellation.refundable_amount`; the cancellation is refused when the refund differs. */
   expected_refundable_amount: Money & string;
   /**
    * A note from the account holder, kept with the cancellation.
@@ -3111,11 +3109,11 @@ export interface QuoteAddress {
 }
 
 /**
- * Quote proposed items, changes or renewals: exactly one of them. Give exactly one of `billing_account_id` and `currency`; changes and renewals need the account. Promotion codes apply to proposed items and changes. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.
+ * Quote proposed items, changes, renewals or a cancellation: exactly one of them. Give exactly one of `billing_account_id` and `currency`; changes, renewals and a cancellation need the account. Promotion codes apply to proposed items and changes. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.
  */
 export interface QuoteRequest {
   /**
-   * The billing account to price for; it must be yours or currently pay for a project you are a member of, and an access token is required. Renewals must currently be paid by it.
+   * The billing account to price for; it must be yours or currently pay for a project you are a member of, and an access token is required. Renewals and a cancellation must currently be paid by it.
    * @minimum 1
    */
   billing_account_id?: number;
@@ -3143,6 +3141,7 @@ export interface QuoteRequest {
    * @maxItems 100
    */
   changes?: QuoteChangeInput[];
+  cancellation?: QuoteCancellation;
   /** When the changes take effect; defaults to `immediate`. `immediate` prices the rest of the paid period from `proration_date`, charging an upgrade the difference and showing what a downgrade refunds. `period_end` prices the first period at the new terms, which replaces the renewal when the paid period ends. */
   change_effective?: QuoteRequestChangeEffective;
   /** Only with `currency`. Where the customer is, to include the tax that would be added there for a customer who is not tax exempt; `tax_status` is then `complete`. Refused with `billing_account_id`, whose invoice contact decides tax. */

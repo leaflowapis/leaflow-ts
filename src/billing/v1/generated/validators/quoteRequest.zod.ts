@@ -7,6 +7,7 @@
  */
 import * as zod from "zod";
 import { QuoteAddress } from "./quoteAddress.zod.js";
+import { QuoteCancellation } from "./quoteCancellation.zod.js";
 import { QuoteChangeInput } from "./quoteChangeInput.zod.js";
 import { QuoteItemInput } from "./quoteItemInput.zod.js";
 import { QuoteRenewal } from "./quoteRenewal.zod.js";
@@ -29,7 +30,7 @@ export const QuoteRequest = zod
       .min(1)
       .optional()
       .describe(
-        "The billing account to price for; it must be yours or currently pay for a project you are a member of, and an access token is required. Renewals must currently be paid by it.",
+        "The billing account to price for; it must be yours or currently pay for a project you are a member of, and an access token is required. Renewals and a cancellation must currently be paid by it.",
       ),
     currency: zod
       .string()
@@ -59,6 +60,7 @@ export const QuoteRequest = zod
       .describe(
         "Preview changing these subscriptions in one order, each at most once. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account or a member of the subscription's project; all must belong to the same project, or all to no project.",
       ),
+    cancellation: QuoteCancellation.optional(),
     change_effective: zod
       .enum(["immediate", "period_end"])
       .optional()
@@ -71,7 +73,7 @@ export const QuoteRequest = zod
     promotion_code: zod.string().min(1).max(quoteRequestPromotionCodeMax).optional(),
   })
   .describe(
-    "Quote proposed items, changes or renewals: exactly one of them. Give exactly one of `billing_account_id` and `currency`; changes and renewals need the account. Promotion codes apply to proposed items and changes. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.",
+    "Quote proposed items, changes, renewals or a cancellation: exactly one of them. Give exactly one of `billing_account_id` and `currency`; changes, renewals and a cancellation need the account. Promotion codes apply to proposed items and changes. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.",
   );
 
 export type QuoteRequest = zod.input<typeof QuoteRequest>;
