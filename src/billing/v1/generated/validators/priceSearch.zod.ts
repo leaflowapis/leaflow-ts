@@ -17,6 +17,8 @@ export const priceSearchIdsMax = 200;
 
 export const priceSearchPlanIdsMax = 200;
 
+export const priceSearchDimensionsMax = 200;
+
 export const priceSearchPageMax = 2147483647;
 
 export const priceSearchPageSizeMax = 200;
@@ -43,6 +45,14 @@ export const PriceSearch = zod
     product_id: ProductID.optional(),
     type: PriceType.optional().describe("Narrows to one price type."),
     usage_type: UsageType.optional().describe("Narrows to one usage type."),
+    dimensions: zod
+      .array(zod.record(zod.string(), zod.string().min(1)))
+      .min(1)
+      .max(priceSearchDimensionsMax)
+      .optional()
+      .describe(
+        "Narrows each price's `rates` to these dimension value sets, given as on order lines and usage; prices are not filtered by it. A set no rate has adds nothing.",
+      ),
     page: zod
       .int()
       .min(1)

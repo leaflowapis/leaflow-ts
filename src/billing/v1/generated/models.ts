@@ -2700,6 +2700,29 @@ export const PriceInterval = {
   year: "year",
 } as const;
 
+/**
+ * Licensed rates only, the period the amount buys; `none` for metered rates.
+ */
+export type RateInterval = (typeof RateInterval)[keyof typeof RateInterval];
+
+export const RateInterval = {
+  none: "none",
+  day: "day",
+  month: "month",
+  year: "year",
+} as const;
+
+/**
+ * `graduated` charges each band at its own rate; `volume` charges everything at the rate of the band the total lands in. `none` for a `per_unit` rate.
+ */
+export type RateTiersMode = (typeof RateTiersMode)[keyof typeof RateTiersMode];
+
+export const RateTiersMode = {
+  none: "none",
+  graduated: "graduated",
+  volume: "volume",
+} as const;
+
 export interface Tier {
   /**
    * The band's inclusive upper bound; null for the last band.
@@ -2711,8 +2734,44 @@ export interface Tier {
   flat_amount?: Money;
 }
 
+/**
+ * The dimension values this rate applies to, such as region and machine type.
+ */
+export type RateDimensions = { [key: string]: string };
+
+export interface Rate {
+  meter: ObjectIdentity;
+  /** The unit readings are reported in, such as `core-second`. */
+  unit?: string;
+  /** The dimension values this rate applies to, such as region and machine type. */
+  dimensions: RateDimensions;
+  billing_scheme: BillingScheme;
+  /** `metered` prices usage; `licensed` prices holding a quantity for one period. */
+  usage_type: UsageType;
+  /** Licensed rates only, the period the amount buys; `none` for metered rates. */
+  interval: RateInterval;
+  /** @nullable */
+  interval_count?: number | null;
+  /** `graduated` charges each band at its own rate; `volume` charges everything at the rate of the band the total lands in. `none` for a `per_unit` rate. */
+  tiers_mode: RateTiersMode;
+  /** Present for `per_unit`. Tiered rates carry their amounts on the tiers. */
+  unit_amount?: Money;
+  /** Present for a tiered rate, in ascending order. */
+  tiers?: Tier[];
+  /** How many measured units one amount covers; an hourly rate on a per-second meter is `"3600"`. */
+  unit_quantity?: string;
+  currency: string;
+  effective_from: string;
+  /** @nullable */
+  effective_to?: string | null;
+}
+
 export interface Price {
-  rate_card?: ObjectIdentity;
+  /**
+   * For a price that delegates to a rate card, the rates in effect now that it charges at, one for each meter, dimension values and period; metered rates for a metered price, and rates on its own meter and period for a licensed one. `search-prices` narrows them with `dimensions`. Null for a price with its own amounts.
+   * @nullable
+   */
+  rates?: Rate[] | null;
   lookup_key?: string;
   product: Product;
   plan: ObjectIdentity;
@@ -2742,8 +2801,6 @@ export interface Price {
   tiers_mode?: PriceTiersMode;
   /** Present for `tiered`, in ascending order. */
   tiers?: Tier[];
-  /** Present when the price delegates to a rate card, the price list its rates are read from. */
-  rate_card_id?: string;
   /** The smallest quantity that can be bought. Absent means no lower bound. */
   min_quantity?: string;
   /** The largest quantity that may be bought; absent when there is no limit. A larger quantity is refused with `BILLING_PRICE_INVALID` and `field` `max_quantity`. */
@@ -2758,66 +2815,6 @@ export interface Price {
 
 export interface PriceList {
   items: Price[];
-  pagination: OffsetPagination;
-}
-
-/**
- * The dimension values this rate applies to, such as region and machine type.
- */
-export type RateDimensions = { [key: string]: string };
-
-/**
- * Licensed rates only, the period the amount buys; `none` for metered rates.
- */
-export type RateInterval = (typeof RateInterval)[keyof typeof RateInterval];
-
-export const RateInterval = {
-  none: "none",
-  day: "day",
-  month: "month",
-  year: "year",
-} as const;
-
-/**
- * `graduated` charges each band at its own rate; `volume` charges everything at the rate of the band the total lands in. `none` for a `per_unit` rate.
- */
-export type RateTiersMode = (typeof RateTiersMode)[keyof typeof RateTiersMode];
-
-export const RateTiersMode = {
-  none: "none",
-  graduated: "graduated",
-  volume: "volume",
-} as const;
-
-export interface Rate {
-  meter: ObjectIdentity;
-  /** The unit readings are reported in, such as `core-second`. */
-  unit?: string;
-  /** The dimension values this rate applies to, such as region and machine type. */
-  dimensions: RateDimensions;
-  billing_scheme: BillingScheme;
-  /** `metered` prices usage; `licensed` prices holding a quantity for one period. */
-  usage_type: UsageType;
-  /** Licensed rates only, the period the amount buys; `none` for metered rates. */
-  interval: RateInterval;
-  /** @nullable */
-  interval_count?: number | null;
-  /** `graduated` charges each band at its own rate; `volume` charges everything at the rate of the band the total lands in. `none` for a `per_unit` rate. */
-  tiers_mode: RateTiersMode;
-  /** Present for `per_unit`. Tiered rates carry their amounts on the tiers. */
-  unit_amount?: Money;
-  /** Present for a tiered rate, in ascending order. */
-  tiers?: Tier[];
-  /** How many measured units one amount covers; an hourly rate on a per-second meter is `"3600"`. */
-  unit_quantity?: string;
-  currency: string;
-  effective_from: string;
-  /** @nullable */
-  effective_to?: string | null;
-}
-
-export interface RateList {
-  items: Rate[];
   pagination: OffsetPagination;
 }
 
@@ -3440,6 +3437,8 @@ export interface ContactList {
   pagination: OffsetPagination;
 }
 
+export type PriceSearchDimensionsItem = { [key: string]: string };
+
 /**
  * Conditions combined with AND.
  */
@@ -3468,35 +3467,11 @@ export interface PriceSearch {
   /** Narrows to one usage type. */
   usage_type?: UsageType;
   /**
-   * 1-based page number. Defaults to 1.
-   * @minimum 1
-   * @maximum 2147483647
-   */
-  page?: number;
-  /**
-   * Items per page. Defaults to 50; at most 200.
-   * @minimum 1
-   * @maximum 200
-   */
-  page_size?: number;
-}
-
-export type RateSearchDimensionsItem = { [key: string]: string };
-
-/**
- * Conditions combined with AND.
- */
-export interface RateSearch {
-  /** Only rates on this meter. */
-  meter_id?: string;
-  /** Rates in effect at this moment; defaults to now. */
-  at?: string;
-  /**
-   * Only rates whose dimension values are exactly one of these sets, given as on order lines and usage. A set no rate has matches nothing.
+   * Narrows each price's `rates` to these dimension value sets, given as on order lines and usage; prices are not filtered by it. A set no rate has adds nothing.
    * @minItems 1
    * @maxItems 200
    */
-  dimensions?: RateSearchDimensionsItem[];
+  dimensions?: PriceSearchDimensionsItem[];
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -4460,36 +4435,6 @@ export type ListPricesByPlanParams = {
 };
 
 export type ListPricesByPlanHeaders = {
-  /**
-   * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
-   */
-  "If-None-Match"?: IfNoneMatchParameter;
-};
-
-export type ListRatesParams = {
-  /**
-   * 1-based page number. Defaults to 1.
-   * @minimum 1
-   * @maximum 2147483647
-   */
-  page?: number;
-  /**
-   * Items per page. Defaults to 50; at most 200.
-   * @minimum 1
-   * @maximum 200
-   */
-  page_size?: number;
-  /**
-   * Filter by the meter UUID.
-   */
-  meter_id?: string;
-  /**
-   * Rates in effect at this moment; defaults to now.
-   */
-  at?: string;
-};
-
-export type ListRatesHeaders = {
   /**
    * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */

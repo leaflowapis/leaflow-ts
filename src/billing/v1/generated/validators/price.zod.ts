@@ -13,12 +13,18 @@ import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
+import { Rate } from "./rate.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
 import { Tier } from "./tier.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const Price = zod.strictObject({
-  rate_card: ObjectIdentity.optional(),
+  rates: zod
+    .array(Rate)
+    .nullish()
+    .describe(
+      "For a price that delegates to a rate card, the rates in effect now that it charges at, one for each meter, dimension values and period; metered rates for a metered price, and rates on its own meter and period for a licensed one. `search-prices` narrows them with `dimensions`. Null for a price with its own amounts.",
+    ),
   lookup_key: zod.string().optional(),
   product: Product,
   plan: ObjectIdentity,
@@ -64,12 +70,6 @@ export const Price = zod.strictObject({
       "How a ladder is walked: `graduated` charges each band at its own rate, `volume` charges everything at the rate of the band the total falls in. `none` when not tiered.",
     ),
   tiers: zod.array(Tier).optional().describe("Present for `tiered`, in ascending order."),
-  rate_card_id: zod
-    .uuid()
-    .optional()
-    .describe(
-      "Present when the price delegates to a rate card, the price list its rates are read from.",
-    ),
   min_quantity: zod
     .string()
     .optional()

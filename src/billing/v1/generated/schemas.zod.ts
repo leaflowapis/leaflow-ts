@@ -1777,60 +1777,6 @@ export const ListPricesByPlanHeader = zod.strictObject({
 });
 
 /**
- * Rules of a public rate card; contract cards are not readable here.
- * @summary List catalog rates
- */
-export const ListRatesParams = zod.strictObject({
-  rateCardId: zod.uuid(),
-});
-
-export const listRatesQueryPageDefault = 1;
-export const listRatesQueryPageMax = 2147483647;
-
-export const listRatesQueryPageSizeDefault = 50;
-export const listRatesQueryPageSizeMax = 200;
-
-export const ListRatesQueryParams = zod.strictObject({
-  page: zod
-    .int()
-    .min(1)
-    .max(listRatesQueryPageMax)
-    .default(listRatesQueryPageDefault)
-    .describe("1-based page number. Defaults to 1."),
-  page_size: zod
-    .int()
-    .min(1)
-    .max(listRatesQueryPageSizeMax)
-    .default(listRatesQueryPageSizeDefault)
-    .describe("Items per page. Defaults to 50; at most 200."),
-  meter_id: zod.uuid().optional().describe("Filter by the meter UUID."),
-  at: zod.iso
-    .datetime({ offset: true })
-    .optional()
-    .describe("Rates in effect at this moment; defaults to now."),
-});
-
-export const ListRatesHeader = zod.strictObject({
-  "If-None-Match": zod
-    .string()
-    .optional()
-    .describe(
-      "The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.",
-    ),
-});
-
-/**
- * Rules of a public rate card that meet every condition in the body, as `list-rates` lists them, for anyone,
- * signed in or not; contract cards are not readable here. Use it to read the rates at the dimension values of the
- * items on a page, such as each region and machine type offered, and match each rate to its price by meter,
- * usage type, interval and dimensions.
- * @summary Search catalog rates
- */
-export const SearchRatesParams = zod.strictObject({
-  rateCardId: zod.uuid(),
-});
-
-/**
  * Continuous metering registrations paid for by your billing accounts; members of a project list its registrations with `project_ids`. Their state does not describe the resource's runtime.
  * @summary List active resources
  */

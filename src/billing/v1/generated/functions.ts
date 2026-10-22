@@ -79,8 +79,6 @@ import type {
   ListProductsHeaders,
   ListProductsParams,
   ListProjectAssignmentsParams,
-  ListRatesHeaders,
-  ListRatesParams,
   ListRefundsParams,
   ListRenewalPricesParams,
   ListSpendParams,
@@ -121,8 +119,6 @@ import type {
   ProjectAssignmentList,
   Quote,
   QuoteRequest,
-  RateList,
-  RateSearch,
   RefundList,
   RenewRequest,
   RenewalPriceList,
@@ -4753,8 +4749,8 @@ export const getSearchPricesUrl = () => {
 /**
  * Lists the active prices in `currency` that meet every condition in the body, as `list-prices` lists them, for
  * anyone, signed in or not. Use it for conditions a query string cannot hold, such as the plans of a whole
- * catalog page. A price that delegates to a rate card has no amount of its own; read its rates with
- * `search-rates`.
+ * catalog page. A price that delegates to a rate card has no amount of its own and carries its `rates`, which
+ * `dimensions` narrows to the dimension values of the items on the page.
  * @summary Search what is on sale, with prices
  */
 export const searchPrices = async (
@@ -5248,156 +5244,6 @@ export const listPricesByPlan = async (
 
   const data: listPricesByPlanResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listPricesByPlanResponse;
-};
-
-export type listRatesResponse200 = {
-  data: RateList;
-  status: 200;
-};
-
-export type listRatesResponse304 = {
-  data: NotModifiedResponse;
-  status: 304;
-};
-
-export type listRatesResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 304>;
-};
-
-export type listRatesResponseSuccess = listRatesResponse200 & {
-  headers: Headers;
-};
-export type listRatesResponseError = (listRatesResponse304 | listRatesResponseDefault) & {
-  headers: Headers;
-};
-
-export type listRatesResponse = listRatesResponseSuccess | listRatesResponseError;
-
-export const getListRatesUrl = (rateCardId: string, params?: ListRatesParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/rate-cards/${encodeURIComponent(String(rateCardId))}/rules?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/rate-cards/${encodeURIComponent(String(rateCardId))}/rules`;
-};
-
-/**
- * Rules of a public rate card; contract cards are not readable here.
- * @summary List catalog rates
- */
-export const listRates = async (
-  rateCardId: string,
-  params?: ListRatesParams,
-  headers?: ListRatesHeaders,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<listRatesResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getListRatesUrl(rateCardId, params), {
-    ...options,
-    method: "GET",
-    headers: { ...headers, ...getHeaders(options?.headers) },
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: listRatesResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listRatesResponse;
-};
-
-export type searchRatesResponse200 = {
-  data: RateList;
-  status: 200;
-};
-
-export type searchRatesResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type searchRatesResponseSuccess = searchRatesResponse200 & {
-  headers: Headers;
-};
-export type searchRatesResponseError = searchRatesResponseDefault & {
-  headers: Headers;
-};
-
-export type searchRatesResponse = searchRatesResponseSuccess | searchRatesResponseError;
-
-export const getSearchRatesUrl = (rateCardId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/rate-cards/${encodeURIComponent(String(rateCardId))}/rules`;
-};
-
-/**
- * Rules of a public rate card that meet every condition in the body, as `list-rates` lists them, for anyone,
- * signed in or not; contract cards are not readable here. Use it to read the rates at the dimension values of the
- * items on a page, such as each region and machine type offered, and match each rate to its price by meter,
- * usage type, interval and dimensions.
- * @summary Search catalog rates
- */
-export const searchRates = async (
-  rateCardId: string,
-  rateSearch: RateSearch,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<searchRatesResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getSearchRatesUrl(rateCardId), {
-    ...options,
-    method: "QUERY",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(rateSearch),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: searchRatesResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as searchRatesResponse;
 };
 
 export type listActiveResourcesResponse200 = {

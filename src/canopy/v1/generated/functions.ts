@@ -1115,7 +1115,7 @@ export const getListModelsUrl = () => {
  *
  * `context_length` and `max_output_tokens` are advisory. The server does not truncate on their basis, and the request body is forwarded upstream unchanged.
  *
- * Canopy returns no amounts: each model's `billing` names the Billing plan and the rate dimensions its token usage is priced at. Read the rates from Billing with `search-prices` and `search-rates`.
+ * Canopy returns no amounts: each model's `billing` names the Billing plan and the rate dimensions its token usage is priced at. Read the rates from the `rates` of the plan's prices in Billing's `search-prices`.
  * @summary List the available models
  */
 export const listModels = async (
