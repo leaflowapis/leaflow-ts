@@ -23,7 +23,7 @@ export const Price = zod.strictObject({
     .array(Rate)
     .nullish()
     .describe(
-      "For a price that delegates to a rate card, the rates in effect now that it charges at, one for each meter, dimension values and period; metered rates for a metered price, and rates on its own meter and period for a licensed one. `search-prices` narrows them with `dimensions`. Null for a price with its own amounts.",
+      "For a price that delegates to a rate card, the rates in effect now that it charges at, one for each meter, dimension values and period; metered rates for a metered price, and rates on its own meter and period for a licensed one. `search-prices` narrows them with `dimensions`. Null for a price with its own amounts. Prices are set per currency, and dimension values a currency does not offer, for example in a region it does not sell to, have no rate in that currency and cannot be bought with it.",
     ),
   lookup_key: zod.string().optional(),
   product: Product,

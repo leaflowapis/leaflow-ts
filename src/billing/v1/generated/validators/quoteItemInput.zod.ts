@@ -42,7 +42,7 @@ export const QuoteItemInput = zod
       .record(zod.string(), zod.string())
       .optional()
       .describe(
-        "The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero.",
+        "The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused with `BILLING_PRICE_UNAVAILABLE` rather than priced at zero. Prices are set per currency, and a currency may not offer some combinations at all, for example in a region it does not sell to.",
       ),
   })
   .describe(

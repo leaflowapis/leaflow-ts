@@ -2768,7 +2768,7 @@ export interface Rate {
 
 export interface Price {
   /**
-   * For a price that delegates to a rate card, the rates in effect now that it charges at, one for each meter, dimension values and period; metered rates for a metered price, and rates on its own meter and period for a licensed one. `search-prices` narrows them with `dimensions`. Null for a price with its own amounts.
+   * For a price that delegates to a rate card, the rates in effect now that it charges at, one for each meter, dimension values and period; metered rates for a metered price, and rates on its own meter and period for a licensed one. `search-prices` narrows them with `dimensions`. Null for a price with its own amounts. Prices are set per currency, and dimension values a currency does not offer, for example in a region it does not sell to, have no rate in that currency and cannot be bought with it.
    * @nullable
    */
   rates?: Rate[] | null;
@@ -2829,7 +2829,7 @@ export const QuoteItemInputInterval = {
 } as const;
 
 /**
- * The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero.
+ * The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused with `BILLING_PRICE_UNAVAILABLE` rather than priced at zero. Prices are set per currency, and a currency may not offer some combinations at all, for example in a region it does not sell to.
  */
 export type QuoteItemInputDimensions = { [key: string]: string };
 
@@ -2861,7 +2861,7 @@ export interface QuoteItemInput {
   cancellation_policy?: CancellationPolicy;
   /** @pattern ^(?:(?:[1-9][0-9]{0,27}|0(?:[1-9][0-9]{0,26}|0(?:[1-9][0-9]{0,25}|0(?:[1-9][0-9]{0,24}|0(?:[1-9][0-9]{0,23}|0(?:[1-9][0-9]{0,22}|0(?:[1-9][0-9]{0,21}|0(?:[1-9][0-9]{0,20}|0(?:[1-9][0-9]{0,19}|0(?:[1-9][0-9]{0,18}|0(?:[1-9][0-9]{0,17}|0(?:[1-9][0-9]{0,16}|0(?:[1-9][0-9]{0,15}|0(?:[1-9][0-9]{0,14}|0(?:[1-9][0-9]{0,13}|0(?:[1-9][0-9]{0,12}|0(?:[1-9][0-9]{0,11}|0(?:[1-9][0-9]{0,10}|0(?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9])))))))))))))))))))))))))))([.][0-9]{1,10})?|0{1,28}[.](?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))$ */
   quantity: string;
-  /** The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused rather than priced at zero. */
+  /** The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused with `BILLING_PRICE_UNAVAILABLE` rather than priced at zero. Prices are set per currency, and a currency may not offer some combinations at all, for example in a region it does not sell to. */
   dimensions?: QuoteItemInputDimensions;
 }
 
