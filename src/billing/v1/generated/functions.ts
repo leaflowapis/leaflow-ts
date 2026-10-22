@@ -790,7 +790,7 @@ export const getListCurrenciesUrl = (params?: ListCurrenciesParams) => {
 };
 
 /**
- * Currencies a new billing account can be opened in; retired currencies are not listed.
+ * Currencies a new billing account can be opened in, and prices and quotes without an account can be given in, for anyone, signed in or not. Retired currencies are not listed.
  * @summary List currencies accounts can be opened in
  */
 export const listCurrencies = async (

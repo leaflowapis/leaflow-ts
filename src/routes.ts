@@ -978,7 +978,7 @@ export const routes = [
     method: "GET",
     path: "/api/v1/currencies",
     operationId: "list-currencies",
-    securityScheme: "AccessToken",
+    securityScheme: null,
     upstreamUrl: "https://billing.leaflow.cloud",
   },
   {
