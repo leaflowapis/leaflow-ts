@@ -160,17 +160,6 @@ export interface BillingComponent {
 }
 
 /**
- * `immediate` releases the resource now and refunds under the subscriptions' terms; `period_end` keeps it until `scheduled_at`.
- */
-export type ResourceCancellationMode =
-  (typeof ResourceCancellationMode)[keyof typeof ResourceCancellationMode];
-
-export const ResourceCancellationMode = {
-  immediate: "immediate",
-  period_end: "period_end",
-} as const;
-
-/**
  * `requested` and `scheduled` have not begun release; `releasing` is releasing the resource.
  */
 export type ResourceCancellationStatus =
@@ -183,12 +172,26 @@ export const ResourceCancellationStatus = {
 } as const;
 
 /**
+ * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
+ * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
+ * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
+ * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
+ * BILLING_CANCELLATION_MODE_FIXED.
+ */
+export type CancellationMode = (typeof CancellationMode)[keyof typeof CancellationMode];
+
+export const CancellationMode = {
+  immediate: "immediate",
+  period_end: "period_end",
+} as const;
+
+/**
  * The Billing cancellation of the subscriptions that pay for a resource. Read it in Billing with `get-cancellation` for its refund and progress.
  */
 export interface ResourceCancellation {
   id: string;
-  /** `immediate` releases the resource now and refunds under the subscriptions' terms; `period_end` keeps it until `scheduled_at`. */
-  mode: ResourceCancellationMode;
+  /** `immediate` releases the resource now; `period_end` keeps it until `scheduled_at`. */
+  mode: CancellationMode;
   /** `requested` and `scheduled` have not begun release; `releasing` is releasing the resource. */
   status: ResourceCancellationStatus;
   /**
@@ -2651,6 +2654,8 @@ export interface CursorPagination {
  */
 export type ConflictResponse = Error;
 
+export type CancellationModeParameter = CancellationMode;
+
 export type ListBackupsParams = {
   /**
    * Return only the backups of this disk
@@ -2711,6 +2716,17 @@ export type ListImagesParams = {
    * @maximum 200
    */
   page_size?: number;
+};
+
+export type DeleteImageParams = {
+  /**
+   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
+   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
+   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
+   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
+   * BILLING_CANCELLATION_MODE_FIXED.
+   */
+  cancellation_mode?: CancellationModeParameter;
 };
 
 export type ListInstanceTypesParams = {
@@ -2779,6 +2795,17 @@ export type ListDisksParams = {
   page_size?: number;
 };
 
+export type DeleteDiskParams = {
+  /**
+   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
+   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
+   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
+   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
+   * BILLING_CANCELLATION_MODE_FIXED.
+   */
+  cancellation_mode?: CancellationModeParameter;
+};
+
 export type ListFloatingIpsParams = {
   /**
    * 1-based page number. Defaults to 1.
@@ -2792,6 +2819,17 @@ export type ListFloatingIpsParams = {
    * @maximum 200
    */
   page_size?: number;
+};
+
+export type ReleaseFloatingIpParams = {
+  /**
+   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
+   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
+   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
+   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
+   * BILLING_CANCELLATION_MODE_FIXED.
+   */
+  cancellation_mode?: CancellationModeParameter;
 };
 
 export type ListInstancesParams = {
@@ -2812,6 +2850,17 @@ export type ListInstancesParams = {
    * @maximum 200
    */
   page_size?: number;
+};
+
+export type DeleteInstanceParams = {
+  /**
+   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
+   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
+   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
+   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
+   * BILLING_CANCELLATION_MODE_FIXED.
+   */
+  cancellation_mode?: CancellationModeParameter;
 };
 
 export type GetInstanceConsoleOutputParams = {
@@ -2980,6 +3029,28 @@ export type ListSecurityGroupRulesParams = {
   page_size?: number;
 };
 
+export type DeleteSnapshotQuotaParams = {
+  /**
+   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
+   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
+   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
+   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
+   * BILLING_CANCELLATION_MODE_FIXED.
+   */
+  cancellation_mode?: CancellationModeParameter;
+};
+
+export type DeleteBackupServiceParams = {
+  /**
+   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
+   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
+   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
+   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
+   * BILLING_CANCELLATION_MODE_FIXED.
+   */
+  cancellation_mode?: CancellationModeParameter;
+};
+
 export type ListBackupCapacityPacksParams = {
   /**
    * 1-based page number. Defaults to 1.
@@ -2993,6 +3064,17 @@ export type ListBackupCapacityPacksParams = {
    * @maximum 200
    */
   page_size?: number;
+};
+
+export type DeleteBackupCapacityPackParams = {
+  /**
+   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
+   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
+   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
+   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
+   * BILLING_CANCELLATION_MODE_FIXED.
+   */
+  cancellation_mode?: CancellationModeParameter;
 };
 
 export type ListSnapshotsParams = {

@@ -22,15 +22,14 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { CancellationMode } from "./cancellationMode.zod.js";
 
 export const ResourceCancellation = zod
   .strictObject({
     id: zod.uuid(),
-    mode: zod
-      .enum(["immediate", "period_end"])
-      .describe(
-        "`immediate` releases the resource now and refunds under the subscriptions' terms; `period_end` keeps it until `scheduled_at`.",
-      ),
+    mode: CancellationMode.describe(
+      "`immediate` releases the resource now; `period_end` keeps it until `scheduled_at`.",
+    ),
     status: zod
       .enum(["requested", "scheduled", "releasing"])
       .describe(

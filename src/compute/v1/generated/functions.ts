@@ -53,9 +53,15 @@ import type {
   CreateSecurityRuleRequestBody,
   CreateSnapshotRequestBody,
   CreateSubnetRequestBody,
+  DeleteBackupCapacityPackParams,
+  DeleteBackupServiceParams,
+  DeleteDiskParams,
   DeleteDiskResponseBody,
+  DeleteImageParams,
   DeleteImageResponseBody,
+  DeleteInstanceParams,
   DeleteInstanceResponseBody,
+  DeleteSnapshotQuotaParams,
   DiskAttachmentList,
   DiskListResponseBody,
   DiskResource,
@@ -111,6 +117,7 @@ import type {
   RebuildInstanceResponseBody,
   RegionListResponseBody,
   ReleaseFloatingIPResponseBody,
+  ReleaseFloatingIpParams,
   RenameBackupRequestBody,
   RenameDiskRequestBody,
   RenameImageRequestBody,
@@ -923,8 +930,20 @@ export type deleteImageResponseError = (deleteImageResponse409 | deleteImageResp
 
 export type deleteImageResponse = deleteImageResponseSuccess | deleteImageResponseError;
 
-export const getDeleteImageUrl = (imageId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/images/${encodeURIComponent(String(imageId))}`;
+export const getDeleteImageUrl = (imageId: string, params?: DeleteImageParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://compute.leaflow.cloud/api/v1/images/${encodeURIComponent(String(imageId))}?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/images/${encodeURIComponent(String(imageId))}`;
 };
 
 /**
@@ -934,15 +953,16 @@ export const getDeleteImageUrl = (imageId: string) => {
  *
  * An image whose capture has not finished can be deleted; the capture is aborted. This is the one operation accepted while the `create` operation is in progress.
  *
- * When subscriptions pay for the image, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the image is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
+ * When subscriptions pay for the image, its `release_subscription_ids`, this request cancels them in Billing as `cancellation_mode` says, and the response carries that cancellation. Canceled now, they are refunded under their terms and release begins when Billing begins the cancellation; canceled at the end of their paid period, the image is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
  * @summary Delete a private image
  */
 export const deleteImage = async (
   imageId: string,
+  params?: DeleteImageParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteImageResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteImageUrl(imageId), {
+  const res = await (fetchFn ?? fetch)(getDeleteImageUrl(imageId, params), {
     ...options,
     method: "DELETE",
   });
@@ -1383,22 +1403,35 @@ export type deleteDiskResponseError = (deleteDiskResponse409 | deleteDiskRespons
 
 export type deleteDiskResponse = deleteDiskResponseSuccess | deleteDiskResponseError;
 
-export const getDeleteDiskUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}`;
+export const getDeleteDiskUrl = (diskId: string, params?: DeleteDiskParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}`;
 };
 
 /**
  * Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
  *
- * When subscriptions pay for the disk, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the disk is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
+ * When subscriptions pay for the disk, its `release_subscription_ids`, this request cancels them in Billing as `cancellation_mode` says, and the response carries that cancellation. Canceled now, they are refunded under their terms and release begins when Billing begins the cancellation; canceled at the end of their paid period, the disk is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
  * @summary Delete a disk
  */
 export const deleteDisk = async (
   diskId: string,
+  params?: DeleteDiskParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteDiskResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteDiskUrl(diskId), {
+  const res = await (fetchFn ?? fetch)(getDeleteDiskUrl(diskId, params), {
     ...options,
     method: "DELETE",
   });
@@ -1764,22 +1797,35 @@ export type releaseFloatingIpResponse =
   | releaseFloatingIpResponseSuccess
   | releaseFloatingIpResponseError;
 
-export const getReleaseFloatingIpUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}`;
+export const getReleaseFloatingIpUrl = (floatingIpId: string, params?: ReleaseFloatingIpParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}`;
 };
 
 /**
  * Releases the floating IP after unbinding it. The floating IP shows the `delete` operation until it is released.
  *
- * When subscriptions pay for the address, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the floating IP is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
+ * When subscriptions pay for the address, its `release_subscription_ids`, this request cancels them in Billing as `cancellation_mode` says, and the response carries that cancellation. Canceled now, they are refunded under their terms and release begins when Billing begins the cancellation; canceled at the end of their paid period, the floating IP is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
  * @summary Release a floating IP
  */
 export const releaseFloatingIp = async (
   floatingIpId: string,
+  params?: ReleaseFloatingIpParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<releaseFloatingIpResponse> => {
-  const res = await (fetchFn ?? fetch)(getReleaseFloatingIpUrl(floatingIpId), {
+  const res = await (fetchFn ?? fetch)(getReleaseFloatingIpUrl(floatingIpId, params), {
     ...options,
     method: "DELETE",
   });
@@ -2263,8 +2309,20 @@ export type deleteInstanceResponseError = (
 
 export type deleteInstanceResponse = deleteInstanceResponseSuccess | deleteInstanceResponseError;
 
-export const getDeleteInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}`;
+export const getDeleteInstanceUrl = (instanceId: string, params?: DeleteInstanceParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}`;
 };
 
 /**
@@ -2272,15 +2330,16 @@ export const getDeleteInstanceUrl = (instanceId: string) => {
  *
  * An instance being captured as a private image cannot be released. Wait for the capture to finish, or delete that image first.
  *
- * When subscriptions pay for the instance, or for a disk deleted with it, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the instance is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
+ * When subscriptions pay for the instance, or for a disk deleted with it, its `release_subscription_ids`, this request cancels them in Billing as `cancellation_mode` says, and the response carries that cancellation. Canceled now, they are refunded under their terms and release begins when Billing begins the cancellation; canceled at the end of their paid period, the instance is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
  * @summary Release an instance
  */
 export const deleteInstance = async (
   instanceId: string,
+  params?: DeleteInstanceParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteInstanceResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteInstanceUrl(instanceId), {
+  const res = await (fetchFn ?? fetch)(getDeleteInstanceUrl(instanceId, params), {
     ...options,
     method: "DELETE",
   });
@@ -5246,22 +5305,35 @@ export type deleteSnapshotQuotaResponse =
   | deleteSnapshotQuotaResponseSuccess
   | deleteSnapshotQuotaResponseError;
 
-export const getDeleteSnapshotQuotaUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/snapshot-quota`;
+export const getDeleteSnapshotQuotaUrl = (regionId: string, params?: DeleteSnapshotQuotaParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/snapshot-quota?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/snapshot-quota`;
 };
 
 /**
- * Cancels the quota's subscription in Billing and returns the cancellation. Refused with 409 `SNAPSHOT_QUOTA_IN_USE` while any snapshot exists in the region; delete the snapshots first. Refused with 409 `SNAPSHOT_QUOTA_NOT_ACTIVE` when no subscription pays for a quota in the region.
+ * Cancels the quota's subscription in Billing as `cancellation_mode` says and returns the cancellation. Refused with 409 `SNAPSHOT_QUOTA_IN_USE` while any snapshot exists in the region; delete the snapshots first. Refused with 409 `SNAPSHOT_QUOTA_NOT_ACTIVE` when no subscription pays for a quota in the region.
  *
- * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and the quota stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * Canceled now, it is refunded under its terms; canceled at the end of its paid period, the quota stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
  * @summary Delete regional snapshot quota
  */
 export const deleteSnapshotQuota = async (
   regionId: string,
+  params?: DeleteSnapshotQuotaParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteSnapshotQuotaResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteSnapshotQuotaUrl(regionId), {
+  const res = await (fetchFn ?? fetch)(getDeleteSnapshotQuotaUrl(regionId, params), {
     ...options,
     method: "DELETE",
   });
@@ -5425,22 +5497,35 @@ export type deleteBackupServiceResponse =
   | deleteBackupServiceResponseSuccess
   | deleteBackupServiceResponseError;
 
-export const getDeleteBackupServiceUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-service`;
+export const getDeleteBackupServiceUrl = (regionId: string, params?: DeleteBackupServiceParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-service?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-service`;
 };
 
 /**
- * Cancels the service's subscription in Billing and returns the cancellation. Refused with 409 `BACKUP_SERVICE_IN_USE` while any backup is retained in the region; delete the backups first. Capacity packs are deleted separately. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` when no subscription pays for a service in the region.
+ * Cancels the service's subscription in Billing as `cancellation_mode` says and returns the cancellation. Refused with 409 `BACKUP_SERVICE_IN_USE` while any backup is retained in the region; delete the backups first. Capacity packs are deleted separately. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` when no subscription pays for a service in the region.
  *
- * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and the service stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * Canceled now, it is refunded under its terms; canceled at the end of its paid period, the service stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
  * @summary Delete the backup service of a region
  */
 export const deleteBackupService = async (
   regionId: string,
+  params?: DeleteBackupServiceParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteBackupServiceResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteBackupServiceUrl(regionId), {
+  const res = await (fetchFn ?? fetch)(getDeleteBackupServiceUrl(regionId, params), {
     ...options,
     method: "DELETE",
   });
@@ -5618,23 +5703,40 @@ export type deleteBackupCapacityPackResponse =
   | deleteBackupCapacityPackResponseSuccess
   | deleteBackupCapacityPackResponseError;
 
-export const getDeleteBackupCapacityPackUrl = (regionId: string, packId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-capacity-packs/${encodeURIComponent(String(packId))}`;
+export const getDeleteBackupCapacityPackUrl = (
+  regionId: string,
+  packId: string,
+  params?: DeleteBackupCapacityPackParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-capacity-packs/${encodeURIComponent(String(packId))}?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-capacity-packs/${encodeURIComponent(String(packId))}`;
 };
 
 /**
- * Cancels the pack's subscription in Billing and returns the cancellation. Refused with 404 `BACKUP_CAPACITY_PACK_NOT_FOUND` when the project has no pack of this ID in the region, and with 409 `BACKUP_CAPACITY_PACK_ENDED` when the pack has ended.
+ * Cancels the pack's subscription in Billing as `cancellation_mode` says and returns the cancellation. Refused with 404 `BACKUP_CAPACITY_PACK_NOT_FOUND` when the project has no pack of this ID in the region, and with 409 `BACKUP_CAPACITY_PACK_ENDED` when the pack has ended.
  *
- * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and its coverage stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * Canceled now, it is refunded under its terms; canceled at the end of its paid period, its coverage stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
  * @summary Delete a backup capacity pack
  */
 export const deleteBackupCapacityPack = async (
   regionId: string,
   packId: string,
+  params?: DeleteBackupCapacityPackParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteBackupCapacityPackResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteBackupCapacityPackUrl(regionId, packId), {
+  const res = await (fetchFn ?? fetch)(getDeleteBackupCapacityPackUrl(regionId, packId, params), {
     ...options,
     method: "DELETE",
   });

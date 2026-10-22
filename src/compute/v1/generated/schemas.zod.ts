@@ -293,11 +293,20 @@ export const RenameImageBody = RenameImageRequestBody;
  *
  * An image whose capture has not finished can be deleted; the capture is aborted. This is the one operation accepted while the `create` operation is in progress.
  *
- * When subscriptions pay for the image, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the image is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
+ * When subscriptions pay for the image, its `release_subscription_ids`, this request cancels them in Billing as `cancellation_mode` says, and the response carries that cancellation. Canceled now, they are refunded under their terms and release begins when Billing begins the cancellation; canceled at the end of their paid period, the image is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
  * @summary Delete a private image
  */
 export const DeleteImageParams = zod.strictObject({
   imageId: zod.uuid(),
+});
+
+export const DeleteImageQueryParams = zod.strictObject({
+  cancellation_mode: zod
+    .enum(["immediate", "period_end"])
+    .optional()
+    .describe(
+      "How the subscriptions that pay for what is deleted are canceled. `immediate` cancels them now and refunds them under their terms; `period_end` cancels them at the end of their paid period and keeps what is deleted until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period.\n\nRefused with 422 `BILLING_CANCELLATION_MODE_FIXED` when a subscription's terms do not allow the mode: a pay-as-you-go subscription is canceled only now, and a prepaid one whose terms allow only the end of its period only then. Refused with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` for `period_end` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again returns it as it is.",
+    ),
 });
 
 /**
@@ -438,11 +447,20 @@ export const RenameDiskBody = RenameDiskRequestBody;
 /**
  * Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
  *
- * When subscriptions pay for the disk, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the disk is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
+ * When subscriptions pay for the disk, its `release_subscription_ids`, this request cancels them in Billing as `cancellation_mode` says, and the response carries that cancellation. Canceled now, they are refunded under their terms and release begins when Billing begins the cancellation; canceled at the end of their paid period, the disk is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
  * @summary Delete a disk
  */
 export const DeleteDiskParams = zod.strictObject({
   diskId: zod.uuid(),
+});
+
+export const DeleteDiskQueryParams = zod.strictObject({
+  cancellation_mode: zod
+    .enum(["immediate", "period_end"])
+    .optional()
+    .describe(
+      "How the subscriptions that pay for what is deleted are canceled. `immediate` cancels them now and refunds them under their terms; `period_end` cancels them at the end of their paid period and keeps what is deleted until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period.\n\nRefused with 422 `BILLING_CANCELLATION_MODE_FIXED` when a subscription's terms do not allow the mode: a pay-as-you-go subscription is canceled only now, and a prepaid one whose terms allow only the end of its period only then. Refused with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` for `period_end` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again returns it as it is.",
+    ),
 });
 
 /**
@@ -521,11 +539,20 @@ export const GetFloatingIpParams = zod.strictObject({
 /**
  * Releases the floating IP after unbinding it. The floating IP shows the `delete` operation until it is released.
  *
- * When subscriptions pay for the address, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the floating IP is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
+ * When subscriptions pay for the address, its `release_subscription_ids`, this request cancels them in Billing as `cancellation_mode` says, and the response carries that cancellation. Canceled now, they are refunded under their terms and release begins when Billing begins the cancellation; canceled at the end of their paid period, the floating IP is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
  * @summary Release a floating IP
  */
 export const ReleaseFloatingIpParams = zod.strictObject({
   floatingIpId: zod.uuid(),
+});
+
+export const ReleaseFloatingIpQueryParams = zod.strictObject({
+  cancellation_mode: zod
+    .enum(["immediate", "period_end"])
+    .optional()
+    .describe(
+      "How the subscriptions that pay for what is deleted are canceled. `immediate` cancels them now and refunds them under their terms; `period_end` cancels them at the end of their paid period and keeps what is deleted until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period.\n\nRefused with 422 `BILLING_CANCELLATION_MODE_FIXED` when a subscription's terms do not allow the mode: a pay-as-you-go subscription is canceled only now, and a prepaid one whose terms allow only the end of its period only then. Refused with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` for `period_end` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again returns it as it is.",
+    ),
 });
 
 /**
@@ -629,11 +656,20 @@ export const RenameInstanceBody = RenameInstanceRequestBody;
  *
  * An instance being captured as a private image cannot be released. Wait for the capture to finish, or delete that image first.
  *
- * When subscriptions pay for the instance, or for a disk deleted with it, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the instance is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
+ * When subscriptions pay for the instance, or for a disk deleted with it, its `release_subscription_ids`, this request cancels them in Billing as `cancellation_mode` says, and the response carries that cancellation. Canceled now, they are refunded under their terms and release begins when Billing begins the cancellation; canceled at the end of their paid period, the instance is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
  * @summary Release an instance
  */
 export const DeleteInstanceParams = zod.strictObject({
   instanceId: zod.uuid(),
+});
+
+export const DeleteInstanceQueryParams = zod.strictObject({
+  cancellation_mode: zod
+    .enum(["immediate", "period_end"])
+    .optional()
+    .describe(
+      "How the subscriptions that pay for what is deleted are canceled. `immediate` cancels them now and refunds them under their terms; `period_end` cancels them at the end of their paid period and keeps what is deleted until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period.\n\nRefused with 422 `BILLING_CANCELLATION_MODE_FIXED` when a subscription's terms do not allow the mode: a pay-as-you-go subscription is canceled only now, and a prepaid one whose terms allow only the end of its period only then. Refused with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` for `period_end` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again returns it as it is.",
+    ),
 });
 
 /**
@@ -1341,13 +1377,22 @@ export const SetSnapshotQuotaParams = zod.strictObject({
 export const SetSnapshotQuotaBody = SetSnapshotQuotaRequestBody;
 
 /**
- * Cancels the quota's subscription in Billing and returns the cancellation. Refused with 409 `SNAPSHOT_QUOTA_IN_USE` while any snapshot exists in the region; delete the snapshots first. Refused with 409 `SNAPSHOT_QUOTA_NOT_ACTIVE` when no subscription pays for a quota in the region.
+ * Cancels the quota's subscription in Billing as `cancellation_mode` says and returns the cancellation. Refused with 409 `SNAPSHOT_QUOTA_IN_USE` while any snapshot exists in the region; delete the snapshots first. Refused with 409 `SNAPSHOT_QUOTA_NOT_ACTIVE` when no subscription pays for a quota in the region.
  *
- * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and the quota stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * Canceled now, it is refunded under its terms; canceled at the end of its paid period, the quota stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
  * @summary Delete regional snapshot quota
  */
 export const DeleteSnapshotQuotaParams = zod.strictObject({
   regionId: zod.uuid(),
+});
+
+export const DeleteSnapshotQuotaQueryParams = zod.strictObject({
+  cancellation_mode: zod
+    .enum(["immediate", "period_end"])
+    .optional()
+    .describe(
+      "How the subscriptions that pay for what is deleted are canceled. `immediate` cancels them now and refunds them under their terms; `period_end` cancels them at the end of their paid period and keeps what is deleted until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period.\n\nRefused with 422 `BILLING_CANCELLATION_MODE_FIXED` when a subscription's terms do not allow the mode: a pay-as-you-go subscription is canceled only now, and a prepaid one whose terms allow only the end of its period only then. Refused with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` for `period_end` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again returns it as it is.",
+    ),
 });
 
 /**
@@ -1373,13 +1418,22 @@ export const CreateBackupServiceParams = zod.strictObject({
 export const CreateBackupServiceBody = CreateBackupServiceRequestBody;
 
 /**
- * Cancels the service's subscription in Billing and returns the cancellation. Refused with 409 `BACKUP_SERVICE_IN_USE` while any backup is retained in the region; delete the backups first. Capacity packs are deleted separately. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` when no subscription pays for a service in the region.
+ * Cancels the service's subscription in Billing as `cancellation_mode` says and returns the cancellation. Refused with 409 `BACKUP_SERVICE_IN_USE` while any backup is retained in the region; delete the backups first. Capacity packs are deleted separately. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` when no subscription pays for a service in the region.
  *
- * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and the service stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * Canceled now, it is refunded under its terms; canceled at the end of its paid period, the service stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
  * @summary Delete the backup service of a region
  */
 export const DeleteBackupServiceParams = zod.strictObject({
   regionId: zod.uuid(),
+});
+
+export const DeleteBackupServiceQueryParams = zod.strictObject({
+  cancellation_mode: zod
+    .enum(["immediate", "period_end"])
+    .optional()
+    .describe(
+      "How the subscriptions that pay for what is deleted are canceled. `immediate` cancels them now and refunds them under their terms; `period_end` cancels them at the end of their paid period and keeps what is deleted until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period.\n\nRefused with 422 `BILLING_CANCELLATION_MODE_FIXED` when a subscription's terms do not allow the mode: a pay-as-you-go subscription is canceled only now, and a prepaid one whose terms allow only the end of its period only then. Refused with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` for `period_end` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again returns it as it is.",
+    ),
 });
 
 /**
@@ -1424,14 +1478,23 @@ export const CreateBackupCapacityPackParams = zod.strictObject({
 export const CreateBackupCapacityPackBody = CreateBackupCapacityPackRequestBody;
 
 /**
- * Cancels the pack's subscription in Billing and returns the cancellation. Refused with 404 `BACKUP_CAPACITY_PACK_NOT_FOUND` when the project has no pack of this ID in the region, and with 409 `BACKUP_CAPACITY_PACK_ENDED` when the pack has ended.
+ * Cancels the pack's subscription in Billing as `cancellation_mode` says and returns the cancellation. Refused with 404 `BACKUP_CAPACITY_PACK_NOT_FOUND` when the project has no pack of this ID in the region, and with 409 `BACKUP_CAPACITY_PACK_ENDED` when the pack has ended.
  *
- * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and its coverage stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * Canceled now, it is refunded under its terms; canceled at the end of its paid period, its coverage stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
  * @summary Delete a backup capacity pack
  */
 export const DeleteBackupCapacityPackParams = zod.strictObject({
   regionId: zod.uuid(),
   packId: zod.uuid(),
+});
+
+export const DeleteBackupCapacityPackQueryParams = zod.strictObject({
+  cancellation_mode: zod
+    .enum(["immediate", "period_end"])
+    .optional()
+    .describe(
+      "How the subscriptions that pay for what is deleted are canceled. `immediate` cancels them now and refunds them under their terms; `period_end` cancels them at the end of their paid period and keeps what is deleted until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period.\n\nRefused with 422 `BILLING_CANCELLATION_MODE_FIXED` when a subscription's terms do not allow the mode: a pay-as-you-go subscription is canceled only now, and a prepaid one whose terms allow only the end of its period only then. Refused with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` for `period_end` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again returns it as it is.",
+    ),
 });
 
 /**

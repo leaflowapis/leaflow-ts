@@ -348,6 +348,20 @@ export interface Quote {
 }
 
 /**
+ * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
+ * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
+ * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
+ * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
+ * BILLING_CANCELLATION_MODE_FIXED.
+ */
+export type CancellationMode = (typeof CancellationMode)[keyof typeof CancellationMode];
+
+export const CancellationMode = {
+  immediate: "immediate",
+  period_end: "period_end",
+} as const;
+
+/**
  * What ending these subscriptions together would return, for one mode; preview `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).
  */
 export interface CancellationPreviewRequest {
@@ -362,7 +376,7 @@ export interface CancellationPreviewRequest {
    * @maxItems 50
    */
   subscription_ids: string[];
-  mode: CancellationPolicy;
+  mode: CancellationMode;
 }
 
 /**
@@ -420,7 +434,7 @@ export interface CancellationRefundPreviewItem {
  * Metered and one-time subscriptions show zero; their usage until release is charged as usual.
  */
 export interface CancellationRefundPreview {
-  mode: CancellationPolicy;
+  mode: CancellationMode;
   /** For `period_end`, when release begins, the end of the paid terms. */
   scheduled_at?: string;
   /** For `immediate`, the second the refund is computed as of. Give it when creating the cancellation. */
@@ -443,7 +457,7 @@ export interface CancellationCreate {
    * @maxItems 50
    */
   subscription_ids: string[];
-  mode: CancellationPolicy;
+  mode: CancellationMode;
   /** For `immediate`, the quote's `proration_date`: a whole second, not in the future and at most ten minutes old; the refund is computed as of it. Now when omitted. */
   proration_date?: string;
   /** The quote's `refundable_amount`; the cancellation is refused when the refund differs. */
@@ -532,7 +546,7 @@ export interface CancellationItem {
 export interface Cancellation {
   id: string;
   status: CancellationStatus;
-  mode: CancellationPolicy;
+  mode: CancellationMode;
   scheduled_at?: string;
   /** For `immediate`, the second the refund is computed as of. */
   proration_date?: string;
@@ -580,14 +594,6 @@ export const SubscriptionCancellationStatus = {
   canceled: "canceled",
 } as const;
 
-export type SubscriptionCancellationMode =
-  (typeof SubscriptionCancellationMode)[keyof typeof SubscriptionCancellationMode];
-
-export const SubscriptionCancellationMode = {
-  immediate: "immediate",
-  period_end: "period_end",
-} as const;
-
 /**
  * The latest cancellation including the subscription, with this subscription's item: `id` is the item and `cancellation_id` the cancellation. scheduled_at is the intended time and effective_at the confirmed end of service.
  */
@@ -598,7 +604,7 @@ export interface SubscriptionCancellation {
   id: string;
   subscription_id: string;
   status: SubscriptionCancellationStatus;
-  mode: SubscriptionCancellationMode;
+  mode: CancellationMode;
   requested_at: string;
   scheduled_at?: string;
   effective_at?: string;
@@ -3506,7 +3512,7 @@ export interface RateSearch {
 }
 
 export interface CancelSubscriptionRequest {
-  mode: CancellationPolicy;
+  mode: CancellationMode;
   /** For immediate cancellation, the quoted whole-second refund basis. Now when omitted. */
   proration_date?: string;
   /** The cancellation quote's refundable amount, including an explicit zero. */

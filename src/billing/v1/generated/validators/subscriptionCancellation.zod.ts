@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CancellationMode } from "./cancellationMode.zod.js";
 
 export const SubscriptionCancellation = zod
   .strictObject({
@@ -19,7 +20,7 @@ export const SubscriptionCancellation = zod
     id: zod.uuid(),
     subscription_id: zod.uuid(),
     status: zod.enum(["requested", "scheduled", "releasing", "failed", "completed", "canceled"]),
-    mode: zod.enum(["immediate", "period_end"]),
+    mode: CancellationMode,
     requested_at: zod.iso.datetime({ offset: true }),
     scheduled_at: zod.iso.datetime({ offset: true }).optional(),
     effective_at: zod.iso.datetime({ offset: true }).optional(),

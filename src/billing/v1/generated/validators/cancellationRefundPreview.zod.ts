@@ -6,13 +6,13 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { CancellationPolicy } from "./cancellationPolicy.zod.js";
+import { CancellationMode } from "./cancellationMode.zod.js";
 import { CancellationRefundPreviewItem } from "./cancellationRefundPreviewItem.zod.js";
 import { Money } from "./money.zod.js";
 
 export const CancellationRefundPreview = zod
   .strictObject({
-    mode: CancellationPolicy,
+    mode: CancellationMode,
     scheduled_at: zod.iso
       .datetime({ offset: true })
       .optional()
