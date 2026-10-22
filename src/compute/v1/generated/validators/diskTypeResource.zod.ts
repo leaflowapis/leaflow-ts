@@ -11,7 +11,7 @@
  * ## Conventions
  *
  * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the Checkout Session and the order in Billing for checkout and payment progress.
- * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the licensed and metered options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
+ * - **Commercial terms.** Compute returns no amounts. Catalog items, such as instance types, disk types and public IP pools, and the region's own products carry `billing`: the Billing plan an order line for them is sold under, the dimensions the line carries, how its quantity is counted for each usage type, and the meters its metered price reads. Read their prices from Billing with `search-prices` and `search-rates`, quote a purchase or a change with Billing's `get-quote` using the same lines, and estimate metered usage with Billing's `estimate-usage`. A purchase chooses its terms with `billing`, which applies to all of its components.
  * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid.
  * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time.
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
@@ -22,8 +22,8 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { BillingComponent } from "./billingComponent.zod.js";
 import { DiskTypePurpose } from "./diskTypePurpose.zod.js";
-import { Pricing } from "./pricing.zod.js";
 
 export const DiskTypeResource = zod.strictObject({
   availability_zone_id: zod.uuid(),
@@ -57,11 +57,7 @@ export const DiskTypeResource = zod.strictObject({
     .describe(
       "Throughput a disk of `max_size_gb` gets, in bytes per second. Null when this type is not rate-limited",
     ),
-  pricing: zod
-    .union([Pricing, zod.null()])
-    .describe(
-      "How a disk of this type can be bought, per GiB. Null when the project has no billing account.",
-    ),
+  billing: BillingComponent,
 });
 
 export type DiskTypeResource = zod.input<typeof DiskTypeResource>;

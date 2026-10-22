@@ -11,7 +11,7 @@
  * ## Conventions
  *
  * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the Checkout Session and the order in Billing for checkout and payment progress.
- * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the licensed and metered options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
+ * - **Commercial terms.** Compute returns no amounts. Catalog items, such as instance types, disk types and public IP pools, and the region's own products carry `billing`: the Billing plan an order line for them is sold under, the dimensions the line carries, how its quantity is counted for each usage type, and the meters its metered price reads. Read their prices from Billing with `search-prices` and `search-rates`, quote a purchase or a change with Billing's `get-quote` using the same lines, and estimate metered usage with Billing's `estimate-usage`. A purchase chooses its terms with `billing`, which applies to all of its components.
  * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid.
  * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time.
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
@@ -22,7 +22,6 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
-  AllocateFloatingIPQuoteRequestBody,
   AllocateFloatingIPRequestBody,
   AllocateFloatingIPResponseBody,
   AttachDiskRequestBody,
@@ -37,16 +36,13 @@ import type {
   ConflictResponse,
   ConsoleOutputResponseBody,
   ConsoleResponseBody,
-  CreateBackupCapacityPackQuoteRequestBody,
   CreateBackupCapacityPackRequestBody,
   CreateBackupCapacityPackResponseBody,
   CreateBackupRequestBody,
   CreateBackupServiceRequestBody,
   CreateBackupServiceResponseBody,
-  CreateDiskQuoteRequestBody,
   CreateDiskRequestBody,
   CreateDiskResponseBody,
-  CreateImageQuoteRequestBody,
   CreateImageRequestBody,
   CreateImageResponseBody,
   CreatePeeringRequestBody,
@@ -57,6 +53,9 @@ import type {
   CreateSecurityRuleRequestBody,
   CreateSnapshotRequestBody,
   CreateSubnetRequestBody,
+  DeleteDiskResponseBody,
+  DeleteImageResponseBody,
+  DeleteInstanceResponseBody,
   DiskAttachmentList,
   DiskListResponseBody,
   DiskResource,
@@ -73,7 +72,6 @@ import type {
   InstanceListResponseBody,
   InstanceResource,
   InstanceTypeListResponseBody,
-  LaunchInstanceQuoteRequestBody,
   LaunchInstanceRequestBody,
   LaunchInstanceResponseBody,
   ListAvailabilityZonesParams,
@@ -108,11 +106,11 @@ import type {
   PowerRequest,
   PrivateNetworkListResponseBody,
   PrivateNetworkResource,
-  Quote,
   RebootInstanceRequestBody,
   RebuildInstanceRequestBody,
   RebuildInstanceResponseBody,
   RegionListResponseBody,
+  ReleaseFloatingIPResponseBody,
   RenameBackupRequestBody,
   RenameDiskRequestBody,
   RenameImageRequestBody,
@@ -122,13 +120,11 @@ import type {
   RenameSnapshotRequestBody,
   ResetPasswordRequestBody,
   ResetPasswordResponseBody,
-  ResizeDiskQuoteRequestBody,
   ResizeDiskRequestBody,
   ResizeDiskResponseBody,
-  ResizeInstanceQuoteRequestBody,
   ResizeInstanceRequestBody,
   ResizeInstanceResponseBody,
-  RestoreBackupQuoteRequestBody,
+  ResourceCancellation,
   RestoreBackupRequestBody,
   RevertDiskRequestBody,
   RouteListResponseBody,
@@ -138,12 +134,10 @@ import type {
   SecurityGroupResource,
   SecurityRuleListResponseBody,
   SecurityRuleResource,
-  SetFloatingIPBandwidthQuoteRequestBody,
   SetFloatingIPBandwidthRequestBody,
   SetFloatingIPBandwidthResponseBody,
   SetInstanceLabelsRequestBody,
   SetInstanceNotesRequestBody,
-  SetSnapshotQuotaQuoteRequestBody,
   SetSnapshotQuotaRequestBody,
   SetSnapshotQuotaResponseBody,
   SnapshotListResponseBody,
@@ -556,81 +550,6 @@ export const restoreBackup = async (
   return { data, status: res.status, headers: res.headers } as restoreBackupResponse;
 };
 
-export type createBackupRestoreQuoteResponse200 = {
-  data: Quote;
-  status: 200;
-};
-
-export type createBackupRestoreQuoteResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type createBackupRestoreQuoteResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createBackupRestoreQuoteResponseSuccess = createBackupRestoreQuoteResponse200 & {
-  headers: Headers;
-};
-export type createBackupRestoreQuoteResponseError = (
-  | createBackupRestoreQuoteResponse409
-  | createBackupRestoreQuoteResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createBackupRestoreQuoteResponse =
-  | createBackupRestoreQuoteResponseSuccess
-  | createBackupRestoreQuoteResponseError;
-
-export const getCreateBackupRestoreQuoteUrl = (backupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/backups/${encodeURIComponent(String(backupId))}/restore/quote`;
-};
-
-/**
- * Prices what `restore-backup` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote restoring from a backup
- */
-export const createBackupRestoreQuote = async (
-  backupId: string,
-  restoreBackupQuoteRequestBody: RestoreBackupQuoteRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createBackupRestoreQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateBackupRestoreQuoteUrl(backupId), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(restoreBackupQuoteRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createBackupRestoreQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createBackupRestoreQuoteResponse;
-};
-
 export type listDiskTypesResponse200 = {
   data: DiskTypeListResponseBody;
   status: 200;
@@ -832,7 +751,7 @@ export const getCreateImageUrl = () => {
  *
  * The instance can be started, stopped and used normally during the capture, but cannot be released.
  *
- * The image is billed for the storage it occupies, as the region's `private_image_pricing` shows. Obtain a quote with `create-image-quote` first.
+ * The image is billed for the storage it occupies, under the region's `private_image_billing`. Quote it with Billing first.
  * @summary Capture an instance as a private image
  */
 export const createImage = async (
@@ -870,80 +789,6 @@ export const createImage = async (
 
   const data: createImageResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as createImageResponse;
-};
-
-export type createImageQuoteResponse200 = {
-  data: Quote;
-  status: 200;
-};
-
-export type createImageQuoteResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type createImageQuoteResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createImageQuoteResponseSuccess = createImageQuoteResponse200 & {
-  headers: Headers;
-};
-export type createImageQuoteResponseError = (
-  | createImageQuoteResponse409
-  | createImageQuoteResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createImageQuoteResponse =
-  | createImageQuoteResponseSuccess
-  | createImageQuoteResponseError;
-
-export const getCreateImageQuoteUrl = () => {
-  return `https://compute.leaflow.cloud/api/v1/images/quote`;
-};
-
-/**
- * Prices the capture `create-image` would order for the same instance, without ordering anything; nothing is reserved or recorded. The quantity priced is the size of the system disk, which is the most the image can occupy, with the option chosen in `billing`. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. Prices may change, so quote again before final confirmation.
- * @summary Quote capturing an instance as a private image
- */
-export const createImageQuote = async (
-  createImageQuoteRequestBody: CreateImageQuoteRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createImageQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateImageQuoteUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(createImageQuoteRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createImageQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createImageQuoteResponse;
 };
 
 export type getImageResponse200 = {
@@ -1055,7 +900,7 @@ export const renameImage = async (
 };
 
 export type deleteImageResponse202 = {
-  data: ImageResource;
+  data: DeleteImageResponseBody;
   status: 202;
 };
 
@@ -1089,7 +934,7 @@ export const getDeleteImageUrl = (imageId: string) => {
  *
  * An image whose capture has not finished can be deleted; the capture is aborted. This is the one operation accepted while the `create` operation is in progress.
  *
- * Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the image, including a pay-as-you-go subscription. `meta.resource_id` names the image. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+ * When subscriptions pay for the image, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the image is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
  * @summary Delete a private image
  */
 export const deleteImage = async (
@@ -1406,78 +1251,6 @@ export const createDisk = async (
   return { data, status: res.status, headers: res.headers } as createDiskResponse;
 };
 
-export type createDiskQuoteResponse200 = {
-  data: Quote;
-  status: 200;
-};
-
-export type createDiskQuoteResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type createDiskQuoteResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createDiskQuoteResponseSuccess = createDiskQuoteResponse200 & {
-  headers: Headers;
-};
-export type createDiskQuoteResponseError = (
-  | createDiskQuoteResponse409
-  | createDiskQuoteResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createDiskQuoteResponse = createDiskQuoteResponseSuccess | createDiskQuoteResponseError;
-
-export const getCreateDiskQuoteUrl = () => {
-  return `https://compute.leaflow.cloud/api/v1/disks/quote`;
-};
-
-/**
- * Prices what `create-disk` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote creating a disk
- */
-export const createDiskQuote = async (
-  createDiskQuoteRequestBody: CreateDiskQuoteRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createDiskQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateDiskQuoteUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(createDiskQuoteRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createDiskQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createDiskQuoteResponse;
-};
-
 export type getDiskResponse200 = {
   data: DiskResource;
   status: 200;
@@ -1587,7 +1360,7 @@ export const renameDisk = async (
 };
 
 export type deleteDiskResponse202 = {
-  data: DiskResource;
+  data: DeleteDiskResponseBody;
   status: 202;
 };
 
@@ -1617,7 +1390,7 @@ export const getDeleteDiskUrl = (diskId: string) => {
 /**
  * Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
  *
- * Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the disk, including a pay-as-you-go subscription. `meta.resource_id` names the disk. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+ * When subscriptions pay for the disk, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the disk is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
  * @summary Delete a disk
  */
 export const deleteDisk = async (
@@ -1710,81 +1483,6 @@ export const resizeDisk = async (
 
   const data: resizeDiskResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as resizeDiskResponse;
-};
-
-export type createDiskResizeQuoteResponse200 = {
-  data: Quote;
-  status: 200;
-};
-
-export type createDiskResizeQuoteResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type createDiskResizeQuoteResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createDiskResizeQuoteResponseSuccess = createDiskResizeQuoteResponse200 & {
-  headers: Headers;
-};
-export type createDiskResizeQuoteResponseError = (
-  | createDiskResizeQuoteResponse409
-  | createDiskResizeQuoteResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createDiskResizeQuoteResponse =
-  | createDiskResizeQuoteResponseSuccess
-  | createDiskResizeQuoteResponseError;
-
-export const getCreateDiskResizeQuoteUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}/resize/quote`;
-};
-
-/**
- * Prices the change `resize-disk` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote resizing a disk
- */
-export const createDiskResizeQuote = async (
-  diskId: string,
-  resizeDiskQuoteRequestBody: ResizeDiskQuoteRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createDiskResizeQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateDiskResizeQuoteUrl(diskId), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(resizeDiskQuoteRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createDiskResizeQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createDiskResizeQuoteResponse;
 };
 
 export type revertDiskResponse202 = {
@@ -1995,80 +1693,6 @@ export const allocateFloatingIp = async (
   return { data, status: res.status, headers: res.headers } as allocateFloatingIpResponse;
 };
 
-export type createFloatingIpQuoteResponse200 = {
-  data: Quote;
-  status: 200;
-};
-
-export type createFloatingIpQuoteResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type createFloatingIpQuoteResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createFloatingIpQuoteResponseSuccess = createFloatingIpQuoteResponse200 & {
-  headers: Headers;
-};
-export type createFloatingIpQuoteResponseError = (
-  | createFloatingIpQuoteResponse409
-  | createFloatingIpQuoteResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createFloatingIpQuoteResponse =
-  | createFloatingIpQuoteResponseSuccess
-  | createFloatingIpQuoteResponseError;
-
-export const getCreateFloatingIpQuoteUrl = () => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/quote`;
-};
-
-/**
- * Prices what `allocate-floating-ip` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote allocating a floating IP
- */
-export const createFloatingIpQuote = async (
-  allocateFloatingIPQuoteRequestBody: AllocateFloatingIPQuoteRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createFloatingIpQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateFloatingIpQuoteUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(allocateFloatingIPQuoteRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createFloatingIpQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createFloatingIpQuoteResponse;
-};
-
 export type getFloatingIpResponse200 = {
   data: FloatingIPResource;
   status: 200;
@@ -2112,7 +1736,7 @@ export const getFloatingIp = async (
 };
 
 export type releaseFloatingIpResponse202 = {
-  data: FloatingIPResource;
+  data: ReleaseFloatingIPResponseBody;
   status: 202;
 };
 
@@ -2147,7 +1771,7 @@ export const getReleaseFloatingIpUrl = (floatingIpId: string) => {
 /**
  * Releases the floating IP after unbinding it. The floating IP shows the `delete` operation until it is released.
  *
- * Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the address, including a pay-as-you-go subscription. `meta.resource_id` names the floating IP. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+ * When subscriptions pay for the address, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the floating IP is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
  * @summary Release a floating IP
  */
 export const releaseFloatingIp = async (
@@ -2241,86 +1865,6 @@ export const setFloatingIpBandwidth = async (
 
   const data: setFloatingIpBandwidthResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as setFloatingIpBandwidthResponse;
-};
-
-export type createFloatingIpBandwidthQuoteResponse200 = {
-  data: Quote;
-  status: 200;
-};
-
-export type createFloatingIpBandwidthQuoteResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type createFloatingIpBandwidthQuoteResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createFloatingIpBandwidthQuoteResponseSuccess =
-  createFloatingIpBandwidthQuoteResponse200 & {
-    headers: Headers;
-  };
-export type createFloatingIpBandwidthQuoteResponseError = (
-  | createFloatingIpBandwidthQuoteResponse409
-  | createFloatingIpBandwidthQuoteResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createFloatingIpBandwidthQuoteResponse =
-  | createFloatingIpBandwidthQuoteResponseSuccess
-  | createFloatingIpBandwidthQuoteResponseError;
-
-export const getCreateFloatingIpBandwidthQuoteUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}/bandwidth/quote`;
-};
-
-/**
- * Prices the change `set-floating-ip-bandwidth` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote changing the bandwidth limit
- */
-export const createFloatingIpBandwidthQuote = async (
-  floatingIpId: string,
-  setFloatingIPBandwidthQuoteRequestBody: SetFloatingIPBandwidthQuoteRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createFloatingIpBandwidthQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateFloatingIpBandwidthQuoteUrl(floatingIpId), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(setFloatingIPBandwidthQuoteRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createFloatingIpBandwidthQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as createFloatingIpBandwidthQuoteResponse;
 };
 
 export type bindFloatingIpResponse202 = {
@@ -2584,80 +2128,6 @@ export const launchInstance = async (
   return { data, status: res.status, headers: res.headers } as launchInstanceResponse;
 };
 
-export type createInstanceQuoteResponse200 = {
-  data: Quote;
-  status: 200;
-};
-
-export type createInstanceQuoteResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type createInstanceQuoteResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createInstanceQuoteResponseSuccess = createInstanceQuoteResponse200 & {
-  headers: Headers;
-};
-export type createInstanceQuoteResponseError = (
-  | createInstanceQuoteResponse409
-  | createInstanceQuoteResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createInstanceQuoteResponse =
-  | createInstanceQuoteResponseSuccess
-  | createInstanceQuoteResponseError;
-
-export const getCreateInstanceQuoteUrl = () => {
-  return `https://compute.leaflow.cloud/api/v1/instances/quote`;
-};
-
-/**
- * Prices what `launch-instance` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote creating instances
- */
-export const createInstanceQuote = async (
-  launchInstanceQuoteRequestBody: LaunchInstanceQuoteRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createInstanceQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateInstanceQuoteUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(launchInstanceQuoteRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createInstanceQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createInstanceQuoteResponse;
-};
-
 export type getInstanceResponse200 = {
   data: InstanceResource;
   status: 200;
@@ -2767,7 +2237,7 @@ export const renameInstance = async (
 };
 
 export type deleteInstanceResponse202 = {
-  data: InstanceResource;
+  data: DeleteInstanceResponseBody;
   status: 202;
 };
 
@@ -2802,7 +2272,7 @@ export const getDeleteInstanceUrl = (instanceId: string) => {
  *
  * An instance being captured as a private image cannot be released. Wait for the capture to finish, or delete that image first.
  *
- * Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the instance, or for a disk that is deleted with it, including a pay-as-you-go subscription. `meta.resource_id` names that resource. The instance is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+ * When subscriptions pay for the instance, or for a disk deleted with it, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the instance is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
  * @summary Release an instance
  */
 export const deleteInstance = async (
@@ -3466,81 +2936,6 @@ export const resizeInstance = async (
 
   const data: resizeInstanceResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as resizeInstanceResponse;
-};
-
-export type createInstanceResizeQuoteResponse200 = {
-  data: Quote;
-  status: 200;
-};
-
-export type createInstanceResizeQuoteResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type createInstanceResizeQuoteResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
-};
-
-export type createInstanceResizeQuoteResponseSuccess = createInstanceResizeQuoteResponse200 & {
-  headers: Headers;
-};
-export type createInstanceResizeQuoteResponseError = (
-  | createInstanceResizeQuoteResponse409
-  | createInstanceResizeQuoteResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type createInstanceResizeQuoteResponse =
-  | createInstanceResizeQuoteResponseSuccess
-  | createInstanceResizeQuoteResponseError;
-
-export const getCreateInstanceResizeQuoteUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/resize/quote`;
-};
-
-/**
- * Prices the change `resize-instance` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote resizing an instance
- */
-export const createInstanceResizeQuote = async (
-  instanceId: string,
-  resizeInstanceQuoteRequestBody: ResizeInstanceQuoteRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createInstanceResizeQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateInstanceResizeQuoteUrl(instanceId), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(resizeInstanceQuoteRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createInstanceResizeQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createInstanceResizeQuoteResponse;
 };
 
 export type startInstanceResponse202 = {
@@ -5711,9 +5106,9 @@ export const getGetSnapshotQuotaUrl = (regionId: string) => {
  * max(limit - used, 0) while active, and zero when creation is not permitted; additional
  * creation is refused while the quota is inactive, suspended or exhausted.
  *
- * Canceling the quota's subscription through Billing is refused while any snapshot exists in
- * the region: the cancellation fails with SNAPSHOT_QUOTA_IN_USE. Reclaiming the quota for
- * non-payment deletes its snapshots, as for other reclaimed resources.
+ * Deleting the quota, which cancels its subscription, is refused while any snapshot exists in the
+ * region with SNAPSHOT_QUOTA_IN_USE. Reclaiming the quota for non-payment deletes its snapshots, as
+ * for other reclaimed resources.
  * @summary Get regional snapshot quota
  */
 export const getSnapshotQuota = async (
@@ -5768,8 +5163,9 @@ export const getSetSnapshotQuotaUrl = (regionId: string) => {
 /**
  * Purchases or changes the maximum number of snapshots this project may hold in this region.
  * limit is the target total, not an additional number of slots or a consumable create allowance.
- * billing chooses one of the quota's pricing options; a change of an existing purchase keeps its
- * usage type and period, and billing must name that option. The purchased quantity is this count.
+ * billing chooses how the quota is bought, among the prices Billing offers for the region's
+ * `snapshot_quota_billing`; a change of an existing purchase keeps its usage type and period, and billing
+ * must name them. The purchased quantity is this count.
  *
  * Returns the quota with the Checkout Session. pending_limit records the target while the current limit stays
  * in force; the new limit applies once the order is accepted and the quota is activated. Snapshots
@@ -5821,79 +5217,59 @@ export const setSnapshotQuota = async (
   return { data, status: res.status, headers: res.headers } as setSnapshotQuotaResponse;
 };
 
-export type createSnapshotQuotaQuoteResponse200 = {
-  data: Quote;
-  status: 200;
+export type deleteSnapshotQuotaResponse202 = {
+  data: ResourceCancellation;
+  status: 202;
 };
 
-export type createSnapshotQuotaQuoteResponse409 = {
+export type deleteSnapshotQuotaResponse409 = {
   data: ConflictResponse;
   status: 409;
 };
 
-export type createSnapshotQuotaQuoteResponseDefault = {
+export type deleteSnapshotQuotaResponseDefault = {
   data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
+  status: Exclude<HTTPStatusCodes, 202 | 409>;
 };
 
-export type createSnapshotQuotaQuoteResponseSuccess = createSnapshotQuotaQuoteResponse200 & {
+export type deleteSnapshotQuotaResponseSuccess = deleteSnapshotQuotaResponse202 & {
   headers: Headers;
 };
-export type createSnapshotQuotaQuoteResponseError = (
-  | createSnapshotQuotaQuoteResponse409
-  | createSnapshotQuotaQuoteResponseDefault
+export type deleteSnapshotQuotaResponseError = (
+  | deleteSnapshotQuotaResponse409
+  | deleteSnapshotQuotaResponseDefault
 ) & {
   headers: Headers;
 };
 
-export type createSnapshotQuotaQuoteResponse =
-  | createSnapshotQuotaQuoteResponseSuccess
-  | createSnapshotQuotaQuoteResponseError;
+export type deleteSnapshotQuotaResponse =
+  | deleteSnapshotQuotaResponseSuccess
+  | deleteSnapshotQuotaResponseError;
 
-export const getCreateSnapshotQuotaQuoteUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/snapshot-quota/quote`;
+export const getDeleteSnapshotQuotaUrl = (regionId: string) => {
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/snapshot-quota`;
 };
 
 /**
- * Prices what `set-snapshot-quota` would order, including a change of an existing purchase as of now, for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote setting the regional snapshot quota
+ * Cancels the quota's subscription in Billing and returns the cancellation. Refused with 409 `SNAPSHOT_QUOTA_IN_USE` while any snapshot exists in the region; delete the snapshots first. Refused with 409 `SNAPSHOT_QUOTA_NOT_ACTIVE` when no subscription pays for a quota in the region.
+ *
+ * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and the quota stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * @summary Delete regional snapshot quota
  */
-export const createSnapshotQuotaQuote = async (
+export const deleteSnapshotQuota = async (
   regionId: string,
-  setSnapshotQuotaQuoteRequestBody: SetSnapshotQuotaQuoteRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<createSnapshotQuotaQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateSnapshotQuotaQuoteUrl(regionId), {
+): Promise<deleteSnapshotQuotaResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteSnapshotQuotaUrl(regionId), {
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(setSnapshotQuotaQuoteRequestBody),
+    method: "DELETE",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createSnapshotQuotaQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createSnapshotQuotaQuoteResponse;
+  const data: deleteSnapshotQuotaResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as deleteSnapshotQuotaResponse;
 };
 
 export type getBackupServiceResponse200 = {
@@ -5924,7 +5300,7 @@ export const getGetBackupServiceUrl = (regionId: string) => {
 /**
  * The backup service of the authenticated project in this region. Backups can be created only while it is `active`. Each hour, Compute covers retained backup capacity up to the total `capacity_gib` of the capacity packs active in the region and meters only the excess on this service's subscription, per GiB-hour.
  *
- * Canceling the service's subscription through Billing is refused while any backup is retained in the region: the cancellation fails with `BACKUP_SERVICE_IN_USE`. Delete the backups first. Capacity packs are canceled separately, under their own refund terms. Reclaiming the service for non-payment deletes its backups.
+ * Deleting the service, which cancels its subscription, is refused while any backup is retained in the region with `BACKUP_SERVICE_IN_USE`. Delete the backups first. Capacity packs are deleted separately, under their own refund terms. Reclaiming the service for non-payment deletes its backups.
  * @summary Get the backup service of a region
  */
 export const getBackupService = async (
@@ -6020,57 +5396,59 @@ export const createBackupService = async (
   return { data, status: res.status, headers: res.headers } as createBackupServiceResponse;
 };
 
-export type createBackupServiceQuoteResponse200 = {
-  data: Quote;
-  status: 200;
+export type deleteBackupServiceResponse202 = {
+  data: ResourceCancellation;
+  status: 202;
 };
 
-export type createBackupServiceQuoteResponse409 = {
+export type deleteBackupServiceResponse409 = {
   data: ConflictResponse;
   status: 409;
 };
 
-export type createBackupServiceQuoteResponseDefault = {
+export type deleteBackupServiceResponseDefault = {
   data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
+  status: Exclude<HTTPStatusCodes, 202 | 409>;
 };
 
-export type createBackupServiceQuoteResponseSuccess = createBackupServiceQuoteResponse200 & {
+export type deleteBackupServiceResponseSuccess = deleteBackupServiceResponse202 & {
   headers: Headers;
 };
-export type createBackupServiceQuoteResponseError = (
-  | createBackupServiceQuoteResponse409
-  | createBackupServiceQuoteResponseDefault
+export type deleteBackupServiceResponseError = (
+  | deleteBackupServiceResponse409
+  | deleteBackupServiceResponseDefault
 ) & {
   headers: Headers;
 };
 
-export type createBackupServiceQuoteResponse =
-  | createBackupServiceQuoteResponseSuccess
-  | createBackupServiceQuoteResponseError;
+export type deleteBackupServiceResponse =
+  | deleteBackupServiceResponseSuccess
+  | deleteBackupServiceResponseError;
 
-export const getCreateBackupServiceQuoteUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-service/quote`;
+export const getDeleteBackupServiceUrl = (regionId: string) => {
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-service`;
 };
 
 /**
- * Prices what `create-backup-service` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote activating the backup service
+ * Cancels the service's subscription in Billing and returns the cancellation. Refused with 409 `BACKUP_SERVICE_IN_USE` while any backup is retained in the region; delete the backups first. Capacity packs are deleted separately. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` when no subscription pays for a service in the region.
+ *
+ * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and the service stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * @summary Delete the backup service of a region
  */
-export const createBackupServiceQuote = async (
+export const deleteBackupService = async (
   regionId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<createBackupServiceQuoteResponse> => {
-  const res = await (fetchFn ?? fetch)(getCreateBackupServiceQuoteUrl(regionId), {
+): Promise<deleteBackupServiceResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteBackupServiceUrl(regionId), {
     ...options,
-    method: "POST",
+    method: "DELETE",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createBackupServiceQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createBackupServiceQuoteResponse;
+  const data: deleteBackupServiceResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as deleteBackupServiceResponse;
 };
 
 export type listBackupCapacityPacksResponse200 = {
@@ -6168,7 +5546,7 @@ export const getCreateBackupCapacityPackUrl = (regionId: string) => {
 };
 
 /**
- * Purchases a capacity pack, backup capacity for this project and region bought in advance by month or year: `billing` must be licensed with a period, as offered in the backup service's `capacity_pack_pricing`. Compute applies the coverage: each hour, retained backup capacity up to the total `capacity_gib` of the packs active in the region is covered, and Compute meters only the excess on the backup service's subscription. A pack is not a Billing allowance or credit; Billing takes its order and payment and handles its renewal and cancellation through the pack's subscription.
+ * Purchases a capacity pack, backup capacity for this project and region bought in advance by month or year: `billing` must be licensed with a period, as Billing offers for the region's `capacity_pack_billing`. Compute applies the coverage: each hour, retained backup capacity up to the total `capacity_gib` of the packs active in the region is covered, and Compute meters only the excess on the backup service's subscription. A pack is not a Billing allowance or credit; Billing takes its order and payment and handles its renewal and cancellation through the pack's subscription.
  *
  * Returns the pack as `pending` with its Checkout Session; it applies once the order is accepted. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` and `meta.region_id` when the region's backup service is not active.
  * @summary Buy a backup capacity pack
@@ -6211,84 +5589,60 @@ export const createBackupCapacityPack = async (
   return { data, status: res.status, headers: res.headers } as createBackupCapacityPackResponse;
 };
 
-export type createBackupCapacityPackQuoteResponse200 = {
-  data: Quote;
-  status: 200;
+export type deleteBackupCapacityPackResponse202 = {
+  data: ResourceCancellation;
+  status: 202;
 };
 
-export type createBackupCapacityPackQuoteResponse409 = {
+export type deleteBackupCapacityPackResponse409 = {
   data: ConflictResponse;
   status: 409;
 };
 
-export type createBackupCapacityPackQuoteResponseDefault = {
+export type deleteBackupCapacityPackResponseDefault = {
   data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 409>;
+  status: Exclude<HTTPStatusCodes, 202 | 409>;
 };
 
-export type createBackupCapacityPackQuoteResponseSuccess =
-  createBackupCapacityPackQuoteResponse200 & {
-    headers: Headers;
-  };
-export type createBackupCapacityPackQuoteResponseError = (
-  | createBackupCapacityPackQuoteResponse409
-  | createBackupCapacityPackQuoteResponseDefault
+export type deleteBackupCapacityPackResponseSuccess = deleteBackupCapacityPackResponse202 & {
+  headers: Headers;
+};
+export type deleteBackupCapacityPackResponseError = (
+  | deleteBackupCapacityPackResponse409
+  | deleteBackupCapacityPackResponseDefault
 ) & {
   headers: Headers;
 };
 
-export type createBackupCapacityPackQuoteResponse =
-  | createBackupCapacityPackQuoteResponseSuccess
-  | createBackupCapacityPackQuoteResponseError;
+export type deleteBackupCapacityPackResponse =
+  | deleteBackupCapacityPackResponseSuccess
+  | deleteBackupCapacityPackResponseError;
 
-export const getCreateBackupCapacityPackQuoteUrl = (regionId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-capacity-packs/quote`;
+export const getDeleteBackupCapacityPackUrl = (regionId: string, packId: string) => {
+  return `https://compute.leaflow.cloud/api/v1/regions/${encodeURIComponent(String(regionId))}/backup-capacity-packs/${encodeURIComponent(String(packId))}`;
 };
 
 /**
- * Prices what `create-backup-capacity-pack` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote buying a backup capacity pack
+ * Cancels the pack's subscription in Billing and returns the cancellation. Refused with 404 `BACKUP_CAPACITY_PACK_NOT_FOUND` when the project has no pack of this ID in the region, and with 409 `BACKUP_CAPACITY_PACK_ENDED` when the pack has ended.
+ *
+ * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and its coverage stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * @summary Delete a backup capacity pack
  */
-export const createBackupCapacityPackQuote = async (
+export const deleteBackupCapacityPack = async (
   regionId: string,
-  createBackupCapacityPackQuoteRequestBody: CreateBackupCapacityPackQuoteRequestBody,
+  packId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<createBackupCapacityPackQuoteResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateBackupCapacityPackQuoteUrl(regionId), {
+): Promise<deleteBackupCapacityPackResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteBackupCapacityPackUrl(regionId, packId), {
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(createBackupCapacityPackQuoteRequestBody),
+    method: "DELETE",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createBackupCapacityPackQuoteResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as createBackupCapacityPackQuoteResponse;
+  const data: deleteBackupCapacityPackResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as deleteBackupCapacityPackResponse;
 };
 
 export type listSnapshotsResponse200 = {

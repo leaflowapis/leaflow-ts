@@ -11,7 +11,7 @@
  * ## Conventions
  *
  * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the Checkout Session and the order in Billing for checkout and payment progress.
- * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the licensed and metered options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
+ * - **Commercial terms.** Compute returns no amounts. Catalog items, such as instance types, disk types and public IP pools, and the region's own products carry `billing`: the Billing plan an order line for them is sold under, the dimensions the line carries, how its quantity is counted for each usage type, and the meters its metered price reads. Read their prices from Billing with `search-prices` and `search-rates`, quote a purchase or a change with Billing's `get-quote` using the same lines, and estimate metered usage with Billing's `estimate-usage`. A purchase chooses its terms with `billing`, which applies to all of its components.
  * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid.
  * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time.
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
@@ -93,6 +93,842 @@ export interface CreatePeeringRequestBody {
   requester_network_id: string;
   accepter_project_id: string;
   accepter_network_id: string;
+}
+
+/**
+ * The dimension values the order line carries.
+ */
+export type BillingComponentDimensions = { [key: string]: string };
+
+/**
+ * `one`: one per item. `size_gib`: the size or capacity bought, in GiB. `bandwidth_mbps`: the bandwidth bought, in Mbps. `snapshots`: the number of snapshots the quota allows.
+ */
+export type BillingQuantity = (typeof BillingQuantity)[keyof typeof BillingQuantity];
+
+export const BillingQuantity = {
+  one: "one",
+  size_gib: "size_gib",
+  bandwidth_mbps: "bandwidth_mbps",
+  snapshots: "snapshots",
+} as const;
+
+/**
+ * What the order line's quantity counts, for each usage type the item is sold under. A usage type that is absent is not sold for this item.
+ */
+export type BillingComponentQuantity = {
+  licensed?: BillingQuantity;
+  metered?: BillingQuantity;
+};
+
+/**
+ * What the meter's quantity measures while the item exists: `one` is one item, `size_gib` its size in GiB, `bandwidth_mbps` its bandwidth in Mbps, `stored_gib` the GiB it stores.
+ */
+export type BillingMeterQuantity = (typeof BillingMeterQuantity)[keyof typeof BillingMeterQuantity];
+
+export const BillingMeterQuantity = {
+  one: "one",
+  size_gib: "size_gib",
+  bandwidth_mbps: "bandwidth_mbps",
+  stored_gib: "stored_gib",
+} as const;
+
+/**
+ * The dimension values the meter's usage carries, when they differ from the line's.
+ */
+export type BillingMeterDimensions = { [key: string]: string };
+
+export interface BillingMeter {
+  meter_lookup_key: string;
+  /** What the meter's quantity measures while the item exists: `one` is one item, `size_gib` its size in GiB, `bandwidth_mbps` its bandwidth in Mbps, `stored_gib` the GiB it stores. */
+  quantity: BillingMeterQuantity;
+  /** The dimension values the meter's usage carries, when they differ from the line's. */
+  dimensions?: BillingMeterDimensions;
+}
+
+/**
+ * How one order line of an item is sold in Billing. Give `plan_id` to Billing's `search-prices` for its prices, and `dimensions` to `search-rates` for the rates of a price that delegates to a rate card. Quote a purchase or a change with Billing's `get-quote` using these values, the quantity this describes and the chosen terms, and estimate metered usage with `estimate-usage` and `meters`.
+ */
+export interface BillingComponent {
+  /** The Billing plan the line is ordered under. */
+  plan_id: string;
+  /** The dimension values the order line carries. */
+  dimensions: BillingComponentDimensions;
+  /** What the order line's quantity counts, for each usage type the item is sold under. A usage type that is absent is not sold for this item. */
+  quantity: BillingComponentQuantity;
+  /** What the line's metered price reads. Empty when the line is never metered or its usage is not estimated in advance. */
+  meters: BillingMeter[];
+}
+
+/**
+ * `immediate` releases the resource now and refunds under the subscriptions' terms; `period_end` keeps it until `scheduled_at`.
+ */
+export type ResourceCancellationMode =
+  (typeof ResourceCancellationMode)[keyof typeof ResourceCancellationMode];
+
+export const ResourceCancellationMode = {
+  immediate: "immediate",
+  period_end: "period_end",
+} as const;
+
+/**
+ * `requested` and `scheduled` have not begun release; `releasing` is releasing the resource.
+ */
+export type ResourceCancellationStatus =
+  (typeof ResourceCancellationStatus)[keyof typeof ResourceCancellationStatus];
+
+export const ResourceCancellationStatus = {
+  requested: "requested",
+  scheduled: "scheduled",
+  releasing: "releasing",
+} as const;
+
+/**
+ * The Billing cancellation of the subscriptions that pay for a resource. Read it in Billing with `get-cancellation` for its refund and progress.
+ */
+export interface ResourceCancellation {
+  id: string;
+  /** `immediate` releases the resource now and refunds under the subscriptions' terms; `period_end` keeps it until `scheduled_at`. */
+  mode: ResourceCancellationMode;
+  /** `requested` and `scheduled` have not begun release; `releasing` is releasing the resource. */
+  status: ResourceCancellationStatus;
+  /**
+   * For `period_end`, when release begins; null otherwise.
+   * @nullable
+   */
+  scheduled_at: string | null;
+  subscription_ids: string[];
+}
+
+/**
+ * `pending` until the order is accepted: no virtual machine exists and addresses are null. `provisioning` while the instance is created, then `active`. `failed` means the instance was not created; `failure_reason` states why. `missing` means the virtual machine no longer exists in the cloud. The other values are the state last observed in the cloud; an operation in progress appears in `operation`, not here.
+ */
+export type InstanceResourceStatus =
+  (typeof InstanceResourceStatus)[keyof typeof InstanceResourceStatus];
+
+export const InstanceResourceStatus = {
+  pending: "pending",
+  provisioning: "provisioning",
+  active: "active",
+  stopped: "stopped",
+  paused: "paused",
+  suspended: "suspended",
+  shelved: "shelved",
+  shelved_offloaded: "shelved_offloaded",
+  rescued: "rescued",
+  deleted: "deleted",
+  failed: "failed",
+  error: "error",
+  unknown: "unknown",
+  missing: "missing",
+} as const;
+
+export type InstanceRestrictionSource =
+  (typeof InstanceRestrictionSource)[keyof typeof InstanceRestrictionSource];
+
+export const InstanceRestrictionSource = {
+  billing: "billing",
+  iam: "iam",
+  operator: "operator",
+} as const;
+
+/**
+ * An independent restriction on use. Removing one restriction never removes another source’s restriction, and never starts an instance its user stopped.
+ */
+export interface InstanceRestriction {
+  id: string;
+  source: InstanceRestrictionSource;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  source_id: string;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  reason_code: string;
+  created_at: string;
+}
+
+/**
+ * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this instance is refunded.
+ * @nullable
+ */
+export type InstanceResourceFailureReason =
+  | (typeof InstanceResourceFailureReason)[keyof typeof InstanceResourceFailureReason]
+  | null;
+
+export const InstanceResourceFailureReason = {
+  checkout_expired: "checkout_expired",
+  order_declined: "order_declined",
+  order_canceled: "order_canceled",
+  order_expired: "order_expired",
+  provisioning_failed: "provisioning_failed",
+} as const;
+
+/**
+ * `create` runs from acceptance of the order until the instance is `active` or `failed`. `suspend` and `resume` impose and lift a suspension by the platform or for non-payment. `delete` includes release through a Billing cancellation.
+ */
+export type InstanceOperationType =
+  (typeof InstanceOperationType)[keyof typeof InstanceOperationType];
+
+export const InstanceOperationType = {
+  create: "create",
+  start: "start",
+  stop: "stop",
+  reboot: "reboot",
+  rebuild: "rebuild",
+  resize: "resize",
+  reset_password: "reset_password",
+  attach_disk: "attach_disk",
+  detach_disk: "detach_disk",
+  attach_port: "attach_port",
+  detach_port: "detach_port",
+  bind_floating_ip: "bind_floating_ip",
+  unbind_floating_ip: "unbind_floating_ip",
+  suspend: "suspend",
+  resume: "resume",
+  delete: "delete",
+} as const;
+
+/**
+ * An operation still running on this instance. It is not a separate resource; once it finishes, the instance's `operation` is null again and the instance shows the result.
+ */
+export interface InstanceOperation {
+  /** `create` runs from acceptance of the order until the instance is `active` or `failed`. `suspend` and `resume` impose and lift a suspension by the platform or for non-payment. `delete` includes release through a Billing cancellation. */
+  type: InstanceOperationType;
+  started_at: string;
+}
+
+export type ReleaseResourceType = (typeof ReleaseResourceType)[keyof typeof ReleaseResourceType];
+
+export const ReleaseResourceType = {
+  instance: "instance",
+  disk: "disk",
+  image: "image",
+  floating_ip: "floating_ip",
+  backup_service: "backup_service",
+  snapshot_quota: "snapshot_quota",
+  backup_capacity_pack: "backup_capacity_pack",
+} as const;
+
+/**
+ * A resource a release set releases.
+ */
+export interface ReleaseResource {
+  type: ReleaseResourceType;
+  /** The resource's ID; for `backup_service` and `snapshot_quota`, the ID of their region. */
+  id: string;
+  /** The resource's name. A floating IP is named by its address, a backup service or snapshot quota by its region, and a capacity pack by its capacity, such as 100 GiB. */
+  name: string;
+}
+
+/**
+ * One subscription of a release set and the resource it pays for.
+ */
+export interface ReleaseSetItem {
+  subscription_id: string;
+  resource: ReleaseResource;
+}
+
+/**
+ * @nullable
+ */
+export type InstanceResourceAccessState =
+  | (typeof InstanceResourceAccessState)[keyof typeof InstanceResourceAccessState]
+  | null;
+
+export const InstanceResourceAccessState = {
+  pending: "pending",
+  enabled: "enabled",
+  suspended: "suspended",
+  reclaimed: "reclaimed",
+} as const;
+
+/**
+ * Your own classification of this instance, as key-value pairs. Empty when never set
+ */
+export type InstanceResourceLabels = { [key: string]: string };
+
+export interface InstanceResource {
+  availability_zone_id: string;
+  created_at: string;
+  /** Hostname inside the instance; equals the instance id */
+  hostname: string;
+  id: string;
+  /**
+   * Non-empty when the instance was created from an image, public or private
+   * @nullable
+   */
+  image_id: string | null;
+  /** The instance type in effect, and the basis for billing */
+  instance_type_id: string;
+  /**
+   * IPv6 address of the primary network interface. Assigned automatically once IPv6 is enabled on the private network
+   * @nullable
+   */
+  ipv6_address: string | null;
+  /** Your own classification of this instance, as key-value pairs. Empty when never set */
+  labels: InstanceResourceLabels;
+  /**
+   * The account to log in as over SSH. The password set at creation belongs to this account
+   * @maxLength 32
+   */
+  login_username: string;
+  name: string;
+  /**
+   * A free-text note about this instance. Empty when never set
+   * @maxLength 4096
+   */
+  notes: string;
+  /**
+   * Private address of the instance
+   * @nullable
+   */
+  private_ip: string | null;
+  /** @nullable */
+  private_network_id: string | null;
+  /**
+   * Floating IPv4 addresses bound to the primary network interface; an empty array when none are bound
+   * @nullable
+   */
+  public_ips: string[] | null;
+  region_id: string;
+  /** `pending` until the order is accepted: no virtual machine exists and addresses are null. `provisioning` while the instance is created, then `active`. `failed` means the instance was not created; `failure_reason` states why. `missing` means the virtual machine no longer exists in the cloud. The other values are the state last observed in the cloud; an operation in progress appears in `operation`, not here. */
+  status: InstanceResourceStatus;
+  /** @nullable */
+  subnet_id: string | null;
+  updated_at: string;
+  /** @minimum 1 */
+  generation: number;
+  /** @nullable */
+  observed_at: string | null;
+  restrictions: InstanceRestriction[];
+  /**
+   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this instance is refunded.
+   * @nullable
+   */
+  failure_reason: InstanceResourceFailureReason;
+  /** The operation in progress on this instance, or null when none is. */
+  readonly operation: InstanceOperation | null;
+  /** @nullable */
+  order_id: string | null;
+  /**
+   * The Billing order item for this resource.
+   * @nullable
+   */
+  order_item_id: string | null;
+  /**
+   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
+   * @nullable
+   */
+  checkout_session_id: string | null;
+  /**
+   * The Billing subscription associated with this resource. It may still be pending; its
+   * presence does not imply delivery or metering. Null when no subscription is associated.
+   * @nullable
+   */
+  subscription_id: string | null;
+  /** The subscriptions a cancellation through Billing has to cover to release this instance: its own and those of the disks deleted with it. Snapshots are cleaned up with their source disk without canceling the project's snapshot quota. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+  release_subscription_ids: string[];
+  /** The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+  release_set: ReleaseSetItem[];
+  /** @nullable */
+  access_state: InstanceResourceAccessState;
+  /**
+   * Non-empty when the instance was created from a disk you already had, instead of from an image
+   * @nullable
+   */
+  source_disk_id: string | null;
+}
+
+export interface DeleteInstanceResponseBody {
+  instance: InstanceResource;
+  /** The cancellation this request created or found open, when subscriptions pay for the resource; null when the resource was released directly. */
+  cancellation: ResourceCancellation | null;
+}
+
+/**
+ * `pending` until the order is accepted, with no storage allocated; `provisioning` while the disk is created; then `available`, or `in_use` once attached. `failed` means the disk was not created; `failure_reason` states why. `missing` means the disk no longer exists in the cloud.
+ */
+export type DiskResourceStatus = (typeof DiskResourceStatus)[keyof typeof DiskResourceStatus];
+
+export const DiskResourceStatus = {
+  pending: "pending",
+  provisioning: "provisioning",
+  available: "available",
+  in_use: "in_use",
+  deleted: "deleted",
+  failed: "failed",
+  error: "error",
+  missing: "missing",
+} as const;
+
+/**
+ * @nullable
+ */
+export type DiskResourceAccessState =
+  | (typeof DiskResourceAccessState)[keyof typeof DiskResourceAccessState]
+  | null;
+
+export const DiskResourceAccessState = {
+  pending: "pending",
+  enabled: "enabled",
+  suspended: "suspended",
+  reclaimed: "reclaimed",
+} as const;
+
+/**
+ * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this disk is refunded.
+ * @nullable
+ */
+export type DiskResourceFailureReason =
+  | (typeof DiskResourceFailureReason)[keyof typeof DiskResourceFailureReason]
+  | null;
+
+export const DiskResourceFailureReason = {
+  checkout_expired: "checkout_expired",
+  order_declined: "order_declined",
+  order_canceled: "order_canceled",
+  order_expired: "order_expired",
+  provisioning_failed: "provisioning_failed",
+} as const;
+
+/**
+ * `attach` and `detach` accompany the instance's `attach_disk` and `detach_disk`. `delete` includes release through a Billing cancellation and deletion with an instance.
+ */
+export type DiskOperationType = (typeof DiskOperationType)[keyof typeof DiskOperationType];
+
+export const DiskOperationType = {
+  create: "create",
+  resize: "resize",
+  revert: "revert",
+  attach: "attach",
+  detach: "detach",
+  suspend: "suspend",
+  resume: "resume",
+  delete: "delete",
+} as const;
+
+/**
+ * An operation still running on this disk. It is not a separate resource; once it finishes, the disk's `operation` is null again and the disk shows the result.
+ */
+export interface DiskOperation {
+  /** `attach` and `detach` accompany the instance's `attach_disk` and `detach_disk`. `delete` includes release through a Billing cancellation and deletion with an instance. */
+  type: DiskOperationType;
+  started_at: string;
+}
+
+export type DiskAttachmentRole = (typeof DiskAttachmentRole)[keyof typeof DiskAttachmentRole];
+
+export const DiskAttachmentRole = {
+  boot: "boot",
+  data: "data",
+} as const;
+
+export type DiskAttachmentState = (typeof DiskAttachmentState)[keyof typeof DiskAttachmentState];
+
+export const DiskAttachmentState = {
+  reserved: "reserved",
+  attached: "attached",
+  released: "released",
+  unknown: "unknown",
+} as const;
+
+export interface DiskAttachment {
+  id: string;
+  instance_id: string;
+  disk_id: string;
+  role: DiskAttachmentRole;
+  delete_with_instance: boolean;
+  state: DiskAttachmentState;
+  /** @nullable */
+  attached_at: string | null;
+  /** @nullable */
+  detached_at: string | null;
+  /** @nullable */
+  released_at: string | null;
+  /** @nullable */
+  device: string | null;
+}
+
+export interface DiskResource {
+  /** Availability zone the disk actually resides in. An instance must be in the same zone to attach it */
+  availability_zone_id: string;
+  created_at: string;
+  disk_type_id: string;
+  id: string;
+  name: string;
+  region_id: string;
+  size_gb: number;
+  /**
+   * IOPS this disk is allowed. Null when its type is not rate-limited.
+   *
+   * Computed from the disk's own capacity, so it grows when the disk is grown — but see the
+   * note on the resize endpoint: growing a disk that is attached is refused, precisely because
+   * the new figure would not take effect until it was attached again.
+   * @nullable
+   */
+  iops: number | null;
+  /**
+   * Throughput this disk is allowed, in bytes per second. Null when its type is not rate-limited
+   * @nullable
+   */
+  throughput_bytes_per_sec: number | null;
+  /** `pending` until the order is accepted, with no storage allocated; `provisioning` while the disk is created; then `available`, or `in_use` once attached. `failed` means the disk was not created; `failure_reason` states why. `missing` means the disk no longer exists in the cloud. */
+  status: DiskResourceStatus;
+  /** @nullable */
+  order_id: string | null;
+  /**
+   * The Billing order item for this resource.
+   * @nullable
+   */
+  order_item_id: string | null;
+  /**
+   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
+   * @nullable
+   */
+  checkout_session_id: string | null;
+  /**
+   * The Billing subscription associated with this resource. It may still be pending; its
+   * presence does not imply delivery or metering. Null when no subscription is associated.
+   * @nullable
+   */
+  subscription_id: string | null;
+  /** The subscriptions a cancellation through Billing has to cover to release this disk: its own. Snapshots have no individual subscriptions. A system disk is released only with its instance, so for a system disk the list is that of the instance. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
+  release_subscription_ids: string[];
+  /** The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+  release_set: ReleaseSetItem[];
+  /** @nullable */
+  access_state: DiskResourceAccessState;
+  /**
+   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this disk is refunded.
+   * @nullable
+   */
+  failure_reason: DiskResourceFailureReason;
+  /** The operation in progress on this disk, or null when none is. */
+  readonly operation: DiskOperation | null;
+  attachment?: DiskAttachment | null;
+  /** @minimum 1 */
+  generation: number;
+  /** @nullable */
+  observed_at: string | null;
+}
+
+export interface DeleteDiskResponseBody {
+  disk: DiskResource;
+  /** The cancellation this request created or found open, when subscriptions pay for the resource; null when the resource was released directly. */
+  cancellation: ResourceCancellation | null;
+}
+
+/**
+ * `pending` until the order is accepted, with no address allocated; `provisioning` while the address is allocated; then `available`. `failed` means no address was allocated; `failure_reason` states why. `missing` means the address no longer exists in the cloud.
+ */
+export type FloatingIPResourceStatus =
+  (typeof FloatingIPResourceStatus)[keyof typeof FloatingIPResourceStatus];
+
+export const FloatingIPResourceStatus = {
+  pending: "pending",
+  provisioning: "provisioning",
+  available: "available",
+  deleted: "deleted",
+  failed: "failed",
+  error: "error",
+  unknown: "unknown",
+  missing: "missing",
+} as const;
+
+/**
+ * @nullable
+ */
+export type FloatingIPResourceAccessState =
+  | (typeof FloatingIPResourceAccessState)[keyof typeof FloatingIPResourceAccessState]
+  | null;
+
+export const FloatingIPResourceAccessState = {
+  pending: "pending",
+  enabled: "enabled",
+  suspended: "suspended",
+  reclaimed: "reclaimed",
+} as const;
+
+/**
+ * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this floating IP is refunded.
+ * @nullable
+ */
+export type FloatingIPResourceFailureReason =
+  | (typeof FloatingIPResourceFailureReason)[keyof typeof FloatingIPResourceFailureReason]
+  | null;
+
+export const FloatingIPResourceFailureReason = {
+  checkout_expired: "checkout_expired",
+  order_declined: "order_declined",
+  order_canceled: "order_canceled",
+  order_expired: "order_expired",
+  provisioning_failed: "provisioning_failed",
+} as const;
+
+export type FloatingIPOperationType =
+  (typeof FloatingIPOperationType)[keyof typeof FloatingIPOperationType];
+
+export const FloatingIPOperationType = {
+  create: "create",
+  bind: "bind",
+  unbind: "unbind",
+  set_bandwidth: "set_bandwidth",
+  suspend: "suspend",
+  resume: "resume",
+  delete: "delete",
+} as const;
+
+/**
+ * An operation still running on this floating IP. It is not a separate resource; once it finishes, the floating IP's `operation` is null again and the floating IP shows the result.
+ */
+export interface FloatingIPOperation {
+  type: FloatingIPOperationType;
+  started_at: string;
+}
+
+export type IPv4BindingState = (typeof IPv4BindingState)[keyof typeof IPv4BindingState];
+
+export const IPv4BindingState = {
+  bound: "bound",
+  released: "released",
+  unknown: "unknown",
+} as const;
+
+export interface IPv4Binding {
+  id: string;
+  ipv4_allocation_id: string;
+  port_address_id: string;
+  address: string;
+  fixed_ip: string;
+  state: IPv4BindingState;
+  /** @nullable */
+  bound_at: string | null;
+  /** @nullable */
+  unbound_at: string | null;
+  /** @nullable */
+  released_at: string | null;
+}
+
+/**
+ * One purchased public IP resource, including its bandwidth configuration. Bandwidth has no
+ * separate Compute resource ID; one subscription pays for the address and its bandwidth.
+ * Changing bandwidth updates this same resource, not another allocation.
+ */
+export interface FloatingIPResource {
+  /**
+   * The allocated public address. Null until the address is allocated.
+   * @nullable
+   */
+  address: string | null;
+  /** @nullable */
+  bandwidth_mbps: number | null;
+  created_at: string;
+  id: string;
+  region_id: string;
+  /** `pending` until the order is accepted, with no address allocated; `provisioning` while the address is allocated; then `available`. `failed` means no address was allocated; `failure_reason` states why. `missing` means the address no longer exists in the cloud. */
+  status: FloatingIPResourceStatus;
+  /** @nullable */
+  order_id: string | null;
+  /**
+   * The Billing order item for this resource.
+   * @nullable
+   */
+  order_item_id: string | null;
+  /**
+   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
+   * @nullable
+   */
+  checkout_session_id: string | null;
+  /**
+   * The Billing subscription associated with this resource. It may still be pending; its
+   * presence does not imply delivery or metering. Null when no subscription is associated.
+   * @nullable
+   */
+  subscription_id: string | null;
+  /** The subscription a cancellation through Billing has to cover to release this floating IP. A subscription that has ended is not listed, and the list is empty when no subscription pays for the floating IP. */
+  release_subscription_ids: string[];
+  /** The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+  release_set: ReleaseSetItem[];
+  /** @nullable */
+  access_state: FloatingIPResourceAccessState;
+  /**
+   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this floating IP is refunded.
+   * @nullable
+   */
+  failure_reason: FloatingIPResourceFailureReason;
+  /** The operation in progress on this floating IP, or null when none is. */
+  readonly operation: FloatingIPOperation | null;
+  /** @minimum 1 */
+  generation: number;
+  /** @nullable */
+  observed_at: string | null;
+  binding: IPv4Binding | null;
+}
+
+export interface ReleaseFloatingIPResponseBody {
+  floating_ip: FloatingIPResource;
+  /** The cancellation this request created or found open, when subscriptions pay for the resource; null when the resource was released directly. */
+  cancellation: ResourceCancellation | null;
+}
+
+/**
+ * Who can see and use an image. `public` — offered to every project by the platform. `private` — usable only by the project that owns it.
+ */
+export type ImageVisibility = (typeof ImageVisibility)[keyof typeof ImageVisibility];
+
+export const ImageVisibility = {
+  public: "public",
+  private: "private",
+} as const;
+
+/**
+ * Only `available` images can install instances. A public image is always `available`; a private image is `pending` until its order is accepted, then goes through `provisioning` and `uploading` while it is captured. `failed` means the capture produced no image; `failure_reason` states why. `missing` means a private image no longer exists in the cloud.
+ */
+export type ImageResourceStatus = (typeof ImageResourceStatus)[keyof typeof ImageResourceStatus];
+
+export const ImageResourceStatus = {
+  pending: "pending",
+  provisioning: "provisioning",
+  uploading: "uploading",
+  available: "available",
+  deleted: "deleted",
+  failed: "failed",
+  error: "error",
+  missing: "missing",
+} as const;
+
+/**
+ * @nullable
+ */
+export type ImageResourceAccessState =
+  | (typeof ImageResourceAccessState)[keyof typeof ImageResourceAccessState]
+  | null;
+
+export const ImageResourceAccessState = {
+  pending: "pending",
+  enabled: "enabled",
+  suspended: "suspended",
+  reclaimed: "reclaimed",
+} as const;
+
+/**
+ * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
+ * @nullable
+ */
+export type ImageResourceFailureReason =
+  | (typeof ImageResourceFailureReason)[keyof typeof ImageResourceFailureReason]
+  | null;
+
+export const ImageResourceFailureReason = {
+  checkout_expired: "checkout_expired",
+  order_declined: "order_declined",
+  order_canceled: "order_canceled",
+  order_expired: "order_expired",
+  provisioning_failed: "provisioning_failed",
+} as const;
+
+/**
+ * `create` is the capture of a private image.
+ */
+export type ImageOperationType = (typeof ImageOperationType)[keyof typeof ImageOperationType];
+
+export const ImageOperationType = {
+  create: "create",
+  suspend: "suspend",
+  resume: "resume",
+  delete: "delete",
+} as const;
+
+/**
+ * An operation still running on this image. It is not a separate resource; once it finishes, the image's `operation` is null again and the image shows the result.
+ */
+export interface ImageOperation {
+  /** `create` is the capture of a private image. */
+  type: ImageOperationType;
+  started_at: string;
+}
+
+/**
+ * An image that installs the system of an instance. Fields that describe a capture or its billing apply only to private images and are null, zero or empty for public ones.
+ */
+export interface ImageResource {
+  id: string;
+  region_id: string;
+  visibility: ImageVisibility;
+  name: string;
+  os_family: string;
+  os_version: string;
+  architecture: string;
+  /**
+   * The account this image lets you log in as. The password set at creation belongs to this account
+   * @maxLength 32
+   */
+  login_username: string;
+  /** The system disk of an instance created from this image cannot be smaller than this */
+  min_disk_gb: number;
+  /** The instance type of an instance created from this image must have at least this much memory */
+  min_ram_mb: number;
+  /** False means a new password can only be set by rebuilding an instance created from this image */
+  supports_password_reset: boolean;
+  /** Only `available` images can install instances. A public image is always `available`; a private image is `pending` until its order is accepted, then goes through `provisioning` and `uploading` while it is captured. `failed` means the capture produced no image; `failure_reason` states why. `missing` means a private image no longer exists in the cloud. */
+  status: ImageResourceStatus;
+  /**
+   * Details of why the capture failed; non-empty only when `status` is `failed`
+   * @nullable
+   */
+  failure: string | null;
+  /** Storage occupied by a private image, which is what it is billed for; 0 until its capture completes, and 0 for public images */
+  size_bytes: number;
+  /**
+   * The instance a private image was captured from. The image remains usable after that instance is released. Null for public images
+   * @nullable
+   */
+  source_instance_id: string | null;
+  created_at: string;
+  /** @nullable */
+  order_id: string | null;
+  /**
+   * The Billing order item for this resource.
+   * @nullable
+   */
+  order_item_id: string | null;
+  /**
+   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
+   * @nullable
+   */
+  checkout_session_id: string | null;
+  /**
+   * The Billing subscription associated with this resource. It may still be pending; its
+   * presence does not imply delivery or metering. Null when no subscription is associated.
+   * @nullable
+   */
+  subscription_id: string | null;
+  /** The subscriptions a cancellation through Billing has to cover to release this private image: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for it, and for public images. */
+  release_subscription_ids: string[];
+  /** The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
+  release_set: ReleaseSetItem[];
+  /** @nullable */
+  access_state: ImageResourceAccessState;
+  /**
+   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
+   * @nullable
+   */
+  failure_reason: ImageResourceFailureReason;
+  /** The operation in progress on this image, or null when none is. */
+  readonly operation: ImageOperation | null;
+  /** @minimum 1 */
+  generation: number;
+  /** @nullable */
+  observed_at: string | null;
+}
+
+export interface DeleteImageResponseBody {
+  image: ImageResource;
+  /** The cancellation this request created or found open, when subscriptions pay for the resource; null when the resource was released directly. */
+  cancellation: ResourceCancellation | null;
 }
 
 /**
@@ -317,204 +1153,6 @@ export interface RestoreBackupRequestBody {
 }
 
 /**
- * `pending` until the order is accepted, with no storage allocated; `provisioning` while the disk is created; then `available`, or `in_use` once attached. `failed` means the disk was not created; `failure_reason` states why. `missing` means the disk no longer exists in the cloud.
- */
-export type DiskResourceStatus = (typeof DiskResourceStatus)[keyof typeof DiskResourceStatus];
-
-export const DiskResourceStatus = {
-  pending: "pending",
-  provisioning: "provisioning",
-  available: "available",
-  in_use: "in_use",
-  deleted: "deleted",
-  failed: "failed",
-  error: "error",
-  missing: "missing",
-} as const;
-
-/**
- * @nullable
- */
-export type DiskResourceAccessState =
-  | (typeof DiskResourceAccessState)[keyof typeof DiskResourceAccessState]
-  | null;
-
-export const DiskResourceAccessState = {
-  pending: "pending",
-  enabled: "enabled",
-  suspended: "suspended",
-  reclaimed: "reclaimed",
-} as const;
-
-/**
- * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this disk is refunded.
- * @nullable
- */
-export type DiskResourceFailureReason =
-  | (typeof DiskResourceFailureReason)[keyof typeof DiskResourceFailureReason]
-  | null;
-
-export const DiskResourceFailureReason = {
-  checkout_expired: "checkout_expired",
-  order_declined: "order_declined",
-  order_canceled: "order_canceled",
-  order_expired: "order_expired",
-  provisioning_failed: "provisioning_failed",
-} as const;
-
-export type ReleaseResourceType = (typeof ReleaseResourceType)[keyof typeof ReleaseResourceType];
-
-export const ReleaseResourceType = {
-  instance: "instance",
-  disk: "disk",
-  image: "image",
-  floating_ip: "floating_ip",
-  backup_service: "backup_service",
-  snapshot_quota: "snapshot_quota",
-  backup_capacity_pack: "backup_capacity_pack",
-} as const;
-
-/**
- * A resource a release set releases.
- */
-export interface ReleaseResource {
-  type: ReleaseResourceType;
-  /** The resource's ID; for `backup_service` and `snapshot_quota`, the ID of their region. */
-  id: string;
-  /** The resource's name. A floating IP is named by its address, a backup service or snapshot quota by its region, and a capacity pack by its capacity, such as 100 GiB. */
-  name: string;
-}
-
-/**
- * One subscription of a release set and the resource it pays for.
- */
-export interface ReleaseSetItem {
-  subscription_id: string;
-  resource: ReleaseResource;
-}
-
-/**
- * `attach` and `detach` accompany the instance's `attach_disk` and `detach_disk`. `delete` includes release through a Billing cancellation and deletion with an instance.
- */
-export type DiskOperationType = (typeof DiskOperationType)[keyof typeof DiskOperationType];
-
-export const DiskOperationType = {
-  create: "create",
-  resize: "resize",
-  revert: "revert",
-  attach: "attach",
-  detach: "detach",
-  suspend: "suspend",
-  resume: "resume",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this disk. It is not a separate resource; once it finishes, the disk's `operation` is null again and the disk shows the result.
- */
-export interface DiskOperation {
-  /** `attach` and `detach` accompany the instance's `attach_disk` and `detach_disk`. `delete` includes release through a Billing cancellation and deletion with an instance. */
-  type: DiskOperationType;
-  started_at: string;
-}
-
-export type DiskAttachmentRole = (typeof DiskAttachmentRole)[keyof typeof DiskAttachmentRole];
-
-export const DiskAttachmentRole = {
-  boot: "boot",
-  data: "data",
-} as const;
-
-export type DiskAttachmentState = (typeof DiskAttachmentState)[keyof typeof DiskAttachmentState];
-
-export const DiskAttachmentState = {
-  reserved: "reserved",
-  attached: "attached",
-  released: "released",
-  unknown: "unknown",
-} as const;
-
-export interface DiskAttachment {
-  id: string;
-  instance_id: string;
-  disk_id: string;
-  role: DiskAttachmentRole;
-  delete_with_instance: boolean;
-  state: DiskAttachmentState;
-  /** @nullable */
-  attached_at: string | null;
-  /** @nullable */
-  detached_at: string | null;
-  /** @nullable */
-  released_at: string | null;
-  /** @nullable */
-  device: string | null;
-}
-
-export interface DiskResource {
-  /** Availability zone the disk actually resides in. An instance must be in the same zone to attach it */
-  availability_zone_id: string;
-  created_at: string;
-  disk_type_id: string;
-  id: string;
-  name: string;
-  region_id: string;
-  size_gb: number;
-  /**
-   * IOPS this disk is allowed. Null when its type is not rate-limited.
-   *
-   * Computed from the disk's own capacity, so it grows when the disk is grown — but see the
-   * note on the resize endpoint: growing a disk that is attached is refused, precisely because
-   * the new figure would not take effect until it was attached again.
-   * @nullable
-   */
-  iops: number | null;
-  /**
-   * Throughput this disk is allowed, in bytes per second. Null when its type is not rate-limited
-   * @nullable
-   */
-  throughput_bytes_per_sec: number | null;
-  /** `pending` until the order is accepted, with no storage allocated; `provisioning` while the disk is created; then `available`, or `in_use` once attached. `failed` means the disk was not created; `failure_reason` states why. `missing` means the disk no longer exists in the cloud. */
-  status: DiskResourceStatus;
-  /** @nullable */
-  order_id: string | null;
-  /**
-   * The Billing order item for this resource.
-   * @nullable
-   */
-  order_item_id: string | null;
-  /**
-   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
-   * @nullable
-   */
-  checkout_session_id: string | null;
-  /**
-   * The Billing subscription associated with this resource. It may still be pending; its
-   * presence does not imply delivery or metering. Null when no subscription is associated.
-   * @nullable
-   */
-  subscription_id: string | null;
-  /** The subscriptions a cancellation through Billing has to cover to release this disk: its own. Snapshots have no individual subscriptions. A system disk is released only with its instance, so for a system disk the list is that of the instance. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
-  release_subscription_ids: string[];
-  /** The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
-  release_set: ReleaseSetItem[];
-  /** @nullable */
-  access_state: DiskResourceAccessState;
-  /**
-   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this disk is refunded.
-   * @nullable
-   */
-  failure_reason: DiskResourceFailureReason;
-  /** The operation in progress on this disk, or null when none is. */
-  readonly operation: DiskOperation | null;
-  attachment?: DiskAttachment | null;
-  /** @minimum 1 */
-  generation: number;
-  /** @nullable */
-  observed_at: string | null;
-}
-
-/**
  * The intended purchase use of a disk type, not the current boot role or deletion policy of an individual disk.
  */
 export type DiskTypePurpose = (typeof DiskTypePurpose)[keyof typeof DiskTypePurpose];
@@ -532,104 +1170,6 @@ export const DiskTypeResourceMedia = {
   hdd: "hdd",
   nvme: "nvme",
 } as const;
-
-/**
- * `licensed` pays for a period in advance; `metered` bills usage until canceled.
- */
-export type PricingOptionUsageType =
-  (typeof PricingOptionUsageType)[keyof typeof PricingOptionUsageType];
-
-export const PricingOptionUsageType = {
-  licensed: "licensed",
-  metered: "metered",
-} as const;
-
-/**
- * What the amounts are for: one `item`, such as an instance or an address; one `gib` of size or capacity; one `mbps` of bandwidth; or one `snapshot` slot.
- */
-export type PricingOptionQuantityUnit =
-  (typeof PricingOptionQuantityUnit)[keyof typeof PricingOptionQuantityUnit];
-
-export const PricingOptionQuantityUnit = {
-  item: "item",
-  gib: "gib",
-  mbps: "mbps",
-  snapshot: "snapshot",
-} as const;
-
-/**
- * Metered only; null for licensed. The time unit of `unit_amount`.
- * @nullable
- */
-export type PricingOptionUnit = (typeof PricingOptionUnit)[keyof typeof PricingOptionUnit] | null;
-
-export const PricingOptionUnit = {
-  hour: "hour",
-} as const;
-
-/**
- * What canceling does under this option: `immediate` ends the service at once, with any refund following the option's terms; `period_end` ends it at the end of the paid period. Null means no explicit policy was recorded; it must not be interpreted as immediate.
- * @nullable
- */
-export type PricingOptionTerminationPolicy =
-  | (typeof PricingOptionTerminationPolicy)[keyof typeof PricingOptionTerminationPolicy]
-  | null;
-
-export const PricingOptionTerminationPolicy = {
-  immediate: "immediate",
-  period_end: "period_end",
-} as const;
-
-/**
- * One way to buy an item. Choose it by giving its usage_type, period and termination_policy as billing.
- */
-export interface PricingOption {
-  /** `licensed` pays for a period in advance; `metered` bills usage until canceled. */
-  usage_type: PricingOptionUsageType;
-  /** The term of a licensed option; null for metered. */
-  period: BillingPeriod | null;
-  /** What the amounts are for: one `item`, such as an instance or an address; one `gib` of size or capacity; one `mbps` of bandwidth; or one `snapshot` slot. */
-  quantity_unit: PricingOptionQuantityUnit;
-  /**
-   * Licensed only; null for metered. The amount for one period, per quantity unit.
-   * @nullable
-   */
-  amount: string | null;
-  /**
-   * Licensed only; null for metered. `amount` spread over the months of the period.
-   * @nullable
-   */
-  monthly_amount: string | null;
-  /**
-   * Licensed only. How much lower `monthly_amount` is than that of the shortest licensed period of the same item, as a decimal percentage. Null for that shortest period and for metered.
-   * @nullable
-   */
-  saving_percent: string | null;
-  /**
-   * Metered only; null for licensed. The amount for one `unit` of time, per quantity unit.
-   * @nullable
-   */
-  unit_amount: string | null;
-  /**
-   * Metered only; null for licensed. The time unit of `unit_amount`.
-   * @nullable
-   */
-  unit: PricingOptionUnit;
-  /**
-   * What canceling does under this option: `immediate` ends the service at once, with any refund following the option's terms; `period_end` ends it at the end of the paid period. Null means no explicit policy was recorded; it must not be interpreted as immediate.
-   * @nullable
-   */
-  termination_policy: PricingOptionTerminationPolicy;
-}
-
-/**
- * How a catalog item can be bought, calculated by Billing in the currency of the project's current billing account. These are list amounts before promotion codes, not a checkout guarantee; quote a purchase for its exact total.
- */
-export interface Pricing {
-  currency: string;
-  /** One entry per way the item can be bought. Empty when it cannot be bought in this currency. */
-  options: PricingOption[];
-}
 
 export interface DiskTypeResource {
   availability_zone_id: string;
@@ -669,165 +1209,13 @@ export interface DiskTypeResource {
    * @nullable
    */
   throughput_at_max_size: number | null;
-  /** How a disk of this type can be bought, per GiB. Null when the project has no billing account. */
-  readonly pricing: Pricing | null;
+  billing: BillingComponent;
 }
 
 export interface DiskTypeListResponseBody {
   /** @nullable */
   items: DiskTypeResource[] | null;
   pagination: OffsetPagination;
-}
-
-/**
- * Who can see and use an image. `public` — offered to every project by the platform. `private` — usable only by the project that owns it.
- */
-export type ImageVisibility = (typeof ImageVisibility)[keyof typeof ImageVisibility];
-
-export const ImageVisibility = {
-  public: "public",
-  private: "private",
-} as const;
-
-/**
- * Only `available` images can install instances. A public image is always `available`; a private image is `pending` until its order is accepted, then goes through `provisioning` and `uploading` while it is captured. `failed` means the capture produced no image; `failure_reason` states why. `missing` means a private image no longer exists in the cloud.
- */
-export type ImageResourceStatus = (typeof ImageResourceStatus)[keyof typeof ImageResourceStatus];
-
-export const ImageResourceStatus = {
-  pending: "pending",
-  provisioning: "provisioning",
-  uploading: "uploading",
-  available: "available",
-  deleted: "deleted",
-  failed: "failed",
-  error: "error",
-  missing: "missing",
-} as const;
-
-/**
- * @nullable
- */
-export type ImageResourceAccessState =
-  | (typeof ImageResourceAccessState)[keyof typeof ImageResourceAccessState]
-  | null;
-
-export const ImageResourceAccessState = {
-  pending: "pending",
-  enabled: "enabled",
-  suspended: "suspended",
-  reclaimed: "reclaimed",
-} as const;
-
-/**
- * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
- * @nullable
- */
-export type ImageResourceFailureReason =
-  | (typeof ImageResourceFailureReason)[keyof typeof ImageResourceFailureReason]
-  | null;
-
-export const ImageResourceFailureReason = {
-  checkout_expired: "checkout_expired",
-  order_declined: "order_declined",
-  order_canceled: "order_canceled",
-  order_expired: "order_expired",
-  provisioning_failed: "provisioning_failed",
-} as const;
-
-/**
- * `create` is the capture of a private image.
- */
-export type ImageOperationType = (typeof ImageOperationType)[keyof typeof ImageOperationType];
-
-export const ImageOperationType = {
-  create: "create",
-  suspend: "suspend",
-  resume: "resume",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this image. It is not a separate resource; once it finishes, the image's `operation` is null again and the image shows the result.
- */
-export interface ImageOperation {
-  /** `create` is the capture of a private image. */
-  type: ImageOperationType;
-  started_at: string;
-}
-
-/**
- * An image that installs the system of an instance. Fields that describe a capture or its billing apply only to private images and are null, zero or empty for public ones.
- */
-export interface ImageResource {
-  id: string;
-  region_id: string;
-  visibility: ImageVisibility;
-  name: string;
-  os_family: string;
-  os_version: string;
-  architecture: string;
-  /**
-   * The account this image lets you log in as. The password set at creation belongs to this account
-   * @maxLength 32
-   */
-  login_username: string;
-  /** The system disk of an instance created from this image cannot be smaller than this */
-  min_disk_gb: number;
-  /** The instance type of an instance created from this image must have at least this much memory */
-  min_ram_mb: number;
-  /** False means a new password can only be set by rebuilding an instance created from this image */
-  supports_password_reset: boolean;
-  /** Only `available` images can install instances. A public image is always `available`; a private image is `pending` until its order is accepted, then goes through `provisioning` and `uploading` while it is captured. `failed` means the capture produced no image; `failure_reason` states why. `missing` means a private image no longer exists in the cloud. */
-  status: ImageResourceStatus;
-  /**
-   * Details of why the capture failed; non-empty only when `status` is `failed`
-   * @nullable
-   */
-  failure: string | null;
-  /** Storage occupied by a private image, which is what it is billed for; 0 until its capture completes, and 0 for public images */
-  size_bytes: number;
-  /**
-   * The instance a private image was captured from. The image remains usable after that instance is released. Null for public images
-   * @nullable
-   */
-  source_instance_id: string | null;
-  created_at: string;
-  /** @nullable */
-  order_id: string | null;
-  /**
-   * The Billing order item for this resource.
-   * @nullable
-   */
-  order_item_id: string | null;
-  /**
-   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
-   * @nullable
-   */
-  checkout_session_id: string | null;
-  /**
-   * The Billing subscription associated with this resource. It may still be pending; its
-   * presence does not imply delivery or metering. Null when no subscription is associated.
-   * @nullable
-   */
-  subscription_id: string | null;
-  /** The subscriptions a cancellation through Billing has to cover to release this private image: its own. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for it, and for public images. */
-  release_subscription_ids: string[];
-  /** The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
-  release_set: ReleaseSetItem[];
-  /** @nullable */
-  access_state: ImageResourceAccessState;
-  /**
-   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
-   * @nullable
-   */
-  failure_reason: ImageResourceFailureReason;
-  /** The operation in progress on this image, or null when none is. */
-  readonly operation: ImageOperation | null;
-  /** @minimum 1 */
-  generation: number;
-  /** @nullable */
-  observed_at: string | null;
 }
 
 export interface ImageListResponseBody {
@@ -866,8 +1254,7 @@ export interface InstanceTypeResource {
   ram_mb: number;
   region_id: string;
   vcpus: number;
-  /** How an instance of this type can be bought, per instance. Null when the project has no billing account. */
-  readonly pricing: Pricing | null;
+  billing: BillingComponent;
 }
 
 export interface InstanceTypeListResponseBody {
@@ -883,8 +1270,14 @@ export interface RegionResource {
   /** The region's code, the way the outside world names this place (hk-1). Stable and human-written; addressing is by id. */
   code: string;
   id: string;
-  /** How private image storage in this region is billed, per GiB. Null when the project has no billing account. */
-  readonly private_image_pricing: Pricing | null;
+  /** Private images stored in this region. */
+  private_image_billing: BillingComponent;
+  /** The region's backup service. Retained backup capacity beyond the active capacity packs is reported on it by the hour. */
+  backup_service_billing: BillingComponent;
+  /** Backup capacity packs in this region; null where none are sold. */
+  capacity_pack_billing: BillingComponent | null;
+  /** The snapshot quota in this region; null where it is not sold. */
+  snapshot_quota_billing: BillingComponent | null;
 }
 
 export interface RegionListResponseBody {
@@ -947,160 +1340,13 @@ export interface ResizeDiskRequestBody {
    */
   size_gb: number;
   checkout?: CheckoutOptions;
-  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of Billing's quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
 }
 
 export interface RevertDiskRequestBody {
   /** Must be the most recent snapshot of the disk */
   snapshot_id: string;
-}
-
-/**
- * `pending` until the order is accepted, with no address allocated; `provisioning` while the address is allocated; then `available`. `failed` means no address was allocated; `failure_reason` states why. `missing` means the address no longer exists in the cloud.
- */
-export type FloatingIPResourceStatus =
-  (typeof FloatingIPResourceStatus)[keyof typeof FloatingIPResourceStatus];
-
-export const FloatingIPResourceStatus = {
-  pending: "pending",
-  provisioning: "provisioning",
-  available: "available",
-  deleted: "deleted",
-  failed: "failed",
-  error: "error",
-  unknown: "unknown",
-  missing: "missing",
-} as const;
-
-/**
- * @nullable
- */
-export type FloatingIPResourceAccessState =
-  | (typeof FloatingIPResourceAccessState)[keyof typeof FloatingIPResourceAccessState]
-  | null;
-
-export const FloatingIPResourceAccessState = {
-  pending: "pending",
-  enabled: "enabled",
-  suspended: "suspended",
-  reclaimed: "reclaimed",
-} as const;
-
-/**
- * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this floating IP is refunded.
- * @nullable
- */
-export type FloatingIPResourceFailureReason =
-  | (typeof FloatingIPResourceFailureReason)[keyof typeof FloatingIPResourceFailureReason]
-  | null;
-
-export const FloatingIPResourceFailureReason = {
-  checkout_expired: "checkout_expired",
-  order_declined: "order_declined",
-  order_canceled: "order_canceled",
-  order_expired: "order_expired",
-  provisioning_failed: "provisioning_failed",
-} as const;
-
-export type FloatingIPOperationType =
-  (typeof FloatingIPOperationType)[keyof typeof FloatingIPOperationType];
-
-export const FloatingIPOperationType = {
-  create: "create",
-  bind: "bind",
-  unbind: "unbind",
-  set_bandwidth: "set_bandwidth",
-  suspend: "suspend",
-  resume: "resume",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this floating IP. It is not a separate resource; once it finishes, the floating IP's `operation` is null again and the floating IP shows the result.
- */
-export interface FloatingIPOperation {
-  type: FloatingIPOperationType;
-  started_at: string;
-}
-
-export type IPv4BindingState = (typeof IPv4BindingState)[keyof typeof IPv4BindingState];
-
-export const IPv4BindingState = {
-  bound: "bound",
-  released: "released",
-  unknown: "unknown",
-} as const;
-
-export interface IPv4Binding {
-  id: string;
-  ipv4_allocation_id: string;
-  port_address_id: string;
-  address: string;
-  fixed_ip: string;
-  state: IPv4BindingState;
-  /** @nullable */
-  bound_at: string | null;
-  /** @nullable */
-  unbound_at: string | null;
-  /** @nullable */
-  released_at: string | null;
-}
-
-/**
- * One purchased public IP resource, including its bandwidth configuration. Bandwidth has no
- * separate Compute resource ID; one subscription pays for the address and its bandwidth.
- * Changing bandwidth updates this same resource, not another allocation.
- */
-export interface FloatingIPResource {
-  /**
-   * The allocated public address. Null until the address is allocated.
-   * @nullable
-   */
-  address: string | null;
-  /** @nullable */
-  bandwidth_mbps: number | null;
-  created_at: string;
-  id: string;
-  region_id: string;
-  /** `pending` until the order is accepted, with no address allocated; `provisioning` while the address is allocated; then `available`. `failed` means no address was allocated; `failure_reason` states why. `missing` means the address no longer exists in the cloud. */
-  status: FloatingIPResourceStatus;
-  /** @nullable */
-  order_id: string | null;
-  /**
-   * The Billing order item for this resource.
-   * @nullable
-   */
-  order_item_id: string | null;
-  /**
-   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
-   * @nullable
-   */
-  checkout_session_id: string | null;
-  /**
-   * The Billing subscription associated with this resource. It may still be pending; its
-   * presence does not imply delivery or metering. Null when no subscription is associated.
-   * @nullable
-   */
-  subscription_id: string | null;
-  /** The subscription a cancellation through Billing has to cover to release this floating IP. A subscription that has ended is not listed, and the list is empty when no subscription pays for the floating IP. */
-  release_subscription_ids: string[];
-  /** The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
-  release_set: ReleaseSetItem[];
-  /** @nullable */
-  access_state: FloatingIPResourceAccessState;
-  /**
-   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this floating IP is refunded.
-   * @nullable
-   */
-  failure_reason: FloatingIPResourceFailureReason;
-  /** The operation in progress on this floating IP, or null when none is. */
-  readonly operation: FloatingIPOperation | null;
-  /** @minimum 1 */
-  generation: number;
-  /** @nullable */
-  observed_at: string | null;
-  binding: IPv4Binding | null;
 }
 
 export interface FloatingIPListResponseBody {
@@ -1122,8 +1368,8 @@ export interface AllocateFloatingIPRequestBody {
    * charged nothing for the traffic, while the address itself bills normally — so the invoice
    * looks correct and nothing anywhere reports it.
    *
-   * It is part of this floating IP purchase and is billed as the pool's `bandwidth_pricing` shows,
-   * with the purchase's billing choice. Changing it later updates the
+   * It is part of this floating IP purchase and is billed under the pool's `billing`, with the
+   * purchase's billing choice. Changing it later updates the
    * same floating IP through its bandwidth endpoint, not an independent bandwidth resource.
    * @minimum 1
    * @maximum 1000
@@ -1146,224 +1392,12 @@ export interface SetFloatingIPBandwidthRequestBody {
    */
   bandwidth_mbps: number;
   checkout?: CheckoutOptions;
-  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of Billing's quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
 }
 
 export interface BindFloatingIPRequestBody {
   port_address_id: string;
-}
-
-/**
- * Your own classification of this instance, as key-value pairs. Empty when never set
- */
-export type InstanceResourceLabels = { [key: string]: string };
-
-/**
- * `pending` until the order is accepted: no virtual machine exists and addresses are null. `provisioning` while the instance is created, then `active`. `failed` means the instance was not created; `failure_reason` states why. `missing` means the virtual machine no longer exists in the cloud. The other values are the state last observed in the cloud; an operation in progress appears in `operation`, not here.
- */
-export type InstanceResourceStatus =
-  (typeof InstanceResourceStatus)[keyof typeof InstanceResourceStatus];
-
-export const InstanceResourceStatus = {
-  pending: "pending",
-  provisioning: "provisioning",
-  active: "active",
-  stopped: "stopped",
-  paused: "paused",
-  suspended: "suspended",
-  shelved: "shelved",
-  shelved_offloaded: "shelved_offloaded",
-  rescued: "rescued",
-  deleted: "deleted",
-  failed: "failed",
-  error: "error",
-  unknown: "unknown",
-  missing: "missing",
-} as const;
-
-/**
- * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this instance is refunded.
- * @nullable
- */
-export type InstanceResourceFailureReason =
-  | (typeof InstanceResourceFailureReason)[keyof typeof InstanceResourceFailureReason]
-  | null;
-
-export const InstanceResourceFailureReason = {
-  checkout_expired: "checkout_expired",
-  order_declined: "order_declined",
-  order_canceled: "order_canceled",
-  order_expired: "order_expired",
-  provisioning_failed: "provisioning_failed",
-} as const;
-
-/**
- * @nullable
- */
-export type InstanceResourceAccessState =
-  | (typeof InstanceResourceAccessState)[keyof typeof InstanceResourceAccessState]
-  | null;
-
-export const InstanceResourceAccessState = {
-  pending: "pending",
-  enabled: "enabled",
-  suspended: "suspended",
-  reclaimed: "reclaimed",
-} as const;
-
-export type InstanceRestrictionSource =
-  (typeof InstanceRestrictionSource)[keyof typeof InstanceRestrictionSource];
-
-export const InstanceRestrictionSource = {
-  billing: "billing",
-  iam: "iam",
-  operator: "operator",
-} as const;
-
-/**
- * An independent restriction on use. Removing one restriction never removes another source’s restriction, and never starts an instance its user stopped.
- */
-export interface InstanceRestriction {
-  id: string;
-  source: InstanceRestrictionSource;
-  /**
-   * @minLength 1
-   * @maxLength 255
-   */
-  source_id: string;
-  /**
-   * @minLength 1
-   * @maxLength 128
-   */
-  reason_code: string;
-  created_at: string;
-}
-
-/**
- * `create` runs from acceptance of the order until the instance is `active` or `failed`. `suspend` and `resume` impose and lift a suspension by the platform or for non-payment. `delete` includes release through a Billing cancellation.
- */
-export type InstanceOperationType =
-  (typeof InstanceOperationType)[keyof typeof InstanceOperationType];
-
-export const InstanceOperationType = {
-  create: "create",
-  start: "start",
-  stop: "stop",
-  reboot: "reboot",
-  rebuild: "rebuild",
-  resize: "resize",
-  reset_password: "reset_password",
-  attach_disk: "attach_disk",
-  detach_disk: "detach_disk",
-  attach_port: "attach_port",
-  detach_port: "detach_port",
-  bind_floating_ip: "bind_floating_ip",
-  unbind_floating_ip: "unbind_floating_ip",
-  suspend: "suspend",
-  resume: "resume",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this instance. It is not a separate resource; once it finishes, the instance's `operation` is null again and the instance shows the result.
- */
-export interface InstanceOperation {
-  /** `create` runs from acceptance of the order until the instance is `active` or `failed`. `suspend` and `resume` impose and lift a suspension by the platform or for non-payment. `delete` includes release through a Billing cancellation. */
-  type: InstanceOperationType;
-  started_at: string;
-}
-
-export interface InstanceResource {
-  availability_zone_id: string;
-  created_at: string;
-  /** Hostname inside the instance; equals the instance id */
-  hostname: string;
-  id: string;
-  /**
-   * Non-empty when the instance was created from an image, public or private
-   * @nullable
-   */
-  image_id: string | null;
-  /** The instance type in effect, and the basis for billing */
-  instance_type_id: string;
-  /**
-   * IPv6 address of the primary network interface. Assigned automatically once IPv6 is enabled on the private network
-   * @nullable
-   */
-  ipv6_address: string | null;
-  /** Your own classification of this instance, as key-value pairs. Empty when never set */
-  labels: InstanceResourceLabels;
-  /**
-   * The account to log in as over SSH. The password set at creation belongs to this account
-   * @maxLength 32
-   */
-  login_username: string;
-  name: string;
-  /**
-   * A free-text note about this instance. Empty when never set
-   * @maxLength 4096
-   */
-  notes: string;
-  /**
-   * Private address of the instance
-   * @nullable
-   */
-  private_ip: string | null;
-  /** @nullable */
-  private_network_id: string | null;
-  /**
-   * Floating IPv4 addresses bound to the primary network interface; an empty array when none are bound
-   * @nullable
-   */
-  public_ips: string[] | null;
-  region_id: string;
-  /** `pending` until the order is accepted: no virtual machine exists and addresses are null. `provisioning` while the instance is created, then `active`. `failed` means the instance was not created; `failure_reason` states why. `missing` means the virtual machine no longer exists in the cloud. The other values are the state last observed in the cloud; an operation in progress appears in `operation`, not here. */
-  status: InstanceResourceStatus;
-  /** @nullable */
-  subnet_id: string | null;
-  updated_at: string;
-  /** @minimum 1 */
-  generation: number;
-  /** @nullable */
-  observed_at: string | null;
-  restrictions: InstanceRestriction[];
-  /**
-   * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this instance is refunded.
-   * @nullable
-   */
-  failure_reason: InstanceResourceFailureReason;
-  /** The operation in progress on this instance, or null when none is. */
-  readonly operation: InstanceOperation | null;
-  /** @nullable */
-  order_id: string | null;
-  /**
-   * The Billing order item for this resource.
-   * @nullable
-   */
-  order_item_id: string | null;
-  /**
-   * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
-   * @nullable
-   */
-  checkout_session_id: string | null;
-  /**
-   * The Billing subscription associated with this resource. It may still be pending; its
-   * presence does not imply delivery or metering. Null when no subscription is associated.
-   * @nullable
-   */
-  subscription_id: string | null;
-  /** The subscriptions a cancellation through Billing has to cover to release this instance: its own and those of the disks deleted with it. Snapshots are cleaned up with their source disk without canceling the project's snapshot quota. Subscriptions that have ended are not listed, and the list is empty when no subscription pays for any of them. */
-  release_subscription_ids: string[];
-  /** The subscriptions of `release_subscription_ids`, in the same order, each with the resource it pays for, so that each line of a cancellation can name what it releases. */
-  release_set: ReleaseSetItem[];
-  /** @nullable */
-  access_state: InstanceResourceAccessState;
-  /**
-   * Non-empty when the instance was created from a disk you already had, instead of from an image
-   * @nullable
-   */
-  source_disk_id: string | null;
 }
 
 export interface InstanceListResponseBody {
@@ -1601,7 +1635,7 @@ export interface ResizeInstanceRequestBody {
    */
   instance_type_id: string;
   checkout?: CheckoutOptions;
-  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of Billing's quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
 }
 
@@ -1803,15 +1837,6 @@ export interface CreateImageRequestBody {
   name: string;
   billing: BillingChoice;
   checkout?: CheckoutOptions;
-}
-
-/**
- * The fields of `CreateImageRequestBody` that decide the price
- */
-export interface CreateImageQuoteRequestBody {
-  /** The instance whose system disk would be captured */
-  instance_id: string;
-  billing: BillingChoice;
 }
 
 export interface RenameImageRequestBody {
@@ -2173,8 +2198,6 @@ export interface SnapshotQuota {
    * @nullable
    */
   failure_reason: SnapshotQuotaFailureReason;
-  /** How snapshot quota in this region can be bought, per snapshot slot. Null when the project has no billing account. */
-  readonly pricing: Pricing | null;
 }
 
 export interface SetSnapshotQuotaRequestBody {
@@ -2185,7 +2208,7 @@ export interface SetSnapshotQuotaRequestBody {
   limit: number;
   billing: BillingChoice;
   checkout?: CheckoutOptions;
-  /** The `proration_date` of this change's quote, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of Billing's quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
 }
 
@@ -2364,10 +2387,6 @@ export interface BackupService {
    * @minimum 0
    */
   pack_capacity_gib: number;
-  /** The metered usage price of backups in this region. Null when the project has no billing account. */
-  readonly pricing: Pricing | null;
-  /** The licensed options of capacity packs in this region, per GiB. Null when the project has no billing account. */
-  readonly capacity_pack_pricing: Pricing | null;
 }
 
 export interface CreateBackupServiceRequestBody {
@@ -2471,363 +2490,6 @@ export interface CreateBackupCapacityPackResponseBody {
    * @nullable
    */
   order_id: string | null;
-}
-
-/**
- * The request of `launch-instance`, without `checkout`.
- */
-export interface LaunchInstanceQuoteRequestBody {
-  /**
-   * Bind a floating IP you already hold, instead of allocating a new one. It must be idle and in
-   * the same region.
-   *
-   * Mutually exclusive with `bandwidth_mbps`: an address you already hold has its own bandwidth
-   * ceiling, set when it was allocated, and changing it is a separate operation.
-   *
-   * Like `bandwidth_mbps`, this happens **inside the creation**: if binding fails, no instance is
-   * created. Binding afterwards is still possible from the instance page, but then it is two
-   * operations and a failure in between leaves an instance you cannot reach.
-   *
-   * Only one instance can be created when it is used — one address binds to one interface.
-   */
-  floating_ip_id?: string;
-  /**
-   * Number of instances to create; 1 when omitted. Names are numbered automatically for several
-   * @minimum 1
-   * @maximum 20
-   */
-  count?: number;
-  /** Have the platform generate a random password, returned only in this response */
-  generate_password?: boolean;
-  compute: NewCompute;
-  /**
-   * @minLength 1
-   * @maxLength 128
-   */
-  name: string;
-  /**
-   * The password to set, on the login account and on root. Only the SSH public keys of the project are used when omitted
-   * @maxLength 128
-   */
-  password?: string;
-  /** Use an existing network interface, which may already have a floating IP bound. Exactly one of this and `subnet_id`; only one instance can be created when it is used */
-  port_id?: string;
-  /**
-   * Required when a primary network interface is created, at least one; the default security group is not applied automatically. Ignored together with `port_id`, as the security groups of that interface were fixed when it was created
-   * @minItems 1
-   * @nullable
-   */
-  security_group_ids?: string[] | null;
-  /** Create the primary network interface in this subnet. Exactly one of this and `port_id` */
-  subnet_id?: string;
-  boot_disk: BootDisk;
-  floating_ip?: NewFloatingIP;
-}
-
-/**
- * The request of `create-disk`, without `checkout`.
- */
-export interface CreateDiskQuoteRequestBody {
-  /**
-   * A data disk type currently on sale, one whose `purpose` is `data`. A withdrawn one is rejected even though its identifier still resolves
-   * @maxLength 64
-   */
-  disk_type_id: string;
-  /**
-   * @minLength 1
-   * @maxLength 128
-   */
-  name: string;
-  /** @minimum 1 */
-  size_gb: number;
-  /** Restore from this snapshot. When given, the capacity need only be no smaller than the snapshot */
-  snapshot_id?: string;
-  billing: BillingChoice;
-}
-
-/**
- * The request of `restore-backup`, without `checkout`.
- */
-export interface RestoreBackupQuoteRequestBody {
-  /**
-   * May differ from the availability zone of the source disk, but must be in the same region. It has to be a data disk type on sale — restoring creates a new data disk, so a withdrawn type or a system disk type is rejected here as well
-   * @maxLength 64
-   */
-  disk_type_id: string;
-  /**
-   * @minLength 1
-   * @maxLength 128
-   */
-  name: string;
-  /**
-   * Matches the size of the backup when omitted. When given, it must not be smaller than the backup
-   * @minimum 0
-   */
-  size_gb?: number;
-  billing: BillingChoice;
-}
-
-/**
- * The request of `allocate-floating-ip`, without `checkout`.
- */
-export interface AllocateFloatingIPQuoteRequestBody {
-  /**
-   * The address to allocate. Allocated by the platform when omitted
-   * @maxLength 64
-   */
-  address?: string;
-  /**
-   * The bandwidth ceiling of this address, in Mbit/s, applied to both directions.
-   *
-   * Required, and there is no "unlimited": an address with no ceiling runs at line rate and is
-   * charged nothing for the traffic, while the address itself bills normally — so the invoice
-   * looks correct and nothing anywhere reports it.
-   *
-   * It is part of this floating IP purchase and is billed as the pool's `bandwidth_pricing` shows,
-   * with the purchase's billing choice. Changing it later updates the
-   * same floating IP through its bandwidth endpoint, not an independent bandwidth resource.
-   * @minimum 1
-   * @maximum 1000
-   */
-  bandwidth_mbps: number;
-  private_network_id: string;
-  ipv4_pool_id: string;
-  billing: BillingChoice;
-}
-
-/**
- * The request of `set-snapshot-quota`, without `checkout` and `proration_date`.
- */
-export interface SetSnapshotQuotaQuoteRequestBody {
-  /**
-   * Desired total concurrent snapshot count for this project and region, not additional slots.
-   * @minimum 1
-   */
-  limit: number;
-  billing: BillingChoice;
-}
-
-/**
- * The request of `create-backup-capacity-pack`, without `checkout`.
- */
-export interface CreateBackupCapacityPackQuoteRequestBody {
-  /** @minimum 1 */
-  capacity_gib: number;
-  billing: BillingChoice;
-}
-
-/**
- * The request of `resize-instance`, without `checkout` and `proration_date`.
- */
-export interface ResizeInstanceQuoteRequestBody {
-  /**
-   * Must be in the same region and availability zone as the current instance type
-   * @maxLength 64
-   */
-  instance_type_id: string;
-}
-
-/**
- * The request of `resize-disk`, without `checkout` and `proration_date`.
- */
-export interface ResizeDiskQuoteRequestBody {
-  /**
-   * Must be larger than the current capacity
-   * @minimum 1
-   */
-  size_gb: number;
-}
-
-/**
- * The request of `set-floating-ip-bandwidth`, without `checkout` and `proration_date`.
- */
-export interface SetFloatingIPBandwidthQuoteRequestBody {
-  /**
-   * Applied to both directions
-   * @minimum 1
-   */
-  bandwidth_mbps: number;
-}
-
-/**
- * `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without a billing account, which leaves out tax that would be added; tax already contained in a price is included.
- */
-export type QuoteTaxStatus = (typeof QuoteTaxStatus)[keyof typeof QuoteTaxStatus];
-
-export const QuoteTaxStatus = {
-  complete: "complete",
-  requires_location_inputs: "requires_location_inputs",
-} as const;
-
-/**
- * Account funding for this purchase, calculated by Billing. Amounts use the enclosing response currency.
- * Credit eligibility and all purchase requirements are already evaluated. Nothing is charged or reserved.
- * A licensed purchase may instead be paid with an online payment method.
- */
-export interface Funds {
-  /** Spendable balance after pending returns. */
-  available_balance_amount: Money;
-  /** Currently effective credits eligible for the quoted purchases or metered usage. Each grant is counted once. */
-  usable_credit_amount: Money;
-  /** Currently effective credits that cannot fund any quoted purchase or metered target. Unused eligible credits are not restricted. */
-  restricted_credit_amount: Money;
-  /** Minimum spendable balance needed after eligible credits, covering immediate charges and every new metered purchase's admission requirement. */
-  required_balance_amount: Money;
-  /** Additional balance needed now. Zero means account funds satisfy this quote. No funds are reserved. */
-  balance_shortfall_amount: Money;
-  /** Minimum recharge that covers the shortfall, respecting the currency minimum recharge and currency precision. Zero when no additional balance is needed. */
-  required_top_up_amount: Money;
-}
-
-/**
- * one_time or recurring.
- */
-export type QuoteItemType = (typeof QuoteItemType)[keyof typeof QuoteItemType];
-
-export const QuoteItemType = {
-  one_time: "one_time",
-  recurring: "recurring",
-} as const;
-
-/**
- * licensed or metered.
- */
-export type QuoteItemUsageType = (typeof QuoteItemUsageType)[keyof typeof QuoteItemUsageType];
-
-export const QuoteItemUsageType = {
-  licensed: "licensed",
-  metered: "metered",
-} as const;
-
-/**
- * The billing period of a recurring licensed line; `none` otherwise.
- */
-export type QuoteItemInterval = (typeof QuoteItemInterval)[keyof typeof QuoteItemInterval];
-
-export const QuoteItemInterval = {
-  none: "none",
-  day: "day",
-  month: "month",
-  year: "year",
-} as const;
-
-/**
- * The dimension values the line is priced at, such as region and instance type.
- */
-export type QuoteItemDimensions = { [key: string]: string };
-
-/**
- * One calculated purchase line. Fixed purchase amounts are rounded as checkout rounds them.
- * A line without an immediate charge has zero checkout amounts. unit_amount remains null when
- * no single unit price applies; an unrequested usage estimate remains null.
- */
-export interface QuoteItem {
-  product_id: string;
-  plan_id: string;
-  plan_name: string;
-  /**
-   * The price the line is priced at, including one Billing selected. With quantity and dimensions it
-   * prices the same line in Billing's own quote, for example with a promotion code.
-   */
-  price_id: string;
-  /** The dimension values the line is priced at, such as region and instance type. */
-  dimensions: QuoteItemDimensions;
-  /** one_time or recurring. */
-  type: QuoteItemType;
-  /** licensed or metered. */
-  usage_type: QuoteItemUsageType;
-  /** The billing period of a recurring licensed line; `none` otherwise. */
-  interval: QuoteItemInterval;
-  /**
-   * Periods per billing cycle of a recurring licensed line; null otherwise.
-   * @minimum 1
-   * @nullable
-   */
-  interval_count: number | null;
-  /** The setup charge already included in amount; null when none applies. */
-  setup_amount: Money | null;
-  /**
-   * Recurring licensed lines only; null otherwise. What each later period renews at, before discounts
-   * and tax, which differs from amount when the first period is priced differently.
-   */
-  recurring_amount: Money | null;
-  /**
-   * Unit price before discounts, with tax included only where the price includes it. Null when
-   * no single unit price applies, such as tiered or multiple-rate pricing or an immediate change.
-   */
-  unit_amount: Money | null;
-  /** The quantity priced. */
-  quantity: string;
-  /**
-   * Before discounts, including any setup charges. Contains tax only where the price includes it.
-   * Zero for an item with no immediate charge.
-   */
-  amount: Money;
-  /** Total reduction on this line, including any committed recurring discount. */
-  discount_amount: Money;
-  /** Tax on the discounted amount, including any tax already contained in that amount. */
-  tax_amount: Money;
-  /** The part of tax_amount already contained in amount minus discount_amount. */
-  tax_included_amount: Money;
-  /** amount minus discount_amount plus tax_amount minus tax_included_amount. */
-  total: Money;
-  /**
-   * Projected charge for this line's future usage over the period stated by the quoting operation,
-   * at current rates, before discounts and tax and not rounded. Not part of amount or total and
-   * not collected at checkout. Null when no usage estimate is requested for this line.
-   */
-  estimated_usage_amount: Money | null;
-  currency: string;
-}
-
-/**
- * A price preview for the purchase described by a service, calculated by Billing. Nothing is saved,
- * charged or reserved, and no discount redemption is consumed. Account discounts and tax are
- * evaluated as for automatic checkout. Promotion codes are evaluated by Billing at checkout, not here.
- * All amounts use currency. This preview does not lock prices or guarantee discount availability.
- * Success includes complete checkout amounts and every requested usage estimate. If any item or
- * requested usage estimate cannot be calculated, the operation returns its existing structured
- * error response; it never returns a partial quote with HTTP 200. A quote without a billing account
- * has no funds and no account discount, and leaves out tax that would be added.
- */
-export interface Quote {
-  /** Null for a quote without a billing account. */
-  funds: Funds | null;
-  /** `complete`: tax is calculated for the billing account's invoice contact. `requires_location_inputs`: a quote without a billing account, which leaves out tax that would be added; tax already contained in a price is included. */
-  tax_status: QuoteTaxStatus;
-  /** One line for each item the purchase would order, in the order it would order them. */
-  items: QuoteItem[];
-  /**
-   * Sum of line amounts before discounts, less tax already included in the discounted line
-   * amounts, as on an invoice.
-   */
-  subtotal: Money;
-  /** Sum of line discounts. */
-  discount_amount: Money;
-  /** Sum of tax on the discounted line amounts. */
-  tax_amount: Money;
-  /**
-   * subtotal minus discount_amount plus tax_amount: what checkout collects, before applying
-   * credit grants or balance. Equals the sum of line totals and excludes estimated_usage_amount.
-   */
-  total: Money;
-  /**
-   * Sum of the lines' estimated_usage_amount. A projection, not part of total and not collected at
-   * checkout. Null when no usage estimate is requested.
-   */
-  estimated_usage_amount: Money | null;
-  currency: string;
-  /**
-   * Changes only; null otherwise. The instant the change is priced from. Pass it with the change so the
-   * order is priced from the same instant.
-   * @nullable
-   */
-  proration_date: string | null;
-  /**
-   * Changes that lower the price only; null otherwise. What the change would return to the original
-   * payment sources, including the tax paid on it. total is zero for such a change.
-   */
-  refundable_amount: Money | null;
 }
 
 /**
@@ -2961,10 +2623,8 @@ export interface IPv4PoolResource {
   id: string;
   region_id: string;
   name: string;
-  /** How an address from this pool can be bought, per address. Null when the project has no billing account. */
-  readonly pricing: Pricing | null;
-  /** How the bandwidth of an address from this pool is billed, per Mbit/s. It is bought in the same purchase as the address, with the same billing choice. Null when the project has no billing account. */
-  readonly bandwidth_pricing: Pricing | null;
+  /** A floating IP from this pool is one order line, its quantity the bandwidth in Mbps. Metered, it reads the address and, under the region alone, the bandwidth. */
+  billing: BillingComponent;
 }
 
 export interface IPv4PoolListResponseBody {

@@ -11,7 +11,7 @@
  * ## Conventions
  *
  * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the Checkout Session and the order in Billing for checkout and payment progress.
- * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the licensed and metered options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
+ * - **Commercial terms.** Compute returns no amounts. Catalog items, such as instance types, disk types and public IP pools, and the region's own products carry `billing`: the Billing plan an order line for them is sold under, the dimensions the line carries, how its quantity is counted for each usage type, and the meters its metered price reads. Read their prices from Billing with `search-prices` and `search-rates`, quote a purchase or a change with Billing's `get-quote` using the same lines, and estimate metered usage with Billing's `estimate-usage`. A purchase chooses its terms with `billing`, which applies to all of its components.
  * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid.
  * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time.
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
@@ -22,55 +22,12 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { BillingPeriod } from "./billingPeriod.zod.js";
 
-export const PricingOption = zod
-  .strictObject({
-    usage_type: zod
-      .enum(["licensed", "metered"])
-      .describe("`licensed` pays for a period in advance; `metered` bills usage until canceled."),
-    period: zod
-      .union([BillingPeriod, zod.null()])
-      .describe("The term of a licensed option; null for metered."),
-    quantity_unit: zod
-      .enum(["item", "gib", "mbps", "snapshot"])
-      .describe(
-        "What the amounts are for: one `item`, such as an instance or an address; one `gib` of size or capacity; one `mbps` of bandwidth; or one `snapshot` slot.",
-      ),
-    amount: zod
-      .string()
-      .nullable()
-      .describe("Licensed only; null for metered. The amount for one period, per quantity unit."),
-    monthly_amount: zod
-      .string()
-      .nullable()
-      .describe("Licensed only; null for metered. `amount` spread over the months of the period."),
-    saving_percent: zod
-      .string()
-      .nullable()
-      .describe(
-        "Licensed only. How much lower `monthly_amount` is than that of the shortest licensed period of the same item, as a decimal percentage. Null for that shortest period and for metered.",
-      ),
-    unit_amount: zod
-      .string()
-      .nullable()
-      .describe(
-        "Metered only; null for licensed. The amount for one `unit` of time, per quantity unit.",
-      ),
-    unit: zod
-      .union([zod.literal("hour"), zod.literal(null)])
-      .nullable()
-      .describe("Metered only; null for licensed. The time unit of `unit_amount`."),
-    termination_policy: zod
-      .union([zod.literal("immediate"), zod.literal("period_end"), zod.literal(null)])
-      .nullable()
-      .describe(
-        "What canceling does under this option: `immediate` ends the service at once, with any refund following the option's terms; `period_end` ends it at the end of the paid period. Null means no explicit policy was recorded; it must not be interpreted as immediate.",
-      ),
-  })
+export const BillingQuantity = zod
+  .enum(["one", "size_gib", "bandwidth_mbps", "snapshots"])
   .describe(
-    "One way to buy an item. Choose it by giving its usage_type, period and termination_policy as billing.",
+    "`one`: one per item. `size_gib`: the size or capacity bought, in GiB. `bandwidth_mbps`: the bandwidth bought, in Mbps. `snapshots`: the number of snapshots the quota allows.",
   );
 
-export type PricingOption = zod.input<typeof PricingOption>;
-export type PricingOptionOutput = zod.output<typeof PricingOption>;
+export type BillingQuantity = zod.input<typeof BillingQuantity>;
+export type BillingQuantityOutput = zod.output<typeof BillingQuantity>;

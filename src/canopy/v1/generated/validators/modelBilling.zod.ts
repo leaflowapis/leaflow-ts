@@ -16,7 +16,7 @@
  * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
  * through as written; a model's `capabilities` lists the values its upstream accepts.
  *
- * Management operations use `/api/v1`. The management model catalogue includes pricing;
+ * Management operations use `/api/v1`. The management model catalogue names how each model is billed in Billing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
  *
  * ## Authentication
@@ -35,26 +35,27 @@
  * - **A usage query must carry a time range**, spanning no more than 31 days, or 400 days for the usage timeline. `from` and `to` carry a timezone offset, which the server does not infer.
  * - **The request and response bodies do not appear in the ledger.** They are not recorded. Quote the `upstream_request_id` from the response when reporting a problem.
  * - **Usage may be estimated.** The upstream provider does not report usage on every request. Where it does not, `usage_source` is `estimated` and the figures are derived from the character classes of the payload, to within roughly fifteen per cent.
- * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates stated in each model's `pricing`.
+ * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { Money } from "./money.zod.js";
+import { ModelMeter } from "./modelMeter.zod.js";
 
-export const TokenPrice = zod.strictObject({
-  token_kind: zod.enum(["input", "output", "cache_read", "cache_write", "reasoning"]),
-  unit_amount: zod
-    .union([Money, zod.null()])
-    .describe(
-      "The charge for `unit_quantity` tokens of this kind. Null when the kind has no rate in the currency, in which case the model cannot be billed for it.",
-    ),
-  unit_quantity: zod
-    .string()
-    .nullable()
-    .describe(
-      "How many tokens `unit_amount` is for, such as `1000000`. Null when `unit_amount` is null.",
-    ),
-});
+export const ModelBilling = zod
+  .strictObject({
+    plan_id: zod
+      .uuid()
+      .nullable()
+      .describe("The Billing plan of the service; null where the service is not sold."),
+    meters: zod
+      .array(ModelMeter)
+      .describe(
+        "One entry for each of the five token kinds, in the order input, output, cache_read, cache_write, reasoning.",
+      ),
+  })
+  .describe(
+    "How requests to a model are billed: under the service's subscription, on the Billing plan `plan_id`, one rate for each token kind. Read the rates from Billing with `search-prices` for the plan and then `search-rates` with each meter's `dimensions`.\n\nEach token kind is priced on its own. `input` excludes cached input, which is `cache_read`, and `output` excludes reasoning the provider reports separately, which is `reasoning`; a request is billed for each kind it used.",
+  );
 
-export type TokenPrice = zod.input<typeof TokenPrice>;
-export type TokenPriceOutput = zod.output<typeof TokenPrice>;
+export type ModelBilling = zod.input<typeof ModelBilling>;
+export type ModelBillingOutput = zod.output<typeof ModelBilling>;

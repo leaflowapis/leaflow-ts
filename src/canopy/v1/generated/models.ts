@@ -16,7 +16,7 @@
  * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
  * through as written; a model's `capabilities` lists the values its upstream accepts.
  *
- * Management operations use `/api/v1`. The management model catalogue includes pricing;
+ * Management operations use `/api/v1`. The management model catalogue names how each model is billed in Billing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
  *
  * ## Authentication
@@ -35,7 +35,7 @@
  * - **A usage query must carry a time range**, spanning no more than 31 days, or 400 days for the usage timeline. `from` and `to` carry a timezone offset, which the server does not infer.
  * - **The request and response bodies do not appear in the ledger.** They are not recorded. Quote the `upstream_request_id` from the response when reporting a problem.
  * - **Usage may be estimated.** The upstream provider does not report usage on every request. Where it does not, `usage_source` is `estimated` and the figures are derived from the character classes of the payload, to within roughly fifteen per cent.
- * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates stated in each model's `pricing`.
+ * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
  * OpenAPI spec version: 1.0.0
  */
 export type ReasoningDiagnosticsRequested = { [key: string]: unknown };
@@ -355,9 +355,9 @@ export const ModelResourceStatus = {
   retired: "retired",
 } as const;
 
-export type TokenPriceTokenKind = (typeof TokenPriceTokenKind)[keyof typeof TokenPriceTokenKind];
+export type ModelMeterTokenKind = (typeof ModelMeterTokenKind)[keyof typeof ModelMeterTokenKind];
 
-export const TokenPriceTokenKind = {
+export const ModelMeterTokenKind = {
   input: "input",
   output: "output",
   cache_read: "cache_read",
@@ -366,38 +366,30 @@ export const TokenPriceTokenKind = {
 } as const;
 
 /**
- * A decimal string, in the currency stated alongside it.
- *
- * **The currency is not part of this type.** It is carried by a `currency` field next to the
- * amount, or by the account the amount belongs to. Reading an amount without that field is
- * reading a number with no unit.
- *
- * It is a string rather than a JSON number because a JSON number is a float in most parsers,
- * and a float loses precision on the first arithmetic. Nothing on this platform puts an amount
- * through a float.
+ * The dimension values the usage of this token kind carries, and the rate is matched at.
  */
-export type Money = string;
+export type ModelMeterDimensions = { [key: string]: string };
 
-export interface TokenPrice {
-  token_kind: TokenPriceTokenKind;
-  /** The charge for `unit_quantity` tokens of this kind. Null when the kind has no rate in the currency, in which case the model cannot be billed for it. */
-  unit_amount: Money | null;
-  /**
-   * How many tokens `unit_amount` is for, such as `1000000`. Null when `unit_amount` is null.
-   * @nullable
-   */
-  unit_quantity: string | null;
+export interface ModelMeter {
+  token_kind: ModelMeterTokenKind;
+  meter_lookup_key: string;
+  /** The dimension values the usage of this token kind carries, and the rate is matched at. */
+  dimensions: ModelMeterDimensions;
 }
 
 /**
- * What requests to a model cost, as Billing prices them in the currency of the project's current billing account. These are list amounts before promotion codes, not a checkout guarantee; usage is billed afterwards under the service's subscription.
+ * How requests to a model are billed: under the service's subscription, on the Billing plan `plan_id`, one rate for each token kind. Read the rates from Billing with `search-prices` for the plan and then `search-rates` with each meter's `dimensions`.
  *
  * Each token kind is priced on its own. `input` excludes cached input, which is `cache_read`, and `output` excludes reasoning the provider reports separately, which is `reasoning`; a request is billed for each kind it used.
  */
-export interface ModelPricing {
-  currency: string;
+export interface ModelBilling {
+  /**
+   * The Billing plan of the service; null where the service is not sold.
+   * @nullable
+   */
+  plan_id: string | null;
   /** One entry for each of the five token kinds, in the order input, output, cache_read, cache_write, reasoning. */
-  token_kinds: TokenPrice[];
+  meters: ModelMeter[];
 }
 
 export interface ModelResource {
@@ -410,8 +402,7 @@ export interface ModelResource {
   id: string;
   /** The maximum output length. Advisory only */
   max_output_tokens: number;
-  /** What requests to this model cost. Null when the project has no billing account. */
-  pricing: ModelPricing | null;
+  billing: ModelBilling;
   status: ModelResourceStatus;
   /** The model developer; not the upstream provider or model family. */
   developer: string;
@@ -609,7 +600,7 @@ export interface ServiceResource {
    */
   order_id: string | null;
   /**
-   * The Billing plan the service is sold under; null where the service is not sold. Price enabling it with Billing's quote, giving this plan with the `recurring` price type, the `metered` usage type and a quantity of 1; token usage is priced per model, as each model's `pricing` states.
+   * The Billing plan the service is sold under; null where the service is not sold. Price enabling it with Billing's quote, giving this plan with the `recurring` price type, the `metered` usage type and a quantity of 1; token usage is priced per model, at the rates Billing holds for each model's `billing`.
    * @nullable
    */
   plan_id: string | null;
@@ -645,6 +636,19 @@ export const CheckoutMode = {
   automatic: "automatic",
   deferred: "deferred",
 } as const;
+
+/**
+ * A decimal string, in the currency stated alongside it.
+ *
+ * **The currency is not part of this type.** It is carried by a `currency` field next to the
+ * amount, or by the account the amount belongs to. Reading an amount without that field is
+ * reading a number with no unit.
+ *
+ * It is a string rather than a JSON number because a JSON number is a float in most parsers,
+ * and a float loses precision on the first arithmetic. Nothing on this platform puts an amount
+ * through a float.
+ */
+export type Money = string;
 
 /**
  * Shared checkout choices for a product purchase. The service may set them or forward its client's

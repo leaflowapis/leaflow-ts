@@ -16,7 +16,7 @@
  * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
  * through as written; a model's `capabilities` lists the values its upstream accepts.
  *
- * Management operations use `/api/v1`. The management model catalogue includes pricing;
+ * Management operations use `/api/v1`. The management model catalogue names how each model is billed in Billing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
  *
  * ## Authentication
@@ -35,7 +35,7 @@
  * - **A usage query must carry a time range**, spanning no more than 31 days, or 400 days for the usage timeline. `from` and `to` carry a timezone offset, which the server does not infer.
  * - **The request and response bodies do not appear in the ledger.** They are not recorded. Quote the `upstream_request_id` from the response when reporting a problem.
  * - **Usage may be estimated.** The upstream provider does not report usage on every request. Where it does not, `usage_source` is `estimated` and the figures are derived from the character classes of the payload, to within roughly fifteen per cent.
- * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates stated in each model's `pricing`.
+ * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -73,7 +73,7 @@ export const ServiceResource = zod
       .uuid()
       .nullable()
       .describe(
-        "The Billing plan the service is sold under; null where the service is not sold. Price enabling it with Billing's quote, giving this plan with the `recurring` price type, the `metered` usage type and a quantity of 1; token usage is priced per model, as each model's `pricing` states.",
+        "The Billing plan the service is sold under; null where the service is not sold. Price enabling it with Billing's quote, giving this plan with the `recurring` price type, the `metered` usage type and a quantity of 1; token usage is priced per model, at the rates Billing holds for each model's `billing`.",
       ),
     subscription_id: zod
       .uuid()

@@ -57,13 +57,11 @@ export const PlanPriceInterval = {
 } as const;
 
 /**
- * A price of the plan in Billing.
+ * A price of the plan in Billing. Membership returns no amounts; read the price from Billing with `get-price` or `search-prices` by `price_id`.
  */
 export interface PlanPrice {
   price_id: string;
   currency: Currency;
-  /** Charged for each period, before tax and discounts. */
-  unit_amount: Money;
   interval: PlanPriceInterval;
   /** @minimum 1 */
   interval_count: number;

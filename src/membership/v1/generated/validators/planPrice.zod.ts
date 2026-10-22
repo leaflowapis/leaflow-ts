@@ -7,17 +7,17 @@
  */
 import * as zod from "zod";
 import { Currency } from "./currency.zod.js";
-import { Money } from "./money.zod.js";
 
 export const PlanPrice = zod
   .strictObject({
     price_id: zod.uuid(),
     currency: Currency,
-    unit_amount: Money.describe("Charged for each period, before tax and discounts."),
     interval: zod.enum(["month", "year"]),
     interval_count: zod.int().min(1),
   })
-  .describe("A price of the plan in Billing.");
+  .describe(
+    "A price of the plan in Billing. Membership returns no amounts; read the price from Billing with `get-price` or `search-prices` by `price_id`.",
+  );
 
 export type PlanPrice = zod.input<typeof PlanPrice>;
 export type PlanPriceOutput = zod.output<typeof PlanPrice>;

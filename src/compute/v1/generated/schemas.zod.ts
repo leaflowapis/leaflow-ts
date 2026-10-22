@@ -11,7 +11,7 @@
  * ## Conventions
  *
  * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, a resource becomes `provisioning` and then reaches its usual status, such as `active` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. Read the Checkout Session and the order in Billing for checkout and payment progress.
- * - **Pricing.** Catalog items, such as instance types, disk types and public IP pools, carry `pricing`: the licensed and metered options Billing offers for them, in the currency of the project's current billing account, or null when the project has no billing account. They are list amounts before promotion codes, not a checkout guarantee. A purchase chooses one option with `billing`, which applies to all of its components. Every purchase and change has a quote operation beside it, at the same path followed by `/quote`, which returns what checkout would collect without ordering anything.
+ * - **Commercial terms.** Compute returns no amounts. Catalog items, such as instance types, disk types and public IP pools, and the region's own products carry `billing`: the Billing plan an order line for them is sold under, the dimensions the line carries, how its quantity is counted for each usage type, and the meters its metered price reads. Read their prices from Billing with `search-prices` and `search-rates`, quote a purchase or a change with Billing's `get-quote` using the same lines, and estimate metered usage with Billing's `estimate-usage`. A purchase chooses its terms with `billing`, which applies to all of its components.
  * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid.
  * - **Operations.** Requests such as starting, stopping, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a disk, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time.
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. The subscription is `pending` until the order is accepted, `provisioning` while the resource is created, and `active` once it is delivered. Bandwidth is a property of its floating IP, not a separate resource. Snapshots use a purchased per-region count quota, and backups are metered on the region's backup service; neither has an order or subscription of its own.
@@ -23,8 +23,6 @@
  */
 import * as zod from "zod";
 
-import { AllocateFloatingIPQuoteRequestBody } from "./validators/allocateFloatingIPQuoteRequestBody.zod.js";
-
 import { AllocateFloatingIPRequestBody } from "./validators/allocateFloatingIPRequestBody.zod.js";
 
 import { AttachDiskRequestBody } from "./validators/attachDiskRequestBody.zod.js";
@@ -35,19 +33,13 @@ import { AttachPortRequestBody } from "./validators/attachPortRequestBody.zod.js
 
 import { BindFloatingIPRequestBody } from "./validators/bindFloatingIPRequestBody.zod.js";
 
-import { CreateBackupCapacityPackQuoteRequestBody } from "./validators/createBackupCapacityPackQuoteRequestBody.zod.js";
-
 import { CreateBackupCapacityPackRequestBody } from "./validators/createBackupCapacityPackRequestBody.zod.js";
 
 import { CreateBackupRequestBody } from "./validators/createBackupRequestBody.zod.js";
 
 import { CreateBackupServiceRequestBody } from "./validators/createBackupServiceRequestBody.zod.js";
 
-import { CreateDiskQuoteRequestBody } from "./validators/createDiskQuoteRequestBody.zod.js";
-
 import { CreateDiskRequestBody } from "./validators/createDiskRequestBody.zod.js";
-
-import { CreateImageQuoteRequestBody } from "./validators/createImageQuoteRequestBody.zod.js";
 
 import { CreateImageRequestBody } from "./validators/createImageRequestBody.zod.js";
 
@@ -66,8 +58,6 @@ import { CreateSecurityRuleRequestBody } from "./validators/createSecurityRuleRe
 import { CreateSnapshotRequestBody } from "./validators/createSnapshotRequestBody.zod.js";
 
 import { CreateSubnetRequestBody } from "./validators/createSubnetRequestBody.zod.js";
-
-import { LaunchInstanceQuoteRequestBody } from "./validators/launchInstanceQuoteRequestBody.zod.js";
 
 import { LaunchInstanceRequestBody } from "./validators/launchInstanceRequestBody.zod.js";
 
@@ -93,15 +83,9 @@ import { RenameSnapshotRequestBody } from "./validators/renameSnapshotRequestBod
 
 import { ResetPasswordRequestBody } from "./validators/resetPasswordRequestBody.zod.js";
 
-import { ResizeDiskQuoteRequestBody } from "./validators/resizeDiskQuoteRequestBody.zod.js";
-
 import { ResizeDiskRequestBody } from "./validators/resizeDiskRequestBody.zod.js";
 
-import { ResizeInstanceQuoteRequestBody } from "./validators/resizeInstanceQuoteRequestBody.zod.js";
-
 import { ResizeInstanceRequestBody } from "./validators/resizeInstanceRequestBody.zod.js";
-
-import { RestoreBackupQuoteRequestBody } from "./validators/restoreBackupQuoteRequestBody.zod.js";
 
 import { RestoreBackupRequestBody } from "./validators/restoreBackupRequestBody.zod.js";
 
@@ -109,15 +93,11 @@ import { RevertDiskRequestBody } from "./validators/revertDiskRequestBody.zod.js
 
 import { RunCommandRequestBody } from "./validators/runCommandRequestBody.zod.js";
 
-import { SetFloatingIPBandwidthQuoteRequestBody } from "./validators/setFloatingIPBandwidthQuoteRequestBody.zod.js";
-
 import { SetFloatingIPBandwidthRequestBody } from "./validators/setFloatingIPBandwidthRequestBody.zod.js";
 
 import { SetInstanceLabelsRequestBody } from "./validators/setInstanceLabelsRequestBody.zod.js";
 
 import { SetInstanceNotesRequestBody } from "./validators/setInstanceNotesRequestBody.zod.js";
-
-import { SetSnapshotQuotaQuoteRequestBody } from "./validators/setSnapshotQuotaQuoteRequestBody.zod.js";
 
 import { SetSnapshotQuotaRequestBody } from "./validators/setSnapshotQuotaRequestBody.zod.js";
 
@@ -194,16 +174,6 @@ export const RestoreBackupParams = zod.strictObject({
 });
 
 export const RestoreBackupBody = RestoreBackupRequestBody;
-
-/**
- * Prices what `restore-backup` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote restoring from a backup
- */
-export const CreateBackupRestoreQuoteParams = zod.strictObject({
-  backupId: zod.uuid(),
-});
-
-export const CreateBackupRestoreQuoteBody = RestoreBackupQuoteRequestBody;
 
 /**
  * Only disk types currently on sale are listed, both system disk types and data disk types; `purpose` narrows the list to one of the two. A withdrawn one disappears from here and can no longer be bought, while the disks already on it keep working and can still be resized.
@@ -293,16 +263,10 @@ export const ListImagesQueryParams = zod.strictObject({
  *
  * The instance can be started, stopped and used normally during the capture, but cannot be released.
  *
- * The image is billed for the storage it occupies, as the region's `private_image_pricing` shows. Obtain a quote with `create-image-quote` first.
+ * The image is billed for the storage it occupies, under the region's `private_image_billing`. Quote it with Billing first.
  * @summary Capture an instance as a private image
  */
 export const CreateImageBody = CreateImageRequestBody;
-
-/**
- * Prices the capture `create-image` would order for the same instance, without ordering anything; nothing is reserved or recorded. The quantity priced is the size of the system disk, which is the most the image can occupy, with the option chosen in `billing`. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. Prices may change, so quote again before final confirmation.
- * @summary Quote capturing an instance as a private image
- */
-export const CreateImageQuoteBody = CreateImageQuoteRequestBody;
 
 /**
  * Returns a public image, or a private image of this project; any other image is reported as not found. Use this endpoint to poll capture progress. When `status` is `failed`, `failure_reason` states why.
@@ -329,7 +293,7 @@ export const RenameImageBody = RenameImageRequestBody;
  *
  * An image whose capture has not finished can be deleted; the capture is aborted. This is the one operation accepted while the `create` operation is in progress.
  *
- * Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the image, including a pay-as-you-go subscription. `meta.resource_id` names the image. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+ * When subscriptions pay for the image, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the image is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
  * @summary Delete a private image
  */
 export const DeleteImageParams = zod.strictObject({
@@ -454,12 +418,6 @@ export const ListDisksQueryParams = zod.strictObject({
 export const CreateDiskBody = CreateDiskRequestBody;
 
 /**
- * Prices what `create-disk` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote creating a disk
- */
-export const CreateDiskQuoteBody = CreateDiskQuoteRequestBody;
-
-/**
  * Returns the stored state of the disk; it does not query the cloud.
  * @summary Retrieve a disk
  */
@@ -480,7 +438,7 @@ export const RenameDiskBody = RenameDiskRequestBody;
 /**
  * Deletion is rejected while the disk is attached, or while snapshots created from it still exist.
  *
- * Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the disk, including a pay-as-you-go subscription. `meta.resource_id` names the disk. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+ * When subscriptions pay for the disk, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the disk is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, deletion begins at once and `cancellation` is null.
  * @summary Delete a disk
  */
 export const DeleteDiskParams = zod.strictObject({
@@ -502,16 +460,6 @@ export const ResizeDiskParams = zod.strictObject({
 });
 
 export const ResizeDiskBody = ResizeDiskRequestBody;
-
-/**
- * Prices the change `resize-disk` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote resizing a disk
- */
-export const CreateDiskResizeQuoteParams = zod.strictObject({
-  diskId: zod.uuid(),
-});
-
-export const CreateDiskResizeQuoteBody = ResizeDiskQuoteRequestBody;
 
 /**
  * Restores the contents of the disk to the moment the snapshot was taken. **All data written after that moment is lost and cannot be recovered.**
@@ -564,12 +512,6 @@ export const ListFloatingIpsQueryParams = zod.strictObject({
 export const AllocateFloatingIpBody = AllocateFloatingIPRequestBody;
 
 /**
- * Prices what `allocate-floating-ip` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote allocating a floating IP
- */
-export const CreateFloatingIpQuoteBody = AllocateFloatingIPQuoteRequestBody;
-
-/**
  * @summary Retrieve a floating IP
  */
 export const GetFloatingIpParams = zod.strictObject({
@@ -579,7 +521,7 @@ export const GetFloatingIpParams = zod.strictObject({
 /**
  * Releases the floating IP after unbinding it. The floating IP shows the `delete` operation until it is released.
  *
- * Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the address, including a pay-as-you-go subscription. `meta.resource_id` names the floating IP. It is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+ * When subscriptions pay for the address, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the floating IP is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
  * @summary Release a floating IP
  */
 export const ReleaseFloatingIpParams = zod.strictObject({
@@ -597,16 +539,6 @@ export const SetFloatingIpBandwidthParams = zod.strictObject({
 });
 
 export const SetFloatingIpBandwidthBody = SetFloatingIPBandwidthRequestBody;
-
-/**
- * Prices the change `set-floating-ip-bandwidth` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote changing the bandwidth limit
- */
-export const CreateFloatingIpBandwidthQuoteParams = zod.strictObject({
-  floatingIpId: zod.uuid(),
-});
-
-export const CreateFloatingIpBandwidthQuoteBody = SetFloatingIPBandwidthQuoteRequestBody;
 
 /**
  * The floating IP shows the `bind` operation until the binding is confirmed.
@@ -675,12 +607,6 @@ export const ListInstancesQueryParams = zod.strictObject({
 export const LaunchInstanceBody = LaunchInstanceRequestBody;
 
 /**
- * Prices what `launch-instance` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote creating instances
- */
-export const CreateInstanceQuoteBody = LaunchInstanceQuoteRequestBody;
-
-/**
  * Returns the stored state of the instance; it does not query the cloud. Use it to poll creation progress.
  * @summary Retrieve an instance
  */
@@ -703,7 +629,7 @@ export const RenameInstanceBody = RenameInstanceRequestBody;
  *
  * An instance being captured as a private image cannot be released. Wait for the capture to finish, or delete that image first.
  *
- * Refused with `COMPUTE_RESOURCE_SUBSCRIBED` while a subscription pays for the instance, or for a disk that is deleted with it, including a pay-as-you-go subscription. `meta.resource_id` names that resource. The instance is released by canceling the subscriptions listed in `meta.subscription_ids` through Billing, the same set as its `release_subscription_ids`.
+ * When subscriptions pay for the instance, or for a disk deleted with it, its `release_subscription_ids`, this request cancels them in Billing, and the response carries that cancellation. Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms, and release begins when Billing begins the cancellation. When any of them can only be canceled at the end of its paid period, all of them are canceled then, and the instance is kept until `scheduled_at`. Deleting again while the cancellation is open returns it. Without subscriptions, release begins at once and `cancellation` is null.
  * @summary Release an instance
  */
 export const DeleteInstanceParams = zod.strictObject({
@@ -854,16 +780,6 @@ export const ResizeInstanceParams = zod.strictObject({
 });
 
 export const ResizeInstanceBody = ResizeInstanceRequestBody;
-
-/**
- * Prices the change `resize-instance` would order, as of now, without ordering or changing anything. A change that raises the price has the charge for the rest of the paid period as `total`; one that lowers it has a zero `total` and the refund as `refundable_amount`. Give the returned `proration_date` with the change, and for automatic checkout `total` as `checkout.expected_amount`. A request the change would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote resizing an instance
- */
-export const CreateInstanceResizeQuoteParams = zod.strictObject({
-  instanceId: zod.uuid(),
-});
-
-export const CreateInstanceResizeQuoteBody = ResizeInstanceQuoteRequestBody;
 
 /**
  * Outstanding restrictions can prevent starting. The instance shows the `start` operation until it is running or the start has failed.
@@ -1390,9 +1306,9 @@ export const DeleteSecurityGroupRuleParams = zod.strictObject({
  * max(limit - used, 0) while active, and zero when creation is not permitted; additional
  * creation is refused while the quota is inactive, suspended or exhausted.
  *
- * Canceling the quota's subscription through Billing is refused while any snapshot exists in
- * the region: the cancellation fails with SNAPSHOT_QUOTA_IN_USE. Reclaiming the quota for
- * non-payment deletes its snapshots, as for other reclaimed resources.
+ * Deleting the quota, which cancels its subscription, is refused while any snapshot exists in the
+ * region with SNAPSHOT_QUOTA_IN_USE. Reclaiming the quota for non-payment deletes its snapshots, as
+ * for other reclaimed resources.
  * @summary Get regional snapshot quota
  */
 export const GetSnapshotQuotaParams = zod.strictObject({
@@ -1402,8 +1318,9 @@ export const GetSnapshotQuotaParams = zod.strictObject({
 /**
  * Purchases or changes the maximum number of snapshots this project may hold in this region.
  * limit is the target total, not an additional number of slots or a consumable create allowance.
- * billing chooses one of the quota's pricing options; a change of an existing purchase keeps its
- * usage type and period, and billing must name that option. The purchased quantity is this count.
+ * billing chooses how the quota is bought, among the prices Billing offers for the region's
+ * `snapshot_quota_billing`; a change of an existing purchase keeps its usage type and period, and billing
+ * must name them. The purchased quantity is this count.
  *
  * Returns the quota with the Checkout Session. pending_limit records the target while the current limit stays
  * in force; the new limit applies once the order is accepted and the quota is activated. Snapshots
@@ -1424,19 +1341,19 @@ export const SetSnapshotQuotaParams = zod.strictObject({
 export const SetSnapshotQuotaBody = SetSnapshotQuotaRequestBody;
 
 /**
- * Prices what `set-snapshot-quota` would order, including a change of an existing purchase as of now, for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote setting the regional snapshot quota
+ * Cancels the quota's subscription in Billing and returns the cancellation. Refused with 409 `SNAPSHOT_QUOTA_IN_USE` while any snapshot exists in the region; delete the snapshots first. Refused with 409 `SNAPSHOT_QUOTA_NOT_ACTIVE` when no subscription pays for a quota in the region.
+ *
+ * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and the quota stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * @summary Delete regional snapshot quota
  */
-export const CreateSnapshotQuotaQuoteParams = zod.strictObject({
+export const DeleteSnapshotQuotaParams = zod.strictObject({
   regionId: zod.uuid(),
 });
-
-export const CreateSnapshotQuotaQuoteBody = SetSnapshotQuotaQuoteRequestBody;
 
 /**
  * The backup service of the authenticated project in this region. Backups can be created only while it is `active`. Each hour, Compute covers retained backup capacity up to the total `capacity_gib` of the capacity packs active in the region and meters only the excess on this service's subscription, per GiB-hour.
  *
- * Canceling the service's subscription through Billing is refused while any backup is retained in the region: the cancellation fails with `BACKUP_SERVICE_IN_USE`. Delete the backups first. Capacity packs are canceled separately, under their own refund terms. Reclaiming the service for non-payment deletes its backups.
+ * Deleting the service, which cancels its subscription, is refused while any backup is retained in the region with `BACKUP_SERVICE_IN_USE`. Delete the backups first. Capacity packs are deleted separately, under their own refund terms. Reclaiming the service for non-payment deletes its backups.
  * @summary Get the backup service of a region
  */
 export const GetBackupServiceParams = zod.strictObject({
@@ -1456,10 +1373,12 @@ export const CreateBackupServiceParams = zod.strictObject({
 export const CreateBackupServiceBody = CreateBackupServiceRequestBody;
 
 /**
- * Prices what `create-backup-service` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote activating the backup service
+ * Cancels the service's subscription in Billing and returns the cancellation. Refused with 409 `BACKUP_SERVICE_IN_USE` while any backup is retained in the region; delete the backups first. Capacity packs are deleted separately. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` when no subscription pays for a service in the region.
+ *
+ * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and the service stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * @summary Delete the backup service of a region
  */
-export const CreateBackupServiceQuoteParams = zod.strictObject({
+export const DeleteBackupServiceParams = zod.strictObject({
   regionId: zod.uuid(),
 });
 
@@ -1493,7 +1412,7 @@ export const ListBackupCapacityPacksQueryParams = zod.strictObject({
 });
 
 /**
- * Purchases a capacity pack, backup capacity for this project and region bought in advance by month or year: `billing` must be licensed with a period, as offered in the backup service's `capacity_pack_pricing`. Compute applies the coverage: each hour, retained backup capacity up to the total `capacity_gib` of the packs active in the region is covered, and Compute meters only the excess on the backup service's subscription. A pack is not a Billing allowance or credit; Billing takes its order and payment and handles its renewal and cancellation through the pack's subscription.
+ * Purchases a capacity pack, backup capacity for this project and region bought in advance by month or year: `billing` must be licensed with a period, as Billing offers for the region's `capacity_pack_billing`. Compute applies the coverage: each hour, retained backup capacity up to the total `capacity_gib` of the packs active in the region is covered, and Compute meters only the excess on the backup service's subscription. A pack is not a Billing allowance or credit; Billing takes its order and payment and handles its renewal and cancellation through the pack's subscription.
  *
  * Returns the pack as `pending` with its Checkout Session; it applies once the order is accepted. Refused with 409 `BACKUP_SERVICE_NOT_ACTIVE` and `meta.region_id` when the region's backup service is not active.
  * @summary Buy a backup capacity pack
@@ -1505,14 +1424,15 @@ export const CreateBackupCapacityPackParams = zod.strictObject({
 export const CreateBackupCapacityPackBody = CreateBackupCapacityPackRequestBody;
 
 /**
- * Prices what `create-backup-capacity-pack` would order for the same request, without ordering or creating anything; nothing is reserved or recorded. Billing evaluates applicable account discounts and tax as for automatic checkout. `total` is what automatic checkout would collect before credit grants and balance; give it as `checkout.expected_amount` to be refused rather than charged a different amount. `estimated_usage_amount` projects metered usage over one month of 730 hours and is not collected at checkout. A request the purchase would refuse is refused the same way. Prices may change, so quote again before final confirmation.
- * @summary Quote buying a backup capacity pack
+ * Cancels the pack's subscription in Billing and returns the cancellation. Refused with 404 `BACKUP_CAPACITY_PACK_NOT_FOUND` when the project has no pack of this ID in the region, and with 409 `BACKUP_CAPACITY_PACK_ENDED` when the pack has ended.
+ *
+ * Pay-as-you-go subscriptions, and prepaid ones whose terms allow it, are canceled at once and refunded under those terms. When the subscription can only be canceled at the end of its paid period, it is canceled then, and its coverage stays in force until `scheduled_at`. Deleting again while the cancellation is open returns it.
+ * @summary Delete a backup capacity pack
  */
-export const CreateBackupCapacityPackQuoteParams = zod.strictObject({
+export const DeleteBackupCapacityPackParams = zod.strictObject({
   regionId: zod.uuid(),
+  packId: zod.uuid(),
 });
-
-export const CreateBackupCapacityPackQuoteBody = CreateBackupCapacityPackQuoteRequestBody;
 
 /**
  * @summary List snapshots
