@@ -486,7 +486,7 @@ export type upgradeMembershipResponse =
   | upgradeMembershipResponseError;
 
 export const getUpgradeMembershipUrl = (membershipId: string) => {
-  return `https://membership.leaflow.cloud/api/v1/memberships/${encodeURIComponent(String(membershipId))}/upgrade`;
+  return `https://membership.leaflow.cloud/api/v1/memberships/${encodeURIComponent(String(membershipId))}:upgrade`;
 };
 
 /**
@@ -554,7 +554,7 @@ export type scheduleMembershipDowngradeResponse =
   | scheduleMembershipDowngradeResponseError;
 
 export const getScheduleMembershipDowngradeUrl = (membershipId: string) => {
-  return `https://membership.leaflow.cloud/api/v1/memberships/${encodeURIComponent(String(membershipId))}/downgrade`;
+  return `https://membership.leaflow.cloud/api/v1/memberships/${encodeURIComponent(String(membershipId))}:scheduleDowngrade`;
 };
 
 /**
@@ -621,7 +621,7 @@ export type cancelMembershipDowngradeResponse =
   | cancelMembershipDowngradeResponseError;
 
 export const getCancelMembershipDowngradeUrl = (membershipId: string) => {
-  return `https://membership.leaflow.cloud/api/v1/memberships/${encodeURIComponent(String(membershipId))}/downgrade`;
+  return `https://membership.leaflow.cloud/api/v1/memberships/${encodeURIComponent(String(membershipId))}:cancelDowngrade`;
 };
 
 /**
@@ -635,7 +635,7 @@ export const cancelMembershipDowngrade = async (
 ): Promise<cancelMembershipDowngradeResponse> => {
   const res = await (fetchFn ?? fetch)(getCancelMembershipDowngradeUrl(membershipId), {
     ...options,
-    method: "DELETE",
+    method: "POST",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();

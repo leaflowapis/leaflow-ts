@@ -25,15 +25,9 @@
  */
 import * as zod from "zod";
 
-export const RequestAccountDeletionRequestBody = zod.strictObject({
-  acknowledge_forfeiture: zod
-    .literal(true)
-    .describe(
-      "Must be true. Confirms that any remaining balance and prepaid benefits are forfeited when the deletion is carried out",
-    ),
+export const RequestAccountDeletionParams = zod.strictObject({
+  acknowledge_forfeiture: zod.literal(true),
 });
 
-export type RequestAccountDeletionRequestBody = zod.input<typeof RequestAccountDeletionRequestBody>;
-export type RequestAccountDeletionRequestBodyOutput = zod.output<
-  typeof RequestAccountDeletionRequestBody
->;
+export type RequestAccountDeletionParams = zod.input<typeof RequestAccountDeletionParams>;
+export type RequestAccountDeletionParamsOutput = zod.output<typeof RequestAccountDeletionParams>;

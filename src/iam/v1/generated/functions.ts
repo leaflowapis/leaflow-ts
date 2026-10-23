@@ -1194,7 +1194,7 @@ export type transferProjectOwnershipResponse =
   | transferProjectOwnershipResponseError;
 
 export const getTransferProjectOwnershipUrl = () => {
-  return `https://iam.leaflow.cloud/api/v1/transfer-ownership`;
+  return `https://iam.leaflow.cloud/api/v1/project:transferOwnership`;
 };
 
 /**

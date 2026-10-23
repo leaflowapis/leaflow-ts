@@ -45,7 +45,7 @@ import type {
   ProjectAccessResource,
   ProjectSlugAvailabilityResource,
   RegisterRequestBody,
-  RequestAccountDeletionRequestBody,
+  RequestAccountDeletionParams,
   ScopedTokenResponseBody,
   SearchProjectsRequestBody,
   SettingsResource,
@@ -121,7 +121,7 @@ export const getGetSettingsUrl = () => {
 /**
  * No token required.
  *
- * While `registration_mode` is not `OPEN`, `POST /account/v1/register` answers 403: `CLOSED` refuses everyone, and `INVITE_ONLY` accepts only an email address holding a project invitation. `project_creation_mode` behaves the same way, and `VERIFIED_ONLY` requires identity verification to have completed.
+ * While `registration_mode` is not `OPEN`, `POST /account/v1/me:register` answers 403: `CLOSED` refuses everyone, and `INVITE_ONLY` accepts only an email address holding a project invitation. `project_creation_mode` behaves the same way, and `VERIFIED_ONLY` requires identity verification to have completed.
  *
  * Both quotas are `0` when unlimited. The decision itself is made at the moment of writing.
  * @summary Get registration and project creation settings
@@ -211,7 +211,7 @@ export const getListAgreementsUrl = () => {
 };
 
 /**
- * No token required. Send the `type` and `version` of each one back unchanged to `POST /account/v1/register`.
+ * No token required. Send the `type` and `version` of each one back unchanged to `POST /account/v1/me:register`.
  *
  * The array is empty while no agreement is in force, and registration then takes no `consents`.
  * @summary List the agreements registration requires
@@ -361,7 +361,7 @@ export type registerResponseError = registerResponseDefault & {
 export type registerResponse = registerResponseSuccess | registerResponseError;
 
 export const getRegisterUrl = () => {
-  return `https://account.leaflow.cloud/account/v1/register`;
+  return `https://account.leaflow.cloud/account/v1/me:register`;
 };
 
 /**
@@ -515,6 +515,70 @@ export const updateAccount = async (
   return { data, status: res.status, headers: res.headers } as updateAccountResponse;
 };
 
+export type requestAccountDeletionResponse202 = {
+  data: AccountDeletionResource;
+  status: 202;
+};
+
+export type requestAccountDeletionResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 202>;
+};
+
+export type requestAccountDeletionResponseSuccess = requestAccountDeletionResponse202 & {
+  headers: Headers;
+};
+export type requestAccountDeletionResponseError = requestAccountDeletionResponseDefault & {
+  headers: Headers;
+};
+
+export type requestAccountDeletionResponse =
+  | requestAccountDeletionResponseSuccess
+  | requestAccountDeletionResponseError;
+
+export const getRequestAccountDeletionUrl = (params: RequestAccountDeletionParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://account.leaflow.cloud/account/v1/me?${stringifiedParams}`
+    : `https://account.leaflow.cloud/account/v1/me`;
+};
+
+/**
+ * The account is frozen at once: it can no longer enter a project or change anything in one. The answer is 202 with `state` `checking` while the services holding data for the account are asked whether it can be closed. Poll `GET /account/v1/me/deletion` until `state` leaves `checking`, which normally takes a few seconds.
+ *
+ * - If any service refuses, the account returns to use, `state` becomes `none`, and `rejected_at` and `objections` say why.
+ * - Otherwise `state` becomes `scheduled`, and the account is deleted at `scheduled_at`, fifteen days after the request. The conditions are checked once more at that time.
+ *
+ * The deletion can be cancelled with `POST /account/v1/me:undelete` until `scheduled_at`, and not after. Once carried out it cannot be undone, and the same sign-in cannot register again. Any remaining balance and prepaid benefits are forfeited, which `acknowledge_forfeiture` confirms.
+ *
+ * Requesting again while a deletion is open returns it unchanged. Fails with 412 `USER_OWNS_PROJECTS` while `blocking_projects` is not empty, and with 401 `INSUFFICIENT_USER_AUTHENTICATION` unless the caller signed in within the last `meta.max_age` seconds; sign in again with that `max_age` and retry.
+ * @summary Request deletion of the current account
+ */
+export const requestAccountDeletion = async (
+  params: RequestAccountDeletionParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<requestAccountDeletionResponse> => {
+  const res = await (fetchFn ?? fetch)(getRequestAccountDeletionUrl(params), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: requestAccountDeletionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as requestAccountDeletionResponse;
+};
+
 export type getAccountDeletionResponse200 = {
   data: AccountDeletionResource;
   status: 200;
@@ -561,79 +625,6 @@ export const getAccountDeletion = async (
   return { data, status: res.status, headers: res.headers } as getAccountDeletionResponse;
 };
 
-export type requestAccountDeletionResponse202 = {
-  data: AccountDeletionResource;
-  status: 202;
-};
-
-export type requestAccountDeletionResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 202>;
-};
-
-export type requestAccountDeletionResponseSuccess = requestAccountDeletionResponse202 & {
-  headers: Headers;
-};
-export type requestAccountDeletionResponseError = requestAccountDeletionResponseDefault & {
-  headers: Headers;
-};
-
-export type requestAccountDeletionResponse =
-  | requestAccountDeletionResponseSuccess
-  | requestAccountDeletionResponseError;
-
-export const getRequestAccountDeletionUrl = () => {
-  return `https://account.leaflow.cloud/account/v1/me/deletion`;
-};
-
-/**
- * The account is frozen at once: it can no longer enter a project or change anything in one. The answer is 202 with `state` `checking` while the services holding data for the account are asked whether it can be closed. Poll `GET /account/v1/me/deletion` until `state` leaves `checking`, which normally takes a few seconds.
- *
- * - If any service refuses, the account returns to use, `state` becomes `none`, and `rejected_at` and `objections` say why.
- * - Otherwise `state` becomes `scheduled`, and the account is deleted at `scheduled_at`, fifteen days after the request. The conditions are checked once more at that time.
- *
- * The deletion can be cancelled with `DELETE /account/v1/me/deletion` until `scheduled_at`, and not after. Once carried out it cannot be undone, and the same sign-in cannot register again. Any remaining balance and prepaid benefits are forfeited, which `acknowledge_forfeiture` confirms.
- *
- * Requesting again while a deletion is open returns it unchanged. Fails with 412 `USER_OWNS_PROJECTS` while `blocking_projects` is not empty, and with 401 `INSUFFICIENT_USER_AUTHENTICATION` unless the caller signed in within the last `meta.max_age` seconds; sign in again with that `max_age` and retry.
- * @summary Request deletion of the current account
- */
-export const requestAccountDeletion = async (
-  requestAccountDeletionRequestBody: RequestAccountDeletionRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<requestAccountDeletionResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getRequestAccountDeletionUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(requestAccountDeletionRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: requestAccountDeletionResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as requestAccountDeletionResponse;
-};
-
 export type cancelAccountDeletionResponse200 = {
   data: AccountDeletionResource;
   status: 200;
@@ -656,7 +647,7 @@ export type cancelAccountDeletionResponse =
   | cancelAccountDeletionResponseError;
 
 export const getCancelAccountDeletionUrl = () => {
-  return `https://account.leaflow.cloud/account/v1/me/deletion`;
+  return `https://account.leaflow.cloud/account/v1/me:undelete`;
 };
 
 /**
@@ -669,7 +660,7 @@ export const cancelAccountDeletion = async (
 ): Promise<cancelAccountDeletionResponse> => {
   const res = await (fetchFn ?? fetch)(getCancelAccountDeletionUrl(), {
     ...options,
-    method: "DELETE",
+    method: "POST",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -928,7 +919,7 @@ export type acceptInvitationByTokenResponse =
   | acceptInvitationByTokenResponseError;
 
 export const getAcceptInvitationByTokenUrl = () => {
-  return `https://account.leaflow.cloud/account/v1/me/invitations/accept`;
+  return `https://account.leaflow.cloud/account/v1/me/invitations:accept`;
 };
 
 /**
@@ -994,7 +985,7 @@ export type acceptInvitationResponse =
   | acceptInvitationResponseError;
 
 export const getAcceptInvitationUrl = (invitationId: string) => {
-  return `https://account.leaflow.cloud/account/v1/me/invitations/${encodeURIComponent(String(invitationId))}/accept`;
+  return `https://account.leaflow.cloud/account/v1/me/invitations/${encodeURIComponent(String(invitationId))}:accept`;
 };
 
 /**

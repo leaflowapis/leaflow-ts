@@ -218,7 +218,7 @@ export type markNotificationsReadResponse =
   | markNotificationsReadResponseError;
 
 export const getMarkNotificationsReadUrl = () => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/read`;
+  return `https://notification.leaflow.cloud/api/v1/notifications:batchMarkRead`;
 };
 
 /**
@@ -390,7 +390,7 @@ export type markNotificationReadResponse =
   | markNotificationReadResponseError;
 
 export const getMarkNotificationReadUrl = (notificationId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}/read`;
+  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}:markRead`;
 };
 
 /**
@@ -435,7 +435,7 @@ export type markNotificationUnreadResponse =
   | markNotificationUnreadResponseError;
 
 export const getMarkNotificationUnreadUrl = (notificationId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}/read`;
+  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}:markUnread`;
 };
 
 /**
@@ -452,7 +452,7 @@ export const markNotificationUnread = async (
 ): Promise<markNotificationUnreadResponse> => {
   const res = await (fetchFn ?? fetch)(getMarkNotificationUnreadUrl(notificationId), {
     ...options,
-    method: "DELETE",
+    method: "POST",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -483,7 +483,7 @@ export type archiveNotificationResponse =
   | archiveNotificationResponseError;
 
 export const getArchiveNotificationUrl = (notificationId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}/archive`;
+  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}:archive`;
 };
 
 /**
@@ -529,7 +529,7 @@ export type unarchiveNotificationResponse =
   | unarchiveNotificationResponseError;
 
 export const getUnarchiveNotificationUrl = (notificationId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}/archive`;
+  return `https://notification.leaflow.cloud/api/v1/notifications/${encodeURIComponent(String(notificationId))}:unarchive`;
 };
 
 /**
@@ -550,7 +550,7 @@ export const unarchiveNotification = async (
 ): Promise<unarchiveNotificationResponse> => {
   const res = await (fetchFn ?? fetch)(getUnarchiveNotificationUrl(notificationId), {
     ...options,
-    method: "DELETE",
+    method: "POST",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -638,7 +638,7 @@ export type readAllAnnouncementsResponse =
   | readAllAnnouncementsResponseError;
 
 export const getReadAllAnnouncementsUrl = () => {
-  return `https://notification.leaflow.cloud/api/v1/announcements/read`;
+  return `https://notification.leaflow.cloud/api/v1/announcements:markAllRead`;
 };
 
 /**
@@ -682,7 +682,7 @@ export type readAnnouncementResponse =
   | readAnnouncementResponseError;
 
 export const getReadAnnouncementUrl = (announcementId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/announcements/${encodeURIComponent(String(announcementId))}/read`;
+  return `https://notification.leaflow.cloud/api/v1/announcements/${encodeURIComponent(String(announcementId))}:markRead`;
 };
 
 /**
@@ -1005,7 +1005,7 @@ export type confirmEmailOverrideResponse =
   | confirmEmailOverrideResponseError;
 
 export const getConfirmEmailOverrideUrl = () => {
-  return `https://notification.leaflow.cloud/api/v1/preferences/email-override/code/confirm`;
+  return `https://notification.leaflow.cloud/api/v1/preferences/email-override/code:confirm`;
 };
 
 /**
@@ -1544,7 +1544,7 @@ export type verifyUserChannelResponse =
   | verifyUserChannelResponseError;
 
 export const getVerifyUserChannelUrl = (channelId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channelId))}/verify`;
+  return `https://notification.leaflow.cloud/api/v1/channels/${encodeURIComponent(String(channelId))}:verify`;
 };
 
 /**
@@ -1645,7 +1645,7 @@ export type revealCredentialResponse =
   | revealCredentialResponseError;
 
 export const getRevealCredentialUrl = (ticketId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(ticketId))}/reveal`;
+  return `https://notification.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(ticketId))}:reveal`;
 };
 
 /**

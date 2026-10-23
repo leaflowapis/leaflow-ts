@@ -510,7 +510,7 @@ export type restoreBackupResponseError = (
 export type restoreBackupResponse = restoreBackupResponseSuccess | restoreBackupResponseError;
 
 export const getRestoreBackupUrl = (backupId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/backups/${encodeURIComponent(String(backupId))}/restore`;
+  return `https://compute.leaflow.cloud/api/v1/backups/${encodeURIComponent(String(backupId))}:restore`;
 };
 
 /**
@@ -1467,7 +1467,7 @@ export type resizeDiskResponseError = (resizeDiskResponse409 | resizeDiskRespons
 export type resizeDiskResponse = resizeDiskResponseSuccess | resizeDiskResponseError;
 
 export const getResizeDiskUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}/resize`;
+  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}:resize`;
 };
 
 /**
@@ -1543,7 +1543,7 @@ export type revertDiskResponseError = (revertDiskResponse409 | revertDiskRespons
 export type revertDiskResponse = revertDiskResponseSuccess | revertDiskResponseError;
 
 export const getRevertDiskUrl = (diskId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}/revert`;
+  return `https://compute.leaflow.cloud/api/v1/disks/${encodeURIComponent(String(diskId))}:revert`;
 };
 
 /**
@@ -1941,7 +1941,7 @@ export type bindFloatingIpResponseError = (
 export type bindFloatingIpResponse = bindFloatingIpResponseSuccess | bindFloatingIpResponseError;
 
 export const getBindFloatingIpUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}/binding`;
+  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}:bind`;
 };
 
 /**
@@ -1975,7 +1975,7 @@ export const bindFloatingIp = async (
   };
   const res = await (fetchFn ?? fetch)(getBindFloatingIpUrl(floatingIpId), {
     ...options,
-    method: "PUT",
+    method: "POST",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
     body: JSON.stringify(bindFloatingIPRequestBody),
   });
@@ -2016,7 +2016,7 @@ export type unbindFloatingIpResponse =
   | unbindFloatingIpResponseError;
 
 export const getUnbindFloatingIpUrl = (floatingIpId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}/binding`;
+  return `https://compute.leaflow.cloud/api/v1/floating-ips/${encodeURIComponent(String(floatingIpId))}:unbind`;
 };
 
 /**
@@ -2030,7 +2030,7 @@ export const unbindFloatingIp = async (
 ): Promise<unbindFloatingIpResponse> => {
   const res = await (fetchFn ?? fetch)(getUnbindFloatingIpUrl(floatingIpId), {
     ...options,
-    method: "DELETE",
+    method: "POST",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -2792,7 +2792,7 @@ export type rebootInstanceResponseError = (
 export type rebootInstanceResponse = rebootInstanceResponseSuccess | rebootInstanceResponseError;
 
 export const getRebootInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/reboot`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}:reboot`;
 };
 
 /**
@@ -2873,7 +2873,7 @@ export type rebuildInstanceResponseError = (
 export type rebuildInstanceResponse = rebuildInstanceResponseSuccess | rebuildInstanceResponseError;
 
 export const getRebuildInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/rebuild`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}:rebuild`;
 };
 
 /**
@@ -2950,7 +2950,7 @@ export type resizeInstanceResponseError = (
 export type resizeInstanceResponse = resizeInstanceResponseSuccess | resizeInstanceResponseError;
 
 export const getResizeInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/resize`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}:resize`;
 };
 
 /**
@@ -3025,7 +3025,7 @@ export type startInstanceResponseError = (
 export type startInstanceResponse = startInstanceResponseSuccess | startInstanceResponseError;
 
 export const getStartInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/start`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}:start`;
 };
 
 /**
@@ -3095,7 +3095,7 @@ export type stopInstanceResponseError = (stopInstanceResponse409 | stopInstanceR
 export type stopInstanceResponse = stopInstanceResponseSuccess | stopInstanceResponseError;
 
 export const getStopInstanceUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/stop`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}:stop`;
 };
 
 /**
@@ -6321,7 +6321,7 @@ export type acceptPeeringResponseError = (
 export type acceptPeeringResponse = acceptPeeringResponseSuccess | acceptPeeringResponseError;
 
 export const getAcceptPeeringUrl = (peeringId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/peerings/${encodeURIComponent(String(peeringId))}/accept`;
+  return `https://compute.leaflow.cloud/api/v1/peerings/${encodeURIComponent(String(peeringId))}:accept`;
 };
 
 /**
@@ -6363,7 +6363,7 @@ export type rejectPeeringResponseError = rejectPeeringResponseDefault & {
 export type rejectPeeringResponse = rejectPeeringResponseSuccess | rejectPeeringResponseError;
 
 export const getRejectPeeringUrl = (peeringId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/peerings/${encodeURIComponent(String(peeringId))}/reject`;
+  return `https://compute.leaflow.cloud/api/v1/peerings/${encodeURIComponent(String(peeringId))}:reject`;
 };
 
 /**

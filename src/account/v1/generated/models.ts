@@ -277,12 +277,6 @@ export interface AccountDeletionResource {
   objections: AccountDeletionObjectionResource[];
 }
 
-export const RequestAccountDeletionRequestBodyValue = {
-  /** Must be true. Confirms that any remaining balance and prepaid benefits are forfeited when the deletion is carried out */
-  acknowledge_forfeiture: true,
-} as const;
-export type RequestAccountDeletionRequestBody = typeof RequestAccountDeletionRequestBodyValue;
-
 /**
  * The language used for the interface and for email. It is independent of `country`, and neither can be inferred from the other
  */
@@ -603,6 +597,13 @@ export interface CursorPagination {
   /** @nullable */
   next_cursor?: string | null;
 }
+
+export type RequestAccountDeletionParams = {
+  /**
+   * Must be true. Confirms that any remaining balance and prepaid benefits are forfeited when the deletion is carried out.
+   */
+  acknowledge_forfeiture: true;
+};
 
 export type ListMyInvitationsParams = {
   /**

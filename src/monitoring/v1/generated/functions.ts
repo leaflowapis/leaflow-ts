@@ -245,7 +245,7 @@ export type acknowledgeIncidentResponse =
   | acknowledgeIncidentResponseError;
 
 export const getAcknowledgeIncidentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/acknowledge`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}:acknowledge`;
 };
 
 /**
@@ -377,7 +377,7 @@ export type closeIncidentResponseError = closeIncidentResponseDefault & {
 export type closeIncidentResponse = closeIncidentResponseSuccess | closeIncidentResponseError;
 
 export const getCloseIncidentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/close`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}:close`;
 };
 
 /**
@@ -575,7 +575,7 @@ export type reopenIncidentResponseError = reopenIncidentResponseDefault & {
 export type reopenIncidentResponse = reopenIncidentResponseSuccess | reopenIncidentResponseError;
 
 export const getReopenIncidentUrl = (incidentId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}/reopen`;
+  return `https://monitoring.leaflow.cloud/api/v1/incidents/${encodeURIComponent(String(incidentId))}:reopen`;
 };
 
 /**
@@ -1504,7 +1504,7 @@ export type disableServerMonitoringResponse =
   | disableServerMonitoringResponseError;
 
 export const getDisableServerMonitoringUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/disable`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}:disable`;
 };
 
 /**
@@ -3329,7 +3329,7 @@ export type cancelStatusPageMaintenanceResponse =
   | cancelStatusPageMaintenanceResponseError;
 
 export const getCancelStatusPageMaintenanceUrl = (maintenanceId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${encodeURIComponent(String(maintenanceId))}/cancel`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${encodeURIComponent(String(maintenanceId))}:cancel`;
 };
 
 /**
@@ -3376,7 +3376,7 @@ export type completeStatusPageMaintenanceResponse =
   | completeStatusPageMaintenanceResponseError;
 
 export const getCompleteStatusPageMaintenanceUrl = (maintenanceId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${encodeURIComponent(String(maintenanceId))}/complete`;
+  return `https://monitoring.leaflow.cloud/api/v1/status-page/maintenances/${encodeURIComponent(String(maintenanceId))}:complete`;
 };
 
 /**

@@ -354,7 +354,7 @@ export type closeTicketResponseError = closeTicketResponseDefault & {
 export type closeTicketResponse = closeTicketResponseSuccess | closeTicketResponseError;
 
 export const getCloseTicketUrl = (ticketId: string) => {
-  return `https://support.leaflow.cloud/api/v1/tickets/${encodeURIComponent(String(ticketId))}/close`;
+  return `https://support.leaflow.cloud/api/v1/tickets/${encodeURIComponent(String(ticketId))}:close`;
 };
 
 /**

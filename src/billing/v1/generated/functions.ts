@@ -388,7 +388,7 @@ export type previewWithdrawalResponse =
   | previewWithdrawalResponseError;
 
 export const getPreviewWithdrawalUrl = () => {
-  return `https://billing.leaflow.cloud/api/v1/withdrawals/preview`;
+  return `https://billing.leaflow.cloud/api/v1/withdrawals:preview`;
 };
 
 /**
@@ -1062,7 +1062,7 @@ export type suspendBillingAccountResponse =
   | suspendBillingAccountResponseError;
 
 export const getSuspendBillingAccountUrl = (accountId: number) => {
-  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/suspend`;
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}:suspend`;
 };
 
 /**
@@ -1111,7 +1111,7 @@ export type resumeBillingAccountResponse =
   | resumeBillingAccountResponseError;
 
 export const getResumeBillingAccountUrl = (accountId: number) => {
-  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/resume`;
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}:resume`;
 };
 
 /**
@@ -1697,7 +1697,7 @@ export type cancelTopUpResponseError = (cancelTopUpResponse409 | cancelTopUpResp
 export type cancelTopUpResponse = cancelTopUpResponseSuccess | cancelTopUpResponseError;
 
 export const getCancelTopUpUrl = (topUpId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/top-ups/${encodeURIComponent(String(topUpId))}/cancel`;
+  return `https://billing.leaflow.cloud/api/v1/top-ups/${encodeURIComponent(String(topUpId))}:cancel`;
 };
 
 /**
@@ -1960,7 +1960,7 @@ export type payInvoiceResponseError = payInvoiceResponseDefault & {
 export type payInvoiceResponse = payInvoiceResponseSuccess | payInvoiceResponseError;
 
 export const getPayInvoiceUrl = (invoiceId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/invoices/${encodeURIComponent(String(invoiceId))}/pay`;
+  return `https://billing.leaflow.cloud/api/v1/invoices/${encodeURIComponent(String(invoiceId))}:pay`;
 };
 
 /**
@@ -2062,8 +2062,8 @@ export const getPreviewInvoicePaymentUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/invoices/${encodeURIComponent(String(invoiceId))}/payment-preview?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/invoices/${encodeURIComponent(String(invoiceId))}/payment-preview`;
+    ? `https://billing.leaflow.cloud/api/v1/invoices/${encodeURIComponent(String(invoiceId))}:previewPayment?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/invoices/${encodeURIComponent(String(invoiceId))}:previewPayment`;
 };
 
 /**
@@ -2189,7 +2189,7 @@ export type previewPayTogetherResponse =
   | previewPayTogetherResponseError;
 
 export const getPreviewPayTogetherUrl = () => {
-  return `https://billing.leaflow.cloud/api/v1/payments/preview`;
+  return `https://billing.leaflow.cloud/api/v1/payments:preview`;
 };
 
 /**
@@ -2998,7 +2998,7 @@ export type cancelSubscriptionResponse =
   | cancelSubscriptionResponseError;
 
 export const getCancelSubscriptionUrl = (subscriptionId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/cancel`;
+  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}:cancel`;
 };
 
 /**
@@ -3425,7 +3425,7 @@ export type withdrawCancellationResponse =
   | withdrawCancellationResponseError;
 
 export const getWithdrawCancellationUrl = (cancellationId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/cancellations/${encodeURIComponent(String(cancellationId))}/withdraw`;
+  return `https://billing.leaflow.cloud/api/v1/cancellations/${encodeURIComponent(String(cancellationId))}:withdraw`;
 };
 
 /**
@@ -3539,7 +3539,7 @@ export type renewSubscriptionResponse =
   | renewSubscriptionResponseError;
 
 export const getRenewSubscriptionUrl = (subscriptionId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/renew`;
+  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}:renew`;
 };
 
 /**
@@ -4060,7 +4060,7 @@ export type confirmCheckoutSessionResponse =
   | confirmCheckoutSessionResponseError;
 
 export const getConfirmCheckoutSessionUrl = (checkoutSessionId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}/confirm`;
+  return `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}:confirm`;
 };
 
 /**
@@ -4145,7 +4145,7 @@ export type expireCheckoutSessionResponse =
   | expireCheckoutSessionResponseError;
 
 export const getExpireCheckoutSessionUrl = (checkoutSessionId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}/expire`;
+  return `https://billing.leaflow.cloud/api/v1/checkout-sessions/${encodeURIComponent(String(checkoutSessionId))}:expire`;
 };
 
 /**
@@ -4299,8 +4299,8 @@ export const getPreviewOrderRefundUrl = (orderId: string, params?: PreviewOrderR
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/orders/${encodeURIComponent(String(orderId))}/refund-preview?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/orders/${encodeURIComponent(String(orderId))}/refund-preview`;
+    ? `https://billing.leaflow.cloud/api/v1/orders/${encodeURIComponent(String(orderId))}:previewRefund?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/orders/${encodeURIComponent(String(orderId))}:previewRefund`;
 };
 
 /**
@@ -4349,7 +4349,7 @@ export type cancelOrderResponseError = (cancelOrderResponse409 | cancelOrderResp
 export type cancelOrderResponse = cancelOrderResponseSuccess | cancelOrderResponseError;
 
 export const getCancelOrderUrl = (orderId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/orders/${encodeURIComponent(String(orderId))}/cancel`;
+  return `https://billing.leaflow.cloud/api/v1/orders/${encodeURIComponent(String(orderId))}:cancel`;
 };
 
 /**

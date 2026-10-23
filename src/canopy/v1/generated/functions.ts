@@ -974,7 +974,7 @@ export type disableApiKeyResponseError = disableApiKeyResponseDefault & {
 export type disableApiKeyResponse = disableApiKeyResponseSuccess | disableApiKeyResponseError;
 
 export const getDisableApiKeyUrl = (keyId: string) => {
-  return `https://canopy.leaflow.cloud/api/v1/keys/${encodeURIComponent(String(keyId))}/disable`;
+  return `https://canopy.leaflow.cloud/api/v1/keys/${encodeURIComponent(String(keyId))}:disable`;
 };
 
 /**
@@ -1017,7 +1017,7 @@ export type enableApiKeyResponseError = enableApiKeyResponseDefault & {
 export type enableApiKeyResponse = enableApiKeyResponseSuccess | enableApiKeyResponseError;
 
 export const getEnableApiKeyUrl = (keyId: string) => {
-  return `https://canopy.leaflow.cloud/api/v1/keys/${encodeURIComponent(String(keyId))}/enable`;
+  return `https://canopy.leaflow.cloud/api/v1/keys/${encodeURIComponent(String(keyId))}:enable`;
 };
 
 /**
@@ -1060,7 +1060,7 @@ export type revokeApiKeyResponseError = revokeApiKeyResponseDefault & {
 export type revokeApiKeyResponse = revokeApiKeyResponseSuccess | revokeApiKeyResponseError;
 
 export const getRevokeApiKeyUrl = (keyId: string) => {
-  return `https://canopy.leaflow.cloud/api/v1/keys/${encodeURIComponent(String(keyId))}/revoke`;
+  return `https://canopy.leaflow.cloud/api/v1/keys/${encodeURIComponent(String(keyId))}:revoke`;
 };
 
 /**
