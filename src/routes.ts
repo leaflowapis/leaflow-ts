@@ -1381,6 +1381,15 @@ export const routes = [
   {
     service: "billing",
     contract: "billing",
+    method: "QUERY",
+    path: "/api/v1/cancellations:preview",
+    operationId: "preview-cancellation",
+    securityScheme: "AccessToken",
+    upstreamUrl: "https://billing.leaflow.cloud",
+  },
+  {
+    service: "billing",
+    contract: "billing",
     method: "GET",
     path: "/api/v1/cancellations/{cancellationId}",
     operationId: "get-cancellation",
