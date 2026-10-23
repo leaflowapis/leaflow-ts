@@ -1547,7 +1547,7 @@ export type rotateAgentPskResponseError = rotateAgentPskResponseDefault & {
 export type rotateAgentPskResponse = rotateAgentPskResponseSuccess | rotateAgentPskResponseError;
 
 export const getRotateAgentPskUrl = (serverId: string) => {
-  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}/psk`;
+  return `https://monitoring.leaflow.cloud/api/v1/servers/${encodeURIComponent(String(serverId))}:rotatePsk`;
 };
 
 /**

@@ -423,7 +423,7 @@ export type verifyCredentialResponse =
   | verifyCredentialResponseError;
 
 export const getVerifyCredentialUrl = (credentialId: string) => {
-  return `https://dns.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(credentialId))}/verification`;
+  return `https://dns.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(credentialId))}:verify`;
 };
 
 /**

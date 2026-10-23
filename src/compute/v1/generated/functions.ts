@@ -2715,7 +2715,7 @@ export type resetInstancePasswordResponse =
   | resetInstancePasswordResponseError;
 
 export const getResetInstancePasswordUrl = (instanceId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}/password`;
+  return `https://compute.leaflow.cloud/api/v1/instances/${encodeURIComponent(String(instanceId))}:resetPassword`;
 };
 
 /**
@@ -4214,7 +4214,7 @@ export type enablePrivateNetworkIpv6Response =
   | enablePrivateNetworkIpv6ResponseError;
 
 export const getEnablePrivateNetworkIpv6Url = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/ipv6`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}:enableIpv6`;
 };
 
 /**
@@ -4269,7 +4269,7 @@ export type disablePrivateNetworkIpv6Response =
   | disablePrivateNetworkIpv6ResponseError;
 
 export const getDisablePrivateNetworkIpv6Url = (privateNetworkId: string) => {
-  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}/ipv6`;
+  return `https://compute.leaflow.cloud/api/v1/private-networks/${encodeURIComponent(String(privateNetworkId))}:disableIpv6`;
 };
 
 /**
@@ -4283,7 +4283,7 @@ export const disablePrivateNetworkIpv6 = async (
 ): Promise<disablePrivateNetworkIpv6Response> => {
   const res = await (fetchFn ?? fetch)(getDisablePrivateNetworkIpv6Url(privateNetworkId), {
     ...options,
-    method: "DELETE",
+    method: "POST",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
