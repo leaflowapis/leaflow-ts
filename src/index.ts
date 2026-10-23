@@ -10,3 +10,4 @@ export * as monitoring from "./monitoring/v1/index.js";
 export * as notification from "./notification/v1/index.js";
 export * as support from "./support/v1/index.js";
 export * as type from "./type/index.js";
+export * as swasLegacy from "./swas-legacy/v1/index.js";
