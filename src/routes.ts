@@ -1390,8 +1390,8 @@ export const routes = [
   {
     service: "billing",
     contract: "billing",
-    method: "POST",
-    path: "/api/v1/cancellations/{cancellationId}:withdraw",
+    method: "DELETE",
+    path: "/api/v1/cancellations/{cancellationId}",
     operationId: "withdraw-cancellation",
     securityScheme: "AccessToken",
     upstreamUrl: "https://billing.leaflow.cloud",

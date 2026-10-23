@@ -3425,11 +3425,11 @@ export type withdrawCancellationResponse =
   | withdrawCancellationResponseError;
 
 export const getWithdrawCancellationUrl = (cancellationId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/cancellations/${encodeURIComponent(String(cancellationId))}:withdraw`;
+  return `https://billing.leaflow.cloud/api/v1/cancellations/${encodeURIComponent(String(cancellationId))}`;
 };
 
 /**
- * Withdraws the whole cancellation while no resource has begun to be released; afterwards it is refused with 409 `BILLING_CANCELLATION_CONFLICT`. The subscriptions continue, but automatic renewal, turned off when the cancellation was created, stays off until it is turned on again. Withdrawing a withdrawn cancellation returns it unchanged. Open to the owner of the subscriptions' current billing account and to members of their project with the project permission `billing:finance.manage`.
+ * Withdraws the whole cancellation, which stays with status `canceled`, while no resource has begun to be released; afterwards it is refused with 409 `BILLING_CANCELLATION_CONFLICT`. The subscriptions continue, but automatic renewal, turned off when the cancellation was created, stays off until it is turned on again. Withdrawing a withdrawn cancellation returns it unchanged. Open to the owner of the subscriptions' current billing account and to members of their project with the project permission `billing:finance.manage`.
  * @summary Withdraw a cancellation
  */
 export const withdrawCancellation = async (
@@ -3439,7 +3439,7 @@ export const withdrawCancellation = async (
 ): Promise<withdrawCancellationResponse> => {
   const res = await (fetchFn ?? fetch)(getWithdrawCancellationUrl(cancellationId), {
     ...options,
-    method: "POST",
+    method: "DELETE",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
