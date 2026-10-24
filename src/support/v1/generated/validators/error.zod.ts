@@ -49,18 +49,15 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { ErrorStatus } from "./errorStatus.zod.js";
 
-export const Error = zod.strictObject({
-  code: zod.string().optional(),
-  message: zod.string(),
-  meta: zod
-    .record(zod.string(), zod.unknown())
-    .optional()
-    .describe(
-      "What a given `code` carries alongside the message. The keys depend on the code,\nand a client that does not recognise one ignores it.",
-    ),
-  status: zod.int(),
-});
+export const Error = zod
+  .strictObject({
+    error: ErrorStatus,
+  })
+  .describe(
+    "A failed request. The envelope follows the Google REST error format: `code` is the HTTP\nstatus, `status` is its canonical name, and `reason` is the stable machine-readable code\nthat identifies the failure.",
+  );
 
 export type Error = zod.input<typeof Error>;
 export type ErrorOutput = zod.output<typeof Error>;

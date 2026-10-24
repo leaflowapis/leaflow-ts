@@ -616,21 +616,65 @@ export interface SubscriptionCancellation {
   failure_reason?: string;
 }
 
-/**
- * What a given `code` carries alongside the message. The keys depend on the code,
- * and a client that does not recognise one ignores it.
- */
-export type ErrorMeta = { [key: string]: unknown };
+export interface FieldViolation {
+  /** The path to the rejected field in the request body, such as `items[2].price_id`. */
+  field: string;
+  /** Why the field was rejected, such as `REQUIRED` or `OUT_OF_RANGE`. */
+  reason?: string;
+}
 
-export interface Error {
-  code?: string;
+/**
+ * Values that belong to `reason`, one set per reason. Clients use them to fill in
+ * localized text and never parse `message` to obtain them. Keys are documented per
+ * reason; a key that has appeared once keeps appearing.
+ */
+export type ErrorStatusMetadata = { [key: string]: string };
+
+export interface ErrorStatus {
+  /** The HTTP status code of the response. */
+  code: number;
+  /** The canonical name of the status, such as `INVALID_ARGUMENT` or `UNAVAILABLE`. */
+  status: string;
+  /**
+   * A description of the failure for developers. It is always English and is not meant
+   * to be shown to end users as is.
+   */
   message: string;
   /**
-   * What a given `code` carries alongside the message. The keys depend on the code,
-   * and a client that does not recognise one ignores it.
+   * A stable machine-readable code identifying the failure. Clients branch on this value
+   * and render their own text; it does not change once published.
    */
-  meta?: ErrorMeta;
-  status: number;
+  reason?: string;
+  /**
+   * Values that belong to `reason`, one set per reason. Clients use them to fill in
+   * localized text and never parse `message` to obtain them. Keys are documented per
+   * reason; a key that has appeared once keeps appearing.
+   */
+  metadata?: ErrorStatusMetadata;
+  /**
+   * Request fields rejected by the request's constraints. Present on validation
+   * failures; one request may violate several fields.
+   */
+  field_violations?: FieldViolation[];
+  /**
+   * How long the client should wait before retrying, as a duration string such as
+   * `30s`. Present only when waiting can succeed.
+   */
+  retry_delay?: string;
+  /**
+   * The identifier of the request in the service's logs. Quote it when reporting a
+   * failure.
+   */
+  request_id?: string;
+}
+
+/**
+ * A failed request. The envelope follows the Google REST error format: `code` is the HTTP
+ * status, `status` is its canonical name, and `reason` is the stable machine-readable code
+ * that identifies the failure.
+ */
+export interface Error {
+  error: ErrorStatus;
 }
 
 export interface Product {
