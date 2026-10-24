@@ -58,7 +58,7 @@ export const RegionResource = zod.strictObject({
     "The line every volume backup in this region is, metered on the size it stores.",
   ),
   private_image_billing: BillingComponent.describe(
-    "The line every private image in this region is, metered on the size it stores.",
+    "The line every private image in this region is, metered each second it is stored under its `billing_position`.",
   ),
 });
 

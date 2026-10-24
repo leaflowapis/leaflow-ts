@@ -42,6 +42,11 @@ export const BillingMeter = zod
       .describe(
         "What the meter measures. `one` counts each second the item is metered; `size_gib` the volume's size in GiB each second; `stored_gib` the GiB stored each second; `bandwidth_mbps` the bandwidth in Mbps each second; `egress_bytes` the bytes sent.",
       ),
+    resource_dimensions: zod
+      .array(zod.string())
+      .describe(
+        "Dimensions each reading carries beside the line's own, whose values the resource itself states and which can change while it is held. A private image's meter carries `position`, its `billing_position`; for a capture not made yet, the position it will take is one more than the number of the project's private images in the region whose `billing_position` is set and not `legacy`. Give them together with the line's dimensions when estimating usage. Empty for every other meter.",
+      ),
   })
   .describe("One meter a metered line reads.");
 

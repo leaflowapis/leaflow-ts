@@ -1186,7 +1186,11 @@ export const DetachInstanceNetworkInterfaceParams = zod.strictObject({
 });
 
 /**
- * Boots a temporary rescue environment while retaining the original boot volume. Starting, stopping, changing `instance_type_id`, rebuilding and resetting the password are unavailable in rescue mode. A stopped instance is refused with 409 `INSTANCE_NOT_RUNNING`; start it first, which works even when its operating system no longer boots.
+ * Boots a temporary rescue environment in place of the instance's own system, with the original boot volume attached to it as a further disk to repair. A running instance can be rescued, and so can one in `error`. A stopped instance is refused with 409 `INSTANCE_NOT_RUNNING`; start it first, which works even when its operating system no longer boots.
+ *
+ * In rescue mode, everything only the instance's own system can take is refused with 409 `INSTANCE_UNRESCUE_REQUIRED`: starting, stopping, rebooting, rebuilding, resetting the password, changing `instance_type_id`, attaching or detaching volumes and network interfaces, capturing a private image and running commands. Leave rescue mode with `:unrescue` first. The console stays available, releasing the instance works as usual, and the instance is charged as when running. A suspension that begins in rescue mode takes the instance out of rescue before stopping it, and starting it again once the suspension ends boots its own system.
+ *
+ * A rescue the compute service could not boot ends the `rescue` operation and leaves the instance as it was, or in `error`; request it again or reboot the instance.
  *
  * The request does not name an image. The rescue image is the region's enabled rescue image for the architecture of the instance's boot volume. A region and architecture with no enabled rescue image is refused with `RESCUE_IMAGE_NOT_CONFIGURED` (409).
  * @summary Put an instance into rescue mode
@@ -1727,7 +1731,7 @@ export const ListPrivateImagesQueryParams = zod.strictObject({
 /**
  * Creates a project image from the instance boot volume, excluding data volumes. Stop the instance first for file-system consistency. The instance cannot be released while its source volume is being captured. Compute project quotas are enforced independently of billing.
  *
- * It is metered by the hour on a subscription of its own and takes no billing choice. It is bought through a Billing Checkout Session: automatic checkout completes at once for metered pricing and the image is captured as soon as the order is accepted; with deferred checkout it stays `pending` until the customer completes checkout in Billing. The source and project quotas are checked before the Checkout Session is created, and a refused request creates nothing.
+ * It is metered on a subscription of its own and takes no billing choice. Each second the image is stored is reported under its region and its `billing_position`: its place among the project's stored private images in the region, counted from the oldest, which moves up whenever an older one is deleted. Billing prices each position, and a position it prices at zero costs nothing; that is how a number of images in each region are free. The image's size does not change what it costs. It is bought through a Billing Checkout Session: automatic checkout completes at once for metered pricing and the image is captured as soon as the order is accepted; with deferred checkout it stays `pending` until the customer completes checkout in Billing. The source and project quotas are checked before the Checkout Session is created, and a refused request creates nothing.
  *
  * The image shows the `create` operation from the moment its Checkout Session is created until it is delivered or its checkout or order ends. While its purchase awaits checkout or payment its deletion is refused with `COMPUTE_PURCHASE_PENDING`; once the capture runs, deletion is the one operation it accepts.
  * @summary Capture an instance as a private image
@@ -1954,7 +1958,7 @@ export const GetQuotaParams = zod.strictObject({
       "private_images",
     ])
     .describe(
-      "The resource or capacity constrained by a project quota in a region. Platform defaults: instances=5; vcpus=16; memory_mib=32768; volumes=20; volume_gib=500; virtual_private_clouds=3; virtual_private_cloud_subnets=20; network_interfaces=20; elastic_ips=3; security_groups=10; security_group_rules=100; volume_snapshots=20; volume_backups=20; private_images=10. memory_mib is measured in MiB and volume_gib in GiB. A zero limit permits no additional capacity; it is not unlimited.",
+      "The resource or capacity constrained by a project quota in a region. Platform defaults: instances=5; vcpus=16; memory_mib=32768; volumes=20; volume_gib=500; virtual_private_clouds=3; virtual_private_cloud_subnets=20; network_interfaces=20; elastic_ips=3; security_groups=10; security_group_rules=100; volume_snapshots=20; volume_backups=20; private_images=20. memory_mib is measured in MiB and volume_gib in GiB. A zero limit permits no additional capacity; it is not unlimited.",
     ),
 });
 

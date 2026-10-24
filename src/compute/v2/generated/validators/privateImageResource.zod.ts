@@ -82,7 +82,13 @@ export const PrivateImageResource = zod
     size_bytes: zod
       .int()
       .describe(
-        "Storage occupied by the project image, in bytes. Zero until the capture reports its size.",
+        "Storage occupied by the project image, in bytes. Zero until the capture reports its size. It does not change what the image costs.",
+      ),
+    billing_position: zod
+      .string()
+      .nullable()
+      .describe(
+        "The `position` the image's storage is reported under now, the price Billing gives that position in the region's `private_image_billing` being what it costs. A number from `1`, its place among this project's stored private images in the region counted from the oldest, which moves up whenever an older one is deleted; `legacy` for an image carried over from the previous version, which takes no position and whose storage is never charged. Null while the image is not stored, before its capture finishes and once it is deleted or failed.",
       ),
     source_instance_id: InstanceID,
     created_at: zod.iso.datetime({ offset: true }),
@@ -124,7 +130,7 @@ export const PrivateImageResource = zod
       ),
   })
   .describe(
-    "An image this project captured from one of its instances, used to install instances of this project. Its storage is billed only to this project.",
+    "An image this project captured from one of its instances, used to install instances of this project. Its storage is billed only to this project. Reclaimed for non-payment while instances installed from it remain, it is kept, unusable and no longer charged, and deleted once the last of them is released.",
   );
 
 export type PrivateImageResource = zod.input<typeof PrivateImageResource>;

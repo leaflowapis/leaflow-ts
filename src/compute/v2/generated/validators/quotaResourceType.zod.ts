@@ -52,7 +52,7 @@ export const QuotaResourceType = zod
     "private_images",
   ])
   .describe(
-    "The resource or capacity constrained by a project quota in a region. Platform defaults: instances=5; vcpus=16; memory_mib=32768; volumes=20; volume_gib=500; virtual_private_clouds=3; virtual_private_cloud_subnets=20; network_interfaces=20; elastic_ips=3; security_groups=10; security_group_rules=100; volume_snapshots=20; volume_backups=20; private_images=10. memory_mib is measured in MiB and volume_gib in GiB. A zero limit permits no additional capacity; it is not unlimited.",
+    "The resource or capacity constrained by a project quota in a region. Platform defaults: instances=5; vcpus=16; memory_mib=32768; volumes=20; volume_gib=500; virtual_private_clouds=3; virtual_private_cloud_subnets=20; network_interfaces=20; elastic_ips=3; security_groups=10; security_group_rules=100; volume_snapshots=20; volume_backups=20; private_images=20. memory_mib is measured in MiB and volume_gib in GiB. A zero limit permits no additional capacity; it is not unlimited.",
   );
 
 export type QuotaResourceType = zod.input<typeof QuotaResourceType>;

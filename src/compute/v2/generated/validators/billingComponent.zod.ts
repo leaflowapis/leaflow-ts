@@ -42,7 +42,7 @@ export const BillingComponent = zod
     dimensions: zod
       .record(zod.string(), zod.string())
       .describe(
-        "The line's dimensions, the coordinates Billing prices it at; every meter of the line reads under the same ones. Pass them to Billing unchanged; they name nothing a client needs to read.",
+        "The line's dimensions, the coordinates Billing prices it at; every meter of the line reads under the same ones, and under its own `resource_dimensions` as well. Pass them to Billing unchanged; they name nothing a client needs to read.",
       ),
     quantity: BillingQuantity,
     meters: zod

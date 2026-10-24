@@ -177,7 +177,7 @@ export interface CheckoutOptions {
 }
 
 /**
- * The line's dimensions, the coordinates Billing prices it at; every meter of the line reads under the same ones. Pass them to Billing unchanged; they name nothing a client needs to read.
+ * The line's dimensions, the coordinates Billing prices it at; every meter of the line reads under the same ones, and under its own `resource_dimensions` as well. Pass them to Billing unchanged; they name nothing a client needs to read.
  */
 export type BillingComponentDimensions = { [key: string]: string };
 
@@ -220,6 +220,8 @@ export interface BillingMeter {
   meter_lookup_key: string;
   /** What the meter measures. `one` counts each second the item is metered; `size_gib` the volume's size in GiB each second; `stored_gib` the GiB stored each second; `bandwidth_mbps` the bandwidth in Mbps each second; `egress_bytes` the bytes sent. */
   quantity: BillingMeterQuantity;
+  /** Dimensions each reading carries beside the line's own, whose values the resource itself states and which can change while it is held. A private image's meter carries `position`, its `billing_position`; for a capture not made yet, the position it will take is one more than the number of the project's private images in the region whose `billing_position` is set and not `legacy`. Give them together with the line's dimensions when estimating usage. Empty for every other meter. */
+  resource_dimensions: string[];
 }
 
 /**
@@ -228,7 +230,7 @@ export interface BillingMeter {
 export interface BillingComponent {
   /** The Billing Plan the line is sold under. */
   plan_id: string;
-  /** The line's dimensions, the coordinates Billing prices it at; every meter of the line reads under the same ones. Pass them to Billing unchanged; they name nothing a client needs to read. */
+  /** The line's dimensions, the coordinates Billing prices it at; every meter of the line reads under the same ones, and under its own `resource_dimensions` as well. Pass them to Billing unchanged; they name nothing a client needs to read. */
   dimensions: BillingComponentDimensions;
   quantity: BillingQuantity;
   /** What a metered price of the line reads; empty when the line is never metered. */
@@ -2177,7 +2179,7 @@ export const PrivateImageResourceFailureReason = {
 } as const;
 
 /**
- * An image this project captured from one of its instances, used to install instances of this project. Its storage is billed only to this project.
+ * An image this project captured from one of its instances, used to install instances of this project. Its storage is billed only to this project. Reclaimed for non-payment while instances installed from it remain, it is kept, unusable and no longer charged, and deleted once the last of them is released.
  */
 export interface PrivateImageResource {
   id: ImageID;
@@ -2204,8 +2206,13 @@ export interface PrivateImageResource {
    * @nullable
    */
   failure: string | null;
-  /** Storage occupied by the project image, in bytes. Zero until the capture reports its size. */
+  /** Storage occupied by the project image, in bytes. Zero until the capture reports its size. It does not change what the image costs. */
   size_bytes: number;
+  /**
+   * The `position` the image's storage is reported under now, the price Billing gives that position in the region's `private_image_billing` being what it costs. A number from `1`, its place among this project's stored private images in the region counted from the oldest, which moves up whenever an older one is deleted; `legacy` for an image carried over from the previous version, which takes no position and whose storage is never charged. Null while the image is not stored, before its capture finishes and once it is deleted or failed.
+   * @nullable
+   */
+  billing_position: string | null;
   source_instance_id: InstanceID;
   created_at: string;
   /** The operation in progress on this image, or null when none is. */
@@ -2331,7 +2338,7 @@ export interface PublicImageListResponseBody {
 }
 
 /**
- * The resource or capacity constrained by a project quota in a region. Platform defaults: instances=5; vcpus=16; memory_mib=32768; volumes=20; volume_gib=500; virtual_private_clouds=3; virtual_private_cloud_subnets=20; network_interfaces=20; elastic_ips=3; security_groups=10; security_group_rules=100; volume_snapshots=20; volume_backups=20; private_images=10. memory_mib is measured in MiB and volume_gib in GiB. A zero limit permits no additional capacity; it is not unlimited.
+ * The resource or capacity constrained by a project quota in a region. Platform defaults: instances=5; vcpus=16; memory_mib=32768; volumes=20; volume_gib=500; virtual_private_clouds=3; virtual_private_cloud_subnets=20; network_interfaces=20; elastic_ips=3; security_groups=10; security_group_rules=100; volume_snapshots=20; volume_backups=20; private_images=20. memory_mib is measured in MiB and volume_gib in GiB. A zero limit permits no additional capacity; it is not unlimited.
  */
 export type QuotaResourceType = (typeof QuotaResourceType)[keyof typeof QuotaResourceType];
 
@@ -2391,7 +2398,7 @@ export interface RegionResource {
   volume_snapshot_billing: BillingComponent;
   /** The line every volume backup in this region is, metered on the size it stores. */
   volume_backup_billing: BillingComponent;
-  /** The line every private image in this region is, metered on the size it stores. */
+  /** The line every private image in this region is, metered each second it is stored under its `billing_position`. */
   private_image_billing: BillingComponent;
 }
 
