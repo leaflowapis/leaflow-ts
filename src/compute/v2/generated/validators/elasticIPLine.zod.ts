@@ -62,11 +62,6 @@ export const ElasticIPLine = zod
       .describe(
         "The most bandwidth an elastic IP of this line can be bought with, in Mbps, at most 1000. An elastic IP associated with an instance is also held to the instance type's `max_bandwidth_mbps`.",
       ),
-    bandwidth_step_mbps: zod
-      .int()
-      .describe(
-        "Bandwidth is bought in multiples of this many Mbps, from `min_bandwidth_mbps` to `max_bandwidth_mbps`, both of which are multiples of it too.",
-      ),
     sale_status: zod
       .enum(["on_sale", "off_sale"])
       .describe(

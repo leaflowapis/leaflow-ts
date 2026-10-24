@@ -318,8 +318,6 @@ export interface ElasticIPLine {
   min_bandwidth_mbps: number;
   /** The most bandwidth an elastic IP of this line can be bought with, in Mbps, at most 1000. An elastic IP associated with an instance is also held to the instance type's `max_bandwidth_mbps`. */
   max_bandwidth_mbps: number;
-  /** Bandwidth is bought in multiples of this many Mbps, from `min_bandwidth_mbps` to `max_bandwidth_mbps`, both of which are multiples of it too. */
-  bandwidth_step_mbps: number;
   /** `on_sale` is offered for new elastic IPs; `off_sale` takes none, while the elastic IPs already on it keep working. */
   sale_status: ElasticIPLineSaleStatus;
   /** Whether an elastic IP of this line can be bought with `internet_charge_type` `traffic`, billed by the bytes it sends. `off_sale` refuses that with `ELASTIC_IP_TRAFFIC_UNAVAILABLE`. */
@@ -736,8 +734,8 @@ export interface CreateElasticIPRequestBody {
    * charged nothing for the traffic, while the address itself bills normally — so the invoice
    * looks correct and nothing anywhere reports it.
    *
-   * It must lie within the line's `min_bandwidth_mbps` and `max_bandwidth_mbps` and be a multiple of its
-   * `bandwidth_step_mbps`, otherwise the request is refused with `ELASTIC_IP_BANDWIDTH_RANGE`. Changing it
+   * Any whole number of Mbps within the line's `min_bandwidth_mbps` and `max_bandwidth_mbps`, otherwise the
+   * request is refused with `ELASTIC_IP_BANDWIDTH_RANGE`. Changing it
    * later updates the same elastic IP through `update-elastic-ip`, not an independent bandwidth resource.
    * @minimum 1
    * @maximum 1000
@@ -1446,7 +1444,7 @@ export interface NewElasticIP {
   type: NewElasticIPType;
   line_id: ElasticIPLineID;
   /**
-   * Within the line's `min_bandwidth_mbps` and `max_bandwidth_mbps` and a multiple of its `bandwidth_step_mbps`, otherwise refused with `ELASTIC_IP_BANDWIDTH_RANGE`.
+   * Any whole number of Mbps within the line's `min_bandwidth_mbps` and `max_bandwidth_mbps`, otherwise refused with `ELASTIC_IP_BANDWIDTH_RANGE`.
    * @minimum 1
    * @maximum 1000
    */

@@ -48,7 +48,7 @@ export const NewElasticIP = zod
       .min(1)
       .max(newElasticIPBandwidthMbpsMax)
       .describe(
-        "Within the line's `min_bandwidth_mbps` and `max_bandwidth_mbps` and a multiple of its `bandwidth_step_mbps`, otherwise refused with `ELASTIC_IP_BANDWIDTH_RANGE`.",
+        "Any whole number of Mbps within the line's `min_bandwidth_mbps` and `max_bandwidth_mbps`, otherwise refused with `ELASTIC_IP_BANDWIDTH_RANGE`.",
       ),
     internet_charge_type: InternetChargeType.optional(),
     billing: BillingChoice.optional(),
