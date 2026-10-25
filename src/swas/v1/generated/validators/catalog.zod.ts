@@ -15,7 +15,7 @@ export const Catalog = zod
     complete: zod.boolean(),
   })
   .describe(
-    "Bounded catalog snapshot for one requested region. Incomplete or unavailable price information is not a purchasable offer.",
+    "Bounded catalog snapshot for one requested region. Incomplete or unavailable price information is not a purchasable offer. Provider plan IDs are unique regardless of the number of billing periods.",
   );
 
 export type Catalog = zod.input<typeof Catalog>;

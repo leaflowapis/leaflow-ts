@@ -39,7 +39,10 @@ export interface PurchaseCreate {
    * @maxLength 256
    */
   provider_plan_id: string;
-  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  /**
+   * Selects a price from the requested plan and current catalog revision. The server resolves its immutable Billing terms, billing period and ownership; the client does not set the billing period.
+   * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+   */
   billing_price_id: string;
   /**
    * @minLength 1
@@ -47,6 +50,7 @@ export interface PurchaseCreate {
    */
   image_id: string;
   quantity: 1;
+  /** An assertion about the displayed quote, not an authoritative amount. The server obtains a new Billing quote and rejects a mismatch before accepting a purchase. */
   expected_quote: ExpectedQuote;
   /**
    * @minLength 1
@@ -108,6 +112,31 @@ export interface Price {
   period_months: PricePeriodMonths;
 }
 
+export type PriceOptionPeriodMonths =
+  (typeof PriceOptionPeriodMonths)[keyof typeof PriceOptionPeriodMonths];
+
+export const PriceOptionPeriodMonths = {
+  NUMBER_1: 1,
+  NUMBER_3: 3,
+  NUMBER_6: 6,
+  NUMBER_12: 12,
+  NUMBER_24: 24,
+  NUMBER_36: 36,
+} as const;
+
+/**
+ * A verified price option for one billing period. Its Billing price must currently be available, use period-end cancellation without an automatic refund, and match this provider plan and region. Archived snapshots, unknown periods and unverified prices are excluded. Selection does not bypass current permissions, quote checks or disabled purchase controls. IDs and amounts are authoritative only after server revalidation.
+ */
+export interface PriceOption {
+  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  billing_plan_id: string;
+  /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
+  billing_price_id: string;
+  currency: "USD";
+  amount: DecimalAmount;
+  period_months: PriceOptionPeriodMonths;
+}
+
 export interface Plan {
   provider_plan_id: string;
   region_id: string;
@@ -115,7 +144,14 @@ export interface Plan {
   /** @minimum 1 */
   catalog_revision: number;
   buyable: boolean;
+  /** The existing default price representation. Its availability and the buyable field are unchanged by include_prices; clients using price retain the same default billing period. */
   price: Price | null;
+  /**
+   * Present only when include_prices=true. Contains all currently verified billing-period options, ordered by period_months. Billing price IDs and billing periods are each unique within a plan. An empty array means no verified option is available. It does not make the default price buyable.
+   * @minItems 0
+   * @maxItems 6
+   */
+  prices?: PriceOption[];
   /**
    * @minItems 1
    * @maxItems 256
@@ -130,7 +166,7 @@ export interface Plan {
 }
 
 /**
- * Bounded catalog snapshot for one requested region. Incomplete or unavailable price information is not a purchasable offer.
+ * Bounded catalog snapshot for one requested region. Incomplete or unavailable price information is not a purchasable offer. Provider plan IDs are unique regardless of the number of billing periods.
  */
 export interface Catalog {
   items: Plan[];
@@ -427,6 +463,10 @@ export type ListPlansParams = {
    * @maxLength 128
    */
   region_id: string;
+  /**
+   * Set to true to include all verified billing-period price options. When false or omitted, the response omits prices and preserves the default price representation.
+   */
+  include_prices?: boolean;
 };
 
 export type CreatePurchaseHeaders = {

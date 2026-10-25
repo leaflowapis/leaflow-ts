@@ -22,10 +22,17 @@ export const purchaseCreateRegionIdMax = 128;
 export const PurchaseCreate = zod.strictObject({
   catalog_revision: zod.int().min(1).max(purchaseCreateCatalogRevisionMax),
   provider_plan_id: zod.string().min(1).max(purchaseCreateProviderPlanIdMax),
-  billing_price_id: zod.uuid().regex(purchaseCreateBillingPriceIdRegExp),
+  billing_price_id: zod
+    .uuid()
+    .regex(purchaseCreateBillingPriceIdRegExp)
+    .describe(
+      "Selects a price from the requested plan and current catalog revision. The server resolves its immutable Billing terms, billing period and ownership; the client does not set the billing period.",
+    ),
   image_id: zod.string().min(1).max(purchaseCreateImageIdMax),
   quantity: zod.literal(1),
-  expected_quote: ExpectedQuote,
+  expected_quote: ExpectedQuote.describe(
+    "An assertion about the displayed quote, not an authoritative amount. The server obtains a new Billing quote and rejects a mismatch before accepting a purchase.",
+  ),
   region_id: zod.string().min(1).max(purchaseCreateRegionIdMax),
 });
 
