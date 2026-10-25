@@ -10,13 +10,13 @@
  *
  * ## Conventions
  *
- * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, the resource is created: it stays `pending` and shows the `create` operation, then reaches its usual status, such as `running` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. A purchased change, such as a resize requested with `instance_type_id`, `size_gib` or `bandwidth_mbps` on the resource, returns the resource unchanged with the Checkout Session for the change, and applies once its order is accepted.
+ * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, the resource is created: it stays `pending`, then reaches its usual status, such as `running` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. A purchased change, such as a resize requested with `instance_type_id`, `size_gib` or `bandwidth_mbps` on the resource, returns the resource unchanged with the Checkout Session for the change, and applies once its order is accepted.
  * - **Commercial terms.** Compute catalogs describe technical specifications and, for each order line a purchase makes, how it is sold in Billing (a `BillingComponent`: its Plan, dimensions, what its quantity counts and what its meters read); prices, amounts and currency belong to Billing. A purchase chooses its terms with `billing`, and Billing selects the matching price. Read prices and their rates with Billing's `search-prices` from those components, quote a proposed purchase with `get-quote`, and a change of a resource by its `subscription_id`; Compute has no quote or price proxy endpoint and returns no amounts.
  * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid. Do not submit the purchase again after paying; after an uncertain response, look the Checkout Session up in Billing first.
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
  * - **Custom methods.** An action that is not one of the standard methods (list, get, create, update, delete) is a custom method, `POST` on the resource's path followed by `:` and the verb, as in `POST /api/v2/instances/{id}:reboot` (AIP-136). A state is changed by its custom method, never by writing the state: `:start` and `:stop`, `:rescue` and `:unrescue`, `:associate` and `:disassociate`.
- * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
+ * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. Its `access_state` is `pending` until the order is accepted and delivery settles it, then `enabled`; a subscription that lapses suspends or reclaims the resource it pays for. Deleting a resource that subscriptions pay for cancels the subscriptions of its `release_set` in Billing, and the deletion answers with that cancellation.
  * - **Availability zones.** A volume and an instance must reside in the same availability zone to be attached. An instance type and a volume type each belong to one availability zone, as on GCP, so a purchase names the type and the type names the zone; the volumes bought with an instance have to be of types of the instance type's zone.
  * - **IPv6 is routed, not translated.** A virtual private cloud with IPv6 holds a /56 and each of its subnets a /64 of it, as on Alibaba Cloud, Tencent Cloud and Azure; IPv6 and its security groups require no EIP or NAT gateway. EIP and NATGateway are IPv4 products; IPv6 EIP, NAT66 and IPv6 port forwarding are not supported.
@@ -357,7 +357,7 @@ export type IPv4HostAddress = string;
 export type ElasticIPID = string;
 
 /**
- * `pending` until the address is created, with no address allocated before the order is accepted and the `create` operation shown while it is created; then `available`. `failed` means no address was allocated; `failure_reason` states why.
+ * `pending` until the address is created, with no address allocated before the order is accepted; then `available`. `failed` means no address was allocated; `failure_reason` states why. A value naming an operation in progress (`associating`, `disassociating`, `updating_bandwidth`, `updating_internet_charge_type`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the elastic IP refuses another operation until it ends.
  */
 export type ElasticIPStatus = (typeof ElasticIPStatus)[keyof typeof ElasticIPStatus];
 
@@ -367,6 +367,13 @@ export const ElasticIPStatus = {
   deleted: "deleted",
   failed: "failed",
   error: "error",
+  associating: "associating",
+  disassociating: "disassociating",
+  updating_bandwidth: "updating_bandwidth",
+  updating_internet_charge_type: "updating_internet_charge_type",
+  suspending: "suspending",
+  resuming: "resuming",
+  deleting: "deleting",
 } as const;
 
 export type InstanceReleaseResourceType =
@@ -561,28 +568,6 @@ export const ElasticIPFailureReason = {
   provisioning_failed: "provisioning_failed",
 } as const;
 
-export type ElasticIPOperationType =
-  (typeof ElasticIPOperationType)[keyof typeof ElasticIPOperationType];
-
-export const ElasticIPOperationType = {
-  create: "create",
-  associate: "associate",
-  disassociate: "disassociate",
-  update_bandwidth: "update_bandwidth",
-  update_internet_charge_type: "update_internet_charge_type",
-  suspend: "suspend",
-  resume: "resume",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this elastic IP. It is not a separate resource; once it finishes, the elastic IP's `operation` is null again and the elastic IP shows the result.
- */
-export interface ElasticIPOperation {
-  type: ElasticIPOperationType;
-  started_at: string;
-}
-
 /**
  * Compute ElasticIPAssociation TypeID. UUID text is not accepted.
  * @minLength 41
@@ -649,7 +634,7 @@ export interface ElasticIP {
   id: ElasticIPID;
   line_id: ElasticIPLineID;
   region_id: RegionID;
-  /** `pending` until the address is created, with no address allocated before the order is accepted and the `create` operation shown while it is created; then `available`. `failed` means no address was allocated; `failure_reason` states why. */
+  /** `pending` until the address is created, with no address allocated before the order is accepted; then `available`. `failed` means no address was allocated; `failure_reason` states why. A value naming an operation in progress (`associating`, `disassociating`, `updating_bandwidth`, `updating_internet_charge_type`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the elastic IP refuses another operation until it ends. */
   status: ElasticIPStatus;
   /**
    * The Billing Checkout Session that bought this resource; `order_id` and the order items stay null until its checkout completes. Null when the resource was not bought through one.
@@ -687,8 +672,6 @@ export interface ElasticIP {
    * @nullable
    */
   failure_reason: ElasticIPFailureReason;
-  /** The operation in progress on this elastic IP, or null when none is. */
-  readonly operation: ElasticIPOperation | null;
   association: ElasticIPAssociation | null;
 }
 
@@ -1051,7 +1034,7 @@ export const InstanceImageType = {
 } as const;
 
 /**
- * `pending` until the instance is created: before the order is accepted no instance exists and addresses are null, and while it is created it shows the `create` operation. Then `running`. `failed` means the instance was not created; `failure_reason` states why. The other values are the state of the instance in the cloud; an operation in progress appears in `operation`, not here.
+ * `pending` until the instance is created: before the order is accepted no instance exists and addresses are null. Then `running`. `failed` means the instance was not created; `failure_reason` states why. The other values are the state of the instance in the cloud. A value naming an operation in progress (`starting`, `stopping`, `rebooting`, `rebuilding`, `rescuing`, `unrescuing`, `resizing`, `resetting_password`, `attaching_volume`, `detaching_volume`, `attaching_network_interface`, `detaching_network_interface`, `associating_elastic_ip`, `disassociating_elastic_ip`, `capturing_image`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the instance refuses another operation until it ends.
  */
 export type InstanceStatus = (typeof InstanceStatus)[keyof typeof InstanceStatus];
 
@@ -1065,6 +1048,24 @@ export const InstanceStatus = {
   deleted: "deleted",
   failed: "failed",
   error: "error",
+  starting: "starting",
+  stopping: "stopping",
+  rebooting: "rebooting",
+  rebuilding: "rebuilding",
+  rescuing: "rescuing",
+  unrescuing: "unrescuing",
+  resizing: "resizing",
+  resetting_password: "resetting_password",
+  attaching_volume: "attaching_volume",
+  detaching_volume: "detaching_volume",
+  attaching_network_interface: "attaching_network_interface",
+  detaching_network_interface: "detaching_network_interface",
+  associating_elastic_ip: "associating_elastic_ip",
+  disassociating_elastic_ip: "disassociating_elastic_ip",
+  capturing_image: "capturing_image",
+  suspending: "suspending",
+  resuming: "resuming",
+  deleting: "deleting",
 } as const;
 
 /**
@@ -1133,43 +1134,6 @@ export const InstanceFailureReason = {
 } as const;
 
 /**
- * `create` runs from acceptance of the order until the instance is `running` or `failed`. `suspend` and `resume` impose and lift a suspension by the platform or for non-payment. `capture_image` holds the machine while a private image is captured from the volume it boots from; the machine cannot be resized, rebuilt or released meanwhile. `delete` includes release through a Billing cancellation.
- */
-export type InstanceOperationType =
-  (typeof InstanceOperationType)[keyof typeof InstanceOperationType];
-
-export const InstanceOperationType = {
-  create: "create",
-  start: "start",
-  stop: "stop",
-  reboot: "reboot",
-  rebuild: "rebuild",
-  rescue: "rescue",
-  unrescue: "unrescue",
-  resize: "resize",
-  reset_password: "reset_password",
-  attach_volume: "attach_volume",
-  detach_volume: "detach_volume",
-  attach_network_interface: "attach_network_interface",
-  detach_network_interface: "detach_network_interface",
-  associate_elastic_ip: "associate_elastic_ip",
-  disassociate_elastic_ip: "disassociate_elastic_ip",
-  capture_image: "capture_image",
-  suspend: "suspend",
-  resume: "resume",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this instance. It is not a separate resource; once it finishes, the instance's `operation` is null again and the instance shows the result.
- */
-export interface InstanceOperation {
-  /** `create` runs from acceptance of the order until the instance is `running` or `failed`. `suspend` and `resume` impose and lift a suspension by the platform or for non-payment. `capture_image` holds the machine while a private image is captured from the volume it boots from; the machine cannot be resized, rebuilt or released meanwhile. `delete` includes release through a Billing cancellation. */
-  type: InstanceOperationType;
-  started_at: string;
-}
-
-/**
  * @nullable
  */
 export type InstanceAccessState =
@@ -1232,7 +1196,7 @@ export interface Instance {
    */
   elastic_ip_addresses: string[] | null;
   region_id: RegionID;
-  /** `pending` until the instance is created: before the order is accepted no instance exists and addresses are null, and while it is created it shows the `create` operation. Then `running`. `failed` means the instance was not created; `failure_reason` states why. The other values are the state of the instance in the cloud; an operation in progress appears in `operation`, not here. */
+  /** `pending` until the instance is created: before the order is accepted no instance exists and addresses are null. Then `running`. `failed` means the instance was not created; `failure_reason` states why. The other values are the state of the instance in the cloud. A value naming an operation in progress (`starting`, `stopping`, `rebooting`, `rebuilding`, `rescuing`, `unrescuing`, `resizing`, `resetting_password`, `attaching_volume`, `detaching_volume`, `attaching_network_interface`, `detaching_network_interface`, `associating_elastic_ip`, `disassociating_elastic_ip`, `capturing_image`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the instance refuses another operation until it ends. */
   status: InstanceStatus;
   subnet_id: SubnetID | null;
   updated_at: string;
@@ -1242,8 +1206,6 @@ export interface Instance {
    * @nullable
    */
   failure_reason: InstanceFailureReason;
-  /** The operation in progress on this instance, or null when none is. */
-  readonly operation: InstanceOperation | null;
   /**
    * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
    * @nullable
@@ -1864,7 +1826,7 @@ export interface LaunchTemplateVersionListResponseBody {
 }
 
 /**
- * `pending` until the interface is created, then `available`. `error` means its creation failed or the cloud reports it broken; delete it and create another.
+ * `pending` until the interface is created, then `available`. `error` means its creation failed or the cloud reports it broken; delete it and create another. A value naming an operation in progress (`attaching`, `detaching`, `associating_elastic_ip`, `updating_security_groups`, `adding_address`, `removing_address`, `deleting`) is shown while that operation runs; the interface refuses another operation until it ends.
  */
 export type NetworkInterfaceStatus =
   (typeof NetworkInterfaceStatus)[keyof typeof NetworkInterfaceStatus];
@@ -1873,6 +1835,13 @@ export const NetworkInterfaceStatus = {
   pending: "pending",
   available: "available",
   error: "error",
+  attaching: "attaching",
+  detaching: "detaching",
+  associating_elastic_ip: "associating_elastic_ip",
+  updating_security_groups: "updating_security_groups",
+  adding_address: "adding_address",
+  removing_address: "removing_address",
+  deleting: "deleting",
 } as const;
 
 /**
@@ -1956,32 +1925,6 @@ export interface NetworkInterfaceAttachment {
   released_at: string | null;
 }
 
-/**
- * `associate_elastic_ip` holds the network interface while an elastic IP is associated with it directly rather than through an instance. `update_security_groups` replaces its security groups, `add_address` and `remove_address` change its secondary IPv4 addresses.
- */
-export type NetworkInterfaceOperationType =
-  (typeof NetworkInterfaceOperationType)[keyof typeof NetworkInterfaceOperationType];
-
-export const NetworkInterfaceOperationType = {
-  create: "create",
-  attach: "attach",
-  detach: "detach",
-  associate_elastic_ip: "associate_elastic_ip",
-  update_security_groups: "update_security_groups",
-  add_address: "add_address",
-  remove_address: "remove_address",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this network interface. It is not a separate resource; once it finishes, the network interface's `operation` is null again and the network interface shows the result.
- */
-export interface NetworkInterfaceOperation {
-  /** `associate_elastic_ip` holds the network interface while an elastic IP is associated with it directly rather than through an instance. `update_security_groups` replaces its security groups, `add_address` and `remove_address` change its secondary IPv4 addresses. */
-  type: NetworkInterfaceOperationType;
-  started_at: string;
-}
-
 export interface NetworkInterface {
   id: NetworkInterfaceID;
   /** @nullable */
@@ -1997,10 +1940,8 @@ export interface NetworkInterface {
   security_group_ids: SecurityGroupID[];
   addresses?: NetworkInterfaceAddress[];
   attachment: NetworkInterfaceAttachment | null;
-  /** `pending` until the interface is created, then `available`. `error` means its creation failed or the cloud reports it broken; delete it and create another. */
+  /** `pending` until the interface is created, then `available`. `error` means its creation failed or the cloud reports it broken; delete it and create another. A value naming an operation in progress (`attaching`, `detaching`, `associating_elastic_ip`, `updating_security_groups`, `adding_address`, `removing_address`, `deleting`) is shown while that operation runs; the interface refuses another operation until it ends. */
   status: NetworkInterfaceStatus;
-  /** The operation in progress on this network interface, or null when none is. */
-  readonly operation: NetworkInterfaceOperation | null;
 }
 
 export interface NetworkInterfaceListResponseBody {
@@ -2125,7 +2066,7 @@ export interface OperationLogListResponseBody {
 }
 
 /**
- * Only available images can install instances. A capture is pending until it finishes and shows the `create` operation while it runs, then becomes available. Failed means no usable image was produced; failure describes the outcome. Error means the image service broke the image or no longer holds it, and nothing can be installed from it.
+ * Only available images can install instances. A capture is pending until it finishes, then becomes available. Failed means no usable image was produced; failure describes the outcome. Error means the image service broke the image or no longer holds it, and nothing can be installed from it. A value naming an operation in progress (`suspending`, `resuming`, `deleting`) is shown while that operation runs.
  */
 export type PrivateImageResourceStatus =
   (typeof PrivateImageResourceStatus)[keyof typeof PrivateImageResourceStatus];
@@ -2136,29 +2077,10 @@ export const PrivateImageResourceStatus = {
   deleted: "deleted",
   failed: "failed",
   error: "error",
+  suspending: "suspending",
+  resuming: "resuming",
+  deleting: "deleting",
 } as const;
-
-/**
- * `create` is the capture of a private image.
- */
-export type PrivateImageOperationType =
-  (typeof PrivateImageOperationType)[keyof typeof PrivateImageOperationType];
-
-export const PrivateImageOperationType = {
-  create: "create",
-  suspend: "suspend",
-  resume: "resume",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this image. It is not a separate resource; once it finishes, the image's `operation` is null again and the image shows the result.
- */
-export interface PrivateImageOperation {
-  /** `create` is the capture of a private image. */
-  type: PrivateImageOperationType;
-  started_at: string;
-}
 
 /**
  * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
@@ -2197,7 +2119,7 @@ export interface PrivateImageResource {
   min_memory_mib: number;
   /** False means a new password can only be set by rebuilding an instance created from this image */
   supports_password_reset: boolean;
-  /** Only available images can install instances. A capture is pending until it finishes and shows the `create` operation while it runs, then becomes available. Failed means no usable image was produced; failure describes the outcome. Error means the image service broke the image or no longer holds it, and nothing can be installed from it. */
+  /** Only available images can install instances. A capture is pending until it finishes, then becomes available. Failed means no usable image was produced; failure describes the outcome. Error means the image service broke the image or no longer holds it, and nothing can be installed from it. A value naming an operation in progress (`suspending`, `resuming`, `deleting`) is shown while that operation runs. */
   status: PrivateImageResourceStatus;
   /**
    * Details of why the capture failed; non-empty only when `status` is `failed`
@@ -2213,8 +2135,6 @@ export interface PrivateImageResource {
   billing_position: string | null;
   source_instance_id: InstanceID;
   created_at: string;
-  /** The operation in progress on this image, or null when none is. */
-  readonly operation: PrivateImageOperation | null;
   /**
    * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
    * @nullable
@@ -2535,7 +2455,7 @@ export const VirtualPrivateCloudPeeringResourceAcceptance = {
 } as const;
 
 /**
- * `pending` until the connectivity exists: while acceptance is pending, and after it is accepted while the `provision` operation builds the link. Then `active`. `failed` means the link could not be built; `failure_reason` states why. `deleted` once deleted or rejected.
+ * `pending` until the connectivity exists: while acceptance is pending, and after it is accepted while the link is built (`provisioning`). Then `active`. `failed` means the link could not be built; `failure_reason` states why. `deleted` once deleted or rejected.
  */
 export type VirtualPrivateCloudPeeringResourceStatus =
   (typeof VirtualPrivateCloudPeeringResourceStatus)[keyof typeof VirtualPrivateCloudPeeringResourceStatus];
@@ -2545,27 +2465,8 @@ export const VirtualPrivateCloudPeeringResourceStatus = {
   active: "active",
   deleted: "deleted",
   failed: "failed",
+  provisioning: "provisioning",
 } as const;
-
-/**
- * `provision` runs after the peering is accepted, until it is `active`.
- */
-export type VirtualPrivateCloudPeeringOperationType =
-  (typeof VirtualPrivateCloudPeeringOperationType)[keyof typeof VirtualPrivateCloudPeeringOperationType];
-
-export const VirtualPrivateCloudPeeringOperationType = {
-  provision: "provision",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this peering. It is not a separate resource; once it finishes, the peering's `operation` is null again and the peering shows the result.
- */
-export interface VirtualPrivateCloudPeeringOperation {
-  /** `provision` runs after the peering is accepted, until it is `active`. */
-  type: VirtualPrivateCloudPeeringOperationType;
-  started_at: string;
-}
 
 export interface VirtualPrivateCloudPeeringResource {
   id: VirtualPrivateCloudPeeringID;
@@ -2577,7 +2478,7 @@ export interface VirtualPrivateCloudPeeringResource {
   accepter_virtual_private_cloud_id: VirtualPrivateCloudID;
   /** The accepter project's decision. `pending` until it decides; `accept-virtual-private-cloud-peering` and `reject-virtual-private-cloud-peering` make it `accepted` or `rejected`. A rejected peering is `deleted`. */
   acceptance: VirtualPrivateCloudPeeringResourceAcceptance;
-  /** `pending` until the connectivity exists: while acceptance is pending, and after it is accepted while the `provision` operation builds the link. Then `active`. `failed` means the link could not be built; `failure_reason` states why. `deleted` once deleted or rejected. */
+  /** `pending` until the connectivity exists: while acceptance is pending, and after it is accepted while the link is built (`provisioning`). Then `active`. `failed` means the link could not be built; `failure_reason` states why. `deleted` once deleted or rejected. */
   status: VirtualPrivateCloudPeeringResourceStatus;
   created_at: string;
   /**
@@ -2585,8 +2486,6 @@ export interface VirtualPrivateCloudPeeringResource {
    * @nullable
    */
   failure_reason: string | null;
-  /** The operation in progress on this peering, or null when none is. */
-  readonly operation: VirtualPrivateCloudPeeringOperation | null;
 }
 
 export interface VirtualPrivateCloudPeeringListResponseBody {
@@ -2707,7 +2606,7 @@ export interface UpdateVirtualPrivateCloudSubnetRequestBody {
 }
 
 /**
- * `available` from creation: the network and router are created in the backend by the first member that needs them, so a virtual private cloud nothing uses holds no capacity there. `failed` means the cloud reports the network broken; instances cannot be created in it then and are refused with `VIRTUAL_PRIVATE_CLOUD_UNAVAILABLE`. `deleting` from the moment its deletion began until it is gone: subnets, security groups and routes in it can no longer be created, changed or deleted, and are refused with `VIRTUAL_PRIVATE_CLOUD_DELETING`. A deletion that stopped before the end leaves it `deleting` with no operation, and deleting it again resumes from where it stopped.
+ * `available` from creation: the network and router are created in the backend by the first member that needs them, so a virtual private cloud nothing uses holds no capacity there. `failed` means the cloud reports the network broken; instances cannot be created in it then and are refused with `VIRTUAL_PRIVATE_CLOUD_UNAVAILABLE`. `deleting` from the moment its deletion began until it is gone: subnets, security groups and routes in it can no longer be created, changed or deleted, and are refused with `VIRTUAL_PRIVATE_CLOUD_DELETING`. A deletion that stopped before the end leaves it `deleting`, and deleting it again resumes from where it stopped. `creating`, `enabling_ipv6` and `disabling_ipv6` name operations in progress; the network refuses another operation until they end.
  */
 export type VirtualPrivateCloudStatus =
   (typeof VirtualPrivateCloudStatus)[keyof typeof VirtualPrivateCloudStatus];
@@ -2716,25 +2615,10 @@ export const VirtualPrivateCloudStatus = {
   available: "available",
   deleting: "deleting",
   failed: "failed",
+  creating: "creating",
+  enabling_ipv6: "enabling_ipv6",
+  disabling_ipv6: "disabling_ipv6",
 } as const;
-
-export type VirtualPrivateCloudOperationType =
-  (typeof VirtualPrivateCloudOperationType)[keyof typeof VirtualPrivateCloudOperationType];
-
-export const VirtualPrivateCloudOperationType = {
-  create: "create",
-  enable_ipv6: "enable_ipv6",
-  disable_ipv6: "disable_ipv6",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this virtual private cloud. It is not a separate resource; once it finishes, the virtual private cloud's `operation` is null again and the virtual private cloud shows the result.
- */
-export interface VirtualPrivateCloudOperation {
-  type: VirtualPrivateCloudOperationType;
-  started_at: string;
-}
 
 export interface VirtualPrivateCloud {
   id: VirtualPrivateCloudID;
@@ -2746,10 +2630,8 @@ export interface VirtualPrivateCloud {
    * @nullable
    */
   ipv6_cidr: string | null;
-  /** `available` from creation: the network and router are created in the backend by the first member that needs them, so a virtual private cloud nothing uses holds no capacity there. `failed` means the cloud reports the network broken; instances cannot be created in it then and are refused with `VIRTUAL_PRIVATE_CLOUD_UNAVAILABLE`. `deleting` from the moment its deletion began until it is gone: subnets, security groups and routes in it can no longer be created, changed or deleted, and are refused with `VIRTUAL_PRIVATE_CLOUD_DELETING`. A deletion that stopped before the end leaves it `deleting` with no operation, and deleting it again resumes from where it stopped. */
+  /** `available` from creation: the network and router are created in the backend by the first member that needs them, so a virtual private cloud nothing uses holds no capacity there. `failed` means the cloud reports the network broken; instances cannot be created in it then and are refused with `VIRTUAL_PRIVATE_CLOUD_UNAVAILABLE`. `deleting` from the moment its deletion began until it is gone: subnets, security groups and routes in it can no longer be created, changed or deleted, and are refused with `VIRTUAL_PRIVATE_CLOUD_DELETING`. A deletion that stopped before the end leaves it `deleting`, and deleting it again resumes from where it stopped. `creating`, `enabling_ipv6` and `disabling_ipv6` name operations in progress; the network refuses another operation until they end. */
   status: VirtualPrivateCloudStatus;
-  /** The operation in progress on this virtual private cloud, or null when none is. */
-  readonly operation: VirtualPrivateCloudOperation | null;
   created_at: string;
   updated_at: string;
 }
@@ -2792,7 +2674,7 @@ export interface FreeSubnetCidr {
 }
 
 /**
- * `pending` from the purchase until the backup is taken, then `available`; while it is taken the backup shows the `create` operation. `failed` means the backup was not created.
+ * `pending` from the purchase until the backup is taken, then `available`. `failed` means the backup was not created. A value naming an operation in progress (`restoring`, `deleting`) is shown while that operation runs; the backup refuses another operation until it ends.
  */
 export type VolumeBackupResourceStatus =
   (typeof VolumeBackupResourceStatus)[keyof typeof VolumeBackupResourceStatus];
@@ -2803,28 +2685,9 @@ export const VolumeBackupResourceStatus = {
   deleted: "deleted",
   failed: "failed",
   error: "error",
+  restoring: "restoring",
+  deleting: "deleting",
 } as const;
-
-/**
- * `restore`: a volume is being created from this backup with `volume_backup_id` on `create-volume`.
- */
-export type VolumeBackupOperationType =
-  (typeof VolumeBackupOperationType)[keyof typeof VolumeBackupOperationType];
-
-export const VolumeBackupOperationType = {
-  create: "create",
-  restore: "restore",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this backup. It is not a separate resource; once it finishes, the backup's `operation` is null again and the backup shows the result.
- */
-export interface VolumeBackupOperation {
-  /** `restore`: a volume is being created from this backup with `volume_backup_id` on `create-volume`. */
-  type: VolumeBackupOperationType;
-  started_at: string;
-}
 
 /**
  * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this backup is refunded.
@@ -2855,10 +2718,8 @@ export interface VolumeBackupResource {
   /** The capacity metered for this backup, in GiB: the size of the source volume when the backup was taken. Usage is this capacity multiplied by the time the backup is retained. */
   capacity_gib: number;
   source_volume_id: VolumeID;
-  /** `pending` from the purchase until the backup is taken, then `available`; while it is taken the backup shows the `create` operation. `failed` means the backup was not created. */
+  /** `pending` from the purchase until the backup is taken, then `available`. `failed` means the backup was not created. A value naming an operation in progress (`restoring`, `deleting`) is shown while that operation runs; the backup refuses another operation until it ends. */
   status: VolumeBackupResourceStatus;
-  /** The operation in progress on this backup, or null when none is. */
-  readonly operation: VolumeBackupOperation | null;
   source_availability_zone_id: AvailabilityZoneID;
   /**
    * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this backup is refunded.
@@ -2940,7 +2801,7 @@ export interface CreateVolumeBackupResponseBody {
 }
 
 /**
- * `pending` once a quota slot is reserved and until the snapshot is taken, showing the `create` operation while it is taken; then `available`. `failed` means the snapshot was not created; its slot is released once no snapshot data remains. `error` means the cloud reports the snapshot broken.
+ * `pending` once a quota slot is reserved and until the snapshot is taken; then `available`. `failed` means the snapshot was not created; its slot is released once no snapshot data remains. `error` means the cloud reports the snapshot broken. A value naming an operation in progress (`restoring`, `deleting`) is shown while that operation runs; the snapshot refuses another operation until it ends.
  */
 export type VolumeSnapshotResourceStatus =
   (typeof VolumeSnapshotResourceStatus)[keyof typeof VolumeSnapshotResourceStatus];
@@ -2951,28 +2812,9 @@ export const VolumeSnapshotResourceStatus = {
   deleted: "deleted",
   failed: "failed",
   error: "error",
+  restoring: "restoring",
+  deleting: "deleting",
 } as const;
-
-/**
- * `restore`: a volume is being reverted to this snapshot (`revert-volume`) or created from it (`create-volume` with `volume_snapshot_id`).
- */
-export type VolumeSnapshotOperationType =
-  (typeof VolumeSnapshotOperationType)[keyof typeof VolumeSnapshotOperationType];
-
-export const VolumeSnapshotOperationType = {
-  create: "create",
-  restore: "restore",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this snapshot. It is not a separate resource; once it finishes, the snapshot's `operation` is null again and the snapshot shows the result.
- */
-export interface VolumeSnapshotOperation {
-  /** `restore`: a volume is being reverted to this snapshot (`revert-volume`) or created from it (`create-volume` with `volume_snapshot_id`). */
-  type: VolumeSnapshotOperationType;
-  started_at: string;
-}
 
 /**
  * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this snapshot is refunded.
@@ -3002,10 +2844,8 @@ export interface VolumeSnapshotResource {
   region_id: RegionID;
   /** Capacity of the source volume when the snapshot was created. A volume restored from it cannot be smaller */
   size_gib: number;
-  /** `pending` once a quota slot is reserved and until the snapshot is taken, showing the `create` operation while it is taken; then `available`. `failed` means the snapshot was not created; its slot is released once no snapshot data remains. `error` means the cloud reports the snapshot broken. */
+  /** `pending` once a quota slot is reserved and until the snapshot is taken; then `available`. `failed` means the snapshot was not created; its slot is released once no snapshot data remains. `error` means the cloud reports the snapshot broken. A value naming an operation in progress (`restoring`, `deleting`) is shown while that operation runs; the snapshot refuses another operation until it ends. */
   status: VolumeSnapshotResourceStatus;
-  /** The operation in progress on this snapshot, or null when none is. */
-  readonly operation: VolumeSnapshotOperation | null;
   /**
    * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this snapshot is refunded.
    * @nullable
@@ -3158,7 +2998,7 @@ export interface VolumePerformance {
 }
 
 /**
- * `pending` until the volume is created, with no storage allocated before the order is accepted and the `create` operation shown while it is created; then `available`, or `in_use` once attached. `failed` means the volume was not created; `failure_reason` states why. `error` means the cloud reports the volume broken.
+ * `pending` until the volume is created, with no storage allocated before the order is accepted; then `available`, or `in_use` once attached. `failed` means the volume was not created; `failure_reason` states why. `error` means the cloud reports the volume broken. A value naming an operation in progress (`resizing`, `retyping`, `reverting`, `attaching`, `detaching`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the volume refuses another operation until it ends.
  */
 export type VolumeResourceStatus = (typeof VolumeResourceStatus)[keyof typeof VolumeResourceStatus];
 
@@ -3169,6 +3009,14 @@ export const VolumeResourceStatus = {
   deleted: "deleted",
   failed: "failed",
   error: "error",
+  resizing: "resizing",
+  retyping: "retyping",
+  reverting: "reverting",
+  attaching: "attaching",
+  detaching: "detaching",
+  suspending: "suspending",
+  resuming: "resuming",
+  deleting: "deleting",
 } as const;
 
 /**
@@ -3200,32 +3048,6 @@ export const VolumeResourceFailureReason = {
   checkout_expired: "checkout_expired",
   provisioning_failed: "provisioning_failed",
 } as const;
-
-/**
- * `attach` and `detach` accompany the instance's `attach_volume` and `detach_volume` operations. `delete` includes release through a Billing cancellation and deletion with an instance.
- */
-export type VolumeOperationType = (typeof VolumeOperationType)[keyof typeof VolumeOperationType];
-
-export const VolumeOperationType = {
-  create: "create",
-  resize: "resize",
-  retype: "retype",
-  revert: "revert",
-  attach: "attach",
-  detach: "detach",
-  suspend: "suspend",
-  resume: "resume",
-  delete: "delete",
-} as const;
-
-/**
- * An operation still running on this volume. It is not a separate resource; once it finishes, the volume's `operation` is null again and the volume shows the result.
- */
-export interface VolumeOperation {
-  /** `attach` and `detach` accompany the instance's `attach_volume` and `detach_volume` operations. `delete` includes release through a Billing cancellation and deletion with an instance. */
-  type: VolumeOperationType;
-  started_at: string;
-}
 
 export type VolumeAttachmentRole = (typeof VolumeAttachmentRole)[keyof typeof VolumeAttachmentRole];
 
@@ -3283,7 +3105,7 @@ export interface VolumeResource {
   region_id: RegionID;
   size_gib: number;
   performance: VolumePerformance;
-  /** `pending` until the volume is created, with no storage allocated before the order is accepted and the `create` operation shown while it is created; then `available`, or `in_use` once attached. `failed` means the volume was not created; `failure_reason` states why. `error` means the cloud reports the volume broken. */
+  /** `pending` until the volume is created, with no storage allocated before the order is accepted; then `available`, or `in_use` once attached. `failed` means the volume was not created; `failure_reason` states why. `error` means the cloud reports the volume broken. A value naming an operation in progress (`resizing`, `retyping`, `reverting`, `attaching`, `detaching`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the volume refuses another operation until it ends. */
   status: VolumeResourceStatus;
   /**
    * The Billing Checkout Session that bought this resource; `order_id` and `order_item_id` stay null until its checkout completes. Null when the resource was not bought through one.
@@ -3312,8 +3134,6 @@ export interface VolumeResource {
    * @nullable
    */
   failure_reason: VolumeResourceFailureReason;
-  /** The operation in progress on this volume, or null when none is. */
-  readonly operation: VolumeOperation | null;
   attachment: VolumeAttachment | null;
 }
 
@@ -3489,7 +3309,7 @@ export interface Error {
 /**
  * The request conflicts with the current state of a resource or offering it involves. `COMPUTE_RESOURCE_BUSY`
  * means a resource has an operation in progress: `meta.resource_type`, such as `instance` or `elastic_ip`, and
- * `meta.resource_id` name it, and `meta.operation` is the type of that operation, as in its `operation` field.
+ * `meta.resource_id` name it, and `meta.operation` is the type of that operation, which the resource's `status` also names while it runs.
  * Retry once it has finished. Other codes, such as `BILLING_OPTION_UNAVAILABLE`, are described where they
  * apply.
  */

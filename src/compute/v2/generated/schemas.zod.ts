@@ -10,13 +10,13 @@
  *
  * ## Conventions
  *
- * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, the resource is created: it stays `pending` and shows the `create` operation, then reaches its usual status, such as `running` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. A purchased change, such as a resize requested with `instance_type_id`, `size_gib` or `bandwidth_mbps` on the resource, returns the resource unchanged with the Checkout Session for the change, and applies once its order is accepted.
+ * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, the resource is created: it stays `pending`, then reaches its usual status, such as `running` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. A purchased change, such as a resize requested with `instance_type_id`, `size_gib` or `bandwidth_mbps` on the resource, returns the resource unchanged with the Checkout Session for the change, and applies once its order is accepted.
  * - **Commercial terms.** Compute catalogs describe technical specifications and, for each order line a purchase makes, how it is sold in Billing (a `BillingComponent`: its Plan, dimensions, what its quantity counts and what its meters read); prices, amounts and currency belong to Billing. A purchase chooses its terms with `billing`, and Billing selects the matching price. Read prices and their rates with Billing's `search-prices` from those components, quote a proposed purchase with `get-quote`, and a change of a resource by its `subscription_id`; Compute has no quote or price proxy endpoint and returns no amounts.
  * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid. Do not submit the purchase again after paying; after an uncertain response, look the Checkout Session up in Billing first.
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
  * - **Custom methods.** An action that is not one of the standard methods (list, get, create, update, delete) is a custom method, `POST` on the resource's path followed by `:` and the verb, as in `POST /api/v2/instances/{id}:reboot` (AIP-136). A state is changed by its custom method, never by writing the state: `:start` and `:stop`, `:rescue` and `:unrescue`, `:associate` and `:disassociate`.
- * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `operation` field names it; the field is null once the operation has finished, and the resource then shows the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
+ * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. Its `access_state` is `pending` until the order is accepted and delivery settles it, then `enabled`; a subscription that lapses suspends or reclaims the resource it pays for. Deleting a resource that subscriptions pay for cancels the subscriptions of its `release_set` in Billing, and the deletion answers with that cancellation.
  * - **Availability zones.** A volume and an instance must reside in the same availability zone to be attached. An instance type and a volume type each belong to one availability zone, as on GCP, so a purchase names the type and the type names the zone; the volumes bought with an instance have to be of types of the instance type's zone.
  * - **IPv6 is routed, not translated.** A virtual private cloud with IPv6 holds a /56 and each of its subnets a /64 of it, as on Alibaba Cloud, Tencent Cloud and Azure; IPv6 and its security groups require no EIP or NAT gateway. EIP and NATGateway are IPv4 products; IPv6 EIP, NAT66 and IPv6 port forwarding are not supported.
@@ -267,7 +267,7 @@ export const ListElasticIpsQueryParams = zod.strictObject({
  *
  * Allocation does not select or create a virtual private cloud. A later association selects an assigned network-interface address; Compute then establishes the required network connectivity.
  *
- * The elastic IP shows the `create` operation from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
+ * The elastic IP is `pending` from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
  * @summary Allocate an elastic IP
  */
 export const CreateElasticIpBody = CreateElasticIPRequestBody;
@@ -301,9 +301,9 @@ export const GetElasticIpParams = zod.strictObject({
  * - **Prepaid**: the change goes through a Checkout Session that changes the network subscription, priced for the rest of its period. It starts once Billing accepts the order; if checkout is not completed, the order is not accepted or the change fails, `bandwidth_mbps` keeps its value and Billing shows the outcome.
  * - **Pay-as-you-go**: there is no checkout. The change starts at once, `checkout_session_id` and `order_id` are null, and the new limit is metered from the instant it is applied; if it fails, the old limit stays in effect and metered. `checkout` and `proration_date` are refused with `ELASTIC_IP_CHECKOUT_UNUSED`.
  *
- * A change of `internet_charge_type` needs no checkout and shows the `update_internet_charge_type` operation until it is applied; see the field.
+ * A change of `internet_charge_type` needs no checkout and is `updating_internet_charge_type` until it is applied; see the field.
  *
- * The elastic IP shows the `update_bandwidth` operation until the change is applied or ends, so other operations and a second change are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The current limit stays in effect until the change is applied.
+ * The elastic IP is `updating_bandwidth` until the change is applied or ends, so other operations and a second change are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The current limit stays in effect until the change is applied.
  *
  * While the address is associated with an instance, the limit must not exceed the `max_bandwidth_mbps` of that instance's type; a higher limit is refused with `INSTANCE_BANDWIDTH_CEILING`. The limit of an address that is not associated is checked when the address is associated with an instance.
  * @summary Update an elastic IP
@@ -329,7 +329,7 @@ export const UpdateElasticIpParams = zod.strictObject({
 export const UpdateElasticIpBody = UpdateElasticIPRequestBody;
 
 /**
- * Releases the elastic IP after dissociating it. The elastic IP shows the `delete` operation until cleanup is confirmed; the address then immediately returns to available inventory, with no cooldown period. Deleting the association or replacing it alone does not release the address.
+ * Releases the elastic IP after dissociating it. The elastic IP is `deleting` until cleanup is confirmed; the address then immediately returns to available inventory, with no cooldown period. Deleting the association or replacing it alone does not release the address.
  *
  * Refused with `COMPUTE_PURCHASE_PENDING` while the purchase that created it still awaits checkout or payment; `meta.checkout_session_id` names its Checkout Session and `meta.order_id` its order once checkout created one. Expire the session or cancel the order in Billing instead.
  *
@@ -439,7 +439,7 @@ export const GetElasticIpAssociationParams = zod.strictObject({
 /**
  * Points the elastic IP at a target: an instance, which means the primary private IPv4 address of its primary network interface, or a network interface address (`network_interface_address_id`) given directly. Exactly one of `instance_id` and `network_interface_address_id`. A network interface address must be an assigned, unreleased IPv4 address on a network interface in this project and region; IPv6 addresses are rejected.
  *
- * The target becomes what the elastic IP points at. Repeating the request for the target it already points at changes nothing; an elastic IP associated with another target is refused with `ELASTIC_IP_ALREADY_ASSOCIATED` (409), and is moved by disassociating it first, so that the moment traffic stops reaching the old target is one the caller chose. The elastic IP shows the `associate` operation until the association is confirmed, and with an instance as the target that instance shows the `associate_elastic_ip` operation as well, so the instance must not have another operation in progress.
+ * The target becomes what the elastic IP points at. Repeating the request for the target it already points at changes nothing; an elastic IP associated with another target is refused with `ELASTIC_IP_ALREADY_ASSOCIATED` (409), and is moved by disassociating it first, so that the moment traffic stops reaching the old target is one the caller chose. The elastic IP is `associating` until the association is confirmed, and with an instance as the target that instance is `associating_elastic_ip` as well, so the instance must not have another operation in progress.
  *
  * The elastic IP must be in the same region as the target. With an instance as the target, the elastic IP's `bandwidth_mbps` must not exceed the `max_bandwidth_mbps` of that instance's type; a higher limit is refused with `INSTANCE_BANDWIDTH_CEILING`.
  * @summary Associate an elastic IP with a target
@@ -465,7 +465,7 @@ export const AssociateElasticIpParams = zod.strictObject({
 export const AssociateElasticIpBody = AssociateElasticIPRequestBody;
 
 /**
- * The address remains held by the project and simply no longer points at any network interface. The elastic IP shows the `disassociate` operation until the change is confirmed, and an instance whose primary interface it pointed at shows the `disassociate_elastic_ip` operation. Removing an association that does not exist is refused with 404 `ELASTIC_IP_NOT_ASSOCIATED`.
+ * The address remains held by the project and simply no longer points at any network interface. The elastic IP is `disassociating` until the change is confirmed, and an instance whose primary interface it pointed at is `disassociating_elastic_ip`. Removing an association that does not exist is refused with 404 `ELASTIC_IP_NOT_ASSOCIATED`.
  * @summary Remove the association of an elastic IP
  */
 export const disassociateElasticIpPathElasticIpIdMin = 30;
@@ -665,7 +665,7 @@ export const ListInstancesQueryParams = zod.strictObject({
 /**
  * Creates a Billing Checkout Session, including for metered terms, and returns one `pending` instance per requested instance with it. Each new component carries its own commercial terms; their usage type and period must match. A pending instance has no server, boot volume or address, and is not metered.
  *
- * Creation starts once Billing accepts the order: the instance stays `pending` with the `create` operation while it is created, then becomes `running`. With automatic checkout, insufficient funds refuse the request and nothing is created. With deferred checkout, the instances stay `pending` until the customer completes checkout in Billing and the order is paid; an expired Checkout Session, or a canceled or expired order, leaves them `failed` with `checkout_expired`, `order_canceled` or `order_expired`. Do not submit another creation request after paying. After an uncertain response, look the Checkout Session up in Billing before submitting again.
+ * Creation starts once Billing accepts the order: the instance stays `pending` while it is created, then becomes `running`. With automatic checkout, insufficient funds refuse the request and nothing is created. With deferred checkout, the instances stay `pending` until the customer completes checkout in Billing and the order is paid; an expired Checkout Session, or a canceled or expired order, leaves them `failed` with `checkout_expired`, `order_canceled` or `order_expired`. Do not submit another creation request after paying. After an uncertain response, look the Checkout Session up in Billing before submitting again.
  *
  * The instances are created in the availability zone of their instance type, and the volumes bought with them have to be of volume types of that zone (422 `VOLUME_TYPE_OTHER_AVAILABILITY_ZONE`). The types have to have room for all of them, checked before anything is ordered: refused with 409 `INSTANCE_TYPE_SOLD_OUT` or `VOLUME_TYPE_SOLD_OUT` when a type takes no new orders for now, `INSTANCE_TYPE_CAPACITY_REACHED` or `VOLUME_TYPE_CAPACITY_REACHED` when what is sold of it is used up, `INSTANCE_TYPE_NO_HOST_ROOM` when no host of the zone can take the machine, `VOLUME_TYPE_NO_POOL_ROOM` when the storage of the zone cannot take the boot volume, and `ELASTIC_IP_LINE_EXHAUSTED` when the line of the new elastic IPs has fewer addresses left than instances. Two orders placed at the same moment can both pass; an instance that finds a type full when its order is accepted is not created and is refunded, ending `failed` with `provisioning_failed`.
  *
@@ -675,7 +675,7 @@ export const ListInstancesQueryParams = zod.strictObject({
  *
  * The network is checked before the Checkout Session is created, and a request it refuses orders and charges nothing. It is refused with `VIRTUAL_PRIVATE_CLOUD_UNAVAILABLE` when the virtual private cloud's `status` is not `available`, `VIRTUAL_PRIVATE_CLOUD_SUBNET_UNAVAILABLE` or `SECURITY_GROUP_UNAVAILABLE` when the subnet or a security group is not ready, `SECURITY_GROUP_OTHER_VIRTUAL_PRIVATE_CLOUD` when a security group belongs to another virtual private cloud, and `NETWORK_INTERFACE_UNAVAILABLE` when the port's `status` is not `available`. `meta` names the resource.
  *
- * Each instance shows the `create` operation from the moment the Checkout Session is created until it is delivered or the checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its release with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
+ * Each instance is `pending` from the moment the Checkout Session is created until it is delivered or the checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its release with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
  * @summary Create instances
  */
 export const CreateInstanceBody = CreateInstanceRequestBody;
@@ -715,7 +715,7 @@ export const GetInstanceParams = zod.strictObject({
  *
  * **`instance_type_id`** changes the instance's type **cold**: the instance has to be stopped, and is refused with 409 `INSTANCE_RESIZE_REQUIRES_STOP` otherwise. Its operating system is not booted for the change, and it is still stopped once the change is applied; start it when you are ready. An instance stopped by the legacy stop, which released its host, is refused with 409 `INSTANCE_SHELVED`; start it once and stop it again. A target type that cannot hold what the instance already uses is refused before anything is ordered: fewer network interfaces than are attached with 409 `INSTANCE_RESIZE_NETWORK_INTERFACES_EXCEED`, fewer elastic IPs than are associated with 409 `INSTANCE_RESIZE_ELASTIC_IPS_EXCEED`, and less purchasable bandwidth than an associated elastic IP has with 409 `INSTANCE_BANDWIDTH_CEILING` naming it in `meta.elastic_ip_id`. The request returns 202 with the instance and the Checkout Session for the change, including for metered terms. The instance keeps its usage type and period, priced with the target type's matching option; a target type without that option is refused with 409 `BILLING_OPTION_UNAVAILABLE`. The resize starts once Billing accepts the order. Do not submit the change again after paying. After an uncertain response, look the Checkout Session up in Billing before submitting again.
  *
- * The instance shows the `resize` operation until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. It keeps its current type until the resize is applied; the new type takes effect, and is billed from then on, when `instance_type_id` shows it. If checkout is not completed, the order is not accepted or the resize fails, the instance keeps its current type and Billing shows the outcome. A completed resize is final and cannot be reverted; to return to the previous type, submit another resize.
+ * The instance is `resizing` until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. It keeps its current type until the resize is applied; the new type takes effect, and is billed from then on, when `instance_type_id` shows it. If checkout is not completed, the order is not accepted or the resize fails, the instance keeps its current type and Billing shows the outcome. A completed resize is final and cannot be reverted; to return to the previous type, submit another resize.
  * @summary Update an instance
  */
 export const updateInstancePathInstanceIdMin = 30;
@@ -776,7 +776,7 @@ export const DeleteInstanceQueryParams = zod.strictObject({
 });
 
 /**
- * Boots the stopped instance on the host it kept; outstanding restrictions can prevent starting. It shows the `start` operation until it is running or the start has failed. Starting a running instance changes nothing.
+ * Boots the stopped instance on the host it kept; outstanding restrictions can prevent starting. It is `starting` until it is running or the start has failed. Starting a running instance changes nothing.
  *
  * When its boot volume grew since it was last connected, the start connects its volumes afresh so that the boot volume runs at the performance of its new size: the instance is taken off its host for that moment and placed again. Only then can the start find no room in the zone; it is refused with 409 `INSTANCE_START_NO_HOST_ROOM`, or ends with the instance still stopped, and can be tried again later. An instance stopped by the legacy stop, which released its host, is placed again the same way.
  * @summary Start an instance
@@ -800,7 +800,7 @@ export const StartInstanceParams = zod.strictObject({
 });
 
 /**
- * Shuts the instance down **on its host**, as Alibaba Cloud's ordinary stop does: it keeps its volumes, network interfaces, addresses and quota, and the vCPU and memory of its host stay reserved for it, so it starts again without asking for room. **A metered instance keeps being charged for compute while stopped**; its volumes and elastic IPs are charged as always. An instance stopped by a suspension, for non-payment or by the platform, is not charged for compute while the suspension lasts. It shows the `stop` operation until it is stopped. Stopping a stopped instance changes nothing.
+ * Shuts the instance down **on its host**, as Alibaba Cloud's ordinary stop does: it keeps its volumes, network interfaces, addresses and quota, and the vCPU and memory of its host stay reserved for it, so it starts again without asking for room. **A metered instance keeps being charged for compute while stopped**; its volumes and elastic IPs are charged as always. An instance stopped by a suspension, for non-payment or by the platform, is not charged for compute while the suspension lasts. It is `stopping` until it is stopped. Stopping a stopped instance changes nothing.
  *
  * Changing `instance_type_id` is done on a stopped instance and only then. A stopped instance can also be rebuilt and have network interfaces and volumes attached and detached; rescuing it needs it running.
  * @summary Stop an instance
@@ -924,7 +924,7 @@ export const ResetInstancePasswordBody = PasswordChoice;
  *
  * An instance suspended by the platform must be unsuspended first.
  *
- * The instance shows the `reboot` operation until the reboot has finished.
+ * The instance is `rebooting` until the reboot has finished.
  * @summary Reboot an instance
  */
 export const rebootInstancePathInstanceIdMin = 30;
@@ -954,7 +954,7 @@ export const RebootInstanceBody = RebootInstanceRequestBody;
  *
  * The image this instance already runs is accepted even after the platform has withdrawn it, since rebuilding is the only way back into an instance broken from the inside. Any *other* withdrawn image is rejected with `IMAGE_RETIRED`, which is a change of image and therefore a new order.
  *
- * The instance shows the `rebuild` operation until the rebuild has finished.
+ * The instance is `rebuilding` until the rebuild has finished.
  * @summary Rebuild an instance
  */
 export const rebuildInstancePathInstanceIdMin = 30;
@@ -1020,7 +1020,7 @@ export const ListInstanceVolumesQueryParams = zod.strictObject({
 });
 
 /**
- * The volume must be in the same region and availability zone as the instance. Returns the volume; the instance shows the `attach_volume` operation and the volume the `attach` operation until the attachment is confirmed. Partition the volume and mount the file system inside the instance once it is attached.
+ * The volume must be in the same region and availability zone as the instance. Returns the volume; the instance is `attaching_volume` and the volume is `attaching` until the attachment is confirmed. Partition the volume and mount the file system inside the instance once it is attached.
  * @summary Attach a volume
  */
 export const attachInstanceVolumePathInstanceIdMin = 30;
@@ -1048,7 +1048,7 @@ export const AttachInstanceVolumeBody = AttachVolumeRequestBody;
  *
  * The volume the instance boots from cannot be detached, whether it is the boot volume bought with the instance or a volume supplied as the existing boot_volume at launch. Such a request is refused with `INSTANCE_BOOT_VOLUME_LOCKED` and changes nothing; releasing the instance is what frees that volume.
  *
- * Returns the volume; the instance shows the `detach_volume` operation and the volume the `detach` operation until the volume is detached.
+ * Returns the volume; the instance is `detaching_volume` and the volume is `detaching` until the volume is detached.
  * @summary Detach a volume
  */
 export const detachInstanceVolumePathInstanceIdMin = 30;
@@ -1124,7 +1124,7 @@ export const ListInstanceNetworkInterfacesQueryParams = zod.strictObject({
 });
 
 /**
- * Returns the network interface; the instance shows the `attach_network_interface` operation and the interface the `attach` operation until the attachment is confirmed. The instance has to be running or stopped; one stopped by the legacy stop, which released its host, is refused with 409 `INSTANCE_SHELVED`.
+ * Returns the network interface; the instance is `attaching_network_interface` and the interface is `attaching` until the attachment is confirmed. The instance has to be running or stopped; one stopped by the legacy stop, which released its host, is refused with 409 `INSTANCE_SHELVED`.
  * @summary Attach a network interface
  */
 export const attachInstanceNetworkInterfacePathInstanceIdMin = 30;
@@ -1150,7 +1150,7 @@ export const AttachInstanceNetworkInterfaceBody = AttachNetworkInterfaceRequestB
 /**
  * The primary network interface cannot be detached; the instance would lose its network address. The instance has to be running or stopped; one stopped by the legacy stop, which released its host, is refused with 409 `INSTANCE_SHELVED`.
  *
- * Returns the network interface; the instance shows the `detach_network_interface` operation and the interface the `detach` operation until it is detached.
+ * Returns the network interface; the instance is `detaching_network_interface` and the interface is `detaching` until it is detached.
  * @summary Detach a network interface
  */
 export const detachInstanceNetworkInterfacePathInstanceIdMin = 30;
@@ -1190,7 +1190,7 @@ export const DetachInstanceNetworkInterfaceParams = zod.strictObject({
  *
  * In rescue mode, everything only the instance's own system can take is refused with 409 `INSTANCE_UNRESCUE_REQUIRED`: starting, stopping, rebooting, rebuilding, resetting the password, changing `instance_type_id`, attaching or detaching volumes and network interfaces, capturing a private image and running commands. Leave rescue mode with `:unrescue` first. The console stays available, releasing the instance works as usual, and the instance is charged as when running. A suspension that begins in rescue mode takes the instance out of rescue before stopping it, and starting it again once the suspension ends boots its own system.
  *
- * A rescue the compute service could not boot ends the `rescue` operation and leaves the instance as it was, or in `error`; request it again or reboot the instance.
+ * A rescue the compute service could not boot leaves the instance as it was, or in `error`; request it again or reboot the instance.
  *
  * The request does not name an image. The rescue image is the region's enabled rescue image for the architecture of the instance's boot volume. A region and architecture with no enabled rescue image is refused with `RESCUE_IMAGE_NOT_CONFIGURED` (409).
  * @summary Put an instance into rescue mode
@@ -1216,7 +1216,7 @@ export const RescueInstanceParams = zod.strictObject({
 export const RescueInstanceBody = RescueInstanceRequestBody;
 
 /**
- * Restores boot from the original boot volume. Completion is shown by the instance state, and the instance shows the `unrescue` operation until then.
+ * Restores boot from the original boot volume. Completion is shown by the instance state, and the instance is `unrescuing` until then.
  * @summary Take an instance out of rescue mode
  */
 export const unrescueInstancePathInstanceIdMin = 30;
@@ -1519,7 +1519,7 @@ export const GetNetworkInterfaceParams = zod.strictObject({
  * Changes the name, or replaces the security groups. The two are never combined (422 `UPDATE_FIELDS_COMBINED`).
  *
  * - `name` is not an operation, is accepted at any time and answers 200.
- * - `security_group_ids` is the complete new set, one to five groups of the network interface's virtual private cloud; groups left out are removed. It applies to traffic of the running instance as soon as it is in place, and answers 202 with the network interface showing the `update_security_groups` operation until then.
+ * - `security_group_ids` is the complete new set, one to five groups of the network interface's virtual private cloud; groups left out are removed. It applies to traffic of the running instance as soon as it is in place, and answers 202 with the network interface `updating_security_groups` until then.
  *
  * Secondary IPv4 addresses are added and removed under `/network-interfaces/{networkInterfaceId}/addresses`.
  * @summary Update a network interface
@@ -1567,7 +1567,7 @@ export const DeleteNetworkInterfaceParams = zod.strictObject({
 });
 
 /**
- * Adds an IPv4 address in the network interface's subnet, given or chosen by the network, and answers 202 with the network interface showing the `add_address` operation until the address is in place; it then appears among `addresses` with `role` `secondary`. An elastic IP can be associated with it like the primary address.
+ * Adds an IPv4 address in the network interface's subnet, given or chosen by the network, and answers 202 with the network interface `adding_address` until the address is in place; it then appears among `addresses` with `role` `secondary`. An elastic IP can be associated with it like the primary address.
  *
  * **The operating system has to be configured to use it**: DHCP hands out only the primary address. Changing the addresses of a network interface in use may briefly interrupt its traffic.
  *
@@ -1595,7 +1595,7 @@ export const CreateNetworkInterfaceAddressParams = zod.strictObject({
 export const CreateNetworkInterfaceAddressBody = CreateNetworkInterfaceAddressRequestBody;
 
 /**
- * Removes a secondary IPv4 address and answers 202 with the network interface showing the `remove_address` operation until it is gone. The primary address goes only with the network interface (409 `NETWORK_INTERFACE_ADDRESS_PRIMARY`), and an address an elastic IP is associated with is refused until it is disassociated (409 `NETWORK_INTERFACE_ADDRESS_ASSOCIATED`).
+ * Removes a secondary IPv4 address and answers 202 with the network interface `removing_address` until it is gone. The primary address goes only with the network interface (409 `NETWORK_INTERFACE_ADDRESS_PRIMARY`), and an address an elastic IP is associated with is refused until it is disassociated (409 `NETWORK_INTERFACE_ADDRESS_ASSOCIATED`).
  * @summary Remove a secondary IPv4 address
  */
 export const deleteNetworkInterfaceAddressPathNetworkInterfaceIdMin = 30;
@@ -1733,7 +1733,7 @@ export const ListPrivateImagesQueryParams = zod.strictObject({
  *
  * It is metered on a subscription of its own and takes no billing choice. Each second the image is stored is reported under its region and its `billing_position`: its place among the project's stored private images in the region, counted from the oldest, which moves up whenever an older one is deleted. Billing prices each position, and a position it prices at zero costs nothing; that is how a number of images in each region are free. The image's size does not change what it costs. It is bought through a Billing Checkout Session: automatic checkout completes at once for metered pricing and the image is captured as soon as the order is accepted; with deferred checkout it stays `pending` until the customer completes checkout in Billing. The source and project quotas are checked before the Checkout Session is created, and a refused request creates nothing.
  *
- * The image shows the `create` operation from the moment its Checkout Session is created until it is delivered or its checkout or order ends. While its purchase awaits checkout or payment its deletion is refused with `COMPUTE_PURCHASE_PENDING`; once the capture runs, deletion is the one operation it accepts.
+ * The image is `pending` from the moment its Checkout Session is created until it is delivered or its checkout or order ends. While its purchase awaits checkout or payment its deletion is refused with `COMPUTE_PURCHASE_PENDING`; once the capture runs, deletion is the one operation it accepts.
  * @summary Capture an instance as a private image
  */
 export const CreatePrivateImageBody = CreatePrivateImageRequestBody;
@@ -1785,7 +1785,7 @@ export const UpdatePrivateImageBody = UpdatePrivateImageRequestBody;
  *
  * Deletion is rejected while instances created from the image still exist, as they need it in order to be rebuilt.
  *
- * An image whose capture has not finished can be deleted; the capture is aborted. This is the one operation accepted while the `create` operation is in progress.
+ * An image whose capture has not finished can be deleted; the capture is aborted. This is the one operation accepted while its status is `pending`.
  *
  * Quota capacity and storage metering are released only after cleanup is confirmed.
  *
@@ -2314,7 +2314,7 @@ export const DeleteVirtualPrivateCloudPeeringParams = zod.strictObject({
 });
 
 /**
- * Starts the provisioning of the connectivity; the peering shows the `provision` operation until it is `active`. It does not change security groups or provide transitive routing. Only the accepter project may decide; the requester project is refused, because a peering would otherwise be accepted by the party who asked for it. The decision is made once: a peering whose `acceptance` is no longer `pending` refuses both methods.
+ * Starts the provisioning of the connectivity; the peering is `provisioning` until it is `active`. It does not change security groups or provide transitive routing. Only the accepter project may decide; the requester project is refused, because a peering would otherwise be accepted by the party who asked for it. The decision is made once: a peering whose `acceptance` is no longer `pending` refuses both methods.
  * @summary Accept a peering
  */
 export const acceptVirtualPrivateCloudPeeringPathVirtualPrivateCloudPeeringIdMin = 37;
@@ -2879,7 +2879,7 @@ export const ListVolumeBackupsQueryParams = zod.strictObject({
  *
  * It is metered by the hour on a subscription of its own and takes no billing choice. It is bought through a Billing Checkout Session: automatic checkout completes at once for metered pricing and the backup is taken as soon as the order is accepted; with deferred checkout it stays `pending` until the customer completes checkout in Billing. The source and project quotas are checked before the Checkout Session is created, and a refused request creates nothing.
  *
- * The backup shows the `create` operation from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
+ * The backup is `pending` from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
  * @summary Create a volume backup
  */
 export const CreateVolumeBackupBody = CreateVolumeBackupRequestBody;
@@ -3003,7 +3003,7 @@ export const ListVolumeSnapshotsQueryParams = zod.strictObject({
  *
  * It is metered by the hour on a subscription of its own and takes no billing choice. It is bought through a Billing Checkout Session: automatic checkout completes at once for metered pricing and the snapshot is taken as soon as the order is accepted; with deferred checkout it stays `pending` until the customer completes checkout in Billing. The source and project quotas are checked before the Checkout Session is created, and a refused request creates nothing.
  *
- * The snapshot shows the `create` operation from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
+ * The snapshot is `pending` from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
  * @summary Create a snapshot
  */
 export const CreateVolumeSnapshotBody = CreateVolumeSnapshotRequestBody;
@@ -3218,7 +3218,7 @@ export const ListVolumesQueryParams = zod.strictObject({
  *
  * A volume bought on its own is licensed: `billing.usage_type` `metered` is refused with `VOLUME_USAGE_TYPE_UNAVAILABLE`. A volume created with an instance follows the machine's terms instead and may be metered.
  *
- * The volume shows the `create` operation from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
+ * The volume is `pending` from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
  * @summary Create a volume
  */
 export const CreateVolumeBody = CreateVolumeRequestBody;
@@ -3250,9 +3250,9 @@ export const GetVolumeParams = zod.strictObject({
  *
  * **Renaming** is not an operation and is accepted at any time. It returns 200 with `checkout_session_id` and `order_id` null.
  *
- * **Resizing** accepts only an increase; a smaller `size_gib` is refused with `VOLUME_CANNOT_SHRINK` (422), since a file system cannot be shrunk from outside the instance. It returns 202 with the volume and the Checkout Session for the resize, which keeps the volume's usage type and period. The volume shows the `resize` operation until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The volume keeps its current size until the resize is applied; once `size_gib` shows the new size, extend the file system inside the instance. If checkout is not completed, the order is not accepted or the resize fails, the volume keeps its size and Billing shows the outcome.
+ * **Resizing** accepts only an increase; a smaller `size_gib` is refused with `VOLUME_CANNOT_SHRINK` (422), since a file system cannot be shrunk from outside the instance. It returns 202 with the volume and the Checkout Session for the resize, which keeps the volume's usage type and period. The volume is `resizing` until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The volume keeps its current size until the resize is applied; once `size_gib` shows the new size, extend the file system inside the instance. If checkout is not completed, the order is not accepted or the resize fails, the volume keeps its size and Billing shows the outcome.
  *
- * **Changing the type** moves the volume to another volume type at the same capacity, priced as that type, and returns 202 with the volume and the Checkout Session for the change, which keeps the volume's usage type and period. The volume has to be detached (409 `VOLUME_RETYPE_ATTACHED`), so a boot volume cannot change its type. The target has to be on sale (`VOLUME_TYPE_OFF_SALE`), in the volume's region (422 `VOLUME_RETYPE_OTHER_REGION`), of the volume's availability zone (422 `VOLUME_TYPE_OTHER_AVAILABILITY_ZONE`) with room for the volume (409 `VOLUME_TYPE_SOLD_OUT`, `VOLUME_TYPE_CAPACITY_REACHED`, `VOLUME_TYPE_NO_POOL_ROOM`), admit the volume's capacity (422 `VOLUME_SIZE_OUT_OF_RANGE`, `VOLUME_SIZE_NOT_ON_STEP`) and differ from the current one (422 `VOLUME_RETYPE_SAME_TYPE`). The volume shows the `retype` operation until the change is applied, its Checkout Session expires or its order is canceled. A target on the same storage backend takes effect at once; one on another backend copies the volume's data there first, which takes longer the larger the volume is. The volume keeps its type until `volume_type_id` shows the new one, and its `performance` follows from then on; a change that did not take effect leaves the volume as it was and is refunded.
+ * **Changing the type** moves the volume to another volume type at the same capacity, priced as that type, and returns 202 with the volume and the Checkout Session for the change, which keeps the volume's usage type and period. The volume has to be detached (409 `VOLUME_RETYPE_ATTACHED`), so a boot volume cannot change its type. The target has to be on sale (`VOLUME_TYPE_OFF_SALE`), in the volume's region (422 `VOLUME_RETYPE_OTHER_REGION`), of the volume's availability zone (422 `VOLUME_TYPE_OTHER_AVAILABILITY_ZONE`) with room for the volume (409 `VOLUME_TYPE_SOLD_OUT`, `VOLUME_TYPE_CAPACITY_REACHED`, `VOLUME_TYPE_NO_POOL_ROOM`), admit the volume's capacity (422 `VOLUME_SIZE_OUT_OF_RANGE`, `VOLUME_SIZE_NOT_ON_STEP`) and differ from the current one (422 `VOLUME_RETYPE_SAME_TYPE`). The volume is `retyping` until the change is applied, its Checkout Session expires or its order is canceled. A target on the same storage backend takes effect at once; one on another backend copies the volume's data there first, which takes longer the larger the volume is. The volume keeps its type until `volume_type_id` shows the new one, and its `performance` follows from then on; a change that did not take effect leaves the volume as it was and is refunded.
  *
  * An attached volume, including a boot volume, can be resized. The capacity is usable at once, and the volume's `performance` shows what its type gives the new size. **That performance applies from the volume's next attachment, or the next start of its stopped instance**: the storage reads a volume's limits only while connecting it. Until then the attachment's `performance` shows what is in effect.
  * @summary Update a volume
@@ -3313,7 +3313,7 @@ export const DeleteVolumeQueryParams = zod.strictObject({
  *
  * Three restrictions apply: only the most recent snapshot of the volume can be reverted to; the volume must be detached from its instance first; and a volume resized since the snapshot was taken cannot be reverted. To return to an earlier point in time, or to keep the existing volume, create a new volume from the snapshot instead.
  *
- * The revert is a request of its own rather than a state of the volume: the response is the volume, which shows the `revert` operation until the revert is complete.
+ * The revert is a request of its own rather than a state of the volume: the response is the volume, which is `reverting` until the revert is complete.
  * @summary Revert a volume to a snapshot
  */
 export const revertVolumePathVolumeIdMin = 30;
