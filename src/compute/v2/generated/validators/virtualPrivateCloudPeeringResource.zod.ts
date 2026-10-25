@@ -51,9 +51,9 @@ export const VirtualPrivateCloudPeeringResource = zod.strictObject({
       "The accepter project's decision. `pending` until it decides; `accept-virtual-private-cloud-peering` and `reject-virtual-private-cloud-peering` make it `accepted` or `rejected`. A rejected peering is `deleted`.",
     ),
   status: zod
-    .enum(["pending", "active", "deleted", "failed", "provisioning"])
+    .enum(["pending", "active", "deleted", "failed", "provisioning", "deleting"])
     .describe(
-      "`pending` until the connectivity exists: while acceptance is pending, and after it is accepted while the link is built (`provisioning`). Then `active`. `failed` means the link could not be built; `failure_reason` states why. `deleted` once deleted or rejected.",
+      "`pending` until the connectivity exists: while acceptance is pending, and after it is accepted while the link is built (`provisioning`). Then `active`. `failed` means the link could not be built; `failure_reason` states why. `deleted` once deleted or rejected. `deleting` runs until the link and its peer routes are gone.",
     ),
   created_at: zod.iso.datetime({ offset: true }),
   failure_reason: zod
