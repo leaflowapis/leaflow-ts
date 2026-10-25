@@ -17,3 +17,4 @@ export { CustomerRefundProgress } from "./generated/validators/customerRefundPro
 export { SupplierRefundProgress } from "./generated/validators/supplierRefundProgress.zod.js";
 export { DecimalAmount } from "./generated/validators/decimalAmount.zod.js";
 export { Money } from "./generated/validators/money.zod.js";
+export { PriceOption } from "./generated/validators/priceOption.zod.js";

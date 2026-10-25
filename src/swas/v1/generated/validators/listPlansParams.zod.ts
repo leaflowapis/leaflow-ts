@@ -9,8 +9,10 @@ import * as zod from "zod";
 
 export const listPlansParamsRegionIdMax = 128;
 
+export const listPlansParamsIncludePricesDefault = false;
 export const ListPlansParams = zod.strictObject({
   region_id: zod.string().min(1).max(listPlansParamsRegionIdMax),
+  include_prices: zod.boolean().default(listPlansParamsIncludePricesDefault),
 });
 
 export type ListPlansParams = zod.input<typeof ListPlansParams>;

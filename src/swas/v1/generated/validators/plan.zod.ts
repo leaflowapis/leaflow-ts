@@ -7,6 +7,10 @@
  */
 import * as zod from "zod";
 import { Price } from "./price.zod.js";
+import { PriceOption } from "./priceOption.zod.js";
+
+export const planPricesMin = 0;
+export const planPricesMax = 6;
 
 export const planImageIdsMax = 256;
 
@@ -16,7 +20,19 @@ export const Plan = zod.strictObject({
   name: zod.string(),
   catalog_revision: zod.int().min(1),
   buyable: zod.boolean(),
-  price: zod.union([Price, zod.null()]),
+  price: zod
+    .union([Price, zod.null()])
+    .describe(
+      "The existing default price representation. Its availability and the buyable field are unchanged by include_prices; clients using price retain the same default billing period.",
+    ),
+  prices: zod
+    .array(PriceOption)
+    .min(planPricesMin)
+    .max(planPricesMax)
+    .optional()
+    .describe(
+      "Present only when include_prices=true. Contains all currently verified billing-period options, ordered by period_months. Billing price IDs and billing periods are each unique within a plan. An empty array means no verified option is available. It does not make the default price buyable.",
+    ),
   image_ids: zod.array(zod.string()).min(1).max(planImageIdsMax),
   cpu: zod.int().min(1),
   memory_mb: zod.int().min(1),

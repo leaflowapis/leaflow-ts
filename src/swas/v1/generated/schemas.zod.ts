@@ -16,13 +16,21 @@ import { StartInstance } from "./validators/startInstance.zod.js";
 import { StopInstance } from "./validators/stopInstance.zod.js";
 
 /**
- * Lists available plans and prices for the requested region. A plan without a price is not available to buy.
+ * Lists one plan per provider plan ID in the requested region. The default response preserves the single price and buyable fields. With include_prices=true, plans also contain verified price options for explicit billing-period selection. Archived snapshot prices are never offered for purchase.
  * @summary List plans
  */
 export const listPlansQueryRegionIdMax = 128;
 
+export const listPlansQueryIncludePricesDefault = false;
+
 export const ListPlansQueryParams = zod.strictObject({
   region_id: zod.string().min(1).max(listPlansQueryRegionIdMax),
+  include_prices: zod
+    .boolean()
+    .default(listPlansQueryIncludePricesDefault)
+    .describe(
+      "Set to true to include all verified billing-period price options. When false or omitted, the response omits prices and preserves the default price representation.",
+    ),
 });
 
 /**
