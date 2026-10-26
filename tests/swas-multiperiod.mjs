@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getListPlansUrl, listPlans } from '../dist/swas/v1/generated/functions.js';
 import { ListPlansQueryParams } from '../dist/swas/v1/generated/schemas.zod.js';
-import { Plan, PriceOption, Error as ErrorResponse } from '../dist/swas/v1/response-schemas.js';
+import { Plan, PriceOption, InstancePrice, Error as ErrorResponse } from '../dist/swas/v1/response-schemas.js';
 
 const option = { billing_plan_id: '10000000-0000-4000-8000-000000000001', billing_price_id: '20000000-0000-4000-8000-000000000001', currency: 'USD', amount: '10.01', period_months: 1 };
 const plan = {provider_plan_id:'plan-1', region_id:'region-1', name:'Synthetic', catalog_revision:1, buyable:false, price:null, image_ids:['image-1'], cpu:2, memory_mb:1024, disk_gb:40};
@@ -49,4 +49,12 @@ test('Price option may omit historical amount; Billing owns quotes',()=>{
  const parsed=PriceOption.parse(selection);
  assert.equal(Object.hasOwn(parsed,'amount'),false);
  assert.equal(parsed.billing_price_id,option.billing_price_id);
+});
+
+
+test('Price-only instance omits unknown historical amount, not zero',()=>{
+ const price=InstancePrice.parse({currency:'USD',period_months:12});
+ assert.equal(Object.hasOwn(price,'amount'),false);
+ assert.equal(price.period_months,12);
+ assert.equal(InstancePrice.safeParse({currency:'USD',period_months:12,amount:''}).success,false);
 });

@@ -251,7 +251,11 @@ export const InstancePricePeriodMonths = {
 
 export interface InstancePrice {
   currency: "USD";
-  amount: DecimalAmount;
+  /**
+   * Historical display metadata only. Price-only purchases omit this field; use Billing for quotes.
+   * @deprecated
+   */
+  amount?: DecimalAmount;
   period_months: InstancePricePeriodMonths;
 }
 
