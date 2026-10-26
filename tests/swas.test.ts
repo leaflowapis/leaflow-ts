@@ -15,7 +15,6 @@ const purchase = {
   image_id: "synthetic-image",
   quantity: 1 as const,
   region_id: "synthetic-region",
-  expected_quote: { currency: "USD" as const, amount: "10.0000000001" },
 };
 
 test("native SWAS functions preserve all ten methods, custom verbs and credentials without network", async () => {
@@ -89,18 +88,9 @@ test("native request schemas use shared pagination and retain precision and stri
   ]) {
     assert.equal(swas.schemas.ListInstancesQueryParams.safeParse(invalid).success, false);
   }
-  assert.equal(
-    swas.schemas.CreatePurchaseBody.parse(purchase).expected_quote.amount,
-    "10.0000000001",
-  );
-  for (const amount of [1, "-1", "1e3", "1.00000000001"]) {
-    assert.equal(
-      swas.schemas.CreatePurchaseBody.safeParse({
-        ...purchase,
-        expected_quote: { currency: "USD", amount },
-      }).success,
-      false,
-    );
+  assert.deepEqual(swas.schemas.CreatePurchaseBody.parse(purchase), purchase);
+  for (const value of [{ expected_quote: { currency: "USD", amount: "1" } }, { amount: "1" }, { billing_account_id: 7 }]) {
+    assert.equal(swas.schemas.CreatePurchaseBody.safeParse({ ...purchase, ...value }).success, false);
   }
   for (const action of ["Start", "Stop", "Reboot"]) {
     const schemas = swas.schemas as Record<string, { safeParse(v: unknown): { success: boolean } }>;
@@ -131,7 +121,7 @@ test("native SWAS routing metadata is complete and keeps legacy operations prese
 });
 
 test("native response functions preserve the shared error envelope and unknown refund values", async () => {
-  const error = { status: 403, message: "Permission denied", code: "SCOPE_DENIED", meta: {} };
+  const error = { error: { code: 403, status: "PERMISSION_DENIED", message: "Permission denied", reason: "SCOPE_DENIED" } };
   const errorReply = await swas.getInstance(
     id,
     options,

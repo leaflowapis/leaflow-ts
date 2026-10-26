@@ -38,7 +38,7 @@ export const Purchase = zod
     billing_settled: zod.boolean(),
   })
   .describe(
-    "Durable purchase progress. delivered and billing_settled describe different facts. Acceptance is not cloud delivery or checkout completion.",
+    "Durable purchase progress. The checkout_session_id identifies the Billing session for user quote, confirmation and payment. It is not ready while checkout creation is pending. SWAS does not quote or charge automatically. delivered and billing_settled describe different facts; acceptance is not delivery.",
   );
 
 export type Purchase = zod.input<typeof Purchase>;

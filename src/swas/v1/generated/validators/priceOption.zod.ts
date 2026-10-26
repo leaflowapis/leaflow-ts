@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { DecimalAmount } from "./decimalAmount.zod.js";
 
 export const priceOptionBillingPlanIdRegExp = new RegExp(
   "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
@@ -14,13 +13,23 @@ export const priceOptionBillingPlanIdRegExp = new RegExp(
 export const priceOptionBillingPriceIdRegExp = new RegExp(
   "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
 );
+export const priceOptionAmountTwoRegExp = new RegExp("^(0|[1-9][0-9]{0,14})(\\.[0-9]{1,10})?$");
 
 export const PriceOption = zod
   .strictObject({
     billing_plan_id: zod.uuid().regex(priceOptionBillingPlanIdRegExp),
     billing_price_id: zod.uuid().regex(priceOptionBillingPriceIdRegExp),
     currency: zod.literal("USD"),
-    amount: DecimalAmount,
+    amount: zod
+      .string()
+      .describe(
+        "A decimal string, in the currency stated alongside it.\n\n**The currency is not part of this type.** It is carried by a `currency` field next to the\namount, or by the account the amount belongs to. Reading an amount without that field is\nreading a number with no unit.\n\nIt is a string rather than a JSON number because a JSON number is a float in most parsers,\nand a float loses precision on the first arithmetic. Nothing on this platform puts an amount\nthrough a float.",
+      )
+      .and(zod.string().regex(priceOptionAmountTwoRegExp))
+      .optional()
+      .describe(
+        "Historical display metadata only. New responses omit this field; use Billing for quotes.",
+      ),
     period_months: zod.union([
       zod.literal(1),
       zod.literal(3),
@@ -31,7 +40,7 @@ export const PriceOption = zod
     ]),
   })
   .describe(
-    "A verified price option for one billing period. Its Billing price must currently be available, use period-end cancellation without an automatic refund, and match this provider plan and region. Archived snapshots, unknown periods and unverified prices are excluded. Selection does not bypass current permissions, quote checks or disabled purchase controls. IDs and amounts are authoritative only after server revalidation.",
+    "A verified price option for one billing period. Its Billing price must currently be available, use period-end cancellation without an automatic refund, and match this provider plan and region. Archived snapshots, unknown periods and unverified prices are excluded. Selection does not bypass current permissions, Price validation or disabled purchase controls. Billing owns quotes and checkout amounts.",
   );
 
 export type PriceOption = zod.input<typeof PriceOption>;
