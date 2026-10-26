@@ -43,3 +43,10 @@ test('multi-period retains the authoritative nested Error response',()=>{
  assert.equal(ErrorResponse.parse(canonical).error.code,400);
  assert.equal(ErrorResponse.safeParse({status:400,message:'stale flat shape'}).success,false);
 });
+
+test('Price option may omit historical amount; Billing owns quotes',()=>{
+ const {amount,...selection}=option;
+ const parsed=PriceOption.parse(selection);
+ assert.equal(Object.hasOwn(parsed,'amount'),false);
+ assert.equal(parsed.billing_price_id,option.billing_price_id);
+});

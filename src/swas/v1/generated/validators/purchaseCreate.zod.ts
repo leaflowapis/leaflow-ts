@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { ExpectedQuote } from "./expectedQuote.zod.js";
 
 export const purchaseCreateCatalogRevisionMax = 9007199254740991;
 
@@ -26,13 +25,10 @@ export const PurchaseCreate = zod.strictObject({
     .uuid()
     .regex(purchaseCreateBillingPriceIdRegExp)
     .describe(
-      "Selects a price from the requested plan and current catalog revision. The server resolves its immutable Billing terms, billing period and ownership; the client does not set the billing period.",
+      "Selects a price from the requested plan and current catalog revision. The server resolves its immutable Billing terms, billing period and ownership; the client does not set the billing period. SWAS validates the Price selection only. Billing owns quotes, checkout confirmation and payment.",
     ),
   image_id: zod.string().min(1).max(purchaseCreateImageIdMax),
   quantity: zod.literal(1),
-  expected_quote: ExpectedQuote.describe(
-    "An assertion about the displayed quote, not an authoritative amount. The server obtains a new Billing quote and rejects a mismatch before accepting a purchase.",
-  ),
   region_id: zod.string().min(1).max(purchaseCreateRegionIdMax),
 });
 
