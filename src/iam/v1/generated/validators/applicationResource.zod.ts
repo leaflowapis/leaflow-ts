@@ -20,6 +20,11 @@ export const ApplicationResource = zod.strictObject({
   type: zod.enum(["PUBLIC", "CONFIDENTIAL"]),
   client_id: zod.string(),
   redirect_uris: zod.array(zod.string()),
+  scopes: zod
+    .array(zod.string())
+    .describe(
+      "The scopes this application may request. The list is the boundary — a scope not here cannot be obtained, and the platform's own scopes are never offered",
+    ),
   status: zod.enum(["ACTIVE", "DISABLED", "ARCHIVED"]),
   created_by: zod.string().nullable(),
   created_at: zod.iso.datetime({ offset: true }),

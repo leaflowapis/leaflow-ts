@@ -27,6 +27,12 @@ export const CreateApplicationRequestBody = zod.strictObject({
     .array(zod.string().min(1).max(createApplicationRequestBodyRedirectUrisItemMax))
     .min(1)
     .max(createApplicationRequestBodyRedirectUrisMax),
+  scopes: zod
+    .array(zod.string())
+    .optional()
+    .describe(
+      "The scopes the application may request. Omitted means the defaults, `profile` and `email`; a scope not in the platform's list is refused",
+    ),
 });
 
 export type CreateApplicationRequestBody = zod.input<typeof CreateApplicationRequestBody>;

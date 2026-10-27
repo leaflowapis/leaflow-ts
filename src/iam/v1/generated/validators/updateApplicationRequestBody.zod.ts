@@ -27,6 +27,10 @@ export const UpdateApplicationRequestBody = zod.strictObject({
     .min(1)
     .max(updateApplicationRequestBodyRedirectUrisMax)
     .optional(),
+  scopes: zod
+    .array(zod.string())
+    .optional()
+    .describe("The scopes the application may request. Omitted leaves them unchanged"),
 });
 
 export type UpdateApplicationRequestBody = zod.input<typeof UpdateApplicationRequestBody>;

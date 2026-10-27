@@ -631,6 +631,8 @@ export interface ApplicationResource {
   type: ApplicationResourceType;
   client_id: string;
   redirect_uris: string[];
+  /** The scopes this application may request. The list is the boundary — a scope not here cannot be obtained, and the platform's own scopes are never offered */
+  scopes: string[];
   status: ApplicationResourceStatus;
   /** @nullable */
   created_by: string | null;
@@ -663,6 +665,8 @@ export interface CreateApplicationRequestBody {
    * @items.maxLength 2048
    */
   redirect_uris: string[];
+  /** The scopes the application may request. Omitted means the defaults, `profile` and `email`; a scope not in the platform's list is refused */
+  scopes?: string[];
 }
 
 export interface CreateApplicationResponseBody {
@@ -687,6 +691,8 @@ export interface UpdateApplicationRequestBody {
    * @items.maxLength 2048
    */
   redirect_uris?: string[];
+  /** The scopes the application may request. Omitted leaves them unchanged */
+  scopes?: string[];
 }
 
 export interface RotateApplicationSecretResponseBody {
