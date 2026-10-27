@@ -347,11 +347,7 @@ export const createChatCompletion = async (
     body: JSON.stringify(chatCompletionRequest),
   });
 
-  const body = [204, 205, 304].includes(res.status)
-    ? null
-    : res.headers.get("content-type")?.includes("application/json")
-      ? JSON.parse(await res.text())
-      : await res.blob();
+  const body = [204, 205, 304].includes(res.status) ? null : res.headers.get("content-type")?.includes("application/json") ? JSON.parse(await res.text()) : await res.blob();
   const data: createChatCompletionResponse["data"] = body as createChatCompletionResponse["data"];
   return { data, status: res.status, headers: res.headers } as createChatCompletionResponse;
 };
