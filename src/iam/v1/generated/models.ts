@@ -608,6 +608,99 @@ export interface RenameSSHKeyRequestBody {
   name: string;
 }
 
+export type ApplicationResourceType =
+  (typeof ApplicationResourceType)[keyof typeof ApplicationResourceType];
+
+export const ApplicationResourceType = {
+  PUBLIC: "PUBLIC",
+  CONFIDENTIAL: "CONFIDENTIAL",
+} as const;
+
+export type ApplicationResourceStatus =
+  (typeof ApplicationResourceStatus)[keyof typeof ApplicationResourceStatus];
+
+export const ApplicationResourceStatus = {
+  ACTIVE: "ACTIVE",
+  DISABLED: "DISABLED",
+  ARCHIVED: "ARCHIVED",
+} as const;
+
+export interface ApplicationResource {
+  id: string;
+  name: string;
+  type: ApplicationResourceType;
+  client_id: string;
+  redirect_uris: string[];
+  status: ApplicationResourceStatus;
+  /** @nullable */
+  created_by: string | null;
+  created_at: string;
+  /** @nullable */
+  disabled_at: string | null;
+  /** @nullable */
+  secret_rotated_at: string | null;
+}
+
+export type CreateApplicationRequestBodyType =
+  (typeof CreateApplicationRequestBodyType)[keyof typeof CreateApplicationRequestBodyType];
+
+export const CreateApplicationRequestBodyType = {
+  PUBLIC: "PUBLIC",
+  CONFIDENTIAL: "CONFIDENTIAL",
+} as const;
+
+export interface CreateApplicationRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name: string;
+  type: CreateApplicationRequestBodyType;
+  /**
+   * @minItems 1
+   * @maxItems 10
+   * @items.minLength 1
+   * @items.maxLength 2048
+   */
+  redirect_uris: string[];
+}
+
+export interface CreateApplicationResponseBody {
+  application: ApplicationResource;
+  /**
+   * Present only for a confidential application, and only in this response
+   * @nullable
+   */
+  secret: string | null;
+}
+
+export interface UpdateApplicationRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name?: string;
+  /**
+   * @minItems 1
+   * @maxItems 10
+   * @items.minLength 1
+   * @items.maxLength 2048
+   */
+  redirect_uris?: string[];
+}
+
+export interface RotateApplicationSecretResponseBody {
+  secret: string;
+  rotated_at: string;
+}
+
+export interface LengthAwarePageApplicationResource {
+  items: ApplicationResource[];
+  limit: number;
+  offset: number;
+  total: number;
+}
+
 /**
  * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
  */
@@ -703,3 +796,22 @@ export const ListSshKeysStatus = {
   ACTIVE: "ACTIVE",
   REVOKED: "REVOKED",
 } as const;
+
+export type ListApplicationsParams = {
+  /**
+   * Items returned in this page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * Items to skip. Defaults to 0; at most 10000.
+   * @minimum 0
+   * @maximum 10000
+   */
+  offset?: number;
+  /**
+   * Include applications that have been deleted
+   */
+  include_archived?: boolean;
+};

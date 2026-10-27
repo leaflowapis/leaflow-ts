@@ -13,18 +13,23 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
+  ApplicationResource,
   AttachPolicyRequestBody,
   BatchGetMembersRequestBody,
   BatchGetMembersResponseBody,
   CatalogListResponseBody,
+  CreateApplicationRequestBody,
+  CreateApplicationResponseBody,
   CreateRoleRequestBody,
   CreateSSHKeyRequestBody,
   Error,
   IssueInvitationRequestBody,
   IssuedInvitationResponseBody,
+  LengthAwarePageApplicationResource,
   LengthAwarePageInvitationResource,
   LengthAwarePageMemberResource,
   LengthAwarePageSSHKeyResource,
+  ListApplicationsParams,
   ListMembersParams,
   ListPoliciesParams,
   ListProjectInvitationsParams,
@@ -39,11 +44,13 @@ import type {
   RenameSSHKeyRequestBody,
   RoleListResponseBody,
   RoleResource,
+  RotateApplicationSecretResponseBody,
   SSHKeyResource,
   SetMemberPermissionsRequestBody,
   SetMemberRolesRequestBody,
   SetProjectSlugRequestBody,
   TransferOwnershipRequestBody,
+  UpdateApplicationRequestBody,
   UpdatePolicyRequestBody,
   UpdateProjectRequestBody,
   UpdateRoleRequestBody,
@@ -1759,4 +1766,339 @@ export const revokeSshKey = async (
 
   const data: revokeSshKeyResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as revokeSshKeyResponse;
+};
+
+export type listApplicationsResponse200 = {
+  data: LengthAwarePageApplicationResource;
+  status: 200;
+};
+
+export type listApplicationsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listApplicationsResponseSuccess = listApplicationsResponse200 & {
+  headers: Headers;
+};
+export type listApplicationsResponseError = listApplicationsResponseDefault & {
+  headers: Headers;
+};
+
+export type listApplicationsResponse =
+  | listApplicationsResponseSuccess
+  | listApplicationsResponseError;
+
+export const getListApplicationsUrl = (params?: ListApplicationsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://iam.leaflow.cloud/api/v1/applications?${stringifiedParams}`
+    : `https://iam.leaflow.cloud/api/v1/applications`;
+};
+
+/**
+ * Disabled applications are listed. Archived applications are omitted unless
+ * `include_archived` is true. An application that is still being created is not listed.
+ * @summary List the applications of this project
+ */
+export const listApplications = async (
+  params?: ListApplicationsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listApplicationsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListApplicationsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listApplicationsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listApplicationsResponse;
+};
+
+export type createApplicationResponse201 = {
+  data: CreateApplicationResponseBody;
+  status: 201;
+};
+
+export type createApplicationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createApplicationResponseSuccess = createApplicationResponse201 & {
+  headers: Headers;
+};
+export type createApplicationResponseError = createApplicationResponseDefault & {
+  headers: Headers;
+};
+
+export type createApplicationResponse =
+  | createApplicationResponseSuccess
+  | createApplicationResponseError;
+
+export const getCreateApplicationUrl = () => {
+  return `https://iam.leaflow.cloud/api/v1/applications`;
+};
+
+/**
+ * Creates an OIDC client for an application of this project. Applications authenticate
+ * against `https://auth.leaflow.net/realms/user`.
+ *
+ * The `secret` is present only for a confidential application, and only in this response.
+ * It is not stored and cannot be read again; use `:rotateSecret` to obtain a new one.
+ *
+ * Any account of this platform may sign in to the application. Membership of this project
+ * is confirmed only when a token is exchanged for a scoped token.
+ * @summary Create an application
+ */
+export const createApplication = async (
+  createApplicationRequestBody: CreateApplicationRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createApplicationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateApplicationUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createApplicationRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createApplicationResponse;
+};
+
+export type getApplicationResponse200 = {
+  data: ApplicationResource;
+  status: 200;
+};
+
+export type getApplicationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getApplicationResponseSuccess = getApplicationResponse200 & {
+  headers: Headers;
+};
+export type getApplicationResponseError = getApplicationResponseDefault & {
+  headers: Headers;
+};
+
+export type getApplicationResponse = getApplicationResponseSuccess | getApplicationResponseError;
+
+export const getGetApplicationUrl = (applicationId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/applications/${encodeURIComponent(String(applicationId))}`;
+};
+
+/**
+ * An application that has been deleted is still returned, with `status` `ARCHIVED`.
+ * @summary Get an application
+ */
+export const getApplication = async (
+  applicationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getApplicationResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetApplicationUrl(applicationId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getApplicationResponse;
+};
+
+export type updateApplicationResponse200 = {
+  data: ApplicationResource;
+  status: 200;
+};
+
+export type updateApplicationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updateApplicationResponseSuccess = updateApplicationResponse200 & {
+  headers: Headers;
+};
+export type updateApplicationResponseError = updateApplicationResponseDefault & {
+  headers: Headers;
+};
+
+export type updateApplicationResponse =
+  | updateApplicationResponseSuccess
+  | updateApplicationResponseError;
+
+export const getUpdateApplicationUrl = (applicationId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/applications/${encodeURIComponent(String(applicationId))}`;
+};
+
+/**
+ * Only the name and the redirect URIs can change. The type and `client_id` never change.
+ *
+ * An application that is disabled or deleted cannot be updated.
+ * @summary Update an application
+ */
+export const updateApplication = async (
+  applicationId: string,
+  updateApplicationRequestBody: UpdateApplicationRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateApplicationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateApplicationUrl(applicationId), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateApplicationRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as updateApplicationResponse;
+};
+
+export type deleteApplicationResponse200 = {
+  data: ApplicationResource;
+  status: 200;
+};
+
+export type deleteApplicationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type deleteApplicationResponseSuccess = deleteApplicationResponse200 & {
+  headers: Headers;
+};
+export type deleteApplicationResponseError = deleteApplicationResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteApplicationResponse =
+  | deleteApplicationResponseSuccess
+  | deleteApplicationResponseError;
+
+export const getDeleteApplicationUrl = (applicationId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/applications/${encodeURIComponent(String(applicationId))}`;
+};
+
+/**
+ * The application is removed from the identity provider and its row is retained with
+ * `status` `ARCHIVED`. Repeating the call returns the same resource.
+ * @summary Delete an application
+ */
+export const deleteApplication = async (
+  applicationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteApplicationResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteApplicationUrl(applicationId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as deleteApplicationResponse;
+};
+
+export type rotateApplicationSecretResponse200 = {
+  data: RotateApplicationSecretResponseBody;
+  status: 200;
+};
+
+export type rotateApplicationSecretResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type rotateApplicationSecretResponseSuccess = rotateApplicationSecretResponse200 & {
+  headers: Headers;
+};
+export type rotateApplicationSecretResponseError = rotateApplicationSecretResponseDefault & {
+  headers: Headers;
+};
+
+export type rotateApplicationSecretResponse =
+  | rotateApplicationSecretResponseSuccess
+  | rotateApplicationSecretResponseError;
+
+export const getRotateApplicationSecretUrl = (applicationId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/applications/${encodeURIComponent(String(applicationId))}:rotateSecret`;
+};
+
+/**
+ * Returns a new secret and invalidates the previous one immediately. Only an active
+ * confidential application has a secret; any other state answers 412.
+ * @summary Rotate the secret of an application
+ */
+export const rotateApplicationSecret = async (
+  applicationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<rotateApplicationSecretResponse> => {
+  const res = await (fetchFn ?? fetch)(getRotateApplicationSecretUrl(applicationId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: rotateApplicationSecretResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as rotateApplicationSecretResponse;
 };

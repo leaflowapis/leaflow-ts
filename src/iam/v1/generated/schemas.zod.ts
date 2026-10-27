@@ -18,6 +18,8 @@ import { AttachPolicyRequestBody } from "./validators/attachPolicyRequestBody.zo
 
 import { BatchGetMembersRequestBody } from "./validators/batchGetMembersRequestBody.zod.js";
 
+import { CreateApplicationRequestBody } from "./validators/createApplicationRequestBody.zod.js";
+
 import { CreateRoleRequestBody } from "./validators/createRoleRequestBody.zod.js";
 
 import { CreateSSHKeyRequestBody } from "./validators/createSSHKeyRequestBody.zod.js";
@@ -33,6 +35,8 @@ import { SetMemberRolesRequestBody } from "./validators/setMemberRolesRequestBod
 import { SetProjectSlugRequestBody } from "./validators/setProjectSlugRequestBody.zod.js";
 
 import { TransferOwnershipRequestBody } from "./validators/transferOwnershipRequestBody.zod.js";
+
+import { UpdateApplicationRequestBody } from "./validators/updateApplicationRequestBody.zod.js";
 
 import { UpdatePolicyRequestBody } from "./validators/updatePolicyRequestBody.zod.js";
 
@@ -332,4 +336,88 @@ export const RenameSshKeyBody = RenameSSHKeyRequestBody;
  */
 export const RevokeSshKeyParams = zod.strictObject({
   keyId: zod.uuid(),
+});
+
+/**
+ * Disabled applications are listed. Archived applications are omitted unless
+ * `include_archived` is true. An application that is still being created is not listed.
+ * @summary List the applications of this project
+ */
+export const listApplicationsQueryLimitDefault = 50;
+export const listApplicationsQueryLimitMax = 200;
+
+export const listApplicationsQueryOffsetDefault = 0;
+export const listApplicationsQueryOffsetMin = 0;
+export const listApplicationsQueryOffsetMax = 10000;
+
+export const listApplicationsQueryIncludeArchivedDefault = false;
+
+export const ListApplicationsQueryParams = zod.strictObject({
+  limit: zod
+    .int()
+    .min(1)
+    .max(listApplicationsQueryLimitMax)
+    .default(listApplicationsQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
+  offset: zod
+    .int()
+    .min(listApplicationsQueryOffsetMin)
+    .max(listApplicationsQueryOffsetMax)
+    .default(listApplicationsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
+  include_archived: zod
+    .boolean()
+    .default(listApplicationsQueryIncludeArchivedDefault)
+    .describe("Include applications that have been deleted"),
+});
+
+/**
+ * Creates an OIDC client for an application of this project. Applications authenticate
+ * against `https://auth.leaflow.net/realms/user`.
+ *
+ * The `secret` is present only for a confidential application, and only in this response.
+ * It is not stored and cannot be read again; use `:rotateSecret` to obtain a new one.
+ *
+ * Any account of this platform may sign in to the application. Membership of this project
+ * is confirmed only when a token is exchanged for a scoped token.
+ * @summary Create an application
+ */
+export const CreateApplicationBody = CreateApplicationRequestBody;
+
+/**
+ * An application that has been deleted is still returned, with `status` `ARCHIVED`.
+ * @summary Get an application
+ */
+export const GetApplicationParams = zod.strictObject({
+  applicationId: zod.uuid(),
+});
+
+/**
+ * Only the name and the redirect URIs can change. The type and `client_id` never change.
+ *
+ * An application that is disabled or deleted cannot be updated.
+ * @summary Update an application
+ */
+export const UpdateApplicationParams = zod.strictObject({
+  applicationId: zod.uuid(),
+});
+
+export const UpdateApplicationBody = UpdateApplicationRequestBody;
+
+/**
+ * The application is removed from the identity provider and its row is retained with
+ * `status` `ARCHIVED`. Repeating the call returns the same resource.
+ * @summary Delete an application
+ */
+export const DeleteApplicationParams = zod.strictObject({
+  applicationId: zod.uuid(),
+});
+
+/**
+ * Returns a new secret and invalidates the previous one immediately. Only an active
+ * confidential application has a secret; any other state answers 412.
+ * @summary Rotate the secret of an application
+ */
+export const RotateApplicationSecretParams = zod.strictObject({
+  applicationId: zod.uuid(),
 });
