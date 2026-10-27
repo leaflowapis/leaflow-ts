@@ -39,12 +39,34 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { AudioCapabilities } from "./audioCapabilities.zod.js";
+import { ImageCapabilities } from "./imageCapabilities.zod.js";
+import { ModelParameter } from "./modelParameter.zod.js";
 import { ReasoningCapabilities } from "./reasoningCapabilities.zod.js";
+import { VideoCapabilities } from "./videoCapabilities.zod.js";
 
 export const EndpointCapabilities = zod.strictObject({
   function_calling: zod.boolean().nullable(),
   structured_output: zod.boolean().nullable(),
   reasoning: zod.union([ReasoningCapabilities, zod.null()]),
+  image: zod
+    .union([ImageCapabilities, zod.null()])
+    .optional()
+    .describe("Present on image generation and edit endpoints. Null or absent elsewhere."),
+  audio: zod
+    .union([AudioCapabilities, zod.null()])
+    .optional()
+    .describe("Present on speech and transcription endpoints. Null or absent elsewhere."),
+  video: zod
+    .union([VideoCapabilities, zod.null()])
+    .optional()
+    .describe("Present on the videos endpoint. Null or absent elsewhere."),
+  parameters: zod
+    .array(ModelParameter)
+    .nullish()
+    .describe(
+      "Non-standard request fields this endpoint accepts, sent at the top level of the request body. Null or absent means none are declared.",
+    ),
 });
 
 export type EndpointCapabilities = zod.input<typeof EndpointCapabilities>;

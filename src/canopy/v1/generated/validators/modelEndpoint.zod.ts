@@ -52,6 +52,19 @@ export const ModelEndpoint = zod.enum([
   "/v1/audio/translations",
   "/v1/audio/speech",
   "/v1/realtime",
+  "/v1/completions",
+  "/v1/rerank",
+  "/v1/moderations",
+  "/v1/images/variations",
+  "/v1/files",
+  "/v1/uploads",
+  "/v1/batches",
+  "/v1/fine_tuning/jobs",
+  "/v1/assistants",
+  "/v1/threads",
+  "/v1/vector_stores",
+  "/v1/containers",
+  "/v1/videos",
 ]);
 
 export type ModelEndpoint = zod.input<typeof ModelEndpoint>;

@@ -41,12 +41,35 @@
 import * as zod from "zod";
 
 export const ModelMeter = zod.strictObject({
-  token_kind: zod.enum(["input", "output", "cache_read", "cache_write", "reasoning"]),
+  kind: zod
+    .enum([
+      "input",
+      "output",
+      "cache_read",
+      "cache_write",
+      "reasoning",
+      "images",
+      "audio_characters",
+      "audio_seconds",
+      "video_seconds",
+      "rerank_units",
+    ])
+    .describe(
+      "The billable quantity this entry prices. Token kinds are `input`, `output`, `cache_read`, `cache_write` and `reasoning`; media kinds are `images`, `audio_characters`, `audio_seconds` and `video_seconds`.",
+    ),
   meter_lookup_key: zod.string(),
+  unit: zod
+    .string()
+    .describe("The unit the meter counts in, such as token, image, character or second."),
+  dimension_keys: zod
+    .array(zod.string())
+    .describe(
+      "The dimension keys every rate of this kind is matched on, in the order the meter declares them.",
+    ),
   dimensions: zod
     .record(zod.string(), zod.string())
     .describe(
-      "The dimension values the usage of this token kind carries, and the rate is matched at.",
+      "One set of dimension values of this kind, useful as a query template. A media kind may have other values on the same keys, such as another size or resolution.",
     ),
 });
 

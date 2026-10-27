@@ -126,12 +126,153 @@ export interface ReasoningCapabilities {
   summary: string[] | null;
 }
 
+/**
+ * The image parameters this endpoint accepts. The client chooses among them; a value outside the list is rejected before the upstream is called.
+ */
+export interface ImageCapabilities {
+  /**
+   * Size values the upstream accepts, such as 1024x1024 or auto. Null means unknown.
+   * @nullable
+   */
+  sizes: string[] | null;
+  /**
+   * Quality values the upstream accepts. Null means unknown.
+   * @nullable
+   */
+  qualities: string[] | null;
+  /**
+   * Response formats the upstream accepts. Null means unknown.
+   * @nullable
+   */
+  response_formats: string[] | null;
+  /**
+   * The largest number of images one request may ask for. Null means unknown.
+   * @minimum 0
+   * @maximum 128
+   * @nullable
+   */
+  max_n: number | null;
+  /**
+   * Whether the endpoint can stream partial images. Null means unknown.
+   * @nullable
+   */
+  supports_stream: boolean | null;
+}
+
+/**
+ * The audio parameters this endpoint accepts.
+ */
+export interface AudioCapabilities {
+  /**
+   * Voices the speech endpoint accepts. Empty for transcription endpoints. Null means unknown.
+   * @nullable
+   */
+  voices: string[] | null;
+  /**
+   * Audio container or codec values the endpoint accepts. Null means unknown.
+   * @nullable
+   */
+  formats: string[] | null;
+  /**
+   * Response formats the transcription endpoint accepts, such as json or srt. Null means unknown.
+   * @nullable
+   */
+  response_formats: string[] | null;
+  /**
+   * The largest upload the endpoint accepts, in bytes. Null means unknown.
+   * @minimum 0
+   * @nullable
+   */
+  max_input_bytes: number | null;
+  /**
+   * Whether the endpoint can stream its response. Null means unknown.
+   * @nullable
+   */
+  supports_stream: boolean | null;
+}
+
+/**
+ * The video parameters this endpoint accepts. Video is asynchronous on every endpoint that supports it. Create returns a task, and the task is polled separately.
+ */
+export interface VideoCapabilities {
+  /**
+   * Durations the upstream accepts, in seconds. Null means unknown.
+   * @nullable
+   * @items.minimum 1
+   */
+  seconds: number[] | null;
+  /**
+   * Output sizes the upstream accepts, such as 1280x720. Null means unknown.
+   * @nullable
+   */
+  sizes: string[] | null;
+  /**
+   * Resolution tiers the upstream accepts, such as 720p or 1080p. Null means unknown.
+   * @nullable
+   */
+  resolutions: string[] | null;
+  /**
+   * Whether a request may carry a reference image. Null means unknown.
+   * @nullable
+   */
+  supports_input_reference: boolean | null;
+  /**
+   * Whether a generated video can be remixed into another task. Null means unknown.
+   * @nullable
+   */
+  supports_remix: boolean | null;
+  /**
+   * Whether the upstream accepts reusable characters. Null means unknown.
+   * @nullable
+   */
+  supports_characters: boolean | null;
+}
+
+export type ModelParameterType = (typeof ModelParameterType)[keyof typeof ModelParameterType];
+
+export const ModelParameterType = {
+  string: "string",
+  integer: "integer",
+  number: "number",
+  boolean: "boolean",
+  object: "object",
+  array: "array",
+} as const;
+
+/**
+ * A non-standard request field this endpoint accepts. OpenAI SDK callers pass it through `extra_body`, which places it at the top level of the body.
+ */
+export interface ModelParameter {
+  name: string;
+  description: string;
+  type: ModelParameterType;
+  required: boolean;
+  /** The value the upstream assumes when the field is absent; null when there is none. The service never writes it into the request. */
+  default?: unknown;
+  /**
+   * The accepted values of an enumerated string parameter. Null when the parameter is not enumerated.
+   * @nullable
+   */
+  values?: string[] | null;
+}
+
 export interface EndpointCapabilities {
   /** @nullable */
   function_calling: boolean | null;
   /** @nullable */
   structured_output: boolean | null;
   reasoning: ReasoningCapabilities | null;
+  /** Present on image generation and edit endpoints. Null or absent elsewhere. */
+  image?: ImageCapabilities | null;
+  /** Present on speech and transcription endpoints. Null or absent elsewhere. */
+  audio?: AudioCapabilities | null;
+  /** Present on the videos endpoint. Null or absent elsewhere. */
+  video?: VideoCapabilities | null;
+  /**
+   * Non-standard request fields this endpoint accepts, sent at the top level of the request body. Null or absent means none are declared.
+   * @nullable
+   */
+  parameters?: ModelParameter[] | null;
 }
 
 /**
@@ -155,6 +296,19 @@ export const ModelEndpoint = {
   "/v1/audio/translations": "/v1/audio/translations",
   "/v1/audio/speech": "/v1/audio/speech",
   "/v1/realtime": "/v1/realtime",
+  "/v1/completions": "/v1/completions",
+  "/v1/rerank": "/v1/rerank",
+  "/v1/moderations": "/v1/moderations",
+  "/v1/images/variations": "/v1/images/variations",
+  "/v1/files": "/v1/files",
+  "/v1/uploads": "/v1/uploads",
+  "/v1/batches": "/v1/batches",
+  "/v1/fine_tuning/jobs": "/v1/fine_tuning/jobs",
+  "/v1/assistants": "/v1/assistants",
+  "/v1/threads": "/v1/threads",
+  "/v1/vector_stores": "/v1/vector_stores",
+  "/v1/containers": "/v1/containers",
+  "/v1/videos": "/v1/videos",
 } as const;
 
 export interface Model {
@@ -399,34 +553,47 @@ export const ModelResourceStatus = {
   retired: "retired",
 } as const;
 
-export type ModelMeterTokenKind = (typeof ModelMeterTokenKind)[keyof typeof ModelMeterTokenKind];
+/**
+ * The billable quantity this entry prices. Token kinds are `input`, `output`, `cache_read`, `cache_write` and `reasoning`; media kinds are `images`, `audio_characters`, `audio_seconds` and `video_seconds`.
+ */
+export type ModelMeterKind = (typeof ModelMeterKind)[keyof typeof ModelMeterKind];
 
-export const ModelMeterTokenKind = {
+export const ModelMeterKind = {
   input: "input",
   output: "output",
   cache_read: "cache_read",
   cache_write: "cache_write",
   reasoning: "reasoning",
+  images: "images",
+  audio_characters: "audio_characters",
+  audio_seconds: "audio_seconds",
+  video_seconds: "video_seconds",
+  rerank_units: "rerank_units",
 } as const;
 
 /**
- * The dimension values the usage of this token kind carries, and the rate is matched at.
+ * One set of dimension values of this kind, useful as a query template. A media kind may have other values on the same keys, such as another size or resolution.
  */
 export type ModelMeterDimensions = { [key: string]: string };
 
 export interface ModelMeter {
-  token_kind: ModelMeterTokenKind;
+  /** The billable quantity this entry prices. Token kinds are `input`, `output`, `cache_read`, `cache_write` and `reasoning`; media kinds are `images`, `audio_characters`, `audio_seconds` and `video_seconds`. */
+  kind: ModelMeterKind;
   meter_lookup_key: string;
-  /** The dimension values the usage of this token kind carries, and the rate is matched at. */
+  /** The unit the meter counts in, such as token, image, character or second. */
+  unit: string;
+  /** The dimension keys every rate of this kind is matched on, in the order the meter declares them. */
+  dimension_keys: string[];
+  /** One set of dimension values of this kind, useful as a query template. A media kind may have other values on the same keys, such as another size or resolution. */
   dimensions: ModelMeterDimensions;
 }
 
 /**
- * How requests to a model are billed: under the service's subscription, on the Billing plan `plan_id`, one rate for each token kind. Read the rates from Billing with `search-prices` for the plan, narrowing each price's `rates` with each meter's `dimensions`.
+ * How requests to a model are billed: under the service's subscription, on the Billing plan `plan_id`, one rate for each billable kind. Read the rates from Billing with `search-prices` for the plan, narrowing each price's `rates` with each meter's `dimensions`.
  *
- * Each token kind is priced on its own. `input` excludes cached input, which is `cache_read`, and `output` excludes reasoning the provider reports separately, which is `reasoning`; a request is billed for each kind it used.
+ * Text is billed on the five token kinds. `input` excludes cached input, which is `cache_read`; `output` excludes reasoning the provider reports separately, which is `reasoning`. Media is billed on its own unit and never converted to tokens: `images` counts generated images, `audio_characters` counts the input characters of speech synthesis, `audio_seconds` counts the duration of a transcription, and `video_seconds` counts the duration of a generated video. A request is billed for each kind it used.
  *
- * Rates are set per currency, and a currency may not offer a model at all. A model is offered in the currency of the project's billing account when at least one of its token kinds has a rate there; a token kind without a rate in that currency is not charged. Requests to a model with no rate in that currency are refused with 403 `BILLING_MODEL_NOT_OFFERED`.
+ * Rates are set per currency, and a currency may not offer a model at all. A model is offered in the currency of the project's billing account when at least one of its billable kinds has a rate there; a kind without a rate in that currency is not charged. Requests to a model with no rate in that currency are refused with 403 `BILLING_MODEL_NOT_OFFERED`.
  */
 export interface ModelBilling {
   /**
@@ -434,7 +601,7 @@ export interface ModelBilling {
    * @nullable
    */
   plan_id: string | null;
-  /** One entry for each of the five token kinds, in the order input, output, cache_read, cache_write, reasoning. */
+  /** One entry for each billable kind the model uses. A text model lists the five token kinds in the order input, output, cache_read, cache_write, reasoning; media kinds follow in the order images, audio_characters, audio_seconds, video_seconds. */
   meters: ModelMeter[];
 }
 
@@ -466,6 +633,35 @@ export interface ModelResource {
   capabilities: ModelCapabilities;
   /** Explicitly supported API endpoints. Requests to any other endpoint are rejected before upstream admission. */
   supported_endpoints: ModelEndpoint[];
+}
+
+/**
+ * Media quantities and the rate dimensions they were billed at. Absent on a token-only request.
+ */
+export interface MediaUsage {
+  /** Number of generated images. */
+  images: number;
+  /** Input characters of speech synthesis. */
+  audio_characters: number;
+  /** Duration of transcribed audio. */
+  audio_seconds: number;
+  /** Duration of a generated video. */
+  video_seconds: number;
+  /**
+   * Image or video size the request asked for, if it carried one.
+   * @nullable
+   */
+  size: string | null;
+  /**
+   * Image quality the request asked for, if it carried one.
+   * @nullable
+   */
+  quality: string | null;
+  /**
+   * Video resolution tier the request asked for, if it carried one.
+   * @nullable
+   */
+  resolution: string | null;
 }
 
 export interface ModelListResponseBody {
@@ -510,6 +706,7 @@ export interface RequestResource {
   finished_at: string | null;
   /** @nullable */
   first_token_at: string | null;
+  /** A typed request id such as `req_01j...`. Legacy rows may still be returned as a bare UUID. */
   id: string;
   input_tokens: number;
   /** The model named in the request */
@@ -533,6 +730,8 @@ export interface RequestResource {
   /** upstream means the figures were reported by the provider; estimated means they were derived from the character classes of the payload */
   usage_source: RequestResourceUsageSource;
   reasoning: ReasoningDiagnostics | null;
+  /** Media quantities and their rate dimensions. Null for a token-only request. */
+  media?: MediaUsage | null;
 }
 
 export interface CursorPageRequestResource {
@@ -549,6 +748,8 @@ export interface APIKeyUsageResource {
   input_tokens: number;
   output_tokens: number;
   reasoning_tokens: number;
+  /** Media quantities and their rate dimensions. Null when this range has no media usage. */
+  media?: MediaUsage | null;
   requests: number;
 }
 
@@ -563,6 +764,8 @@ export interface ModelUsageResource {
   model_id: string;
   output_tokens: number;
   reasoning_tokens: number;
+  /** Media quantities and their rate dimensions. Null when this range has no media usage. */
+  media?: MediaUsage | null;
   requests: number;
 }
 
@@ -576,6 +779,8 @@ export interface TotalsResource {
   input_tokens: number;
   output_tokens: number;
   reasoning_tokens: number;
+  /** Media quantities and their rate dimensions. Null when this range has no media usage. */
+  media?: MediaUsage | null;
   requests: number;
 }
 
@@ -587,6 +792,8 @@ export interface UsageBucketResource {
   input_tokens: number;
   output_tokens: number;
   reasoning_tokens: number;
+  /** Media quantities and their rate dimensions. Null when this range has no media usage. */
+  media?: MediaUsage | null;
   requests: number;
   /** End of the bucket, exclusive */
   to: string;

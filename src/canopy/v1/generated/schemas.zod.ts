@@ -283,7 +283,9 @@ export const ListRequestsQueryParams = zod.strictObject({
  * @summary Get a single request record
  */
 export const GetRequestParams = zod.strictObject({
-  requestId: zod.uuid(),
+  requestId: zod
+    .string()
+    .describe("A typed request id such as `req_01j...`; a bare UUID is also accepted."),
 });
 
 /**

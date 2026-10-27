@@ -39,6 +39,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { MediaUsage } from "./mediaUsage.zod.js";
 import { ReasoningDiagnostics } from "./reasoningDiagnostics.zod.js";
 
 export const requestResourceSourceMax = 64;
@@ -57,7 +58,11 @@ export const RequestResource = zod.strictObject({
   error_code: zod.string().describe("The error code on failure. Empty on success"),
   finished_at: zod.iso.datetime({ offset: true }).nullable(),
   first_token_at: zod.iso.datetime({ offset: true }).nullable(),
-  id: zod.uuid(),
+  id: zod
+    .string()
+    .describe(
+      "A typed request id such as `req_01j...`. Legacy rows may still be returned as a bare UUID.",
+    ),
   input_tokens: zod.int(),
   model_id: zod.string().describe("The model named in the request"),
   output_tokens: zod.int(),
@@ -85,6 +90,10 @@ export const RequestResource = zod.strictObject({
       "upstream means the figures were reported by the provider; estimated means they were derived from the character classes of the payload",
     ),
   reasoning: zod.union([ReasoningDiagnostics, zod.null()]),
+  media: zod
+    .union([MediaUsage, zod.null()])
+    .optional()
+    .describe("Media quantities and their rate dimensions. Null for a token-only request."),
 });
 
 export type RequestResource = zod.input<typeof RequestResource>;

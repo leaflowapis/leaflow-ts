@@ -39,6 +39,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { MediaUsage } from "./mediaUsage.zod.js";
 
 export const APIKeyUsageResource = zod.strictObject({
   api_key_id: zod.uuid(),
@@ -47,6 +48,12 @@ export const APIKeyUsageResource = zod.strictObject({
   input_tokens: zod.int(),
   output_tokens: zod.int(),
   reasoning_tokens: zod.int(),
+  media: zod
+    .union([MediaUsage, zod.null()])
+    .optional()
+    .describe(
+      "Media quantities and their rate dimensions. Null when this range has no media usage.",
+    ),
   requests: zod.int(),
 });
 

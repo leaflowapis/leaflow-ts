@@ -50,11 +50,11 @@ export const ModelBilling = zod
     meters: zod
       .array(ModelMeter)
       .describe(
-        "One entry for each of the five token kinds, in the order input, output, cache_read, cache_write, reasoning.",
+        "One entry for each billable kind the model uses. A text model lists the five token kinds in the order input, output, cache_read, cache_write, reasoning; media kinds follow in the order images, audio_characters, audio_seconds, video_seconds.",
       ),
   })
   .describe(
-    "How requests to a model are billed: under the service's subscription, on the Billing plan `plan_id`, one rate for each token kind. Read the rates from Billing with `search-prices` for the plan, narrowing each price's `rates` with each meter's `dimensions`.\n\nEach token kind is priced on its own. `input` excludes cached input, which is `cache_read`, and `output` excludes reasoning the provider reports separately, which is `reasoning`; a request is billed for each kind it used.\n\nRates are set per currency, and a currency may not offer a model at all. A model is offered in the currency of the project's billing account when at least one of its token kinds has a rate there; a token kind without a rate in that currency is not charged. Requests to a model with no rate in that currency are refused with 403 `BILLING_MODEL_NOT_OFFERED`.",
+    "How requests to a model are billed: under the service's subscription, on the Billing plan `plan_id`, one rate for each billable kind. Read the rates from Billing with `search-prices` for the plan, narrowing each price's `rates` with each meter's `dimensions`.\n\nText is billed on the five token kinds. `input` excludes cached input, which is `cache_read`; `output` excludes reasoning the provider reports separately, which is `reasoning`. Media is billed on its own unit and never converted to tokens: `images` counts generated images, `audio_characters` counts the input characters of speech synthesis, `audio_seconds` counts the duration of a transcription, and `video_seconds` counts the duration of a generated video. A request is billed for each kind it used.\n\nRates are set per currency, and a currency may not offer a model at all. A model is offered in the currency of the project's billing account when at least one of its billable kinds has a rate there; a kind without a rate in that currency is not charged. Requests to a model with no rate in that currency are refused with 403 `BILLING_MODEL_NOT_OFFERED`.",
   );
 
 export type ModelBilling = zod.input<typeof ModelBilling>;

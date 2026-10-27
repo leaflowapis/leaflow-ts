@@ -4,6 +4,7 @@ export * as billing from "./billing/v1/index.js";
 export * as canopy from "./canopy/v1/index.js";
 export * as compute from "./compute/v2/index.js";
 export * as dns from "./dns/v1/index.js";
+export * as eventbus from "./eventbus/v1/index.js";
 export * as iam from "./iam/v1/index.js";
 export * as membership from "./membership/v1/index.js";
 export * as monitoring from "./monitoring/v1/index.js";
