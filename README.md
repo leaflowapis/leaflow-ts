@@ -22,6 +22,21 @@ npm run build
 so JSON and SSE retain their respective response formats. No compatibility forwarding layer is used. For local generation, CONTRACTS_DIR
 may point to an existing clean checkout of the exact CONTRACTS_REF commit. CI checks out that commit.
 
+## Protocol messages
+
+The contract's protobuf messages, currently the Fleet protocol spoken by VirtualDesktop viewers, are
+generated with protoc-gen-es under `src/proto`, keeping their proto paths. Import a file by that
+path and encode or decode with `@bufbuild/protobuf`; no gRPC or Connect transport is involved:
+
+```ts
+import { create, toBinary } from "@bufbuild/protobuf";
+import { ClientMessageSchema } from "@leaflow/sdk/proto/leaflow/fleet/control/v1/control_pb";
+
+const bytes = toBinary(ClientMessageSchema, create(ClientMessageSchema, {}));
+```
+
+`npm run generate` runs Orval and then `buf generate` on the same contract checkout.
+
 ## Canopy migration
 
 Project inference and management are exported from `canopy` and `@leaflow/sdk/canopy/v1`.

@@ -1,3 +1,6 @@
 dist/
 leaflowapis/
 node_modules/
+
+# protoc-gen-es output: generated, kept exactly as the generator writes it so that CI can compare it byte for byte.
+src/proto/
