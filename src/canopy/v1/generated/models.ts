@@ -697,9 +697,16 @@ export interface RequestResource {
    * @nullable
    */
   api_key_id: string | null;
-  /** The portion served from the upstream prefix cache, which costs an order of magnitude less than ordinary input */
-  cache_read_tokens: number;
-  cache_write_tokens: number;
+  /**
+   * The portion served from the upstream prefix cache, which costs an order of magnitude less than ordinary input. Null on a request billed on a non-token meter.
+   * @nullable
+   */
+  cache_read_tokens: number | null;
+  /**
+   * Tokens written to the provider's prompt cache. Null on a request billed on a non-token meter.
+   * @nullable
+   */
+  cache_write_tokens: number | null;
   /** The error code on failure. Empty on success */
   error_code: string;
   /** @nullable */
@@ -708,13 +715,25 @@ export interface RequestResource {
   first_token_at: string | null;
   /** A typed request id such as `req_01j...`. Legacy rows may still be returned as a bare UUID. */
   id: string;
-  input_tokens: number;
+  /**
+   * Input tokens the provider billed for. Null on a request billed on a non-token meter, such as image generation, video generation or speech.
+   * @nullable
+   */
+  input_tokens: number | null;
   /** The model named in the request */
   model_id: string;
   /** The request operation, such as video_create or video_retrieve. Absent for historical requests where it was not recorded. */
   operation?: string;
-  output_tokens: number;
-  reasoning_tokens: number;
+  /**
+   * Output tokens the provider billed for. Null on a request billed on a non-token meter, such as image generation, video generation or speech.
+   * @nullable
+   */
+  output_tokens: number | null;
+  /**
+   * Reasoning tokens the provider reports separately. Null on a request billed on a non-token meter.
+   * @nullable
+   */
+  reasoning_tokens: number | null;
   retries: number;
   /**
    * Who made the request. `api_key` means one of the project's API keys and `project_token` a project access token on the OpenAI-compatible endpoints; any other value names the Leaflow service that made it on the project's behalf, such as `assistant`, and more services may appear. Null for requests recorded before sources were tracked

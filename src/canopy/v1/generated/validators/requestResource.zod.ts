@@ -51,10 +51,16 @@ export const RequestResource = zod.strictObject({
     .describe("Null for a request that did not come through one of the project's API keys."),
   cache_read_tokens: zod
     .int()
+    .nullable()
     .describe(
-      "The portion served from the upstream prefix cache, which costs an order of magnitude less than ordinary input",
+      "The portion served from the upstream prefix cache, which costs an order of magnitude less than ordinary input. Null on a request billed on a non-token meter.",
     ),
-  cache_write_tokens: zod.int(),
+  cache_write_tokens: zod
+    .int()
+    .nullable()
+    .describe(
+      "Tokens written to the provider's prompt cache. Null on a request billed on a non-token meter.",
+    ),
   error_code: zod.string().describe("The error code on failure. Empty on success"),
   finished_at: zod.iso.datetime({ offset: true }).nullable(),
   first_token_at: zod.iso.datetime({ offset: true }).nullable(),
@@ -63,7 +69,12 @@ export const RequestResource = zod.strictObject({
     .describe(
       "A typed request id such as `req_01j...`. Legacy rows may still be returned as a bare UUID.",
     ),
-  input_tokens: zod.int(),
+  input_tokens: zod
+    .int()
+    .nullable()
+    .describe(
+      "Input tokens the provider billed for. Null on a request billed on a non-token meter, such as image generation, video generation or speech.",
+    ),
   model_id: zod.string().describe("The model named in the request"),
   operation: zod
     .string()
@@ -71,8 +82,18 @@ export const RequestResource = zod.strictObject({
     .describe(
       "The request operation, such as video_create or video_retrieve. Absent for historical requests where it was not recorded.",
     ),
-  output_tokens: zod.int(),
-  reasoning_tokens: zod.int(),
+  output_tokens: zod
+    .int()
+    .nullable()
+    .describe(
+      "Output tokens the provider billed for. Null on a request billed on a non-token meter, such as image generation, video generation or speech.",
+    ),
+  reasoning_tokens: zod
+    .int()
+    .nullable()
+    .describe(
+      "Reasoning tokens the provider reports separately. Null on a request billed on a non-token meter.",
+    ),
   retries: zod.int(),
   source: zod
     .string()
