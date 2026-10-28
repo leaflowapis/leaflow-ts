@@ -49,9 +49,9 @@ export type Call = Message<"leaflow.fleet.rpc.v1.Call"> & {
   payload: Uint8Array;
 
   /**
-   * How long the callee may work on the call, counted from receipt. When it
-   * passes the result is DEADLINE_EXCEEDED. Unset: the default the method
-   * documents.
+   * How long the callee may work on the call, counted from the receipt of
+   * its first piece. When it passes the result is DEADLINE_EXCEEDED. Unset:
+   * the default the method documents.
    *
    * @generated from field: google.protobuf.Duration timeout = 4;
    */
