@@ -42,11 +42,11 @@ import * as zod from "zod";
 import { MediaUsage } from "./mediaUsage.zod.js";
 
 export const TotalsResource = zod.strictObject({
-  cache_read_tokens: zod.int(),
-  cache_write_tokens: zod.int(),
-  input_tokens: zod.int(),
-  output_tokens: zod.int(),
-  reasoning_tokens: zod.int(),
+  cache_read_tokens: zod.int().nullable().describe("Null when this range has no token usage."),
+  cache_write_tokens: zod.int().nullable().describe("Null when this range has no token usage."),
+  input_tokens: zod.int().nullable().describe("Null when this range has no token usage."),
+  output_tokens: zod.int().nullable().describe("Null when this range has no token usage."),
+  reasoning_tokens: zod.int().nullable().describe("Null when this range has no token usage."),
   media: zod
     .union([MediaUsage, zod.null()])
     .optional()

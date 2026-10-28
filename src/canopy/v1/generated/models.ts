@@ -764,11 +764,31 @@ export interface CursorPageRequestResource {
 
 export interface APIKeyUsageResource {
   api_key_id: string;
-  cache_read_tokens: number;
-  cache_write_tokens: number;
-  input_tokens: number;
-  output_tokens: number;
-  reasoning_tokens: number;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  cache_read_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  cache_write_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  input_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  output_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  reasoning_tokens: number | null;
   /** Media quantities and their rate dimensions. Null when this range has no media usage. */
   media?: MediaUsage | null;
   requests: number;
@@ -779,12 +799,32 @@ export interface APIKeyUsageListResponseBody {
 }
 
 export interface ModelUsageResource {
-  cache_read_tokens: number;
-  cache_write_tokens: number;
-  input_tokens: number;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  cache_read_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  cache_write_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  input_tokens: number | null;
   model_id: string;
-  output_tokens: number;
-  reasoning_tokens: number;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  output_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  reasoning_tokens: number | null;
   /** Media quantities and their rate dimensions. Null when this range has no media usage. */
   media?: MediaUsage | null;
   requests: number;
@@ -795,24 +835,64 @@ export interface ModelUsageListResponseBody {
 }
 
 export interface TotalsResource {
-  cache_read_tokens: number;
-  cache_write_tokens: number;
-  input_tokens: number;
-  output_tokens: number;
-  reasoning_tokens: number;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  cache_read_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  cache_write_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  input_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  output_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  reasoning_tokens: number | null;
   /** Media quantities and their rate dimensions. Null when this range has no media usage. */
   media?: MediaUsage | null;
   requests: number;
 }
 
 export interface UsageBucketResource {
-  cache_read_tokens: number;
-  cache_write_tokens: number;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  cache_read_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  cache_write_tokens: number | null;
   /** Start of the bucket, inclusive */
   from: string;
-  input_tokens: number;
-  output_tokens: number;
-  reasoning_tokens: number;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  input_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  output_tokens: number | null;
+  /**
+   * Null when this range has no token usage.
+   * @nullable
+   */
+  reasoning_tokens: number | null;
   /** Media quantities and their rate dimensions. Null when this range has no media usage. */
   media?: MediaUsage | null;
   requests: number;
