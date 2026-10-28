@@ -39,7 +39,7 @@ export const SearchTasksRequestBody = zod.strictObject({
     .optional()
     .describe("Only the tasks that report to this conversation."),
   status: zod.enum(["active", "paused", "completed", "cancelled"]).optional(),
-  triggerType: zod.enum(["now", "at", "interval", "cron"]).optional(),
+  triggerType: zod.enum(["now", "at", "interval", "cron", "event"]).optional(),
   actionType: zod.enum(["prompt", "command"]).optional(),
   cursor: zod.string().max(searchTasksRequestBodyCursorMax).optional(),
   limit: zod

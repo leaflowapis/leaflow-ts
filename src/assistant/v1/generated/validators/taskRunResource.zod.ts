@@ -24,6 +24,7 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { TaskRunEvent } from "./taskRunEvent.zod.js";
 
 export const TaskRunResource = zod.strictObject({
   id: zod.string(),
@@ -40,9 +41,18 @@ export const TaskRunResource = zod.strictObject({
     ),
   errorCode: zod.string().nullable().describe("Why the run failed. Null unless status is failed."),
   trigger: zod
-    .enum(["schedule", "manual", "assistant"])
+    .enum(["schedule", "manual", "assistant", "event"])
     .describe(
-      "How the run started: `schedule` by the task's own trigger, including a task set to run now;\n`manual` by a person running it outside its schedule; `assistant` by the assistant.",
+      "How the run started: `schedule` by the task's own trigger, including a task set to run now;\n`manual` by a person running it outside its schedule; `assistant` by the assistant; `event` by\nmatching event messages.",
+    ),
+  eventCount: zod
+    .int()
+    .describe("For runs started by events, the number of matching messages the run covers."),
+  events: zod
+    .array(TaskRunEvent)
+    .nullable()
+    .describe(
+      "For runs started by events, up to 20 of the messages the run covers. Null in lists; read the run for it.",
     ),
 });
 

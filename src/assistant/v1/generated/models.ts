@@ -1288,6 +1288,7 @@ export const TaskTriggerType = {
   at: "at",
   interval: "interval",
   cron: "cron",
+  event: "event",
 } as const;
 
 /**
@@ -1302,7 +1303,10 @@ export const TaskTriggerOverlapPolicy = {
 } as const;
 
 /**
- * When the task runs. `type` determines which fields apply.
+ * When the task runs. `type` determines which fields apply. An `event` task runs when a matching
+ * event message arrives. Messages are delivered as they happen and are not stored: a message
+ * published while delivery is interrupted does not start a run, and a message can arrive late or
+ * more than once.
  */
 export interface TaskTrigger {
   type: TaskTriggerType;
@@ -1337,6 +1341,46 @@ export interface TaskTrigger {
    * @minimum 10
    */
   catchupSeconds?: number;
+  /**
+   * For `event`. The full name of the event to listen for.
+   * @maxLength 128
+   * @nullable
+   */
+  event?: string | null;
+  /**
+   * For `event`. A filter on the message key: layers separated by `/`, `+` matching exactly one
+   * layer, and `#` as the last layer matching that layer and every layer below it. Null matches
+   * every key.
+   * @maxLength 512
+   * @nullable
+   */
+  eventKey?: string | null;
+  /**
+   * For `event`. A CEL expression that must be true for a message to count, over `data` (the
+   * payload) and `event` (`name`, `version`, `key`, `sender_id` and `created_at`). Reading a field
+   * the payload does not carry counts as false; use `has()` for optional fields. Null counts every
+   * message.
+   * @maxLength 2048
+   * @nullable
+   */
+  eventCondition?: string | null;
+  /**
+   * For `event`. The number of event-triggered runs after which the task completes. Null means no limit.
+   * @minimum 1
+   * @nullable
+   */
+  maxRuns?: number | null;
+  /**
+   * For `event`. The task stops listening and completes at this time.
+   * @nullable
+   */
+  expiresAt?: string | null;
+  /**
+   * For `event`. The least time between the starts of two event-triggered runs. Messages that
+   * match in between are delivered with the next run.
+   * @minimum 10
+   */
+  cooldownSeconds?: number;
 }
 
 export type TaskActionType = (typeof TaskActionType)[keyof typeof TaskActionType];
@@ -1390,7 +1434,8 @@ export const TaskRunResourceStatus = {
 
 /**
  * How the run started: `schedule` by the task's own trigger, including a task set to run now;
- * `manual` by a person running it outside its schedule; `assistant` by the assistant.
+ * `manual` by a person running it outside its schedule; `assistant` by the assistant; `event` by
+ * matching event messages.
  */
 export type TaskRunResourceTrigger =
   (typeof TaskRunResourceTrigger)[keyof typeof TaskRunResourceTrigger];
@@ -1399,7 +1444,31 @@ export const TaskRunResourceTrigger = {
   schedule: "schedule",
   manual: "manual",
   assistant: "assistant",
+  event: "event",
 } as const;
+
+/**
+ * The payload as published. Null when it was larger than 4 KiB; see dataBytes.
+ * @nullable
+ */
+export type TaskRunEventData = { [key: string]: unknown } | null;
+
+/**
+ * An event message that started a run.
+ */
+export interface TaskRunEvent {
+  id: string;
+  event: string;
+  version: number;
+  key: string;
+  createdAt: string;
+  /**
+   * The payload as published. Null when it was larger than 4 KiB; see dataBytes.
+   * @nullable
+   */
+  data: TaskRunEventData;
+  dataBytes: number;
+}
 
 export interface TaskRunResource {
   id: string;
@@ -1426,9 +1495,17 @@ export interface TaskRunResource {
   errorCode: string | null;
   /**
    * How the run started: `schedule` by the task's own trigger, including a task set to run now;
-   * `manual` by a person running it outside its schedule; `assistant` by the assistant.
+   * `manual` by a person running it outside its schedule; `assistant` by the assistant; `event` by
+   * matching event messages.
    */
   trigger: TaskRunResourceTrigger;
+  /** For runs started by events, the number of matching messages the run covers. */
+  eventCount: number;
+  /**
+   * For runs started by events, up to 20 of the messages the run covers. Null in lists; read the run for it.
+   * @nullable
+   */
+  events: TaskRunEvent[] | null;
 }
 
 export interface TaskResource {
@@ -1445,6 +1522,15 @@ export interface TaskResource {
    * @nullable
    */
   nextRunAt: string | null;
+  /**
+   * For `event`. The event version the condition was checked against. It advances when the event
+   * gains a newer version that the condition still fits; when it no longer fits, the task is
+   * paused and a failed run records TASK_EVENT_VERSION_INCOMPATIBLE.
+   * @nullable
+   */
+  eventVersion: number | null;
+  /** For `event`. The event-triggered runs started under the current trigger. */
+  eventRunCount: number;
   lastRun: TaskRunResource | null;
   createdAt: string;
   updatedAt: string;
@@ -1493,6 +1579,7 @@ export const SearchTasksRequestBodyTriggerType = {
   at: "at",
   interval: "interval",
   cron: "cron",
+  event: "event",
 } as const;
 
 export type SearchTasksRequestBodyActionType =

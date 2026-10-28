@@ -41,6 +41,15 @@ export const TaskResource = zod.strictObject({
     .datetime({ offset: true })
     .nullable()
     .describe("When the trigger starts the next run. Null when it will not."),
+  eventVersion: zod
+    .int()
+    .nullable()
+    .describe(
+      "For `event`. The event version the condition was checked against. It advances when the event\ngains a newer version that the condition still fits; when it no longer fits, the task is\npaused and a failed run records TASK_EVENT_VERSION_INCOMPATIBLE.",
+    ),
+  eventRunCount: zod
+    .int()
+    .describe("For `event`. The event-triggered runs started under the current trigger."),
   lastRun: zod.union([TaskRunResource, zod.null()]),
   createdAt: zod.iso.datetime({ offset: true }),
   updatedAt: zod.iso.datetime({ offset: true }),

@@ -34,9 +34,18 @@ export const taskTriggerOverlapPolicyDefault = `buffer_one`;
 export const taskTriggerCatchupSecondsDefault = 300;
 export const taskTriggerCatchupSecondsMin = 10;
 
+export const taskTriggerEventMax = 128;
+
+export const taskTriggerEventKeyMax = 512;
+
+export const taskTriggerEventConditionMax = 2048;
+
+export const taskTriggerCooldownSecondsDefault = 60;
+export const taskTriggerCooldownSecondsMin = 10;
+
 export const TaskTrigger = zod
   .strictObject({
-    type: zod.enum(["now", "at", "interval", "cron"]),
+    type: zod.enum(["now", "at", "interval", "cron", "event"]),
     runAt: zod.iso.datetime({ offset: true }).nullish().describe("For `at`."),
     intervalSeconds: zod
       .int()
@@ -69,8 +78,47 @@ export const TaskTrigger = zod
       .min(taskTriggerCatchupSecondsMin)
       .default(taskTriggerCatchupSecondsDefault)
       .describe("How late a missed run may still start, for example after a pause or an outage."),
+    event: zod
+      .string()
+      .max(taskTriggerEventMax)
+      .nullish()
+      .describe("For `event`. The full name of the event to listen for."),
+    eventKey: zod
+      .string()
+      .max(taskTriggerEventKeyMax)
+      .nullish()
+      .describe(
+        "For `event`. A filter on the message key: layers separated by `/`, `+` matching exactly one\nlayer, and `#` as the last layer matching that layer and every layer below it. Null matches\nevery key.",
+      ),
+    eventCondition: zod
+      .string()
+      .max(taskTriggerEventConditionMax)
+      .nullish()
+      .describe(
+        "For `event`. A CEL expression that must be true for a message to count, over `data` (the\npayload) and `event` (`name`, `version`, `key`, `sender_id` and `created_at`). Reading a field\nthe payload does not carry counts as false; use `has()` for optional fields. Null counts every\nmessage.",
+      ),
+    maxRuns: zod
+      .int()
+      .min(1)
+      .nullish()
+      .describe(
+        "For `event`. The number of event-triggered runs after which the task completes. Null means no limit.",
+      ),
+    expiresAt: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("For `event`. The task stops listening and completes at this time."),
+    cooldownSeconds: zod
+      .int()
+      .min(taskTriggerCooldownSecondsMin)
+      .default(taskTriggerCooldownSecondsDefault)
+      .describe(
+        "For `event`. The least time between the starts of two event-triggered runs. Messages that\nmatch in between are delivered with the next run.",
+      ),
   })
-  .describe("When the task runs. `type` determines which fields apply.");
+  .describe(
+    "When the task runs. `type` determines which fields apply. An `event` task runs when a matching\nevent message arrives. Messages are delivered as they happen and are not stored: a message\npublished while delivery is interrupted does not start a run, and a message can arrive late or\nmore than once.",
+  );
 
 export type TaskTrigger = zod.input<typeof TaskTrigger>;
 export type TaskTriggerOutput = zod.output<typeof TaskTrigger>;
