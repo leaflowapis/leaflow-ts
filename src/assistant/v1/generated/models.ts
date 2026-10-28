@@ -15,8 +15,9 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
- * person's messages for navigating a long conversation.
+ * through EventBus by subscribing to assistant.thread.frame and assistant.resource.updated; after a
+ * reconnection or an assistant.workspace.invalidated message, read them again. list-thread-messages
+ * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -1578,116 +1579,6 @@ export interface UpdateSettingsRequestBody {
   defaultReasoningEffort?: ReasoningEffort | null;
 }
 
-export interface RealtimeTicketResource {
-  /** The WebSocket address, absolute or relative to the API origin. */
-  url: string;
-  ticket: string;
-  expiresAt: string;
-}
-
-export type RealtimeClientMessageType =
-  (typeof RealtimeClientMessageType)[keyof typeof RealtimeClientMessageType];
-
-export const RealtimeClientMessageType = {
-  subscribe: "subscribe",
-  unsubscribe: "unsubscribe",
-  ping: "ping",
-} as const;
-
-/**
- * A message from the client. `type` determines which fields apply.
- */
-export interface RealtimeClientMessage {
-  type: RealtimeClientMessageType;
-  /**
-   * `workspace` or `thread:{id}`. For subscribe and unsubscribe.
-   * @maxLength 128
-   */
-  topic?: string;
-  /**
-   * For a `thread:{id}` subscription, the `streamCursor` to replay from.
-   * @maxLength 128
-   */
-  cursor?: string;
-}
-
-export type RealtimeServerMessageType =
-  (typeof RealtimeServerMessageType)[keyof typeof RealtimeServerMessageType];
-
-export const RealtimeServerMessageType = {
-  subscribed: "subscribed",
-  unsubscribed: "unsubscribed",
-  threadupdated: "thread.updated",
-  threaddeleted: "thread.deleted",
-  turnupdated: "turn.updated",
-  folderupdated: "folder.updated",
-  folderdeleted: "folder.deleted",
-  taskupdated: "task.updated",
-  taskdeleted: "task.deleted",
-  itemframe: "item.frame",
-  resync: "resync",
-  error: "error",
-  pong: "pong",
-} as const;
-
-export type ItemFrameOp = (typeof ItemFrameOp)[keyof typeof ItemFrameOp];
-
-export const ItemFrameOp = {
-  add: "add",
-  set: "set",
-  append: "append",
-} as const;
-
-/**
- * An edit to the transcript as returned by list-thread-items. `path` is a JSON Pointer under
- * `/items`: `add` appends `value` to `/items` or replaces the item with the same id, `set`
- * replaces the value at `path`, and `append` concatenates the string `value` to the string at
- * `path`, which is how answer text streams in.
- */
-export interface ItemFrame {
-  path: string;
-  op: ItemFrameOp;
-  value: unknown;
-}
-
-/**
- * A message from the server. `type` determines which fields apply:
- *
- * - `subscribed` / `unsubscribed` — `topic`
- * - `thread.updated` — `thread`; `thread.deleted` — `threadId`
- * - `turn.updated` — `turn`, sent while a turn runs so its usage can be shown live
- * - `folder.updated` — `folder`; `folder.deleted` — `folderId`
- * - `task.updated` — `task`; `task.deleted` — `taskId`
- * - `item.frame` — `threadId`, `cursor` and `frame`, an edit to the transcript
- * - `resync` — `topic`; the client lost events and reads the current state again
- * - `error` — `code` and `message`
- * - `pong`
- */
-export interface RealtimeServerMessage {
-  type: RealtimeServerMessageType;
-  topic?: string;
-  thread?: ThreadResource;
-  threadId?: string;
-  turn?: ThreadTurnResource;
-  folder?: FolderResource;
-  folderId?: string;
-  task?: TaskResource;
-  taskId?: string;
-  /** For `item.frame`. Resubscribe from this cursor to continue after a reconnect. */
-  cursor?: string;
-  frame?: ItemFrame;
-  code?: string;
-  message?: string;
-}
-
-/**
- * Both directions of the WebSocket protocol, for code generation.
- */
-export interface RealtimeExchange {
-  client: RealtimeClientMessage;
-  server: RealtimeServerMessage;
-}
-
 /**
  * How the assistant will see this file.
  *
@@ -2358,13 +2249,6 @@ export type ListTaskRunsParams = {
    * @maximum 200
    */
   limit?: number;
-};
-
-export type OpenRealtimeParams = {
-  /**
-   * @maxLength 4096
-   */
-  ticket: string;
 };
 
 export type UploadAttachmentParams = {

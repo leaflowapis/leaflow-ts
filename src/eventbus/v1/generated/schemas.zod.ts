@@ -4,20 +4,18 @@
  * Leaflow Event Bus API
  * Event definitions, versions, publishing, and realtime access.
  *
- * ## Authentication
- *
- * Every request carries a scoped token; see the `bearerAuth` security scheme. Neither the path
- * nor the headers carry a `project_id`: the current project is determined by the token.
- *
  * ## Definitions and messages
  *
  * An event is a definition: a name, a description, and one or more versions. A version carries a
  * JSON Schema that every published payload must satisfy. Messages are not stored here and are
  * not part of the event definition.
  *
- * A project event belongs to the current project. A global event has no `project_id`; it is
- * defined by a platform service and is read-only in this API. Global events are listed alongside
- * the project's own events.
+ * Every event belongs to a namespace, and its name is the namespace's name, a dot, and at least a
+ * resource and an action, such as `acme.order.created`. A project creates its own namespaces and
+ * defines events in them. Platform namespaces, such as `leaflow.notification`, are maintained by
+ * platform services: their events are listed alongside the project's own and can be subscribed
+ * to, but cannot be changed or published here, and the namespaces cannot be changed or deleted.
+ * Events in a platform namespace are called platform events below.
  *
  * A version number never changes meaning. Adding optional properties is allowed within a version;
  * a breaking change creates a new version. Publishing without a version uses the highest active
@@ -25,30 +23,189 @@
  *
  * ## Publishing
  *
- * Publishing returns the identity of the message and does not wait for consumers. Messages are
- * not stored and are not replayed: a consumer that connects later does not receive earlier
- * messages. Consumers receive messages through the realtime API or the platform's service API.
+ * Messages are published in batches of up to 64. A batch is validated as a whole: if any message
+ * is rejected, none is published. Publishing returns the identity of each message and does not
+ * wait for consumers. Messages are not stored and are not replayed: a consumer that connects
+ * later does not receive earlier messages.
+ *
+ * Messages published through this API are sent to the current project. A message may name one
+ * `subject`, a member of the project; it is then sent to that member only. Without a subject it is
+ * sent to every member of the project.
+ *
+ * Every publication names a `client_id`. It starts with the prefix returned with a realtime
+ * ticket, `user.{user_id}.project.{project_id}.`, followed by one segment chosen by the
+ * client, such as a random identifier per browser tab. Receivers get it unchanged, so a client
+ * can recognise its own messages. A client ID does not need to be unique: several connections
+ * may share one.
  *
  * ## Realtime
  *
- * Create a ticket, connect to the returned URL with the ticket, and authenticate the connection
- * with a scoped token. A ticket is single-use and short-lived. The connection ends when the
- * token expires unless it is refreshed with a new scoped token for the same user and project.
+ * Every message has a topic `{event}/{project_id|-}/{subject|-}/{key levels}`, where `-` stands
+ * for a missing recipient and the key, split at `/`, supplies the remaining levels. A topic filter
+ * uses `+` to match exactly one level and `#`, only as the last level, to match that level and
+ * every level below it, including none. For example, `{event}/{project_id}/-/#` matches every
+ * message sent to the members of a project, and `{event}/-/{user_id}/#` every message sent to one
+ * person outside any project.
+ *
+ * 1. Create a ticket with `POST /api/v1/realtime/tickets`, naming the events to receive. The
+ *    response lists the topic filters the ticket covers and the `client_id_prefix` to use. For a
+ *    platform event they cover messages sent to the caller, messages sent to no recipient and,
+ *    where the caller's permissions allow, messages sent within the project; for a project event
+ *    they cover messages sent within the project. Without a selected project, use
+ *    `POST /api/v1/account/realtime/tickets`; such a ticket covers only messages sent to the
+ *    caller or to no recipient, and cannot publish.
+ * 2. Open a WebSocket to `wss://eventbus.leaflow.cloud/realtime` and send, within 15 seconds:
+ *    `{"type":"authenticate","ticket":"…","client_id":"…"}`. The reply is
+ *    `{"type":"authenticated","client_id":"…","connection_id":"…","expires_at":"…"}`.
+ *    `connection_id` identifies this connection; it is assigned by EventBus and changes on
+ *    every reconnection.
+ * 3. Send `{"type":"subscribe","id":"…","topics":[…]}`. Each topic must be one of the returned
+ *    `topics` or lie within one of them, for example by naming a key level where the ticket has
+ *    `#`; a batch with any other topic is rejected as a whole. The reply is `subscribed`.
+ *    `unsubscribe` takes the same form and replies `unsubscribed`. Both may be sent at any time
+ *    while the connection is open.
+ * 4. Messages arrive as `{"type":"messages","messages":[…]}`, each element an `EventMessage`. A
+ *    message matching several subscriptions on one connection arrives once for each of them.
+ * 5. A connection may switch to another ticket of the same user at any time by sending
+ *    `authenticate` again: to renew before `expires_at`, to move from an account ticket to a
+ *    project ticket, or to move to another project. `client_id` may be omitted while the
+ *    `client_id_prefix` stays the same; when it changes, a client ID under the new prefix is
+ *    required. Subscriptions the new ticket does not cover are removed at once and reported in a
+ *    `{"type":"revoked","topics":[…]}` frame. A ticket for another user closes the connection
+ *    with code 4401, as does letting the ticket expire.
+ *
+ * A connection holding a project ticket may publish the project's own events with
+ * `{"type":"publish","id":"…","messages":[{"event":"…","key":"…","subject":"…","data":{…}}]}`;
+ * the reply is `published` with the identity of each message. `ping` is answered with `pong`.
+ * A rejected request is answered with `{"type":"error","id":"…","code":"…","message":"…"}`.
+ * Every reply carries the `id` of the request it answers.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
 
 import { CreateEventRequest } from "./validators/createEventRequest.zod.js";
 
+import { CreateNamespaceRequest } from "./validators/createNamespaceRequest.zod.js";
+
 import { CreateVersionRequest } from "./validators/createVersionRequest.zod.js";
 
 import { PublishRequest } from "./validators/publishRequest.zod.js";
 
+import { RealtimeTicketRequest } from "./validators/realtimeTicketRequest.zod.js";
+
 import { UpdateEventRequest } from "./validators/updateEventRequest.zod.js";
 
+import { UpdateNamespaceRequest } from "./validators/updateNamespaceRequest.zod.js";
+
 /**
- * Returns the global events visible to the project and the project's own events. Ordered by
- * name.
+ * Returns the platform namespaces followed by the project's own, each group ordered by name.
+ * Archived namespaces are omitted unless `include_archived` is true.
+ * @summary List namespaces
+ */
+export const listNamespacesQueryPageDefault = 1;
+export const listNamespacesQueryPageMax = 2147483647;
+
+export const listNamespacesQueryPageSizeDefault = 50;
+export const listNamespacesQueryPageSizeMax = 200;
+
+export const listNamespacesQueryKeywordMax = 128;
+
+export const listNamespacesQueryIncludeArchivedDefault = false;
+
+export const ListNamespacesQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listNamespacesQueryPageMax)
+    .default(listNamespacesQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listNamespacesQueryPageSizeMax)
+    .default(listNamespacesQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+  keyword: zod
+    .string()
+    .max(listNamespacesQueryKeywordMax)
+    .optional()
+    .describe("Match the namespace name or description, case-insensitively"),
+  include_archived: zod
+    .boolean()
+    .default(listNamespacesQueryIncludeArchivedDefault)
+    .describe("Include archived namespaces; defaults to false"),
+});
+
+/**
+ * Creates a namespace in the current project. Its name is a single segment, unique within the
+ * project; names reserved for the platform are rejected.
+ * @summary Create a namespace
+ */
+export const CreateNamespaceBody = CreateNamespaceRequest;
+
+/**
+ * Returns a platform namespace or one of the project's own.
+ * @summary Get a namespace
+ */
+export const getNamespacePathNamespaceNameMax = 64;
+
+export const getNamespacePathNamespaceNameRegExp = new RegExp(
+  "^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\\.[a-z](?:[a-z0-9_]*[a-z0-9])?)*$",
+);
+
+export const GetNamespaceParams = zod.strictObject({
+  namespaceName: zod
+    .string()
+    .max(getNamespacePathNamespaceNameMax)
+    .regex(getNamespacePathNamespaceNameRegExp)
+    .describe("The namespace's name, such as `acme`"),
+});
+
+/**
+ * Changes the description or status of one of the project's namespaces. Only the fields
+ * present in the request are changed. While a namespace is archived, its events cannot be
+ * created, published or subscribed to; restoring it lifts that. Platform namespaces cannot be
+ * changed.
+ * @summary Update a namespace
+ */
+export const updateNamespacePathNamespaceNameMax = 64;
+
+export const updateNamespacePathNamespaceNameRegExp = new RegExp(
+  "^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\\.[a-z](?:[a-z0-9_]*[a-z0-9])?)*$",
+);
+
+export const UpdateNamespaceParams = zod.strictObject({
+  namespaceName: zod
+    .string()
+    .max(updateNamespacePathNamespaceNameMax)
+    .regex(updateNamespacePathNamespaceNameRegExp)
+    .describe("The namespace's name, such as `acme`"),
+});
+
+export const UpdateNamespaceBody = UpdateNamespaceRequest;
+
+/**
+ * Deletes one of the project's namespaces together with every event and version in it.
+ * Publishing or subscribing to those events fails from then on. Platform namespaces cannot be
+ * deleted.
+ * @summary Delete a namespace
+ */
+export const deleteNamespacePathNamespaceNameMax = 64;
+
+export const deleteNamespacePathNamespaceNameRegExp = new RegExp(
+  "^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\\.[a-z](?:[a-z0-9_]*[a-z0-9])?)*$",
+);
+
+export const DeleteNamespaceParams = zod.strictObject({
+  namespaceName: zod
+    .string()
+    .max(deleteNamespacePathNamespaceNameMax)
+    .regex(deleteNamespacePathNamespaceNameRegExp)
+    .describe("The namespace's name, such as `acme`"),
+});
+
+/**
+ * Returns the platform events and the project's own events. Ordered by name.
  * @summary List event definitions
  */
 export const listEventsQueryPageDefault = 1;
@@ -93,8 +250,8 @@ export const ListEventsQueryParams = zod.strictObject({
 });
 
 /**
- * Creates a project event with its first version. The name is unique within the project. The
- * first segment of the name is the event's namespace and must not be a platform namespace.
+ * Creates an event with its first version in one of the project's namespaces. The first
+ * segment of the name is that namespace, followed by at least a resource and an action.
  * @summary Create an event definition
  */
 export const CreateEventBody = CreateEventRequest;
@@ -180,23 +337,31 @@ export const GetEventVersionParams = zod.strictObject({
 });
 
 /**
- * Validates the payload against the selected version and publishes the message. The response
- * carries the message identity; it does not mean a consumer received it. A version of zero
- * selects the highest active version.
- * @summary Publish an event message
+ * Validates every message against its selected version and publishes the batch. If any message
+ * is rejected, none is published. The response carries the identity of each message in request
+ * order; it does not mean a consumer received it. Only events defined by the current project can
+ * be published here.
+ * @summary Publish event messages
  */
-export const publishEventPathEventNameMax = 128;
+export const PublishEventsBody = PublishRequest;
 
-export const publishEventPathEventNameRegExp = new RegExp(
-  "^[a-z](?:[a-z0-9_]*[a-z0-9])?(?:\\.[a-z](?:[a-z0-9_]*[a-z0-9])?){2,}$",
-);
+/**
+ * Issues a short-lived ticket for the named events in the current project. For an event defined
+ * by the project, the ticket covers messages sent to the members of the project and messages
+ * sent to the caller within it. For a platform event, it also covers messages sent to the caller
+ * outside any project and messages sent to no recipient; messages sent within the project are
+ * covered as far as the caller's current permissions allow, which may be limited to some
+ * resources or to none. The caller must still be a member of the project. The ticket lives no
+ * longer than the scoped token it was created with. It is not a bearer token for other APIs.
+ * @summary Create a realtime ticket
+ */
+export const CreateRealtimeTicketBody = RealtimeTicketRequest;
 
-export const PublishEventParams = zod.strictObject({
-  eventName: zod
-    .string()
-    .max(publishEventPathEventNameMax)
-    .regex(publishEventPathEventNameRegExp)
-    .describe("The event's full name, such as `acme.order.created`"),
-});
-
-export const PublishEventBody = PublishRequest;
+/**
+ * Issues a short-lived ticket for a caller who has not selected a project, or belongs to none. Only
+ * platform events are accepted, and the ticket covers only messages sent to the caller outside
+ * any project or to no recipient. The ticket cannot publish. Its `client_id_prefix` is `user.{user_id}.`. The
+ * ticket lives no longer than the token it was created with.
+ * @summary Create an account realtime ticket
+ */
+export const CreateAccountRealtimeTicketBody = RealtimeTicketRequest;

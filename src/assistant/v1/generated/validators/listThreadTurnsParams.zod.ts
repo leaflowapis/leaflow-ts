@@ -15,8 +15,9 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
- * person's messages for navigating a long conversation.
+ * through EventBus by subscribing to assistant.thread.frame and assistant.resource.updated; after a
+ * reconnection or an assistant.workspace.invalidated message, read them again. list-thread-messages
+ * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.

@@ -15,8 +15,9 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
- * person's messages for navigating a long conversation.
+ * through EventBus by subscribing to assistant.thread.frame and assistant.resource.updated; after a
+ * reconnection or an assistant.workspace.invalidated message, read them again. list-thread-messages
+ * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -52,13 +53,10 @@ import type {
   LoginResource,
   MemoryListResponseBody,
   MoveFolderRequestBody,
-  OpenRealtimeParams,
   PlaceThreadRequestBody,
   PlatformListResponseBody,
   PutUploadPartHeaders,
   PutUploadPartParams,
-  RealtimeExchange,
-  RealtimeTicketResource,
   RejectionListResponseBody,
   ResumeThreadRequestBody,
   RevertRequestBody,
@@ -2322,118 +2320,6 @@ export const updateSettings = async (
   return { data, status: res.status, headers: res.headers } as updateSettingsResponse;
 };
 
-export type createRealtimeTicketResponse201 = {
-  data: RealtimeTicketResource;
-  status: 201;
-};
-
-export type createRealtimeTicketResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 201>;
-};
-
-export type createRealtimeTicketResponseSuccess = createRealtimeTicketResponse201 & {
-  headers: Headers;
-};
-export type createRealtimeTicketResponseError = createRealtimeTicketResponseDefault & {
-  headers: Headers;
-};
-
-export type createRealtimeTicketResponse =
-  | createRealtimeTicketResponseSuccess
-  | createRealtimeTicketResponseError;
-
-export const getCreateRealtimeTicketUrl = () => {
-  return `https://assistant.leaflow.cloud/api/v1/realtime/tickets`;
-};
-
-/**
- * Returns the address and a short-lived ticket for the realtime WebSocket. Open
- * `{url}?ticket={ticket}`; the ticket stands in for the bearer token, which a browser cannot set
- * on a WebSocket. One connection carries every subscription of a client.
- *
- * Messages are JSON text frames. The client sends `RealtimeClientMessage` and receives
- * `RealtimeServerMessage`. Subscribe to `workspace` for every conversation, folder and task of the
- * caller in this project, and to `thread:{id}` for the transcript of one conversation. A
- * transcript subscription takes the `streamCursor` from list-thread-items and replays what was
- * written after it; when the cursor is too old the server sends `resync` and the client reads the
- * items again.
- *
- * Reconnect with a new ticket after the connection closes. Ping at least every 30 seconds.
- * @summary Issue a realtime ticket
- */
-export const createRealtimeTicket = async (
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createRealtimeTicketResponse> => {
-  const res = await (fetchFn ?? fetch)(getCreateRealtimeTicketUrl(), {
-    ...options,
-    method: "POST",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createRealtimeTicketResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createRealtimeTicketResponse;
-};
-
-export type openRealtimeResponse200 = {
-  data: RealtimeExchange;
-  status: 200;
-};
-
-export type openRealtimeResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type openRealtimeResponseSuccess = openRealtimeResponse200 & {
-  headers: Headers;
-};
-export type openRealtimeResponseError = openRealtimeResponseDefault & {
-  headers: Headers;
-};
-
-export type openRealtimeResponse = openRealtimeResponseSuccess | openRealtimeResponseError;
-
-export const getOpenRealtimeUrl = (params: OpenRealtimeParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `https://assistant.leaflow.cloud/api/v1/realtime?${stringifiedParams}`
-    : `https://assistant.leaflow.cloud/api/v1/realtime`;
-};
-
-/**
- * Upgrades to a WebSocket. The ticket from create-realtime-ticket authenticates the connection;
- * a missing, expired or foreign ticket closes it with code 4401. The 200 response documents the
- * message a client receives on the socket; the endpoint never answers with a plain HTTP body.
- * @summary Open the realtime WebSocket
- */
-export const openRealtime = async (
-  params: OpenRealtimeParams,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<openRealtimeResponse> => {
-  const res = await (fetchFn ?? fetch)(getOpenRealtimeUrl(params), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: openRealtimeResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as openRealtimeResponse;
-};
-
 export type uploadAttachmentResponse201 = {
   data: UploadedResource;
   status: 201;
@@ -4233,4 +4119,49 @@ export const submitWeixinVerifyCode = async (
 
   const data: submitWeixinVerifyCodeResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as submitWeixinVerifyCodeResponse;
+};
+
+export type renewThreadPresenceResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type renewThreadPresenceResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type renewThreadPresenceResponseSuccess = renewThreadPresenceResponse204 & {
+  headers: Headers;
+};
+export type renewThreadPresenceResponseError = renewThreadPresenceResponseDefault & {
+  headers: Headers;
+};
+
+export type renewThreadPresenceResponse =
+  | renewThreadPresenceResponseSuccess
+  | renewThreadPresenceResponseError;
+
+export const getRenewThreadPresenceUrl = (thread: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/threads/${encodeURIComponent(String(thread))}/presence`;
+};
+
+/**
+ * Renews an already announced browser client while the thread is open. It does not create or replace the client catalogue.
+ * @summary Renew client presence
+ */
+export const renewThreadPresence = async (
+  thread: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<renewThreadPresenceResponse> => {
+  const res = await (fetchFn ?? fetch)(getRenewThreadPresenceUrl(thread), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: renewThreadPresenceResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as renewThreadPresenceResponse;
 };

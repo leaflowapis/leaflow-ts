@@ -15,8 +15,9 @@
  * of three efforts — low, medium or high — which are sent to the model unchanged.
  *
  * Read a thread's state with get-thread and its transcript with list-thread-items. Follow both live
- * over the WebSocket described under /api/v1/realtime/tickets. list-thread-messages outlines the
- * person's messages for navigating a long conversation.
+ * through EventBus by subscribing to assistant.thread.frame and assistant.resource.updated; after a
+ * reconnection or an assistant.workspace.invalidated message, read them again. list-thread-messages
+ * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
@@ -690,18 +691,6 @@ export const GetTaskRunParams = zod.strictObject({
 export const UpdateSettingsBody = UpdateSettingsRequestBody;
 
 /**
- * Upgrades to a WebSocket. The ticket from create-realtime-ticket authenticates the connection;
- * a missing, expired or foreign ticket closes it with code 4401. The 200 response documents the
- * message a client receives on the socket; the endpoint never answers with a plain HTTP body.
- * @summary Open the realtime WebSocket
- */
-export const openRealtimeQueryTicketMax = 4096;
-
-export const OpenRealtimeQueryParams = zod.strictObject({
-  ticket: zod.string().max(openRealtimeQueryTicketMax),
-});
-
-/**
  * The body is the file bytes themselves, not multipart, one file per request. The type is determined from the content, not from Content-Type or from the name. Put the returned id in attachmentIds when sending a message.
  *
  * An upload that no message ever references is a draft, and drafts are collected — `draftExpiresAt` in the response says when this one goes. Sending a message with the id makes it permanent.
@@ -1028,3 +1017,16 @@ export const SubmitWeixinVerifyCodeParams = zod.strictObject({
 });
 
 export const SubmitWeixinVerifyCodeBody = VerifyCodeRequestBody;
+
+/**
+ * Renews an already announced browser client while the thread is open. It does not create or replace the client catalogue.
+ * @summary Renew client presence
+ */
+export const renewThreadPresencePathThreadMax = 64;
+
+export const RenewThreadPresenceParams = zod.strictObject({
+  thread: zod
+    .string()
+    .max(renewThreadPresencePathThreadMax)
+    .describe("A thread id. Subagents are threads as well."),
+});

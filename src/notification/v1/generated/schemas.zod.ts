@@ -61,8 +61,6 @@
  */
 import * as zod from "zod";
 
-import { AuthorizeRealtimeChannelRequestBody } from "./validators/authorizeRealtimeChannelRequestBody.zod.js";
-
 import { ConfirmEmailOverrideRequestBody } from "./validators/confirmEmailOverrideRequestBody.zod.js";
 
 import { CreateChannelRequestBody } from "./validators/createChannelRequestBody.zod.js";
@@ -142,7 +140,8 @@ export const MarkNotificationsReadBody = MarkNotificationsReadRequestBody;
 
 /**
  * Returns the number of unread notifications. This is the value behind the badge in the
- * console, and it is also carried on every realtime event, so it does not normally need to be
+ * console, and it is also carried on every `notification.inbox.created` and
+ * `notification.inbox.read` message delivered by EventBus, so it does not normally need to be
  * requested on its own.
  * @summary Count unread notifications
  */
@@ -443,17 +442,3 @@ export const DescribeCredentialTicketParams = zod.strictObject({
 export const RevealCredentialParams = zod.strictObject({
   ticketId: zod.uuid().describe("The one-time credential"),
 });
-
-/**
- * Authorizes one subscription. Realtime clients call this on their own while subscribing; it
- * is not normally called directly.
- *
- * Only two channels are authorized: the one naming you, and the one naming the project in
- * the token. Any other channel returns `REALTIME_CHANNEL_FORBIDDEN`.
- *
- * **Authorization is evaluated once, when the subscription is established.** A subscription
- * already open is not revoked when project membership changes, so realtime events carry
- * identifiers and counts only, never the contents of a notification.
- * @summary Authorize a realtime channel subscription
- */
-export const AuthorizeRealtimeChannelBody = AuthorizeRealtimeChannelRequestBody;

@@ -62,7 +62,6 @@
 import type {
   AnnouncementListResource,
   AnnouncementReadResultResource,
-  AuthorizeRealtimeChannelRequestBody,
   ChannelListResponseBody,
   ChannelResource,
   ConfirmEmailOverrideRequestBody,
@@ -80,8 +79,6 @@ import type {
   NotificationResource,
   NotificationTypeListResponseBody,
   PreferencesResource,
-  RealtimeAuthResource,
-  RealtimeConnectionResource,
   RevealedCredentialResource,
   TypePreferenceListResponseBody,
   TypePreferenceResource,
@@ -304,7 +301,8 @@ export const getCountUnreadNotificationsUrl = (params?: CountUnreadNotifications
 
 /**
  * Returns the number of unread notifications. This is the value behind the badge in the
- * console, and it is also carried on every realtime event, so it does not normally need to be
+ * console, and it is also carried on every `notification.inbox.created` and
+ * `notification.inbox.read` message delivered by EventBus, so it does not normally need to be
  * requested on its own.
  * @summary Count unread notifications
  */
@@ -1679,128 +1677,4 @@ export const revealCredential = async (
 
   const data: revealCredentialResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as revealCredentialResponse;
-};
-
-export type describeRealtimeConnectionResponse200 = {
-  data: RealtimeConnectionResource;
-  status: 200;
-};
-
-export type describeRealtimeConnectionResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type describeRealtimeConnectionResponseSuccess = describeRealtimeConnectionResponse200 & {
-  headers: Headers;
-};
-export type describeRealtimeConnectionResponseError = describeRealtimeConnectionResponseDefault & {
-  headers: Headers;
-};
-
-export type describeRealtimeConnectionResponse =
-  | describeRealtimeConnectionResponseSuccess
-  | describeRealtimeConnectionResponseError;
-
-export const getDescribeRealtimeConnectionUrl = () => {
-  return `https://notification.leaflow.cloud/api/v1/realtime`;
-};
-
-/**
- * Returns everything needed to open a realtime connection, and the names of the channels to
- * subscribe to. The parameters are not constants: they differ between environments, so they
- * must be requested rather than compiled in.
- *
- * Realtime delivery is an optimisation. Everything it announces is also readable through the
- * listing operations, so a client that cannot connect stays correct by polling or by
- * refreshing.
- * @summary Describe the realtime connection
- */
-export const describeRealtimeConnection = async (
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<describeRealtimeConnectionResponse> => {
-  const res = await (fetchFn ?? fetch)(getDescribeRealtimeConnectionUrl(), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: describeRealtimeConnectionResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as describeRealtimeConnectionResponse;
-};
-
-export type authorizeRealtimeChannelResponse200 = {
-  data: RealtimeAuthResource;
-  status: 200;
-};
-
-export type authorizeRealtimeChannelResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type authorizeRealtimeChannelResponseSuccess = authorizeRealtimeChannelResponse200 & {
-  headers: Headers;
-};
-export type authorizeRealtimeChannelResponseError = authorizeRealtimeChannelResponseDefault & {
-  headers: Headers;
-};
-
-export type authorizeRealtimeChannelResponse =
-  | authorizeRealtimeChannelResponseSuccess
-  | authorizeRealtimeChannelResponseError;
-
-export const getAuthorizeRealtimeChannelUrl = () => {
-  return `https://notification.leaflow.cloud/api/v1/realtime/auth`;
-};
-
-/**
- * Authorizes one subscription. Realtime clients call this on their own while subscribing; it
- * is not normally called directly.
- *
- * Only two channels are authorized: the one naming you, and the one naming the project in
- * the token. Any other channel returns `REALTIME_CHANNEL_FORBIDDEN`.
- *
- * **Authorization is evaluated once, when the subscription is established.** A subscription
- * already open is not revoked when project membership changes, so realtime events carry
- * identifiers and counts only, never the contents of a notification.
- * @summary Authorize a realtime channel subscription
- */
-export const authorizeRealtimeChannel = async (
-  authorizeRealtimeChannelRequestBody: AuthorizeRealtimeChannelRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<authorizeRealtimeChannelResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getAuthorizeRealtimeChannelUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(authorizeRealtimeChannelRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: authorizeRealtimeChannelResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as authorizeRealtimeChannelResponse;
 };

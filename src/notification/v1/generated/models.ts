@@ -629,56 +629,6 @@ export interface RevealedCredentialResource {
 }
 
 /**
- * Everything needed to open a realtime connection. The connection speaks the Pusher channels
- * protocol, so any client library for it works.
- */
-export interface RealtimeConnectionResource {
-  /** The path a client posts to while subscribing, relative to this API */
-  auth_path: string;
-  /** The cluster name some client libraries require; empty when the deployment does not use one */
-  cluster: string;
-  /** False when realtime delivery is not configured in this deployment. Every other field is empty and clients should not attempt to connect */
-  enabled: boolean;
-  host: string;
-  /** The application key, which is public and identifies the deployment rather than the caller */
-  key: string;
-  port: number;
-  /**
-   * The channel carrying announcements. It is public: subscribing to it needs no
-   * authorization, because an announcement is addressed to everybody. The events on it
-   * carry an identifier and nothing else, so a client fetches the list and sees the
-   * announcements it is entitled to
-   */
-  announcements_channel: string;
-  /** The channel carrying events about the project in the token; empty when the token names no project */
-  project_channel: string;
-  /** Whether to connect over TLS */
-  secure: boolean;
-  /** The channel carrying events addressed to you */
-  user_channel: string;
-}
-
-export interface AuthorizeRealtimeChannelRequestBody {
-  /**
-   * The channel being subscribed to
-   * @minLength 1
-   * @maxLength 255
-   */
-  channel_name: string;
-  /**
-   * The connection identifier the realtime server assigned to this client
-   * @minLength 1
-   * @maxLength 128
-   */
-  socket_id: string;
-}
-
-export interface RealtimeAuthResource {
-  /** The authorization token for this subscription, passed back to the realtime server by the client library */
-  auth: string;
-}
-
-/**
  * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
  */
 export interface OffsetPagination {

@@ -4,20 +4,18 @@
  * Leaflow Event Bus API
  * Event definitions, versions, publishing, and realtime access.
  *
- * ## Authentication
- *
- * Every request carries a scoped token; see the `bearerAuth` security scheme. Neither the path
- * nor the headers carry a `project_id`: the current project is determined by the token.
- *
  * ## Definitions and messages
  *
  * An event is a definition: a name, a description, and one or more versions. A version carries a
  * JSON Schema that every published payload must satisfy. Messages are not stored here and are
  * not part of the event definition.
  *
- * A project event belongs to the current project. A global event has no `project_id`; it is
- * defined by a platform service and is read-only in this API. Global events are listed alongside
- * the project's own events.
+ * Every event belongs to a namespace, and its name is the namespace's name, a dot, and at least a
+ * resource and an action, such as `acme.order.created`. A project creates its own namespaces and
+ * defines events in them. Platform namespaces, such as `leaflow.notification`, are maintained by
+ * platform services: their events are listed alongside the project's own and can be subscribed
+ * to, but cannot be changed or published here, and the namespaces cannot be changed or deleted.
+ * Events in a platform namespace are called platform events below.
  *
  * A version number never changes meaning. Adding optional properties is allowed within a version;
  * a breaking change creates a new version. Publishing without a version uses the highest active
@@ -25,15 +23,62 @@
  *
  * ## Publishing
  *
- * Publishing returns the identity of the message and does not wait for consumers. Messages are
- * not stored and are not replayed: a consumer that connects later does not receive earlier
- * messages. Consumers receive messages through the realtime API or the platform's service API.
+ * Messages are published in batches of up to 64. A batch is validated as a whole: if any message
+ * is rejected, none is published. Publishing returns the identity of each message and does not
+ * wait for consumers. Messages are not stored and are not replayed: a consumer that connects
+ * later does not receive earlier messages.
+ *
+ * Messages published through this API are sent to the current project. A message may name one
+ * `subject`, a member of the project; it is then sent to that member only. Without a subject it is
+ * sent to every member of the project.
+ *
+ * Every publication names a `client_id`. It starts with the prefix returned with a realtime
+ * ticket, `user.{user_id}.project.{project_id}.`, followed by one segment chosen by the
+ * client, such as a random identifier per browser tab. Receivers get it unchanged, so a client
+ * can recognise its own messages. A client ID does not need to be unique: several connections
+ * may share one.
  *
  * ## Realtime
  *
- * Create a ticket, connect to the returned URL with the ticket, and authenticate the connection
- * with a scoped token. A ticket is single-use and short-lived. The connection ends when the
- * token expires unless it is refreshed with a new scoped token for the same user and project.
+ * Every message has a topic `{event}/{project_id|-}/{subject|-}/{key levels}`, where `-` stands
+ * for a missing recipient and the key, split at `/`, supplies the remaining levels. A topic filter
+ * uses `+` to match exactly one level and `#`, only as the last level, to match that level and
+ * every level below it, including none. For example, `{event}/{project_id}/-/#` matches every
+ * message sent to the members of a project, and `{event}/-/{user_id}/#` every message sent to one
+ * person outside any project.
+ *
+ * 1. Create a ticket with `POST /api/v1/realtime/tickets`, naming the events to receive. The
+ *    response lists the topic filters the ticket covers and the `client_id_prefix` to use. For a
+ *    platform event they cover messages sent to the caller, messages sent to no recipient and,
+ *    where the caller's permissions allow, messages sent within the project; for a project event
+ *    they cover messages sent within the project. Without a selected project, use
+ *    `POST /api/v1/account/realtime/tickets`; such a ticket covers only messages sent to the
+ *    caller or to no recipient, and cannot publish.
+ * 2. Open a WebSocket to `wss://eventbus.leaflow.cloud/realtime` and send, within 15 seconds:
+ *    `{"type":"authenticate","ticket":"…","client_id":"…"}`. The reply is
+ *    `{"type":"authenticated","client_id":"…","connection_id":"…","expires_at":"…"}`.
+ *    `connection_id` identifies this connection; it is assigned by EventBus and changes on
+ *    every reconnection.
+ * 3. Send `{"type":"subscribe","id":"…","topics":[…]}`. Each topic must be one of the returned
+ *    `topics` or lie within one of them, for example by naming a key level where the ticket has
+ *    `#`; a batch with any other topic is rejected as a whole. The reply is `subscribed`.
+ *    `unsubscribe` takes the same form and replies `unsubscribed`. Both may be sent at any time
+ *    while the connection is open.
+ * 4. Messages arrive as `{"type":"messages","messages":[…]}`, each element an `EventMessage`. A
+ *    message matching several subscriptions on one connection arrives once for each of them.
+ * 5. A connection may switch to another ticket of the same user at any time by sending
+ *    `authenticate` again: to renew before `expires_at`, to move from an account ticket to a
+ *    project ticket, or to move to another project. `client_id` may be omitted while the
+ *    `client_id_prefix` stays the same; when it changes, a client ID under the new prefix is
+ *    required. Subscriptions the new ticket does not cover are removed at once and reported in a
+ *    `{"type":"revoked","topics":[…]}` frame. A ticket for another user closes the connection
+ *    with code 4401, as does letting the ticket expire.
+ *
+ * A connection holding a project ticket may publish the project's own events with
+ * `{"type":"publish","id":"…","messages":[{"event":"…","key":"…","subject":"…","data":{…}}]}`;
+ * the reply is `published` with the identity of each message. `ping` is answered with `pong`.
+ * A rejected request is answered with `{"type":"error","id":"…","code":"…","message":"…"}`.
+ * Every reply carries the `id` of the request it answers.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -41,13 +86,22 @@ import { EventStatus } from "./eventStatus.zod.js";
 
 export const eventResourceNameMax = 128;
 
+export const eventResourceNamespaceMax = 64;
+
 export const eventResourceDescriptionMax = 1024;
 
 export const eventResourceTagsItemMax = 64;
 
 export const EventResource = zod.strictObject({
   name: zod.string().max(eventResourceNameMax).describe("The full event name"),
-  project_id: zod.uuid().nullish().describe("The owning project; absent for a global event"),
+  namespace: zod
+    .string()
+    .max(eventResourceNamespaceMax)
+    .describe("The namespace the event belongs to; the name starts with it and a dot"),
+  project_id: zod
+    .uuid()
+    .nullish()
+    .describe("The owning project; absent for an event in a platform namespace"),
   description: zod
     .string()
     .max(eventResourceDescriptionMax)
