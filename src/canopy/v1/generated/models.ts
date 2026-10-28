@@ -711,6 +711,8 @@ export interface RequestResource {
   input_tokens: number;
   /** The model named in the request */
   model_id: string;
+  /** The request operation, such as video_create or video_retrieve. Absent for historical requests where it was not recorded. */
+  operation?: string;
   output_tokens: number;
   reasoning_tokens: number;
   retries: number;

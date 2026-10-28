@@ -65,6 +65,12 @@ export const RequestResource = zod.strictObject({
     ),
   input_tokens: zod.int(),
   model_id: zod.string().describe("The model named in the request"),
+  operation: zod
+    .string()
+    .optional()
+    .describe(
+      "The request operation, such as video_create or video_retrieve. Absent for historical requests where it was not recorded.",
+    ),
   output_tokens: zod.int(),
   reasoning_tokens: zod.int(),
   retries: zod.int(),
