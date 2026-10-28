@@ -28,54 +28,53 @@
  * wait for consumers. Messages are not stored and are not replayed: a consumer that connects
  * later does not receive earlier messages.
  *
- * Messages published through this API are sent to the current project. A message may name one
- * `subject`, a member of the project; it is then sent to that member only. Without a subject it is
- * sent to every member of the project.
+ * Messages published through this API are sent to the current project. A message may name a
+ * `recipient`, a member of the project; it is then sent to that member only. Without a recipient
+ * it is sent to every member of the project.
  *
- * Every publication names a `client_id`. It starts with the prefix returned with a realtime
- * ticket, `user.{user_id}.project.{project_id}.`, followed by one segment chosen by the
- * client, such as a random identifier per browser tab. Receivers get it unchanged, so a client
- * can recognise its own messages. A client ID does not need to be unique: several connections
- * may share one.
+ * Every message names its `sender`: an `id` and the `name` the publisher had when the message was
+ * accepted. A publication may also carry a `client_id`, any label the client chooses, such as one
+ * per browser tab. Receivers get it unchanged, so a client can recognise its own messages by
+ * `sender` and `client_id`. A client ID need not be unique; a realtime connection is identified
+ * by its `connection_id`.
  *
  * ## Realtime
  *
- * Every message has a topic `{event}/{project_id|-}/{subject|-}/{key levels}`, where `-` stands
- * for a missing recipient and the key, split at `/`, supplies the remaining levels. A topic filter
+ * Every message has a topic `{event}/{recipient project_id|-}/{recipient id|-}/{key levels}`, where
+ * `-` stands for a missing recipient and the key, split at `/`, supplies the remaining levels. A topic filter
  * uses `+` to match exactly one level and `#`, only as the last level, to match that level and
  * every level below it, including none. For example, `{event}/{project_id}/-/#` matches every
  * message sent to the members of a project, and `{event}/-/{user_id}/#` every message sent to one
  * person outside any project.
  *
  * 1. Create a ticket with `POST /api/v1/realtime/tickets`, naming the events to receive. The
- *    response lists the topic filters the ticket covers and the `client_id_prefix` to use. For a
- *    platform event they cover messages sent to the caller, messages sent to no recipient and,
+ *    response lists the topic filters the ticket covers. For a platform event they cover messages sent to the caller, messages sent to no recipient and,
  *    where the caller's permissions allow, messages sent within the project; for a project event
  *    they cover messages sent within the project. Without a selected project, use
  *    `POST /api/v1/account/realtime/tickets`; such a ticket covers only messages sent to the
  *    caller or to no recipient, and cannot publish.
  * 2. Open a WebSocket to `wss://eventbus.leaflow.cloud/realtime` and send, within 15 seconds:
- *    `{"type":"authenticate","ticket":"…","client_id":"…"}`. The reply is
- *    `{"type":"authenticated","client_id":"…","connection_id":"…","expires_at":"…"}`.
+ *    `{"type":"authenticate","ticket":"…","client_id":"…"}`, where `client_id` is optional. The
+ *    reply is `{"type":"authenticated","client_id":"…","connection_id":"…","expires_at":"…"}`.
  *    `connection_id` identifies this connection; it is assigned by EventBus and changes on
  *    every reconnection.
- * 3. Send `{"type":"subscribe","id":"…","topics":[…]}`. Each topic must be one of the returned
+ * 3. Only after `authenticated`, send `{"type":"subscribe","id":"…","topics":[…]}`; a
+ *    subscription sent before is rejected. Each topic must be one of the returned
  *    `topics` or lie within one of them, for example by naming a key level where the ticket has
  *    `#`; a batch with any other topic is rejected as a whole. The reply is `subscribed`.
- *    `unsubscribe` takes the same form and replies `unsubscribed`. Both may be sent at any time
- *    while the connection is open.
+ *    `unsubscribe` takes the same form and replies `unsubscribed`.
  * 4. Messages arrive as `{"type":"messages","messages":[…]}`, each element an `EventMessage`. A
  *    message matching several subscriptions on one connection arrives once for each of them.
  * 5. A connection may switch to another ticket of the same user at any time by sending
  *    `authenticate` again: to renew before `expires_at`, to move from an account ticket to a
- *    project ticket, or to move to another project. `client_id` may be omitted while the
- *    `client_id_prefix` stays the same; when it changes, a client ID under the new prefix is
- *    required. Subscriptions the new ticket does not cover are removed at once and reported in a
+ *    project ticket, or to move to another project. Wait for its `authenticated` reply before
+ *    changing subscriptions; if it is rejected, the previous ticket stays in effect. `client_id`
+ *    may be omitted to keep the current one. Subscriptions the new ticket does not cover are removed at once and reported in a
  *    `{"type":"revoked","topics":[…]}` frame. A ticket for another user closes the connection
  *    with code 4401, as does letting the ticket expire.
  *
  * A connection holding a project ticket may publish the project's own events with
- * `{"type":"publish","id":"…","messages":[{"event":"…","key":"…","subject":"…","data":{…}}]}`;
+ * `{"type":"publish","id":"…","messages":[{"event":"…","key":"…","recipient":{"id":"…"},"data":{…}}]}`;
  * the reply is `published` with the identity of each message. `ping` is answered with `pong`.
  * A rejected request is answered with `{"type":"error","id":"…","code":"…","message":"…"}`.
  * Every reply carries the `id` of the request it answers.
@@ -90,9 +89,6 @@ export const RealtimeTicket = zod.strictObject({
   expires_at: zod.iso
     .datetime({ offset: true })
     .describe("When the ticket expires, in UTC RFC 3339; renew the connection before then"),
-  client_id_prefix: zod
-    .string()
-    .describe("The prefix every client ID on this ticket must start with"),
   topics: zod
     .array(zod.string())
     .describe("The topic filters the ticket covers; subscribe to these or to filters within them"),
