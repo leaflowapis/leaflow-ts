@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/directory/v1/directory.proto.
  */
 export const file_leaflow_fleet_directory_v1_directory: GenFile = /*@__PURE__*/
-  fileDesc("CipsZWFmbG93L2ZsZWV0L2RpcmVjdG9yeS92MS9kaXJlY3RvcnkucHJvdG8SGmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxIocBCglEaXJlY3RvcnkSEAoIcmV2aXNpb24YASABKAkSNQoIYWNjb3VudHMYAiADKAsyIy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5BY2NvdW50EjEKBmdyb3VwcxgDIAMoCzIhLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdyb3VwIsIBCgdBY2NvdW50EhAKCHVzZXJuYW1lGAEgASgJEgsKA3VpZBgCIAEoDRILCgNnaWQYAyABKA0SFAoMZGlzcGxheV9uYW1lGAQgASgJEhYKDmhvbWVfZGlyZWN0b3J5GAUgASgJEg0KBXNoZWxsGAYgASgJEg8KB3VzZXJfaWQYByABKAkSFwoPc3NoX3B1YmxpY19rZXlzGAkgAygJEhUKDWxvZ2luX2FsbG93ZWQYCiABKAgSDQoFYWRtaW4YCyABKAgiMwoFR3JvdXASDAoEbmFtZRgBIAEoCRILCgNnaWQYAiABKA0SDwoHbWVtYmVycxgDIAMoCSJPChNTZXREaXJlY3RvcnlSZXF1ZXN0EjgKCWRpcmVjdG9yeRgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkRpcmVjdG9yeSIWChRTZXREaXJlY3RvcnlSZXNwb25zZSIlChFHZXRBY2NvdW50UmVxdWVzdBIQCgh1c2VybmFtZRgBIAEoCSJKChJHZXRBY2NvdW50UmVzcG9uc2USNAoHYWNjb3VudBgBIAEoCzIjLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkFjY291bnQiMAocUmVwb3J0RGlyZWN0b3J5U3RhdHVzUmVxdWVzdBIQCghyZXZpc2lvbhgBIAEoCSIfCh1SZXBvcnREaXJlY3RvcnlTdGF0dXNSZXNwb25zZTKRAQoXTWFjaGluZURpcmVjdG9yeVNlcnZpY2USdgoMU2V0RGlyZWN0b3J5Ei8ubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuU2V0RGlyZWN0b3J5UmVxdWVzdBowLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLlNldERpcmVjdG9yeVJlc3BvbnNlIgOQAgIymAIKEERpcmVjdG9yeVNlcnZpY2UScAoKR2V0QWNjb3VudBItLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdldEFjY291bnRSZXF1ZXN0Gi4ubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuR2V0QWNjb3VudFJlc3BvbnNlIgOQAgESkQEKFVJlcG9ydERpcmVjdG9yeVN0YXR1cxI4LmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLlJlcG9ydERpcmVjdG9yeVN0YXR1c1JlcXVlc3QaOS5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5SZXBvcnREaXJlY3RvcnlTdGF0dXNSZXNwb25zZSIDkAICQkJaQGdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9kaXJlY3RvcnkvdjE7ZGlyZWN0b3J5djFiBnByb3RvMw");
+  fileDesc("CipsZWFmbG93L2ZsZWV0L2RpcmVjdG9yeS92MS9kaXJlY3RvcnkucHJvdG8SGmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxIocBCglEaXJlY3RvcnkSEAoIcmV2aXNpb24YASABKAkSNQoIYWNjb3VudHMYAiADKAsyIy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5BY2NvdW50EjEKBmdyb3VwcxgDIAMoCzIhLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdyb3VwIsIBCgdBY2NvdW50EhAKCHVzZXJuYW1lGAEgASgJEgsKA3VpZBgCIAEoDRILCgNnaWQYAyABKA0SFAoMZGlzcGxheV9uYW1lGAQgASgJEhYKDmhvbWVfZGlyZWN0b3J5GAUgASgJEg0KBXNoZWxsGAYgASgJEg8KB3VzZXJfaWQYByABKAkSFwoPc3NoX3B1YmxpY19rZXlzGAkgAygJEhUKDWxvZ2luX2FsbG93ZWQYCiABKAgSDQoFYWRtaW4YCyABKAgiMwoFR3JvdXASDAoEbmFtZRgBIAEoCRILCgNnaWQYAiABKA0SDwoHbWVtYmVycxgDIAMoCSJPChNTZXREaXJlY3RvcnlSZXF1ZXN0EjgKCWRpcmVjdG9yeRgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkRpcmVjdG9yeSIWChRTZXREaXJlY3RvcnlSZXNwb25zZSLdAQoWVXBkYXRlRGlyZWN0b3J5UmVxdWVzdBIVCg1iYXNlX3JldmlzaW9uGAEgASgJEhAKCHJldmlzaW9uGAIgASgJEjUKCGFjY291bnRzGAMgAygLMiMubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuQWNjb3VudBIxCgZncm91cHMYBCADKAsyIS5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5Hcm91cBIYChByZW1vdmVkX2FjY291bnRzGAUgAygJEhYKDnJlbW92ZWRfZ3JvdXBzGAYgAygJIhkKF1VwZGF0ZURpcmVjdG9yeVJlc3BvbnNlIiUKEUdldEFjY291bnRSZXF1ZXN0EhAKCHVzZXJuYW1lGAEgASgJIkoKEkdldEFjY291bnRSZXNwb25zZRI0CgdhY2NvdW50GAEgASgLMiMubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuQWNjb3VudCIwChxSZXBvcnREaXJlY3RvcnlTdGF0dXNSZXF1ZXN0EhAKCHJldmlzaW9uGAEgASgJIh8KHVJlcG9ydERpcmVjdG9yeVN0YXR1c1Jlc3BvbnNlMpICChdNYWNoaW5lRGlyZWN0b3J5U2VydmljZRJ2CgxTZXREaXJlY3RvcnkSLy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5TZXREaXJlY3RvcnlSZXF1ZXN0GjAubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuU2V0RGlyZWN0b3J5UmVzcG9uc2UiA5ACAhJ/Cg9VcGRhdGVEaXJlY3RvcnkSMi5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5VcGRhdGVEaXJlY3RvcnlSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuVXBkYXRlRGlyZWN0b3J5UmVzcG9uc2UiA5ACAjKYAgoQRGlyZWN0b3J5U2VydmljZRJwCgpHZXRBY2NvdW50Ei0ubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuR2V0QWNjb3VudFJlcXVlc3QaLi5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5HZXRBY2NvdW50UmVzcG9uc2UiA5ACARKRAQoVUmVwb3J0RGlyZWN0b3J5U3RhdHVzEjgubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuUmVwb3J0RGlyZWN0b3J5U3RhdHVzUmVxdWVzdBo5LmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLlJlcG9ydERpcmVjdG9yeVN0YXR1c1Jlc3BvbnNlIgOQAgJCQlpAZ2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L2RpcmVjdG9yeS92MTtkaXJlY3Rvcnl2MWIGcHJvdG8z");
 
 /**
  * The directory of the machine's project, as the machine sees it.
@@ -214,6 +214,78 @@ export const SetDirectoryResponseSchema: GenMessage<SetDirectoryResponse> = /*@_
   messageDesc(file_leaflow_fleet_directory_v1_directory, 4);
 
 /**
+ * The request of UpdateDirectory.
+ *
+ * @generated from message leaflow.fleet.directory.v1.UpdateDirectoryRequest
+ */
+export type UpdateDirectoryRequest = Message<"leaflow.fleet.directory.v1.UpdateDirectoryRequest"> & {
+  /**
+   * The revision the change applies to: Directory.revision of the copy the
+   * machine holds.
+   *
+   * @generated from field: string base_revision = 1;
+   */
+  baseRevision: string;
+
+  /**
+   * Directory.revision after the change.
+   *
+   * @generated from field: string revision = 2;
+   */
+  revision: string;
+
+  /**
+   * Accounts added, or replacing the account of the same username.
+   *
+   * @generated from field: repeated leaflow.fleet.directory.v1.Account accounts = 3;
+   */
+  accounts: Account[];
+
+  /**
+   * Groups added, or replacing the group of the same name.
+   *
+   * @generated from field: repeated leaflow.fleet.directory.v1.Group groups = 4;
+   */
+  groups: Group[];
+
+  /**
+   * The usernames of the accounts removed.
+   *
+   * @generated from field: repeated string removed_accounts = 5;
+   */
+  removedAccounts: string[];
+
+  /**
+   * The names of the groups removed.
+   *
+   * @generated from field: repeated string removed_groups = 6;
+   */
+  removedGroups: string[];
+};
+
+/**
+ * Describes the message leaflow.fleet.directory.v1.UpdateDirectoryRequest.
+ * Use `create(UpdateDirectoryRequestSchema)` to create a new message.
+ */
+export const UpdateDirectoryRequestSchema: GenMessage<UpdateDirectoryRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 5);
+
+/**
+ * The response of UpdateDirectory.
+ *
+ * @generated from message leaflow.fleet.directory.v1.UpdateDirectoryResponse
+ */
+export type UpdateDirectoryResponse = Message<"leaflow.fleet.directory.v1.UpdateDirectoryResponse"> & {
+};
+
+/**
+ * Describes the message leaflow.fleet.directory.v1.UpdateDirectoryResponse.
+ * Use `create(UpdateDirectoryResponseSchema)` to create a new message.
+ */
+export const UpdateDirectoryResponseSchema: GenMessage<UpdateDirectoryResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 6);
+
+/**
  * The request of GetAccount.
  *
  * @generated from message leaflow.fleet.directory.v1.GetAccountRequest
@@ -232,7 +304,7 @@ export type GetAccountRequest = Message<"leaflow.fleet.directory.v1.GetAccountRe
  * Use `create(GetAccountRequestSchema)` to create a new message.
  */
 export const GetAccountRequestSchema: GenMessage<GetAccountRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 5);
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 7);
 
 /**
  * The response of GetAccount.
@@ -253,7 +325,7 @@ export type GetAccountResponse = Message<"leaflow.fleet.directory.v1.GetAccountR
  * Use `create(GetAccountResponseSchema)` to create a new message.
  */
 export const GetAccountResponseSchema: GenMessage<GetAccountResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 6);
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 8);
 
 /**
  * The request of ReportDirectoryStatus.
@@ -275,7 +347,7 @@ export type ReportDirectoryStatusRequest = Message<"leaflow.fleet.directory.v1.R
  * Use `create(ReportDirectoryStatusRequestSchema)` to create a new message.
  */
 export const ReportDirectoryStatusRequestSchema: GenMessage<ReportDirectoryStatusRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 7);
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 9);
 
 /**
  * The response of ReportDirectoryStatus.
@@ -290,7 +362,7 @@ export type ReportDirectoryStatusResponse = Message<"leaflow.fleet.directory.v1.
  * Use `create(ReportDirectoryStatusResponseSchema)` to create a new message.
  */
 export const ReportDirectoryStatusResponseSchema: GenMessage<ReportDirectoryStatusResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 8);
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 10);
 
 /**
  * Keeps the machine's copy of the directory. Served by the daemon; the
@@ -340,6 +412,34 @@ export const MachineDirectoryService: GenService<{
     input: typeof SetDirectoryRequestSchema;
     output: typeof SetDirectoryResponseSchema;
   },
+  /**
+   * Changes the machine's copy of the directory from base_revision, the
+   * revision it holds, to revision: the accounts and groups of the request
+   * are added or replace those of the same name, and the names removed go.
+   * What results is served exactly as the same directory sent whole with
+   * SetDirectory would be. The service sends a change instead of the whole
+   * directory when it knows the revision the machine holds
+   * (ReportDirectoryStatus, or the last call that succeeded), and the whole
+   * directory whenever this call fails. A request with the revision the
+   * Agent holds already changes nothing, so that a retry succeeds.
+   *
+   * Fails with:
+   *   - FAILED_PRECONDITION and reason REVISION_MISMATCH, with metadata
+   *     "revision", the revision the Agent holds (empty for none), when
+   *     base_revision is not it; the copy stays as it is;
+   *   - INVALID_ARGUMENT and reason INVALID_REQUEST, with metadata "field"
+   *     naming the first offending field, for a request that names an entry
+   *     twice, adds and removes the same name or removes one the copy does
+   *     not have, or whose result breaks a rule of Directory, Account or
+   *     Group; the copy stays as it is.
+   *
+   * @generated from rpc leaflow.fleet.directory.v1.MachineDirectoryService.UpdateDirectory
+   */
+  updateDirectory: {
+    methodKind: "unary";
+    input: typeof UpdateDirectoryRequestSchema;
+    output: typeof UpdateDirectoryResponseSchema;
+  },
 }> = /*@__PURE__*/
   serviceDesc(file_leaflow_fleet_directory_v1_directory, 0);
 
@@ -369,8 +469,9 @@ export const DirectoryService: GenService<{
   },
   /**
    * Reports the copy the Agent serves. The Agent reports after every connect
-   * and after every SetDirectory that changed its copy. The service sends
-   * SetDirectory when the revision is not the one it holds.
+   * and after every SetDirectory or UpdateDirectory that changed its copy.
+   * The service sends SetDirectory, or UpdateDirectory from the reported
+   * revision, when it is not the one the service holds.
    *
    * @generated from rpc leaflow.fleet.directory.v1.DirectoryService.ReportDirectoryStatus
    */
