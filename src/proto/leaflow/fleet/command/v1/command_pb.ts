@@ -43,8 +43,11 @@ export type RunCommandRequest = Message<"leaflow.fleet.command.v1.RunCommandRequ
   command: string;
 
   /**
-   * Kills the command, and every process it started, this long after it
-   * started. 1 to 300 seconds; unset: 60 seconds.
+   * Kills the command, and every process it started, when it has not ended
+   * this long after it started: the shell still runs or its output is still
+   * open. 1 to 300 seconds; unset: 60 seconds. As with ssh, a command ends
+   * without waiting for what it left running in the background with its
+   * output elsewhere (`nohup daemon >log 2>&1 &`), and that keeps running.
    *
    * @generated from field: google.protobuf.Duration timeout = 4;
    */
@@ -158,7 +161,9 @@ export const CommandService: GenService<{
    *     the account or the session (PAM_PERM_DENIED), with metadata
    *     "pamMessage", the text PAM gave;
    *   - INTERNAL and reason COMMAND_START_FAILED when the shell could not
-   *     start; nothing ran.
+   *     start; nothing ran;
+   *   - INTERNAL and reason COMMAND_LOST when the Agent lost the command
+   *     while it ran: it may have run in part, and what it wrote is gone.
    *
    * @generated from rpc leaflow.fleet.command.v1.CommandService.RunCommand
    */

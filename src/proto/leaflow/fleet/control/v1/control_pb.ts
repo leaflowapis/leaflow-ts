@@ -257,7 +257,8 @@ export type ServerHello = Message<"leaflow.fleet.control.v1.ServerHello"> & {
   idleTimeout?: Duration | undefined;
 
   /**
-   * The largest message, in bytes, either end may send.
+   * The largest message, in bytes, either end may send. At least 512 KiB, so
+   * that a piece of a call's payload (leaflow.fleet.rpc.v1) always fits.
    *
    * @generated from field: uint32 max_message_size = 5;
    */

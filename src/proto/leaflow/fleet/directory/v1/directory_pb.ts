@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/directory/v1/directory.proto.
  */
 export const file_leaflow_fleet_directory_v1_directory: GenFile = /*@__PURE__*/
-  fileDesc("CipsZWFmbG93L2ZsZWV0L2RpcmVjdG9yeS92MS9kaXJlY3RvcnkucHJvdG8SGmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxIocBCglEaXJlY3RvcnkSEAoIcmV2aXNpb24YASABKAkSNQoIYWNjb3VudHMYAiADKAsyIy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5BY2NvdW50EjEKBmdyb3VwcxgDIAMoCzIhLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdyb3VwItcBCgdBY2NvdW50EhAKCHVzZXJuYW1lGAEgASgJEgsKA3VpZBgCIAEoDRILCgNnaWQYAyABKA0SFAoMZGlzcGxheV9uYW1lGAQgASgJEhYKDmhvbWVfZGlyZWN0b3J5GAUgASgJEg0KBXNoZWxsGAYgASgJEg8KB3VzZXJfaWQYByABKAkSOQoGYWNjZXNzGAggASgLMikubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuQWNjb3VudEFjY2VzcxIXCg9zc2hfcHVibGljX2tleXMYCSADKAkiNQoNQWNjb3VudEFjY2VzcxIVCg1sb2dpbl9hbGxvd2VkGAEgASgIEg0KBWFkbWluGAIgASgIIjMKBUdyb3VwEgwKBG5hbWUYASABKAkSCwoDZ2lkGAIgASgNEg8KB21lbWJlcnMYAyADKAkiTwoTU2V0RGlyZWN0b3J5UmVxdWVzdBI4CglkaXJlY3RvcnkYASABKAsyJS5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5EaXJlY3RvcnkiFgoUU2V0RGlyZWN0b3J5UmVzcG9uc2UiKwoXR2V0QWNjb3VudEFjY2Vzc1JlcXVlc3QSEAoIdXNlcm5hbWUYASABKAkiVQoYR2V0QWNjb3VudEFjY2Vzc1Jlc3BvbnNlEjkKBmFjY2VzcxgBIAEoCzIpLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkFjY291bnRBY2Nlc3MiMAocUmVwb3J0RGlyZWN0b3J5U3RhdHVzUmVxdWVzdBIQCghyZXZpc2lvbhgBIAEoCSIfCh1SZXBvcnREaXJlY3RvcnlTdGF0dXNSZXNwb25zZTKRAQoXTWFjaGluZURpcmVjdG9yeVNlcnZpY2USdgoMU2V0RGlyZWN0b3J5Ei8ubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuU2V0RGlyZWN0b3J5UmVxdWVzdBowLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLlNldERpcmVjdG9yeVJlc3BvbnNlIgOQAgIyqwIKEERpcmVjdG9yeVNlcnZpY2USggEKEEdldEFjY291bnRBY2Nlc3MSMy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5HZXRBY2NvdW50QWNjZXNzUmVxdWVzdBo0LmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdldEFjY291bnRBY2Nlc3NSZXNwb25zZSIDkAIBEpEBChVSZXBvcnREaXJlY3RvcnlTdGF0dXMSOC5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5SZXBvcnREaXJlY3RvcnlTdGF0dXNSZXF1ZXN0GjkubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuUmVwb3J0RGlyZWN0b3J5U3RhdHVzUmVzcG9uc2UiA5ACAkJCWkBnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvZGlyZWN0b3J5L3YxO2RpcmVjdG9yeXYxYgZwcm90bzM");
+  fileDesc("CipsZWFmbG93L2ZsZWV0L2RpcmVjdG9yeS92MS9kaXJlY3RvcnkucHJvdG8SGmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxIocBCglEaXJlY3RvcnkSEAoIcmV2aXNpb24YASABKAkSNQoIYWNjb3VudHMYAiADKAsyIy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5BY2NvdW50EjEKBmdyb3VwcxgDIAMoCzIhLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdyb3VwIsIBCgdBY2NvdW50EhAKCHVzZXJuYW1lGAEgASgJEgsKA3VpZBgCIAEoDRILCgNnaWQYAyABKA0SFAoMZGlzcGxheV9uYW1lGAQgASgJEhYKDmhvbWVfZGlyZWN0b3J5GAUgASgJEg0KBXNoZWxsGAYgASgJEg8KB3VzZXJfaWQYByABKAkSFwoPc3NoX3B1YmxpY19rZXlzGAkgAygJEhUKDWxvZ2luX2FsbG93ZWQYCiABKAgSDQoFYWRtaW4YCyABKAgiMwoFR3JvdXASDAoEbmFtZRgBIAEoCRILCgNnaWQYAiABKA0SDwoHbWVtYmVycxgDIAMoCSJPChNTZXREaXJlY3RvcnlSZXF1ZXN0EjgKCWRpcmVjdG9yeRgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkRpcmVjdG9yeSIWChRTZXREaXJlY3RvcnlSZXNwb25zZSIlChFHZXRBY2NvdW50UmVxdWVzdBIQCgh1c2VybmFtZRgBIAEoCSJKChJHZXRBY2NvdW50UmVzcG9uc2USNAoHYWNjb3VudBgBIAEoCzIjLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkFjY291bnQiMAocUmVwb3J0RGlyZWN0b3J5U3RhdHVzUmVxdWVzdBIQCghyZXZpc2lvbhgBIAEoCSIfCh1SZXBvcnREaXJlY3RvcnlTdGF0dXNSZXNwb25zZTKRAQoXTWFjaGluZURpcmVjdG9yeVNlcnZpY2USdgoMU2V0RGlyZWN0b3J5Ei8ubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuU2V0RGlyZWN0b3J5UmVxdWVzdBowLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLlNldERpcmVjdG9yeVJlc3BvbnNlIgOQAgIymAIKEERpcmVjdG9yeVNlcnZpY2UScAoKR2V0QWNjb3VudBItLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdldEFjY291bnRSZXF1ZXN0Gi4ubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuR2V0QWNjb3VudFJlc3BvbnNlIgOQAgESkQEKFVJlcG9ydERpcmVjdG9yeVN0YXR1cxI4LmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLlJlcG9ydERpcmVjdG9yeVN0YXR1c1JlcXVlc3QaOS5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5SZXBvcnREaXJlY3RvcnlTdGF0dXNSZXNwb25zZSIDkAICQkJaQGdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9kaXJlY3RvcnkvdjE7ZGlyZWN0b3J5djFiBnByb3RvMw");
 
 /**
  * The directory of the machine's project, as the machine sees it.
@@ -111,19 +111,26 @@ export type Account = Message<"leaflow.fleet.directory.v1.Account"> & {
   userId: string;
 
   /**
-   * What the account may do on this machine.
-   *
-   * @generated from field: leaflow.fleet.directory.v1.AccountAccess access = 8;
-   */
-  access?: AccountAccess | undefined;
-
-  /**
    * The SSH public keys the account logs in with, each an authorized_keys(5)
    * key without options, such as "ssh-ed25519 AAAAC3Nz...".
    *
    * @generated from field: repeated string ssh_public_keys = 9;
    */
   sshPublicKeys: string[];
+
+  /**
+   * The account may log in to this machine.
+   *
+   * @generated from field: bool login_allowed = 10;
+   */
+  loginAllowed: boolean;
+
+  /**
+   * The account may become root on this machine through sudo(8).
+   *
+   * @generated from field: bool admin = 11;
+   */
+  admin: boolean;
 };
 
 /**
@@ -132,34 +139,6 @@ export type Account = Message<"leaflow.fleet.directory.v1.Account"> & {
  */
 export const AccountSchema: GenMessage<Account> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_directory_v1_directory, 1);
-
-/**
- * What an account may do on one machine.
- *
- * @generated from message leaflow.fleet.directory.v1.AccountAccess
- */
-export type AccountAccess = Message<"leaflow.fleet.directory.v1.AccountAccess"> & {
-  /**
-   * The account may log in.
-   *
-   * @generated from field: bool login_allowed = 1;
-   */
-  loginAllowed: boolean;
-
-  /**
-   * The account may become root through sudo(8).
-   *
-   * @generated from field: bool admin = 2;
-   */
-  admin: boolean;
-};
-
-/**
- * Describes the message leaflow.fleet.directory.v1.AccountAccess.
- * Use `create(AccountAccessSchema)` to create a new message.
- */
-export const AccountAccessSchema: GenMessage<AccountAccess> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 2);
 
 /**
  * A directory group (group(5)).
@@ -196,7 +175,7 @@ export type Group = Message<"leaflow.fleet.directory.v1.Group"> & {
  * Use `create(GroupSchema)` to create a new message.
  */
 export const GroupSchema: GenMessage<Group> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 3);
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 2);
 
 /**
  * The request of SetDirectory.
@@ -217,7 +196,7 @@ export type SetDirectoryRequest = Message<"leaflow.fleet.directory.v1.SetDirecto
  * Use `create(SetDirectoryRequestSchema)` to create a new message.
  */
 export const SetDirectoryRequestSchema: GenMessage<SetDirectoryRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 4);
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 3);
 
 /**
  * The response of SetDirectory.
@@ -232,14 +211,14 @@ export type SetDirectoryResponse = Message<"leaflow.fleet.directory.v1.SetDirect
  * Use `create(SetDirectoryResponseSchema)` to create a new message.
  */
 export const SetDirectoryResponseSchema: GenMessage<SetDirectoryResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 5);
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 4);
 
 /**
- * The request of GetAccountAccess.
+ * The request of GetAccount.
  *
- * @generated from message leaflow.fleet.directory.v1.GetAccountAccessRequest
+ * @generated from message leaflow.fleet.directory.v1.GetAccountRequest
  */
-export type GetAccountAccessRequest = Message<"leaflow.fleet.directory.v1.GetAccountAccessRequest"> & {
+export type GetAccountRequest = Message<"leaflow.fleet.directory.v1.GetAccountRequest"> & {
   /**
    * The account's login name.
    *
@@ -249,32 +228,32 @@ export type GetAccountAccessRequest = Message<"leaflow.fleet.directory.v1.GetAcc
 };
 
 /**
- * Describes the message leaflow.fleet.directory.v1.GetAccountAccessRequest.
- * Use `create(GetAccountAccessRequestSchema)` to create a new message.
+ * Describes the message leaflow.fleet.directory.v1.GetAccountRequest.
+ * Use `create(GetAccountRequestSchema)` to create a new message.
  */
-export const GetAccountAccessRequestSchema: GenMessage<GetAccountAccessRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 6);
+export const GetAccountRequestSchema: GenMessage<GetAccountRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 5);
 
 /**
- * The response of GetAccountAccess.
+ * The response of GetAccount.
  *
- * @generated from message leaflow.fleet.directory.v1.GetAccountAccessResponse
+ * @generated from message leaflow.fleet.directory.v1.GetAccountResponse
  */
-export type GetAccountAccessResponse = Message<"leaflow.fleet.directory.v1.GetAccountAccessResponse"> & {
+export type GetAccountResponse = Message<"leaflow.fleet.directory.v1.GetAccountResponse"> & {
   /**
-   * What the account may do on the calling machine now.
+   * The account as the calling machine's directory has it now.
    *
-   * @generated from field: leaflow.fleet.directory.v1.AccountAccess access = 1;
+   * @generated from field: leaflow.fleet.directory.v1.Account account = 1;
    */
-  access?: AccountAccess | undefined;
+  account?: Account | undefined;
 };
 
 /**
- * Describes the message leaflow.fleet.directory.v1.GetAccountAccessResponse.
- * Use `create(GetAccountAccessResponseSchema)` to create a new message.
+ * Describes the message leaflow.fleet.directory.v1.GetAccountResponse.
+ * Use `create(GetAccountResponseSchema)` to create a new message.
  */
-export const GetAccountAccessResponseSchema: GenMessage<GetAccountAccessResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 7);
+export const GetAccountResponseSchema: GenMessage<GetAccountResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 6);
 
 /**
  * The request of ReportDirectoryStatus.
@@ -296,7 +275,7 @@ export type ReportDirectoryStatusRequest = Message<"leaflow.fleet.directory.v1.R
  * Use `create(ReportDirectoryStatusRequestSchema)` to create a new message.
  */
 export const ReportDirectoryStatusRequestSchema: GenMessage<ReportDirectoryStatusRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 8);
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 7);
 
 /**
  * The response of ReportDirectoryStatus.
@@ -311,7 +290,7 @@ export type ReportDirectoryStatusResponse = Message<"leaflow.fleet.directory.v1.
  * Use `create(ReportDirectoryStatusResponseSchema)` to create a new message.
  */
 export const ReportDirectoryStatusResponseSchema: GenMessage<ReportDirectoryStatusResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_directory_v1_directory, 9);
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 8);
 
 /**
  * Keeps the machine's copy of the directory. Served by the daemon; the
@@ -372,19 +351,21 @@ export const MachineDirectoryService: GenService<{
  */
 export const DirectoryService: GenService<{
   /**
-   * Returns what an account may do on the calling machine now, from the
-   * platform's current permissions. The Agent asks when the account logs in
-   * and when it asks to become root, and updates its copy with the answer.
+   * Returns an account of the calling machine's directory as it stands now,
+   * from the platform's current permissions and keys: the Account that
+   * SetDirectory would carry now. The Agent asks when the account logs in and
+   * when it asks to become root, and replaces its copy of the account with
+   * the answer.
    *
    * Fails with NOT_FOUND and reason ACCOUNT_NOT_FOUND for a name that is not
    * an account of the machine's directory.
    *
-   * @generated from rpc leaflow.fleet.directory.v1.DirectoryService.GetAccountAccess
+   * @generated from rpc leaflow.fleet.directory.v1.DirectoryService.GetAccount
    */
-  getAccountAccess: {
+  getAccount: {
     methodKind: "unary";
-    input: typeof GetAccountAccessRequestSchema;
-    output: typeof GetAccountAccessResponseSchema;
+    input: typeof GetAccountRequestSchema;
+    output: typeof GetAccountResponseSchema;
   },
   /**
    * Reports the copy the Agent serves. The Agent reports after every connect
