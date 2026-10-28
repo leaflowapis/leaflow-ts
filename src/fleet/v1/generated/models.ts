@@ -35,6 +35,24 @@
  * 3. Approve it with `POST /api/v1/enrollments/{enrollmentId}:approve`. The machine joins the
  *    current project within its next polling interval.
  *
+ * ## Adding a machine without interaction
+ *
+ * A machine that is set up unattended, such as by cloud-init on first boot, joins with a
+ * registration token instead of a pairing code:
+ *
+ * 1. Create a registration with `POST /api/v1/machine-registrations`. It reserves a machine in
+ *    the current project under the given name and returns its `machine_id` and a `token`. The
+ *    token is returned only in this response.
+ * 2. Give the token to the machine in a file that only root can read, and run
+ *    `leaflow-fleet-agent daemon enroll --token-file <path>`. The machine joins the current
+ *    project as `machine_id` at once, and the Agent deletes the file.
+ *
+ * A token enrolls one machine once, and only until the registration expires. Anyone who reads
+ * the token before the machine uses it can enroll a key of their own instead, so pass it only
+ * to the machine, keep its lifetime short, and compare the `public_key` of the used
+ * registration with the key the machine shows when that matters. Revoke a registration that
+ * will not be used with `DELETE /api/v1/machine-registrations/{registrationId}`.
+ *
  * ## Trusting a machine's key
  *
  * Each machine has an Ed25519 key that it generates itself and that never leaves it. Viewers
@@ -382,6 +400,79 @@ export interface ApproveEnrollmentRequest {
    * @maxLength 128
    */
   name: string;
+}
+
+/**
+ * `pending` waits for a machine to use the token; `used` enrolled a machine; `expired` was not
+ * used in time; `revoked` was revoked before it was used.
+ */
+export type MachineRegistrationState =
+  (typeof MachineRegistrationState)[keyof typeof MachineRegistrationState];
+
+export const MachineRegistrationState = {
+  pending: "pending",
+  used: "used",
+  expired: "expired",
+  revoked: "revoked",
+} as const;
+
+export interface MachineRegistrationResource {
+  id: string;
+  /** The machine that the registration's token enrolls */
+  machine_id: string;
+  /** The name of the machine in the project */
+  name: string;
+  state: MachineRegistrationState;
+  created_at: string;
+  /** When the token stops enrolling a machine */
+  expires_at: string;
+  /**
+   * When a machine used the token; null until then
+   * @nullable
+   */
+  used_at: string | null;
+  /** The key of the machine that used the token; null until then */
+  public_key: PublicKey | null;
+  /**
+   * The IP address the machine used the token from; null until then
+   * @nullable
+   */
+  source_address: string | null;
+}
+
+export interface MachineRegistrationList {
+  items: MachineRegistrationResource[];
+  /** @minimum 0 */
+  total_count: number;
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+}
+
+export interface CreateMachineRegistrationRequest {
+  /**
+   * The name of the machine in the project
+   * @minLength 1
+   * @maxLength 128
+   */
+  name: string;
+  /**
+   * How long the token can be used, from now
+   * @minimum 60
+   * @maximum 86400
+   */
+  expires_in_seconds?: number;
+}
+
+export interface CreateMachineRegistrationResponse {
+  registration: MachineRegistrationResource;
+  /**
+   * The token to give to the machine, returned only in this response. A secret: anyone who
+   * has it can enroll a machine into the current project until it is used, expires or is
+   * revoked. Never put it in a URL.
+   */
+  token: string;
 }
 
 /**
@@ -857,6 +948,21 @@ export type FindEnrollmentByPairingCodeParams = {
    * @maxLength 32
    */
   pairing_code: string;
+};
+
+export type ListMachineRegistrationsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
 };
 
 export type ListAccountsParams = {

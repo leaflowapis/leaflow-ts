@@ -35,6 +35,24 @@
  * 3. Approve it with `POST /api/v1/enrollments/{enrollmentId}:approve`. The machine joins the
  *    current project within its next polling interval.
  *
+ * ## Adding a machine without interaction
+ *
+ * A machine that is set up unattended, such as by cloud-init on first boot, joins with a
+ * registration token instead of a pairing code:
+ *
+ * 1. Create a registration with `POST /api/v1/machine-registrations`. It reserves a machine in
+ *    the current project under the given name and returns its `machine_id` and a `token`. The
+ *    token is returned only in this response.
+ * 2. Give the token to the machine in a file that only root can read, and run
+ *    `leaflow-fleet-agent daemon enroll --token-file <path>`. The machine joins the current
+ *    project as `machine_id` at once, and the Agent deletes the file.
+ *
+ * A token enrolls one machine once, and only until the registration expires. Anyone who reads
+ * the token before the machine uses it can enroll a key of their own instead, so pass it only
+ * to the machine, keep its lifetime short, and compare the `public_key` of the used
+ * registration with the key the machine shows when that matters. Revoke a registration that
+ * will not be used with `DELETE /api/v1/machine-registrations/{registrationId}`.
+ *
  * ## Trusting a machine's key
  *
  * Each machine has an Ed25519 key that it generates itself and that never leaves it. Viewers
@@ -141,6 +159,8 @@ import type {
   ApproveEnrollmentRequest,
   CreateGroupMemberRequest,
   CreateGroupRequest,
+  CreateMachineRegistrationRequest,
+  CreateMachineRegistrationResponse,
   CreateSessionRequest,
   CreateViewerTicketRequest,
   EnrollmentResource,
@@ -153,11 +173,14 @@ import type {
   ListGroupMembersParams,
   ListGroupsParams,
   ListMachineEventsParams,
+  ListMachineRegistrationsParams,
   ListMachinesParams,
   ListPrivilegeRequestsParams,
   ListSessionsParams,
   MachineEventList,
   MachineList,
+  MachineRegistrationList,
+  MachineRegistrationResource,
   MachineResource,
   PrivilegeApproval,
   PrivilegeRequestList,
@@ -1071,6 +1094,232 @@ export const denyEnrollment = async (
 
   const data: denyEnrollmentResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as denyEnrollmentResponse;
+};
+
+export type listMachineRegistrationsResponse200 = {
+  data: MachineRegistrationList;
+  status: 200;
+};
+
+export type listMachineRegistrationsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listMachineRegistrationsResponseSuccess = listMachineRegistrationsResponse200 & {
+  headers: Headers;
+};
+export type listMachineRegistrationsResponseError = listMachineRegistrationsResponseDefault & {
+  headers: Headers;
+};
+
+export type listMachineRegistrationsResponse =
+  | listMachineRegistrationsResponseSuccess
+  | listMachineRegistrationsResponseError;
+
+export const getListMachineRegistrationsUrl = (params?: ListMachineRegistrationsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/machine-registrations?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/machine-registrations`;
+};
+
+/**
+ * Returns the registrations of the current project, newest first. Registrations are kept
+ * for 30 days.
+ *
+ * Requires `fleet:machines.manage`.
+ * @summary List machine registrations
+ */
+export const listMachineRegistrations = async (
+  params?: ListMachineRegistrationsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listMachineRegistrationsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListMachineRegistrationsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listMachineRegistrationsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listMachineRegistrationsResponse;
+};
+
+export type createMachineRegistrationResponse201 = {
+  data: CreateMachineRegistrationResponse;
+  status: 201;
+};
+
+export type createMachineRegistrationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createMachineRegistrationResponseSuccess = createMachineRegistrationResponse201 & {
+  headers: Headers;
+};
+export type createMachineRegistrationResponseError = createMachineRegistrationResponseDefault & {
+  headers: Headers;
+};
+
+export type createMachineRegistrationResponse =
+  | createMachineRegistrationResponseSuccess
+  | createMachineRegistrationResponseError;
+
+export const getCreateMachineRegistrationUrl = () => {
+  return `https://fleet.leaflow.cloud/api/v1/machine-registrations`;
+};
+
+/**
+ * Reserves a machine in the current project under the given name and returns the
+ * registration with a one-time token. A machine that presents the token when it enrolls
+ * joins the project as `registration.machine_id` without approval. The token is returned
+ * only in this response and cannot be read again.
+ *
+ * Requires `fleet:machines.manage`.
+ * @summary Create a machine registration
+ */
+export const createMachineRegistration = async (
+  createMachineRegistrationRequest: CreateMachineRegistrationRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createMachineRegistrationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateMachineRegistrationUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createMachineRegistrationRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createMachineRegistrationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createMachineRegistrationResponse;
+};
+
+export type getMachineRegistrationResponse200 = {
+  data: MachineRegistrationResource;
+  status: 200;
+};
+
+export type getMachineRegistrationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getMachineRegistrationResponseSuccess = getMachineRegistrationResponse200 & {
+  headers: Headers;
+};
+export type getMachineRegistrationResponseError = getMachineRegistrationResponseDefault & {
+  headers: Headers;
+};
+
+export type getMachineRegistrationResponse =
+  | getMachineRegistrationResponseSuccess
+  | getMachineRegistrationResponseError;
+
+export const getGetMachineRegistrationUrl = (registrationId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machine-registrations/${encodeURIComponent(String(registrationId))}`;
+};
+
+/**
+ * Requires `fleet:machines.manage`.
+ * @summary Get a machine registration
+ */
+export const getMachineRegistration = async (
+  registrationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getMachineRegistrationResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetMachineRegistrationUrl(registrationId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getMachineRegistrationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getMachineRegistrationResponse;
+};
+
+export type deleteMachineRegistrationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteMachineRegistrationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type deleteMachineRegistrationResponseSuccess = deleteMachineRegistrationResponse204 & {
+  headers: Headers;
+};
+export type deleteMachineRegistrationResponseError = deleteMachineRegistrationResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteMachineRegistrationResponse =
+  | deleteMachineRegistrationResponseSuccess
+  | deleteMachineRegistrationResponseError;
+
+export const getDeleteMachineRegistrationUrl = (registrationId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machine-registrations/${encodeURIComponent(String(registrationId))}`;
+};
+
+/**
+ * Revokes the registration: its token no longer enrolls a machine. Revoking a registration
+ * that is already revoked or expired succeeds and changes nothing else. A registration that
+ * a machine has used is rejected with `MACHINE_REGISTRATION_USED`; to remove that machine,
+ * delete the machine.
+ *
+ * Requires `fleet:machines.manage`.
+ * @summary Revoke a machine registration
+ */
+export const deleteMachineRegistration = async (
+  registrationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteMachineRegistrationResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteMachineRegistrationUrl(registrationId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteMachineRegistrationResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteMachineRegistrationResponse;
 };
 
 export type listAccountsResponse200 = {

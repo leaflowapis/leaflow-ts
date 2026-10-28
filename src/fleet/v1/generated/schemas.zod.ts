@@ -35,6 +35,24 @@
  * 3. Approve it with `POST /api/v1/enrollments/{enrollmentId}:approve`. The machine joins the
  *    current project within its next polling interval.
  *
+ * ## Adding a machine without interaction
+ *
+ * A machine that is set up unattended, such as by cloud-init on first boot, joins with a
+ * registration token instead of a pairing code:
+ *
+ * 1. Create a registration with `POST /api/v1/machine-registrations`. It reserves a machine in
+ *    the current project under the given name and returns its `machine_id` and a `token`. The
+ *    token is returned only in this response.
+ * 2. Give the token to the machine in a file that only root can read, and run
+ *    `leaflow-fleet-agent daemon enroll --token-file <path>`. The machine joins the current
+ *    project as `machine_id` at once, and the Agent deletes the file.
+ *
+ * A token enrolls one machine once, and only until the registration expires. Anyone who reads
+ * the token before the machine uses it can enroll a key of their own instead, so pass it only
+ * to the machine, keep its lifetime short, and compare the `public_key` of the used
+ * registration with the key the machine shows when that matters. Revoke a registration that
+ * will not be used with `DELETE /api/v1/machine-registrations/{registrationId}`.
+ *
  * ## Trusting a machine's key
  *
  * Each machine has an Ed25519 key that it generates itself and that never leaves it. Viewers
@@ -142,6 +160,8 @@ import { ApproveEnrollmentRequest } from "./validators/approveEnrollmentRequest.
 import { CreateGroupMemberRequest } from "./validators/createGroupMemberRequest.zod.js";
 
 import { CreateGroupRequest } from "./validators/createGroupRequest.zod.js";
+
+import { CreateMachineRegistrationRequest } from "./validators/createMachineRegistrationRequest.zod.js";
 
 import { CreateSessionRequest } from "./validators/createSessionRequest.zod.js";
 
@@ -415,6 +435,66 @@ export const ApproveEnrollmentBody = ApproveEnrollmentRequest;
  */
 export const DenyEnrollmentParams = zod.strictObject({
   enrollmentId: zod.uuid(),
+});
+
+/**
+ * Returns the registrations of the current project, newest first. Registrations are kept
+ * for 30 days.
+ *
+ * Requires `fleet:machines.manage`.
+ * @summary List machine registrations
+ */
+export const listMachineRegistrationsQueryPageDefault = 1;
+export const listMachineRegistrationsQueryPageMax = 2147483647;
+
+export const listMachineRegistrationsQueryPageSizeDefault = 50;
+export const listMachineRegistrationsQueryPageSizeMax = 200;
+
+export const ListMachineRegistrationsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listMachineRegistrationsQueryPageMax)
+    .default(listMachineRegistrationsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listMachineRegistrationsQueryPageSizeMax)
+    .default(listMachineRegistrationsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
+
+/**
+ * Reserves a machine in the current project under the given name and returns the
+ * registration with a one-time token. A machine that presents the token when it enrolls
+ * joins the project as `registration.machine_id` without approval. The token is returned
+ * only in this response and cannot be read again.
+ *
+ * Requires `fleet:machines.manage`.
+ * @summary Create a machine registration
+ */
+export const CreateMachineRegistrationBody = CreateMachineRegistrationRequest;
+
+/**
+ * Requires `fleet:machines.manage`.
+ * @summary Get a machine registration
+ */
+export const GetMachineRegistrationParams = zod.strictObject({
+  registrationId: zod.uuid(),
+});
+
+/**
+ * Revokes the registration: its token no longer enrolls a machine. Revoking a registration
+ * that is already revoked or expired succeeds and changes nothing else. A registration that
+ * a machine has used is rejected with `MACHINE_REGISTRATION_USED`; to remove that machine,
+ * delete the machine.
+ *
+ * Requires `fleet:machines.manage`.
+ * @summary Revoke a machine registration
+ */
+export const DeleteMachineRegistrationParams = zod.strictObject({
+  registrationId: zod.uuid(),
 });
 
 /**

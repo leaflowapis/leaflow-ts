@@ -35,6 +35,24 @@
  * 3. Approve it with `POST /api/v1/enrollments/{enrollmentId}:approve`. The machine joins the
  *    current project within its next polling interval.
  *
+ * ## Adding a machine without interaction
+ *
+ * A machine that is set up unattended, such as by cloud-init on first boot, joins with a
+ * registration token instead of a pairing code:
+ *
+ * 1. Create a registration with `POST /api/v1/machine-registrations`. It reserves a machine in
+ *    the current project under the given name and returns its `machine_id` and a `token`. The
+ *    token is returned only in this response.
+ * 2. Give the token to the machine in a file that only root can read, and run
+ *    `leaflow-fleet-agent daemon enroll --token-file <path>`. The machine joins the current
+ *    project as `machine_id` at once, and the Agent deletes the file.
+ *
+ * A token enrolls one machine once, and only until the registration expires. Anyone who reads
+ * the token before the machine uses it can enroll a key of their own instead, so pass it only
+ * to the machine, keep its lifetime short, and compare the `public_key` of the used
+ * registration with the key the machine shows when that matters. Revoke a registration that
+ * will not be used with `DELETE /api/v1/machine-registrations/{registrationId}`.
+ *
  * ## Trusting a machine's key
  *
  * Each machine has an Ed25519 key that it generates itself and that never leaves it. Viewers
