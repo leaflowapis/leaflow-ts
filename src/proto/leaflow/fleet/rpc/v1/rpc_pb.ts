@@ -35,7 +35,7 @@ export type Call = Message<"leaflow.fleet.rpc.v1.Call"> & {
   /**
    * The method, in the form of a gRPC request path: "/" + full service name
    * + "/" + method name, such as
-   * "/leaflow.fleet.virtualdesktop.capture.v1.CaptureService/CaptureScreenshot".
+   * "/leaflow.fleet.filetransfer.v1.FileSystemService/ListDirectory".
    *
    * @generated from field: string method = 2;
    */

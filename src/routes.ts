@@ -3267,6 +3267,15 @@ export const routes = [
   {
     service: "fleet",
     contract: "fleet",
+    method: "POST",
+    path: "/api/v1/machines/{machineId}:runCommand",
+    operationId: "run-machine-command",
+    securityScheme: "ScopedToken",
+    upstreamUrl: "https://fleet.leaflow.cloud",
+  },
+  {
+    service: "fleet",
+    contract: "fleet",
     method: "GET",
     path: "/api/v1/enrollments:find",
     operationId: "find-enrollment-by-pairing-code",

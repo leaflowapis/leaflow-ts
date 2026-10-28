@@ -1695,8 +1695,8 @@ export const MoveResizeDirectionSchema: GenEnum<MoveResizeDirection> = /*@__PURE
 
 /**
  * Operates windows through calls. Every call follows the rules for operation
- * calls of the session channel, never makes the caller the driver, and
- * returns the session revision at which it took effect. Besides those
+ * calls (leaflow.fleet.virtualdesktop.lease.v1), never makes the caller the driver,
+ * and returns the session revision at which it took effect. Besides those
  * rules, calls fail before anything happens with:
  *   - NOT_FOUND and reason WINDOW_NOT_FOUND for a window that is gone;
  *   - FAILED_PRECONDITION and reason WINDOW_NOT_MANAGED for a window the

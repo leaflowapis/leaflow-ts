@@ -1543,8 +1543,8 @@ export const CompositionPhaseSchema: GenEnum<CompositionPhase> = /*@__PURE__*/
  * "Return", "Control_L", "F13" or "U20AC", or given as a single character,
  * such as "/"; an unknown name fails with INVALID_ARGUMENT and reason
  * UNKNOWN_KEYSYM (metadata "keysym"). Every call follows the rules for
- * operation calls of the session channel and returns the session revision at which it took
- * effect.
+ * operation calls (leaflow.fleet.virtualdesktop.lease.v1) and returns the session
+ * revision at which it took effect.
  *
  * What a gesture presses is released when its call ends, however it ends.
  * Keys and buttons pressed with DispatchKey and DispatchPointerButton stay
@@ -1552,7 +1552,7 @@ export const CompositionPhaseSchema: GenEnum<CompositionPhase> = /*@__PURE__*/
  * the input lease. A press of a pointer button brings the window it goes to
  * to the front, as a person's click does.
  *
- * Besides the refusals of the session channel, calls fail with:
+ * Besides the refusals of those rules, calls fail with:
  *   - NOT_FOUND and reason WINDOW_NOT_FOUND for a window that is gone
  *     (metadata "windowId");
  *   - FAILED_PRECONDITION and reason WINDOW_HIDDEN for a minimized window;

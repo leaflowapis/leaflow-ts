@@ -1005,7 +1005,7 @@ export const ApplicationService: GenService<{
   },
   /**
    * Ends a process of the session. It acts on the session and follows the
-   * rules for operation calls of the session channel.
+   * rules for operation calls (leaflow.fleet.virtualdesktop.lease.v1).
    *
    * @generated from rpc leaflow.fleet.virtualdesktop.application.v1.ApplicationService.TerminateProcess
    */
