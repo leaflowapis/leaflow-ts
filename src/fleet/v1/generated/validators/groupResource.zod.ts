@@ -10,12 +10,13 @@
  *
  * This API coordinates. It admits viewers to sessions and passes the signaling of their
  * connections, but everything a session shows or receives — terminals, files, the screen,
- * input, the clipboard, printing and privilege approvals — travels end to end between the viewer
- * and the session, encrypted with keys that never leave them. The platform sees which machine,
- * which session and who is connected, and nothing of what happens inside.
+ * input, the clipboard, printing and privilege approvals on a viewer — travels end to end
+ * between the viewer and the session, encrypted with keys that never leave them. The platform
+ * sees which machine, which session and who is connected, and nothing of what happens inside.
  *
- * Commands are the exception: the platform passes a command and its output between the caller
- * and the machine, and sees both.
+ * Commands and privilege requests decided on the platform are the exception: the platform passes
+ * a command and its output between the caller and the machine, and keeps the command line of a
+ * privilege request it asks the owner about; it sees both.
  *
  * ## Authentication
  *
@@ -81,8 +82,7 @@
  * machines or for chosen ones. Changes reach the machines within about a minute, and every login
  * and elevation is checked against the current permissions while the machine is connected. To
  * keep a member out of some machines, deny them `fleet:machines.login` on those machines.
- * Elevation through sudo is approved on a viewer, or by the request of a command run through this
- * API, never by a password.
+ * Elevation through sudo is never approved by a password; see "Approving sudo".
  *
  * Members log in over SSH with the keys they own among the project's SSH keys, while they may
  * log in to the machine.
@@ -98,6 +98,25 @@
  * port, no distributed key and no address the caller can reach. Like logging in, it requires
  * `fleet:machines.login` on the machine. Inside the command, `sudo` works without a prompt for
  * a caller with `fleet:machines.admin` on the machine: the request approves the elevation.
+ *
+ * ## Approving sudo
+ *
+ * An account may become root through sudo on a machine while its user has
+ * `fleet:machines.admin` there. Each elevation is approved, in the first of these ways that
+ * applies:
+ *
+ * - inside a command run through this API, by the request itself;
+ * - at once, while the user has set the machine to approve without asking, for a while or for
+ *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - by the user, on any of their devices, for a request listed by
+ *   `GET /api/v1/privilege-requests` (`POST …:approve` or `…:deny`), or on a viewer of the session
+ *   the asking process belongs to. A request nobody decides expires, and sudo fails.
+ *
+ * Requests reach the user's devices as they happen through EventBus: the event
+ * `leaflow.fleet.privilege.requested` when one is waiting and `leaflow.fleet.privilege.decided`
+ * when it ends, each addressed to the user in the current project and carrying the request's
+ * `id`. A client that subscribes to them needs no polling; one that does not can list the
+ * pending requests.
  *
  * ## Viewing a session
  *

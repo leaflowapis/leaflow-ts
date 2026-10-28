@@ -10,12 +10,13 @@
  *
  * This API coordinates. It admits viewers to sessions and passes the signaling of their
  * connections, but everything a session shows or receives — terminals, files, the screen,
- * input, the clipboard, printing and privilege approvals — travels end to end between the viewer
- * and the session, encrypted with keys that never leave them. The platform sees which machine,
- * which session and who is connected, and nothing of what happens inside.
+ * input, the clipboard, printing and privilege approvals on a viewer — travels end to end
+ * between the viewer and the session, encrypted with keys that never leave them. The platform
+ * sees which machine, which session and who is connected, and nothing of what happens inside.
  *
- * Commands are the exception: the platform passes a command and its output between the caller
- * and the machine, and sees both.
+ * Commands and privilege requests decided on the platform are the exception: the platform passes
+ * a command and its output between the caller and the machine, and keeps the command line of a
+ * privilege request it asks the owner about; it sees both.
  *
  * ## Authentication
  *
@@ -81,8 +82,7 @@
  * machines or for chosen ones. Changes reach the machines within about a minute, and every login
  * and elevation is checked against the current permissions while the machine is connected. To
  * keep a member out of some machines, deny them `fleet:machines.login` on those machines.
- * Elevation through sudo is approved on a viewer, or by the request of a command run through this
- * API, never by a password.
+ * Elevation through sudo is never approved by a password; see "Approving sudo".
  *
  * Members log in over SSH with the keys they own among the project's SSH keys, while they may
  * log in to the machine.
@@ -98,6 +98,25 @@
  * port, no distributed key and no address the caller can reach. Like logging in, it requires
  * `fleet:machines.login` on the machine. Inside the command, `sudo` works without a prompt for
  * a caller with `fleet:machines.admin` on the machine: the request approves the elevation.
+ *
+ * ## Approving sudo
+ *
+ * An account may become root through sudo on a machine while its user has
+ * `fleet:machines.admin` there. Each elevation is approved, in the first of these ways that
+ * applies:
+ *
+ * - inside a command run through this API, by the request itself;
+ * - at once, while the user has set the machine to approve without asking, for a while or for
+ *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - by the user, on any of their devices, for a request listed by
+ *   `GET /api/v1/privilege-requests` (`POST …:approve` or `…:deny`), or on a viewer of the session
+ *   the asking process belongs to. A request nobody decides expires, and sudo fails.
+ *
+ * Requests reach the user's devices as they happen through EventBus: the event
+ * `leaflow.fleet.privilege.requested` when one is waiting and `leaflow.fleet.privilege.decided`
+ * when it ends, each addressed to the user in the current project and carrying the request's
+ * `id`. A client that subscribes to them needs no polling; one that does not can list the
+ * pending requests.
  *
  * ## Viewing a session
  *
@@ -135,10 +154,14 @@ import type {
   ListGroupsParams,
   ListMachineEventsParams,
   ListMachinesParams,
+  ListPrivilegeRequestsParams,
   ListSessionsParams,
   MachineEventList,
   MachineList,
   MachineResource,
+  PrivilegeApproval,
+  PrivilegeRequestList,
+  PrivilegeRequestResource,
   RunCommandRequest,
   RunCommandResponse,
   SessionList,
@@ -549,6 +572,319 @@ export const runMachineCommand = async (
 
   const data: runMachineCommandResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as runMachineCommandResponse;
+};
+
+export type getPrivilegeApprovalResponse200 = {
+  data: PrivilegeApproval;
+  status: 200;
+};
+
+export type getPrivilegeApprovalResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getPrivilegeApprovalResponseSuccess = getPrivilegeApprovalResponse200 & {
+  headers: Headers;
+};
+export type getPrivilegeApprovalResponseError = getPrivilegeApprovalResponseDefault & {
+  headers: Headers;
+};
+
+export type getPrivilegeApprovalResponse =
+  | getPrivilegeApprovalResponseSuccess
+  | getPrivilegeApprovalResponseError;
+
+export const getGetPrivilegeApprovalUrl = (machineId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/privilege-approval`;
+};
+
+/**
+ * Returns whether the caller's elevations on the machine are approved without asking. A
+ * caller who never set it gets `never`.
+ * @summary Get the caller's privilege approval setting for a machine
+ */
+export const getPrivilegeApproval = async (
+  machineId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getPrivilegeApprovalResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetPrivilegeApprovalUrl(machineId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getPrivilegeApprovalResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getPrivilegeApprovalResponse;
+};
+
+export type updatePrivilegeApprovalResponse200 = {
+  data: PrivilegeApproval;
+  status: 200;
+};
+
+export type updatePrivilegeApprovalResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updatePrivilegeApprovalResponseSuccess = updatePrivilegeApprovalResponse200 & {
+  headers: Headers;
+};
+export type updatePrivilegeApprovalResponseError = updatePrivilegeApprovalResponseDefault & {
+  headers: Headers;
+};
+
+export type updatePrivilegeApprovalResponse =
+  | updatePrivilegeApprovalResponseSuccess
+  | updatePrivilegeApprovalResponseError;
+
+export const getUpdatePrivilegeApprovalUrl = (machineId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/privilege-approval`;
+};
+
+/**
+ * Sets whether the caller's elevations on the machine are approved without asking: `never`
+ * asks every time, `until` approves without asking until `auto_approve_until`, `forever`
+ * always does. It applies to the caller's own account only, and only while they may become
+ * root on the machine. Fails with `INVALID_ARGUMENT` when `auto_approve_until` is missing
+ * or past for `until`, or present otherwise.
+ * @summary Set the caller's privilege approval setting for a machine
+ */
+export const updatePrivilegeApproval = async (
+  machineId: string,
+  privilegeApproval: PrivilegeApproval,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updatePrivilegeApprovalResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdatePrivilegeApprovalUrl(machineId), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(privilegeApproval),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updatePrivilegeApprovalResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as updatePrivilegeApprovalResponse;
+};
+
+export type listPrivilegeRequestsResponse200 = {
+  data: PrivilegeRequestList;
+  status: 200;
+};
+
+export type listPrivilegeRequestsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listPrivilegeRequestsResponseSuccess = listPrivilegeRequestsResponse200 & {
+  headers: Headers;
+};
+export type listPrivilegeRequestsResponseError = listPrivilegeRequestsResponseDefault & {
+  headers: Headers;
+};
+
+export type listPrivilegeRequestsResponse =
+  | listPrivilegeRequestsResponseSuccess
+  | listPrivilegeRequestsResponseError;
+
+export const getListPrivilegeRequestsUrl = (params?: ListPrivilegeRequestsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/privilege-requests?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/privilege-requests`;
+};
+
+/**
+ * Returns the caller's privilege requests on the project's machines, newest first. Requests
+ * are kept for 30 days.
+ * @summary List the caller's privilege requests
+ */
+export const listPrivilegeRequests = async (
+  params?: ListPrivilegeRequestsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listPrivilegeRequestsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListPrivilegeRequestsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listPrivilegeRequestsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listPrivilegeRequestsResponse;
+};
+
+export type getPrivilegeRequestResponse200 = {
+  data: PrivilegeRequestResource;
+  status: 200;
+};
+
+export type getPrivilegeRequestResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getPrivilegeRequestResponseSuccess = getPrivilegeRequestResponse200 & {
+  headers: Headers;
+};
+export type getPrivilegeRequestResponseError = getPrivilegeRequestResponseDefault & {
+  headers: Headers;
+};
+
+export type getPrivilegeRequestResponse =
+  | getPrivilegeRequestResponseSuccess
+  | getPrivilegeRequestResponseError;
+
+export const getGetPrivilegeRequestUrl = (requestId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/privilege-requests/${encodeURIComponent(String(requestId))}`;
+};
+
+/**
+ * Returns one of the caller's privilege requests.
+ * @summary Get a privilege request
+ */
+export const getPrivilegeRequest = async (
+  requestId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getPrivilegeRequestResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetPrivilegeRequestUrl(requestId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getPrivilegeRequestResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getPrivilegeRequestResponse;
+};
+
+export type approvePrivilegeRequestResponse200 = {
+  data: PrivilegeRequestResource;
+  status: 200;
+};
+
+export type approvePrivilegeRequestResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type approvePrivilegeRequestResponseSuccess = approvePrivilegeRequestResponse200 & {
+  headers: Headers;
+};
+export type approvePrivilegeRequestResponseError = approvePrivilegeRequestResponseDefault & {
+  headers: Headers;
+};
+
+export type approvePrivilegeRequestResponse =
+  | approvePrivilegeRequestResponseSuccess
+  | approvePrivilegeRequestResponseError;
+
+export const getApprovePrivilegeRequestUrl = (requestId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/privilege-requests/${encodeURIComponent(String(requestId))}:approve`;
+};
+
+/**
+ * Approves one of the caller's pending requests; the waiting sudo goes on as root. Fails with
+ * `PRIVILEGE_REQUEST_CLOSED` when the request is no longer pending, with `metadata.state`
+ * giving how it ended.
+ * @summary Approve a privilege request
+ */
+export const approvePrivilegeRequest = async (
+  requestId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<approvePrivilegeRequestResponse> => {
+  const res = await (fetchFn ?? fetch)(getApprovePrivilegeRequestUrl(requestId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: approvePrivilegeRequestResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as approvePrivilegeRequestResponse;
+};
+
+export type denyPrivilegeRequestResponse200 = {
+  data: PrivilegeRequestResource;
+  status: 200;
+};
+
+export type denyPrivilegeRequestResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type denyPrivilegeRequestResponseSuccess = denyPrivilegeRequestResponse200 & {
+  headers: Headers;
+};
+export type denyPrivilegeRequestResponseError = denyPrivilegeRequestResponseDefault & {
+  headers: Headers;
+};
+
+export type denyPrivilegeRequestResponse =
+  | denyPrivilegeRequestResponseSuccess
+  | denyPrivilegeRequestResponseError;
+
+export const getDenyPrivilegeRequestUrl = (requestId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/privilege-requests/${encodeURIComponent(String(requestId))}:deny`;
+};
+
+/**
+ * Denies one of the caller's pending requests; the waiting sudo fails. Fails with
+ * `PRIVILEGE_REQUEST_CLOSED` as for approving.
+ * @summary Deny a privilege request
+ */
+export const denyPrivilegeRequest = async (
+  requestId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<denyPrivilegeRequestResponse> => {
+  const res = await (fetchFn ?? fetch)(getDenyPrivilegeRequestUrl(requestId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: denyPrivilegeRequestResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as denyPrivilegeRequestResponse;
 };
 
 export type findEnrollmentByPairingCodeResponse200 = {

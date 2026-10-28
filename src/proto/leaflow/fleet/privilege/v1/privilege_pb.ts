@@ -2,8 +2,8 @@
 // @generated from file leaflow/fleet/privilege/v1/privilege.proto (package leaflow.fleet.privilege.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -12,7 +12,49 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/privilege/v1/privilege.proto.
  */
 export const file_leaflow_fleet_privilege_v1_privilege: GenFile = /*@__PURE__*/
-  fileDesc("CipsZWFmbG93L2ZsZWV0L3ByaXZpbGVnZS92MS9wcml2aWxlZ2UucHJvdG8SGmxlYWZsb3cuZmxlZXQucHJpdmlsZWdlLnYxImMKDUNsaWVudE1lc3NhZ2USRwoIZGVjaXNpb24YASABKAsyMy5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5TaWduZWRQcml2aWxlZ2VEZWNpc2lvbkgAQgkKB21lc3NhZ2UiqQIKDVNlcnZlck1lc3NhZ2USPwoMc2VydmVyX2hlbGxvGAEgASgLMicubGVhZmxvdy5mbGVldC5wcml2aWxlZ2UudjEuU2VydmVySGVsbG9IABI9CgZwcm9tcHQYAiABKAsyKy5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5Qcml2aWxlZ2VQcm9tcHRIABJMCg5yZXF1ZXN0X2Nsb3NlZBgDIAEoCzIyLmxlYWZsb3cuZmxlZXQucHJpdmlsZWdlLnYxLlByaXZpbGVnZVJlcXVlc3RDbG9zZWRIABI/CgxzbmFwc2hvdF9lbmQYBCABKAsyJy5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UiJgoLU2VydmVySGVsbG8SFwoPYXBwcm92ZV9hbGxvd2VkGAEgASgIIiIKD1ByaXZpbGVnZVByb21wdBIPCgdyZXF1ZXN0GAEgASgMIv8CChBQcml2aWxlZ2VSZXF1ZXN0EhIKCnJlcXVlc3RfaWQYASABKAkSDQoFbm9uY2UYAiABKAwSEgoKbWFjaGluZV9pZBgDIAEoCRISCgpzZXNzaW9uX2lkGAQgASgJEi4KCmNyZWF0ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEgsKA3BpZBgHIAEoDRIUCgxjb21tYW5kX2xpbmUYCCABKAkSSwoScGFtX2F1dGhlbnRpY2F0aW9uGAkgASgLMi0ubGVhZmxvdy5mbGVldC5wcml2aWxlZ2UudjEuUGFtQXV0aGVudGljYXRpb25IABJDCg5rZXlyaW5nX2FjY2VzcxgKIAEoCzIpLmxlYWZsb3cuZmxlZXQucHJpdmlsZWdlLnYxLktleXJpbmdBY2Nlc3NIAEILCglvcGVyYXRpb24imQIKEVBhbUF1dGhlbnRpY2F0aW9uEg8KB3NlcnZpY2UYASABKAkSEAoIdXNlcm5hbWUYAiABKAkSFwoPcmVxdWVzdGluZ191c2VyGAMgASgJEhMKC3JlbW90ZV9ob3N0GAQgASgJEgsKA3R0eRgFIAEoCRIYChBwb2xraXRfYWN0aW9uX2lkGAYgASgJEg8KB21lc3NhZ2UYByABKAkSSwoHZGV0YWlscxgIIAMoCzI6LmxlYWZsb3cuZmxlZXQucHJpdmlsZWdlLnYxLlBhbUF1dGhlbnRpY2F0aW9uLkRldGFpbHNFbnRyeRouCgxEZXRhaWxzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJqCg1LZXlyaW5nQWNjZXNzEj8KCW9wZXJhdGlvbhgBIAEoDjIsLmxlYWZsb3cuZmxlZXQucHJpdmlsZWdlLnYxLktleXJpbmdPcGVyYXRpb24SGAoQY29sbGVjdGlvbl9sYWJlbBgCIAEoCSI+ChdTaWduZWRQcml2aWxlZ2VEZWNpc2lvbhIQCghkZWNpc2lvbhgBIAEoDBIRCglzaWduYXR1cmUYAiABKAwibQoRUHJpdmlsZWdlRGVjaXNpb24SFgoOcmVxdWVzdF9zaGEyNTYYASABKAwSEAoIYXBwcm92ZWQYAiABKAgSLgoKZGVjaWRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiawoWUHJpdmlsZWdlUmVxdWVzdENsb3NlZBISCgpyZXF1ZXN0X2lkGAEgASgJEj0KB291dGNvbWUYAiABKA4yLC5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5Qcml2aWxlZ2VPdXRjb21lIg0KC1NuYXBzaG90RW5kIioKD1ByaXZpbGVnZVBvbGljeRIXCg9hcHByb3ZlX2FsbG93ZWQYASABKAgqhwEKEEtleXJpbmdPcGVyYXRpb24SIQodS0VZUklOR19PUEVSQVRJT05fVU5TUEVDSUZJRUQQABInCiNLRVlSSU5HX09QRVJBVElPTl9VTkxPQ0tfQ09MTEVDVElPThABEicKI0tFWVJJTkdfT1BFUkFUSU9OX0NSRUFURV9DT0xMRUNUSU9OEAIqswEKEFByaXZpbGVnZU91dGNvbWUSIQodUFJJVklMRUdFX09VVENPTUVfVU5TUEVDSUZJRUQQABIeChpQUklWSUxFR0VfT1VUQ09NRV9BUFBST1ZFRBABEhwKGFBSSVZJTEVHRV9PVVRDT01FX0RFTklFRBACEh0KGVBSSVZJTEVHRV9PVVRDT01FX0VYUElSRUQQAxIfChtQUklWSUxFR0VfT1VUQ09NRV9DQU5DRUxMRUQQBEJCWkBnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvcHJpdmlsZWdlL3YxO3ByaXZpbGVnZXYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
+  fileDesc("CipsZWFmbG93L2ZsZWV0L3ByaXZpbGVnZS92MS9wcml2aWxlZ2UucHJvdG8SGmxlYWZsb3cuZmxlZXQucHJpdmlsZWdlLnYxIl4KHURlY2lkZVByaXZpbGVnZVJlcXVlc3RSZXF1ZXN0Ej0KB3JlcXVlc3QYASABKAsyLC5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5Qcml2aWxlZ2VSZXF1ZXN0Il8KHkRlY2lkZVByaXZpbGVnZVJlcXVlc3RSZXNwb25zZRI9CgdvdXRjb21lGAEgASgOMiwubGVhZmxvdy5mbGVldC5wcml2aWxlZ2UudjEuUHJpdmlsZWdlT3V0Y29tZSJjCg1DbGllbnRNZXNzYWdlEkcKCGRlY2lzaW9uGAEgASgLMjMubGVhZmxvdy5mbGVldC5wcml2aWxlZ2UudjEuU2lnbmVkUHJpdmlsZWdlRGVjaXNpb25IAEIJCgdtZXNzYWdlIqkCCg1TZXJ2ZXJNZXNzYWdlEj8KDHNlcnZlcl9oZWxsbxgBIAEoCzInLmxlYWZsb3cuZmxlZXQucHJpdmlsZWdlLnYxLlNlcnZlckhlbGxvSAASPQoGcHJvbXB0GAIgASgLMisubGVhZmxvdy5mbGVldC5wcml2aWxlZ2UudjEuUHJpdmlsZWdlUHJvbXB0SAASTAoOcmVxdWVzdF9jbG9zZWQYAyABKAsyMi5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5Qcml2aWxlZ2VSZXF1ZXN0Q2xvc2VkSAASPwoMc25hcHNob3RfZW5kGAQgASgLMicubGVhZmxvdy5mbGVldC5wcml2aWxlZ2UudjEuU25hcHNob3RFbmRIAEIJCgdtZXNzYWdlIiYKC1NlcnZlckhlbGxvEhcKD2FwcHJvdmVfYWxsb3dlZBgBIAEoCCIiCg9Qcml2aWxlZ2VQcm9tcHQSDwoHcmVxdWVzdBgBIAEoDCL/AgoQUHJpdmlsZWdlUmVxdWVzdBISCgpyZXF1ZXN0X2lkGAEgASgJEg0KBW5vbmNlGAIgASgMEhIKCm1hY2hpbmVfaWQYAyABKAkSEgoKc2Vzc2lvbl9pZBgEIAEoCRIuCgpjcmVhdGVkX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBILCgNwaWQYByABKA0SFAoMY29tbWFuZF9saW5lGAggASgJEksKEnBhbV9hdXRoZW50aWNhdGlvbhgJIAEoCzItLmxlYWZsb3cuZmxlZXQucHJpdmlsZWdlLnYxLlBhbUF1dGhlbnRpY2F0aW9uSAASQwoOa2V5cmluZ19hY2Nlc3MYCiABKAsyKS5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5LZXlyaW5nQWNjZXNzSABCCwoJb3BlcmF0aW9uIpkCChFQYW1BdXRoZW50aWNhdGlvbhIPCgdzZXJ2aWNlGAEgASgJEhAKCHVzZXJuYW1lGAIgASgJEhcKD3JlcXVlc3RpbmdfdXNlchgDIAEoCRITCgtyZW1vdGVfaG9zdBgEIAEoCRILCgN0dHkYBSABKAkSGAoQcG9sa2l0X2FjdGlvbl9pZBgGIAEoCRIPCgdtZXNzYWdlGAcgASgJEksKB2RldGFpbHMYCCADKAsyOi5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5QYW1BdXRoZW50aWNhdGlvbi5EZXRhaWxzRW50cnkaLgoMRGV0YWlsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiagoNS2V5cmluZ0FjY2VzcxI/CglvcGVyYXRpb24YASABKA4yLC5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5LZXlyaW5nT3BlcmF0aW9uEhgKEGNvbGxlY3Rpb25fbGFiZWwYAiABKAkiPgoXU2lnbmVkUHJpdmlsZWdlRGVjaXNpb24SEAoIZGVjaXNpb24YASABKAwSEQoJc2lnbmF0dXJlGAIgASgMIm0KEVByaXZpbGVnZURlY2lzaW9uEhYKDnJlcXVlc3Rfc2hhMjU2GAEgASgMEhAKCGFwcHJvdmVkGAIgASgIEi4KCmRlY2lkZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wImsKFlByaXZpbGVnZVJlcXVlc3RDbG9zZWQSEgoKcmVxdWVzdF9pZBgBIAEoCRI9CgdvdXRjb21lGAIgASgOMiwubGVhZmxvdy5mbGVldC5wcml2aWxlZ2UudjEuUHJpdmlsZWdlT3V0Y29tZSINCgtTbmFwc2hvdEVuZCIqCg9Qcml2aWxlZ2VQb2xpY3kSFwoPYXBwcm92ZV9hbGxvd2VkGAEgASgIKocBChBLZXlyaW5nT3BlcmF0aW9uEiEKHUtFWVJJTkdfT1BFUkFUSU9OX1VOU1BFQ0lGSUVEEAASJwojS0VZUklOR19PUEVSQVRJT05fVU5MT0NLX0NPTExFQ1RJT04QARInCiNLRVlSSU5HX09QRVJBVElPTl9DUkVBVEVfQ09MTEVDVElPThACKrMBChBQcml2aWxlZ2VPdXRjb21lEiEKHVBSSVZJTEVHRV9PVVRDT01FX1VOU1BFQ0lGSUVEEAASHgoaUFJJVklMRUdFX09VVENPTUVfQVBQUk9WRUQQARIcChhQUklWSUxFR0VfT1VUQ09NRV9ERU5JRUQQAhIdChlQUklWSUxFR0VfT1VUQ09NRV9FWFBJUkVEEAMSHwobUFJJVklMRUdFX09VVENPTUVfQ0FOQ0VMTEVEEAQypAEKEFByaXZpbGVnZVNlcnZpY2USjwEKFkRlY2lkZVByaXZpbGVnZVJlcXVlc3QSOS5sZWFmbG93LmZsZWV0LnByaXZpbGVnZS52MS5EZWNpZGVQcml2aWxlZ2VSZXF1ZXN0UmVxdWVzdBo6LmxlYWZsb3cuZmxlZXQucHJpdmlsZWdlLnYxLkRlY2lkZVByaXZpbGVnZVJlcXVlc3RSZXNwb25zZUJCWkBnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvcHJpdmlsZWdlL3YxO3ByaXZpbGVnZXYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
+
+/**
+ * The request of DecidePrivilegeRequest.
+ *
+ * @generated from message leaflow.fleet.privilege.v1.DecidePrivilegeRequestRequest
+ */
+export type DecidePrivilegeRequestRequest = Message<"leaflow.fleet.privilege.v1.DecidePrivilegeRequestRequest"> & {
+  /**
+   * The request, as the daemon shows it to viewers.
+   *
+   * @generated from field: leaflow.fleet.privilege.v1.PrivilegeRequest request = 1;
+   */
+  request?: PrivilegeRequest | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.privilege.v1.DecidePrivilegeRequestRequest.
+ * Use `create(DecidePrivilegeRequestRequestSchema)` to create a new message.
+ */
+export const DecidePrivilegeRequestRequestSchema: GenMessage<DecidePrivilegeRequestRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 0);
+
+/**
+ * The response of DecidePrivilegeRequest.
+ *
+ * @generated from message leaflow.fleet.privilege.v1.DecidePrivilegeRequestResponse
+ */
+export type DecidePrivilegeRequestResponse = Message<"leaflow.fleet.privilege.v1.DecidePrivilegeRequestResponse"> & {
+  /**
+   * APPROVED, DENIED or EXPIRED.
+   *
+   * @generated from field: leaflow.fleet.privilege.v1.PrivilegeOutcome outcome = 1;
+   */
+  outcome: PrivilegeOutcome;
+};
+
+/**
+ * Describes the message leaflow.fleet.privilege.v1.DecidePrivilegeRequestResponse.
+ * Use `create(DecidePrivilegeRequestResponseSchema)` to create a new message.
+ */
+export const DecidePrivilegeRequestResponseSchema: GenMessage<DecidePrivilegeRequestResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 1);
 
 /**
  * A message from the viewer.
@@ -41,7 +83,7 @@ export type ClientMessage = Message<"leaflow.fleet.privilege.v1.ClientMessage"> 
  * Use `create(ClientMessageSchema)` to create a new message.
  */
 export const ClientMessageSchema: GenMessage<ClientMessage> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 0);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 2);
 
 /**
  * A message from the session.
@@ -94,7 +136,7 @@ export type ServerMessage = Message<"leaflow.fleet.privilege.v1.ServerMessage"> 
  * Use `create(ServerMessageSchema)` to create a new message.
  */
 export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 1);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 3);
 
 /**
  * What this viewer may do.
@@ -116,7 +158,7 @@ export type ServerHello = Message<"leaflow.fleet.privilege.v1.ServerHello"> & {
  * Use `create(ServerHelloSchema)` to create a new message.
  */
 export const ServerHelloSchema: GenMessage<ServerHello> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 2);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 4);
 
 /**
  * A pending request to show.
@@ -139,7 +181,7 @@ export type PrivilegePrompt = Message<"leaflow.fleet.privilege.v1.PrivilegePromp
  * Use `create(PrivilegePromptSchema)` to create a new message.
  */
 export const PrivilegePromptSchema: GenMessage<PrivilegePrompt> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 3);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 5);
 
 /**
  * A request for a privileged operation, serialized by the Agent's privileged
@@ -170,7 +212,8 @@ export type PrivilegeRequest = Message<"leaflow.fleet.privilege.v1.PrivilegeRequ
   machineId: string;
 
   /**
-   * The session the asking process belongs to.
+   * The session the asking process belongs to. Empty when it belongs to no
+   * session of the platform, such as after an SSH login.
    *
    * @generated from field: string session_id = 4;
    */
@@ -236,7 +279,7 @@ export type PrivilegeRequest = Message<"leaflow.fleet.privilege.v1.PrivilegeRequ
  * Use `create(PrivilegeRequestSchema)` to create a new message.
  */
 export const PrivilegeRequestSchema: GenMessage<PrivilegeRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 4);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 6);
 
 /**
  * Authentication by a PAM stack (pam_start(3)), as sudo and polkit ask for
@@ -309,7 +352,7 @@ export type PamAuthentication = Message<"leaflow.fleet.privilege.v1.PamAuthentic
  * Use `create(PamAuthenticationSchema)` to create a new message.
  */
 export const PamAuthenticationSchema: GenMessage<PamAuthentication> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 5);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 7);
 
 /**
  * Access to a collection of the user's keyring (freedesktop Secret Service
@@ -339,7 +382,7 @@ export type KeyringAccess = Message<"leaflow.fleet.privilege.v1.KeyringAccess"> 
  * Use `create(KeyringAccessSchema)` to create a new message.
  */
 export const KeyringAccessSchema: GenMessage<KeyringAccess> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 6);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 8);
 
 /**
  * A person's decision, signed by the viewer.
@@ -369,7 +412,7 @@ export type SignedPrivilegeDecision = Message<"leaflow.fleet.privilege.v1.Signed
  * Use `create(SignedPrivilegeDecisionSchema)` to create a new message.
  */
 export const SignedPrivilegeDecisionSchema: GenMessage<SignedPrivilegeDecision> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 7);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 9);
 
 /**
  * A person's decision on one request.
@@ -404,7 +447,7 @@ export type PrivilegeDecision = Message<"leaflow.fleet.privilege.v1.PrivilegeDec
  * Use `create(PrivilegeDecisionSchema)` to create a new message.
  */
 export const PrivilegeDecisionSchema: GenMessage<PrivilegeDecision> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 8);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 10);
 
 /**
  * A request is no longer pending.
@@ -432,7 +475,7 @@ export type PrivilegeRequestClosed = Message<"leaflow.fleet.privilege.v1.Privile
  * Use `create(PrivilegeRequestClosedSchema)` to create a new message.
  */
 export const PrivilegeRequestClosedSchema: GenMessage<PrivilegeRequestClosed> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 9);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 11);
 
 /**
  * Ends the snapshot.
@@ -447,7 +490,7 @@ export type SnapshotEnd = Message<"leaflow.fleet.privilege.v1.SnapshotEnd"> & {
  * Use `create(SnapshotEndSchema)` to create a new message.
  */
 export const SnapshotEndSchema: GenMessage<SnapshotEnd> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 10);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 12);
 
 /**
  * What a viewer may do with privilege requests. Carried in the viewer's
@@ -470,7 +513,7 @@ export type PrivilegePolicy = Message<"leaflow.fleet.privilege.v1.PrivilegePolic
  * Use `create(PrivilegePolicySchema)` to create a new message.
  */
 export const PrivilegePolicySchema: GenMessage<PrivilegePolicy> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 11);
+  messageDesc(file_leaflow_fleet_privilege_v1_privilege, 13);
 
 /**
  * An operation on the keyring that needs approval.
@@ -549,4 +592,48 @@ export enum PrivilegeOutcome {
  */
 export const PrivilegeOutcomeSchema: GenEnum<PrivilegeOutcome> = /*@__PURE__*/
   enumDesc(file_leaflow_fleet_privilege_v1_privilege, 1);
+
+/**
+ * Decides on the platform the PAM authentications of directory accounts
+ * (leaflow.fleet.directory.v1), so that sudo works where no viewer can
+ * approve, such as after an SSH login, and its owner can approve from any of
+ * their devices. Served by the service on daemon connections
+ * (leaflow.fleet.control.v1).
+ *
+ * The daemon asks for every PAM authentication of a directory account, at
+ * the same time as it shows the request to the viewers of the session the
+ * process belongs to, if any. The first decision counts: the daemon cancels
+ * this call (CallCancel) once a viewer decides, and stops showing the request
+ * once this call answers. A decision of the platform is not signed; the
+ * daemon trusts it as it trusts the service for the directory.
+ *
+ * Unlike a viewer, the platform keeps the request's claims with the request
+ * and shows them to the account's owner: at most the first 4 KiB of
+ * command_line, and remote_host and tty.
+ *
+ * @generated from service leaflow.fleet.privilege.v1.PrivilegeService
+ */
+export const PrivilegeService: GenService<{
+  /**
+   * Decides a request. While the account's owner has set the machine to
+   * approve their requests without asking, the request is approved at once.
+   * Otherwise the owner is asked on the platform, and the answer is their
+   * decision, or EXPIRED once expires_at passes without one.
+   *
+   * Fails with:
+   *   - NOT_FOUND and reason ACCOUNT_NOT_FOUND when the username of the
+   *     authentication is not an account of the machine's directory;
+   *   - PERMISSION_DENIED and reason PRIVILEGE_NOT_ALLOWED when the account
+   *     may not become root on the machine (Account.admin), or the operation
+   *     is not a PAM authentication.
+   *
+   * @generated from rpc leaflow.fleet.privilege.v1.PrivilegeService.DecidePrivilegeRequest
+   */
+  decidePrivilegeRequest: {
+    methodKind: "unary";
+    input: typeof DecidePrivilegeRequestRequestSchema;
+    output: typeof DecidePrivilegeRequestResponseSchema;
+  },
+}> = /*@__PURE__*/
+  serviceDesc(file_leaflow_fleet_privilege_v1_privilege, 0);
 

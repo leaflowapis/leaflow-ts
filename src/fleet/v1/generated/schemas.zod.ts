@@ -10,12 +10,13 @@
  *
  * This API coordinates. It admits viewers to sessions and passes the signaling of their
  * connections, but everything a session shows or receives — terminals, files, the screen,
- * input, the clipboard, printing and privilege approvals — travels end to end between the viewer
- * and the session, encrypted with keys that never leave them. The platform sees which machine,
- * which session and who is connected, and nothing of what happens inside.
+ * input, the clipboard, printing and privilege approvals on a viewer — travels end to end
+ * between the viewer and the session, encrypted with keys that never leave them. The platform
+ * sees which machine, which session and who is connected, and nothing of what happens inside.
  *
- * Commands are the exception: the platform passes a command and its output between the caller
- * and the machine, and sees both.
+ * Commands and privilege requests decided on the platform are the exception: the platform passes
+ * a command and its output between the caller and the machine, and keeps the command line of a
+ * privilege request it asks the owner about; it sees both.
  *
  * ## Authentication
  *
@@ -81,8 +82,7 @@
  * machines or for chosen ones. Changes reach the machines within about a minute, and every login
  * and elevation is checked against the current permissions while the machine is connected. To
  * keep a member out of some machines, deny them `fleet:machines.login` on those machines.
- * Elevation through sudo is approved on a viewer, or by the request of a command run through this
- * API, never by a password.
+ * Elevation through sudo is never approved by a password; see "Approving sudo".
  *
  * Members log in over SSH with the keys they own among the project's SSH keys, while they may
  * log in to the machine.
@@ -98,6 +98,25 @@
  * port, no distributed key and no address the caller can reach. Like logging in, it requires
  * `fleet:machines.login` on the machine. Inside the command, `sudo` works without a prompt for
  * a caller with `fleet:machines.admin` on the machine: the request approves the elevation.
+ *
+ * ## Approving sudo
+ *
+ * An account may become root through sudo on a machine while its user has
+ * `fleet:machines.admin` there. Each elevation is approved, in the first of these ways that
+ * applies:
+ *
+ * - inside a command run through this API, by the request itself;
+ * - at once, while the user has set the machine to approve without asking, for a while or for
+ *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - by the user, on any of their devices, for a request listed by
+ *   `GET /api/v1/privilege-requests` (`POST …:approve` or `…:deny`), or on a viewer of the session
+ *   the asking process belongs to. A request nobody decides expires, and sudo fails.
+ *
+ * Requests reach the user's devices as they happen through EventBus: the event
+ * `leaflow.fleet.privilege.requested` when one is waiting and `leaflow.fleet.privilege.decided`
+ * when it ends, each addressed to the user in the current project and carrying the request's
+ * `id`. A client that subscribes to them needs no polling; one that does not can list the
+ * pending requests.
  *
  * ## Viewing a session
  *
@@ -127,6 +146,8 @@ import { CreateGroupRequest } from "./validators/createGroupRequest.zod.js";
 import { CreateSessionRequest } from "./validators/createSessionRequest.zod.js";
 
 import { CreateViewerTicketRequest } from "./validators/createViewerTicketRequest.zod.js";
+
+import { PrivilegeApproval } from "./validators/privilegeApproval.zod.js";
 
 import { RunCommandRequest } from "./validators/runCommandRequest.zod.js";
 
@@ -264,6 +285,87 @@ export const RunMachineCommandParams = zod.strictObject({
 });
 
 export const RunMachineCommandBody = RunCommandRequest;
+
+/**
+ * Returns whether the caller's elevations on the machine are approved without asking. A
+ * caller who never set it gets `never`.
+ * @summary Get the caller's privilege approval setting for a machine
+ */
+export const GetPrivilegeApprovalParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+/**
+ * Sets whether the caller's elevations on the machine are approved without asking: `never`
+ * asks every time, `until` approves without asking until `auto_approve_until`, `forever`
+ * always does. It applies to the caller's own account only, and only while they may become
+ * root on the machine. Fails with `INVALID_ARGUMENT` when `auto_approve_until` is missing
+ * or past for `until`, or present otherwise.
+ * @summary Set the caller's privilege approval setting for a machine
+ */
+export const UpdatePrivilegeApprovalParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+export const UpdatePrivilegeApprovalBody = PrivilegeApproval;
+
+/**
+ * Returns the caller's privilege requests on the project's machines, newest first. Requests
+ * are kept for 30 days.
+ * @summary List the caller's privilege requests
+ */
+export const listPrivilegeRequestsQueryPageDefault = 1;
+export const listPrivilegeRequestsQueryPageMax = 2147483647;
+
+export const listPrivilegeRequestsQueryPageSizeDefault = 50;
+export const listPrivilegeRequestsQueryPageSizeMax = 200;
+
+export const ListPrivilegeRequestsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listPrivilegeRequestsQueryPageMax)
+    .default(listPrivilegeRequestsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listPrivilegeRequestsQueryPageSizeMax)
+    .default(listPrivilegeRequestsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+  state: zod
+    .enum(["pending", "approved", "denied", "expired", "cancelled"])
+    .optional()
+    .describe("Return only the requests in this state"),
+  machine_id: zod.uuid().optional().describe("Return only the requests on this machine"),
+});
+
+/**
+ * Returns one of the caller's privilege requests.
+ * @summary Get a privilege request
+ */
+export const GetPrivilegeRequestParams = zod.strictObject({
+  requestId: zod.uuid(),
+});
+
+/**
+ * Approves one of the caller's pending requests; the waiting sudo goes on as root. Fails with
+ * `PRIVILEGE_REQUEST_CLOSED` when the request is no longer pending, with `metadata.state`
+ * giving how it ended.
+ * @summary Approve a privilege request
+ */
+export const ApprovePrivilegeRequestParams = zod.strictObject({
+  requestId: zod.uuid(),
+});
+
+/**
+ * Denies one of the caller's pending requests; the waiting sudo fails. Fails with
+ * `PRIVILEGE_REQUEST_CLOSED` as for approving.
+ * @summary Deny a privilege request
+ */
+export const DenyPrivilegeRequestParams = zod.strictObject({
+  requestId: zod.uuid(),
+});
 
 /**
  * Returns the pending enrollment request whose pairing code matches, or no enrollment when
