@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/rpc/v1/rpc.proto.
  */
 export const file_leaflow_fleet_rpc_v1_rpc: GenFile = /*@__PURE__*/
-  fileDesc("Ch5sZWFmbG93L2ZsZWV0L3JwYy92MS9ycGMucHJvdG8SFGxlYWZsb3cuZmxlZXQucnBjLnYxInUKBENhbGwSEgoKcmVxdWVzdF9pZBgBIAEoCRIOCgZtZXRob2QYAiABKAkSDwoHcGF5bG9hZBgDIAEoDBIqCgd0aW1lb3V0GAQgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEgwKBG1vcmUYBSABKAgicAoKQ2FsbFJlc3VsdBISCgpyZXF1ZXN0X2lkGAEgASgJEhEKB3BheWxvYWQYAiABKAxIABIjCgVlcnJvchgDIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzSAASDAoEbW9yZRgEIAEoCEIICgZyZXN1bHQiIAoKQ2FsbENhbmNlbBISCgpyZXF1ZXN0X2lkGAEgASgJIn8KDUNsaWVudE1lc3NhZ2USKgoEY2FsbBgBIAEoCzIaLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxIABI3CgtjYWxsX2NhbmNlbBgCIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxDYW5jZWxIAEIJCgdtZXNzYWdlIlMKDVNlcnZlck1lc3NhZ2USNwoLY2FsbF9yZXN1bHQYASABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsUmVzdWx0SABCCQoHbWVzc2FnZSqOAQoORXhlY3V0aW9uU3RhdGUSHwobRVhFQ1VUSU9OX1NUQVRFX1VOU1BFQ0lGSUVEEAASHwobRVhFQ1VUSU9OX1NUQVRFX05PVF9TVEFSVEVEEAESHQoZRVhFQ1VUSU9OX1NUQVRFX0NPTVBMRVRFRBACEhsKF0VYRUNVVElPTl9TVEFURV9VTktOT1dOEANCNlo0Z2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3JwYy92MTtycGN2MWIGcHJvdG8z", [file_google_protobuf_duration, file_google_rpc_status]);
+  fileDesc("Ch5sZWFmbG93L2ZsZWV0L3JwYy92MS9ycGMucHJvdG8SFGxlYWZsb3cuZmxlZXQucnBjLnYxImcKBENhbGwSEgoKcmVxdWVzdF9pZBgBIAEoCRIOCgZtZXRob2QYAiABKAkSDwoHcGF5bG9hZBgDIAEoDBIqCgd0aW1lb3V0GAQgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uImIKCkNhbGxSZXN1bHQSEgoKcmVxdWVzdF9pZBgBIAEoCRIRCgdwYXlsb2FkGAIgASgMSAASIwoFZXJyb3IYAyABKAsyEi5nb29nbGUucnBjLlN0YXR1c0gAQggKBnJlc3VsdCIgCgpDYWxsQ2FuY2VsEhIKCnJlcXVlc3RfaWQYASABKAkifwoNQ2xpZW50TWVzc2FnZRIqCgRjYWxsGAEgASgLMhoubGVhZmxvdy5mbGVldC5ycGMudjEuQ2FsbEgAEjcKC2NhbGxfY2FuY2VsGAIgASgLMiAubGVhZmxvdy5mbGVldC5ycGMudjEuQ2FsbENhbmNlbEgAQgkKB21lc3NhZ2UiUwoNU2VydmVyTWVzc2FnZRI3CgtjYWxsX3Jlc3VsdBgBIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxSZXN1bHRIAEIJCgdtZXNzYWdlKo4BCg5FeGVjdXRpb25TdGF0ZRIfChtFWEVDVVRJT05fU1RBVEVfVU5TUEVDSUZJRUQQABIfChtFWEVDVVRJT05fU1RBVEVfTk9UX1NUQVJURUQQARIdChlFWEVDVVRJT05fU1RBVEVfQ09NUExFVEVEEAISGwoXRVhFQ1VUSU9OX1NUQVRFX1VOS05PV04QA0I2WjRnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvcnBjL3YxO3JwY3YxYgZwcm90bzM", [file_google_protobuf_duration, file_google_rpc_status]);
 
 /**
  * Invokes a method.
@@ -49,21 +49,13 @@ export type Call = Message<"leaflow.fleet.rpc.v1.Call"> & {
   payload: Uint8Array;
 
   /**
-   * How long the callee may work on the call, counted from the receipt of
-   * its first piece. When it passes the result is DEADLINE_EXCEEDED. Unset:
-   * the default the method documents.
+   * How long the callee may work on the call, counted from receipt. When it
+   * passes the result is DEADLINE_EXCEEDED. Unset: the default the method
+   * documents.
    *
    * @generated from field: google.protobuf.Duration timeout = 4;
    */
   timeout?: Duration | undefined;
-
-  /**
-   * Set on every piece of the payload but the last (see Pieces). Method and
-   * timeout are only on the first piece.
-   *
-   * @generated from field: bool more = 5;
-   */
-  more: boolean;
 };
 
 /**
@@ -110,13 +102,6 @@ export type CallResult = Message<"leaflow.fleet.rpc.v1.CallResult"> & {
     value: Status;
     case: "error";
   } | { case: undefined; value?: undefined };
-
-  /**
-   * Set on every piece of the payload but the last (see Pieces).
-   *
-   * @generated from field: bool more = 4;
-   */
-  more: boolean;
 };
 
 /**
