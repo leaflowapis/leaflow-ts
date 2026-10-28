@@ -33,6 +33,7 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { LatestOperation } from "./latestOperation.zod.js";
 import { RegionID } from "./regionID.zod.js";
 import { VirtualPrivateCloudID } from "./virtualPrivateCloudID.zod.js";
 
@@ -54,6 +55,11 @@ export const VirtualPrivateCloud = zod.strictObject({
     ),
   created_at: zod.iso.datetime({ offset: true }),
   updated_at: zod.iso.datetime({ offset: true }),
+  latest_operation: zod
+    .union([LatestOperation, zod.null()])
+    .describe(
+      "The most recent operation started on the virtual private cloud; null when none has been recorded.",
+    ),
 });
 
 export type VirtualPrivateCloud = zod.input<typeof VirtualPrivateCloud>;

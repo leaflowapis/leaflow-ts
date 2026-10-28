@@ -608,6 +608,28 @@ export interface ElasticIPAssociation {
 }
 
 /**
+ * `operating` while the operation runs; `succeeded` or `failed` once it has ended.
+ */
+export type LatestOperationState = (typeof LatestOperationState)[keyof typeof LatestOperationState];
+
+export const LatestOperationState = {
+  operating: "operating",
+  succeeded: "succeeded",
+  failed: "failed",
+} as const;
+
+/**
+ * The most recent operation started on a resource and how it stands. It is replaced when the next operation starts.
+ */
+export interface LatestOperation {
+  /** The operation, named as the request that started it, for example `resize` or `attach_volume`. While `state` is `operating`, the resource's `status` names the same operation in progress. */
+  name: string;
+  /** `operating` while the operation runs; `succeeded` or `failed` once it has ended. */
+  state: LatestOperationState;
+  started_at: string;
+}
+
+/**
  * One public IP resource, including its bandwidth configuration. Bandwidth has no separate Compute resource ID.
  * Two subscriptions of one order pay for it: the address subscription, always pay-as-you-go, charges for the
  * address while it is not associated with anything, and the network subscription, on the terms chosen at
@@ -673,6 +695,8 @@ export interface ElasticIP {
    */
   failure_reason: ElasticIPFailureReason;
   association: ElasticIPAssociation | null;
+  /** The most recent operation started on the elastic IP; null when none has been recorded. */
+  latest_operation: LatestOperation | null;
 }
 
 /**
@@ -1237,6 +1261,8 @@ export interface Instance {
    * @nullable
    */
   launch_template_version_number: number | null;
+  /** The most recent operation started on the instance; null when none has been recorded. */
+  latest_operation: LatestOperation | null;
 }
 
 /**
@@ -1942,6 +1968,8 @@ export interface NetworkInterface {
   attachment: NetworkInterfaceAttachment | null;
   /** `pending` until the interface is created, then `available`. `error` means its creation failed or the cloud reports it broken; delete it and create another. A value naming an operation in progress (`attaching`, `detaching`, `associating_elastic_ip`, `updating_security_groups`, `adding_address`, `removing_address`, `deleting`) is shown while that operation runs; the interface refuses another operation until it ends. */
   status: NetworkInterfaceStatus;
+  /** The most recent operation started on the network interface; null when none has been recorded. */
+  latest_operation: LatestOperation | null;
 }
 
 export interface NetworkInterfaceListResponseBody {
@@ -2162,6 +2190,8 @@ export interface PrivateImageResource {
   readonly subscription_id: string | null;
   /** The subscription that pays for this private image, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription pays for it, and once it is released. */
   release_set: ReleaseSetItem[];
+  /** The most recent operation started on the image; null when none has been recorded. */
+  latest_operation: LatestOperation | null;
 }
 
 /**
@@ -2487,6 +2517,8 @@ export interface VirtualPrivateCloudPeeringResource {
    * @nullable
    */
   failure_reason: string | null;
+  /** The most recent operation started on the peering; null when none has been recorded. */
+  latest_operation: LatestOperation | null;
 }
 
 export interface VirtualPrivateCloudPeeringListResponseBody {
@@ -2635,6 +2667,8 @@ export interface VirtualPrivateCloud {
   status: VirtualPrivateCloudStatus;
   created_at: string;
   updated_at: string;
+  /** The most recent operation started on the virtual private cloud; null when none has been recorded. */
+  latest_operation: LatestOperation | null;
 }
 
 export interface VirtualPrivateCloudListResponseBody {
@@ -2749,6 +2783,8 @@ export interface VolumeBackupResource {
   readonly subscription_id: string | null;
   /** The subscription that pays for this volume backup, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription pays for it, and once it is released. */
   release_set: ReleaseSetItem[];
+  /** The most recent operation started on the backup; null when none has been recorded. */
+  latest_operation: LatestOperation | null;
 }
 
 /**
@@ -2874,6 +2910,8 @@ export interface VolumeSnapshotResource {
   readonly subscription_id: string | null;
   /** The subscription that pays for this snapshot, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription pays for it, and once it is released. */
   release_set: ReleaseSetItem[];
+  /** The most recent operation started on the snapshot; null when none has been recorded. */
+  latest_operation: LatestOperation | null;
 }
 
 /**
@@ -3136,6 +3174,8 @@ export interface VolumeResource {
    */
   failure_reason: VolumeResourceFailureReason;
   attachment: VolumeAttachment | null;
+  /** The most recent operation started on the volume; null when none has been recorded. */
+  latest_operation: LatestOperation | null;
 }
 
 /**

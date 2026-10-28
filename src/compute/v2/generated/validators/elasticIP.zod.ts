@@ -38,6 +38,7 @@ import { ElasticIPID } from "./elasticIPID.zod.js";
 import { ElasticIPLineID } from "./elasticIPLineID.zod.js";
 import { InternetChargeType } from "./internetChargeType.zod.js";
 import { IPv4HostAddress } from "./iPv4HostAddress.zod.js";
+import { LatestOperation } from "./latestOperation.zod.js";
 import { RegionID } from "./regionID.zod.js";
 import { ReleaseSetItem } from "./releaseSetItem.zod.js";
 
@@ -135,6 +136,11 @@ export const ElasticIP = zod
         "Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this elastic IP is refunded.",
       ),
     association: zod.union([ElasticIPAssociation, zod.null()]),
+    latest_operation: zod
+      .union([LatestOperation, zod.null()])
+      .describe(
+        "The most recent operation started on the elastic IP; null when none has been recorded.",
+      ),
   })
   .describe(
     "One public IP resource, including its bandwidth configuration. Bandwidth has no separate Compute resource ID.\nTwo subscriptions of one order pay for it: the address subscription, always pay-as-you-go, charges for the\naddress while it is not associated with anything, and the network subscription, on the terms chosen at\npurchase, charges for the bandwidth or the traffic. Changing bandwidth updates this same resource, not another\nallocation.",

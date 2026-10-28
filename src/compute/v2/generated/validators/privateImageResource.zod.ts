@@ -35,6 +35,7 @@
 import * as zod from "zod";
 import { ImageID } from "./imageID.zod.js";
 import { InstanceID } from "./instanceID.zod.js";
+import { LatestOperation } from "./latestOperation.zod.js";
 import { RegionID } from "./regionID.zod.js";
 import { ReleaseSetItem } from "./releaseSetItem.zod.js";
 
@@ -132,6 +133,11 @@ export const PrivateImageResource = zod
       .array(ReleaseSetItem)
       .describe(
         "The subscription that pays for this private image, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription pays for it, and once it is released.",
+      ),
+    latest_operation: zod
+      .union([LatestOperation, zod.null()])
+      .describe(
+        "The most recent operation started on the image; null when none has been recorded.",
       ),
   })
   .describe(

@@ -34,6 +34,7 @@
  */
 import * as zod from "zod";
 import { AvailabilityZoneID } from "./availabilityZoneID.zod.js";
+import { LatestOperation } from "./latestOperation.zod.js";
 import { RegionID } from "./regionID.zod.js";
 import { ReleaseSetItem } from "./releaseSetItem.zod.js";
 import { VolumeBackupID } from "./volumeBackupID.zod.js";
@@ -94,6 +95,11 @@ export const VolumeBackupResource = zod
       .array(ReleaseSetItem)
       .describe(
         "The subscription that pays for this volume backup, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription pays for it, and once it is released.",
+      ),
+    latest_operation: zod
+      .union([LatestOperation, zod.null()])
+      .describe(
+        "The most recent operation started on the backup; null when none has been recorded.",
       ),
   })
   .describe(

@@ -38,6 +38,7 @@ import { ImageID } from "./imageID.zod.js";
 import { InstanceID } from "./instanceID.zod.js";
 import { InstanceRestriction } from "./instanceRestriction.zod.js";
 import { InstanceTypeID } from "./instanceTypeID.zod.js";
+import { LatestOperation } from "./latestOperation.zod.js";
 import { LaunchTemplateID } from "./launchTemplateID.zod.js";
 import { RegionID } from "./regionID.zod.js";
 import { ReleaseSetItem } from "./releaseSetItem.zod.js";
@@ -188,6 +189,11 @@ export const Instance = zod.strictObject({
     .int()
     .nullable()
     .describe("The version of that launch template it was created from; null when none was named."),
+  latest_operation: zod
+    .union([LatestOperation, zod.null()])
+    .describe(
+      "The most recent operation started on the instance; null when none has been recorded.",
+    ),
 });
 
 export type Instance = zod.input<typeof Instance>;

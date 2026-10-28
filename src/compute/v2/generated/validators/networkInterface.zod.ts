@@ -33,6 +33,7 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { LatestOperation } from "./latestOperation.zod.js";
 import { NetworkInterfaceAddress } from "./networkInterfaceAddress.zod.js";
 import { NetworkInterfaceAttachment } from "./networkInterfaceAttachment.zod.js";
 import { NetworkInterfaceID } from "./networkInterfaceID.zod.js";
@@ -70,6 +71,11 @@ export const NetworkInterface = zod.strictObject({
     ])
     .describe(
       "`pending` until the interface is created, then `available`. `error` means its creation failed or the cloud reports it broken; delete it and create another. A value naming an operation in progress (`attaching`, `detaching`, `associating_elastic_ip`, `updating_security_groups`, `adding_address`, `removing_address`, `deleting`) is shown while that operation runs; the interface refuses another operation until it ends.",
+    ),
+  latest_operation: zod
+    .union([LatestOperation, zod.null()])
+    .describe(
+      "The most recent operation started on the network interface; null when none has been recorded.",
     ),
 });
 

@@ -34,6 +34,7 @@
  */
 import * as zod from "zod";
 import { AvailabilityZoneID } from "./availabilityZoneID.zod.js";
+import { LatestOperation } from "./latestOperation.zod.js";
 import { RegionID } from "./regionID.zod.js";
 import { ReleaseSetItem } from "./releaseSetItem.zod.js";
 import { VolumeAttachment } from "./volumeAttachment.zod.js";
@@ -112,6 +113,9 @@ export const VolumeResource = zod.strictObject({
       "Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this volume is refunded.",
     ),
   attachment: zod.union([VolumeAttachment, zod.null()]),
+  latest_operation: zod
+    .union([LatestOperation, zod.null()])
+    .describe("The most recent operation started on the volume; null when none has been recorded."),
 });
 
 export type VolumeResource = zod.input<typeof VolumeResource>;

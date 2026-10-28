@@ -33,6 +33,7 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { LatestOperation } from "./latestOperation.zod.js";
 import { RegionID } from "./regionID.zod.js";
 import { VirtualPrivateCloudID } from "./virtualPrivateCloudID.zod.js";
 import { VirtualPrivateCloudPeeringID } from "./virtualPrivateCloudPeeringID.zod.js";
@@ -60,6 +61,11 @@ export const VirtualPrivateCloudPeeringResource = zod.strictObject({
     .string()
     .nullable()
     .describe("Why provisioning failed; null unless `status` is `failed`."),
+  latest_operation: zod
+    .union([LatestOperation, zod.null()])
+    .describe(
+      "The most recent operation started on the peering; null when none has been recorded.",
+    ),
 });
 
 export type VirtualPrivateCloudPeeringResource = zod.input<
