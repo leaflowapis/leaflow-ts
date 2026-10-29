@@ -16,6 +16,10 @@
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
  *
+ * ## SSH keys
+ *
+ * The SSH keys of an account sign its holder in as themselves, in every project they belong to: Fleet machines accept them for the holder's directory account wherever `fleet:machines.login` allows it, and Compute installs them on the servers the holder creates or reinstalls. A key is active on one account at most. Keys shared by a project, such as one used by CI, belong to the project instead and are managed through the IAM API.
+ *
  * ## Project slugs
  *
  * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
@@ -31,7 +35,11 @@ import { AcceptInvitationByTokenRequestBody } from "./validators/acceptInvitatio
 
 import { CreateProjectRequestBody } from "./validators/createProjectRequestBody.zod.js";
 
+import { CreateSSHKeyRequestBody } from "./validators/createSSHKeyRequestBody.zod.js";
+
 import { RegisterRequestBody } from "./validators/registerRequestBody.zod.js";
+
+import { RenameSSHKeyRequestBody } from "./validators/renameSSHKeyRequestBody.zod.js";
 
 import { SubmitIdentityVerificationRequestBody } from "./validators/submitIdentityVerificationRequestBody.zod.js";
 
@@ -83,6 +91,71 @@ export const RequestAccountDeletionQueryParams = zod.strictObject({
  * @summary Submit identity verification
  */
 export const SubmitIdentityVerificationBody = SubmitIdentityVerificationRequestBody;
+
+/**
+ * Most recent first.
+ * @summary List the SSH keys of the current account
+ */
+export const listSshKeysQueryLimitDefault = 50;
+export const listSshKeysQueryLimitMax = 200;
+
+export const listSshKeysQueryOffsetDefault = 0;
+export const listSshKeysQueryOffsetMin = 0;
+export const listSshKeysQueryOffsetMax = 10000;
+
+export const ListSshKeysQueryParams = zod.strictObject({
+  limit: zod
+    .int()
+    .min(1)
+    .max(listSshKeysQueryLimitMax)
+    .default(listSshKeysQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
+  offset: zod
+    .int()
+    .min(listSshKeysQueryOffsetMin)
+    .max(listSshKeysQueryOffsetMax)
+    .default(listSshKeysQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
+  status: zod
+    .enum(["ACTIVE", "REVOKED"])
+    .optional()
+    .describe("Both kinds are returned while this is absent"),
+});
+
+/**
+ * The key takes effect in every project the caller belongs to: Fleet machines accept it within about a minute, and Compute installs it on the servers the caller creates or reinstalls from then on.
+ *
+ * Fails with 409 `SSH_KEY_ALREADY_EXISTS` while the same key is active on any account, this one included, and with 412 `SSH_KEY_QUOTA_EXCEEDED` while the account already holds 50 active keys.
+ * @summary Add an SSH key to the current account
+ */
+export const CreateSshKeyBody = CreateSSHKeyRequestBody;
+
+/**
+ * @summary Get an SSH key of the current account
+ */
+export const GetSshKeyParams = zod.strictObject({
+  keyId: zod.uuid(),
+});
+
+/**
+ * Only the name can change. The key, its type and its fingerprint are three statements about one thing, and changing one of them would leave the row describing a key that does not exist.
+ * @summary Rename an SSH key of the current account
+ */
+export const RenameSshKeyParams = zod.strictObject({
+  keyId: zod.uuid(),
+});
+
+export const RenameSshKeyBody = RenameSSHKeyRequestBody;
+
+/**
+ * The row remains and its status becomes `REVOKED`, so it stays answerable afterwards which key was trusted at the time. Fleet machines stop accepting the key within about a minute. A server on which Compute installed the key keeps it until it is removed there.
+ *
+ * The same key can then be added again, to this account or another.
+ * @summary Revoke an SSH key of the current account
+ */
+export const RevokeSshKeyParams = zod.strictObject({
+  keyId: zod.uuid(),
+});
 
 /**
  * Matched against the email address of the current account.

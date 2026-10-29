@@ -16,6 +16,10 @@
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
  *
+ * ## SSH keys
+ *
+ * The SSH keys of an account sign its holder in as themselves, in every project they belong to: Fleet machines accept them for the holder's directory account wherever `fleet:machines.login` allows it, and Compute installs them on the servers the holder creates or reinstalls. A key is active on one account at most. Keys shared by a project, such as one used by CI, belong to the project instead and are managed through the IAM API.
+ *
  * ## Project slugs
  *
  * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.

@@ -16,6 +16,10 @@
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
  *
+ * ## SSH keys
+ *
+ * The SSH keys of an account sign its holder in as themselves, in every project they belong to: Fleet machines accept them for the holder's directory account wherever `fleet:machines.login` allows it, and Compute installs them on the servers the holder creates or reinstalls. A key is active on one account at most. Keys shared by a project, such as one used by CI, belong to the project instead and are managed through the IAM API.
+ *
  * ## Project slugs
  *
  * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
@@ -417,6 +421,59 @@ export interface SubmitIdentityVerificationRequestBody {
   real_name: string;
 }
 
+export type SSHKeyResourceStatus = (typeof SSHKeyResourceStatus)[keyof typeof SSHKeyResourceStatus];
+
+export const SSHKeyResourceStatus = {
+  ACTIVE: "ACTIVE",
+  REVOKED: "REVOKED",
+} as const;
+
+export interface SSHKeyResource {
+  created_at: string;
+  /** The SHA-256 fingerprint, as `ssh-keygen -l` prints it */
+  fingerprint: string;
+  id: string;
+  /** The algorithm, such as `ssh-ed25519` */
+  key_type: string;
+  name: string;
+  /** The key in OpenSSH format, without the comment it was added with */
+  public_key: string;
+  status: SSHKeyResourceStatus;
+}
+
+export interface LengthAwarePageSSHKeyResource {
+  /** The items in this page */
+  items: SSHKeyResource[];
+  /** Maximum number of items in this page, echoing the request */
+  limit: number;
+  /** Number of items skipped, echoing the request */
+  offset: number;
+  /** Total number of matches, not only this page */
+  total: number;
+}
+
+export interface CreateSSHKeyRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name: string;
+  /**
+   * The public key in OpenSSH format. The type and the fingerprint are derived from it and cannot be changed. A certificate is refused, being a signature rather than a key
+   * @minLength 1
+   * @maxLength 16384
+   */
+  public_key: string;
+}
+
+export interface RenameSSHKeyRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name: string;
+}
+
 /**
  * What an invitation states before it is accepted. It carries neither the invitation id nor the full recipient address; the invitations listed against the current account are returned by `list-my-invitations`
  */
@@ -648,6 +705,32 @@ export type RequestAccountDeletionParams = {
    */
   acknowledge_forfeiture: true;
 };
+
+export type ListSshKeysParams = {
+  /**
+   * Items returned in this page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * Items to skip. Defaults to 0; at most 10000.
+   * @minimum 0
+   * @maximum 10000
+   */
+  offset?: number;
+  /**
+   * Both kinds are returned while this is absent
+   */
+  status?: ListSshKeysStatus;
+};
+
+export type ListSshKeysStatus = (typeof ListSshKeysStatus)[keyof typeof ListSshKeysStatus];
+
+export const ListSshKeysStatus = {
+  ACTIVE: "ACTIVE",
+  REVOKED: "REVOKED",
+} as const;
 
 export type ListMyInvitationsParams = {
   /**

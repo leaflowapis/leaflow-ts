@@ -16,6 +16,10 @@
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
  *
+ * ## SSH keys
+ *
+ * The SSH keys of an account sign its holder in as themselves, in every project they belong to: Fleet machines accept them for the holder's directory account wherever `fleet:machines.login` allows it, and Compute installs them on the servers the holder creates or reinstalls. A key is active on one account at most. Keys shared by a project, such as one used by CI, belong to the project instead and are managed through the IAM API.
+ *
  * ## Project slugs
  *
  * Every project carries a `slug`, the label naming it in its address. Until a custom slug is chosen the slug is the project's `id`, and the address under the `id` keeps working after a custom slug is chosen. `GET /account/v1/projects/by-slug/{slug}` finds the project named by either label.
@@ -32,20 +36,25 @@ import type {
   AgreementListResponseBody,
   ConsentListResponseBody,
   CreateProjectRequestBody,
+  CreateSSHKeyRequestBody,
   Error,
   IdentityVerificationResource,
   InvitationPreviewResource,
   LengthAwarePageInvitationResource,
   LengthAwarePageProjectAccessResource,
+  LengthAwarePageSSHKeyResource,
   ListMyInvitationsParams,
   ListProjectsParams,
+  ListSshKeysParams,
   LocaleOptionsResource,
   PreviewInvitationByTokenParams,
   ProjectAccessList,
   ProjectAccessResource,
   ProjectSlugAvailabilityResource,
   RegisterRequestBody,
+  RenameSSHKeyRequestBody,
   RequestAccountDeletionParams,
+  SSHKeyResource,
   ScopedTokenResponseBody,
   SearchProjectsRequestBody,
   SettingsResource,
@@ -777,6 +786,279 @@ export const submitIdentityVerification = async (
 
   const data: submitIdentityVerificationResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as submitIdentityVerificationResponse;
+};
+
+export type listSshKeysResponse200 = {
+  data: LengthAwarePageSSHKeyResource;
+  status: 200;
+};
+
+export type listSshKeysResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listSshKeysResponseSuccess = listSshKeysResponse200 & {
+  headers: Headers;
+};
+export type listSshKeysResponseError = listSshKeysResponseDefault & {
+  headers: Headers;
+};
+
+export type listSshKeysResponse = listSshKeysResponseSuccess | listSshKeysResponseError;
+
+export const getListSshKeysUrl = (params?: ListSshKeysParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://account.leaflow.cloud/account/v1/me/ssh-keys?${stringifiedParams}`
+    : `https://account.leaflow.cloud/account/v1/me/ssh-keys`;
+};
+
+/**
+ * Most recent first.
+ * @summary List the SSH keys of the current account
+ */
+export const listSshKeys = async (
+  params?: ListSshKeysParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listSshKeysResponse> => {
+  const res = await (fetchFn ?? fetch)(getListSshKeysUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listSshKeysResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listSshKeysResponse;
+};
+
+export type createSshKeyResponse201 = {
+  data: SSHKeyResource;
+  status: 201;
+};
+
+export type createSshKeyResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createSshKeyResponseSuccess = createSshKeyResponse201 & {
+  headers: Headers;
+};
+export type createSshKeyResponseError = createSshKeyResponseDefault & {
+  headers: Headers;
+};
+
+export type createSshKeyResponse = createSshKeyResponseSuccess | createSshKeyResponseError;
+
+export const getCreateSshKeyUrl = () => {
+  return `https://account.leaflow.cloud/account/v1/me/ssh-keys`;
+};
+
+/**
+ * The key takes effect in every project the caller belongs to: Fleet machines accept it within about a minute, and Compute installs it on the servers the caller creates or reinstalls from then on.
+ *
+ * Fails with 409 `SSH_KEY_ALREADY_EXISTS` while the same key is active on any account, this one included, and with 412 `SSH_KEY_QUOTA_EXCEEDED` while the account already holds 50 active keys.
+ * @summary Add an SSH key to the current account
+ */
+export const createSshKey = async (
+  createSSHKeyRequestBody: CreateSSHKeyRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createSshKeyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateSshKeyUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createSSHKeyRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createSshKeyResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createSshKeyResponse;
+};
+
+export type getSshKeyResponse200 = {
+  data: SSHKeyResource;
+  status: 200;
+};
+
+export type getSshKeyResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getSshKeyResponseSuccess = getSshKeyResponse200 & {
+  headers: Headers;
+};
+export type getSshKeyResponseError = getSshKeyResponseDefault & {
+  headers: Headers;
+};
+
+export type getSshKeyResponse = getSshKeyResponseSuccess | getSshKeyResponseError;
+
+export const getGetSshKeyUrl = (keyId: string) => {
+  return `https://account.leaflow.cloud/account/v1/me/ssh-keys/${encodeURIComponent(String(keyId))}`;
+};
+
+/**
+ * @summary Get an SSH key of the current account
+ */
+export const getSshKey = async (
+  keyId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getSshKeyResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetSshKeyUrl(keyId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getSshKeyResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getSshKeyResponse;
+};
+
+export type renameSshKeyResponse200 = {
+  data: SSHKeyResource;
+  status: 200;
+};
+
+export type renameSshKeyResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type renameSshKeyResponseSuccess = renameSshKeyResponse200 & {
+  headers: Headers;
+};
+export type renameSshKeyResponseError = renameSshKeyResponseDefault & {
+  headers: Headers;
+};
+
+export type renameSshKeyResponse = renameSshKeyResponseSuccess | renameSshKeyResponseError;
+
+export const getRenameSshKeyUrl = (keyId: string) => {
+  return `https://account.leaflow.cloud/account/v1/me/ssh-keys/${encodeURIComponent(String(keyId))}`;
+};
+
+/**
+ * Only the name can change. The key, its type and its fingerprint are three statements about one thing, and changing one of them would leave the row describing a key that does not exist.
+ * @summary Rename an SSH key of the current account
+ */
+export const renameSshKey = async (
+  keyId: string,
+  renameSSHKeyRequestBody: RenameSSHKeyRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<renameSshKeyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getRenameSshKeyUrl(keyId), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(renameSSHKeyRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: renameSshKeyResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as renameSshKeyResponse;
+};
+
+export type revokeSshKeyResponse200 = {
+  data: SSHKeyResource;
+  status: 200;
+};
+
+export type revokeSshKeyResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type revokeSshKeyResponseSuccess = revokeSshKeyResponse200 & {
+  headers: Headers;
+};
+export type revokeSshKeyResponseError = revokeSshKeyResponseDefault & {
+  headers: Headers;
+};
+
+export type revokeSshKeyResponse = revokeSshKeyResponseSuccess | revokeSshKeyResponseError;
+
+export const getRevokeSshKeyUrl = (keyId: string) => {
+  return `https://account.leaflow.cloud/account/v1/me/ssh-keys/${encodeURIComponent(String(keyId))}`;
+};
+
+/**
+ * The row remains and its status becomes `REVOKED`, so it stays answerable afterwards which key was trusted at the time. Fleet machines stop accepting the key within about a minute. A server on which Compute installed the key keeps it until it is removed there.
+ *
+ * The same key can then be added again, to this account or another.
+ * @summary Revoke an SSH key of the current account
+ */
+export const revokeSshKey = async (
+  keyId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<revokeSshKeyResponse> => {
+  const res = await (fetchFn ?? fetch)(getRevokeSshKeyUrl(keyId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: revokeSshKeyResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as revokeSshKeyResponse;
 };
 
 export type listMyInvitationsResponse200 = {
