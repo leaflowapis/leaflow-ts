@@ -207,7 +207,7 @@ export const PeerConnection = zod
     candidates: zod
       .array(IceCandidate)
       .describe(
-        "The session's ICE candidates gathered until it reported the end of its candidates, or\nuntil 2 seconds after its answer",
+        "The session's ICE candidates gathered until it reported the end of its candidates, or\nuntil 10 seconds after its answer",
       ),
     authorization: SignedMessage.describe(
       "The signed `PeerAuthorization` of the PeerConnection, the same one the session holds",

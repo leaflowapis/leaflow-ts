@@ -955,7 +955,7 @@ export interface PeerConnection {
   answer: string;
   /**
    * The session's ICE candidates gathered until it reported the end of its candidates, or
-   * until 2 seconds after its answer
+   * until 10 seconds after its answer
    */
   candidates: IceCandidate[];
   /** The signed `PeerAuthorization` of the PeerConnection, the same one the session holds */
