@@ -139,16 +139,28 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has approved their requests on the machine without asking, for a
- *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
+ * - by the user's automatic approval for the machine, for a while or until removed
+ *   (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`), in one of two modes:
+ *   - `automatic_review`, the recommended one: a large language model reviews each request and
+ *     approves or denies it with a reason. It stops most dangerous requests, but not all of
+ *     them. Each review is a request to Canopy, the model platform, through the project's
+ *     Canopy service, and may incur Canopy charges; the project needs Canopy enabled. A
+ *     request that cannot be reviewed, such as when the project has not enabled Canopy or the
+ *     review does not complete in time, is denied with a reason saying so;
+ *   - `always_approve`: every request is approved at once. This is dangerous: any program that
+ *     runs as the account, such as a script or an AI agent, becomes root without anyone being
+ *     asked;
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
  *
+ * A denied sudo shows whoever ran it the reason, when the denial gave one.
+ *
  * Requests reach the user's devices as they happen through EventBus: the event
- * `leaflow.fleet.privilege.requested` when one is waiting and `leaflow.fleet.privilege.decided`
- * when it ends, each addressed to the user in the current project and carrying the request's
- * `id`. A client that subscribes to them needs no polling; one that does not can list the
+ * `leaflow.fleet.privilege.requested` when one waits for the user and
+ * `leaflow.fleet.privilege.decided` when it ends, each addressed to the user in the current
+ * project and carrying the request's `id`. Requests decided without asking the user raise
+ * neither. A client that subscribes to them needs no polling; one that does not can list the
  * pending requests.
  *
  * ## Connections that drop
@@ -239,6 +251,7 @@ import type {
   CreatePeerConnectionRequest,
   CreateSessionRequest,
   DeleteMcpServerParams,
+  DenyPrivilegeRequestRequest,
   EnrollmentResource,
   Error,
   FindEnrollmentByPairingCodeParams,
@@ -1281,12 +1294,14 @@ export const getUpdatePrivilegeAutoApprovalUrl = (machineId: string) => {
 };
 
 /**
- * Approves the caller's privilege requests on the machine at once, until `expires_at`, or
- * until removed when `expires_at` is null, replacing any earlier automatic approval. It
- * applies to the caller's own account only, which is created if the caller has none yet,
- * and only while they may become root on the machine. Fails with `INVALID_ARGUMENT` when
+ * Has the caller's privilege requests on the machine decided without asking them, in
+ * `mode`, until `expires_at`, or until removed when `expires_at` is null, replacing any
+ * earlier automatic approval. `automatic_review` is recommended; with `always_approve` any
+ * program that runs as the account becomes root without anyone being asked. It applies to
+ * the caller's own account only, which is created if the caller has none yet, and only
+ * while they may become root on the machine. Fails with `INVALID_ARGUMENT` when
  * `expires_at` has passed.
- * @summary Approve the caller's privilege requests on a machine without asking
+ * @summary Decide the caller's privilege requests on a machine without asking
  */
 export const updatePrivilegeAutoApproval = async (
   machineId: string,
@@ -1607,18 +1622,40 @@ export const getDenyPrivilegeRequestUrl = (requestId: string) => {
 };
 
 /**
- * Denies one of the caller's pending requests; the waiting sudo fails. Fails with
- * `PRIVILEGE_REQUEST_CLOSED` as for approving.
+ * Denies one of the caller's pending requests; the waiting sudo fails and shows `reason`,
+ * when given, to whoever ran it. Fails with `PRIVILEGE_REQUEST_CLOSED` as for approving.
  * @summary Deny a privilege request
  */
 export const denyPrivilegeRequest = async (
   requestId: string,
+  denyPrivilegeRequestRequest?: DenyPrivilegeRequestRequest,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<denyPrivilegeRequestResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
   const res = await (fetchFn ?? fetch)(getDenyPrivilegeRequestUrl(requestId), {
     ...options,
     method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(denyPrivilegeRequestRequest),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();

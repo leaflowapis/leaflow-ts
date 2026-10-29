@@ -139,16 +139,28 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has approved their requests on the machine without asking, for a
- *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
+ * - by the user's automatic approval for the machine, for a while or until removed
+ *   (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`), in one of two modes:
+ *   - `automatic_review`, the recommended one: a large language model reviews each request and
+ *     approves or denies it with a reason. It stops most dangerous requests, but not all of
+ *     them. Each review is a request to Canopy, the model platform, through the project's
+ *     Canopy service, and may incur Canopy charges; the project needs Canopy enabled. A
+ *     request that cannot be reviewed, such as when the project has not enabled Canopy or the
+ *     review does not complete in time, is denied with a reason saying so;
+ *   - `always_approve`: every request is approved at once. This is dangerous: any program that
+ *     runs as the account, such as a script or an AI agent, becomes root without anyone being
+ *     asked;
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
  *
+ * A denied sudo shows whoever ran it the reason, when the denial gave one.
+ *
  * Requests reach the user's devices as they happen through EventBus: the event
- * `leaflow.fleet.privilege.requested` when one is waiting and `leaflow.fleet.privilege.decided`
- * when it ends, each addressed to the user in the current project and carrying the request's
- * `id`. A client that subscribes to them needs no polling; one that does not can list the
+ * `leaflow.fleet.privilege.requested` when one waits for the user and
+ * `leaflow.fleet.privilege.decided` when it ends, each addressed to the user in the current
+ * project and carrying the request's `id`. Requests decided without asking the user raise
+ * neither. A client that subscribes to them needs no polling; one that does not can list the
  * pending requests.
  *
  * ## Connections that drop
@@ -1101,7 +1113,28 @@ export interface McpToolList {
   unavailable_servers: McpUnavailableServer[];
 }
 
+/**
+ * How the caller's privilege requests on the machine are decided without asking them:
+ * - `automatic_review`, recommended: a large language model reviews each request from what
+ *   the machine reports about it, chiefly the command line, and approves or denies it with
+ *   a reason. It stops most dangerous requests, but not all of them. Each review is a
+ *   request to Canopy through the project's Canopy service and may incur Canopy charges. A
+ *   request that cannot be reviewed, such as when the project has not enabled Canopy, is
+ *   denied.
+ * - `always_approve`: every request is approved at once. Dangerous: any program that runs
+ *   as the account, such as a script or an AI agent, becomes root without anyone being
+ *   asked.
+ */
+export type PrivilegeAutoApprovalMode =
+  (typeof PrivilegeAutoApprovalMode)[keyof typeof PrivilegeAutoApprovalMode];
+
+export const PrivilegeAutoApprovalMode = {
+  automatic_review: "automatic_review",
+  always_approve: "always_approve",
+} as const;
+
 export interface UpdatePrivilegeAutoApprovalRequest {
+  mode: PrivilegeAutoApprovalMode;
   /**
    * When the automatic approval ends; null for one that lasts until removed
    * @nullable
@@ -1112,6 +1145,7 @@ export interface UpdatePrivilegeAutoApprovalRequest {
 export interface PrivilegeAutoApprovalResource {
   id: string;
   machine_id: string;
+  mode: PrivilegeAutoApprovalMode;
   /**
    * When the automatic approval ends; null for one that lasts until removed
    * @nullable
@@ -1132,15 +1166,25 @@ export interface PrivilegeAutoApprovalList {
 }
 
 /**
- * Who decided a request on the platform: `user` the user, or `auto_approval` the user's
- * automatic approval for the machine, at once.
+ * Who decided a request on the platform: `user` the user, `always_approve` the user's
+ * automatic approval that approves every request, or `automatic_review` the large language
+ * model that reviewed it.
  */
 export type PrivilegeDecider = (typeof PrivilegeDecider)[keyof typeof PrivilegeDecider];
 
 export const PrivilegeDecider = {
   user: "user",
-  auto_approval: "auto_approval",
+  always_approve: "always_approve",
+  automatic_review: "automatic_review",
 } as const;
+
+export interface DenyPrivilegeRequestRequest {
+  /**
+   * Why, shown to whoever ran sudo: plain text without control characters
+   * @maxLength 200
+   */
+  reason?: string;
+}
 
 /**
  * `pending` waits for a decision; `approved` and `denied` were decided on the platform, as
@@ -1185,6 +1229,13 @@ export interface PrivilegeRequestResource {
   state: PrivilegeRequestState;
   /** Who decided an `approved` or `denied` request; null in any other state */
   decided_by: PrivilegeDecider | null;
+  /**
+   * Why the request was decided so: as the user gave it when denying, or as the automatic
+   * review gave it, including why a review could not be made; null when none was given
+   * @maxLength 200
+   * @nullable
+   */
+  reason: string | null;
   created_at: string;
   expires_at: string;
   /**
