@@ -120,6 +120,18 @@
  * `fleet:machines.login` on the machine. Inside the command, `sudo` works without a prompt for
  * a caller with `fleet:machines.admin` on the machine: the request approves the elevation.
  *
+ * ## MCP servers
+ *
+ * A machine that offers `leaflow.fleet.mcp.v1` reaches the MCP servers its accounts configure:
+ * servers it runs itself and remote servers it connects to. Each account configures them in
+ * `~/.local/share/leaflow/agent/mcp.json` in its home directory, in the `mcpServers` format other
+ * MCP clients use, by hand or through this API; the machine picks up every change by itself.
+ * The caller's servers run as the caller's account, and the requests below act on them only.
+ *
+ * The configuration stays on the machine. The values of `env` and `headers` often hold
+ * credentials: this API writes them, and they then pass through the platform, but never returns
+ * them. Arguments, URLs, tool arguments and tool results pass through the platform as they are.
+ *
  * ## Approving sudo
  *
  * An account may become root through sudo on a machine while its user has
@@ -212,6 +224,8 @@ import * as zod from "zod";
 
 import { ApproveEnrollmentRequest } from "./validators/approveEnrollmentRequest.zod.js";
 
+import { CallMcpToolRequest } from "./validators/callMcpToolRequest.zod.js";
+
 import { CreateGroupMemberRequest } from "./validators/createGroupMemberRequest.zod.js";
 
 import { CreateGroupRequest } from "./validators/createGroupRequest.zod.js";
@@ -230,13 +244,19 @@ import { MigrationStep } from "./validators/migrationStep.zod.js";
 
 import { RenewParticipantRequest } from "./validators/renewParticipantRequest.zod.js";
 
+import { ReplaceMcpConfigurationRequest } from "./validators/replaceMcpConfigurationRequest.zod.js";
+
 import { RunCommandRequest } from "./validators/runCommandRequest.zod.js";
+
+import { SendMcpRequestRequest } from "./validators/sendMcpRequestRequest.zod.js";
 
 import { UpdateAccountRequest } from "./validators/updateAccountRequest.zod.js";
 
 import { UpdateGroupRequest } from "./validators/updateGroupRequest.zod.js";
 
 import { UpdateMachineRequest } from "./validators/updateMachineRequest.zod.js";
+
+import { UpdateMcpServerRequest } from "./validators/updateMcpServerRequest.zod.js";
 
 import { UpdatePrivilegeAutoApprovalRequest } from "./validators/updatePrivilegeAutoApprovalRequest.zod.js";
 
@@ -368,6 +388,228 @@ export const RunMachineCommandParams = zod.strictObject({
 });
 
 export const RunMachineCommandBody = RunCommandRequest;
+
+/**
+ * Returns the caller's MCP configuration file on the machine and every server in it, with
+ * what each is doing now. The values of `env` and `headers` are never returned, only their
+ * keys. Requires `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary Get the caller's MCP configuration on a machine
+ */
+export const GetMcpConfigurationParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+/**
+ * Replaces the caller's MCP configuration file on the machine as a whole, also one that cannot
+ * be read or is not valid. The machine starts the servers that were added, stops the ones
+ * that were removed and restarts the ones that changed when they are next used. The account
+ * is created if the caller has none yet. The content, secrets included, passes through the
+ * platform. Requires `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MCP_CONFIGURATION_CHANGED` when the file is no longer at `expected_revision`;
+ * - `MCP_CONFIGURATION_INVALID` when `content` is not an object with an object `mcpServers`,
+ *   with `metadata.line` and `metadata.column`;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary Replace the caller's MCP configuration on a machine
+ */
+export const ReplaceMcpConfigurationParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+export const ReplaceMcpConfigurationBody = ReplaceMcpConfigurationRequest;
+
+/**
+ * Adds a server to the caller's MCP configuration on the machine, or replaces the one with
+ * the same name. The values of `env` and `headers` the request gives, secrets included, pass
+ * through the platform; those named in `keep_env` and `keep_headers` stay as they are on the
+ * machine. The account is created if the caller has none yet. Requires
+ * `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MCP_CONFIGURATION_CHANGED` when the file is no longer at `expected_revision`;
+ * - `MCP_CONFIGURATION_INVALID` when the file cannot be read or is not valid; replace it
+ *   whole first;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary Add or replace an MCP server
+ */
+export const updateMcpServerPathServerNameRegExp = new RegExp("^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$");
+
+export const UpdateMcpServerParams = zod.strictObject({
+  machineId: zod.uuid(),
+  serverName: zod
+    .string()
+    .regex(updateMcpServerPathServerNameRegExp)
+    .describe(
+      "The server's key in `mcpServers`: a letter or digit, then up to 63 letters, digits, `_`\nor `-`, without `__`, since the tools of all servers are named `<server>__<tool>` together",
+    ),
+});
+
+export const UpdateMcpServerBody = UpdateMcpServerRequest;
+
+/**
+ * Removes a server from the caller's MCP configuration on the machine and stops it. Removing
+ * one that is not configured succeeds. Requires `fleet:machines.login` on the machine.
+ *
+ * Fails as replacing a server does.
+ * @summary Remove an MCP server
+ */
+export const deleteMcpServerPathServerNameRegExp = new RegExp("^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$");
+
+export const DeleteMcpServerParams = zod.strictObject({
+  machineId: zod.uuid(),
+  serverName: zod
+    .string()
+    .regex(deleteMcpServerPathServerNameRegExp)
+    .describe(
+      "The server's key in `mcpServers`: a letter or digit, then up to 63 letters, digits, `_`\nor `-`, without `__`, since the tools of all servers are named `<server>__<tool>` together",
+    ),
+});
+
+export const deleteMcpServerQueryExpectedRevisionMax = 64;
+
+export const DeleteMcpServerQueryParams = zod.strictObject({
+  expected_revision: zod
+    .string()
+    .max(deleteMcpServerQueryExpectedRevisionMax)
+    .optional()
+    .describe(
+      "The configuration's `revision` as last read; absent only for one that was `missing`",
+    ),
+});
+
+/**
+ * Sends one JSON-RPC request of MCP to one of the caller's servers on the machine, such as
+ * `tools/call`, `resources/read` or `prompts/get`, and returns the server's response. The
+ * machine starts or connects to the server if it is not running, and handles its
+ * initialization itself; a request still running when `timeout_seconds` passes is cancelled
+ * at the server. Requests the server makes of the client, such as for sampling, are refused,
+ * and its notifications, such as of progress, are dropped. A response with a JSON-RPC error
+ * is a successful request. Neither the request nor the response is hidden from the
+ * platform. Requires `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MCP_SERVER_NOT_FOUND` when the server is not configured;
+ * - `MCP_SERVER_UNAVAILABLE` when it could not be started or reached, with
+ *   `metadata.failure`, an `McpServerFailure`;
+ * - `INVALID_ARGUMENT` when `request` is not one JSON-RPC request, such as a notification, or
+ *   is one of initialization;
+ * - `RESULT_TOO_LARGE` when the response is larger than 8 MiB;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary Send an MCP request to a server
+ */
+export const sendMcpRequestPathServerNameRegExp = new RegExp("^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$");
+
+export const SendMcpRequestParams = zod.strictObject({
+  machineId: zod.uuid(),
+  serverName: zod
+    .string()
+    .regex(sendMcpRequestPathServerNameRegExp)
+    .describe(
+      "The server's key in `mcpServers`: a letter or digit, then up to 63 letters, digits, `_`\nor `-`, without `__`, since the tools of all servers are named `<server>__<tool>` together",
+    ),
+});
+
+export const SendMcpRequestBody = SendMcpRequestRequest;
+
+/**
+ * Calls one tool of one of the caller's servers on the machine and returns its MCP
+ * `CallToolResult`. A tool that reports an error, with `isError`, is a successful request. A
+ * tool whose name cannot appear in a path is called with `send-mcp-request`. Neither the
+ * arguments nor the result is hidden from the platform. Requires `fleet:machines.login` on
+ * the machine.
+ *
+ * Fails as sending a request does.
+ * @summary Call an MCP tool
+ */
+export const callMcpToolPathServerNameRegExp = new RegExp("^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$");
+export const callMcpToolPathToolNameMax = 128;
+
+export const CallMcpToolParams = zod.strictObject({
+  machineId: zod.uuid(),
+  serverName: zod
+    .string()
+    .regex(callMcpToolPathServerNameRegExp)
+    .describe(
+      "The server's key in `mcpServers`: a letter or digit, then up to 63 letters, digits, `_`\nor `-`, without `__`, since the tools of all servers are named `<server>__<tool>` together",
+    ),
+  toolName: zod.string().min(1).max(callMcpToolPathToolNameMax),
+});
+
+export const CallMcpToolBody = CallMcpToolRequest;
+
+/**
+ * Lists the tools of the caller's servers on the machine, or of one of them, that match
+ * `query`: every word of it, ignoring case, in the tool's name, title or description. They
+ * are ordered by server, then by tool name. Servers that are not running are started to
+ * learn their tools; one that cannot be is named in `unavailable_servers`, and the others are
+ * listed anyway. Slow servers do not hold the request up: those still starting are named
+ * with `timeout` and go on starting, so that a later request lists their tools. Requires
+ * `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MCP_SERVER_NOT_FOUND` when `server` is not configured;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary List the caller's MCP tools on a machine
+ */
+export const ListMcpToolsParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+export const listMcpToolsQueryServerMax = 64;
+
+export const listMcpToolsQueryQueryMax = 256;
+
+export const listMcpToolsQueryPageSizeDefault = 100;
+export const listMcpToolsQueryPageSizeMax = 500;
+
+export const listMcpToolsQueryPageTokenMax = 1024;
+
+export const ListMcpToolsQueryParams = zod.strictObject({
+  server: zod
+    .string()
+    .max(listMcpToolsQueryServerMax)
+    .optional()
+    .describe("Only this server's tools"),
+  query: zod
+    .string()
+    .max(listMcpToolsQueryQueryMax)
+    .optional()
+    .describe("Words that each must occur in a tool's name, title or description"),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listMcpToolsQueryPageSizeMax)
+    .default(listMcpToolsQueryPageSizeDefault),
+  page_token: zod
+    .string()
+    .max(listMcpToolsQueryPageTokenMax)
+    .optional()
+    .describe("`next_page_token` of the previous page"),
+});
 
 /**
  * Returns the caller's automatic approval of their privilege requests on the machine. Fails

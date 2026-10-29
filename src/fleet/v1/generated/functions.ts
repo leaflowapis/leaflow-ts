@@ -120,6 +120,18 @@
  * `fleet:machines.login` on the machine. Inside the command, `sudo` works without a prompt for
  * a caller with `fleet:machines.admin` on the machine: the request approves the elevation.
  *
+ * ## MCP servers
+ *
+ * A machine that offers `leaflow.fleet.mcp.v1` reaches the MCP servers its accounts configure:
+ * servers it runs itself and remote servers it connects to. Each account configures them in
+ * `~/.local/share/leaflow/agent/mcp.json` in its home directory, in the `mcpServers` format other
+ * MCP clients use, by hand or through this API; the machine picks up every change by itself.
+ * The caller's servers run as the caller's account, and the requests below act on them only.
+ *
+ * The configuration stays on the machine. The values of `env` and `headers` often hold
+ * credentials: this API writes them, and they then pass through the platform, but never returns
+ * them. Arguments, URLs, tool arguments and tool results pass through the platform as they are.
+ *
  * ## Approving sudo
  *
  * An account may become root through sudo on a machine while its user has
@@ -212,6 +224,8 @@ import type {
   AccountList,
   AccountResource,
   ApproveEnrollmentRequest,
+  CallMcpToolRequest,
+  CallMcpToolResponse,
   CreateGroupMemberRequest,
   CreateGroupRequest,
   CreateMachineRegistrationRequest,
@@ -221,6 +235,7 @@ import type {
   CreatePeerConnectionCandidatesRequest,
   CreatePeerConnectionRequest,
   CreateSessionRequest,
+  DeleteMcpServerParams,
   EnrollmentResource,
   Error,
   FindEnrollmentByPairingCodeParams,
@@ -233,6 +248,7 @@ import type {
   ListMachineEventsParams,
   ListMachineRegistrationsParams,
   ListMachinesParams,
+  ListMcpToolsParams,
   ListPrivilegeAutoApprovalsParams,
   ListPrivilegeRequestsParams,
   ListSessionsParams,
@@ -241,6 +257,9 @@ import type {
   MachineRegistrationList,
   MachineRegistrationResource,
   MachineResource,
+  McpConfigurationFile,
+  McpConfigurationResource,
+  McpToolList,
   MigrationStep,
   ParticipantList,
   ParticipantResource,
@@ -251,14 +270,19 @@ import type {
   PrivilegeRequestResource,
   RenewParticipantRequest,
   RenewParticipantResponse,
+  ReplaceMcpConfigurationRequest,
   RtcConfiguration,
   RunCommandRequest,
   RunCommandResponse,
+  SendMcpRequestRequest,
+  SendMcpRequestResponse,
   SessionList,
   SessionResource,
   UpdateAccountRequest,
   UpdateGroupRequest,
   UpdateMachineRequest,
+  UpdateMcpServerRequest,
+  UpdateMcpServerResponse,
   UpdatePrivilegeAutoApprovalRequest,
 } from "./models.js";
 
@@ -661,6 +685,514 @@ export const runMachineCommand = async (
 
   const data: runMachineCommandResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as runMachineCommandResponse;
+};
+
+export type getMcpConfigurationResponse200 = {
+  data: McpConfigurationResource;
+  status: 200;
+};
+
+export type getMcpConfigurationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getMcpConfigurationResponseSuccess = getMcpConfigurationResponse200 & {
+  headers: Headers;
+};
+export type getMcpConfigurationResponseError = getMcpConfigurationResponseDefault & {
+  headers: Headers;
+};
+
+export type getMcpConfigurationResponse =
+  | getMcpConfigurationResponseSuccess
+  | getMcpConfigurationResponseError;
+
+export const getGetMcpConfigurationUrl = (machineId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-configuration`;
+};
+
+/**
+ * Returns the caller's MCP configuration file on the machine and every server in it, with
+ * what each is doing now. The values of `env` and `headers` are never returned, only their
+ * keys. Requires `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary Get the caller's MCP configuration on a machine
+ */
+export const getMcpConfiguration = async (
+  machineId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getMcpConfigurationResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetMcpConfigurationUrl(machineId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getMcpConfigurationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getMcpConfigurationResponse;
+};
+
+export type replaceMcpConfigurationResponse200 = {
+  data: McpConfigurationFile;
+  status: 200;
+};
+
+export type replaceMcpConfigurationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type replaceMcpConfigurationResponseSuccess = replaceMcpConfigurationResponse200 & {
+  headers: Headers;
+};
+export type replaceMcpConfigurationResponseError = replaceMcpConfigurationResponseDefault & {
+  headers: Headers;
+};
+
+export type replaceMcpConfigurationResponse =
+  | replaceMcpConfigurationResponseSuccess
+  | replaceMcpConfigurationResponseError;
+
+export const getReplaceMcpConfigurationUrl = (machineId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-configuration`;
+};
+
+/**
+ * Replaces the caller's MCP configuration file on the machine as a whole, also one that cannot
+ * be read or is not valid. The machine starts the servers that were added, stops the ones
+ * that were removed and restarts the ones that changed when they are next used. The account
+ * is created if the caller has none yet. The content, secrets included, passes through the
+ * platform. Requires `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MCP_CONFIGURATION_CHANGED` when the file is no longer at `expected_revision`;
+ * - `MCP_CONFIGURATION_INVALID` when `content` is not an object with an object `mcpServers`,
+ *   with `metadata.line` and `metadata.column`;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary Replace the caller's MCP configuration on a machine
+ */
+export const replaceMcpConfiguration = async (
+  machineId: string,
+  replaceMcpConfigurationRequest: ReplaceMcpConfigurationRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<replaceMcpConfigurationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getReplaceMcpConfigurationUrl(machineId), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(replaceMcpConfigurationRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: replaceMcpConfigurationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as replaceMcpConfigurationResponse;
+};
+
+export type updateMcpServerResponse200 = {
+  data: UpdateMcpServerResponse;
+  status: 200;
+};
+
+export type updateMcpServerResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updateMcpServerResponseSuccess = updateMcpServerResponse200 & {
+  headers: Headers;
+};
+export type updateMcpServerResponseError = updateMcpServerResponseDefault & {
+  headers: Headers;
+};
+
+export type updateMcpServerResponse = updateMcpServerResponseSuccess | updateMcpServerResponseError;
+
+export const getUpdateMcpServerUrl = (machineId: string, serverName: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-servers/${encodeURIComponent(String(serverName))}`;
+};
+
+/**
+ * Adds a server to the caller's MCP configuration on the machine, or replaces the one with
+ * the same name. The values of `env` and `headers` the request gives, secrets included, pass
+ * through the platform; those named in `keep_env` and `keep_headers` stay as they are on the
+ * machine. The account is created if the caller has none yet. Requires
+ * `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MCP_CONFIGURATION_CHANGED` when the file is no longer at `expected_revision`;
+ * - `MCP_CONFIGURATION_INVALID` when the file cannot be read or is not valid; replace it
+ *   whole first;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary Add or replace an MCP server
+ */
+export const updateMcpServer = async (
+  machineId: string,
+  serverName: string,
+  updateMcpServerRequest: UpdateMcpServerRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateMcpServerResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateMcpServerUrl(machineId, serverName), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateMcpServerRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateMcpServerResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as updateMcpServerResponse;
+};
+
+export type deleteMcpServerResponse200 = {
+  data: McpConfigurationFile;
+  status: 200;
+};
+
+export type deleteMcpServerResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type deleteMcpServerResponseSuccess = deleteMcpServerResponse200 & {
+  headers: Headers;
+};
+export type deleteMcpServerResponseError = deleteMcpServerResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteMcpServerResponse = deleteMcpServerResponseSuccess | deleteMcpServerResponseError;
+
+export const getDeleteMcpServerUrl = (
+  machineId: string,
+  serverName: string,
+  params?: DeleteMcpServerParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-servers/${encodeURIComponent(String(serverName))}?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-servers/${encodeURIComponent(String(serverName))}`;
+};
+
+/**
+ * Removes a server from the caller's MCP configuration on the machine and stops it. Removing
+ * one that is not configured succeeds. Requires `fleet:machines.login` on the machine.
+ *
+ * Fails as replacing a server does.
+ * @summary Remove an MCP server
+ */
+export const deleteMcpServer = async (
+  machineId: string,
+  serverName: string,
+  params?: DeleteMcpServerParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteMcpServerResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteMcpServerUrl(machineId, serverName, params), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteMcpServerResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as deleteMcpServerResponse;
+};
+
+export type sendMcpRequestResponse200 = {
+  data: SendMcpRequestResponse;
+  status: 200;
+};
+
+export type sendMcpRequestResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type sendMcpRequestResponseSuccess = sendMcpRequestResponse200 & {
+  headers: Headers;
+};
+export type sendMcpRequestResponseError = sendMcpRequestResponseDefault & {
+  headers: Headers;
+};
+
+export type sendMcpRequestResponse = sendMcpRequestResponseSuccess | sendMcpRequestResponseError;
+
+export const getSendMcpRequestUrl = (machineId: string, serverName: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-servers/${encodeURIComponent(String(serverName))}:send`;
+};
+
+/**
+ * Sends one JSON-RPC request of MCP to one of the caller's servers on the machine, such as
+ * `tools/call`, `resources/read` or `prompts/get`, and returns the server's response. The
+ * machine starts or connects to the server if it is not running, and handles its
+ * initialization itself; a request still running when `timeout_seconds` passes is cancelled
+ * at the server. Requests the server makes of the client, such as for sampling, are refused,
+ * and its notifications, such as of progress, are dropped. A response with a JSON-RPC error
+ * is a successful request. Neither the request nor the response is hidden from the
+ * platform. Requires `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MCP_SERVER_NOT_FOUND` when the server is not configured;
+ * - `MCP_SERVER_UNAVAILABLE` when it could not be started or reached, with
+ *   `metadata.failure`, an `McpServerFailure`;
+ * - `INVALID_ARGUMENT` when `request` is not one JSON-RPC request, such as a notification, or
+ *   is one of initialization;
+ * - `RESULT_TOO_LARGE` when the response is larger than 8 MiB;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary Send an MCP request to a server
+ */
+export const sendMcpRequest = async (
+  machineId: string,
+  serverName: string,
+  sendMcpRequestRequest: SendMcpRequestRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<sendMcpRequestResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getSendMcpRequestUrl(machineId, serverName), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(sendMcpRequestRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: sendMcpRequestResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as sendMcpRequestResponse;
+};
+
+export type callMcpToolResponse200 = {
+  data: CallMcpToolResponse;
+  status: 200;
+};
+
+export type callMcpToolResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type callMcpToolResponseSuccess = callMcpToolResponse200 & {
+  headers: Headers;
+};
+export type callMcpToolResponseError = callMcpToolResponseDefault & {
+  headers: Headers;
+};
+
+export type callMcpToolResponse = callMcpToolResponseSuccess | callMcpToolResponseError;
+
+export const getCallMcpToolUrl = (machineId: string, serverName: string, toolName: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-servers/${encodeURIComponent(String(serverName))}/tools/${encodeURIComponent(String(toolName))}:call`;
+};
+
+/**
+ * Calls one tool of one of the caller's servers on the machine and returns its MCP
+ * `CallToolResult`. A tool that reports an error, with `isError`, is a successful request. A
+ * tool whose name cannot appear in a path is called with `send-mcp-request`. Neither the
+ * arguments nor the result is hidden from the platform. Requires `fleet:machines.login` on
+ * the machine.
+ *
+ * Fails as sending a request does.
+ * @summary Call an MCP tool
+ */
+export const callMcpTool = async (
+  machineId: string,
+  serverName: string,
+  toolName: string,
+  callMcpToolRequest: CallMcpToolRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<callMcpToolResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCallMcpToolUrl(machineId, serverName, toolName), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(callMcpToolRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: callMcpToolResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as callMcpToolResponse;
+};
+
+export type listMcpToolsResponse200 = {
+  data: McpToolList;
+  status: 200;
+};
+
+export type listMcpToolsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listMcpToolsResponseSuccess = listMcpToolsResponse200 & {
+  headers: Headers;
+};
+export type listMcpToolsResponseError = listMcpToolsResponseDefault & {
+  headers: Headers;
+};
+
+export type listMcpToolsResponse = listMcpToolsResponseSuccess | listMcpToolsResponseError;
+
+export const getListMcpToolsUrl = (machineId: string, params?: ListMcpToolsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-tools?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-tools`;
+};
+
+/**
+ * Lists the tools of the caller's servers on the machine, or of one of them, that match
+ * `query`: every word of it, ignoring case, in the tool's name, title or description. They
+ * are ordered by server, then by tool name. Servers that are not running are started to
+ * learn their tools; one that cannot be is named in `unavailable_servers`, and the others are
+ * listed anyway. Slow servers do not hold the request up: those still starting are named
+ * with `timeout` and go on starting, so that a later request lists their tools. Requires
+ * `fleet:machines.login` on the machine.
+ *
+ * Fails with:
+ * - `MCP_SERVER_NOT_FOUND` when `server` is not configured;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
+ *   the machine refuses the account, as for opening a session;
+ * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @summary List the caller's MCP tools on a machine
+ */
+export const listMcpTools = async (
+  machineId: string,
+  params?: ListMcpToolsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listMcpToolsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListMcpToolsUrl(machineId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listMcpToolsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listMcpToolsResponse;
 };
 
 export type getPrivilegeAutoApprovalResponse200 = {

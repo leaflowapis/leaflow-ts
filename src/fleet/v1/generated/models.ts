@@ -120,6 +120,18 @@
  * `fleet:machines.login` on the machine. Inside the command, `sudo` works without a prompt for
  * a caller with `fleet:machines.admin` on the machine: the request approves the elevation.
  *
+ * ## MCP servers
+ *
+ * A machine that offers `leaflow.fleet.mcp.v1` reaches the MCP servers its accounts configure:
+ * servers it runs itself and remote servers it connects to. Each account configures them in
+ * `~/.local/share/leaflow/agent/mcp.json` in its home directory, in the `mcpServers` format other
+ * MCP clients use, by hand or through this API; the machine picks up every change by itself.
+ * The caller's servers run as the caller's account, and the requests below act on them only.
+ *
+ * The configuration stays on the machine. The values of `env` and `headers` often hold
+ * credentials: this API writes them, and they then pass through the platform, but never returns
+ * them. Arguments, URLs, tool arguments and tool results pass through the platform as they are.
+ *
  * ## Approving sudo
  *
  * An account may become root through sudo on a machine while its user has
@@ -775,6 +787,319 @@ export interface RunCommandResponse {
   stderr_truncated: boolean;
 }
 
+/**
+ * `ok` when the file was read in full; `missing` when there is none, which is no server;
+ * `unreadable` when it cannot be read and `invalid` when it is not an object with an
+ * object `mcpServers`: then the machine serves the servers of the file it last read in
+ * full, if any, and none otherwise.
+ */
+export type McpConfigurationFileState =
+  (typeof McpConfigurationFileState)[keyof typeof McpConfigurationFileState];
+
+export const McpConfigurationFileState = {
+  ok: "ok",
+  missing: "missing",
+  unreadable: "unreadable",
+  invalid: "invalid",
+} as const;
+
+export interface McpConfigurationFile {
+  /**
+   * `ok` when the file was read in full; `missing` when there is none, which is no server;
+   * `unreadable` when it cannot be read and `invalid` when it is not an object with an
+   * object `mcpServers`: then the machine serves the servers of the file it last read in
+   * full, if any, and none otherwise.
+   */
+  state: McpConfigurationFileState;
+  /**
+   * SHA-256 of the file in lower-case hex, empty while it is `missing`. Edits carry it as
+   * `expected_revision`, so that they fail rather than undo an edit made in between.
+   */
+  revision: string;
+  /**
+   * With `invalid`, the line of the first error, counted from 1; null otherwise
+   * @nullable
+   */
+  invalid_line: number | null;
+  /**
+   * With `invalid`, the column of the first error, counted from 1; null otherwise
+   * @nullable
+   */
+  invalid_column: number | null;
+  /**
+   * The name, in the file's directory, under which the machine set aside a file that was not
+   * valid when it started to serve the account, and put an empty configuration in its place;
+   * null when it did not
+   * @nullable
+   */
+  set_aside: string | null;
+}
+
+/**
+ * `stdio` for a program the machine starts as the account, `http` for Streamable HTTP and
+ * `sse` for HTTP with Server-Sent Events, the transport of earlier revisions of MCP
+ */
+export type McpTransport = (typeof McpTransport)[keyof typeof McpTransport];
+
+export const McpTransport = {
+  stdio: "stdio",
+  http: "http",
+  sse: "sse",
+} as const;
+
+/**
+ * `stopped` before its first use or after it was idle, `starting`, `running`, `failed`
+ * (it is tried again when next used), `disabled` or `invalid`
+ */
+export type McpServerResourceState =
+  (typeof McpServerResourceState)[keyof typeof McpServerResourceState];
+
+export const McpServerResourceState = {
+  stopped: "stopped",
+  starting: "starting",
+  running: "running",
+  failed: "failed",
+  disabled: "disabled",
+  invalid: "invalid",
+} as const;
+
+/**
+ * Why a server failed or is not valid: `invalid_definition`, `start_failed` (its program could
+ * not be started), `exited`, `unreachable`, `unauthorized` (it asked for authorization the
+ * headers do not give, such as through OAuth), `protocol_error` or `timeout`
+ */
+export type McpServerFailure = (typeof McpServerFailure)[keyof typeof McpServerFailure];
+
+export const McpServerFailure = {
+  invalid_definition: "invalid_definition",
+  start_failed: "start_failed",
+  exited: "exited",
+  unreachable: "unreachable",
+  unauthorized: "unauthorized",
+  protocol_error: "protocol_error",
+  timeout: "timeout",
+} as const;
+
+export interface McpImplementation {
+  name: string;
+  version: string;
+  title?: string;
+}
+
+export interface McpServerResource {
+  /** Its key in `mcpServers` */
+  name: string;
+  transport: McpTransport;
+  /** With `stdio`, the program */
+  command: string;
+  args: string[];
+  /** The variables `env` sets; their values are never returned */
+  env_keys: string[];
+  /** With `http` and `sse`, the endpoint */
+  url: string;
+  /** The headers `headers` sends; their values are never returned */
+  header_keys: string[];
+  /** Configured but kept stopped */
+  disabled: boolean;
+  /**
+   * `stopped` before its first use or after it was idle, `starting`, `running`, `failed`
+   * (it is tried again when next used), `disabled` or `invalid`
+   */
+  state: McpServerResourceState;
+  /** With `failed` and `invalid`, why; null otherwise */
+  failure: McpServerFailure | null;
+  /** With `running`, what the server said of itself; null otherwise */
+  implementation: McpImplementation | null;
+  /**
+   * With `running`, how many tools it offers; null otherwise
+   * @nullable
+   */
+  tool_count: number | null;
+}
+
+export interface McpConfigurationResource {
+  file: McpConfigurationFile;
+  servers: McpServerResource[];
+}
+
+/**
+ * With `stdio`, variables added to the account's environment
+ */
+export type UpdateMcpServerRequestEnv = { [key: string]: string };
+
+/**
+ * With `http` and `sse`, headers sent with every request
+ */
+export type UpdateMcpServerRequestHeaders = { [key: string]: string };
+
+export interface UpdateMcpServerRequest {
+  /** Unset for `stdio` with `command` and `http` with `url` */
+  transport?: McpTransport;
+  /**
+   * With `stdio`, the program, looked up in the account's `PATH`
+   * @maxLength 4096
+   */
+  command?: string;
+  /**
+   * With `stdio`; shown to anyone who reads the configuration, so no place for credentials
+   * @maxItems 256
+   * @items.maxLength 65536
+   */
+  args?: string[];
+  /** With `stdio`, variables added to the account's environment */
+  env?: UpdateMcpServerRequestEnv;
+  /**
+   * With `http` and `sse`, the endpoint; shown to anyone who reads the configuration
+   * @maxLength 4096
+   */
+  url?: string;
+  /** With `http` and `sse`, headers sent with every request */
+  headers?: UpdateMcpServerRequestHeaders;
+  /** Configured but kept stopped */
+  disabled?: boolean;
+  /**
+   * Variables of the server's current `env` whose values stay as they are
+   * @maxItems 256
+   */
+  keep_env?: string[];
+  /**
+   * Headers of the server's current `headers` whose values stay as they are
+   * @maxItems 256
+   */
+  keep_headers?: string[];
+  /**
+   * The configuration's `revision` as last read; absent only for one that was `missing`
+   * @maxLength 64
+   */
+  expected_revision?: string;
+}
+
+export interface UpdateMcpServerResponse {
+  file: McpConfigurationFile;
+  server: McpServerResource;
+}
+
+/**
+ * The new file, an object with an object `mcpServers`, at most 1 MiB as JSON
+ */
+export type ReplaceMcpConfigurationRequestContent = { [key: string]: unknown };
+
+export interface ReplaceMcpConfigurationRequest {
+  /** The new file, an object with an object `mcpServers`, at most 1 MiB as JSON */
+  content: ReplaceMcpConfigurationRequestContent;
+  /**
+   * The configuration's `revision` as last read; absent replaces whatever is there, such as
+   * a file that cannot be read
+   * @maxLength 64
+   */
+  expected_revision?: string;
+}
+
+/**
+ * One JSON-RPC 2.0 request of MCP, at most 4 MiB
+ */
+export type SendMcpRequestRequestRequest = { [key: string]: unknown };
+
+export interface SendMcpRequestRequest {
+  /** One JSON-RPC 2.0 request of MCP, at most 4 MiB */
+  request: SendMcpRequestRequestRequest;
+  /**
+   * How long to wait for the response
+   * @minimum 1
+   * @maximum 300
+   */
+  timeout_seconds?: number;
+}
+
+/**
+ * The server's JSON-RPC 2.0 response, with the id of the request
+ */
+export type SendMcpRequestResponseResponse = { [key: string]: unknown };
+
+export interface SendMcpRequestResponse {
+  /** The server's JSON-RPC 2.0 response, with the id of the request */
+  response: SendMcpRequestResponseResponse;
+}
+
+/**
+ * The tool's arguments, as its `input_schema` describes them
+ */
+export type CallMcpToolRequestArguments = { [key: string]: unknown };
+
+export interface CallMcpToolRequest {
+  /** The tool's arguments, as its `input_schema` describes them */
+  arguments?: CallMcpToolRequestArguments;
+  /**
+   * How long to wait for the result
+   * @minimum 1
+   * @maximum 300
+   */
+  timeout_seconds?: number;
+}
+
+/**
+ * The tool's MCP `CallToolResult`, with `content`, `structuredContent` and `isError`
+ */
+export type CallMcpToolResponseResult = { [key: string]: unknown };
+
+export interface CallMcpToolResponse {
+  /** The tool's MCP `CallToolResult`, with `content`, `structuredContent` and `isError` */
+  result: CallMcpToolResponseResult;
+}
+
+/**
+ * The JSON Schema of its arguments
+ */
+export type McpToolResourceInputSchema = { [key: string]: unknown };
+
+/**
+ * The JSON Schema of its structured result; null when it has none
+ * @nullable
+ */
+export type McpToolResourceOutputSchema = { [key: string]: unknown } | null;
+
+/**
+ * Its MCP `ToolAnnotations`, such as `readOnlyHint`; hints of the server, not guarantees
+ * @nullable
+ */
+export type McpToolResourceAnnotations = { [key: string]: unknown } | null;
+
+export interface McpToolResource {
+  /** The server that offers it */
+  server: string;
+  name: string;
+  title: string;
+  description: string;
+  /** The JSON Schema of its arguments */
+  input_schema: McpToolResourceInputSchema;
+  /**
+   * The JSON Schema of its structured result; null when it has none
+   * @nullable
+   */
+  output_schema: McpToolResourceOutputSchema;
+  /**
+   * Its MCP `ToolAnnotations`, such as `readOnlyHint`; hints of the server, not guarantees
+   * @nullable
+   */
+  annotations: McpToolResourceAnnotations;
+}
+
+export interface McpUnavailableServer {
+  name: string;
+  failure: McpServerFailure;
+}
+
+export interface McpToolList {
+  items: McpToolResource[];
+  /**
+   * Null on the last page
+   * @nullable
+   */
+  next_page_token: string | null;
+  /** Servers whose tools are missing because they could not be started or reached */
+  unavailable_servers: McpUnavailableServer[];
+}
+
 export interface UpdatePrivilegeAutoApprovalRequest {
   /**
    * When the automatic approval ends; null for one that lasts until removed
@@ -1135,6 +1460,37 @@ export type ListMachineEventsParams = {
    * Return only events of this type
    */
   type?: MachineEventType;
+};
+
+export type DeleteMcpServerParams = {
+  /**
+   * The configuration's `revision` as last read; absent only for one that was `missing`
+   * @maxLength 64
+   */
+  expected_revision?: string;
+};
+
+export type ListMcpToolsParams = {
+  /**
+   * Only this server's tools
+   * @maxLength 64
+   */
+  server?: string;
+  /**
+   * Words that each must occur in a tool's name, title or description
+   * @maxLength 256
+   */
+  query?: string;
+  /**
+   * @minimum 1
+   * @maximum 500
+   */
+  page_size?: number;
+  /**
+   * `next_page_token` of the previous page
+   * @maxLength 1024
+   */
+  page_token?: string;
 };
 
 export type ListPrivilegeAutoApprovalsParams = {

@@ -119,7 +119,8 @@ export type McpConfigurationFile = Message<"leaflow.fleet.mcp.v1.McpConfiguratio
 
   /**
    * The name, in the same directory, under which the Agent set aside a file
-   * that was not valid when it started; empty when it did not.
+   * that was not valid when it started to serve the account; empty when it
+   * did not.
    *
    * @generated from field: string set_aside = 5;
    */
@@ -290,8 +291,8 @@ export type PutMcpServerRequest = Message<"leaflow.fleet.mcp.v1.PutMcpServerRequ
   account?: McpAccount | undefined;
 
   /**
-   * The server's key in "mcpServers": 1 to 64 letters, digits, "_" or "-",
-   * since tools of every server are named "<server>__<tool>" together.
+   * The server's key in "mcpServers", by the rule of Configuration; any other
+   * fails the call with INVALID_REQUEST.
    *
    * @generated from field: string name = 2;
    */
@@ -319,7 +320,8 @@ export type PutMcpServerRequest = Message<"leaflow.fleet.mcp.v1.PutMcpServerRequ
   keepHeaders: string[];
 
   /**
-   * McpConfigurationFile.revision as last read.
+   * McpConfigurationFile.revision as last read, empty only for a file that
+   * was MISSING.
    *
    * @generated from field: string expected_revision = 6;
    */
@@ -374,7 +376,8 @@ export type DeleteMcpServerRequest = Message<"leaflow.fleet.mcp.v1.DeleteMcpServ
   name: string;
 
   /**
-   * McpConfigurationFile.revision as last read.
+   * McpConfigurationFile.revision as last read, empty only for a file that
+   * was MISSING.
    *
    * @generated from field: string expected_revision = 3;
    */
@@ -515,7 +518,8 @@ export const ListMcpToolsRequestSchema: GenMessage<ListMcpToolsRequest> = /*@__P
  */
 export type ListMcpToolsResponse = Message<"leaflow.fleet.mcp.v1.ListMcpToolsResponse"> & {
   /**
-   * Ordered by server, then by tool name.
+   * Ordered by server, then by tool name; fewer than page_size when more
+   * would make the response larger than 8 MiB.
    *
    * @generated from field: repeated leaflow.fleet.mcp.v1.McpTool tools = 1;
    */
@@ -843,7 +847,8 @@ export enum McpServerFailure {
   UNSPECIFIED = 0,
 
   /**
-   * Its entry is not valid, such as with neither "command" nor "url".
+   * Its name or entry is not valid, such as an entry with neither "command"
+   * nor "url".
    *
    * @generated from enum value: MCP_SERVER_FAILURE_INVALID_DEFINITION = 1;
    */
@@ -976,7 +981,10 @@ export const McpService: GenService<{
    * a query: every word of it, ignoring case, in the tool's name, title or
    * description. Servers that are not running are started to learn their
    * tools; one that cannot be is named in unavailable_servers, and the
-   * others are listed anyway.
+   * others are listed anyway. The call does not wait for slow servers: before
+   * its timeout passes it answers with those still starting named in
+   * unavailable_servers with TIMEOUT, and they go on starting, so that a
+   * later call lists their tools.
    *
    * Fails with NOT_FOUND and reason MCP_SERVER_NOT_FOUND for a server that is
    * not configured.
@@ -991,7 +999,13 @@ export const McpService: GenService<{
   /**
    * Sends one JSON-RPC request of MCP to one of the account's servers, such
    * as tools/call, resources/read or prompts/get, and returns its response.
-   * The Agent itself handles initialization and the session of the server.
+   * The Agent itself handles initialization and the session of the server,
+   * and passes the request on without checking it against a revision of MCP.
+   * When the call is cancelled or its timeout passes, the Agent cancels the
+   * request at the server (notifications/cancelled). A request the server
+   * makes of the client meanwhile, such as for sampling, is answered with the
+   * JSON-RPC error -32601, and its notifications, such as of progress, are
+   * dropped.
    *
    * Fails with:
    *   - NOT_FOUND and reason MCP_SERVER_NOT_FOUND for a server that is not
@@ -1000,7 +1014,8 @@ export const McpService: GenService<{
    *     be started or reached, with metadata "failure", a McpServerFailure
    *     name without its prefix in lower case, such as "unauthorized";
    *   - INVALID_ARGUMENT and reason INVALID_REQUEST for a message that is not
-   *     a JSON-RPC request, or one of initialize or of the lifecycle.
+   *     one JSON-RPC request, such as a batch or a notification, or that is
+   *     one of initialization.
    * A response with a JSON-RPC error is a successful call.
    *
    * @generated from rpc leaflow.fleet.mcp.v1.McpService.SendMcpRequest

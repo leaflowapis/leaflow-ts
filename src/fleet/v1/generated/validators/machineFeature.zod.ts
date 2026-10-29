@@ -120,6 +120,18 @@
  * `fleet:machines.login` on the machine. Inside the command, `sudo` works without a prompt for
  * a caller with `fleet:machines.admin` on the machine: the request approves the elevation.
  *
+ * ## MCP servers
+ *
+ * A machine that offers `leaflow.fleet.mcp.v1` reaches the MCP servers its accounts configure:
+ * servers it runs itself and remote servers it connects to. Each account configures them in
+ * `~/.local/share/leaflow/agent/mcp.json` in its home directory, in the `mcpServers` format other
+ * MCP clients use, by hand or through this API; the machine picks up every change by itself.
+ * The caller's servers run as the caller's account, and the requests below act on them only.
+ *
+ * The configuration stays on the machine. The values of `env` and `headers` often hold
+ * credentials: this API writes them, and they then pass through the platform, but never returns
+ * them. Arguments, URLs, tool arguments and tool results pass through the platform as they are.
+ *
  * ## Approving sudo
  *
  * An account may become root through sudo on a machine while its user has
