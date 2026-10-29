@@ -269,11 +269,11 @@ export const UpdateMcpServerRequest = zod.strictObject({
     .string()
     .max(updateMcpServerRequestUrlMax)
     .optional()
-    .describe("With `http` and `sse`, the endpoint; shown to anyone who reads the configuration"),
+    .describe("With `http`, the endpoint; shown to anyone who reads the configuration"),
   headers: zod
     .record(zod.string(), zod.string().max(updateMcpServerRequestHeadersMaxOne))
     .optional()
-    .describe("With `http` and `sse`, headers sent with every request"),
+    .describe("With `http`, headers sent with every request"),
   disabled: zod
     .boolean()
     .default(updateMcpServerRequestDisabledDefault)

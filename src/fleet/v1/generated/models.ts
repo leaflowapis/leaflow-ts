@@ -839,15 +839,13 @@ export interface McpConfigurationFile {
 }
 
 /**
- * `stdio` for a program the machine starts as the account, `http` for Streamable HTTP and
- * `sse` for HTTP with Server-Sent Events, the transport of earlier revisions of MCP
+ * `stdio` for a program the machine starts as the account, `http` for Streamable HTTP
  */
 export type McpTransport = (typeof McpTransport)[keyof typeof McpTransport];
 
 export const McpTransport = {
   stdio: "stdio",
   http: "http",
-  sse: "sse",
 } as const;
 
 /**
@@ -898,7 +896,7 @@ export interface McpServerResource {
   args: string[];
   /** The variables `env` sets; their values are never returned */
   env_keys: string[];
-  /** With `http` and `sse`, the endpoint */
+  /** With `http`, the endpoint */
   url: string;
   /** The headers `headers` sends; their values are never returned */
   header_keys: string[];
@@ -931,7 +929,7 @@ export interface McpConfigurationResource {
 export type UpdateMcpServerRequestEnv = { [key: string]: string };
 
 /**
- * With `http` and `sse`, headers sent with every request
+ * With `http`, headers sent with every request
  */
 export type UpdateMcpServerRequestHeaders = { [key: string]: string };
 
@@ -952,11 +950,11 @@ export interface UpdateMcpServerRequest {
   /** With `stdio`, variables added to the account's environment */
   env?: UpdateMcpServerRequestEnv;
   /**
-   * With `http` and `sse`, the endpoint; shown to anyone who reads the configuration
+   * With `http`, the endpoint; shown to anyone who reads the configuration
    * @maxLength 4096
    */
   url?: string;
-  /** With `http` and `sse`, headers sent with every request */
+  /** With `http`, headers sent with every request */
   headers?: UpdateMcpServerRequestHeaders;
   /** Configured but kept stopped */
   disabled?: boolean;

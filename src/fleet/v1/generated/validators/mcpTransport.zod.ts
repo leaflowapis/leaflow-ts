@@ -226,10 +226,8 @@
 import * as zod from "zod";
 
 export const McpTransport = zod
-  .enum(["stdio", "http", "sse"])
-  .describe(
-    "`stdio` for a program the machine starts as the account, `http` for Streamable HTTP and\n`sse` for HTTP with Server-Sent Events, the transport of earlier revisions of MCP",
-  );
+  .enum(["stdio", "http"])
+  .describe("`stdio` for a program the machine starts as the account, `http` for Streamable HTTP");
 
 export type McpTransport = zod.input<typeof McpTransport>;
 export type McpTransportOutput = zod.output<typeof McpTransport>;

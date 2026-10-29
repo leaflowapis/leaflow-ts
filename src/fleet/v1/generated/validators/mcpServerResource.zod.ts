@@ -236,7 +236,7 @@ export const McpServerResource = zod.strictObject({
   env_keys: zod
     .array(zod.string())
     .describe("The variables `env` sets; their values are never returned"),
-  url: zod.string().describe("With `http` and `sse`, the endpoint"),
+  url: zod.string().describe("With `http`, the endpoint"),
   header_keys: zod
     .array(zod.string())
     .describe("The headers `headers` sends; their values are never returned"),
