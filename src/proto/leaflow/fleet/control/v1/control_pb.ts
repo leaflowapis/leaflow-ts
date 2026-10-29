@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/control/v1/control.proto.
  */
 export const file_leaflow_fleet_control_v1_control: GenFile = /*@__PURE__*/
-  fileDesc("CiZsZWFmbG93L2ZsZWV0L2NvbnRyb2wvdjEvY29udHJvbC5wcm90bxIYbGVhZmxvdy5mbGVldC5jb250cm9sLnYxIrMECg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUG9uZ0gAEioKBGNhbGwYBCABKAsyGi5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsSAASNwoLY2FsbF9yZXN1bHQYBSABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsUmVzdWx0SAASNwoLY2FsbF9jYW5jZWwYBiABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsQ2FuY2VsSAASNAoGc2lnbmFsGAcgASgLMiIubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuU2lnbmFsSAASOgoJbWlncmF0aW9uGAggASgLMiUubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuTWlncmF0aW9uSAASMAoFY2xvc2UYCSABKAsyHy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQ2xvc2VIABI2CghmcmFnbWVudBgKIAEoCzIiLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5GcmFnbWVudEgAQgkKB21lc3NhZ2UiqAUKDVNlcnZlck1lc3NhZ2USPQoMc2VydmVyX2hlbGxvGAEgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZlckhlbGxvSAASNAoHd2VsY29tZRgCIAEoCzIhLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5XZWxjb21lSAASLgoEcGluZxgDIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5QaW5nSAASLgoEcG9uZxgEIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5Qb25nSAASKgoEY2FsbBgFIAEoCzIaLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxIABI3CgtjYWxsX3Jlc3VsdBgGIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxSZXN1bHRIABI3CgtjYWxsX2NhbmNlbBgHIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxDYW5jZWxIABI0CgZzaWduYWwYCCABKAsyIi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5TaWduYWxIABI6CgltaWdyYXRpb24YCSABKAsyJS5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5NaWdyYXRpb25IABI9CgxzZXJ2aWNlX2tleXMYCiABKAsyJS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2VydmljZUtleXNIABIwCgVjbG9zZRgLIAEoCzIfLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZUgAEjYKCGZyYWdtZW50GAwgASgLMiIubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkZyYWdtZW50SABCCQoHbWVzc2FnZSL/AQoLU2VydmVySGVsbG8SDgoGaXNzdWVyGAEgASgJEhEKCWNoYWxsZW5nZRgCIAEoDBIwCg1waW5nX2ludGVydmFsGAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi8KDGlkbGVfdGltZW91dBgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIYChBtYXhfbWVzc2FnZV9zaXplGAUgASgNEhwKFG1heF9jb25jdXJyZW50X2NhbGxzGAYgASgNEhsKE21lc3NhZ2VzX3Blcl9zZWNvbmQYByABKA0SFQoNbWVzc2FnZV9idXJzdBgIIAEoDSL1AQoLQ2xpZW50SGVsbG8SPgoHbWFjaGluZRgBIAEoCzIrLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5NYWNoaW5lQ3JlZGVudGlhbEgAEkQKCmVucm9sbG1lbnQYAiABKAsyLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRW5yb2xsbWVudENyZWRlbnRpYWxIABI+CgdzZXNzaW9uGAMgASgLMisubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlc3Npb25DcmVkZW50aWFsSAASEgoKdXNlcl9hZ2VudBgFIAEoCUIMCgpjcmVkZW50aWFsIjoKEU1hY2hpbmVDcmVkZW50aWFsEhIKCm1hY2hpbmVfaWQYASABKAkSEQoJc2lnbmF0dXJlGAIgASgMIj0KFEVucm9sbG1lbnRDcmVkZW50aWFsEhIKCnB1YmxpY19rZXkYASABKAwSEQoJc2lnbmF0dXJlGAIgASgMIlgKEVNlc3Npb25DcmVkZW50aWFsEhIKCmRlbGVnYXRpb24YASABKAwSHAoUZGVsZWdhdGlvbl9zaWduYXR1cmUYAiABKAwSEQoJc2lnbmF0dXJlGAMgASgMIrYBChFTZXNzaW9uRGVsZWdhdGlvbhISCgptYWNoaW5lX2lkGAEgASgJEhIKCnNlc3Npb25faWQYAiABKAkSGgoSc2Vzc2lvbl9wdWJsaWNfa2V5GAMgASgMEi0KCWlzc3VlZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAixwEKB1dlbGNvbWUSFQoNY29ubmVjdGlvbl9pZBgBIAEoBBISCgptYWNoaW5lX2lkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSOwoMc2VydmljZV9rZXlzGAQgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZpY2VLZXlzEi8KDHJlc3VtZV9ncmFjZRgFIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIPCgdyZXN1bWVkGAYgASgIIkAKC1NlcnZpY2VLZXlzEjEKBGtleXMYASADKAsyIy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUHVibGljS2V5IjUKCVB1YmxpY0tleRIOCgZrZXlfaWQYASABKAkSEQoHZWQyNTUxORgCIAEoDEgAQgUKA2tleSLSAgoNQXV0aG9yaXphdGlvbhIOCgZpc3N1ZXIYASABKAkSEgoKbWFjaGluZV9pZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEhUKDWNvbm5lY3Rpb25faWQYBCABKAQSDwoHdXNlcl9pZBgFIAEoCRIUCgxkaXNwbGF5X25hbWUYBiABKAkSEQoJY2xpZW50X2lkGAcgASgJEh4KFnBhcnRpY2lwYW50X3B1YmxpY19rZXkYCSABKAwSEQoJcmVhZF9vbmx5GAsgASgIEiYKCHBvbGljaWVzGAwgAygLMhQuZ29vZ2xlLnByb3RvYnVmLkFueRItCglpc3N1ZWRfYXQYDSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYDiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIk8KE1NpZ25lZEF1dGhvcml6YXRpb24SDgoGa2V5X2lkGAEgASgJEhUKDWF1dGhvcml6YXRpb24YAiABKAwSEQoJc2lnbmF0dXJlGAMgASgMIhwKBFBpbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIhwKBFBvbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIjsKCEZyYWdtZW50EhIKCm1lc3NhZ2VfaWQYASABKAQSDAoEZGF0YRgCIAEoDBINCgVmaW5hbBgDIAEoCCKFAQoFQ2xvc2USNQoGcmVhc29uGAEgASgOMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkNsb3NlUmVhc29uEhUKDXJlYXNvbl9waHJhc2UYAiABKAkSLgoLcmV0cnlfZGVsYXkYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24iYAoYQXR0YWNoUGFydGljaXBhbnRSZXF1ZXN0EkQKDWF1dGhvcml6YXRpb24YASABKAsyLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmVkQXV0aG9yaXphdGlvbiIbChlBdHRhY2hQYXJ0aWNpcGFudFJlc3BvbnNlIm0KJVVwZGF0ZVBhcnRpY2lwYW50QXV0aG9yaXphdGlvblJlcXVlc3QSRAoNYXV0aG9yaXphdGlvbhgBIAEoCzItLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5TaWduZWRBdXRob3JpemF0aW9uIigKJlVwZGF0ZVBhcnRpY2lwYW50QXV0aG9yaXphdGlvblJlc3BvbnNlImgKGERldGFjaFBhcnRpY2lwYW50UmVxdWVzdBIVCg1jb25uZWN0aW9uX2lkGAEgASgEEjUKBnJlYXNvbhgCIAEoDjIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZVJlYXNvbiIbChlEZXRhY2hQYXJ0aWNpcGFudFJlc3BvbnNlKpwFCgtDbG9zZVJlYXNvbhIcChhDTE9TRV9SRUFTT05fVU5TUEVDSUZJRUQQABIVChFDTE9TRV9SRUFTT05fRE9ORRABEhwKGENMT1NFX1JFQVNPTl9DTElFTlRfRVhJVBACEiAKHENMT1NFX1JFQVNPTl9TRVJWRVJfU0hVVERPV04QAxIfChtDTE9TRV9SRUFTT05fU0VSVkVSX1VQR1JBREUQBBIdChlDTE9TRV9SRUFTT05fUElOR19USU1FT1VUEAUSHgoaQ0xPU0VfUkVBU09OX0hFTExPX1RJTUVPVVQQBhIfChtDTE9TRV9SRUFTT05fUFJPVE9DT0xfRVJST1IQBxIgChxDTE9TRV9SRUFTT05fTUVTU0FHRV9UT09fQklHEAgSJgoiQ0xPU0VfUkVBU09OX0FVVEhFTlRJQ0FUSU9OX0ZBSUxFRBAJEiIKHkNMT1NFX1JFQVNPTl9QRVJNSVNTSU9OX0RFTklFRBAKEiIKHkNMT1NFX1JFQVNPTl9TRVNTSU9OX05PVF9GT1VORBALEhsKF0NMT1NFX1JFQVNPTl9ORVdfQ0xJRU5UEAwSHQoZQ0xPU0VfUkVBU09OX1NFU1NJT05fRVhJVBANEiMKH0NMT1NFX1JFQVNPTl9TRVNTSU9OX1JFU1RBUlRJTkcQDhIfChtDTE9TRV9SRUFTT05fREVUQUNIX1JFUVVFU1QQDxIhCh1DTE9TRV9SRUFTT05fUE9MSUNZX1ZJT0xBVElPThAQEh8KG0NMT1NFX1JFQVNPTl9JTlRFUk5BTF9FUlJPUhAREhsKF0NMT1NFX1JFQVNPTl9PVkVSTE9BREVEEBISIgoeQ0xPU0VfUkVBU09OX0VORFBPSU5UX1RPT19TTE9XEBMyxwMKElBhcnRpY2lwYW50U2VydmljZRKBAQoRQXR0YWNoUGFydGljaXBhbnQSMi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQXR0YWNoUGFydGljaXBhbnRSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkF0dGFjaFBhcnRpY2lwYW50UmVzcG9uc2UiA5ACAhKoAQoeVXBkYXRlUGFydGljaXBhbnRBdXRob3JpemF0aW9uEj8ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlVwZGF0ZVBhcnRpY2lwYW50QXV0aG9yaXphdGlvblJlcXVlc3QaQC5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuVXBkYXRlUGFydGljaXBhbnRBdXRob3JpemF0aW9uUmVzcG9uc2UiA5ACAhKBAQoRRGV0YWNoUGFydGljaXBhbnQSMi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRGV0YWNoUGFydGljaXBhbnRSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkRldGFjaFBhcnRpY2lwYW50UmVzcG9uc2UiA5ACAkI+WjxnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvY29udHJvbC92MTtjb250cm9sdjFiBnByb3RvMw", [file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_timestamp, file_leaflow_fleet_rpc_v1_rpc, file_leaflow_fleet_transport_v1_transport]);
+  fileDesc("CiZsZWFmbG93L2ZsZWV0L2NvbnRyb2wvdjEvY29udHJvbC5wcm90bxIYbGVhZmxvdy5mbGVldC5jb250cm9sLnYxIrMECg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUG9uZ0gAEioKBGNhbGwYBCABKAsyGi5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsSAASNwoLY2FsbF9yZXN1bHQYBSABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsUmVzdWx0SAASNwoLY2FsbF9jYW5jZWwYBiABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsQ2FuY2VsSAASNAoGc2lnbmFsGAcgASgLMiIubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuU2lnbmFsSAASOgoJbWlncmF0aW9uGAggASgLMiUubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuTWlncmF0aW9uSAASMAoFY2xvc2UYCSABKAsyHy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQ2xvc2VIABI2CghmcmFnbWVudBgKIAEoCzIiLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5GcmFnbWVudEgAQgkKB21lc3NhZ2UiqAUKDVNlcnZlck1lc3NhZ2USPQoMc2VydmVyX2hlbGxvGAEgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZlckhlbGxvSAASNAoHd2VsY29tZRgCIAEoCzIhLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5XZWxjb21lSAASLgoEcGluZxgDIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5QaW5nSAASLgoEcG9uZxgEIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5Qb25nSAASKgoEY2FsbBgFIAEoCzIaLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxIABI3CgtjYWxsX3Jlc3VsdBgGIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxSZXN1bHRIABI3CgtjYWxsX2NhbmNlbBgHIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxDYW5jZWxIABI0CgZzaWduYWwYCCABKAsyIi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5TaWduYWxIABI6CgltaWdyYXRpb24YCSABKAsyJS5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5NaWdyYXRpb25IABI9CgxzaWduaW5nX2tleXMYCiABKAsyJS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmluZ0tleXNIABIwCgVjbG9zZRgLIAEoCzIfLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZUgAEjYKCGZyYWdtZW50GAwgASgLMiIubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkZyYWdtZW50SABCCQoHbWVzc2FnZSL/AQoLU2VydmVySGVsbG8SDgoGaXNzdWVyGAEgASgJEhEKCWNoYWxsZW5nZRgCIAEoDBIwCg1waW5nX2ludGVydmFsGAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi8KDGlkbGVfdGltZW91dBgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIYChBtYXhfbWVzc2FnZV9zaXplGAUgASgNEhwKFG1heF9jb25jdXJyZW50X2NhbGxzGAYgASgNEhsKE21lc3NhZ2VzX3Blcl9zZWNvbmQYByABKA0SFQoNbWVzc2FnZV9idXJzdBgIIAEoDSL1AQoLQ2xpZW50SGVsbG8SPgoHbWFjaGluZRgBIAEoCzIrLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5NYWNoaW5lQ3JlZGVudGlhbEgAEkQKCmVucm9sbG1lbnQYAiABKAsyLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRW5yb2xsbWVudENyZWRlbnRpYWxIABI+CgdzZXNzaW9uGAMgASgLMisubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlc3Npb25DcmVkZW50aWFsSAASEgoKdXNlcl9hZ2VudBgFIAEoCUIMCgpjcmVkZW50aWFsIjoKEU1hY2hpbmVDcmVkZW50aWFsEhIKCm1hY2hpbmVfaWQYASABKAkSEQoJc2lnbmF0dXJlGAIgASgMIj0KFEVucm9sbG1lbnRDcmVkZW50aWFsEhIKCnB1YmxpY19rZXkYASABKAwSEQoJc2lnbmF0dXJlGAIgASgMIlgKEVNlc3Npb25DcmVkZW50aWFsEhIKCmRlbGVnYXRpb24YASABKAwSHAoUZGVsZWdhdGlvbl9zaWduYXR1cmUYAiABKAwSEQoJc2lnbmF0dXJlGAMgASgMIrYBChFTZXNzaW9uRGVsZWdhdGlvbhISCgptYWNoaW5lX2lkGAEgASgJEhIKCnNlc3Npb25faWQYAiABKAkSGgoSc2Vzc2lvbl9wdWJsaWNfa2V5GAMgASgMEi0KCWlzc3VlZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAixwEKB1dlbGNvbWUSFQoNY29ubmVjdGlvbl9pZBgBIAEoBBISCgptYWNoaW5lX2lkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSOwoMc2lnbmluZ19rZXlzGAQgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNpZ25pbmdLZXlzEi8KDHJlc3VtZV9ncmFjZRgFIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIPCgdyZXN1bWVkGAYgASgIIkAKC1NpZ25pbmdLZXlzEjEKBGtleXMYASADKAsyIy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUHVibGljS2V5IjUKCVB1YmxpY0tleRIOCgZrZXlfaWQYASABKAkSEQoHZWQyNTUxORgCIAEoDEgAQgUKA2tleSLVAgoNQXV0aG9yaXphdGlvbhIOCgZpc3N1ZXIYASABKAkSEgoKbWFjaGluZV9pZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEhYKDnBhcnRpY2lwYW50X2lkGAQgASgEEg8KB3VzZXJfaWQYBSABKAkSFAoMZGlzcGxheV9uYW1lGAYgASgJEhMKC2NsaWVudF9uYW1lGAcgASgJEh4KFnBhcnRpY2lwYW50X3B1YmxpY19rZXkYCSABKAwSEQoJcmVhZF9vbmx5GAsgASgIEiYKCHBvbGljaWVzGAwgAygLMhQuZ29vZ2xlLnByb3RvYnVmLkFueRItCglpc3N1ZWRfYXQYDSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYDiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIk8KE1NpZ25lZEF1dGhvcml6YXRpb24SDgoGa2V5X2lkGAEgASgJEhUKDWF1dGhvcml6YXRpb24YAiABKAwSEQoJc2lnbmF0dXJlGAMgASgMIhwKBFBpbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIhwKBFBvbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIjsKCEZyYWdtZW50EhIKCm1lc3NhZ2VfaWQYASABKAQSDAoEZGF0YRgCIAEoDBINCgVmaW5hbBgDIAEoCCKFAQoFQ2xvc2USNQoGcmVhc29uGAEgASgOMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkNsb3NlUmVhc29uEhUKDXJlYXNvbl9waHJhc2UYAiABKAkSLgoLcmV0cnlfZGVsYXkYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24iYAoYQXR0YWNoUGFydGljaXBhbnRSZXF1ZXN0EkQKDWF1dGhvcml6YXRpb24YASABKAsyLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmVkQXV0aG9yaXphdGlvbiIbChlBdHRhY2hQYXJ0aWNpcGFudFJlc3BvbnNlIm0KJVVwZGF0ZVBhcnRpY2lwYW50QXV0aG9yaXphdGlvblJlcXVlc3QSRAoNYXV0aG9yaXphdGlvbhgBIAEoCzItLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5TaWduZWRBdXRob3JpemF0aW9uIigKJlVwZGF0ZVBhcnRpY2lwYW50QXV0aG9yaXphdGlvblJlc3BvbnNlInIKGERldGFjaFBhcnRpY2lwYW50UmVxdWVzdBIWCg5wYXJ0aWNpcGFudF9pZBgBIAEoBBI+CgZyZWFzb24YAiABKA4yLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUGFydGljaXBhbnRFbmRSZWFzb24iGwoZRGV0YWNoUGFydGljaXBhbnRSZXNwb25zZSrfBAoLQ2xvc2VSZWFzb24SHAoYQ0xPU0VfUkVBU09OX1VOU1BFQ0lGSUVEEAASFQoRQ0xPU0VfUkVBU09OX0RPTkUQARIcChhDTE9TRV9SRUFTT05fQ0xJRU5UX0VYSVQQAhIgChxDTE9TRV9SRUFTT05fU0VSVkVSX1NIVVRET1dOEAMSHwobQ0xPU0VfUkVBU09OX1NFUlZFUl9VUEdSQURFEAQSHQoZQ0xPU0VfUkVBU09OX1BJTkdfVElNRU9VVBAFEh4KGkNMT1NFX1JFQVNPTl9IRUxMT19USU1FT1VUEAYSHwobQ0xPU0VfUkVBU09OX1BST1RPQ09MX0VSUk9SEAcSIAocQ0xPU0VfUkVBU09OX01FU1NBR0VfVE9PX0JJRxAIEiYKIkNMT1NFX1JFQVNPTl9BVVRIRU5USUNBVElPTl9GQUlMRUQQCRIiCh5DTE9TRV9SRUFTT05fUEVSTUlTU0lPTl9ERU5JRUQQChIiCh5DTE9TRV9SRUFTT05fU0VTU0lPTl9OT1RfRk9VTkQQCxIkCiBDTE9TRV9SRUFTT05fQ09OTkVDVElPTl9SRVBMQUNFRBAMEh0KGUNMT1NFX1JFQVNPTl9TRVNTSU9OX0VYSVQQDRIhCh1DTE9TRV9SRUFTT05fUE9MSUNZX1ZJT0xBVElPThAQEh8KG0NMT1NFX1JFQVNPTl9JTlRFUk5BTF9FUlJPUhAREhsKF0NMT1NFX1JFQVNPTl9PVkVSTE9BREVEEBISIgoeQ0xPU0VfUkVBU09OX0VORFBPSU5UX1RPT19TTE9XEBMqsAMKFFBhcnRpY2lwYW50RW5kUmVhc29uEiYKIlBBUlRJQ0lQQU5UX0VORF9SRUFTT05fVU5TUEVDSUZJRUQQABIfChtQQVJUSUNJUEFOVF9FTkRfUkVBU09OX0xFRlQQARIiCh5QQVJUSUNJUEFOVF9FTkRfUkVBU09OX1JFTU9WRUQQAhIoCiRQQVJUSUNJUEFOVF9FTkRfUkVBU09OX0xFQVNFX0VYUElSRUQQAxIoCiRQQVJUSUNJUEFOVF9FTkRfUkVBU09OX1NFU1NJT05fRU5ERUQQBBIvCitQQVJUSUNJUEFOVF9FTkRfUkVBU09OX1NFU1NJT05fUFJPQ0VTU19MT1NUEAUSKQolUEFSVElDSVBBTlRfRU5EX1JFQVNPTl9SSUdIVFNfQ0hBTkdFRBAGEioKJlBBUlRJQ0lQQU5UX0VORF9SRUFTT05fTUFDSElORV9SRU1PVkVEEAcSJgoiUEFSVElDSVBBTlRfRU5EX1JFQVNPTl9LRVlfUkVWT0tFRBAIEicKI1BBUlRJQ0lQQU5UX0VORF9SRUFTT05fTk9UX0FETUlUVEVEEAkyxwMKElBhcnRpY2lwYW50U2VydmljZRKBAQoRQXR0YWNoUGFydGljaXBhbnQSMi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQXR0YWNoUGFydGljaXBhbnRSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkF0dGFjaFBhcnRpY2lwYW50UmVzcG9uc2UiA5ACAhKoAQoeVXBkYXRlUGFydGljaXBhbnRBdXRob3JpemF0aW9uEj8ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlVwZGF0ZVBhcnRpY2lwYW50QXV0aG9yaXphdGlvblJlcXVlc3QaQC5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuVXBkYXRlUGFydGljaXBhbnRBdXRob3JpemF0aW9uUmVzcG9uc2UiA5ACAhKBAQoRRGV0YWNoUGFydGljaXBhbnQSMi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRGV0YWNoUGFydGljaXBhbnRSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkRldGFjaFBhcnRpY2lwYW50UmVzcG9uc2UiA5ACAkI+WjxnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvY29udHJvbC92MTtjb250cm9sdjFiBnByb3RvMw", [file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_timestamp, file_leaflow_fleet_rpc_v1_rpc, file_leaflow_fleet_transport_v1_transport]);
 
 /**
  * A message from an endpoint.
@@ -208,10 +208,10 @@ export type ServerMessage = Message<"leaflow.fleet.control.v1.ServerMessage"> & 
     /**
      * The keys the service signs with, after they changed.
      *
-     * @generated from field: leaflow.fleet.control.v1.ServiceKeys service_keys = 10;
+     * @generated from field: leaflow.fleet.control.v1.SigningKeys signing_keys = 10;
      */
-    value: ServiceKeys;
-    case: "serviceKeys";
+    value: SigningKeys;
+    case: "signingKeys";
   } | {
     /**
      * The service closes the connection.
@@ -554,9 +554,9 @@ export type Welcome = Message<"leaflow.fleet.control.v1.Welcome"> & {
   /**
    * The keys the service signs with.
    *
-   * @generated from field: leaflow.fleet.control.v1.ServiceKeys service_keys = 4;
+   * @generated from field: leaflow.fleet.control.v1.SigningKeys signing_keys = 4;
    */
-  serviceKeys?: ServiceKeys | undefined;
+  signingKeys?: SigningKeys | undefined;
 
   /**
    * How long the service keeps the session's participants when this connection
@@ -585,9 +585,9 @@ export const WelcomeSchema: GenMessage<Welcome> = /*@__PURE__*/
 /**
  * The keys the service signs with, all of them. Replaces the previous set.
  *
- * @generated from message leaflow.fleet.control.v1.ServiceKeys
+ * @generated from message leaflow.fleet.control.v1.SigningKeys
  */
-export type ServiceKeys = Message<"leaflow.fleet.control.v1.ServiceKeys"> & {
+export type SigningKeys = Message<"leaflow.fleet.control.v1.SigningKeys"> & {
   /**
    * At most 8.
    *
@@ -597,10 +597,10 @@ export type ServiceKeys = Message<"leaflow.fleet.control.v1.ServiceKeys"> & {
 };
 
 /**
- * Describes the message leaflow.fleet.control.v1.ServiceKeys.
- * Use `create(ServiceKeysSchema)` to create a new message.
+ * Describes the message leaflow.fleet.control.v1.SigningKeys.
+ * Use `create(SigningKeysSchema)` to create a new message.
  */
-export const ServiceKeysSchema: GenMessage<ServiceKeys> = /*@__PURE__*/
+export const SigningKeysSchema: GenMessage<SigningKeys> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_control_v1_control, 9);
 
 /**
@@ -669,11 +669,11 @@ export type Authorization = Message<"leaflow.fleet.control.v1.Authorization"> & 
   sessionId: string;
 
   /**
-   * The participant's connection.
+   * The participant.
    *
-   * @generated from field: uint64 connection_id = 4;
+   * @generated from field: uint64 participant_id = 4;
    */
-  connectionId: bigint;
+  participantId: bigint;
 
   /**
    * The platform user the participant acts for.
@@ -690,13 +690,13 @@ export type Authorization = Message<"leaflow.fleet.control.v1.Authorization"> & 
   displayName: string;
 
   /**
-   * The label the client gave itself when it created the participant, such
+   * The name the client gave itself when it created the participant, such
    * as "console" or "assistant", at most 64 bytes. Neither unique nor
    * verified: it lets people tell participants apart and grants nothing.
    *
-   * @generated from field: string client_id = 7;
+   * @generated from field: string client_name = 7;
    */
-  clientId: string;
+  clientName: string;
 
   /**
    * The participant's Ed25519 public key, 32 bytes. The session accepts only
@@ -985,19 +985,18 @@ export const UpdateParticipantAuthorizationResponseSchema: GenMessage<UpdatePart
  */
 export type DetachParticipantRequest = Message<"leaflow.fleet.control.v1.DetachParticipantRequest"> & {
   /**
-   * The participant's connection.
+   * The participant.
    *
-   * @generated from field: uint64 connection_id = 1;
+   * @generated from field: uint64 participant_id = 1;
    */
-  connectionId: bigint;
+  participantId: bigint;
 
   /**
-   * Why it ends, such as DETACH_REQUEST when it was ended through the Fleet
-   * API or PING_TIMEOUT when its lease ran out.
+   * Why it ends.
    *
-   * @generated from field: leaflow.fleet.control.v1.CloseReason reason = 2;
+   * @generated from field: leaflow.fleet.control.v1.ParticipantEndReason reason = 2;
    */
-  reason: CloseReason;
+  reason: ParticipantEndReason;
 };
 
 /**
@@ -1023,8 +1022,7 @@ export const DetachParticipantResponseSchema: GenMessage<DetachParticipantRespon
   messageDesc(file_leaflow_fleet_control_v1_control, 22);
 
 /**
- * Why a control connection ends, and why a participant ends
- * (DetachParticipantRequest.reason).
+ * Why a control connection ends.
  *
  * @generated from enum leaflow.fleet.control.v1.CloseReason
  */
@@ -1063,8 +1061,7 @@ export enum CloseReason {
   SERVER_UPGRADE = 4,
 
   /**
-   * Nothing arrived for idle_timeout. Either side. For a participant, its
-   * lease ran out.
+   * Nothing arrived for idle_timeout. Either side.
    *
    * @generated from enum value: CLOSE_REASON_PING_TIMEOUT = 5;
    */
@@ -1102,8 +1099,8 @@ export enum CloseReason {
   AUTHENTICATION_FAILED = 9,
 
   /**
-   * The endpoint is known but not allowed, such as a removed machine or a
-   * participant whose rights were withdrawn. Service only.
+   * The endpoint is known but not allowed, such as the daemon of a removed
+   * machine. Service only.
    *
    * @generated from enum value: CLOSE_REASON_PERMISSION_DENIED = 10;
    */
@@ -1121,34 +1118,16 @@ export enum CloseReason {
    * A newer connection with the same identity replaced this one, such as a
    * daemon that connected again. Service only.
    *
-   * @generated from enum value: CLOSE_REASON_NEW_CLIENT = 12;
+   * @generated from enum value: CLOSE_REASON_CONNECTION_REPLACED = 12;
    */
-  NEW_CLIENT = 12,
+  CONNECTION_REPLACED = 12,
 
   /**
-   * The session ended. The session process before it ends, and the service
-   * for the session's participants.
+   * The session ends. Session process only, just before its session ends.
    *
    * @generated from enum value: CLOSE_REASON_SESSION_EXIT = 13;
    */
   SESSION_EXIT = 13,
-
-  /**
-   * The session's process did not connect again within
-   * Welcome.resume_grace. Service only, for the session's participants.
-   *
-   * @generated from enum value: CLOSE_REASON_SESSION_RESTARTING = 14;
-   */
-  SESSION_RESTARTING = 14,
-
-  /**
-   * The participant was ended on request, such as when it left or another
-   * member disconnected it; the session goes on. Service only, for
-   * participants.
-   *
-   * @generated from enum value: CLOSE_REASON_DETACH_REQUEST = 15;
-   */
-  DETACH_REQUEST = 15,
 
   /**
    * A rule or a rate limit was broken. Either side.
@@ -1188,6 +1167,90 @@ export const CloseReasonSchema: GenEnum<CloseReason> = /*@__PURE__*/
   enumDesc(file_leaflow_fleet_control_v1_control, 0);
 
 /**
+ * Why a participant ends. The session learns it with DetachParticipant, and the
+ * participant's user through the participant.ended event of the Fleet API.
+ *
+ * @generated from enum leaflow.fleet.control.v1.ParticipantEndReason
+ */
+export enum ParticipantEndReason {
+  /**
+   * @generated from enum value: PARTICIPANT_END_REASON_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * Its user ended it.
+   *
+   * @generated from enum value: PARTICIPANT_END_REASON_LEFT = 1;
+   */
+  LEFT = 1,
+
+  /**
+   * Someone else ended it, such as the owner of the session or an operator.
+   *
+   * @generated from enum value: PARTICIPANT_END_REASON_REMOVED = 2;
+   */
+  REMOVED = 2,
+
+  /**
+   * It was not renewed before its lease ran out.
+   *
+   * @generated from enum value: PARTICIPANT_END_REASON_LEASE_EXPIRED = 3;
+   */
+  LEASE_EXPIRED = 3,
+
+  /**
+   * Its session ended.
+   *
+   * @generated from enum value: PARTICIPANT_END_REASON_SESSION_ENDED = 4;
+   */
+  SESSION_ENDED = 4,
+
+  /**
+   * The session's process did not connect again within Welcome.resume_grace.
+   *
+   * @generated from enum value: PARTICIPANT_END_REASON_SESSION_PROCESS_LOST = 5;
+   */
+  SESSION_PROCESS_LOST = 5,
+
+  /**
+   * Its user's permissions no longer grant what it holds, or the user left
+   * the project.
+   *
+   * @generated from enum value: PARTICIPANT_END_REASON_RIGHTS_CHANGED = 6;
+   */
+  RIGHTS_CHANGED = 6,
+
+  /**
+   * Its machine was removed from the project.
+   *
+   * @generated from enum value: PARTICIPANT_END_REASON_MACHINE_REMOVED = 7;
+   */
+  MACHINE_REMOVED = 7,
+
+  /**
+   * The key that signed its authorization was revoked.
+   *
+   * @generated from enum value: PARTICIPANT_END_REASON_KEY_REVOKED = 8;
+   */
+  KEY_REVOKED = 8,
+
+  /**
+   * Its first PeerConnection did not start, so it was never handed to its
+   * client.
+   *
+   * @generated from enum value: PARTICIPANT_END_REASON_NOT_ADMITTED = 9;
+   */
+  NOT_ADMITTED = 9,
+}
+
+/**
+ * Describes the enum leaflow.fleet.control.v1.ParticipantEndReason.
+ */
+export const ParticipantEndReasonSchema: GenEnum<ParticipantEndReason> = /*@__PURE__*/
+  enumDesc(file_leaflow_fleet_control_v1_control, 1);
+
+/**
  * Admits participants to a session and ends them. Served by the session process
  * on its control connection; the service calls it when a participant
  * is created, renewed or ends through the Fleet API.
@@ -1196,10 +1259,10 @@ export const CloseReasonSchema: GenEnum<CloseReason> = /*@__PURE__*/
  */
 export const ParticipantService: GenService<{
   /**
-   * Admits a participant, before any of its signaling. The session verifies the
-   * signature with a key of ServiceKeys; that issuer, machine_id and session_id
-   * are its own; and the lifetime. It then accepts the PeerConnections of
-   * connection_id whose participant Hello is signed with
+   * Admits a participant, before any of its signaling. The session verifies
+   * the signature with a key of SigningKeys; that issuer, machine_id and
+   * session_id are its own; and the lifetime. It then accepts the
+   * PeerConnections of participant_id whose participant Hello is signed with
    * participant_public_key. Attaching an attached participant again with the
    * same authorization succeeds.
    *

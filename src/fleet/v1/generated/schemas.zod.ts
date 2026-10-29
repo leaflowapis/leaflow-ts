@@ -159,18 +159,18 @@
  *    one second has passed, so that the offer carries them.
  * 3. Join with `POST /api/v1/sessions/{sessionId}/participants`, sending the public key and the
  *    offer. The answer carries the participant's signed authorization, the keys the service
- *    signs with, and the attempt: the session's SDP answer, its ICE candidates and the signed
- *    PeerAuthorization. Pass candidates gathered later with
- *    `POST …/participants/{connectionId}/attempts/{attemptId}/candidates`.
- * 4. Renew the participant with `POST …/participants/{connectionId}:renew` well before
+ *    signs with, and the first PeerConnection: the session's SDP answer, its ICE candidates and
+ *    the signed PeerAuthorization. Pass candidates gathered later with
+ *    `POST …/participants/{participantId}/peer-connections/{peerConnectionId}/candidates`.
+ * 4. Renew the participant with `POST …/participants/{participantId}:renew` well before
  *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
  *    PeerConnection; the answer renews them. A participant whose lease runs out ends, and its
  *    PeerConnections stop within 30 seconds of their last lease.
  * 5. When a path fails, start another PeerConnection with
- *    `POST …/participants/{connectionId}/attempts` and move the connection to it with
- *    `:prepare-migration` and `:commit-migration`. Abandon an attempt with
- *    `DELETE …/attempts/{attemptId}`.
- * 6. Leave with `DELETE …/participants/{connectionId}`.
+ *    `POST …/participants/{participantId}/peer-connections` and move the connection to it with
+ *    `:prepareMigration` and `:commitMigration`. Abandon a PeerConnection that does not
+ *    connect with `DELETE …/peer-connections/{peerConnectionId}`.
+ * 6. Leave with `DELETE …/participants/{participantId}`.
  *
  * Signaling travels only through these requests; a participant holds no other connection to
  * the service.
@@ -178,24 +178,21 @@
  * What a participant may do in a session is decided when it is created, from the caller's
  * permissions and what the request asks for, and does not change afterwards. Participants are not
  * told apart by kind: a person in a browser and a program that operates the session are both
- * participants, named by the `client_id` label they choose, and either can be disconnected.
+ * participants, named by the `client_name` they choose, and either can be disconnected.
  *
  * Every participant that ends, including through `DELETE`, is announced through EventBus as
- * `leaflow.fleet.participant.closed`, addressed to its user in the current project, with its
- * `session_id`, `connection_id` (a decimal string) and `reason`: the name of the
- * `CloseReason` of `leaflow/fleet/control/v1/control.proto` in lower case without its prefix,
- * such as `detach_request` when it was ended through `DELETE`, `ping_timeout` when its lease
- * ran out, `session_exit` when its session ended, `session_restarting` when the session's process
- * did not come back in time, or `permission_denied` when its rights were withdrawn.
+ * `leaflow.fleet.participant.ended`, addressed to its user in the current project, with its
+ * `session_id`, `participant_id` (a decimal string) and `reason`: `left` when its user ended it,
+ * `removed` when someone else did, `lease_expired` when it was not renewed in time,
+ * `session_ended` when its session ended, `session_process_lost` when the session's process did
+ * not come back in time, `rights_changed` when its user's permissions no longer grant what it
+ * holds, `machine_removed` when its machine was removed, or `key_revoked` when the key that signed
+ * its authorization was revoked. A participant whose creation failed is not announced.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
 
 import { ApproveEnrollmentRequest } from "./validators/approveEnrollmentRequest.zod.js";
-
-import { CreateAttemptCandidatesRequest } from "./validators/createAttemptCandidatesRequest.zod.js";
-
-import { CreateAttemptRequest } from "./validators/createAttemptRequest.zod.js";
 
 import { CreateGroupMemberRequest } from "./validators/createGroupMemberRequest.zod.js";
 
@@ -204,6 +201,10 @@ import { CreateGroupRequest } from "./validators/createGroupRequest.zod.js";
 import { CreateMachineRegistrationRequest } from "./validators/createMachineRegistrationRequest.zod.js";
 
 import { CreateParticipantRequest } from "./validators/createParticipantRequest.zod.js";
+
+import { CreatePeerConnectionCandidatesRequest } from "./validators/createPeerConnectionCandidatesRequest.zod.js";
+
+import { CreatePeerConnectionRequest } from "./validators/createPeerConnectionRequest.zod.js";
 
 import { CreateSessionRequest } from "./validators/createSessionRequest.zod.js";
 
@@ -896,8 +897,8 @@ export const GetSessionRtcConfigurationParams = zod.strictObject({
 /**
  * Admits one participant with the given public key to the session: signs its authorization,
  * has the session accept it, and starts its first PeerConnection with the offer. The answer
- * carries the participant, its authorization and the attempt with the session's answer. The
- * participant lasts while it is renewed.
+ * carries the participant, its authorization and the PeerConnection with the session's
+ * answer. The participant lasts while it is renewed.
  *
  * The owner of a session may operate it. Joining another member's session requires
  * `fleet:sessions.view`, which admits watching only, or
@@ -915,8 +916,8 @@ export const GetSessionRtcConfigurationParams = zod.strictObject({
  *   time, such as while it restarts; try again after the error's `retry_delay`;
  * - `PARTICIPANT_LIMIT_REACHED` when the session has as many participants as it admits;
  * - `PARTICIPANT_REFUSED` when the session refused the participant;
- * - `ATTEMPT_ABORTED` when the session gave up the PeerConnection; try again with a new
- *   offer.
+ * - `PEER_CONNECTION_ABORTED` when the session gave up the PeerConnection; try again with a
+ *   new offer.
  * @summary Join a session
  */
 export const createParticipantPathSessionIdMax = 40;
@@ -951,10 +952,10 @@ export const ListSessionParticipantsParams = zod.strictObject({
 
 /**
  * Extends the participant's lease and returns renewed PeerAuthorizations for the
- * PeerConnections whose current ones the request presents; the session receives them too.
- * A presented authorization that the service did not sign for this participant, or whose
- * attempt has ended, is left out of the answer. When the participant's authorization nears
- * its end, the answer carries a renewed one, which the session already holds.
+ * PeerConnections whose current ones the request presents; the session receives them too. A
+ * presented authorization that the service did not sign for this participant, or whose
+ * PeerConnection has ended, is left out of the answer. When the participant's authorization
+ * nears its end, the answer carries a renewed one, which the session already holds.
  *
  * Only the participant's user may renew it.
  *
@@ -974,7 +975,7 @@ export const RenewParticipantParams = zod.strictObject({
     .min(1)
     .max(renewParticipantPathSessionIdMax)
     .regex(renewParticipantPathSessionIdRegExp),
-  connectionId: zod.int().min(1),
+  participantId: zod.int().min(1),
 });
 
 export const RenewParticipantBody = RenewParticipantRequest;
@@ -1003,7 +1004,7 @@ export const PrepareParticipantMigrationParams = zod.strictObject({
     .min(1)
     .max(prepareParticipantMigrationPathSessionIdMax)
     .regex(prepareParticipantMigrationPathSessionIdRegExp),
-  connectionId: zod.int().min(1),
+  participantId: zod.int().min(1),
 });
 
 export const PrepareParticipantMigrationBody = MigrationStep;
@@ -1032,7 +1033,7 @@ export const CommitParticipantMigrationParams = zod.strictObject({
     .min(1)
     .max(commitParticipantMigrationPathSessionIdMax)
     .regex(commitParticipantMigrationPathSessionIdRegExp),
-  connectionId: zod.int().min(1),
+  participantId: zod.int().min(1),
 });
 
 export const CommitParticipantMigrationBody = MigrationStep;
@@ -1040,63 +1041,63 @@ export const CommitParticipantMigrationBody = MigrationStep;
 /**
  * Starts another PeerConnection of the participant with the offer, such as after a path
  * failed, and returns the session's answer, its ICE candidates and the signed
- * PeerAuthorization. Move the connection to it with `prepare-participant-migration` and
- * `commit-participant-migration`.
+ * PeerAuthorization. Move the participant's connection to it with
+ * `prepare-participant-migration` and `commit-participant-migration`.
  *
  * Only the participant's user may start one.
  *
  * Fails with:
  * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
  * - `OFFER_INVALID` when the offer is not an SDP offer that names a SHA-256 DTLS fingerprint;
- * - `TOO_MANY_ATTEMPTS` when the participant started too many PeerConnections in the last
- *   minute; try again after the error's `retry_delay`;
+ * - `RATE_LIMIT_EXCEEDED` when the participant started too many PeerConnections in the
+ *   last minute; try again after the error's `retry_delay`;
  * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
  *   time; try again after the error's `retry_delay`;
- * - `ATTEMPT_ABORTED` when the session gave up the PeerConnection; start another.
+ * - `PEER_CONNECTION_ABORTED` when the session gave up the PeerConnection; start another.
  * @summary Start a PeerConnection
  */
-export const createAttemptPathSessionIdMax = 40;
+export const createPeerConnectionPathSessionIdMax = 40;
 
-export const createAttemptPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const createPeerConnectionPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
 
-export const CreateAttemptParams = zod.strictObject({
+export const CreatePeerConnectionParams = zod.strictObject({
   sessionId: zod
     .string()
     .min(1)
-    .max(createAttemptPathSessionIdMax)
-    .regex(createAttemptPathSessionIdRegExp),
-  connectionId: zod.int().min(1),
+    .max(createPeerConnectionPathSessionIdMax)
+    .regex(createPeerConnectionPathSessionIdRegExp),
+  participantId: zod.int().min(1),
 });
 
-export const CreateAttemptBody = CreateAttemptRequest;
+export const CreatePeerConnectionBody = CreatePeerConnectionRequest;
 
 /**
- * Tells the session to give up the attempt and close its PeerConnection. Abandoning an
- * attempt that has ended succeeds.
+ * Tells the session to give up the PeerConnection and close it. Abandoning a PeerConnection
+ * that has ended succeeds.
  *
  * Only the participant's user may abandon it.
  *
  * Fails with `PARTICIPANT_NOT_FOUND` when the participant has ended.
  * @summary Abandon a PeerConnection
  */
-export const deleteAttemptPathSessionIdMax = 40;
+export const deletePeerConnectionPathSessionIdMax = 40;
 
-export const deleteAttemptPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const deletePeerConnectionPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
 
-export const DeleteAttemptParams = zod.strictObject({
+export const DeletePeerConnectionParams = zod.strictObject({
   sessionId: zod
     .string()
     .min(1)
-    .max(deleteAttemptPathSessionIdMax)
-    .regex(deleteAttemptPathSessionIdRegExp),
-  connectionId: zod.int().min(1),
-  attemptId: zod.uuid(),
+    .max(deletePeerConnectionPathSessionIdMax)
+    .regex(deletePeerConnectionPathSessionIdRegExp),
+  participantId: zod.int().min(1),
+  peerConnectionId: zod.uuid(),
 });
 
 /**
  * Passes the ICE candidates the participant gathered after its offer to the session, and with
- * `end_of_candidates`, that it has gathered all (RFC 8838). The session ignores those of an
- * attempt that has ended.
+ * `end_of_candidates`, that it has gathered all (RFC 8838). The session ignores those of a
+ * PeerConnection that has ended.
  *
  * Only the participant's user may add them.
  *
@@ -1106,21 +1107,21 @@ export const DeleteAttemptParams = zod.strictObject({
  *   error's `retry_delay`.
  * @summary Add ICE candidates to a PeerConnection
  */
-export const createAttemptCandidatesPathSessionIdMax = 40;
+export const createPeerConnectionCandidatesPathSessionIdMax = 40;
 
-export const createAttemptCandidatesPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const createPeerConnectionCandidatesPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
 
-export const CreateAttemptCandidatesParams = zod.strictObject({
+export const CreatePeerConnectionCandidatesParams = zod.strictObject({
   sessionId: zod
     .string()
     .min(1)
-    .max(createAttemptCandidatesPathSessionIdMax)
-    .regex(createAttemptCandidatesPathSessionIdRegExp),
-  connectionId: zod.int().min(1),
-  attemptId: zod.uuid(),
+    .max(createPeerConnectionCandidatesPathSessionIdMax)
+    .regex(createPeerConnectionCandidatesPathSessionIdRegExp),
+  participantId: zod.int().min(1),
+  peerConnectionId: zod.uuid(),
 });
 
-export const CreateAttemptCandidatesBody = CreateAttemptCandidatesRequest;
+export const CreatePeerConnectionCandidatesBody = CreatePeerConnectionCandidatesRequest;
 
 /**
  * Returns a participant of the session.
@@ -1136,7 +1137,7 @@ export const GetParticipantParams = zod.strictObject({
     .min(1)
     .max(getParticipantPathSessionIdMax)
     .regex(getParticipantPathSessionIdRegExp),
-  connectionId: zod.int().min(1),
+  participantId: zod.int().min(1),
 });
 
 /**
@@ -1157,5 +1158,5 @@ export const DeleteParticipantParams = zod.strictObject({
     .min(1)
     .max(deleteParticipantPathSessionIdMax)
     .regex(deleteParticipantPathSessionIdRegExp),
-  connectionId: zod.int().min(1),
+  participantId: zod.int().min(1),
 });

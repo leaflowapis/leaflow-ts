@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/host/v1/host.proto.
  */
 export const file_leaflow_fleet_host_v1_host: GenFile = /*@__PURE__*/
-  fileDesc("CiBsZWFmbG93L2ZsZWV0L2hvc3QvdjEvaG9zdC5wcm90bxIVbGVhZmxvdy5mbGVldC5ob3N0LnYxIpwDCgdTZXNzaW9uEhIKCnNlc3Npb25faWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCRIQCgh1c2VybmFtZRgDIAEoCRILCgN1aWQYBCABKA0SMgoFc3RhdGUYBSABKA4yIy5sZWFmbG93LmZsZWV0Lmhvc3QudjEuU2Vzc2lvblN0YXRlEhYKDnhkZ19zZXNzaW9uX2lkGAYgASgJEi4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKDWxhc3RfaW5wdXRfYXQYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEh8KF3Nlc3Npb25fcHJvY2Vzc19ydW5uaW5nGAkgASgIEj8KDGNsb3NlX3JlYXNvbhgKIAEoDjIpLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5TZXNzaW9uQ2xvc2VSZWFzb24SFQoNcmVhc29uX3BocmFzZRgLIAEoCRIlCgdkZXRhaWxzGAwgAygLMhQuZ29vZ2xlLnByb3RvYnVmLkFueSLxAQoNU2Vzc2lvblBvbGljeRI3ChRkaXNjb25uZWN0ZWRfdGltZW91dBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIvCgxtYXhfbGlmZXRpbWUYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SNAoRbm9fY2xpZW50X3RpbWVvdXQYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SQAoQcmVzb3VyY2VfY29udHJvbBgEIAEoCzImLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5SZXNvdXJjZUNvbnRyb2wiiAEKD1Jlc291cmNlQ29udHJvbBIZChFtZW1vcnlfaGlnaF9ieXRlcxgBIAEoBBIYChBtZW1vcnlfbWF4X2J5dGVzGAIgASgEEhIKCmNwdV93ZWlnaHQYAyABKA0SGQoRY3B1X3F1b3RhX3BlcmNlbnQYBCABKA0SEQoJdGFza3NfbWF4GAUgASgNIr0BChJPcGVuU2Vzc2lvblJlcXVlc3QSEgoKc2Vzc2lvbl9pZBgBIAEoCRIPCgd1c2VyX2lkGAIgASgJEhAKCHVzZXJuYW1lGAMgASgJEhMKC3JlbW90ZV9ob3N0GAQgASgJEjQKBnBvbGljeRgFIAEoCzIkLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5TZXNzaW9uUG9saWN5EiUKB29wdGlvbnMYBiADKAsyFC5nb29nbGUucHJvdG9idWYuQW55IkYKE09wZW5TZXNzaW9uUmVzcG9uc2USLwoHc2Vzc2lvbhgBIAEoCzIeLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5TZXNzaW9uIloKE0Nsb3NlU2Vzc2lvblJlcXVlc3QSEgoKc2Vzc2lvbl9pZBgBIAEoCRIvCgxncmFjZV9wZXJpb2QYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24iFgoUQ2xvc2VTZXNzaW9uUmVzcG9uc2UiLQoXVGVybWluYXRlU2Vzc2lvblJlcXVlc3QSEgoKc2Vzc2lvbl9pZBgBIAEoCSIaChhUZXJtaW5hdGVTZXNzaW9uUmVzcG9uc2UibAoVUmVwb3J0U2Vzc2lvbnNSZXF1ZXN0Eg8KB2Jvb3RfaWQYASABKAkSMAoIc2Vzc2lvbnMYAiADKAsyHi5sZWFmbG93LmZsZWV0Lmhvc3QudjEuU2Vzc2lvbhIQCghzZXF1ZW5jZRgDIAEoBCIYChZSZXBvcnRTZXNzaW9uc1Jlc3BvbnNlIl4KGVJlcG9ydFNlc3Npb25TdGF0ZVJlcXVlc3QSLwoHc2Vzc2lvbhgBIAEoCzIeLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5TZXNzaW9uEhAKCHNlcXVlbmNlGAIgASgEIhwKGlJlcG9ydFNlc3Npb25TdGF0ZVJlc3BvbnNlKrEBCgxTZXNzaW9uU3RhdGUSHQoZU0VTU0lPTl9TVEFURV9VTlNQRUNJRklFRBAAEhkKFVNFU1NJT05fU1RBVEVfT1BFTklORxABEhgKFFNFU1NJT05fU1RBVEVfT05MSU5FEAISGAoUU0VTU0lPTl9TVEFURV9BQ1RJVkUQAxIZChVTRVNTSU9OX1NUQVRFX0NMT1NJTkcQBBIYChRTRVNTSU9OX1NUQVRFX0NMT1NFRBAFKtEDChJTZXNzaW9uQ2xvc2VSZWFzb24SJAogU0VTU0lPTl9DTE9TRV9SRUFTT05fVU5TUEVDSUZJRUQQABIoCiRTRVNTSU9OX0NMT1NFX1JFQVNPTl9DTE9TRV9SRVFVRVNURUQQARIsCihTRVNTSU9OX0NMT1NFX1JFQVNPTl9URVJNSU5BVEVfUkVRVUVTVEVEEAISHwobU0VTU0lPTl9DTE9TRV9SRUFTT05fTE9HT1VUEAMSLQopU0VTU0lPTl9DTE9TRV9SRUFTT05fRElTQ09OTkVDVEVEX1RJTUVPVVQQBBIqCiZTRVNTSU9OX0NMT1NFX1JFQVNPTl9OT19DTElFTlRfVElNRU9VVBAFEiUKIVNFU1NJT05fQ0xPU0VfUkVBU09OX01BWF9MSUZFVElNRRAGEiUKIVNFU1NJT05fQ0xPU0VfUkVBU09OX0RJU1BMQVlfRVhJVBAHEiQKIFNFU1NJT05fQ0xPU0VfUkVBU09OX0hFTFBFUl9MT1NUEAgSJAogU0VTU0lPTl9DTE9TRV9SRUFTT05fT1BFTl9GQUlMRUQQCRInCiNTRVNTSU9OX0NMT1NFX1JFQVNPTl9BQ0NFU1NfUkVWT0tFRBAKMucCChJTZXNzaW9uSG9zdFNlcnZpY2USaQoLT3BlblNlc3Npb24SKS5sZWFmbG93LmZsZWV0Lmhvc3QudjEuT3BlblNlc3Npb25SZXF1ZXN0GioubGVhZmxvdy5mbGVldC5ob3N0LnYxLk9wZW5TZXNzaW9uUmVzcG9uc2UiA5ACAhJsCgxDbG9zZVNlc3Npb24SKi5sZWFmbG93LmZsZWV0Lmhvc3QudjEuQ2xvc2VTZXNzaW9uUmVxdWVzdBorLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5DbG9zZVNlc3Npb25SZXNwb25zZSIDkAICEngKEFRlcm1pbmF0ZVNlc3Npb24SLi5sZWFmbG93LmZsZWV0Lmhvc3QudjEuVGVybWluYXRlU2Vzc2lvblJlcXVlc3QaLy5sZWFmbG93LmZsZWV0Lmhvc3QudjEuVGVybWluYXRlU2Vzc2lvblJlc3BvbnNlIgOQAgIyjAIKFlNlc3Npb25SZWdpc3RyeVNlcnZpY2UScgoOUmVwb3J0U2Vzc2lvbnMSLC5sZWFmbG93LmZsZWV0Lmhvc3QudjEuUmVwb3J0U2Vzc2lvbnNSZXF1ZXN0Gi0ubGVhZmxvdy5mbGVldC5ob3N0LnYxLlJlcG9ydFNlc3Npb25zUmVzcG9uc2UiA5ACAhJ+ChJSZXBvcnRTZXNzaW9uU3RhdGUSMC5sZWFmbG93LmZsZWV0Lmhvc3QudjEuUmVwb3J0U2Vzc2lvblN0YXRlUmVxdWVzdBoxLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5SZXBvcnRTZXNzaW9uU3RhdGVSZXNwb25zZSIDkAICQjhaNmdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9ob3N0L3YxO2hvc3R2MWIGcHJvdG8z", [file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("CiBsZWFmbG93L2ZsZWV0L2hvc3QvdjEvaG9zdC5wcm90bxIVbGVhZmxvdy5mbGVldC5ob3N0LnYxIvsCCgdTZXNzaW9uEhIKCnNlc3Npb25faWQYASABKAkSDwoHdXNlcl9pZBgCIAEoCRIQCgh1c2VybmFtZRgDIAEoCRILCgN1aWQYBCABKA0SMgoFc3RhdGUYBSABKA4yIy5sZWFmbG93LmZsZWV0Lmhvc3QudjEuU2Vzc2lvblN0YXRlEhYKDnhkZ19zZXNzaW9uX2lkGAYgASgJEi4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjEKDWxhc3RfaW5wdXRfYXQYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEj8KDGNsb3NlX3JlYXNvbhgKIAEoDjIpLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5TZXNzaW9uQ2xvc2VSZWFzb24SFQoNcmVhc29uX3BocmFzZRgLIAEoCRIlCgdkZXRhaWxzGAwgAygLMhQuZ29vZ2xlLnByb3RvYnVmLkFueSL2AQoNU2Vzc2lvblBvbGljeRI3ChRkaXNjb25uZWN0ZWRfdGltZW91dBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIvCgxtYXhfbGlmZXRpbWUYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SOQoWbm9fcGFydGljaXBhbnRfdGltZW91dBgDIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhJAChByZXNvdXJjZV9jb250cm9sGAQgASgLMiYubGVhZmxvdy5mbGVldC5ob3N0LnYxLlJlc291cmNlQ29udHJvbCKIAQoPUmVzb3VyY2VDb250cm9sEhkKEW1lbW9yeV9oaWdoX2J5dGVzGAEgASgEEhgKEG1lbW9yeV9tYXhfYnl0ZXMYAiABKAQSEgoKY3B1X3dlaWdodBgDIAEoDRIZChFjcHVfcXVvdGFfcGVyY2VudBgEIAEoDRIRCgl0YXNrc19tYXgYBSABKA0ivQEKEk9wZW5TZXNzaW9uUmVxdWVzdBISCgpzZXNzaW9uX2lkGAEgASgJEg8KB3VzZXJfaWQYAiABKAkSEAoIdXNlcm5hbWUYAyABKAkSEwoLcmVtb3RlX2hvc3QYBCABKAkSNAoGcG9saWN5GAUgASgLMiQubGVhZmxvdy5mbGVldC5ob3N0LnYxLlNlc3Npb25Qb2xpY3kSJQoHb3B0aW9ucxgGIAMoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnkiRgoTT3BlblNlc3Npb25SZXNwb25zZRIvCgdzZXNzaW9uGAEgASgLMh4ubGVhZmxvdy5mbGVldC5ob3N0LnYxLlNlc3Npb24iWgoTQ2xvc2VTZXNzaW9uUmVxdWVzdBISCgpzZXNzaW9uX2lkGAEgASgJEi8KDGdyYWNlX3BlcmlvZBgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbiIWChRDbG9zZVNlc3Npb25SZXNwb25zZSItChdUZXJtaW5hdGVTZXNzaW9uUmVxdWVzdBISCgpzZXNzaW9uX2lkGAEgASgJIhoKGFRlcm1pbmF0ZVNlc3Npb25SZXNwb25zZSJsChVSZXBvcnRTZXNzaW9uc1JlcXVlc3QSDwoHYm9vdF9pZBgBIAEoCRIwCghzZXNzaW9ucxgCIAMoCzIeLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5TZXNzaW9uEhAKCHNlcXVlbmNlGAMgASgEIhgKFlJlcG9ydFNlc3Npb25zUmVzcG9uc2UiXgoZUmVwb3J0U2Vzc2lvblN0YXRlUmVxdWVzdBIvCgdzZXNzaW9uGAEgASgLMh4ubGVhZmxvdy5mbGVldC5ob3N0LnYxLlNlc3Npb24SEAoIc2VxdWVuY2UYAiABKAQiHAoaUmVwb3J0U2Vzc2lvblN0YXRlUmVzcG9uc2UqlQEKDFNlc3Npb25TdGF0ZRIdChlTRVNTSU9OX1NUQVRFX1VOU1BFQ0lGSUVEEAASGQoVU0VTU0lPTl9TVEFURV9PUEVOSU5HEAESFgoSU0VTU0lPTl9TVEFURV9PUEVOEAISGQoVU0VTU0lPTl9TVEFURV9DTE9TSU5HEAQSGAoUU0VTU0lPTl9TVEFURV9DTE9TRUQQBSrXAwoSU2Vzc2lvbkNsb3NlUmVhc29uEiQKIFNFU1NJT05fQ0xPU0VfUkVBU09OX1VOU1BFQ0lGSUVEEAASKAokU0VTU0lPTl9DTE9TRV9SRUFTT05fQ0xPU0VfUkVRVUVTVEVEEAESLAooU0VTU0lPTl9DTE9TRV9SRUFTT05fVEVSTUlOQVRFX1JFUVVFU1RFRBACEh8KG1NFU1NJT05fQ0xPU0VfUkVBU09OX0xPR09VVBADEi0KKVNFU1NJT05fQ0xPU0VfUkVBU09OX0RJU0NPTk5FQ1RFRF9USU1FT1VUEAQSLworU0VTU0lPTl9DTE9TRV9SRUFTT05fTk9fUEFSVElDSVBBTlRfVElNRU9VVBAFEiUKIVNFU1NJT05fQ0xPU0VfUkVBU09OX01BWF9MSUZFVElNRRAGEiUKIVNFU1NJT05fQ0xPU0VfUkVBU09OX0RJU1BMQVlfRVhJVBAHEiUKIVNFU1NJT05fQ0xPU0VfUkVBU09OX1BST0NFU1NfTE9TVBAIEiQKIFNFU1NJT05fQ0xPU0VfUkVBU09OX09QRU5fRkFJTEVEEAkSJwojU0VTU0lPTl9DTE9TRV9SRUFTT05fQUNDRVNTX1JFVk9LRUQQCjLnAgoSU2Vzc2lvbkhvc3RTZXJ2aWNlEmkKC09wZW5TZXNzaW9uEikubGVhZmxvdy5mbGVldC5ob3N0LnYxLk9wZW5TZXNzaW9uUmVxdWVzdBoqLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5PcGVuU2Vzc2lvblJlc3BvbnNlIgOQAgISbAoMQ2xvc2VTZXNzaW9uEioubGVhZmxvdy5mbGVldC5ob3N0LnYxLkNsb3NlU2Vzc2lvblJlcXVlc3QaKy5sZWFmbG93LmZsZWV0Lmhvc3QudjEuQ2xvc2VTZXNzaW9uUmVzcG9uc2UiA5ACAhJ4ChBUZXJtaW5hdGVTZXNzaW9uEi4ubGVhZmxvdy5mbGVldC5ob3N0LnYxLlRlcm1pbmF0ZVNlc3Npb25SZXF1ZXN0Gi8ubGVhZmxvdy5mbGVldC5ob3N0LnYxLlRlcm1pbmF0ZVNlc3Npb25SZXNwb25zZSIDkAICMowCChZTZXNzaW9uUmVnaXN0cnlTZXJ2aWNlEnIKDlJlcG9ydFNlc3Npb25zEiwubGVhZmxvdy5mbGVldC5ob3N0LnYxLlJlcG9ydFNlc3Npb25zUmVxdWVzdBotLmxlYWZsb3cuZmxlZXQuaG9zdC52MS5SZXBvcnRTZXNzaW9uc1Jlc3BvbnNlIgOQAgISfgoSUmVwb3J0U2Vzc2lvblN0YXRlEjAubGVhZmxvdy5mbGVldC5ob3N0LnYxLlJlcG9ydFNlc3Npb25TdGF0ZVJlcXVlc3QaMS5sZWFmbG93LmZsZWV0Lmhvc3QudjEuUmVwb3J0U2Vzc2lvblN0YXRlUmVzcG9uc2UiA5ACAkI4WjZnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvaG9zdC92MTtob3N0djFiBnByb3RvMw", [file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * A session on a machine.
@@ -79,13 +79,6 @@ export type Session = Message<"leaflow.fleet.host.v1.Session"> & {
   lastInputAt?: Timestamp | undefined;
 
   /**
-   * The session process runs. False while it restarts.
-   *
-   * @generated from field: bool session_process_running = 9;
-   */
-  sessionProcessRunning: boolean;
-
-  /**
    * Why the session ended. CLOSED only.
    *
    * @generated from field: leaflow.fleet.host.v1.SessionCloseReason close_reason = 10;
@@ -141,9 +134,9 @@ export type SessionPolicy = Message<"leaflow.fleet.host.v1.SessionPolicy"> & {
   /**
    * Ends the session when no participant came this long after it opened.
    *
-   * @generated from field: google.protobuf.Duration no_client_timeout = 3;
+   * @generated from field: google.protobuf.Duration no_participant_timeout = 3;
    */
-  noClientTimeout?: Duration | undefined;
+  noParticipantTimeout?: Duration | undefined;
 
   /**
    * Limits on the user's resources.
@@ -278,7 +271,7 @@ export const OpenSessionRequestSchema: GenMessage<OpenSessionRequest> = /*@__PUR
  */
 export type OpenSessionResponse = Message<"leaflow.fleet.host.v1.OpenSessionResponse"> & {
   /**
-   * The session, ACTIVE.
+   * The session, OPEN.
    *
    * @generated from field: leaflow.fleet.host.v1.Session session = 1;
    */
@@ -474,8 +467,7 @@ export const ReportSessionStateResponseSchema: GenMessage<ReportSessionStateResp
   messageDesc(file_leaflow_fleet_host_v1_host, 12);
 
 /**
- * Where a session is in its life. ONLINE, ACTIVE and CLOSING are the logind
- * session states (org.freedesktop.login1 Session.State).
+ * Where a session is in its life.
  *
  * @generated from enum leaflow.fleet.host.v1.SessionState
  */
@@ -493,18 +485,11 @@ export enum SessionState {
   OPENING = 1,
 
   /**
-   * Logged in but not in the foreground.
+   * Logged in: the session runs.
    *
-   * @generated from enum value: SESSION_STATE_ONLINE = 2;
+   * @generated from enum value: SESSION_STATE_OPEN = 2;
    */
-  ONLINE = 2,
-
-  /**
-   * Logged in and active: a running session.
-   *
-   * @generated from enum value: SESSION_STATE_ACTIVE = 3;
-   */
-  ACTIVE = 3,
+  OPEN = 2,
 
   /**
    * Logged out; its processes are being cleaned up.
@@ -567,11 +552,11 @@ export enum SessionCloseReason {
   DISCONNECTED_TIMEOUT = 4,
 
   /**
-   * SessionPolicy.no_client_timeout passed.
+   * SessionPolicy.no_participant_timeout passed.
    *
-   * @generated from enum value: SESSION_CLOSE_REASON_NO_CLIENT_TIMEOUT = 5;
+   * @generated from enum value: SESSION_CLOSE_REASON_NO_PARTICIPANT_TIMEOUT = 5;
    */
-  NO_CLIENT_TIMEOUT = 5,
+  NO_PARTICIPANT_TIMEOUT = 5,
 
   /**
    * SessionPolicy.max_lifetime passed.
@@ -589,12 +574,11 @@ export enum SessionCloseReason {
   DISPLAY_EXIT = 7,
 
   /**
-   * The process that held the session died, and the daemon cleaned up what
-   * was left.
+   * The session process died, and the daemon cleaned up what was left.
    *
-   * @generated from enum value: SESSION_CLOSE_REASON_HELPER_LOST = 8;
+   * @generated from enum value: SESSION_CLOSE_REASON_PROCESS_LOST = 8;
    */
-  HELPER_LOST = 8,
+  PROCESS_LOST = 8,
 
   /**
    * Opening failed and was undone.
@@ -720,8 +704,8 @@ export const SessionRegistryService: GenService<{
     output: typeof ReportSessionsResponseSchema;
   },
   /**
-   * Reports that a session changed state or its session process stopped or
-   * started. Only for a session the service opened or saw in a full report.
+   * Reports that a session changed state. Only for a session the service
+   * opened or saw in a full report.
    * CLOSED is final: later reports of the session are ignored.
    *
    * @generated from rpc leaflow.fleet.host.v1.SessionRegistryService.ReportSessionState

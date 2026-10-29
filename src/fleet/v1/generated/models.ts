@@ -159,18 +159,18 @@
  *    one second has passed, so that the offer carries them.
  * 3. Join with `POST /api/v1/sessions/{sessionId}/participants`, sending the public key and the
  *    offer. The answer carries the participant's signed authorization, the keys the service
- *    signs with, and the attempt: the session's SDP answer, its ICE candidates and the signed
- *    PeerAuthorization. Pass candidates gathered later with
- *    `POST …/participants/{connectionId}/attempts/{attemptId}/candidates`.
- * 4. Renew the participant with `POST …/participants/{connectionId}:renew` well before
+ *    signs with, and the first PeerConnection: the session's SDP answer, its ICE candidates and
+ *    the signed PeerAuthorization. Pass candidates gathered later with
+ *    `POST …/participants/{participantId}/peer-connections/{peerConnectionId}/candidates`.
+ * 4. Renew the participant with `POST …/participants/{participantId}:renew` well before
  *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
  *    PeerConnection; the answer renews them. A participant whose lease runs out ends, and its
  *    PeerConnections stop within 30 seconds of their last lease.
  * 5. When a path fails, start another PeerConnection with
- *    `POST …/participants/{connectionId}/attempts` and move the connection to it with
- *    `:prepare-migration` and `:commit-migration`. Abandon an attempt with
- *    `DELETE …/attempts/{attemptId}`.
- * 6. Leave with `DELETE …/participants/{connectionId}`.
+ *    `POST …/participants/{participantId}/peer-connections` and move the connection to it with
+ *    `:prepareMigration` and `:commitMigration`. Abandon a PeerConnection that does not
+ *    connect with `DELETE …/peer-connections/{peerConnectionId}`.
+ * 6. Leave with `DELETE …/participants/{participantId}`.
  *
  * Signaling travels only through these requests; a participant holds no other connection to
  * the service.
@@ -178,15 +178,16 @@
  * What a participant may do in a session is decided when it is created, from the caller's
  * permissions and what the request asks for, and does not change afterwards. Participants are not
  * told apart by kind: a person in a browser and a program that operates the session are both
- * participants, named by the `client_id` label they choose, and either can be disconnected.
+ * participants, named by the `client_name` they choose, and either can be disconnected.
  *
  * Every participant that ends, including through `DELETE`, is announced through EventBus as
- * `leaflow.fleet.participant.closed`, addressed to its user in the current project, with its
- * `session_id`, `connection_id` (a decimal string) and `reason`: the name of the
- * `CloseReason` of `leaflow/fleet/control/v1/control.proto` in lower case without its prefix,
- * such as `detach_request` when it was ended through `DELETE`, `ping_timeout` when its lease
- * ran out, `session_exit` when its session ended, `session_restarting` when the session's process
- * did not come back in time, or `permission_denied` when its rights were withdrawn.
+ * `leaflow.fleet.participant.ended`, addressed to its user in the current project, with its
+ * `session_id`, `participant_id` (a decimal string) and `reason`: `left` when its user ended it,
+ * `removed` when someone else did, `lease_expired` when it was not renewed in time,
+ * `session_ended` when its session ended, `session_process_lost` when the session's process did
+ * not come back in time, `rights_changed` when its user's permissions no longer grant what it
+ * holds, `machine_removed` when its machine was removed, or `key_revoked` when the key that signed
+ * its authorization was revoked. A participant whose creation failed is not announced.
  * OpenAPI spec version: 1.0.0
  */
 export interface FieldViolation {
@@ -604,23 +605,21 @@ export const SessionMode = {
 } as const;
 
 /**
- * `opening` starts; `online` is logged in but not in the foreground; `active` runs;
- * `closing` is ending; `closed` has ended.
+ * `opening` starts; `open` runs; `closing` is ending; `closed` has ended.
  */
 export type SessionState = (typeof SessionState)[keyof typeof SessionState];
 
 export const SessionState = {
   opening: "opening",
-  online: "online",
-  active: "active",
+  open: "open",
   closing: "closing",
   closed: "closed",
 } as const;
 
 /**
  * Why a session ended. `close_requested` and `terminate_requested` follow a request;
- * `logout` the user logged out; `disconnected_timeout`, `no_client_timeout` and
- * `max_lifetime` a time limit passed; `display_exit` and `helper_lost` the session failed;
+ * `logout` the user logged out; `disconnected_timeout`, `no_participant_timeout` and
+ * `max_lifetime` a time limit passed; `display_exit` and `process_lost` the session failed;
  * `open_failed` it never opened; `access_revoked` its user may no longer log in;
  * `machine_restarted` the machine restarted; `unknown` the machine no longer reports it.
  */
@@ -631,10 +630,10 @@ export const SessionCloseReason = {
   terminate_requested: "terminate_requested",
   logout: "logout",
   disconnected_timeout: "disconnected_timeout",
-  no_client_timeout: "no_client_timeout",
+  no_participant_timeout: "no_participant_timeout",
   max_lifetime: "max_lifetime",
   display_exit: "display_exit",
-  helper_lost: "helper_lost",
+  process_lost: "process_lost",
   open_failed: "open_failed",
   access_revoked: "access_revoked",
   machine_restarted: "machine_restarted",
@@ -657,10 +656,11 @@ export interface SessionResource {
   /** The session's desktop; null for a session without one */
   desktop: DesktopState | null;
   /**
-   * The session can admit participants. False while its process restarts; requests that
-   * signal are then answered with `SESSION_UNAVAILABLE` and succeed again shortly.
+   * The session's process is connected to the service, so participants can join and start
+   * PeerConnections. False while it restarts; such requests are then answered with
+   * `SESSION_UNAVAILABLE` and succeed again shortly.
    */
-  process_running: boolean;
+  process_connected: boolean;
   /**
    * The last input of a person in the session
    * @nullable
@@ -859,20 +859,17 @@ export interface PrivilegeRequestList {
 }
 
 export interface ParticipantResource {
-  /** The participant's connection */
-  connection_id: number;
+  /** The participant; `participant_id` of the protocol */
+  id: number;
   user: NamedIdentity;
-  /** The label the participant's client chose, such as `console` or `assistant`; neither unique nor verified */
-  client_id: string;
+  /** The name the participant's client gave itself, such as `console` or `assistant`; neither unique nor verified */
+  client_name: string;
   /** The participant may only watch */
   read_only: boolean;
-  /**
-   * The capabilities granted to the participant, as the full names of their policy messages,
-   * such as `leaflow.fleet.filetransfer.v1.FileTransferPolicy`
-   */
-  policies: string[];
-  /** The IP address the participant joined from */
-  remote_address: string;
+  /** The capabilities granted to the participant, as permission names such as `fleet:files.transfer` */
+  permissions: string[];
+  /** The IP address the participant joined from; empty when it joined through a platform service */
+  source_address: string;
   /** When the participant joined */
   created_at: string;
 }
@@ -886,7 +883,7 @@ export interface ParticipantList {
  * signature, as in `SignedAuthorization` and `SignedPeerAuthorization` of the protocol. Each
  * byte string is standard Base64.
  */
-export interface Signed {
+export interface SignedMessage {
   key_id: string;
   /** The serialized message; decode it only after the signature verified */
   message: string;
@@ -894,11 +891,11 @@ export interface Signed {
 }
 
 /**
- * A key the service signs with, as `ServiceKeys` of the protocol
+ * A key the service signs with, as `SigningKeys` of the protocol
  */
-export interface ServiceKey {
+export interface SigningKey {
   key_id: string;
-  ed25519: PublicKey;
+  public_key: PublicKey;
 }
 
 /**
@@ -949,11 +946,11 @@ export interface IceCandidate {
 /**
  * One PeerConnection of a participant, as the session answered it. Set the answer as the
  * remote description, add the candidates, and verify the authorization before sending
- * application data; its SHA-256 goes into `Hello.authorization_sha256`.
+ * application data; the SHA-256 of its `message` goes into `Hello.authorization_sha256`.
  */
-export interface Attempt {
-  /** The attempt, as `attempt_id` of the transport protocol in its 16 bytes */
-  attempt_id: string;
+export interface PeerConnection {
+  /** The PeerConnection; its 16 bytes are `peer_connection_id` of the transport protocol */
+  id: string;
   /** The session's SDP answer (RFC 8866); it holds ICE credentials, so never log it */
   answer: string;
   /**
@@ -961,21 +958,21 @@ export interface Attempt {
    * until 2 seconds after its answer
    */
   candidates: IceCandidate[];
-  /** The signed `PeerAuthorization` of the attempt, the same one the session holds */
-  authorization: Signed;
+  /** The signed `PeerAuthorization` of the PeerConnection, the same one the session holds */
+  authorization: SignedMessage;
 }
 
-export interface ParticipantConnection {
+export interface CreateParticipantResponse {
   participant: ParticipantResource;
   /** The participant's signed `Authorization`, the same one the session holds */
-  authorization: Signed;
+  authorization: SignedMessage;
   /** The ICE servers for later PeerConnections of the participant */
   rtc_configuration: RtcConfiguration;
-  service_keys: ServiceKey[];
+  signing_keys: SigningKey[];
   /** When the participant ends unless renewed */
   lease_expires_at: string;
   /** The first PeerConnection, started with the request's offer */
-  attempt: Attempt;
+  peer_connection: PeerConnection;
 }
 
 export interface RenewParticipantRequest {
@@ -983,17 +980,17 @@ export interface RenewParticipantRequest {
    * The current signed `PeerAuthorization` of each PeerConnection to renew
    * @maxItems 8
    */
-  peer_authorizations?: Signed[];
+  peer_authorizations?: SignedMessage[];
 }
 
 export interface RenewParticipantResponse {
   lease_expires_at: string;
   /** The renewed signed `PeerAuthorization`s, in the order of the request */
-  peer_authorizations: Signed[];
+  peer_authorizations: SignedMessage[];
   /** A renewed signed `Authorization`, when the current one nears its end */
-  authorization?: Signed;
+  authorization?: SignedMessage;
   rtc_configuration: RtcConfiguration;
-  service_keys: ServiceKey[];
+  signing_keys: SigningKey[];
 }
 
 export type CreateParticipantRequestPermissionsItem =
@@ -1014,10 +1011,10 @@ export const CreateParticipantRequestPermissionsItem = {
 export interface CreateParticipantRequest {
   public_key: PublicKey;
   /**
-   * A label for the client that joins, such as `console` or `assistant`, shown to the other participants. It is neither unique nor verified.
+   * A name for the client that joins, such as `console` or `assistant`, shown to the other participants. It is neither unique nor verified.
    * @maxLength 64
    */
-  client_id?: string;
+  client_name?: string;
   /** The participant only watches, even if the caller may operate the session */
   read_only?: boolean;
   /**
@@ -1035,7 +1032,7 @@ export interface CreateParticipantRequest {
   offer: string;
 }
 
-export interface CreateAttemptRequest {
+export interface CreatePeerConnectionRequest {
   /**
    * The SDP offer (RFC 8866) of the PeerConnection, with the ICE candidates gathered so
    * far; it holds ICE credentials, so never log it
@@ -1044,7 +1041,7 @@ export interface CreateAttemptRequest {
   offer: string;
 }
 
-export interface CreateAttemptCandidatesRequest {
+export interface CreatePeerConnectionCandidatesRequest {
   /** @maxItems 64 */
   candidates?: IceCandidate[];
   /** The participant has gathered all its candidates */

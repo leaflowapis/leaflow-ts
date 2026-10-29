@@ -159,18 +159,18 @@
  *    one second has passed, so that the offer carries them.
  * 3. Join with `POST /api/v1/sessions/{sessionId}/participants`, sending the public key and the
  *    offer. The answer carries the participant's signed authorization, the keys the service
- *    signs with, and the attempt: the session's SDP answer, its ICE candidates and the signed
- *    PeerAuthorization. Pass candidates gathered later with
- *    `POST …/participants/{connectionId}/attempts/{attemptId}/candidates`.
- * 4. Renew the participant with `POST …/participants/{connectionId}:renew` well before
+ *    signs with, and the first PeerConnection: the session's SDP answer, its ICE candidates and
+ *    the signed PeerAuthorization. Pass candidates gathered later with
+ *    `POST …/participants/{participantId}/peer-connections/{peerConnectionId}/candidates`.
+ * 4. Renew the participant with `POST …/participants/{participantId}:renew` well before
  *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
  *    PeerConnection; the answer renews them. A participant whose lease runs out ends, and its
  *    PeerConnections stop within 30 seconds of their last lease.
  * 5. When a path fails, start another PeerConnection with
- *    `POST …/participants/{connectionId}/attempts` and move the connection to it with
- *    `:prepare-migration` and `:commit-migration`. Abandon an attempt with
- *    `DELETE …/attempts/{attemptId}`.
- * 6. Leave with `DELETE …/participants/{connectionId}`.
+ *    `POST …/participants/{participantId}/peer-connections` and move the connection to it with
+ *    `:prepareMigration` and `:commitMigration`. Abandon a PeerConnection that does not
+ *    connect with `DELETE …/peer-connections/{peerConnectionId}`.
+ * 6. Leave with `DELETE …/participants/{participantId}`.
  *
  * Signaling travels only through these requests; a participant holds no other connection to
  * the service.
@@ -178,15 +178,16 @@
  * What a participant may do in a session is decided when it is created, from the caller's
  * permissions and what the request asks for, and does not change afterwards. Participants are not
  * told apart by kind: a person in a browser and a program that operates the session are both
- * participants, named by the `client_id` label they choose, and either can be disconnected.
+ * participants, named by the `client_name` they choose, and either can be disconnected.
  *
  * Every participant that ends, including through `DELETE`, is announced through EventBus as
- * `leaflow.fleet.participant.closed`, addressed to its user in the current project, with its
- * `session_id`, `connection_id` (a decimal string) and `reason`: the name of the
- * `CloseReason` of `leaflow/fleet/control/v1/control.proto` in lower case without its prefix,
- * such as `detach_request` when it was ended through `DELETE`, `ping_timeout` when its lease
- * ran out, `session_exit` when its session ended, `session_restarting` when the session's process
- * did not come back in time, or `permission_denied` when its rights were withdrawn.
+ * `leaflow.fleet.participant.ended`, addressed to its user in the current project, with its
+ * `session_id`, `participant_id` (a decimal string) and `reason`: `left` when its user ended it,
+ * `removed` when someone else did, `lease_expired` when it was not renewed in time,
+ * `session_ended` when its session ended, `session_process_lost` when the session's process did
+ * not come back in time, `rights_changed` when its user's permissions no longer grant what it
+ * holds, `machine_removed` when its machine was removed, or `key_revoked` when the key that signed
+ * its authorization was revoked. A participant whose creation failed is not announced.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";

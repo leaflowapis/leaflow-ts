@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/virtualdesktop/cursor/v1/cursor.proto.
  */
 export const file_leaflow_fleet_virtualdesktop_cursor_v1_cursor: GenFile = /*@__PURE__*/
-  fileDesc("CjNsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2N1cnNvci92MS9jdXJzb3IucHJvdG8SJmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxIsYCCg1TZXJ2ZXJNZXNzYWdlEkAKBmN1cnNvchgBIAEoCzIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxLkN1cnNvckgAEksKDHNuYXBzaG90X2VuZBgCIAEoCzIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxLlNuYXBzaG90RW5kSAASUwoQcG9pbnRlcl9wb3NpdGlvbhgDIAEoCzI3LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxLlBvaW50ZXJQb3NpdGlvbkgAEkYKCWhpZ2hsaWdodBgEIAEoCzIxLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxLkhpZ2hsaWdodEgAQgkKB21lc3NhZ2UiiwEKBkN1cnNvchIMCgRuYW1lGAEgASgJEj0KBWltYWdlGAIgASgLMi4ubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkltYWdlEhEKCWhvdHNwb3RfeBgDIAEoDRIRCglob3RzcG90X3kYBCABKA0SDgoGc2VyaWFsGAUgASgEIlEKD1BvaW50ZXJQb3NpdGlvbhIRCgl3aW5kb3dfaWQYASABKAQSCQoBeBgCIAEoERIJCgF5GAMgASgREhUKDWNvbm5lY3Rpb25faWQYBCABKAQihgEKCUhpZ2hsaWdodBIVCg1jb25uZWN0aW9uX2lkGAEgASgEEhEKCXdpbmRvd19pZBgCIAEoBBJACgRhcmVhGAMgASgLMjIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlJlY3RhbmdsZRINCgVsYWJlbBgEIAEoCSINCgtTbmFwc2hvdEVuZEJLWklnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvY3Vyc29yL3YxO2N1cnNvcnYxYgZwcm90bzM", [file_leaflow_fleet_virtualdesktop_display_v1_display]);
+  fileDesc("CjNsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2N1cnNvci92MS9jdXJzb3IucHJvdG8SJmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxIsYCCg1TZXJ2ZXJNZXNzYWdlEkAKBmN1cnNvchgBIAEoCzIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxLkN1cnNvckgAEksKDHNuYXBzaG90X2VuZBgCIAEoCzIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxLlNuYXBzaG90RW5kSAASUwoQcG9pbnRlcl9wb3NpdGlvbhgDIAEoCzI3LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxLlBvaW50ZXJQb3NpdGlvbkgAEkYKCWhpZ2hsaWdodBgEIAEoCzIxLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuY3Vyc29yLnYxLkhpZ2hsaWdodEgAQgkKB21lc3NhZ2UiiwEKBkN1cnNvchIMCgRuYW1lGAEgASgJEj0KBWltYWdlGAIgASgLMi4ubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkltYWdlEhEKCWhvdHNwb3RfeBgDIAEoDRIRCglob3RzcG90X3kYBCABKA0SDgoGc2VyaWFsGAUgASgEIlIKD1BvaW50ZXJQb3NpdGlvbhIRCgl3aW5kb3dfaWQYASABKAQSCQoBeBgCIAEoERIJCgF5GAMgASgREhYKDnBhcnRpY2lwYW50X2lkGAQgASgEIocBCglIaWdobGlnaHQSFgoOcGFydGljaXBhbnRfaWQYASABKAQSEQoJd2luZG93X2lkGAIgASgEEkAKBGFyZWEYAyABKAsyMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuUmVjdGFuZ2xlEg0KBWxhYmVsGAQgASgJIg0KC1NuYXBzaG90RW5kQktaSWdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC92aXJ0dWFsZGVza3RvcC9jdXJzb3IvdjE7Y3Vyc29ydjFiBnByb3RvMw", [file_leaflow_fleet_virtualdesktop_display_v1_display]);
 
 /**
  * A message from the session.
@@ -153,12 +153,12 @@ export type PointerPosition = Message<"leaflow.fleet.virtualdesktop.cursor.v1.Po
   y: number;
 
   /**
-   * The connection whose input moved it, as in ParticipantList. 0: an
+   * The participant whose input moved it, as in ParticipantList. 0: an
    * application moved it.
    *
-   * @generated from field: uint64 connection_id = 4;
+   * @generated from field: uint64 participant_id = 4;
    */
-  connectionId: bigint;
+  participantId: bigint;
 };
 
 /**
@@ -179,11 +179,11 @@ export const PointerPositionSchema: GenMessage<PointerPosition> = /*@__PURE__*/
  */
 export type Highlight = Message<"leaflow.fleet.virtualdesktop.cursor.v1.Highlight"> & {
   /**
-   * The connection that acted, as in ParticipantList.
+   * The participant that acted, as in ParticipantList.
    *
-   * @generated from field: uint64 connection_id = 1;
+   * @generated from field: uint64 participant_id = 1;
    */
-  connectionId: bigint;
+  participantId: bigint;
 
   /**
    * The window the area is relative to. 0: canvas coordinates.

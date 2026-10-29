@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/session/v1/session.proto.
  */
 export const file_leaflow_fleet_session_v1_session: GenFile = /*@__PURE__*/
-  fileDesc("CiZsZWFmbG93L2ZsZWV0L3Nlc3Npb24vdjEvc2Vzc2lvbi5wcm90bxIYbGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxIusBCg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuUG9uZ0gAEjAKBWNsb3NlGAQgASgLMh8ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLkNsb3NlSABCCQoHbWVzc2FnZSLxAgoNU2VydmVyTWVzc2FnZRI9CgxzZXJ2ZXJfaGVsbG8YASABKAsyJS5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuU2VydmVySGVsbG9IABIuCgRwaW5nGAIgASgLMh4ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBpbmdIABIuCgRwb25nGAMgASgLMh4ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBvbmdIABJFChBwYXJ0aWNpcGFudF9saXN0GAQgASgLMikubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBhcnRpY2lwYW50TGlzdEgAEj0KDHNuYXBzaG90X2VuZBgFIAEoCzIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5TbmFwc2hvdEVuZEgAEjAKBWNsb3NlGAYgASgLMh8ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLkNsb3NlSABCCQoHbWVzc2FnZSJPCgtDbGllbnRIZWxsbxIVCg1jaGFubmVsX3R5cGVzGAEgAygJEhUKDWxhbmd1YWdlX2NvZGUYAiABKAkSEgoKdXNlcl9hZ2VudBgDIAEoCSJOCgtTZXJ2ZXJIZWxsbxIVCg1jaGFubmVsX3R5cGVzGAEgAygJEhEKCXJlYWRfb25seRgCIAEoCBIVCg1jb25uZWN0aW9uX2lkGAMgASgEInEKC1BhcnRpY2lwYW50EhUKDWNvbm5lY3Rpb25faWQYASABKAQSDwoHdXNlcl9pZBgCIAEoCRIUCgxkaXNwbGF5X25hbWUYAyABKAkSEQoJcmVhZF9vbmx5GAQgASgIEhEKCWNsaWVudF9pZBgFIAEoCSJsCg9QYXJ0aWNpcGFudExpc3QSOwoMcGFydGljaXBhbnRzGAEgAygLMiUubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBhcnRpY2lwYW50EhwKFGRyaXZlcl9jb25uZWN0aW9uX2lkGAIgASgEIg0KC1NuYXBzaG90RW5kIhwKBFBpbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIhwKBFBvbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIlUKBUNsb3NlEjUKBnJlYXNvbhgBIAEoDjIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5DbG9zZVJlYXNvbhIVCg1yZWFzb25fcGhyYXNlGAIgASgJKskCCgtDbG9zZVJlYXNvbhIcChhDTE9TRV9SRUFTT05fVU5TUEVDSUZJRUQQABIVChFDTE9TRV9SRUFTT05fRE9ORRABEhwKGENMT1NFX1JFQVNPTl9DTElFTlRfRVhJVBACEh0KGUNMT1NFX1JFQVNPTl9TRVNTSU9OX0VYSVQQAxIjCh9DTE9TRV9SRUFTT05fU0VTU0lPTl9SRVNUQVJUSU5HEAQSHgoaQ0xPU0VfUkVBU09OX0hFTExPX1RJTUVPVVQQBRIdChlDTE9TRV9SRUFTT05fUElOR19USU1FT1VUEAYSIgoeQ0xPU0VfUkVBU09OX1BFUk1JU1NJT05fREVOSUVEEAcSHwobQ0xPU0VfUkVBU09OX1BST1RPQ09MX0VSUk9SEAgSHwobQ0xPU0VfUkVBU09OX0lOVEVSTkFMX0VSUk9SEAlCPlo8Z2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3Nlc3Npb24vdjE7c2Vzc2lvbnYxYgZwcm90bzM");
+  fileDesc("CiZsZWFmbG93L2ZsZWV0L3Nlc3Npb24vdjEvc2Vzc2lvbi5wcm90bxIYbGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxIusBCg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuUG9uZ0gAEjAKBWNsb3NlGAQgASgLMh8ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLkNsb3NlSABCCQoHbWVzc2FnZSLxAgoNU2VydmVyTWVzc2FnZRI9CgxzZXJ2ZXJfaGVsbG8YASABKAsyJS5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuU2VydmVySGVsbG9IABIuCgRwaW5nGAIgASgLMh4ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBpbmdIABIuCgRwb25nGAMgASgLMh4ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBvbmdIABJFChBwYXJ0aWNpcGFudF9saXN0GAQgASgLMikubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBhcnRpY2lwYW50TGlzdEgAEj0KDHNuYXBzaG90X2VuZBgFIAEoCzIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5TbmFwc2hvdEVuZEgAEjAKBWNsb3NlGAYgASgLMh8ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLkNsb3NlSABCCQoHbWVzc2FnZSJPCgtDbGllbnRIZWxsbxIVCg1jaGFubmVsX3R5cGVzGAEgAygJEhUKDWxhbmd1YWdlX2NvZGUYAiABKAkSEgoKdXNlcl9hZ2VudBgDIAEoCSJPCgtTZXJ2ZXJIZWxsbxIVCg1jaGFubmVsX3R5cGVzGAEgAygJEhEKCXJlYWRfb25seRgCIAEoCBIWCg5wYXJ0aWNpcGFudF9pZBgDIAEoBCJoCgtQYXJ0aWNpcGFudBIKCgJpZBgBIAEoBBIPCgd1c2VyX2lkGAIgASgJEhQKDGRpc3BsYXlfbmFtZRgDIAEoCRIRCglyZWFkX29ubHkYBCABKAgSEwoLY2xpZW50X25hbWUYBSABKAkibQoPUGFydGljaXBhbnRMaXN0EjsKDHBhcnRpY2lwYW50cxgBIAMoCzIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5QYXJ0aWNpcGFudBIdChVkcml2ZXJfcGFydGljaXBhbnRfaWQYAiABKAQiDQoLU25hcHNob3RFbmQiHAoEUGluZxIUCgxtb25vdG9uaWNfbXMYASABKAQiHAoEUG9uZxIUCgxtb25vdG9uaWNfbXMYASABKAQiVQoFQ2xvc2USNQoGcmVhc29uGAEgASgOMiUubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLkNsb3NlUmVhc29uEhUKDXJlYXNvbl9waHJhc2UYAiABKAkqyQIKC0Nsb3NlUmVhc29uEhwKGENMT1NFX1JFQVNPTl9VTlNQRUNJRklFRBAAEhUKEUNMT1NFX1JFQVNPTl9ET05FEAESHAoYQ0xPU0VfUkVBU09OX0NMSUVOVF9FWElUEAISHQoZQ0xPU0VfUkVBU09OX1NFU1NJT05fRVhJVBADEiMKH0NMT1NFX1JFQVNPTl9TRVNTSU9OX1JFU1RBUlRJTkcQBBIeChpDTE9TRV9SRUFTT05fSEVMTE9fVElNRU9VVBAFEh0KGUNMT1NFX1JFQVNPTl9QSU5HX1RJTUVPVVQQBhIiCh5DTE9TRV9SRUFTT05fUEVSTUlTU0lPTl9ERU5JRUQQBxIfChtDTE9TRV9SRUFTT05fUFJPVE9DT0xfRVJST1IQCBIfChtDTE9TRV9SRUFTT05fSU5URVJOQUxfRVJST1IQCUI+WjxnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvc2Vzc2lvbi92MTtzZXNzaW9udjFiBnByb3RvMw");
 
 /**
  * A message from the participant.
@@ -199,11 +199,11 @@ export type ServerHello = Message<"leaflow.fleet.session.v1.ServerHello"> & {
   readOnly: boolean;
 
   /**
-   * This participant's connection, as it appears in ParticipantList.
+   * This participant, as it appears in ParticipantList.
    *
-   * @generated from field: uint64 connection_id = 3;
+   * @generated from field: uint64 participant_id = 3;
    */
-  connectionId: bigint;
+  participantId: bigint;
 };
 
 /**
@@ -220,11 +220,11 @@ export const ServerHelloSchema: GenMessage<ServerHello> = /*@__PURE__*/
  */
 export type Participant = Message<"leaflow.fleet.session.v1.Participant"> & {
   /**
-   * The participant's connection.
+   * The participant.
    *
-   * @generated from field: uint64 connection_id = 1;
+   * @generated from field: uint64 id = 1;
    */
-  connectionId: bigint;
+  id: bigint;
 
   /**
    * The platform user the participant acts for.
@@ -248,12 +248,12 @@ export type Participant = Message<"leaflow.fleet.session.v1.Participant"> & {
   readOnly: boolean;
 
   /**
-   * The label the client gave itself, such as "console" or "assistant".
-   * Neither unique nor verified: it lets people tell connections apart.
+   * The name the client gave itself, such as "console" or "assistant".
+   * Neither unique nor verified: it lets people tell participants apart.
    *
-   * @generated from field: string client_id = 5;
+   * @generated from field: string client_name = 5;
    */
-  clientId: string;
+  clientName: string;
 };
 
 /**
@@ -279,12 +279,12 @@ export type ParticipantList = Message<"leaflow.fleet.session.v1.ParticipantList"
   participants: Participant[];
 
   /**
-   * The participant whose settings the session follows, such as the size of its
-   * desktop. 0 before any participant has driven.
+   * The participant whose settings the session follows, such as the size of
+   * its desktop. 0 before any participant has driven.
    *
-   * @generated from field: uint64 driver_connection_id = 2;
+   * @generated from field: uint64 driver_participant_id = 2;
    */
-  driverConnectionId: bigint;
+  driverParticipantId: bigint;
 };
 
 /**

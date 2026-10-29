@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/virtualdesktop/lease/v1/lease.proto.
  */
 export const file_leaflow_fleet_virtualdesktop_lease_v1_lease: GenFile = /*@__PURE__*/
-  fileDesc("CjFsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2xlYXNlL3YxL2xlYXNlLnByb3RvEiVsZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmxlYXNlLnYxIrABCg1TZXJ2ZXJNZXNzYWdlEkgKC2lucHV0X2xlYXNlGAEgASgLMjEubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5sZWFzZS52MS5JbnB1dExlYXNlSAASSgoMc25hcHNob3RfZW5kGAIgASgLMjIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5sZWFzZS52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UiowEKCklucHV0TGVhc2USHAoUaG9sZGVyX2Nvbm5lY3Rpb25faWQYASABKAQSFgoOaG9sZGVyX3VzZXJfaWQYAiABKAkSLwoLYWNxdWlyZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIg0KC1NuYXBzaG90RW5kQklaR2dpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC92aXJ0dWFsZGVza3RvcC9sZWFzZS92MTtsZWFzZXYxYgZwcm90bzM", [file_google_protobuf_timestamp]);
+  fileDesc("CjFsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2xlYXNlL3YxL2xlYXNlLnByb3RvEiVsZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmxlYXNlLnYxIrABCg1TZXJ2ZXJNZXNzYWdlEkgKC2lucHV0X2xlYXNlGAEgASgLMjEubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5sZWFzZS52MS5JbnB1dExlYXNlSAASSgoMc25hcHNob3RfZW5kGAIgASgLMjIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5sZWFzZS52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UipAEKCklucHV0TGVhc2USHQoVaG9sZGVyX3BhcnRpY2lwYW50X2lkGAEgASgEEhYKDmhvbGRlcl91c2VyX2lkGAIgASgJEi8KC2FjcXVpcmVkX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCINCgtTbmFwc2hvdEVuZEJJWkdnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvbGVhc2UvdjE7bGVhc2V2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
 
 /**
  * A message from the session.
@@ -59,11 +59,11 @@ export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
  */
 export type InputLease = Message<"leaflow.fleet.virtualdesktop.lease.v1.InputLease"> & {
   /**
-   * The connection that holds it. 0: nobody; the next input takes it.
+   * The participant that holds it. 0: nobody; the next input takes it.
    *
-   * @generated from field: uint64 holder_connection_id = 1;
+   * @generated from field: uint64 holder_participant_id = 1;
    */
-  holderConnectionId: bigint;
+  holderParticipantId: bigint;
 
   /**
    * The platform user of the holder.
