@@ -215,9 +215,12 @@
  * `session_id`, `participant_id` (a decimal string) and `reason`: `left` when its user ended it,
  * `removed` when someone else did, `lease_expired` when it was not renewed in time,
  * `session_ended` when its session ended, `session_process_lost` when the session's process did
- * not come back in time, `rights_changed` when its user's permissions no longer grant what it
- * holds, `machine_removed` when its machine was removed, or `key_revoked` when the key that signed
- * its authorization was revoked. A participant whose creation failed is not announced.
+ * not come back in time, `permission_revoked` when a permission it was created with was revoked
+ * from its user, `membership_ended` when its user is no longer a member of the project,
+ * `user_inactive` when its user's account was suspended or banned or its deletion was requested,
+ * `project_deletion_requested` when deletion of the project was requested, `machine_removed` when
+ * its machine was removed, or `key_revoked` when the key that signed its authorization was
+ * revoked. A participant whose creation failed is not announced.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
