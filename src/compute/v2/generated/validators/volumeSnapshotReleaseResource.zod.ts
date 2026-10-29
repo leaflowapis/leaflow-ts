@@ -37,7 +37,7 @@ import { VolumeSnapshotID } from "./volumeSnapshotID.zod.js";
 
 export const VolumeSnapshotReleaseResource = zod
   .strictObject({
-    type: zod.enum(["volume_snapshot", "snapshot"]),
+    type: zod.enum(["volume_snapshot"]),
     id: VolumeSnapshotID,
     name: zod.string().describe("The current display name of the selected resource."),
   })

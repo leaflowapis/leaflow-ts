@@ -448,7 +448,6 @@ export type VolumeSnapshotReleaseResourceType =
 
 export const VolumeSnapshotReleaseResourceType = {
   volume_snapshot: "volume_snapshot",
-  snapshot: "snapshot",
 } as const;
 
 /**
