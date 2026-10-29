@@ -149,19 +149,33 @@
  *
  * ## Viewing a session
  *
- * 1. Have an Ed25519 key, for as long as the client wants: one per connection or one kept by the
- *    client. The private key must never leave the client; in a browser, use a non-extractable
- *    WebCrypto key.
- * 2. For each connection, create a ticket for the public key with
- *    `POST /api/v1/sessions/{sessionId}/viewer-tickets`. It is valid for 60 seconds and once.
- * 3. Open a WebSocket to the returned `url` with the subprotocol
- *    `leaflow.fleet.control.v1` and follow `leaflow/fleet/control/v1/control.proto`.
- *    The ticket travels inside the protocol and never in a URL.
+ * 1. Have an Ed25519 key, for as long as the client wants: one per viewer connection or one kept
+ *    by the client. The private key must never leave the client; in a browser, use a
+ *    non-extractable WebCrypto key.
+ * 2. Create a viewer connection for the public key with
+ *    `POST /api/v1/sessions/{sessionId}/viewers`. The answer carries the viewer's signed
+ *    authorization, the ICE servers, the keys the service signs with and a signaling ticket.
+ * 3. To start a PeerConnection, open a WebSocket to the ticket's `url` with the subprotocol
+ *    `leaflow.fleet.control.v1` and follow `leaflow/fleet/control/v1/control.proto` and
+ *    `leaflow/fleet/transport/v1/transport.proto`. The ticket travels inside the protocol and
+ *    never in a URL, and serves once within 60 seconds; for a later PeerConnection, such as
+ *    after a path failed, ask for another with
+ *    `POST /api/v1/sessions/{sessionId}/viewers/{connectionId}/signaling-tickets`. The
+ *    WebSocket may be closed once the PeerConnection carries data.
+ * 4. Renew the viewer connection with `POST …/viewers/{connectionId}:renew` well before
+ *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
+ *    PeerConnection; the answer renews them. A viewer connection whose lease runs out ends,
+ *    and its PeerConnections stop within 30 seconds of their last lease.
+ * 5. Leave with `DELETE …/viewers/{connectionId}`.
  *
- * What a viewer may do in a session is decided when its ticket is created, from the caller's
- * permissions and what the ticket asks for, and does not change during the connection. Viewers
+ * What a viewer may do in a session is decided when its viewer connection is created, from the
+ * caller's permissions and what the request asks for, and does not change afterwards. Viewers
  * are not told apart by kind: a person in a browser and a program that operates the session are
  * both viewers, named by the `client_id` label they choose, and either can be disconnected.
+ *
+ * A viewer connection that ends for any other reason than its own `DELETE` is announced through
+ * EventBus as `leaflow.fleet.viewer.closed`, addressed to its user in the current project, with
+ * its `session_id`, `connection_id` and `reason`.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";

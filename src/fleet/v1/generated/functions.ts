@@ -149,19 +149,33 @@
  *
  * ## Viewing a session
  *
- * 1. Have an Ed25519 key, for as long as the client wants: one per connection or one kept by the
- *    client. The private key must never leave the client; in a browser, use a non-extractable
- *    WebCrypto key.
- * 2. For each connection, create a ticket for the public key with
- *    `POST /api/v1/sessions/{sessionId}/viewer-tickets`. It is valid for 60 seconds and once.
- * 3. Open a WebSocket to the returned `url` with the subprotocol
- *    `leaflow.fleet.control.v1` and follow `leaflow/fleet/control/v1/control.proto`.
- *    The ticket travels inside the protocol and never in a URL.
+ * 1. Have an Ed25519 key, for as long as the client wants: one per viewer connection or one kept
+ *    by the client. The private key must never leave the client; in a browser, use a
+ *    non-extractable WebCrypto key.
+ * 2. Create a viewer connection for the public key with
+ *    `POST /api/v1/sessions/{sessionId}/viewers`. The answer carries the viewer's signed
+ *    authorization, the ICE servers, the keys the service signs with and a signaling ticket.
+ * 3. To start a PeerConnection, open a WebSocket to the ticket's `url` with the subprotocol
+ *    `leaflow.fleet.control.v1` and follow `leaflow/fleet/control/v1/control.proto` and
+ *    `leaflow/fleet/transport/v1/transport.proto`. The ticket travels inside the protocol and
+ *    never in a URL, and serves once within 60 seconds; for a later PeerConnection, such as
+ *    after a path failed, ask for another with
+ *    `POST /api/v1/sessions/{sessionId}/viewers/{connectionId}/signaling-tickets`. The
+ *    WebSocket may be closed once the PeerConnection carries data.
+ * 4. Renew the viewer connection with `POST …/viewers/{connectionId}:renew` well before
+ *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
+ *    PeerConnection; the answer renews them. A viewer connection whose lease runs out ends,
+ *    and its PeerConnections stop within 30 seconds of their last lease.
+ * 5. Leave with `DELETE …/viewers/{connectionId}`.
  *
- * What a viewer may do in a session is decided when its ticket is created, from the caller's
- * permissions and what the ticket asks for, and does not change during the connection. Viewers
+ * What a viewer may do in a session is decided when its viewer connection is created, from the
+ * caller's permissions and what the request asks for, and does not change afterwards. Viewers
  * are not told apart by kind: a person in a browser and a program that operates the session are
  * both viewers, named by the `client_id` label they choose, and either can be disconnected.
+ *
+ * A viewer connection that ends for any other reason than its own `DELETE` is announced through
+ * EventBus as `leaflow.fleet.viewer.closed`, addressed to its user in the current project, with
+ * its `session_id`, `connection_id` and `reason`.
  * OpenAPI spec version: 1.0.0
  */
 import type {
@@ -173,7 +187,7 @@ import type {
   CreateMachineRegistrationRequest,
   CreateMachineRegistrationResponse,
   CreateSessionRequest,
-  CreateViewerTicketRequest,
+  CreateViewerRequest,
   EnrollmentResource,
   Error,
   FindEnrollmentByPairingCodeParams,
@@ -198,16 +212,19 @@ import type {
   PrivilegeApprovalList,
   PrivilegeRequestList,
   PrivilegeRequestResource,
+  RenewViewerRequest,
+  RenewViewerResponse,
   RunCommandRequest,
   RunCommandResponse,
   SessionList,
   SessionResource,
+  SignalingTicket,
   UpdateAccountRequest,
   UpdateGroupRequest,
   UpdateMachineRequest,
+  ViewerConnection,
   ViewerList,
   ViewerResource,
-  ViewerTicketResource,
 } from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
@@ -2106,12 +2123,18 @@ export const getCreateSessionUrl = () => {
  * files, ports, sound, devices, printers and privilege approvals. The account is created if
  * the caller has none yet. Requires `fleet:machines.login` on the machine.
  *
+ * On a machine an account has at most one session with a desktop and at most 8 sessions in
+ * all. Sessions without a desktop run side by side, such as one for a program and one for a
+ * person; several viewers can also share one session.
+ *
  * Fails with:
  * - `MACHINE_OFFLINE` when the machine is not connected;
  * - `FEATURE_UNAVAILABLE` when the machine does not offer sessions, or with `desktop`,
  *   desktops;
- * - `USER_HAS_SESSION` when the account already has a session on the machine, which
- *   `metadata.sessionId` names; connect to it instead;
+ * - `USER_HAS_DESKTOP_SESSION` with `desktop` when the account already has a session with a
+ *   desktop on the machine, which `metadata.sessionId` names; connect to it instead;
+ * - `SESSION_LIMIT_REACHED` when the account already has 8 open sessions on the machine;
+ *   close one first;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, such as while it has not received the account yet or a
  *   local account uses its name; `PAM_PERMISSION_DENIED` carries the machine's message in
@@ -2301,6 +2324,89 @@ export const terminateSession = async (
   return { data, status: res.status, headers: res.headers } as terminateSessionResponse;
 };
 
+export type createViewerResponse201 = {
+  data: ViewerConnection;
+  status: 201;
+};
+
+export type createViewerResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createViewerResponseSuccess = createViewerResponse201 & {
+  headers: Headers;
+};
+export type createViewerResponseError = createViewerResponseDefault & {
+  headers: Headers;
+};
+
+export type createViewerResponse = createViewerResponseSuccess | createViewerResponseError;
+
+export const getCreateViewerUrl = (sessionId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers`;
+};
+
+/**
+ * Admits one viewer with the given public key to the session: signs its authorization,
+ * has the session accept it, and returns it with a first signaling ticket. The viewer
+ * connection lasts while it is renewed.
+ *
+ * The owner of a session may operate it. Viewing another member's session requires
+ * `fleet:sessions.view`, which admits watching only, or
+ * `fleet:sessions.control`, which also admits operating it. Each further capability
+ * of the session — file transfer, the clipboard, terminals and programs, port forwarding,
+ * devices and audio, printing, SSH agent forwarding, approving privilege requests and
+ * reading logs — is granted only with its permission; a viewer that may only watch gets
+ * none of them. A request may ask for less: to watch only, or for some of the capabilities.
+ *
+ * Fails with:
+ * - `SESSION_CLOSED` when the session has ended;
+ * - `SESSION_ACCESS_DENIED` when the caller may not view the session;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected, such as while it
+ *   restarts; try again after `Retry-After`;
+ * - `VIEWER_LIMIT_REACHED` when the session has as many viewers as it admits;
+ * - `VIEWER_REFUSED` when the session refused the viewer.
+ * @summary Create a viewer connection
+ */
+export const createViewer = async (
+  sessionId: string,
+  createViewerRequest: CreateViewerRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createViewerResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateViewerUrl(sessionId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createViewerRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createViewerResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createViewerResponse;
+};
+
 export type listSessionViewersResponse200 = {
   data: ViewerList;
   status: 200;
@@ -2344,6 +2450,132 @@ export const listSessionViewers = async (
 
   const data: listSessionViewersResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as listSessionViewersResponse;
+};
+
+export type renewViewerResponse200 = {
+  data: RenewViewerResponse;
+  status: 200;
+};
+
+export type renewViewerResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type renewViewerResponseSuccess = renewViewerResponse200 & {
+  headers: Headers;
+};
+export type renewViewerResponseError = renewViewerResponseDefault & {
+  headers: Headers;
+};
+
+export type renewViewerResponse = renewViewerResponseSuccess | renewViewerResponseError;
+
+export const getRenewViewerUrl = (sessionId: string, connectionId: number) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers/${encodeURIComponent(String(connectionId))}:renew`;
+};
+
+/**
+ * Extends the viewer connection's lease and returns renewed PeerAuthorizations for the
+ * PeerConnections whose current ones the request presents; the session receives them too.
+ * A presented authorization that the service did not sign for this viewer connection, or
+ * whose attempt has ended, is left out of the answer. When the viewer's authorization nears
+ * its end, the answer carries a renewed one, which the session already holds.
+ *
+ * Only the viewer connection's user may renew it.
+ *
+ * Fails with:
+ * - `VIEWER_NOT_FOUND` when the viewer connection has ended; create another;
+ * - `VIEWER_RIGHTS_CHANGED` when the caller's permissions no longer grant what the viewer
+ *   connection holds; it has ended, and another can be created with the current rights.
+ * @summary Renew a viewer connection
+ */
+export const renewViewer = async (
+  sessionId: string,
+  connectionId: number,
+  renewViewerRequest: RenewViewerRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<renewViewerResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getRenewViewerUrl(sessionId, connectionId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(renewViewerRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: renewViewerResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as renewViewerResponse;
+};
+
+export type createSignalingTicketResponse201 = {
+  data: SignalingTicket;
+  status: 201;
+};
+
+export type createSignalingTicketResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createSignalingTicketResponseSuccess = createSignalingTicketResponse201 & {
+  headers: Headers;
+};
+export type createSignalingTicketResponseError = createSignalingTicketResponseDefault & {
+  headers: Headers;
+};
+
+export type createSignalingTicketResponse =
+  | createSignalingTicketResponseSuccess
+  | createSignalingTicketResponseError;
+
+export const getCreateSignalingTicketUrl = (sessionId: string, connectionId: number) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers/${encodeURIComponent(String(connectionId))}/signaling-tickets`;
+};
+
+/**
+ * Issues a single-use ticket for one signaling WebSocket of the viewer connection, valid for
+ * 60 seconds. Only the viewer connection's user may ask for one.
+ *
+ * Fails with `VIEWER_NOT_FOUND` when the viewer connection has ended.
+ * @summary Create a signaling ticket
+ */
+export const createSignalingTicket = async (
+  sessionId: string,
+  connectionId: number,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createSignalingTicketResponse> => {
+  const res = await (fetchFn ?? fetch)(getCreateSignalingTicketUrl(sessionId, connectionId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createSignalingTicketResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createSignalingTicketResponse;
 };
 
 export type getViewerResponse200 = {
@@ -2414,12 +2646,13 @@ export const getDeleteViewerUrl = (sessionId: string, connectionId: number) => {
 };
 
 /**
- * Disconnects the viewer from the session; the session goes on. The viewer can connect
- * again only with a new ticket.
+ * Ends the viewer connection: the session detaches the viewer and closes its
+ * PeerConnections, and the session goes on. A viewer leaves this way; others are
+ * disconnected this way.
  *
- * The owner of the session may disconnect its viewers; otherwise this requires
- * `fleet:sessions.manage`.
- * @summary Disconnect a viewer
+ * The viewer connection's user and the owner of the session may end it; otherwise this
+ * requires `fleet:sessions.manage`.
+ * @summary End a viewer connection
  */
 export const deleteViewer = async (
   sessionId: string,
@@ -2436,84 +2669,4 @@ export const deleteViewer = async (
 
   const data: deleteViewerResponse["data"] = body ? JSON.parse(body) : undefined;
   return { data, status: res.status, headers: res.headers } as deleteViewerResponse;
-};
-
-export type createViewerTicketResponse201 = {
-  data: ViewerTicketResource;
-  status: 201;
-};
-
-export type createViewerTicketResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 201>;
-};
-
-export type createViewerTicketResponseSuccess = createViewerTicketResponse201 & {
-  headers: Headers;
-};
-export type createViewerTicketResponseError = createViewerTicketResponseDefault & {
-  headers: Headers;
-};
-
-export type createViewerTicketResponse =
-  | createViewerTicketResponseSuccess
-  | createViewerTicketResponseError;
-
-export const getCreateViewerTicketUrl = (sessionId: string) => {
-  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewer-tickets`;
-};
-
-/**
- * Issues a single-use ticket that admits one viewer connection with the given public key to
- * the session. It is valid for 60 seconds.
- *
- * The owner of a session may operate it. Viewing another member's session requires
- * `fleet:sessions.view`, which admits watching only, or
- * `fleet:sessions.control`, which also admits operating it. Each further capability
- * of the session — file transfer, the clipboard, terminals and programs, port forwarding,
- * devices and audio, printing, SSH agent forwarding, approving privilege requests and
- * reading logs — is granted only with its permission; a viewer that may only watch gets
- * none of them. A ticket may ask for less: to watch only, or for some of the capabilities.
- *
- * Fails with:
- * - `SESSION_CLOSED` when the session has ended;
- * - `SESSION_ACCESS_DENIED` when the caller may not view the session.
- * @summary Create a viewer ticket
- */
-export const createViewerTicket = async (
-  sessionId: string,
-  createViewerTicketRequest: CreateViewerTicketRequest,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<createViewerTicketResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getCreateViewerTicketUrl(sessionId), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(createViewerTicketRequest),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: createViewerTicketResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createViewerTicketResponse;
 };

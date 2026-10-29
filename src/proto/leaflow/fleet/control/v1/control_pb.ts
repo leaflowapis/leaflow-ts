@@ -8,7 +8,7 @@ import type { Any, Duration, Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Call, CallCancel, CallResult } from "../../rpc/v1/rpc_pb.js";
 import { file_leaflow_fleet_rpc_v1_rpc } from "../../rpc/v1/rpc_pb.js";
-import type { Migration, RtcConfiguration, Signal } from "../../transport/v1/transport_pb.js";
+import type { Migration, Signal } from "../../transport/v1/transport_pb.js";
 import { file_leaflow_fleet_transport_v1_transport } from "../../transport/v1/transport_pb.js";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/control/v1/control.proto.
  */
 export const file_leaflow_fleet_control_v1_control: GenFile = /*@__PURE__*/
-  fileDesc("CiZsZWFmbG93L2ZsZWV0L2NvbnRyb2wvdjEvY29udHJvbC5wcm90bxIYbGVhZmxvdy5mbGVldC5jb250cm9sLnYxIrMECg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUG9uZ0gAEioKBGNhbGwYBCABKAsyGi5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsSAASNwoLY2FsbF9yZXN1bHQYBSABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsUmVzdWx0SAASNwoLY2FsbF9jYW5jZWwYBiABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsQ2FuY2VsSAASNAoGc2lnbmFsGAcgASgLMiIubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuU2lnbmFsSAASOgoJbWlncmF0aW9uGAggASgLMiUubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuTWlncmF0aW9uSAASMAoFY2xvc2UYCSABKAsyHy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQ2xvc2VIABI2CghmcmFnbWVudBgKIAEoCzIiLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5GcmFnbWVudEgAQgkKB21lc3NhZ2UiqAUKDVNlcnZlck1lc3NhZ2USPQoMc2VydmVyX2hlbGxvGAEgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZlckhlbGxvSAASNAoHd2VsY29tZRgCIAEoCzIhLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5XZWxjb21lSAASLgoEcGluZxgDIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5QaW5nSAASLgoEcG9uZxgEIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5Qb25nSAASKgoEY2FsbBgFIAEoCzIaLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxIABI3CgtjYWxsX3Jlc3VsdBgGIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxSZXN1bHRIABI3CgtjYWxsX2NhbmNlbBgHIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxDYW5jZWxIABI0CgZzaWduYWwYCCABKAsyIi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5TaWduYWxIABI6CgltaWdyYXRpb24YCSABKAsyJS5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5NaWdyYXRpb25IABI9CgxzZXJ2aWNlX2tleXMYCiABKAsyJS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2VydmljZUtleXNIABIwCgVjbG9zZRgLIAEoCzIfLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZUgAEjYKCGZyYWdtZW50GAwgASgLMiIubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkZyYWdtZW50SABCCQoHbWVzc2FnZSL/AQoLU2VydmVySGVsbG8SDgoGaXNzdWVyGAEgASgJEhEKCWNoYWxsZW5nZRgCIAEoDBIwCg1waW5nX2ludGVydmFsGAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi8KDGlkbGVfdGltZW91dBgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIYChBtYXhfbWVzc2FnZV9zaXplGAUgASgNEhwKFG1heF9jb25jdXJyZW50X2NhbGxzGAYgASgNEhsKE21lc3NhZ2VzX3Blcl9zZWNvbmQYByABKA0SFQoNbWVzc2FnZV9idXJzdBgIIAEoDSKzAgoLQ2xpZW50SGVsbG8SPgoHbWFjaGluZRgBIAEoCzIrLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5NYWNoaW5lQ3JlZGVudGlhbEgAEkQKCmVucm9sbG1lbnQYAiABKAsyLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRW5yb2xsbWVudENyZWRlbnRpYWxIABI+CgdzZXNzaW9uGAMgASgLMisubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlc3Npb25DcmVkZW50aWFsSAASPAoGdmlld2VyGAQgASgLMioubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlZpZXdlckNyZWRlbnRpYWxIABISCgp1c2VyX2FnZW50GAUgASgJQgwKCmNyZWRlbnRpYWwiOgoRTWFjaGluZUNyZWRlbnRpYWwSEgoKbWFjaGluZV9pZBgBIAEoCRIRCglzaWduYXR1cmUYAiABKAwiPQoURW5yb2xsbWVudENyZWRlbnRpYWwSEgoKcHVibGljX2tleRgBIAEoDBIRCglzaWduYXR1cmUYAiABKAwiWAoRU2Vzc2lvbkNyZWRlbnRpYWwSEgoKZGVsZWdhdGlvbhgBIAEoDBIcChRkZWxlZ2F0aW9uX3NpZ25hdHVyZRgCIAEoDBIRCglzaWduYXR1cmUYAyABKAwitgEKEVNlc3Npb25EZWxlZ2F0aW9uEhIKCm1hY2hpbmVfaWQYASABKAkSEgoKc2Vzc2lvbl9pZBgCIAEoCRIaChJzZXNzaW9uX3B1YmxpY19rZXkYAyABKAwSLQoJaXNzdWVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJTChBWaWV3ZXJDcmVkZW50aWFsEg4KBnRpY2tldBgBIAEoCRIcChRyZXN1bWVfY29ubmVjdGlvbl9pZBgCIAEoBBIRCglzaWduYXR1cmUYAyABKAwi1gIKB1dlbGNvbWUSFQoNY29ubmVjdGlvbl9pZBgBIAEoBBISCgptYWNoaW5lX2lkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSOwoMc2VydmljZV9rZXlzGAQgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZpY2VLZXlzEi8KDHJlc3VtZV9ncmFjZRgFIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIPCgdyZXN1bWVkGAYgASgIEkQKDWF1dGhvcml6YXRpb24YByABKAsyLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmVkQXV0aG9yaXphdGlvbhJHChFydGNfY29uZmlndXJhdGlvbhgIIAEoCzIsLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLlJ0Y0NvbmZpZ3VyYXRpb24iQAoLU2VydmljZUtleXMSMQoEa2V5cxgBIAMoCzIjLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5QdWJsaWNLZXkiNQoJUHVibGljS2V5Eg4KBmtleV9pZBgBIAEoCRIRCgdlZDI1NTE5GAIgASgMSABCBQoDa2V5Is0CCg1BdXRob3JpemF0aW9uEg4KBmlzc3VlchgBIAEoCRISCgptYWNoaW5lX2lkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSFQoNY29ubmVjdGlvbl9pZBgEIAEoBBIPCgd1c2VyX2lkGAUgASgJEhQKDGRpc3BsYXlfbmFtZRgGIAEoCRIRCgljbGllbnRfaWQYByABKAkSGQoRdmlld2VyX3B1YmxpY19rZXkYCSABKAwSEQoJcmVhZF9vbmx5GAsgASgIEiYKCHBvbGljaWVzGAwgAygLMhQuZ29vZ2xlLnByb3RvYnVmLkFueRItCglpc3N1ZWRfYXQYDSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYDiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIk8KE1NpZ25lZEF1dGhvcml6YXRpb24SDgoGa2V5X2lkGAEgASgJEhUKDWF1dGhvcml6YXRpb24YAiABKAwSEQoJc2lnbmF0dXJlGAMgASgMIhwKBFBpbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIhwKBFBvbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIjsKCEZyYWdtZW50EhIKCm1lc3NhZ2VfaWQYASABKAQSDAoEZGF0YRgCIAEoDBINCgVmaW5hbBgDIAEoCCKFAQoFQ2xvc2USNQoGcmVhc29uGAEgASgOMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkNsb3NlUmVhc29uEhUKDXJlYXNvbl9waHJhc2UYAiABKAkSLgoLcmV0cnlfZGVsYXkYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24iLQobUmVmcmVzaEF1dGhvcml6YXRpb25SZXF1ZXN0Eg4KBnRpY2tldBgBIAEoCSKtAQocUmVmcmVzaEF1dGhvcml6YXRpb25SZXNwb25zZRJECg1hdXRob3JpemF0aW9uGAEgASgLMi0ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNpZ25lZEF1dGhvcml6YXRpb24SRwoRcnRjX2NvbmZpZ3VyYXRpb24YAiABKAsyLC5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5SdGNDb25maWd1cmF0aW9uIlsKE0F0dGFjaFZpZXdlclJlcXVlc3QSRAoNYXV0aG9yaXphdGlvbhgBIAEoCzItLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5TaWduZWRBdXRob3JpemF0aW9uIhYKFEF0dGFjaFZpZXdlclJlc3BvbnNlImgKIFVwZGF0ZVZpZXdlckF1dGhvcml6YXRpb25SZXF1ZXN0EkQKDWF1dGhvcml6YXRpb24YASABKAsyLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmVkQXV0aG9yaXphdGlvbiIjCiFVcGRhdGVWaWV3ZXJBdXRob3JpemF0aW9uUmVzcG9uc2UiYwoTRGV0YWNoVmlld2VyUmVxdWVzdBIVCg1jb25uZWN0aW9uX2lkGAEgASgEEjUKBnJlYXNvbhgCIAEoDjIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZVJlYXNvbiIWChREZXRhY2hWaWV3ZXJSZXNwb25zZSqcBQoLQ2xvc2VSZWFzb24SHAoYQ0xPU0VfUkVBU09OX1VOU1BFQ0lGSUVEEAASFQoRQ0xPU0VfUkVBU09OX0RPTkUQARIcChhDTE9TRV9SRUFTT05fQ0xJRU5UX0VYSVQQAhIgChxDTE9TRV9SRUFTT05fU0VSVkVSX1NIVVRET1dOEAMSHwobQ0xPU0VfUkVBU09OX1NFUlZFUl9VUEdSQURFEAQSHQoZQ0xPU0VfUkVBU09OX1BJTkdfVElNRU9VVBAFEh4KGkNMT1NFX1JFQVNPTl9IRUxMT19USU1FT1VUEAYSHwobQ0xPU0VfUkVBU09OX1BST1RPQ09MX0VSUk9SEAcSIAocQ0xPU0VfUkVBU09OX01FU1NBR0VfVE9PX0JJRxAIEiYKIkNMT1NFX1JFQVNPTl9BVVRIRU5USUNBVElPTl9GQUlMRUQQCRIiCh5DTE9TRV9SRUFTT05fUEVSTUlTU0lPTl9ERU5JRUQQChIiCh5DTE9TRV9SRUFTT05fU0VTU0lPTl9OT1RfRk9VTkQQCxIbChdDTE9TRV9SRUFTT05fTkVXX0NMSUVOVBAMEh0KGUNMT1NFX1JFQVNPTl9TRVNTSU9OX0VYSVQQDRIjCh9DTE9TRV9SRUFTT05fU0VTU0lPTl9SRVNUQVJUSU5HEA4SHwobQ0xPU0VfUkVBU09OX0RFVEFDSF9SRVFVRVNUEA8SIQodQ0xPU0VfUkVBU09OX1BPTElDWV9WSU9MQVRJT04QEBIfChtDTE9TRV9SRUFTT05fSU5URVJOQUxfRVJST1IQERIbChdDTE9TRV9SRUFTT05fT1ZFUkxPQURFRBASEiIKHkNMT1NFX1JFQVNPTl9FTkRQT0lOVF9UT09fU0xPVxATMp4BChRBdXRob3JpemF0aW9uU2VydmljZRKFAQoUUmVmcmVzaEF1dGhvcml6YXRpb24SNS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUmVmcmVzaEF1dGhvcml6YXRpb25SZXF1ZXN0GjYubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlJlZnJlc2hBdXRob3JpemF0aW9uUmVzcG9uc2UykwMKDVZpZXdlclNlcnZpY2UScgoMQXR0YWNoVmlld2VyEi0ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkF0dGFjaFZpZXdlclJlcXVlc3QaLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQXR0YWNoVmlld2VyUmVzcG9uc2UiA5ACAhKZAQoZVXBkYXRlVmlld2VyQXV0aG9yaXphdGlvbhI6LmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5VcGRhdGVWaWV3ZXJBdXRob3JpemF0aW9uUmVxdWVzdBo7LmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5VcGRhdGVWaWV3ZXJBdXRob3JpemF0aW9uUmVzcG9uc2UiA5ACAhJyCgxEZXRhY2hWaWV3ZXISLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRGV0YWNoVmlld2VyUmVxdWVzdBouLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5EZXRhY2hWaWV3ZXJSZXNwb25zZSIDkAICQj5aPGdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9jb250cm9sL3YxO2NvbnRyb2x2MWIGcHJvdG8z", [file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_timestamp, file_leaflow_fleet_rpc_v1_rpc, file_leaflow_fleet_transport_v1_transport]);
+  fileDesc("CiZsZWFmbG93L2ZsZWV0L2NvbnRyb2wvdjEvY29udHJvbC5wcm90bxIYbGVhZmxvdy5mbGVldC5jb250cm9sLnYxIrMECg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUG9uZ0gAEioKBGNhbGwYBCABKAsyGi5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsSAASNwoLY2FsbF9yZXN1bHQYBSABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsUmVzdWx0SAASNwoLY2FsbF9jYW5jZWwYBiABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsQ2FuY2VsSAASNAoGc2lnbmFsGAcgASgLMiIubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuU2lnbmFsSAASOgoJbWlncmF0aW9uGAggASgLMiUubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuTWlncmF0aW9uSAASMAoFY2xvc2UYCSABKAsyHy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQ2xvc2VIABI2CghmcmFnbWVudBgKIAEoCzIiLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5GcmFnbWVudEgAQgkKB21lc3NhZ2UiqAUKDVNlcnZlck1lc3NhZ2USPQoMc2VydmVyX2hlbGxvGAEgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZlckhlbGxvSAASNAoHd2VsY29tZRgCIAEoCzIhLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5XZWxjb21lSAASLgoEcGluZxgDIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5QaW5nSAASLgoEcG9uZxgEIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5Qb25nSAASKgoEY2FsbBgFIAEoCzIaLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxIABI3CgtjYWxsX3Jlc3VsdBgGIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxSZXN1bHRIABI3CgtjYWxsX2NhbmNlbBgHIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxDYW5jZWxIABI0CgZzaWduYWwYCCABKAsyIi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5TaWduYWxIABI6CgltaWdyYXRpb24YCSABKAsyJS5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5NaWdyYXRpb25IABI9CgxzZXJ2aWNlX2tleXMYCiABKAsyJS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2VydmljZUtleXNIABIwCgVjbG9zZRgLIAEoCzIfLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZUgAEjYKCGZyYWdtZW50GAwgASgLMiIubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkZyYWdtZW50SABCCQoHbWVzc2FnZSL/AQoLU2VydmVySGVsbG8SDgoGaXNzdWVyGAEgASgJEhEKCWNoYWxsZW5nZRgCIAEoDBIwCg1waW5nX2ludGVydmFsGAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi8KDGlkbGVfdGltZW91dBgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIYChBtYXhfbWVzc2FnZV9zaXplGAUgASgNEhwKFG1heF9jb25jdXJyZW50X2NhbGxzGAYgASgNEhsKE21lc3NhZ2VzX3Blcl9zZWNvbmQYByABKA0SFQoNbWVzc2FnZV9idXJzdBgIIAEoDSKzAgoLQ2xpZW50SGVsbG8SPgoHbWFjaGluZRgBIAEoCzIrLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5NYWNoaW5lQ3JlZGVudGlhbEgAEkQKCmVucm9sbG1lbnQYAiABKAsyLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRW5yb2xsbWVudENyZWRlbnRpYWxIABI+CgdzZXNzaW9uGAMgASgLMisubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlc3Npb25DcmVkZW50aWFsSAASPAoGdmlld2VyGAQgASgLMioubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlZpZXdlckNyZWRlbnRpYWxIABISCgp1c2VyX2FnZW50GAUgASgJQgwKCmNyZWRlbnRpYWwiOgoRTWFjaGluZUNyZWRlbnRpYWwSEgoKbWFjaGluZV9pZBgBIAEoCRIRCglzaWduYXR1cmUYAiABKAwiPQoURW5yb2xsbWVudENyZWRlbnRpYWwSEgoKcHVibGljX2tleRgBIAEoDBIRCglzaWduYXR1cmUYAiABKAwiWAoRU2Vzc2lvbkNyZWRlbnRpYWwSEgoKZGVsZWdhdGlvbhgBIAEoDBIcChRkZWxlZ2F0aW9uX3NpZ25hdHVyZRgCIAEoDBIRCglzaWduYXR1cmUYAyABKAwitgEKEVNlc3Npb25EZWxlZ2F0aW9uEhIKCm1hY2hpbmVfaWQYASABKAkSEgoKc2Vzc2lvbl9pZBgCIAEoCRIaChJzZXNzaW9uX3B1YmxpY19rZXkYAyABKAwSLQoJaXNzdWVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCI1ChBWaWV3ZXJDcmVkZW50aWFsEg4KBnRpY2tldBgBIAEoCRIRCglzaWduYXR1cmUYAyABKAwixwEKB1dlbGNvbWUSFQoNY29ubmVjdGlvbl9pZBgBIAEoBBISCgptYWNoaW5lX2lkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSOwoMc2VydmljZV9rZXlzGAQgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZpY2VLZXlzEi8KDHJlc3VtZV9ncmFjZRgFIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIPCgdyZXN1bWVkGAYgASgIIkAKC1NlcnZpY2VLZXlzEjEKBGtleXMYASADKAsyIy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUHVibGljS2V5IjUKCVB1YmxpY0tleRIOCgZrZXlfaWQYASABKAkSEQoHZWQyNTUxORgCIAEoDEgAQgUKA2tleSLNAgoNQXV0aG9yaXphdGlvbhIOCgZpc3N1ZXIYASABKAkSEgoKbWFjaGluZV9pZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEhUKDWNvbm5lY3Rpb25faWQYBCABKAQSDwoHdXNlcl9pZBgFIAEoCRIUCgxkaXNwbGF5X25hbWUYBiABKAkSEQoJY2xpZW50X2lkGAcgASgJEhkKEXZpZXdlcl9wdWJsaWNfa2V5GAkgASgMEhEKCXJlYWRfb25seRgLIAEoCBImCghwb2xpY2llcxgMIAMoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnkSLQoJaXNzdWVkX2F0GA0gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GA4gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJPChNTaWduZWRBdXRob3JpemF0aW9uEg4KBmtleV9pZBgBIAEoCRIVCg1hdXRob3JpemF0aW9uGAIgASgMEhEKCXNpZ25hdHVyZRgDIAEoDCIcCgRQaW5nEhQKDG1vbm90b25pY19tcxgBIAEoBCIcCgRQb25nEhQKDG1vbm90b25pY19tcxgBIAEoBCI7CghGcmFnbWVudBISCgptZXNzYWdlX2lkGAEgASgEEgwKBGRhdGEYAiABKAwSDQoFZmluYWwYAyABKAgihQEKBUNsb3NlEjUKBnJlYXNvbhgBIAEoDjIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZVJlYXNvbhIVCg1yZWFzb25fcGhyYXNlGAIgASgJEi4KC3JldHJ5X2RlbGF5GAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uIlsKE0F0dGFjaFZpZXdlclJlcXVlc3QSRAoNYXV0aG9yaXphdGlvbhgBIAEoCzItLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5TaWduZWRBdXRob3JpemF0aW9uIhYKFEF0dGFjaFZpZXdlclJlc3BvbnNlImgKIFVwZGF0ZVZpZXdlckF1dGhvcml6YXRpb25SZXF1ZXN0EkQKDWF1dGhvcml6YXRpb24YASABKAsyLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmVkQXV0aG9yaXphdGlvbiIjCiFVcGRhdGVWaWV3ZXJBdXRob3JpemF0aW9uUmVzcG9uc2UiYwoTRGV0YWNoVmlld2VyUmVxdWVzdBIVCg1jb25uZWN0aW9uX2lkGAEgASgEEjUKBnJlYXNvbhgCIAEoDjIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZVJlYXNvbiIWChREZXRhY2hWaWV3ZXJSZXNwb25zZSqcBQoLQ2xvc2VSZWFzb24SHAoYQ0xPU0VfUkVBU09OX1VOU1BFQ0lGSUVEEAASFQoRQ0xPU0VfUkVBU09OX0RPTkUQARIcChhDTE9TRV9SRUFTT05fQ0xJRU5UX0VYSVQQAhIgChxDTE9TRV9SRUFTT05fU0VSVkVSX1NIVVRET1dOEAMSHwobQ0xPU0VfUkVBU09OX1NFUlZFUl9VUEdSQURFEAQSHQoZQ0xPU0VfUkVBU09OX1BJTkdfVElNRU9VVBAFEh4KGkNMT1NFX1JFQVNPTl9IRUxMT19USU1FT1VUEAYSHwobQ0xPU0VfUkVBU09OX1BST1RPQ09MX0VSUk9SEAcSIAocQ0xPU0VfUkVBU09OX01FU1NBR0VfVE9PX0JJRxAIEiYKIkNMT1NFX1JFQVNPTl9BVVRIRU5USUNBVElPTl9GQUlMRUQQCRIiCh5DTE9TRV9SRUFTT05fUEVSTUlTU0lPTl9ERU5JRUQQChIiCh5DTE9TRV9SRUFTT05fU0VTU0lPTl9OT1RfRk9VTkQQCxIbChdDTE9TRV9SRUFTT05fTkVXX0NMSUVOVBAMEh0KGUNMT1NFX1JFQVNPTl9TRVNTSU9OX0VYSVQQDRIjCh9DTE9TRV9SRUFTT05fU0VTU0lPTl9SRVNUQVJUSU5HEA4SHwobQ0xPU0VfUkVBU09OX0RFVEFDSF9SRVFVRVNUEA8SIQodQ0xPU0VfUkVBU09OX1BPTElDWV9WSU9MQVRJT04QEBIfChtDTE9TRV9SRUFTT05fSU5URVJOQUxfRVJST1IQERIbChdDTE9TRV9SRUFTT05fT1ZFUkxPQURFRBASEiIKHkNMT1NFX1JFQVNPTl9FTkRQT0lOVF9UT09fU0xPVxATMpMDCg1WaWV3ZXJTZXJ2aWNlEnIKDEF0dGFjaFZpZXdlchItLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5BdHRhY2hWaWV3ZXJSZXF1ZXN0Gi4ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkF0dGFjaFZpZXdlclJlc3BvbnNlIgOQAgISmQEKGVVwZGF0ZVZpZXdlckF1dGhvcml6YXRpb24SOi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuVXBkYXRlVmlld2VyQXV0aG9yaXphdGlvblJlcXVlc3QaOy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuVXBkYXRlVmlld2VyQXV0aG9yaXphdGlvblJlc3BvbnNlIgOQAgIScgoMRGV0YWNoVmlld2VyEi0ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkRldGFjaFZpZXdlclJlcXVlc3QaLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRGV0YWNoVmlld2VyUmVzcG9uc2UiA5ACAkI+WjxnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvY29udHJvbC92MTtjb250cm9sdjFiBnByb3RvMw", [file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_timestamp, file_leaflow_fleet_rpc_v1_rpc, file_leaflow_fleet_transport_v1_transport]);
 
 /**
  * A message from an endpoint.
@@ -237,7 +237,8 @@ export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_control_v1_control, 1);
 
 /**
- * The service's side of the handshake.
+ * The service's side of the handshake. Every field is set; an endpoint closes
+ * with PROTOCOL_ERROR a ServerHello that lacks one.
  *
  * @generated from message leaflow.fleet.control.v1.ServerHello
  */
@@ -281,21 +282,23 @@ export type ServerHello = Message<"leaflow.fleet.control.v1.ServerHello"> & {
   maxMessageSize: number;
 
   /**
-   * How many calls of the endpoint may run on the service at a time.
+   * How many calls of the endpoint may run on the service at a time. At
+   * least 1.
    *
    * @generated from field: uint32 max_concurrent_calls = 6;
    */
   maxConcurrentCalls: number;
 
   /**
-   * How many messages a second the endpoint may send on average.
+   * How fast the endpoint's token bucket refills, in messages a second (see
+   * Flow). At least 1.
    *
    * @generated from field: uint32 messages_per_second = 7;
    */
   messagesPerSecond: number;
 
   /**
-   * How many messages the endpoint may send at once, above the average.
+   * How many tokens the endpoint's bucket holds (see Flow). At least 1.
    *
    * @generated from field: uint32 message_burst = 8;
    */
@@ -534,8 +537,8 @@ export const SessionDelegationSchema: GenMessage<SessionDelegation> = /*@__PURE_
  */
 export type ViewerCredential = Message<"leaflow.fleet.control.v1.ViewerCredential"> & {
   /**
-   * A single-use ticket the service issued to a signed-in user for one
-   * session and this viewer key. Valid for at most 60 seconds. It
+   * A single-use signaling ticket the Fleet API issued for one viewer
+   * connection, which names its key. Valid for at most 60 seconds. It
    * authenticates nothing by itself: the signature below proves the key.
    * Whoever asked for it, a browser through its console, a desktop client or
    * a program, connects with it the same way. Never put into a URL.
@@ -543,13 +546,6 @@ export type ViewerCredential = Message<"leaflow.fleet.control.v1.ViewerCredentia
    * @generated from field: string ticket = 1;
    */
   ticket: string;
-
-  /**
-   * Resumes the viewer connection with this id. 0: a new connection.
-   *
-   * @generated from field: uint64 resume_connection_id = 2;
-   */
-  resumeConnectionId: bigint;
 
   /**
    * The Ed25519 signature by the viewer key the ticket names over the ASCII
@@ -576,8 +572,8 @@ export const ViewerCredentialSchema: GenMessage<ViewerCredential> = /*@__PURE__*
  */
 export type Welcome = Message<"leaflow.fleet.control.v1.Welcome"> & {
   /**
-   * The connection. For a viewer, the connection_id of its signaling, its
-   * PeerConnections and its authorization.
+   * The connection. For a viewer, its viewer connection's connection_id,
+   * which its signaling, its PeerConnections and its authorization name.
    *
    * @generated from field: uint64 connection_id = 1;
    */
@@ -605,35 +601,20 @@ export type Welcome = Message<"leaflow.fleet.control.v1.Welcome"> & {
   serviceKeys?: ServiceKeys | undefined;
 
   /**
-   * How long the service keeps the attachments of this connection when it
-   * drops. Session processes and viewers only.
+   * How long the service keeps the session's viewers when this connection
+   * drops. Session processes only.
    *
    * @generated from field: google.protobuf.Duration resume_grace = 5;
    */
   resumeGrace?: Duration | undefined;
 
   /**
-   * The connection resumed one that had dropped.
+   * The session process connected again within resume_grace and kept its
+   * viewers. Session processes only.
    *
    * @generated from field: bool resumed = 6;
    */
   resumed: boolean;
-
-  /**
-   * Viewers only, always set: the viewer's authorization, the same one the
-   * session holds. A viewer checks its own rights here before it offers
-   * anything of its device, such as a port or a camera.
-   *
-   * @generated from field: leaflow.fleet.control.v1.SignedAuthorization authorization = 7;
-   */
-  authorization?: SignedAuthorization | undefined;
-
-  /**
-   * Viewers only: the ICE servers for the PeerConnections the viewer starts.
-   *
-   * @generated from field: leaflow.fleet.transport.v1.RtcConfiguration rtc_configuration = 8;
-   */
-  rtcConfiguration?: RtcConfiguration | undefined;
 };
 
 /**
@@ -968,55 +949,6 @@ export const CloseSchema: GenMessage<Close> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_control_v1_control, 17);
 
 /**
- * The request of RefreshAuthorization.
- *
- * @generated from message leaflow.fleet.control.v1.RefreshAuthorizationRequest
- */
-export type RefreshAuthorizationRequest = Message<"leaflow.fleet.control.v1.RefreshAuthorizationRequest"> & {
-  /**
-   * A fresh ticket, at most 4096 bytes.
-   *
-   * @generated from field: string ticket = 1;
-   */
-  ticket: string;
-};
-
-/**
- * Describes the message leaflow.fleet.control.v1.RefreshAuthorizationRequest.
- * Use `create(RefreshAuthorizationRequestSchema)` to create a new message.
- */
-export const RefreshAuthorizationRequestSchema: GenMessage<RefreshAuthorizationRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 18);
-
-/**
- * The response of RefreshAuthorization.
- *
- * @generated from message leaflow.fleet.control.v1.RefreshAuthorizationResponse
- */
-export type RefreshAuthorizationResponse = Message<"leaflow.fleet.control.v1.RefreshAuthorizationResponse"> & {
-  /**
-   * The renewed authorization.
-   *
-   * @generated from field: leaflow.fleet.control.v1.SignedAuthorization authorization = 1;
-   */
-  authorization?: SignedAuthorization | undefined;
-
-  /**
-   * New ICE servers for the PeerConnections the viewer starts from now on.
-   *
-   * @generated from field: leaflow.fleet.transport.v1.RtcConfiguration rtc_configuration = 2;
-   */
-  rtcConfiguration?: RtcConfiguration | undefined;
-};
-
-/**
- * Describes the message leaflow.fleet.control.v1.RefreshAuthorizationResponse.
- * Use `create(RefreshAuthorizationResponseSchema)` to create a new message.
- */
-export const RefreshAuthorizationResponseSchema: GenMessage<RefreshAuthorizationResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 19);
-
-/**
  * The request of AttachViewer.
  *
  * @generated from message leaflow.fleet.control.v1.AttachViewerRequest
@@ -1035,7 +967,7 @@ export type AttachViewerRequest = Message<"leaflow.fleet.control.v1.AttachViewer
  * Use `create(AttachViewerRequestSchema)` to create a new message.
  */
 export const AttachViewerRequestSchema: GenMessage<AttachViewerRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 20);
+  messageDesc(file_leaflow_fleet_control_v1_control, 18);
 
 /**
  * The response of AttachViewer.
@@ -1050,7 +982,7 @@ export type AttachViewerResponse = Message<"leaflow.fleet.control.v1.AttachViewe
  * Use `create(AttachViewerResponseSchema)` to create a new message.
  */
 export const AttachViewerResponseSchema: GenMessage<AttachViewerResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 21);
+  messageDesc(file_leaflow_fleet_control_v1_control, 19);
 
 /**
  * The request of UpdateViewerAuthorization.
@@ -1071,7 +1003,7 @@ export type UpdateViewerAuthorizationRequest = Message<"leaflow.fleet.control.v1
  * Use `create(UpdateViewerAuthorizationRequestSchema)` to create a new message.
  */
 export const UpdateViewerAuthorizationRequestSchema: GenMessage<UpdateViewerAuthorizationRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 22);
+  messageDesc(file_leaflow_fleet_control_v1_control, 20);
 
 /**
  * The response of UpdateViewerAuthorization.
@@ -1086,7 +1018,7 @@ export type UpdateViewerAuthorizationResponse = Message<"leaflow.fleet.control.v
  * Use `create(UpdateViewerAuthorizationResponseSchema)` to create a new message.
  */
 export const UpdateViewerAuthorizationResponseSchema: GenMessage<UpdateViewerAuthorizationResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 23);
+  messageDesc(file_leaflow_fleet_control_v1_control, 21);
 
 /**
  * The request of DetachViewer.
@@ -1115,7 +1047,7 @@ export type DetachViewerRequest = Message<"leaflow.fleet.control.v1.DetachViewer
  * Use `create(DetachViewerRequestSchema)` to create a new message.
  */
 export const DetachViewerRequestSchema: GenMessage<DetachViewerRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 24);
+  messageDesc(file_leaflow_fleet_control_v1_control, 22);
 
 /**
  * The response of DetachViewer.
@@ -1130,7 +1062,7 @@ export type DetachViewerResponse = Message<"leaflow.fleet.control.v1.DetachViewe
  * Use `create(DetachViewerResponseSchema)` to create a new message.
  */
 export const DetachViewerResponseSchema: GenMessage<DetachViewerResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 25);
+  messageDesc(file_leaflow_fleet_control_v1_control, 23);
 
 /**
  * Why a control connection ends.
@@ -1295,42 +1227,9 @@ export const CloseReasonSchema: GenEnum<CloseReason> = /*@__PURE__*/
   enumDesc(file_leaflow_fleet_control_v1_control, 0);
 
 /**
- * Renews viewers' authorizations. Served by the service on viewer
- * connections.
- *
- * @generated from service leaflow.fleet.control.v1.AuthorizationService
- */
-export const AuthorizationService: GenService<{
-  /**
-   * Renews the viewer's authorization before it expires, keeping its
-   * PeerConnections. The ticket must be a fresh one for the same session and
-   * viewer key. The new authorization differs from the current one only in
-   * later issued_at and expires_at. The service hands it to the session with
-   * UpdateViewerAuthorization before it answers, and starts no PeerConnection
-   * attempt of the viewer until the viewer has it. One call at a time.
-   *
-   * Fails with:
-   *   - PERMISSION_DENIED and reason TICKET_INVALID for a ticket that is
-   *     unknown, used, expired or issued for another session or key;
-   *   - FAILED_PRECONDITION and reason REFRESH_PENDING while another call
-   *     runs.
-   * When the user's rights changed or the session refused the update, the
-   * service closes the connection with PERMISSION_DENIED instead. A ticket
-   * serves once: to call again, ask for a new one.
-   *
-   * @generated from rpc leaflow.fleet.control.v1.AuthorizationService.RefreshAuthorization
-   */
-  refreshAuthorization: {
-    methodKind: "unary";
-    input: typeof RefreshAuthorizationRequestSchema;
-    output: typeof RefreshAuthorizationResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_leaflow_fleet_control_v1_control, 0);
-
-/**
  * Admits viewers to a session and ends them. Served by the session process
- * on its control connection; the service calls it.
+ * on its control connection; the service calls it when a viewer connection
+ * is created, renewed or ends through the Fleet API.
  *
  * @generated from service leaflow.fleet.control.v1.ViewerService
  */
@@ -1386,5 +1285,5 @@ export const ViewerService: GenService<{
     output: typeof DetachViewerResponseSchema;
   },
 }> = /*@__PURE__*/
-  serviceDesc(file_leaflow_fleet_control_v1_control, 1);
+  serviceDesc(file_leaflow_fleet_control_v1_control, 0);
 
