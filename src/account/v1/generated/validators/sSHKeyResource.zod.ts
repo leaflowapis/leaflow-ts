@@ -18,7 +18,7 @@
  *
  * ## SSH keys
  *
- * The SSH keys of an account sign its holder in as themselves, in every project they belong to: Fleet machines accept them for the holder's directory account wherever `fleet:machines.login` allows it, and Compute installs them on the servers the holder creates or reinstalls. A key is active on one account at most. Keys shared by a project, such as one used by CI, belong to the project instead and are managed through the IAM API.
+ * The SSH keys of an account belong to its holder rather than to any project, and a key is active on one account at most. Keys shared by a project, such as one used by CI, belong to the project instead and are managed through the IAM API.
  *
  * ## Project slugs
  *
