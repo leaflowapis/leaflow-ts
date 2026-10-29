@@ -955,7 +955,8 @@ export const CloseSchema: GenMessage<Close> = /*@__PURE__*/
  */
 export type AttachViewerRequest = Message<"leaflow.fleet.control.v1.AttachViewerRequest"> & {
   /**
-   * The viewer's authorization, the same one its Welcome carried.
+   * The viewer's authorization, the same one the Fleet API returned for the
+   * viewer connection.
    *
    * @generated from field: leaflow.fleet.control.v1.SignedAuthorization authorization = 1;
    */
