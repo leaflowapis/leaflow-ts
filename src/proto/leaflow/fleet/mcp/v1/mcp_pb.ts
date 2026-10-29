@@ -912,7 +912,10 @@ export const McpServerFailureSchema: GenEnum<McpServerFailure> = /*@__PURE__*/
  *   - NOT_FOUND and reason USER_NOT_FOUND for an account the machine's copy
  *     of the directory does not hold for user_id;
  *   - PERMISSION_DENIED and reason USER_NOT_ALLOWED, ACCOUNT_EXPIRED or
- *     PAM_PERMISSION_DENIED, as for leaflow.fleet.command.v1 RunCommand.
+ *     PAM_PERMISSION_DENIED, as for leaflow.fleet.command.v1 RunCommand;
+ *   - INTERNAL and reason MCP_START_FAILED when the machine could not start
+ *     MCP for the account in time for another reason; UNAVAILABLE with the
+ *     same reason while the Agent is stopping.
  *
  * @generated from service leaflow.fleet.mcp.v1.McpService
  */
@@ -936,7 +939,9 @@ export const McpService: GenService<{
    *   - FAILED_PRECONDITION and reason MCP_CONFIGURATION_CHANGED when the
    *     file is no longer at expected_revision;
    *   - FAILED_PRECONDITION and reason MCP_CONFIGURATION_INVALID when the
-   *     file cannot be read or is not valid: replace it whole first.
+   *     file cannot be read or is not valid: replace it whole first;
+   *   - INTERNAL and reason MCP_CONFIGURATION_WRITE_FAILED when the file could
+   *     not be written, such as on a full disk.
    *
    * @generated from rpc leaflow.fleet.mcp.v1.McpService.PutMcpServer
    */
@@ -967,7 +972,9 @@ export const McpService: GenService<{
    *     PutMcpServer;
    *   - INVALID_ARGUMENT and reason MCP_CONFIGURATION_INVALID when content is
    *     not a JSON object with an object "mcpServers", with metadata "line"
-   *     and "column" of the first error.
+   *     and "column" of the first error;
+   *   - INTERNAL and reason MCP_CONFIGURATION_WRITE_FAILED as for
+   *     PutMcpServer.
    *
    * @generated from rpc leaflow.fleet.mcp.v1.McpService.ReplaceMcpConfiguration
    */

@@ -725,6 +725,7 @@ export const getGetMcpConfigurationUrl = (machineId: string) => {
  * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
+ * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
  * - `MACHINE_TIMEOUT` when the machine did not answer in time.
  * @summary Get the caller's MCP configuration on a machine
  */
@@ -780,10 +781,12 @@ export const getReplaceMcpConfigurationUrl = (machineId: string) => {
  * - `MCP_CONFIGURATION_CHANGED` when the file is no longer at `expected_revision`;
  * - `MCP_CONFIGURATION_INVALID` when `content` is not an object with an object `mcpServers`,
  *   with `metadata.line` and `metadata.column`;
+ * - `MCP_CONFIGURATION_WRITE_FAILED` when the machine could not write the file;
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
  * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
+ * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
  * - `MACHINE_TIMEOUT` when the machine did not answer in time.
  * @summary Replace the caller's MCP configuration on a machine
  */
@@ -859,10 +862,12 @@ export const getUpdateMcpServerUrl = (machineId: string, serverName: string) => 
  * - `MCP_CONFIGURATION_CHANGED` when the file is no longer at `expected_revision`;
  * - `MCP_CONFIGURATION_INVALID` when the file cannot be read or is not valid; replace it
  *   whole first;
+ * - `MCP_CONFIGURATION_WRITE_FAILED` when the machine could not write the file;
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
  * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
+ * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
  * - `MACHINE_TIMEOUT` when the machine did not answer in time.
  * @summary Add or replace an MCP server
  */
@@ -1013,6 +1018,7 @@ export const getSendMcpRequestUrl = (machineId: string, serverName: string) => {
  * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
+ * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
  * - `MACHINE_TIMEOUT` when the machine did not answer in time.
  * @summary Send an MCP request to a server
  */
@@ -1180,6 +1186,7 @@ export const getListMcpToolsUrl = (machineId: string, params?: ListMcpToolsParam
  * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
+ * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
  * - `MACHINE_TIMEOUT` when the machine did not answer in time.
  * @summary List the caller's MCP tools on a machine
  */
