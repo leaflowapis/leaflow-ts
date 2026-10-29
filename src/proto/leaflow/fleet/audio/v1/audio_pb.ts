@@ -19,14 +19,14 @@ export const file_leaflow_fleet_audio_v1_audio: GenFile = /*@__PURE__*/
   fileDesc("CiJsZWFmbG93L2ZsZWV0L2F1ZGlvL3YxL2F1ZGlvLnByb3RvEhZsZWFmbG93LmZsZWV0LmF1ZGlvLnYxIh4KDEF1ZGlvUmVxdWVzdBIOCgZjb2RlY3MYASADKAkiYAoLQXVkaW9Gb3JtYXQSDQoFY29kZWMYASABKAkSFgoOc2FtcGxlX3JhdGVfaHoYAiABKA0SFQoNY2hhbm5lbF9jb3VudBgDIAEoDRITCgtkZXNjcmlwdGlvbhgEIAEoDCJWCglBdWRpb0RhdGESEAoIc2VxdWVuY2UYASABKAQSFAoMdGltZXN0YW1wX3VzGAIgASgDEhMKC2R1cmF0aW9uX3VzGAMgASgNEgwKBGRhdGEYBCABKAwirwEKE091dHB1dFNlcnZlck1lc3NhZ2USNQoGZm9ybWF0GAEgASgLMiMubGVhZmxvdy5mbGVldC5hdWRpby52MS5BdWRpb0Zvcm1hdEgAEjEKBGRhdGEYAiABKAsyIS5sZWFmbG93LmZsZWV0LmF1ZGlvLnYxLkF1ZGlvRGF0YUgAEiMKBWVycm9yGAMgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIAEIJCgdtZXNzYWdlIosBChJJbnB1dENsaWVudE1lc3NhZ2USNwoHcmVxdWVzdBgBIAEoCzIkLmxlYWZsb3cuZmxlZXQuYXVkaW8udjEuQXVkaW9SZXF1ZXN0SAASMQoEZGF0YRgCIAEoCzIhLmxlYWZsb3cuZmxlZXQuYXVkaW8udjEuQXVkaW9EYXRhSABCCQoHbWVzc2FnZSKIAQoSSW5wdXRTZXJ2ZXJNZXNzYWdlEjMKBWdyYW50GAEgASgLMiIubGVhZmxvdy5mbGVldC5hdWRpby52MS5JbnB1dEdyYW50SAASMgoDZW5kGAIgASgLMiMubGVhZmxvdy5mbGVldC5kZXZpY2UudjEuQ2FwdHVyZUVuZEgAQgkKB21lc3NhZ2UiegoKSW5wdXRHcmFudBIzCgZmb3JtYXQYASABKAsyIy5sZWFmbG93LmZsZWV0LmF1ZGlvLnYxLkF1ZGlvRm9ybWF0EjcKFG1heF9jYXB0dXJlX2R1cmF0aW9uGAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uIg0KC0F1ZGlvUG9saWN5QjpaOGdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9hdWRpby92MTthdWRpb3YxYgZwcm90bzM", [file_google_protobuf_duration, file_google_rpc_status, file_leaflow_fleet_device_v1_device]);
 
 /**
- * Asks for a stream. The first message of the viewer on both channels.
+ * Asks for a stream. The first message of the participant on both channels.
  *
  * @generated from message leaflow.fleet.audio.v1.AudioRequest
  */
 export type AudioRequest = Message<"leaflow.fleet.audio.v1.AudioRequest"> & {
   /**
    * WebCodecs codec strings, most preferred first, such as "opus": for
-   * output those the viewer decodes (AudioDecoder.isConfigSupported), for
+   * output those the participant decodes (AudioDecoder.isConfigSupported), for
    * input those it encodes (AudioEncoder.isConfigSupported).
    *
    * @generated from field: repeated string codecs = 1;
@@ -175,7 +175,7 @@ export const OutputServerMessageSchema: GenMessage<OutputServerMessage> = /*@__P
   messageDesc(file_leaflow_fleet_audio_v1_audio, 3);
 
 /**
- * A message from the viewer on the input channel.
+ * A message from the participant on the input channel.
  *
  * @generated from message leaflow.fleet.audio.v1.InputClientMessage
  */
@@ -187,7 +187,7 @@ export type InputClientMessage = Message<"leaflow.fleet.audio.v1.InputClientMess
    */
   message: {
     /**
-     * The codecs the viewer can encode. The first message.
+     * The codecs the participant can encode. The first message.
      *
      * @generated from field: leaflow.fleet.audio.v1.AudioRequest request = 1;
      */
@@ -263,8 +263,8 @@ export type InputGrant = Message<"leaflow.fleet.audio.v1.InputGrant"> & {
   format?: AudioFormat | undefined;
 
   /**
-   * The viewer stops capturing after this long; the session ends the stream
-   * with DEADLINE_EXCEEDED then.
+   * The participant stops capturing after this long; the session ends the
+   * stream with DEADLINE_EXCEEDED then.
    *
    * @generated from field: google.protobuf.Duration max_capture_duration = 2;
    */
@@ -279,8 +279,8 @@ export const InputGrantSchema: GenMessage<InputGrant> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_audio_v1_audio, 6);
 
 /**
- * Allows a viewer to play the session's sound, and with DevicePolicy to
- * provide the microphone. Carried in the viewer's signed authorization.
+ * Allows a participant to play the session's sound, and with DevicePolicy to
+ * provide the microphone. Carried in the participant's signed authorization.
  *
  * @generated from message leaflow.fleet.audio.v1.AudioPolicy
  */

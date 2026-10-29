@@ -95,7 +95,7 @@ export type DeviceDemand = Message<"leaflow.fleet.device.v1.DeviceDemand"> & {
   consumers: DeviceConsumer[];
 
   /**
-   * The connection that provides the device, as in ViewerList. 0: none.
+   * The connection that provides the device, as in ParticipantList. 0: none.
    *
    * @generated from field: uint64 provider_connection_id = 6;
    */
@@ -174,22 +174,22 @@ export const CaptureEndSchema: GenMessage<CaptureEnd> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_device_v1_device, 4);
 
 /**
- * What devices a viewer may provide. Carried in the viewer's signed
- * authorization; without it the viewer provides none. The microphone also
+ * What devices a participant may provide. Carried in the participant's signed
+ * authorization; without it the participant provides none. The microphone also
  * needs AudioPolicy.
  *
  * @generated from message leaflow.fleet.device.v1.DevicePolicy
  */
 export type DevicePolicy = Message<"leaflow.fleet.device.v1.DevicePolicy"> & {
   /**
-   * The device types the viewer may provide.
+   * The device types the participant may provide.
    *
    * @generated from field: repeated leaflow.fleet.device.v1.DeviceType allowed_types = 1;
    */
   allowedTypes: DeviceType[];
 
   /**
-   * Decides between viewers that may provide the same device: the higher
+   * Decides between participants that may provide the same device: the higher
    * wins, and on a tie the current provider stays.
    *
    * @generated from field: uint32 provider_priority = 2;
@@ -197,7 +197,7 @@ export type DevicePolicy = Message<"leaflow.fleet.device.v1.DevicePolicy"> & {
   providerPriority: number;
 
   /**
-   * The longest the viewer may capture the microphone or the camera at a
+   * The longest the participant may capture the microphone or the camera at a
    * stretch. Unset or 0: the session's limit.
    *
    * @generated from field: google.protobuf.Duration max_capture_duration = 3;
@@ -228,7 +228,7 @@ export const DevicePolicySchema: GenMessage<DevicePolicy> = /*@__PURE__*/
 
 /**
  * Limits of the camera. The effective limits are the smallest of these, the
- * viewer's and the session's. 0: the session's limit.
+ * participant's and the session's. 0: the session's limit.
  *
  * @generated from message leaflow.fleet.device.v1.CameraLimits
  */
@@ -284,7 +284,7 @@ export const CameraLimitsSchema: GenMessage<CameraLimits> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_device_v1_device, 6);
 
 /**
- * Limits of the gamepads one viewer provides. 0: the session's limit.
+ * Limits of the gamepads one participant provides. 0: the session's limit.
  *
  * @generated from message leaflow.fleet.device.v1.GamepadLimits
  */
@@ -341,7 +341,7 @@ export const GamepadLimitsSchema: GenMessage<GamepadLimits> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_device_v1_device, 7);
 
 /**
- * A type of device a viewer can provide.
+ * A type of device a participant can provide.
  *
  * @generated from enum leaflow.fleet.device.v1.DeviceType
  */
@@ -421,7 +421,7 @@ export enum DemandState {
   ACTIVE = 2,
 
   /**
-   * The session cannot tell. Providers stop; viewers never poll instead.
+   * The session cannot tell. Providers stop; participants never poll instead.
    *
    * @generated from enum value: DEMAND_STATE_UNAVAILABLE = 3;
    */
@@ -453,7 +453,7 @@ export enum CaptureEndReason {
   NO_CONSUMERS = 1,
 
   /**
-   * The viewer's authorization no longer allows it.
+   * The participant's authorization no longer allows it.
    *
    * @generated from enum value: CAPTURE_END_REASON_PERMISSION_REVOKED = 2;
    */
@@ -467,7 +467,7 @@ export enum CaptureEndReason {
   DEVICE_UNAVAILABLE = 3,
 
   /**
-   * A viewer with a higher provider priority took over.
+   * A participant with a higher provider priority took over.
    *
    * @generated from enum value: CAPTURE_END_REASON_PROVIDER_REPLACED = 4;
    */
@@ -481,7 +481,7 @@ export enum CaptureEndReason {
   DEADLINE_EXCEEDED = 5,
 
   /**
-   * No format of the viewer can be used.
+   * No format of the participant can be used.
    *
    * @generated from enum value: CAPTURE_END_REASON_UNSUPPORTED_FORMAT = 6;
    */

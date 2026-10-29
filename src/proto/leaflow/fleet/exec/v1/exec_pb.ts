@@ -17,7 +17,7 @@ export const file_leaflow_fleet_exec_v1_exec: GenFile = /*@__PURE__*/
   fileDesc("CiBsZWFmbG93L2ZsZWV0L2V4ZWMvdjEvZXhlYy5wcm90bxIVbGVhZmxvdy5mbGVldC5leGVjLnYxIroBCg1DbGllbnRNZXNzYWdlEjEKBXN0YXJ0GAEgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNTdGFydEgAEjEKBWlucHV0GAIgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNJbnB1dEgAEjgKCWlucHV0X2VuZBgDIAEoCzIjLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjSW5wdXRFbmRIAEIJCgdtZXNzYWdlIoABCg1TZXJ2ZXJNZXNzYWdlEjMKBm91dHB1dBgBIAEoCzIhLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjT3V0cHV0SAASLwoEZXhpdBgCIAEoCzIfLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjRXhpdEgAQgkKB21lc3NhZ2Ui6wEKCUV4ZWNTdGFydBIMCgRhcmd2GAEgAygJEhkKEXdvcmtpbmdfZGlyZWN0b3J5GAIgASgJEioKB3RpbWVvdXQYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SDQoFc3RkaW4YBCABKAgSRgoLZW52aXJvbm1lbnQYBSADKAsyMS5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY1N0YXJ0LkVudmlyb25tZW50RW50cnkaMgoQRW52aXJvbm1lbnRFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIhkKCUV4ZWNJbnB1dBIMCgRkYXRhGAEgASgMIg4KDEV4ZWNJbnB1dEVuZCJPCgpFeGVjT3V0cHV0EjMKBnN0cmVhbRgBIAEoDjIjLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5PdXRwdXRTdHJlYW0SDAoEZGF0YRgCIAEoDCJ4CghFeGVjRXhpdBITCglleGl0X2NvZGUYASABKA1IABIVCgtzaWduYWxfbmFtZRgCIAEoCUgAEhMKC2NvcmVfZHVtcGVkGAMgASgIEiEKBWVycm9yGAQgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNCCAoGc3RhdHVzIgwKCkV4ZWNQb2xpY3kqYQoMT3V0cHV0U3RyZWFtEh0KGU9VVFBVVF9TVFJFQU1fVU5TUEVDSUZJRUQQABIYChRPVVRQVVRfU1RSRUFNX1NURE9VVBABEhgKFE9VVFBVVF9TVFJFQU1fU1RERVJSEAJCOFo2Z2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L2V4ZWMvdjE7ZXhlY3YxYgZwcm90bzM", [file_google_protobuf_duration, file_google_rpc_status]);
 
 /**
- * A message from the viewer.
+ * A message from the participant.
  *
  * @generated from message leaflow.fleet.exec.v1.ClientMessage
  */
@@ -100,7 +100,7 @@ export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_exec_v1_exec, 1);
 
 /**
- * Starts a program. No shell interprets the arguments; a viewer that wants
+ * Starts a program. No shell interprets the arguments; a participant that wants
  * one runs it, such as ["/bin/sh", "-lc", "ls | wc -l"].
  *
  * @generated from message leaflow.fleet.exec.v1.ExecStart
@@ -275,7 +275,7 @@ export const ExecExitSchema: GenMessage<ExecExit> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_exec_v1_exec, 6);
 
 /**
- * Allows a viewer to run commands. Carried in the viewer's signed
+ * Allows a participant to run commands. Carried in the participant's signed
  * authorization.
  *
  * @generated from message leaflow.fleet.exec.v1.ExecPolicy

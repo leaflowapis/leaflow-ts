@@ -4,15 +4,16 @@
  * Leaflow Fleet API
  * Machines that run the Leaflow Fleet Agent (`leaflow-fleet-agent`): adding machines, the
  * accounts and groups that log in to them, running commands, opening and closing sessions, with
- * or without a desktop, and admitting viewers to them.
+ * or without a desktop, and admitting participants to them.
  *
  * ## What this API sees
  *
- * This API coordinates. It admits viewers to sessions and passes the signaling of their
- * connections, but everything a session shows or receives — terminals, files, the screen,
- * input, the clipboard, printing and privilege approvals on a viewer — travels end to end
- * between the viewer and the session, encrypted with keys that never leave them. The platform
- * sees which machine, which session and who is connected, and nothing of what happens inside.
+ * This API coordinates. It admits participants to sessions and passes the signaling of their
+ * PeerConnections, but everything a session shows or receives — terminals, files, the screen,
+ * input, the clipboard, printing and privilege approvals on a participant — travels end to end
+ * between the participant and the session, encrypted with keys that never leave them. The
+ * platform sees which machine, which session and who is connected, and nothing of what happens
+ * inside.
  *
  * Commands and privilege requests decided on the platform are the exception: the platform passes
  * a command and its output between the caller and the machine, and keeps the command line of a
@@ -55,7 +56,7 @@
  *
  * ## Trusting a machine's key
  *
- * Each machine has an Ed25519 key that it generates itself and that never leaves it. Viewers
+ * Each machine has an Ed25519 key that it generates itself and that never leaves it. Participants
  * verify that key end to end before they exchange any data with a session, so a client must
  * decide which key belongs to a machine without relying on any party in between:
  *
@@ -126,9 +127,9 @@
  * - inside a command run through this API, by the request itself;
  * - at once, while the user has set the machine to approve without asking, for a while or for
  *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
- * - by the user, on any of their devices, for a request listed by
- *   `GET /api/v1/privilege-requests` (`POST …:approve` or `…:deny`), or on a viewer of the session
- *   the asking process belongs to. A request nobody decides expires, and sudo fails.
+ * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
+ *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
+ *   to. A request nobody decides expires, and sudo fails.
  *
  * Requests reach the user's devices as they happen through EventBus: the event
  * `leaflow.fleet.privilege.requested` when one is waiting and `leaflow.fleet.privilege.decided`
@@ -147,34 +148,40 @@
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
  * - A privilege request is decided only by the user whose account asks.
  *
- * ## Viewing a session
+ * ## Joining a session
  *
- * 1. Have an Ed25519 key, for as long as the client wants: one per viewer connection or one kept
- *    by the client. The private key must never leave the client; in a browser, use a
+ * 1. Have an Ed25519 key, for as long as the client wants: one per participant or one kept by
+ *    the client. The private key must never leave the client; in a browser, use a
  *    non-extractable WebCrypto key.
- * 2. Create a viewer connection for the public key with
- *    `POST /api/v1/sessions/{sessionId}/viewers`. The answer carries the viewer's signed
- *    authorization, the ICE servers, the keys the service signs with and a signaling ticket.
- * 3. To start a PeerConnection, open a WebSocket to the ticket's `url` with the subprotocol
- *    `leaflow.fleet.control.v1` and follow `leaflow/fleet/control/v1/control.proto` and
- *    `leaflow/fleet/transport/v1/transport.proto`. The ticket travels inside the protocol and
- *    never in a URL, and serves once within 60 seconds; for a later PeerConnection, such as
- *    after a path failed, ask for another with
- *    `POST /api/v1/sessions/{sessionId}/viewers/{connectionId}/signaling-tickets`. The
- *    WebSocket may be closed once the PeerConnection carries data.
- * 4. Renew the viewer connection with `POST …/viewers/{connectionId}:renew` well before
+ * 2. Get the ICE servers with `GET /api/v1/sessions/{sessionId}/rtc-configuration`, create a
+ *    PeerConnection with them and its data channels (`leaflow/fleet/transport/v1/transport.proto`)
+ *    and make an offer. Wait briefly for ICE candidates, such as until gathering completes or
+ *    one second has passed, so that the offer carries them.
+ * 3. Join with `POST /api/v1/sessions/{sessionId}/participants`, sending the public key and the
+ *    offer. The answer carries the participant's signed authorization, the keys the service
+ *    signs with, and the attempt: the session's SDP answer, its ICE candidates and the signed
+ *    PeerAuthorization. Pass candidates gathered later with
+ *    `POST …/participants/{connectionId}/attempts/{attemptId}/candidates`.
+ * 4. Renew the participant with `POST …/participants/{connectionId}:renew` well before
  *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
- *    PeerConnection; the answer renews them. A viewer connection whose lease runs out ends,
- *    and its PeerConnections stop within 30 seconds of their last lease.
- * 5. Leave with `DELETE …/viewers/{connectionId}`.
+ *    PeerConnection; the answer renews them. A participant whose lease runs out ends, and its
+ *    PeerConnections stop within 30 seconds of their last lease.
+ * 5. When a path fails, start another PeerConnection with
+ *    `POST …/participants/{connectionId}/attempts` and move the connection to it with
+ *    `:prepare-migration` and `:commit-migration`. Abandon an attempt with
+ *    `DELETE …/attempts/{attemptId}`.
+ * 6. Leave with `DELETE …/participants/{connectionId}`.
  *
- * What a viewer may do in a session is decided when its viewer connection is created, from the
- * caller's permissions and what the request asks for, and does not change afterwards. Viewers
- * are not told apart by kind: a person in a browser and a program that operates the session are
- * both viewers, named by the `client_id` label they choose, and either can be disconnected.
+ * Signaling travels only through these requests; a participant holds no other connection to
+ * the service.
  *
- * Every viewer connection that ends, including through `DELETE`, is announced through EventBus as
- * `leaflow.fleet.viewer.closed`, addressed to its user in the current project, with its
+ * What a participant may do in a session is decided when it is created, from the caller's
+ * permissions and what the request asks for, and does not change afterwards. Participants are not
+ * told apart by kind: a person in a browser and a program that operates the session are both
+ * participants, named by the `client_id` label they choose, and either can be disconnected.
+ *
+ * Every participant that ends, including through `DELETE`, is announced through EventBus as
+ * `leaflow.fleet.participant.closed`, addressed to its user in the current project, with its
  * `session_id`, `connection_id` (a decimal string) and `reason`: the name of the
  * `CloseReason` of `leaflow/fleet/control/v1/control.proto` in lower case without its prefix,
  * such as `detach_request` when it was ended through `DELETE`, `ping_timeout` when its lease
@@ -202,7 +209,7 @@ export const DesktopOptions = zod
       .max(desktopOptionsWidthMax)
       .optional()
       .describe(
-        "The first width of the canvas, normally the viewer's; the machine's default when omitted",
+        "The first width of the canvas, normally the participant's; the machine's default when omitted",
       ),
     height: zod
       .int()

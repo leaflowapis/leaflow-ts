@@ -4,15 +4,16 @@
  * Leaflow Fleet API
  * Machines that run the Leaflow Fleet Agent (`leaflow-fleet-agent`): adding machines, the
  * accounts and groups that log in to them, running commands, opening and closing sessions, with
- * or without a desktop, and admitting viewers to them.
+ * or without a desktop, and admitting participants to them.
  *
  * ## What this API sees
  *
- * This API coordinates. It admits viewers to sessions and passes the signaling of their
- * connections, but everything a session shows or receives — terminals, files, the screen,
- * input, the clipboard, printing and privilege approvals on a viewer — travels end to end
- * between the viewer and the session, encrypted with keys that never leave them. The platform
- * sees which machine, which session and who is connected, and nothing of what happens inside.
+ * This API coordinates. It admits participants to sessions and passes the signaling of their
+ * PeerConnections, but everything a session shows or receives — terminals, files, the screen,
+ * input, the clipboard, printing and privilege approvals on a participant — travels end to end
+ * between the participant and the session, encrypted with keys that never leave them. The
+ * platform sees which machine, which session and who is connected, and nothing of what happens
+ * inside.
  *
  * Commands and privilege requests decided on the platform are the exception: the platform passes
  * a command and its output between the caller and the machine, and keeps the command line of a
@@ -55,7 +56,7 @@
  *
  * ## Trusting a machine's key
  *
- * Each machine has an Ed25519 key that it generates itself and that never leaves it. Viewers
+ * Each machine has an Ed25519 key that it generates itself and that never leaves it. Participants
  * verify that key end to end before they exchange any data with a session, so a client must
  * decide which key belongs to a machine without relying on any party in between:
  *
@@ -126,9 +127,9 @@
  * - inside a command run through this API, by the request itself;
  * - at once, while the user has set the machine to approve without asking, for a while or for
  *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
- * - by the user, on any of their devices, for a request listed by
- *   `GET /api/v1/privilege-requests` (`POST …:approve` or `…:deny`), or on a viewer of the session
- *   the asking process belongs to. A request nobody decides expires, and sudo fails.
+ * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
+ *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
+ *   to. A request nobody decides expires, and sudo fails.
  *
  * Requests reach the user's devices as they happen through EventBus: the event
  * `leaflow.fleet.privilege.requested` when one is waiting and `leaflow.fleet.privilege.decided`
@@ -147,34 +148,40 @@
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
  * - A privilege request is decided only by the user whose account asks.
  *
- * ## Viewing a session
+ * ## Joining a session
  *
- * 1. Have an Ed25519 key, for as long as the client wants: one per viewer connection or one kept
- *    by the client. The private key must never leave the client; in a browser, use a
+ * 1. Have an Ed25519 key, for as long as the client wants: one per participant or one kept by
+ *    the client. The private key must never leave the client; in a browser, use a
  *    non-extractable WebCrypto key.
- * 2. Create a viewer connection for the public key with
- *    `POST /api/v1/sessions/{sessionId}/viewers`. The answer carries the viewer's signed
- *    authorization, the ICE servers, the keys the service signs with and a signaling ticket.
- * 3. To start a PeerConnection, open a WebSocket to the ticket's `url` with the subprotocol
- *    `leaflow.fleet.control.v1` and follow `leaflow/fleet/control/v1/control.proto` and
- *    `leaflow/fleet/transport/v1/transport.proto`. The ticket travels inside the protocol and
- *    never in a URL, and serves once within 60 seconds; for a later PeerConnection, such as
- *    after a path failed, ask for another with
- *    `POST /api/v1/sessions/{sessionId}/viewers/{connectionId}/signaling-tickets`. The
- *    WebSocket may be closed once the PeerConnection carries data.
- * 4. Renew the viewer connection with `POST …/viewers/{connectionId}:renew` well before
+ * 2. Get the ICE servers with `GET /api/v1/sessions/{sessionId}/rtc-configuration`, create a
+ *    PeerConnection with them and its data channels (`leaflow/fleet/transport/v1/transport.proto`)
+ *    and make an offer. Wait briefly for ICE candidates, such as until gathering completes or
+ *    one second has passed, so that the offer carries them.
+ * 3. Join with `POST /api/v1/sessions/{sessionId}/participants`, sending the public key and the
+ *    offer. The answer carries the participant's signed authorization, the keys the service
+ *    signs with, and the attempt: the session's SDP answer, its ICE candidates and the signed
+ *    PeerAuthorization. Pass candidates gathered later with
+ *    `POST …/participants/{connectionId}/attempts/{attemptId}/candidates`.
+ * 4. Renew the participant with `POST …/participants/{connectionId}:renew` well before
  *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
- *    PeerConnection; the answer renews them. A viewer connection whose lease runs out ends,
- *    and its PeerConnections stop within 30 seconds of their last lease.
- * 5. Leave with `DELETE …/viewers/{connectionId}`.
+ *    PeerConnection; the answer renews them. A participant whose lease runs out ends, and its
+ *    PeerConnections stop within 30 seconds of their last lease.
+ * 5. When a path fails, start another PeerConnection with
+ *    `POST …/participants/{connectionId}/attempts` and move the connection to it with
+ *    `:prepare-migration` and `:commit-migration`. Abandon an attempt with
+ *    `DELETE …/attempts/{attemptId}`.
+ * 6. Leave with `DELETE …/participants/{connectionId}`.
  *
- * What a viewer may do in a session is decided when its viewer connection is created, from the
- * caller's permissions and what the request asks for, and does not change afterwards. Viewers
- * are not told apart by kind: a person in a browser and a program that operates the session are
- * both viewers, named by the `client_id` label they choose, and either can be disconnected.
+ * Signaling travels only through these requests; a participant holds no other connection to
+ * the service.
  *
- * Every viewer connection that ends, including through `DELETE`, is announced through EventBus as
- * `leaflow.fleet.viewer.closed`, addressed to its user in the current project, with its
+ * What a participant may do in a session is decided when it is created, from the caller's
+ * permissions and what the request asks for, and does not change afterwards. Participants are not
+ * told apart by kind: a person in a browser and a program that operates the session are both
+ * participants, named by the `client_id` label they choose, and either can be disconnected.
+ *
+ * Every participant that ends, including through `DELETE`, is announced through EventBus as
+ * `leaflow.fleet.participant.closed`, addressed to its user in the current project, with its
  * `session_id`, `connection_id` (a decimal string) and `reason`: the name of the
  * `CloseReason` of `leaflow/fleet/control/v1/control.proto` in lower case without its prefix,
  * such as `detach_request` when it was ended through `DELETE`, `ping_timeout` when its lease
@@ -186,12 +193,15 @@ import type {
   AccountList,
   AccountResource,
   ApproveEnrollmentRequest,
+  Attempt,
+  CreateAttemptCandidatesRequest,
+  CreateAttemptRequest,
   CreateGroupMemberRequest,
   CreateGroupRequest,
   CreateMachineRegistrationRequest,
   CreateMachineRegistrationResponse,
+  CreateParticipantRequest,
   CreateSessionRequest,
-  CreateViewerRequest,
   EnrollmentResource,
   Error,
   FindEnrollmentByPairingCodeParams,
@@ -212,23 +222,24 @@ import type {
   MachineRegistrationList,
   MachineRegistrationResource,
   MachineResource,
+  MigrationStep,
+  ParticipantConnection,
+  ParticipantList,
+  ParticipantResource,
   PrivilegeApproval,
   PrivilegeApprovalList,
   PrivilegeRequestList,
   PrivilegeRequestResource,
-  RenewViewerRequest,
-  RenewViewerResponse,
+  RenewParticipantRequest,
+  RenewParticipantResponse,
+  RtcConfiguration,
   RunCommandRequest,
   RunCommandResponse,
   SessionList,
   SessionResource,
-  SignalingTicket,
   UpdateAccountRequest,
   UpdateGroupRequest,
   UpdateMachineRequest,
-  ViewerConnection,
-  ViewerList,
-  ViewerResource,
 } from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
@@ -459,9 +470,9 @@ export const getDeleteMachineUrl = (machineId: string) => {
 };
 
 /**
- * Removes the machine from the project. Every viewer of its sessions is disconnected at once
- * and the Agent is refused from then on; to use the machine again, enroll it again. Sessions
- * still open on the machine can no longer be reached and end according to their own
+ * Removes the machine from the project. Every participant of its sessions is disconnected at
+ * once and the Agent is refused from then on; to use the machine again, enroll it again.
+ * Sessions still open on the machine can no longer be reached and end according to their own
  * timeouts. Nothing on the machine is deleted.
  *
  * Requires `fleet:machines.manage`.
@@ -2129,7 +2140,7 @@ export const getCreateSessionUrl = () => {
  *
  * On a machine an account has at most one session with a desktop and at most 8 sessions in
  * all. Sessions without a desktop run side by side, such as one for a program and one for a
- * person; several viewers can also share one session.
+ * person; several participants can also share one session.
  *
  * Fails with:
  * - `MACHINE_OFFLINE` when the machine is not connected;
@@ -2328,57 +2339,116 @@ export const terminateSession = async (
   return { data, status: res.status, headers: res.headers } as terminateSessionResponse;
 };
 
-export type createViewerResponse201 = {
-  data: ViewerConnection;
+export type getSessionRtcConfigurationResponse200 = {
+  data: RtcConfiguration;
+  status: 200;
+};
+
+export type getSessionRtcConfigurationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getSessionRtcConfigurationResponseSuccess = getSessionRtcConfigurationResponse200 & {
+  headers: Headers;
+};
+export type getSessionRtcConfigurationResponseError = getSessionRtcConfigurationResponseDefault & {
+  headers: Headers;
+};
+
+export type getSessionRtcConfigurationResponse =
+  | getSessionRtcConfigurationResponseSuccess
+  | getSessionRtcConfigurationResponseError;
+
+export const getGetSessionRtcConfigurationUrl = (sessionId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/rtc-configuration`;
+};
+
+/**
+ * Returns the STUN and TURN servers for the PeerConnections the caller starts to the session,
+ * with TURN credentials of its own, and the policy for using them. Ask again once
+ * `expires_at` has passed; the credentials of a PeerConnection already relayed last longer.
+ *
+ * Requires that the caller may join the session, as for `create-participant`.
+ *
+ * Fails with:
+ * - `SESSION_CLOSED` when the session has ended;
+ * - `SESSION_ACCESS_DENIED` when the caller may not join the session.
+ * @summary Get the ICE servers for a session
+ */
+export const getSessionRtcConfiguration = async (
+  sessionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getSessionRtcConfigurationResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetSessionRtcConfigurationUrl(sessionId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getSessionRtcConfigurationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getSessionRtcConfigurationResponse;
+};
+
+export type createParticipantResponse201 = {
+  data: ParticipantConnection;
   status: 201;
 };
 
-export type createViewerResponseDefault = {
+export type createParticipantResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
-export type createViewerResponseSuccess = createViewerResponse201 & {
+export type createParticipantResponseSuccess = createParticipantResponse201 & {
   headers: Headers;
 };
-export type createViewerResponseError = createViewerResponseDefault & {
+export type createParticipantResponseError = createParticipantResponseDefault & {
   headers: Headers;
 };
 
-export type createViewerResponse = createViewerResponseSuccess | createViewerResponseError;
+export type createParticipantResponse =
+  | createParticipantResponseSuccess
+  | createParticipantResponseError;
 
-export const getCreateViewerUrl = (sessionId: string) => {
-  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers`;
+export const getCreateParticipantUrl = (sessionId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants`;
 };
 
 /**
- * Admits one viewer with the given public key to the session: signs its authorization,
- * has the session accept it, and returns it with a first signaling ticket. The viewer
- * connection lasts while it is renewed.
+ * Admits one participant with the given public key to the session: signs its authorization,
+ * has the session accept it, and starts its first PeerConnection with the offer. The answer
+ * carries the participant, its authorization and the attempt with the session's answer. The
+ * participant lasts while it is renewed.
  *
- * The owner of a session may operate it. Viewing another member's session requires
+ * The owner of a session may operate it. Joining another member's session requires
  * `fleet:sessions.view`, which admits watching only, or
  * `fleet:sessions.control`, which also admits operating it. Each further capability
  * of the session — file transfer, the clipboard, terminals and programs, port forwarding,
  * devices and audio, printing, SSH agent forwarding, approving privilege requests and
- * reading logs — is granted only with its permission; a viewer that may only watch gets
+ * reading logs — is granted only with its permission; a participant that may only watch gets
  * none of them. A request may ask for less: to watch only, or for some of the capabilities.
  *
- * Fails with:
+ * Fails with the following, and then no participant was created:
  * - `SESSION_CLOSED` when the session has ended;
- * - `SESSION_ACCESS_DENIED` when the caller may not view the session;
- * - `SESSION_UNAVAILABLE` when the session's process is not connected, such as while it
- *   restarts; try again after the error's `retry_delay`;
- * - `VIEWER_LIMIT_REACHED` when the session has as many viewers as it admits;
- * - `VIEWER_REFUSED` when the session refused the viewer.
- * @summary Create a viewer connection
+ * - `SESSION_ACCESS_DENIED` when the caller may not join the session;
+ * - `OFFER_INVALID` when the offer is not an SDP offer that names a SHA-256 DTLS fingerprint;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
+ *   time, such as while it restarts; try again after the error's `retry_delay`;
+ * - `PARTICIPANT_LIMIT_REACHED` when the session has as many participants as it admits;
+ * - `PARTICIPANT_REFUSED` when the session refused the participant;
+ * - `ATTEMPT_ABORTED` when the session gave up the PeerConnection; try again with a new
+ *   offer.
+ * @summary Join a session
  */
-export const createViewer = async (
+export const createParticipant = async (
   sessionId: string,
-  createViewerRequest: CreateViewerRequest,
+  createParticipantRequest: CreateParticipantRequest,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<createViewerResponse> => {
+): Promise<createParticipantResponse> => {
   const getHeaders = (
     h?: NonNullable<RequestInit["headers"]>,
   ): Record<string, string | readonly string[]> => {
@@ -2398,109 +2468,111 @@ export const createViewer = async (
     }
     return headers;
   };
-  const res = await (fetchFn ?? fetch)(getCreateViewerUrl(sessionId), {
+  const res = await (fetchFn ?? fetch)(getCreateParticipantUrl(sessionId), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(createViewerRequest),
+    body: JSON.stringify(createParticipantRequest),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createViewerResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createViewerResponse;
+  const data: createParticipantResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createParticipantResponse;
 };
 
-export type listSessionViewersResponse200 = {
-  data: ViewerList;
+export type listSessionParticipantsResponse200 = {
+  data: ParticipantList;
   status: 200;
 };
 
-export type listSessionViewersResponseDefault = {
+export type listSessionParticipantsResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type listSessionViewersResponseSuccess = listSessionViewersResponse200 & {
+export type listSessionParticipantsResponseSuccess = listSessionParticipantsResponse200 & {
   headers: Headers;
 };
-export type listSessionViewersResponseError = listSessionViewersResponseDefault & {
+export type listSessionParticipantsResponseError = listSessionParticipantsResponseDefault & {
   headers: Headers;
 };
 
-export type listSessionViewersResponse =
-  | listSessionViewersResponseSuccess
-  | listSessionViewersResponseError;
+export type listSessionParticipantsResponse =
+  | listSessionParticipantsResponseSuccess
+  | listSessionParticipantsResponseError;
 
-export const getListSessionViewersUrl = (sessionId: string) => {
-  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers`;
+export const getListSessionParticipantsUrl = (sessionId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants`;
 };
 
 /**
- * Returns the viewers connected to the session, in the order they connected.
- * @summary List the viewers of a session
+ * Returns the participants of the session, in the order they joined.
+ * @summary List the participants of a session
  */
-export const listSessionViewers = async (
+export const listSessionParticipants = async (
   sessionId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<listSessionViewersResponse> => {
-  const res = await (fetchFn ?? fetch)(getListSessionViewersUrl(sessionId), {
+): Promise<listSessionParticipantsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListSessionParticipantsUrl(sessionId), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listSessionViewersResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listSessionViewersResponse;
+  const data: listSessionParticipantsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listSessionParticipantsResponse;
 };
 
-export type renewViewerResponse200 = {
-  data: RenewViewerResponse;
+export type renewParticipantResponse200 = {
+  data: RenewParticipantResponse;
   status: 200;
 };
 
-export type renewViewerResponseDefault = {
+export type renewParticipantResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type renewViewerResponseSuccess = renewViewerResponse200 & {
+export type renewParticipantResponseSuccess = renewParticipantResponse200 & {
   headers: Headers;
 };
-export type renewViewerResponseError = renewViewerResponseDefault & {
+export type renewParticipantResponseError = renewParticipantResponseDefault & {
   headers: Headers;
 };
 
-export type renewViewerResponse = renewViewerResponseSuccess | renewViewerResponseError;
+export type renewParticipantResponse =
+  | renewParticipantResponseSuccess
+  | renewParticipantResponseError;
 
-export const getRenewViewerUrl = (sessionId: string, connectionId: number) => {
-  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers/${encodeURIComponent(String(connectionId))}:renew`;
+export const getRenewParticipantUrl = (sessionId: string, connectionId: number) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(connectionId))}:renew`;
 };
 
 /**
- * Extends the viewer connection's lease and returns renewed PeerAuthorizations for the
+ * Extends the participant's lease and returns renewed PeerAuthorizations for the
  * PeerConnections whose current ones the request presents; the session receives them too.
- * A presented authorization that the service did not sign for this viewer connection, or
- * whose attempt has ended, is left out of the answer. When the viewer's authorization nears
+ * A presented authorization that the service did not sign for this participant, or whose
+ * attempt has ended, is left out of the answer. When the participant's authorization nears
  * its end, the answer carries a renewed one, which the session already holds.
  *
- * Only the viewer connection's user may renew it.
+ * Only the participant's user may renew it.
  *
  * Fails with:
- * - `VIEWER_NOT_FOUND` when the viewer connection has ended; create another;
- * - `VIEWER_RIGHTS_CHANGED` when the caller's permissions no longer grant what the viewer
- *   connection holds; it has ended, and another can be created with the current rights.
- * @summary Renew a viewer connection
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended; create another;
+ * - `PARTICIPANT_RIGHTS_CHANGED` when the caller's permissions no longer grant what the
+ *   participant holds; it has ended, and another can be created with the current rights.
+ * @summary Renew a participant
  */
-export const renewViewer = async (
+export const renewParticipant = async (
   sessionId: string,
   connectionId: number,
-  renewViewerRequest: RenewViewerRequest,
+  renewParticipantRequest: RenewParticipantRequest,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<renewViewerResponse> => {
+): Promise<renewParticipantResponse> => {
   const getHeaders = (
     h?: NonNullable<RequestInit["headers"]>,
   ): Record<string, string | readonly string[]> => {
@@ -2520,157 +2592,481 @@ export const renewViewer = async (
     }
     return headers;
   };
-  const res = await (fetchFn ?? fetch)(getRenewViewerUrl(sessionId, connectionId), {
+  const res = await (fetchFn ?? fetch)(getRenewParticipantUrl(sessionId, connectionId), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(renewViewerRequest),
+    body: JSON.stringify(renewParticipantRequest),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: renewViewerResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as renewViewerResponse;
+  const data: renewParticipantResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as renewParticipantResponse;
 };
 
-export type createSignalingTicketResponse201 = {
-  data: SignalingTicket;
+export type prepareParticipantMigrationResponse200 = {
+  data: MigrationStep;
+  status: 200;
+};
+
+export type prepareParticipantMigrationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type prepareParticipantMigrationResponseSuccess = prepareParticipantMigrationResponse200 & {
+  headers: Headers;
+};
+export type prepareParticipantMigrationResponseError =
+  prepareParticipantMigrationResponseDefault & {
+    headers: Headers;
+  };
+
+export type prepareParticipantMigrationResponse =
+  | prepareParticipantMigrationResponseSuccess
+  | prepareParticipantMigrationResponseError;
+
+export const getPrepareParticipantMigrationUrl = (sessionId: string, connectionId: number) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(connectionId))}:prepare-migration`;
+};
+
+/**
+ * Passes the participant's checkpoint for the next epoch to the session and returns the
+ * session's checkpoint for it: the `prepare` and `prepared` steps of `Migration` in
+ * `leaflow/fleet/transport/v1/transport.proto`. Repeating the step returns the same answer.
+ *
+ * Only the participant's user may migrate it.
+ *
+ * Fails with:
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
+ * - `CHECKPOINT_INVALID` when the checkpoint is not a serialized `Checkpoint`;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
+ *   time; try again after the error's `retry_delay`.
+ * @summary Prepare a migration
+ */
+export const prepareParticipantMigration = async (
+  sessionId: string,
+  connectionId: number,
+  migrationStep: MigrationStep,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<prepareParticipantMigrationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getPrepareParticipantMigrationUrl(sessionId, connectionId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(migrationStep),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: prepareParticipantMigrationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as prepareParticipantMigrationResponse;
+};
+
+export type commitParticipantMigrationResponse200 = {
+  data: MigrationStep;
+  status: 200;
+};
+
+export type commitParticipantMigrationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type commitParticipantMigrationResponseSuccess = commitParticipantMigrationResponse200 & {
+  headers: Headers;
+};
+export type commitParticipantMigrationResponseError = commitParticipantMigrationResponseDefault & {
+  headers: Headers;
+};
+
+export type commitParticipantMigrationResponse =
+  | commitParticipantMigrationResponseSuccess
+  | commitParticipantMigrationResponseError;
+
+export const getCommitParticipantMigrationUrl = (sessionId: string, connectionId: number) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(connectionId))}:commit-migration`;
+};
+
+/**
+ * Commits the epoch the participant prepared and returns the session's checkpoint once it
+ * committed it: the `commit` and `committed` steps of `Migration` in
+ * `leaflow/fleet/transport/v1/transport.proto`. Repeating the step returns the same answer.
+ *
+ * Only the participant's user may migrate it.
+ *
+ * Fails with:
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
+ * - `CHECKPOINT_INVALID` when the checkpoint is not a serialized `Checkpoint`;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
+ *   time; try again after the error's `retry_delay`.
+ * @summary Commit a migration
+ */
+export const commitParticipantMigration = async (
+  sessionId: string,
+  connectionId: number,
+  migrationStep: MigrationStep,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<commitParticipantMigrationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCommitParticipantMigrationUrl(sessionId, connectionId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(migrationStep),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: commitParticipantMigrationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as commitParticipantMigrationResponse;
+};
+
+export type createAttemptResponse201 = {
+  data: Attempt;
   status: 201;
 };
 
-export type createSignalingTicketResponseDefault = {
+export type createAttemptResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
-export type createSignalingTicketResponseSuccess = createSignalingTicketResponse201 & {
+export type createAttemptResponseSuccess = createAttemptResponse201 & {
   headers: Headers;
 };
-export type createSignalingTicketResponseError = createSignalingTicketResponseDefault & {
+export type createAttemptResponseError = createAttemptResponseDefault & {
   headers: Headers;
 };
 
-export type createSignalingTicketResponse =
-  | createSignalingTicketResponseSuccess
-  | createSignalingTicketResponseError;
+export type createAttemptResponse = createAttemptResponseSuccess | createAttemptResponseError;
 
-export const getCreateSignalingTicketUrl = (sessionId: string, connectionId: number) => {
-  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers/${encodeURIComponent(String(connectionId))}/signaling-tickets`;
+export const getCreateAttemptUrl = (sessionId: string, connectionId: number) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(connectionId))}/attempts`;
 };
 
 /**
- * Issues a single-use ticket for one signaling WebSocket of the viewer connection, valid for
- * 60 seconds. Only the viewer connection's user may ask for one.
+ * Starts another PeerConnection of the participant with the offer, such as after a path
+ * failed, and returns the session's answer, its ICE candidates and the signed
+ * PeerAuthorization. Move the connection to it with `prepare-participant-migration` and
+ * `commit-participant-migration`.
  *
- * Fails with `VIEWER_NOT_FOUND` when the viewer connection has ended.
- * @summary Create a signaling ticket
+ * Only the participant's user may start one.
+ *
+ * Fails with:
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
+ * - `OFFER_INVALID` when the offer is not an SDP offer that names a SHA-256 DTLS fingerprint;
+ * - `TOO_MANY_ATTEMPTS` when the participant started too many PeerConnections in the last
+ *   minute; try again after the error's `retry_delay`;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
+ *   time; try again after the error's `retry_delay`;
+ * - `ATTEMPT_ABORTED` when the session gave up the PeerConnection; start another.
+ * @summary Start a PeerConnection
  */
-export const createSignalingTicket = async (
+export const createAttempt = async (
   sessionId: string,
   connectionId: number,
+  createAttemptRequest: CreateAttemptRequest,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<createSignalingTicketResponse> => {
-  const res = await (fetchFn ?? fetch)(getCreateSignalingTicketUrl(sessionId, connectionId), {
+): Promise<createAttemptResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateAttemptUrl(sessionId, connectionId), {
     ...options,
     method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createAttemptRequest),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createSignalingTicketResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as createSignalingTicketResponse;
+  const data: createAttemptResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createAttemptResponse;
 };
 
-export type getViewerResponse200 = {
-  data: ViewerResource;
-  status: 200;
-};
-
-export type getViewerResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type getViewerResponseSuccess = getViewerResponse200 & {
-  headers: Headers;
-};
-export type getViewerResponseError = getViewerResponseDefault & {
-  headers: Headers;
-};
-
-export type getViewerResponse = getViewerResponseSuccess | getViewerResponseError;
-
-export const getGetViewerUrl = (sessionId: string, connectionId: number) => {
-  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers/${encodeURIComponent(String(connectionId))}`;
-};
-
-/**
- * Returns a viewer connected to the session.
- * @summary Get a viewer of a session
- */
-export const getViewer = async (
-  sessionId: string,
-  connectionId: number,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<getViewerResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetViewerUrl(sessionId, connectionId), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getViewerResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as getViewerResponse;
-};
-
-export type deleteViewerResponse204 = {
+export type deleteAttemptResponse204 = {
   data: void;
   status: 204;
 };
 
-export type deleteViewerResponseDefault = {
+export type deleteAttemptResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
-export type deleteViewerResponseSuccess = deleteViewerResponse204 & {
+export type deleteAttemptResponseSuccess = deleteAttemptResponse204 & {
   headers: Headers;
 };
-export type deleteViewerResponseError = deleteViewerResponseDefault & {
+export type deleteAttemptResponseError = deleteAttemptResponseDefault & {
   headers: Headers;
 };
 
-export type deleteViewerResponse = deleteViewerResponseSuccess | deleteViewerResponseError;
+export type deleteAttemptResponse = deleteAttemptResponseSuccess | deleteAttemptResponseError;
 
-export const getDeleteViewerUrl = (sessionId: string, connectionId: number) => {
-  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers/${encodeURIComponent(String(connectionId))}`;
+export const getDeleteAttemptUrl = (sessionId: string, connectionId: number, attemptId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(connectionId))}/attempts/${encodeURIComponent(String(attemptId))}`;
 };
 
 /**
- * Ends the viewer connection: the session detaches the viewer and closes its
- * PeerConnections, and the session goes on. A viewer leaves this way; others are
- * disconnected this way.
+ * Tells the session to give up the attempt and close its PeerConnection. Abandoning an
+ * attempt that has ended succeeds.
  *
- * The viewer connection's user and the owner of the session may end it; otherwise this
- * requires `fleet:sessions.manage`.
- * @summary End a viewer connection
+ * Only the participant's user may abandon it.
+ *
+ * Fails with `PARTICIPANT_NOT_FOUND` when the participant has ended.
+ * @summary Abandon a PeerConnection
  */
-export const deleteViewer = async (
+export const deleteAttempt = async (
   sessionId: string,
   connectionId: number,
+  attemptId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<deleteViewerResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteViewerUrl(sessionId, connectionId), {
+): Promise<deleteAttemptResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteAttemptUrl(sessionId, connectionId, attemptId), {
     ...options,
     method: "DELETE",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: deleteViewerResponse["data"] = body ? JSON.parse(body) : undefined;
-  return { data, status: res.status, headers: res.headers } as deleteViewerResponse;
+  const data: deleteAttemptResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteAttemptResponse;
+};
+
+export type createAttemptCandidatesResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type createAttemptCandidatesResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type createAttemptCandidatesResponseSuccess = createAttemptCandidatesResponse204 & {
+  headers: Headers;
+};
+export type createAttemptCandidatesResponseError = createAttemptCandidatesResponseDefault & {
+  headers: Headers;
+};
+
+export type createAttemptCandidatesResponse =
+  | createAttemptCandidatesResponseSuccess
+  | createAttemptCandidatesResponseError;
+
+export const getCreateAttemptCandidatesUrl = (
+  sessionId: string,
+  connectionId: number,
+  attemptId: string,
+) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(connectionId))}/attempts/${encodeURIComponent(String(attemptId))}/candidates`;
+};
+
+/**
+ * Passes the ICE candidates the participant gathered after its offer to the session, and with
+ * `end_of_candidates`, that it has gathered all (RFC 8838). The session ignores those of an
+ * attempt that has ended.
+ *
+ * Only the participant's user may add them.
+ *
+ * Fails with:
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected; try again after the
+ *   error's `retry_delay`.
+ * @summary Add ICE candidates to a PeerConnection
+ */
+export const createAttemptCandidates = async (
+  sessionId: string,
+  connectionId: number,
+  attemptId: string,
+  createAttemptCandidatesRequest: CreateAttemptCandidatesRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createAttemptCandidatesResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getCreateAttemptCandidatesUrl(sessionId, connectionId, attemptId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+      body: JSON.stringify(createAttemptCandidatesRequest),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createAttemptCandidatesResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as createAttemptCandidatesResponse;
+};
+
+export type getParticipantResponse200 = {
+  data: ParticipantResource;
+  status: 200;
+};
+
+export type getParticipantResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getParticipantResponseSuccess = getParticipantResponse200 & {
+  headers: Headers;
+};
+export type getParticipantResponseError = getParticipantResponseDefault & {
+  headers: Headers;
+};
+
+export type getParticipantResponse = getParticipantResponseSuccess | getParticipantResponseError;
+
+export const getGetParticipantUrl = (sessionId: string, connectionId: number) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(connectionId))}`;
+};
+
+/**
+ * Returns a participant of the session.
+ * @summary Get a participant of a session
+ */
+export const getParticipant = async (
+  sessionId: string,
+  connectionId: number,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getParticipantResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetParticipantUrl(sessionId, connectionId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getParticipantResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getParticipantResponse;
+};
+
+export type deleteParticipantResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteParticipantResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type deleteParticipantResponseSuccess = deleteParticipantResponse204 & {
+  headers: Headers;
+};
+export type deleteParticipantResponseError = deleteParticipantResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteParticipantResponse =
+  | deleteParticipantResponseSuccess
+  | deleteParticipantResponseError;
+
+export const getDeleteParticipantUrl = (sessionId: string, connectionId: number) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(connectionId))}`;
+};
+
+/**
+ * Ends the participant: the session detaches it and closes its PeerConnections, and the
+ * session goes on. A participant leaves this way; others are disconnected this way.
+ *
+ * The participant's user and the owner of the session may end it; otherwise this
+ * requires `fleet:sessions.manage`.
+ * @summary End a participant
+ */
+export const deleteParticipant = async (
+  sessionId: string,
+  connectionId: number,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteParticipantResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteParticipantUrl(sessionId, connectionId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteParticipantResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteParticipantResponse;
 };

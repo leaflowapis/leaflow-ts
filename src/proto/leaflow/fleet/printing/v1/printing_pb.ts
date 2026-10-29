@@ -15,7 +15,7 @@ export const file_leaflow_fleet_printing_v1_printing: GenFile = /*@__PURE__*/
   fileDesc("CihsZWFmbG93L2ZsZWV0L3ByaW50aW5nL3YxL3ByaW50aW5nLnByb3RvEhlsZWFmbG93LmZsZWV0LnByaW50aW5nLnYxIq4CCg1DbGllbnRNZXNzYWdlEj4KDHByaW50ZXJfbGlzdBgBIAEoCzImLmxlYWZsb3cuZmxlZXQucHJpbnRpbmcudjEuUHJpbnRlckxpc3RIABJQChNqb2JfY3JlYXRlX3Jlc3BvbnNlGAIgASgLMjEubGVhZmxvdy5mbGVldC5wcmludGluZy52MS5QcmludEpvYkNyZWF0ZVJlc3BvbnNlSAASPwoKam9iX3N0YXR1cxgDIAEoCzIpLmxlYWZsb3cuZmxlZXQucHJpbnRpbmcudjEuUHJpbnRKb2JTdGF0dXNIABI/Cgpqb2JfY2FuY2VsGAQgASgLMikubGVhZmxvdy5mbGVldC5wcmludGluZy52MS5QcmludEpvYkNhbmNlbEgAQgkKB21lc3NhZ2UirgIKDVNlcnZlck1lc3NhZ2USTwoVcHJpbnRlcl9saXN0X3Jlc3BvbnNlGAEgASgLMi4ubGVhZmxvdy5mbGVldC5wcmludGluZy52MS5QcmludGVyTGlzdFJlc3BvbnNlSAASPwoKam9iX2NyZWF0ZRgCIAEoCzIpLmxlYWZsb3cuZmxlZXQucHJpbnRpbmcudjEuUHJpbnRKb2JDcmVhdGVIABI/Cgpqb2Jfc3VibWl0GAMgASgLMikubGVhZmxvdy5mbGVldC5wcmludGluZy52MS5QcmludEpvYlN1Ym1pdEgAEj8KCmpvYl9jYW5jZWwYBCABKAsyKS5sZWFmbG93LmZsZWV0LnByaW50aW5nLnYxLlByaW50Sm9iQ2FuY2VsSABCCQoHbWVzc2FnZSJDCgtQcmludGVyTGlzdBI0CghwcmludGVycxgBIAMoCzIiLmxlYWZsb3cuZmxlZXQucHJpbnRpbmcudjEuUHJpbnRlciI4ChNQcmludGVyTGlzdFJlc3BvbnNlEiEKBWVycm9yGAEgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXMi7QIKB1ByaW50ZXISEgoKcHJpbnRlcl9pZBgBIAEoCRIMCgRuYW1lGAIgASgJEjYKBXN0YXRlGAMgASgOMicubGVhZmxvdy5mbGVldC5wcmludGluZy52MS5QcmludGVyU3RhdGUSFgoOYWNjZXB0aW5nX2pvYnMYBCABKAgSNAoFbWVkaWEYBSADKAsyJS5sZWFmbG93LmZsZWV0LnByaW50aW5nLnYxLlByaW50TWVkaWESLwoFc2lkZXMYBiADKA4yIC5sZWFmbG93LmZsZWV0LnByaW50aW5nLnYxLlNpZGVzEj8KC3Jlc29sdXRpb25zGAcgAygLMioubGVhZmxvdy5mbGVldC5wcmludGluZy52MS5QcmludFJlc29sdXRpb24SFwoPY29sb3Jfc3VwcG9ydGVkGAggASgIEhIKCm1heF9jb3BpZXMYCSABKA0SGwoTZG9jdW1lbnRfbWltZV90eXBlcxgKIAMoCSI9CgpQcmludE1lZGlhEhAKCG1lZGlhX2lkGAEgASgJEg0KBXdpZHRoGAIgASgNEg4KBmhlaWdodBgDIAEoDSIvCg9QcmludFJlc29sdXRpb24SDQoFeF9kcGkYASABKA0SDQoFeV9kcGkYAiABKA0isAEKDFByaW50T3B0aW9ucxIQCghtZWRpYV9pZBgBIAEoCRIvCgVzaWRlcxgCIAEoDjIgLmxlYWZsb3cuZmxlZXQucHJpbnRpbmcudjEuU2lkZXMSDQoFY29sb3IYAyABKAgSDgoGY29waWVzGAQgASgNEj4KCnJlc29sdXRpb24YBSABKAsyKi5sZWFmbG93LmZsZWV0LnByaW50aW5nLnYxLlByaW50UmVzb2x1dGlvbiK1AQoOUHJpbnRKb2JDcmVhdGUSDgoGam9iX2lkGAEgASgJEhIKCnByaW50ZXJfaWQYAiABKAkSDAoEbmFtZRgDIAEoCRIbChNkb2N1bWVudF9zaXplX2J5dGVzGAQgASgEEhoKEmRvY3VtZW50X21pbWVfdHlwZRgFIAEoCRI4CgdvcHRpb25zGAYgASgLMicubGVhZmxvdy5mbGVldC5wcmludGluZy52MS5QcmludE9wdGlvbnMiSwoWUHJpbnRKb2JDcmVhdGVSZXNwb25zZRIOCgZqb2JfaWQYASABKAkSIQoFZXJyb3IYAiABKAsyEi5nb29nbGUucnBjLlN0YXR1cyIgCg5QcmludEpvYlN1Ym1pdBIOCgZqb2JfaWQYASABKAkiIAoOUHJpbnRKb2JDYW5jZWwSDgoGam9iX2lkGAEgASgJIrUBCg5QcmludEpvYlN0YXR1cxIOCgZqb2JfaWQYASABKAkSNwoFcGhhc2UYAiABKA4yKC5sZWFmbG93LmZsZWV0LnByaW50aW5nLnYxLlByaW50Sm9iUGhhc2USNwoFc3RhdGUYAyABKA4yKC5sZWFmbG93LmZsZWV0LnByaW50aW5nLnYxLlByaW50Sm9iU3RhdGUSIQoFZXJyb3IYBCABKAsyEi5nb29nbGUucnBjLlN0YXR1cyImChRQcmludERvY3VtZW50UmVxdWVzdBIOCgZqb2JfaWQYASABKAkiiAEKDVByaW50RG9jdW1lbnQSDgoEZGF0YRgBIAEoDEgAEjoKA2VuZBgCIAEoCzIrLmxlYWZsb3cuZmxlZXQucHJpbnRpbmcudjEuUHJpbnREb2N1bWVudEVuZEgAEiMKBWVycm9yGAMgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIAEIGCgRwYXJ0IiIKEFByaW50RG9jdW1lbnRFbmQSDgoGc2hhMjU2GAEgASgMIlkKDlByaW50aW5nUG9saWN5Eh8KF21heF9kb2N1bWVudF9zaXplX2J5dGVzGAEgASgEEhAKCG1heF9qb2JzGAIgASgNEhQKDG1heF9wcmludGVycxgDIAEoDSp+CgxQcmludGVyU3RhdGUSHQoZUFJJTlRFUl9TVEFURV9VTlNQRUNJRklFRBAAEhYKElBSSU5URVJfU1RBVEVfSURMRRADEhwKGFBSSU5URVJfU1RBVEVfUFJPQ0VTU0lORxAEEhkKFVBSSU5URVJfU1RBVEVfU1RPUFBFRBAFKnIKBVNpZGVzEhUKEVNJREVTX1VOU1BFQ0lGSUVEEAASEwoPU0lERVNfT05FX1NJREVEEAESHQoZU0lERVNfVFdPX1NJREVEX0xPTkdfRURHRRACEh4KGlNJREVTX1RXT19TSURFRF9TSE9SVF9FREdFEAMqqQEKDVByaW50Sm9iUGhhc2USHwobUFJJTlRfSk9CX1BIQVNFX1VOU1BFQ0lGSUVEEAASHQoZUFJJTlRfSk9CX1BIQVNFX1JFQ0VJVklORxABEhwKGFBSSU5UX0pPQl9QSEFTRV9WRVJJRklFRBACEh0KGVBSSU5UX0pPQl9QSEFTRV9TVUJNSVRURUQQAxIbChdQUklOVF9KT0JfUEhBU0VfVU5LTk9XThAEKpECCg1QcmludEpvYlN0YXRlEh8KG1BSSU5UX0pPQl9TVEFURV9VTlNQRUNJRklFRBAAEhsKF1BSSU5UX0pPQl9TVEFURV9QRU5ESU5HEAMSIAocUFJJTlRfSk9CX1NUQVRFX1BFTkRJTkdfSEVMRBAEEh4KGlBSSU5UX0pPQl9TVEFURV9QUk9DRVNTSU5HEAUSJgoiUFJJTlRfSk9CX1NUQVRFX1BST0NFU1NJTkdfU1RPUFBFRBAGEhwKGFBSSU5UX0pPQl9TVEFURV9DQU5DRUxFRBAHEhsKF1BSSU5UX0pPQl9TVEFURV9BQk9SVEVEEAgSHQoZUFJJTlRfSk9CX1NUQVRFX0NPTVBMRVRFRBAJQkBaPmdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9wcmludGluZy92MTtwcmludGluZ3YxYgZwcm90bzM", [file_google_rpc_status]);
 
 /**
- * A message from the viewer on the printing channel.
+ * A message from the participant on the printing channel.
  *
  * @generated from message leaflow.fleet.printing.v1.ClientMessage
  */
@@ -27,7 +27,7 @@ export type ClientMessage = Message<"leaflow.fleet.printing.v1.ClientMessage"> &
    */
   message: {
     /**
-     * The printers the viewer shares now, in full.
+     * The printers the participant shares now, in full.
      *
      * @generated from field: leaflow.fleet.printing.v1.PrinterList printer_list = 1;
      */
@@ -35,7 +35,7 @@ export type ClientMessage = Message<"leaflow.fleet.printing.v1.ClientMessage"> &
     case: "printerList";
   } | {
     /**
-     * The viewer accepts or refuses a job.
+     * The participant accepts or refuses a job.
      *
      * @generated from field: leaflow.fleet.printing.v1.PrintJobCreateResponse job_create_response = 2;
      */
@@ -51,7 +51,7 @@ export type ClientMessage = Message<"leaflow.fleet.printing.v1.ClientMessage"> &
     case: "jobStatus";
   } | {
     /**
-     * The viewer cancelled a job, such as at its person's request.
+     * The participant cancelled a job, such as at its person's request.
      *
      * @generated from field: leaflow.fleet.printing.v1.PrintJobCancel job_cancel = 4;
      */
@@ -96,7 +96,7 @@ export type ServerMessage = Message<"leaflow.fleet.printing.v1.ServerMessage"> &
     case: "jobCreate";
   } | {
     /**
-     * The viewer may submit a job it stored.
+     * The participant may submit a job it stored.
      *
      * @generated from field: leaflow.fleet.printing.v1.PrintJobSubmit job_submit = 3;
      */
@@ -121,7 +121,7 @@ export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_printing_v1_printing, 1);
 
 /**
- * The printers the viewer shares, replacing the previous list.
+ * The printers the participant shares, replacing the previous list.
  *
  * @generated from message leaflow.fleet.printing.v1.PrinterList
  */
@@ -164,13 +164,13 @@ export const PrinterListResponseSchema: GenMessage<PrinterListResponse> = /*@__P
   messageDesc(file_leaflow_fleet_printing_v1_printing, 3);
 
 /**
- * A printer of the viewer.
+ * A printer of the participant.
  *
  * @generated from message leaflow.fleet.printing.v1.Printer
  */
 export type Printer = Message<"leaflow.fleet.printing.v1.Printer"> & {
   /**
-   * Chosen by the viewer, never reused on the connection.
+   * Chosen by the participant, never reused on the connection.
    *
    * @generated from field: string printer_id = 1;
    */
@@ -417,7 +417,7 @@ export const PrintJobCreateSchema: GenMessage<PrintJobCreate> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_printing_v1_printing, 8);
 
 /**
- * The viewer accepts or refuses a job.
+ * The participant accepts or refuses a job.
  *
  * @generated from message leaflow.fleet.printing.v1.PrintJobCreateResponse
  */
@@ -430,7 +430,7 @@ export type PrintJobCreateResponse = Message<"leaflow.fleet.printing.v1.PrintJob
   jobId: string;
 
   /**
-   * Why the viewer refused it, such as an unknown printer, unsupported
+   * Why the participant refused it, such as an unknown printer, unsupported
    * options or too many jobs. Unset when it accepted it.
    *
    * @generated from field: google.rpc.Status error = 2;
@@ -446,7 +446,7 @@ export const PrintJobCreateResponseSchema: GenMessage<PrintJobCreateResponse> = 
   messageDesc(file_leaflow_fleet_printing_v1_printing, 9);
 
 /**
- * The viewer may submit a job it stored.
+ * The participant may submit a job it stored.
  *
  * @generated from message leaflow.fleet.printing.v1.PrintJobSubmit
  */
@@ -501,14 +501,14 @@ export type PrintJobStatus = Message<"leaflow.fleet.printing.v1.PrintJobStatus">
   jobId: string;
 
   /**
-   * How far the viewer got with it.
+   * How far the participant got with it.
    *
    * @generated from field: leaflow.fleet.printing.v1.PrintJobPhase phase = 2;
    */
   phase: PrintJobPhase;
 
   /**
-   * Its state in the viewer's print queue, once submitted.
+   * Its state in the participant's print queue, once submitted.
    *
    * @generated from field: leaflow.fleet.printing.v1.PrintJobState state = 3;
    */
@@ -597,7 +597,7 @@ export const PrintDocumentSchema: GenMessage<PrintDocument> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_printing_v1_printing, 14);
 
 /**
- * The end of a document. The viewer checks the size and the digest before
+ * The end of a document. The participant checks the size and the digest before
  * storing it.
  *
  * @generated from message leaflow.fleet.printing.v1.PrintDocumentEnd
@@ -619,9 +619,9 @@ export const PrintDocumentEndSchema: GenMessage<PrintDocumentEnd> = /*@__PURE__*
   messageDesc(file_leaflow_fleet_printing_v1_printing, 15);
 
 /**
- * What a viewer may print. Carried in the viewer's signed authorization;
- * without it the viewer shares no printers. It shares nothing else, such as
- * files or devices.
+ * What a participant may print. Carried in the participant's signed
+ * authorization; without it the participant shares no printers. It shares
+ * nothing else, such as files or devices.
  *
  * @generated from message leaflow.fleet.printing.v1.PrintingPolicy
  */
@@ -734,7 +734,7 @@ export const SidesSchema: GenEnum<Sides> = /*@__PURE__*/
   enumDesc(file_leaflow_fleet_printing_v1_printing, 1);
 
 /**
- * How far the viewer got with a job.
+ * How far the participant got with a job.
  *
  * @generated from enum leaflow.fleet.printing.v1.PrintJobPhase
  */
@@ -759,7 +759,7 @@ export enum PrintJobPhase {
   VERIFIED = 2,
 
   /**
-   * The job is in the viewer's print queue.
+   * The job is in the participant's print queue.
    *
    * @generated from enum value: PRINT_JOB_PHASE_SUBMITTED = 3;
    */
@@ -833,7 +833,7 @@ export enum PrintJobState {
   ABORTED = 8,
 
   /**
-   * Printed, as the viewer's print queue reports ("completed").
+   * Printed, as the participant's print queue reports ("completed").
    *
    * @generated from enum value: PRINT_JOB_STATE_COMPLETED = 9;
    */

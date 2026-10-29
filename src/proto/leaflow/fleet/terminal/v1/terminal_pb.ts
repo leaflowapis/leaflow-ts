@@ -14,10 +14,10 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/terminal/v1/terminal.proto.
  */
 export const file_leaflow_fleet_terminal_v1_terminal: GenFile = /*@__PURE__*/
-  fileDesc("CihsZWFmbG93L2ZsZWV0L3Rlcm1pbmFsL3YxL3Rlcm1pbmFsLnByb3RvEhlsZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxIoYCCg1DbGllbnRNZXNzYWdlEjcKBG9wZW4YASABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsT3BlbkgAEjsKBmF0dGFjaBgCIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hIABI5CgVpbnB1dBgDIAEoCzIoLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxJbnB1dEgAEjkKBnJlc2l6ZRgEIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplSABCCQoHbWVzc2FnZSKxAgoNU2VydmVyTWVzc2FnZRI/CghhdHRhY2hlZBgBIAEoCzIrLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hlZEgAEjsKBm91dHB1dBgCIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxPdXRwdXRIABI5CgZyZXNpemUYAyABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsU2l6ZUgAEjcKBGV4aXQYBCABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsRXhpdEgAEiMKBWVycm9yGAUgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIAEIJCgdtZXNzYWdlImIKDFRlcm1pbmFsT3BlbhIMCgR0ZXJtGAEgASgJEjUKBHNpemUYAiABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsU2l6ZRINCgVtb2RlcxgDIAEoDCI1Cg5UZXJtaW5hbEF0dGFjaBITCgt0ZXJtaW5hbF9pZBgBIAEoBBIOCgZvZmZzZXQYAiABKAQifQoQVGVybWluYWxBdHRhY2hlZBITCgt0ZXJtaW5hbF9pZBgBIAEoBBIOCgZvZmZzZXQYAiABKAQSDQoFcmVzZXQYAyABKAgSNQoEc2l6ZRgEIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplIh0KDVRlcm1pbmFsSW5wdXQSDAoEZGF0YRgBIAEoDCIeCg5UZXJtaW5hbE91dHB1dBIMCgRkYXRhGAEgASgMIlIKDFRlcm1pbmFsU2l6ZRIPCgdjb2x1bW5zGAEgASgNEgwKBHJvd3MYAiABKA0SEAoId2lkdGhfcHgYAyABKA0SEQoJaGVpZ2h0X3B4GAQgASgNIlkKDFRlcm1pbmFsRXhpdBITCglleGl0X2NvZGUYASABKA1IABIVCgtzaWduYWxfbmFtZRgCIAEoCUgAEhMKC2NvcmVfZHVtcGVkGAMgASgIQggKBnN0YXR1cyLjAQoIVGVybWluYWwSEwoLdGVybWluYWxfaWQYASABKAQSNQoEc2l6ZRgCIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplEi4KCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhQKDHZpZXdlcl9jb3VudBgEIAEoDRIOCgZvZmZzZXQYBSABKAQSNQoEZXhpdBgGIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxFeGl0IhYKFExpc3RUZXJtaW5hbHNSZXF1ZXN0Ik8KFUxpc3RUZXJtaW5hbHNSZXNwb25zZRI2Cgl0ZXJtaW5hbHMYASADKAsyIy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsIisKFENsb3NlVGVybWluYWxSZXF1ZXN0EhMKC3Rlcm1pbmFsX2lkGAEgASgEIhcKFUNsb3NlVGVybWluYWxSZXNwb25zZSIQCg5UZXJtaW5hbFBvbGljeTL+AQoPVGVybWluYWxTZXJ2aWNlEncKDUxpc3RUZXJtaW5hbHMSLy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLkxpc3RUZXJtaW5hbHNSZXF1ZXN0GjAubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5MaXN0VGVybWluYWxzUmVzcG9uc2UiA5ACARJyCg1DbG9zZVRlcm1pbmFsEi8ubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5DbG9zZVRlcm1pbmFsUmVxdWVzdBowLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuQ2xvc2VUZXJtaW5hbFJlc3BvbnNlQkBaPmdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC90ZXJtaW5hbC92MTt0ZXJtaW5hbHYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_google_rpc_status]);
+  fileDesc("CihsZWFmbG93L2ZsZWV0L3Rlcm1pbmFsL3YxL3Rlcm1pbmFsLnByb3RvEhlsZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxIoYCCg1DbGllbnRNZXNzYWdlEjcKBG9wZW4YASABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsT3BlbkgAEjsKBmF0dGFjaBgCIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hIABI5CgVpbnB1dBgDIAEoCzIoLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxJbnB1dEgAEjkKBnJlc2l6ZRgEIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplSABCCQoHbWVzc2FnZSKxAgoNU2VydmVyTWVzc2FnZRI/CghhdHRhY2hlZBgBIAEoCzIrLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hlZEgAEjsKBm91dHB1dBgCIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxPdXRwdXRIABI5CgZyZXNpemUYAyABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsU2l6ZUgAEjcKBGV4aXQYBCABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsRXhpdEgAEiMKBWVycm9yGAUgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIAEIJCgdtZXNzYWdlImIKDFRlcm1pbmFsT3BlbhIMCgR0ZXJtGAEgASgJEjUKBHNpemUYAiABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsU2l6ZRINCgVtb2RlcxgDIAEoDCI1Cg5UZXJtaW5hbEF0dGFjaBITCgt0ZXJtaW5hbF9pZBgBIAEoBBIOCgZvZmZzZXQYAiABKAQifQoQVGVybWluYWxBdHRhY2hlZBITCgt0ZXJtaW5hbF9pZBgBIAEoBBIOCgZvZmZzZXQYAiABKAQSDQoFcmVzZXQYAyABKAgSNQoEc2l6ZRgEIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplIh0KDVRlcm1pbmFsSW5wdXQSDAoEZGF0YRgBIAEoDCIeCg5UZXJtaW5hbE91dHB1dBIMCgRkYXRhGAEgASgMIlIKDFRlcm1pbmFsU2l6ZRIPCgdjb2x1bW5zGAEgASgNEgwKBHJvd3MYAiABKA0SEAoId2lkdGhfcHgYAyABKA0SEQoJaGVpZ2h0X3B4GAQgASgNIlkKDFRlcm1pbmFsRXhpdBITCglleGl0X2NvZGUYASABKA1IABIVCgtzaWduYWxfbmFtZRgCIAEoCUgAEhMKC2NvcmVfZHVtcGVkGAMgASgIQggKBnN0YXR1cyLoAQoIVGVybWluYWwSEwoLdGVybWluYWxfaWQYASABKAQSNQoEc2l6ZRgCIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplEi4KCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhkKEXBhcnRpY2lwYW50X2NvdW50GAQgASgNEg4KBm9mZnNldBgFIAEoBBI1CgRleGl0GAYgASgLMicubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5UZXJtaW5hbEV4aXQiFgoUTGlzdFRlcm1pbmFsc1JlcXVlc3QiTwoVTGlzdFRlcm1pbmFsc1Jlc3BvbnNlEjYKCXRlcm1pbmFscxgBIAMoCzIjLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWwiKwoUQ2xvc2VUZXJtaW5hbFJlcXVlc3QSEwoLdGVybWluYWxfaWQYASABKAQiFwoVQ2xvc2VUZXJtaW5hbFJlc3BvbnNlIhAKDlRlcm1pbmFsUG9saWN5Mv4BCg9UZXJtaW5hbFNlcnZpY2USdwoNTGlzdFRlcm1pbmFscxIvLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuTGlzdFRlcm1pbmFsc1JlcXVlc3QaMC5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLkxpc3RUZXJtaW5hbHNSZXNwb25zZSIDkAIBEnIKDUNsb3NlVGVybWluYWwSLy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLkNsb3NlVGVybWluYWxSZXF1ZXN0GjAubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5DbG9zZVRlcm1pbmFsUmVzcG9uc2VCQFo+Z2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3Rlcm1pbmFsL3YxO3Rlcm1pbmFsdjFiBnByb3RvMw", [file_google_protobuf_timestamp, file_google_rpc_status]);
 
 /**
- * A message from the viewer on the terminal channel.
+ * A message from the participant on the terminal channel.
  *
  * @generated from message leaflow.fleet.terminal.v1.ClientMessage
  */
@@ -53,8 +53,8 @@ export type ClientMessage = Message<"leaflow.fleet.terminal.v1.ClientMessage"> &
     case: "input";
   } | {
     /**
-     * The viewer's terminal changed size. The latest size of any viewer
-     * applies, and the shell gets SIGWINCH.
+     * The participant's terminal changed size. The latest size of any
+     * participant applies, and the shell gets SIGWINCH.
      *
      * @generated from field: leaflow.fleet.terminal.v1.TerminalSize resize = 4;
      */
@@ -99,7 +99,7 @@ export type ServerMessage = Message<"leaflow.fleet.terminal.v1.ServerMessage"> &
     case: "output";
   } | {
     /**
-     * Another viewer changed the size.
+     * Another participant changed the size.
      *
      * @generated from field: leaflow.fleet.terminal.v1.TerminalSize resize = 3;
      */
@@ -185,7 +185,7 @@ export type TerminalAttach = Message<"leaflow.fleet.terminal.v1.TerminalAttach">
   terminalId: bigint;
 
   /**
-   * The output offset the viewer has applied up to. 0: nothing yet.
+   * The output offset the participant has applied up to. 0: nothing yet.
    *
    * @generated from field: uint64 offset = 2;
    */
@@ -222,7 +222,7 @@ export type TerminalAttached = Message<"leaflow.fleet.terminal.v1.TerminalAttach
   offset: bigint;
 
   /**
-   * The requested offset is no longer kept. The viewer resets its terminal
+   * The requested offset is no longer kept. The participant resets its terminal
    * (ECMA-48 RIS) before applying what follows, and the session makes the
    * program redraw by changing the size and back (SIGWINCH).
    *
@@ -402,11 +402,11 @@ export type Terminal = Message<"leaflow.fleet.terminal.v1.Terminal"> & {
   createdAt?: Timestamp | undefined;
 
   /**
-   * The viewers showing it now, across all connections.
+   * The participants showing it now, across all connections.
    *
-   * @generated from field: uint32 viewer_count = 4;
+   * @generated from field: uint32 participant_count = 4;
    */
-  viewerCount: number;
+  participantCount: number;
 
   /**
    * The offset its output has reached.
@@ -503,7 +503,7 @@ export const CloseTerminalResponseSchema: GenMessage<CloseTerminalResponse> = /*
   messageDesc(file_leaflow_fleet_terminal_v1_terminal, 13);
 
 /**
- * Allows a viewer to use terminals. Carried in the viewer's signed
+ * Allows a participant to use terminals. Carried in the participant's signed
  * authorization.
  *
  * @generated from message leaflow.fleet.terminal.v1.TerminalPolicy
@@ -527,7 +527,7 @@ export const TerminalService: GenService<{
   /**
    * Lists the terminals of the session, oldest first: the running ones, and
    * ended ones whose last output the session still keeps for a while so that
-   * a viewer can read it.
+   * a participant can read it.
    *
    * @generated from rpc leaflow.fleet.terminal.v1.TerminalService.ListTerminals
    */

@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/control/v1/control.proto.
  */
 export const file_leaflow_fleet_control_v1_control: GenFile = /*@__PURE__*/
-  fileDesc("CiZsZWFmbG93L2ZsZWV0L2NvbnRyb2wvdjEvY29udHJvbC5wcm90bxIYbGVhZmxvdy5mbGVldC5jb250cm9sLnYxIrMECg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUG9uZ0gAEioKBGNhbGwYBCABKAsyGi5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsSAASNwoLY2FsbF9yZXN1bHQYBSABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsUmVzdWx0SAASNwoLY2FsbF9jYW5jZWwYBiABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsQ2FuY2VsSAASNAoGc2lnbmFsGAcgASgLMiIubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuU2lnbmFsSAASOgoJbWlncmF0aW9uGAggASgLMiUubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuTWlncmF0aW9uSAASMAoFY2xvc2UYCSABKAsyHy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQ2xvc2VIABI2CghmcmFnbWVudBgKIAEoCzIiLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5GcmFnbWVudEgAQgkKB21lc3NhZ2UiqAUKDVNlcnZlck1lc3NhZ2USPQoMc2VydmVyX2hlbGxvGAEgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZlckhlbGxvSAASNAoHd2VsY29tZRgCIAEoCzIhLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5XZWxjb21lSAASLgoEcGluZxgDIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5QaW5nSAASLgoEcG9uZxgEIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5Qb25nSAASKgoEY2FsbBgFIAEoCzIaLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxIABI3CgtjYWxsX3Jlc3VsdBgGIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxSZXN1bHRIABI3CgtjYWxsX2NhbmNlbBgHIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxDYW5jZWxIABI0CgZzaWduYWwYCCABKAsyIi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5TaWduYWxIABI6CgltaWdyYXRpb24YCSABKAsyJS5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5NaWdyYXRpb25IABI9CgxzZXJ2aWNlX2tleXMYCiABKAsyJS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2VydmljZUtleXNIABIwCgVjbG9zZRgLIAEoCzIfLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZUgAEjYKCGZyYWdtZW50GAwgASgLMiIubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkZyYWdtZW50SABCCQoHbWVzc2FnZSL/AQoLU2VydmVySGVsbG8SDgoGaXNzdWVyGAEgASgJEhEKCWNoYWxsZW5nZRgCIAEoDBIwCg1waW5nX2ludGVydmFsGAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi8KDGlkbGVfdGltZW91dBgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIYChBtYXhfbWVzc2FnZV9zaXplGAUgASgNEhwKFG1heF9jb25jdXJyZW50X2NhbGxzGAYgASgNEhsKE21lc3NhZ2VzX3Blcl9zZWNvbmQYByABKA0SFQoNbWVzc2FnZV9idXJzdBgIIAEoDSKzAgoLQ2xpZW50SGVsbG8SPgoHbWFjaGluZRgBIAEoCzIrLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5NYWNoaW5lQ3JlZGVudGlhbEgAEkQKCmVucm9sbG1lbnQYAiABKAsyLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRW5yb2xsbWVudENyZWRlbnRpYWxIABI+CgdzZXNzaW9uGAMgASgLMisubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlc3Npb25DcmVkZW50aWFsSAASPAoGdmlld2VyGAQgASgLMioubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlZpZXdlckNyZWRlbnRpYWxIABISCgp1c2VyX2FnZW50GAUgASgJQgwKCmNyZWRlbnRpYWwiOgoRTWFjaGluZUNyZWRlbnRpYWwSEgoKbWFjaGluZV9pZBgBIAEoCRIRCglzaWduYXR1cmUYAiABKAwiPQoURW5yb2xsbWVudENyZWRlbnRpYWwSEgoKcHVibGljX2tleRgBIAEoDBIRCglzaWduYXR1cmUYAiABKAwiWAoRU2Vzc2lvbkNyZWRlbnRpYWwSEgoKZGVsZWdhdGlvbhgBIAEoDBIcChRkZWxlZ2F0aW9uX3NpZ25hdHVyZRgCIAEoDBIRCglzaWduYXR1cmUYAyABKAwitgEKEVNlc3Npb25EZWxlZ2F0aW9uEhIKCm1hY2hpbmVfaWQYASABKAkSEgoKc2Vzc2lvbl9pZBgCIAEoCRIaChJzZXNzaW9uX3B1YmxpY19rZXkYAyABKAwSLQoJaXNzdWVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCI1ChBWaWV3ZXJDcmVkZW50aWFsEg4KBnRpY2tldBgBIAEoCRIRCglzaWduYXR1cmUYAyABKAwixwEKB1dlbGNvbWUSFQoNY29ubmVjdGlvbl9pZBgBIAEoBBISCgptYWNoaW5lX2lkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSOwoMc2VydmljZV9rZXlzGAQgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZpY2VLZXlzEi8KDHJlc3VtZV9ncmFjZRgFIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIPCgdyZXN1bWVkGAYgASgIIkAKC1NlcnZpY2VLZXlzEjEKBGtleXMYASADKAsyIy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUHVibGljS2V5IjUKCVB1YmxpY0tleRIOCgZrZXlfaWQYASABKAkSEQoHZWQyNTUxORgCIAEoDEgAQgUKA2tleSLNAgoNQXV0aG9yaXphdGlvbhIOCgZpc3N1ZXIYASABKAkSEgoKbWFjaGluZV9pZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEhUKDWNvbm5lY3Rpb25faWQYBCABKAQSDwoHdXNlcl9pZBgFIAEoCRIUCgxkaXNwbGF5X25hbWUYBiABKAkSEQoJY2xpZW50X2lkGAcgASgJEhkKEXZpZXdlcl9wdWJsaWNfa2V5GAkgASgMEhEKCXJlYWRfb25seRgLIAEoCBImCghwb2xpY2llcxgMIAMoCzIULmdvb2dsZS5wcm90b2J1Zi5BbnkSLQoJaXNzdWVkX2F0GA0gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GA4gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJPChNTaWduZWRBdXRob3JpemF0aW9uEg4KBmtleV9pZBgBIAEoCRIVCg1hdXRob3JpemF0aW9uGAIgASgMEhEKCXNpZ25hdHVyZRgDIAEoDCIcCgRQaW5nEhQKDG1vbm90b25pY19tcxgBIAEoBCIcCgRQb25nEhQKDG1vbm90b25pY19tcxgBIAEoBCI7CghGcmFnbWVudBISCgptZXNzYWdlX2lkGAEgASgEEgwKBGRhdGEYAiABKAwSDQoFZmluYWwYAyABKAgihQEKBUNsb3NlEjUKBnJlYXNvbhgBIAEoDjIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZVJlYXNvbhIVCg1yZWFzb25fcGhyYXNlGAIgASgJEi4KC3JldHJ5X2RlbGF5GAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uIlsKE0F0dGFjaFZpZXdlclJlcXVlc3QSRAoNYXV0aG9yaXphdGlvbhgBIAEoCzItLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5TaWduZWRBdXRob3JpemF0aW9uIhYKFEF0dGFjaFZpZXdlclJlc3BvbnNlImgKIFVwZGF0ZVZpZXdlckF1dGhvcml6YXRpb25SZXF1ZXN0EkQKDWF1dGhvcml6YXRpb24YASABKAsyLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmVkQXV0aG9yaXphdGlvbiIjCiFVcGRhdGVWaWV3ZXJBdXRob3JpemF0aW9uUmVzcG9uc2UiYwoTRGV0YWNoVmlld2VyUmVxdWVzdBIVCg1jb25uZWN0aW9uX2lkGAEgASgEEjUKBnJlYXNvbhgCIAEoDjIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZVJlYXNvbiIWChREZXRhY2hWaWV3ZXJSZXNwb25zZSqcBQoLQ2xvc2VSZWFzb24SHAoYQ0xPU0VfUkVBU09OX1VOU1BFQ0lGSUVEEAASFQoRQ0xPU0VfUkVBU09OX0RPTkUQARIcChhDTE9TRV9SRUFTT05fQ0xJRU5UX0VYSVQQAhIgChxDTE9TRV9SRUFTT05fU0VSVkVSX1NIVVRET1dOEAMSHwobQ0xPU0VfUkVBU09OX1NFUlZFUl9VUEdSQURFEAQSHQoZQ0xPU0VfUkVBU09OX1BJTkdfVElNRU9VVBAFEh4KGkNMT1NFX1JFQVNPTl9IRUxMT19USU1FT1VUEAYSHwobQ0xPU0VfUkVBU09OX1BST1RPQ09MX0VSUk9SEAcSIAocQ0xPU0VfUkVBU09OX01FU1NBR0VfVE9PX0JJRxAIEiYKIkNMT1NFX1JFQVNPTl9BVVRIRU5USUNBVElPTl9GQUlMRUQQCRIiCh5DTE9TRV9SRUFTT05fUEVSTUlTU0lPTl9ERU5JRUQQChIiCh5DTE9TRV9SRUFTT05fU0VTU0lPTl9OT1RfRk9VTkQQCxIbChdDTE9TRV9SRUFTT05fTkVXX0NMSUVOVBAMEh0KGUNMT1NFX1JFQVNPTl9TRVNTSU9OX0VYSVQQDRIjCh9DTE9TRV9SRUFTT05fU0VTU0lPTl9SRVNUQVJUSU5HEA4SHwobQ0xPU0VfUkVBU09OX0RFVEFDSF9SRVFVRVNUEA8SIQodQ0xPU0VfUkVBU09OX1BPTElDWV9WSU9MQVRJT04QEBIfChtDTE9TRV9SRUFTT05fSU5URVJOQUxfRVJST1IQERIbChdDTE9TRV9SRUFTT05fT1ZFUkxPQURFRBASEiIKHkNMT1NFX1JFQVNPTl9FTkRQT0lOVF9UT09fU0xPVxATMpMDCg1WaWV3ZXJTZXJ2aWNlEnIKDEF0dGFjaFZpZXdlchItLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5BdHRhY2hWaWV3ZXJSZXF1ZXN0Gi4ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkF0dGFjaFZpZXdlclJlc3BvbnNlIgOQAgISmQEKGVVwZGF0ZVZpZXdlckF1dGhvcml6YXRpb24SOi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuVXBkYXRlVmlld2VyQXV0aG9yaXphdGlvblJlcXVlc3QaOy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuVXBkYXRlVmlld2VyQXV0aG9yaXphdGlvblJlc3BvbnNlIgOQAgIScgoMRGV0YWNoVmlld2VyEi0ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkRldGFjaFZpZXdlclJlcXVlc3QaLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRGV0YWNoVmlld2VyUmVzcG9uc2UiA5ACAkI+WjxnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvY29udHJvbC92MTtjb250cm9sdjFiBnByb3RvMw", [file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_timestamp, file_leaflow_fleet_rpc_v1_rpc, file_leaflow_fleet_transport_v1_transport]);
+  fileDesc("CiZsZWFmbG93L2ZsZWV0L2NvbnRyb2wvdjEvY29udHJvbC5wcm90bxIYbGVhZmxvdy5mbGVldC5jb250cm9sLnYxIrMECg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUG9uZ0gAEioKBGNhbGwYBCABKAsyGi5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsSAASNwoLY2FsbF9yZXN1bHQYBSABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsUmVzdWx0SAASNwoLY2FsbF9jYW5jZWwYBiABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsQ2FuY2VsSAASNAoGc2lnbmFsGAcgASgLMiIubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuU2lnbmFsSAASOgoJbWlncmF0aW9uGAggASgLMiUubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuTWlncmF0aW9uSAASMAoFY2xvc2UYCSABKAsyHy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQ2xvc2VIABI2CghmcmFnbWVudBgKIAEoCzIiLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5GcmFnbWVudEgAQgkKB21lc3NhZ2UiqAUKDVNlcnZlck1lc3NhZ2USPQoMc2VydmVyX2hlbGxvGAEgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZlckhlbGxvSAASNAoHd2VsY29tZRgCIAEoCzIhLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5XZWxjb21lSAASLgoEcGluZxgDIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5QaW5nSAASLgoEcG9uZxgEIAEoCzIeLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5Qb25nSAASKgoEY2FsbBgFIAEoCzIaLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxIABI3CgtjYWxsX3Jlc3VsdBgGIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxSZXN1bHRIABI3CgtjYWxsX2NhbmNlbBgHIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxDYW5jZWxIABI0CgZzaWduYWwYCCABKAsyIi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5TaWduYWxIABI6CgltaWdyYXRpb24YCSABKAsyJS5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5NaWdyYXRpb25IABI9CgxzZXJ2aWNlX2tleXMYCiABKAsyJS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2VydmljZUtleXNIABIwCgVjbG9zZRgLIAEoCzIfLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZUgAEjYKCGZyYWdtZW50GAwgASgLMiIubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkZyYWdtZW50SABCCQoHbWVzc2FnZSL/AQoLU2VydmVySGVsbG8SDgoGaXNzdWVyGAEgASgJEhEKCWNoYWxsZW5nZRgCIAEoDBIwCg1waW5nX2ludGVydmFsGAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi8KDGlkbGVfdGltZW91dBgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIYChBtYXhfbWVzc2FnZV9zaXplGAUgASgNEhwKFG1heF9jb25jdXJyZW50X2NhbGxzGAYgASgNEhsKE21lc3NhZ2VzX3Blcl9zZWNvbmQYByABKA0SFQoNbWVzc2FnZV9idXJzdBgIIAEoDSL1AQoLQ2xpZW50SGVsbG8SPgoHbWFjaGluZRgBIAEoCzIrLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5NYWNoaW5lQ3JlZGVudGlhbEgAEkQKCmVucm9sbG1lbnQYAiABKAsyLi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRW5yb2xsbWVudENyZWRlbnRpYWxIABI+CgdzZXNzaW9uGAMgASgLMisubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlc3Npb25DcmVkZW50aWFsSAASEgoKdXNlcl9hZ2VudBgFIAEoCUIMCgpjcmVkZW50aWFsIjoKEU1hY2hpbmVDcmVkZW50aWFsEhIKCm1hY2hpbmVfaWQYASABKAkSEQoJc2lnbmF0dXJlGAIgASgMIj0KFEVucm9sbG1lbnRDcmVkZW50aWFsEhIKCnB1YmxpY19rZXkYASABKAwSEQoJc2lnbmF0dXJlGAIgASgMIlgKEVNlc3Npb25DcmVkZW50aWFsEhIKCmRlbGVnYXRpb24YASABKAwSHAoUZGVsZWdhdGlvbl9zaWduYXR1cmUYAiABKAwSEQoJc2lnbmF0dXJlGAMgASgMIrYBChFTZXNzaW9uRGVsZWdhdGlvbhISCgptYWNoaW5lX2lkGAEgASgJEhIKCnNlc3Npb25faWQYAiABKAkSGgoSc2Vzc2lvbl9wdWJsaWNfa2V5GAMgASgMEi0KCWlzc3VlZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKZXhwaXJlc19hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAixwEKB1dlbGNvbWUSFQoNY29ubmVjdGlvbl9pZBgBIAEoBBISCgptYWNoaW5lX2lkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSOwoMc2VydmljZV9rZXlzGAQgASgLMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNlcnZpY2VLZXlzEi8KDHJlc3VtZV9ncmFjZRgFIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIPCgdyZXN1bWVkGAYgASgIIkAKC1NlcnZpY2VLZXlzEjEKBGtleXMYASADKAsyIy5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuUHVibGljS2V5IjUKCVB1YmxpY0tleRIOCgZrZXlfaWQYASABKAkSEQoHZWQyNTUxORgCIAEoDEgAQgUKA2tleSLSAgoNQXV0aG9yaXphdGlvbhIOCgZpc3N1ZXIYASABKAkSEgoKbWFjaGluZV9pZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEhUKDWNvbm5lY3Rpb25faWQYBCABKAQSDwoHdXNlcl9pZBgFIAEoCRIUCgxkaXNwbGF5X25hbWUYBiABKAkSEQoJY2xpZW50X2lkGAcgASgJEh4KFnBhcnRpY2lwYW50X3B1YmxpY19rZXkYCSABKAwSEQoJcmVhZF9vbmx5GAsgASgIEiYKCHBvbGljaWVzGAwgAygLMhQuZ29vZ2xlLnByb3RvYnVmLkFueRItCglpc3N1ZWRfYXQYDSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCmV4cGlyZXNfYXQYDiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIk8KE1NpZ25lZEF1dGhvcml6YXRpb24SDgoGa2V5X2lkGAEgASgJEhUKDWF1dGhvcml6YXRpb24YAiABKAwSEQoJc2lnbmF0dXJlGAMgASgMIhwKBFBpbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIhwKBFBvbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIjsKCEZyYWdtZW50EhIKCm1lc3NhZ2VfaWQYASABKAQSDAoEZGF0YRgCIAEoDBINCgVmaW5hbBgDIAEoCCKFAQoFQ2xvc2USNQoGcmVhc29uGAEgASgOMiUubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkNsb3NlUmVhc29uEhUKDXJlYXNvbl9waHJhc2UYAiABKAkSLgoLcmV0cnlfZGVsYXkYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24iYAoYQXR0YWNoUGFydGljaXBhbnRSZXF1ZXN0EkQKDWF1dGhvcml6YXRpb24YASABKAsyLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmVkQXV0aG9yaXphdGlvbiIbChlBdHRhY2hQYXJ0aWNpcGFudFJlc3BvbnNlIm0KJVVwZGF0ZVBhcnRpY2lwYW50QXV0aG9yaXphdGlvblJlcXVlc3QSRAoNYXV0aG9yaXphdGlvbhgBIAEoCzItLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5TaWduZWRBdXRob3JpemF0aW9uIigKJlVwZGF0ZVBhcnRpY2lwYW50QXV0aG9yaXphdGlvblJlc3BvbnNlImgKGERldGFjaFBhcnRpY2lwYW50UmVxdWVzdBIVCg1jb25uZWN0aW9uX2lkGAEgASgEEjUKBnJlYXNvbhgCIAEoDjIlLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5DbG9zZVJlYXNvbiIbChlEZXRhY2hQYXJ0aWNpcGFudFJlc3BvbnNlKpwFCgtDbG9zZVJlYXNvbhIcChhDTE9TRV9SRUFTT05fVU5TUEVDSUZJRUQQABIVChFDTE9TRV9SRUFTT05fRE9ORRABEhwKGENMT1NFX1JFQVNPTl9DTElFTlRfRVhJVBACEiAKHENMT1NFX1JFQVNPTl9TRVJWRVJfU0hVVERPV04QAxIfChtDTE9TRV9SRUFTT05fU0VSVkVSX1VQR1JBREUQBBIdChlDTE9TRV9SRUFTT05fUElOR19USU1FT1VUEAUSHgoaQ0xPU0VfUkVBU09OX0hFTExPX1RJTUVPVVQQBhIfChtDTE9TRV9SRUFTT05fUFJPVE9DT0xfRVJST1IQBxIgChxDTE9TRV9SRUFTT05fTUVTU0FHRV9UT09fQklHEAgSJgoiQ0xPU0VfUkVBU09OX0FVVEhFTlRJQ0FUSU9OX0ZBSUxFRBAJEiIKHkNMT1NFX1JFQVNPTl9QRVJNSVNTSU9OX0RFTklFRBAKEiIKHkNMT1NFX1JFQVNPTl9TRVNTSU9OX05PVF9GT1VORBALEhsKF0NMT1NFX1JFQVNPTl9ORVdfQ0xJRU5UEAwSHQoZQ0xPU0VfUkVBU09OX1NFU1NJT05fRVhJVBANEiMKH0NMT1NFX1JFQVNPTl9TRVNTSU9OX1JFU1RBUlRJTkcQDhIfChtDTE9TRV9SRUFTT05fREVUQUNIX1JFUVVFU1QQDxIhCh1DTE9TRV9SRUFTT05fUE9MSUNZX1ZJT0xBVElPThAQEh8KG0NMT1NFX1JFQVNPTl9JTlRFUk5BTF9FUlJPUhAREhsKF0NMT1NFX1JFQVNPTl9PVkVSTE9BREVEEBISIgoeQ0xPU0VfUkVBU09OX0VORFBPSU5UX1RPT19TTE9XEBMyxwMKElBhcnRpY2lwYW50U2VydmljZRKBAQoRQXR0YWNoUGFydGljaXBhbnQSMi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuQXR0YWNoUGFydGljaXBhbnRSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkF0dGFjaFBhcnRpY2lwYW50UmVzcG9uc2UiA5ACAhKoAQoeVXBkYXRlUGFydGljaXBhbnRBdXRob3JpemF0aW9uEj8ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlVwZGF0ZVBhcnRpY2lwYW50QXV0aG9yaXphdGlvblJlcXVlc3QaQC5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuVXBkYXRlUGFydGljaXBhbnRBdXRob3JpemF0aW9uUmVzcG9uc2UiA5ACAhKBAQoRRGV0YWNoUGFydGljaXBhbnQSMi5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuRGV0YWNoUGFydGljaXBhbnRSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLkRldGFjaFBhcnRpY2lwYW50UmVzcG9uc2UiA5ACAkI+WjxnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvY29udHJvbC92MTtjb250cm9sdjFiBnByb3RvMw", [file_google_protobuf_any, file_google_protobuf_duration, file_google_protobuf_timestamp, file_leaflow_fleet_rpc_v1_rpc, file_leaflow_fleet_transport_v1_transport]);
 
 /**
  * A message from an endpoint.
@@ -79,7 +79,7 @@ export type ClientMessage = Message<"leaflow.fleet.control.v1.ClientMessage"> & 
     case: "callCancel";
   } | {
     /**
-     * Signaling for a PeerConnection. Viewers and session processes only.
+     * Signaling for a PeerConnection. Session processes only.
      *
      * @generated from field: leaflow.fleet.transport.v1.Signal signal = 7;
      */
@@ -87,7 +87,7 @@ export type ClientMessage = Message<"leaflow.fleet.control.v1.ClientMessage"> & 
     case: "signal";
   } | {
     /**
-     * A step of a migration. Viewers and session processes only.
+     * A step of a migration. Session processes only.
      *
      * @generated from field: leaflow.fleet.transport.v1.Migration migration = 8;
      */
@@ -188,7 +188,8 @@ export type ServerMessage = Message<"leaflow.fleet.control.v1.ServerMessage"> & 
     case: "callCancel";
   } | {
     /**
-     * Signaling for a PeerConnection, from the other end of its connection.
+     * Signaling for a PeerConnection, from its participant through the Fleet
+     * API. To session processes only.
      *
      * @generated from field: leaflow.fleet.transport.v1.Signal signal = 8;
      */
@@ -196,7 +197,8 @@ export type ServerMessage = Message<"leaflow.fleet.control.v1.ServerMessage"> & 
     case: "signal";
   } | {
     /**
-     * A step of a migration, from the other end of its connection.
+     * A step of a migration, from its participant through the Fleet API. To
+     * session processes only.
      *
      * @generated from field: leaflow.fleet.transport.v1.Migration migration = 9;
      */
@@ -347,20 +349,12 @@ export type ClientHello = Message<"leaflow.fleet.control.v1.ClientHello"> & {
      */
     value: SessionCredential;
     case: "session";
-  } | {
-    /**
-     * A viewer.
-     *
-     * @generated from field: leaflow.fleet.control.v1.ViewerCredential viewer = 4;
-     */
-    value: ViewerCredential;
-    case: "viewer";
   } | { case: undefined; value?: undefined };
 
   /**
-   * The endpoint software, such as "leaflow-fleet-agent/1.0.0" or the
-   * browser's User-Agent (RFC 9110 §10.1.5). For diagnostics only. A machine
-   * reports its Agent's version with leaflow.fleet.machine.v1.
+   * The endpoint software, such as "leaflow-fleet-agent/1.0.0". For
+   * diagnostics only. A machine reports its Agent's version with
+   * leaflow.fleet.machine.v1.
    *
    * @generated from field: string user_agent = 5;
    */
@@ -531,49 +525,13 @@ export const SessionDelegationSchema: GenMessage<SessionDelegation> = /*@__PURE_
   messageDesc(file_leaflow_fleet_control_v1_control, 7);
 
 /**
- * A viewer, with its own key.
- *
- * @generated from message leaflow.fleet.control.v1.ViewerCredential
- */
-export type ViewerCredential = Message<"leaflow.fleet.control.v1.ViewerCredential"> & {
-  /**
-   * A single-use signaling ticket the Fleet API issued for one viewer
-   * connection, which names its key. Valid for at most 60 seconds. It
-   * authenticates nothing by itself: the signature below proves the key.
-   * Whoever asked for it, a browser through its console, a desktop client or
-   * a program, connects with it the same way. Never put into a URL.
-   *
-   * @generated from field: string ticket = 1;
-   */
-  ticket: string;
-
-  /**
-   * The Ed25519 signature by the viewer key the ticket names over the ASCII
-   * bytes "leaflow.fleet.control.v1.ViewerCredential", one zero byte
-   * and ServerHello.challenge. The private key never leaves the client, such
-   * as a non-extractable WebCrypto key.
-   *
-   * @generated from field: bytes signature = 3;
-   */
-  signature: Uint8Array;
-};
-
-/**
- * Describes the message leaflow.fleet.control.v1.ViewerCredential.
- * Use `create(ViewerCredentialSchema)` to create a new message.
- */
-export const ViewerCredentialSchema: GenMessage<ViewerCredential> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 8);
-
-/**
  * The service accepted ClientHello.
  *
  * @generated from message leaflow.fleet.control.v1.Welcome
  */
 export type Welcome = Message<"leaflow.fleet.control.v1.Welcome"> & {
   /**
-   * The connection. For a viewer, its viewer connection's connection_id,
-   * which its signaling, its PeerConnections and its authorization name.
+   * The connection.
    *
    * @generated from field: uint64 connection_id = 1;
    */
@@ -587,7 +545,7 @@ export type Welcome = Message<"leaflow.fleet.control.v1.Welcome"> & {
   machineId: string;
 
   /**
-   * The session. Session processes and viewers only.
+   * The session. Session processes only.
    *
    * @generated from field: string session_id = 3;
    */
@@ -601,7 +559,7 @@ export type Welcome = Message<"leaflow.fleet.control.v1.Welcome"> & {
   serviceKeys?: ServiceKeys | undefined;
 
   /**
-   * How long the service keeps the session's viewers when this connection
+   * How long the service keeps the session's participants when this connection
    * drops. Session processes only.
    *
    * @generated from field: google.protobuf.Duration resume_grace = 5;
@@ -610,7 +568,7 @@ export type Welcome = Message<"leaflow.fleet.control.v1.Welcome"> & {
 
   /**
    * The session process connected again within resume_grace and kept its
-   * viewers. Session processes only.
+   * participants. Session processes only.
    *
    * @generated from field: bool resumed = 6;
    */
@@ -622,7 +580,7 @@ export type Welcome = Message<"leaflow.fleet.control.v1.Welcome"> & {
  * Use `create(WelcomeSchema)` to create a new message.
  */
 export const WelcomeSchema: GenMessage<Welcome> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 9);
+  messageDesc(file_leaflow_fleet_control_v1_control, 8);
 
 /**
  * The keys the service signs with, all of them. Replaces the previous set.
@@ -643,7 +601,7 @@ export type ServiceKeys = Message<"leaflow.fleet.control.v1.ServiceKeys"> & {
  * Use `create(ServiceKeysSchema)` to create a new message.
  */
 export const ServiceKeysSchema: GenMessage<ServiceKeys> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 10);
+  messageDesc(file_leaflow_fleet_control_v1_control, 9);
 
 /**
  * A public key of the service.
@@ -679,12 +637,12 @@ export type PublicKey = Message<"leaflow.fleet.control.v1.PublicKey"> & {
  * Use `create(PublicKeySchema)` to create a new message.
  */
 export const PublicKeySchema: GenMessage<PublicKey> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 11);
+  messageDesc(file_leaflow_fleet_control_v1_control, 10);
 
 /**
- * The service's statement of what one viewer connection may do in one
- * session. The session takes who the viewer is and what it may do from here,
- * never from the viewer.
+ * The service's statement of what one participant may do in one session. The
+ * session takes who the participant is and what it may do from here, never from
+ * the participant.
  *
  * @generated from message leaflow.fleet.control.v1.Authorization
  */
@@ -711,14 +669,14 @@ export type Authorization = Message<"leaflow.fleet.control.v1.Authorization"> & 
   sessionId: string;
 
   /**
-   * The viewer's connection.
+   * The participant's connection.
    *
    * @generated from field: uint64 connection_id = 4;
    */
   connectionId: bigint;
 
   /**
-   * The platform user the viewer acts for.
+   * The platform user the participant acts for.
    *
    * @generated from field: string user_id = 5;
    */
@@ -732,32 +690,32 @@ export type Authorization = Message<"leaflow.fleet.control.v1.Authorization"> & 
   displayName: string;
 
   /**
-   * The label the client gave itself when the ticket was issued, such as
-   * "console" or "assistant", at most 64 bytes. Neither unique nor verified:
-   * it lets people tell connections apart and grants nothing.
+   * The label the client gave itself when it created the participant, such
+   * as "console" or "assistant", at most 64 bytes. Neither unique nor
+   * verified: it lets people tell participants apart and grants nothing.
    *
    * @generated from field: string client_id = 7;
    */
   clientId: string;
 
   /**
-   * The viewer's Ed25519 public key, 32 bytes. The viewer proved it with its
-   * credential, and the session accepts only a PeerConnection whose viewer
-   * Hello is signed with it.
+   * The participant's Ed25519 public key, 32 bytes. The session accepts only
+   * a PeerConnection whose participant Hello is signed with it
+   * (leaflow.fleet.transport.v1).
    *
-   * @generated from field: bytes viewer_public_key = 9;
+   * @generated from field: bytes participant_public_key = 9;
    */
-  viewerPublicKey: Uint8Array;
+  participantPublicKey: Uint8Array;
 
   /**
-   * The viewer may only watch, whatever policies say.
+   * The participant may only watch, whatever policies say.
    *
    * @generated from field: bool read_only = 11;
    */
   readOnly: boolean;
 
   /**
-   * The policies of the domains the viewer may use, at most one of each
+   * The policies of the domains the participant may use, at most one of each
    * type, such as a leaflow.fleet.filetransfer.v1.FileTransferPolicy.
    * A domain whose policy is missing is denied. A type the session does not
    * know is ignored.
@@ -775,8 +733,8 @@ export type Authorization = Message<"leaflow.fleet.control.v1.Authorization"> & 
   issuedAt?: Timestamp | undefined;
 
   /**
-   * When it ends. The session refuses it, and ends the viewer's connection,
-   * once this time and 5 more minutes have passed.
+   * When it ends. The session refuses it, and ends the participant's
+   * connection, once this time and 5 more minutes have passed.
    *
    * @generated from field: google.protobuf.Timestamp expires_at = 14;
    */
@@ -788,7 +746,7 @@ export type Authorization = Message<"leaflow.fleet.control.v1.Authorization"> & 
  * Use `create(AuthorizationSchema)` to create a new message.
  */
 export const AuthorizationSchema: GenMessage<Authorization> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 12);
+  messageDesc(file_leaflow_fleet_control_v1_control, 11);
 
 /**
  * An Authorization signed by the service.
@@ -827,7 +785,7 @@ export type SignedAuthorization = Message<"leaflow.fleet.control.v1.SignedAuthor
  * Use `create(SignedAuthorizationSchema)` to create a new message.
  */
 export const SignedAuthorizationSchema: GenMessage<SignedAuthorization> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 13);
+  messageDesc(file_leaflow_fleet_control_v1_control, 12);
 
 /**
  * Asks the peer to answer with a Pong at once (RFC 6455 §5.5.2).
@@ -849,7 +807,7 @@ export type Ping = Message<"leaflow.fleet.control.v1.Ping"> & {
  * Use `create(PingSchema)` to create a new message.
  */
 export const PingSchema: GenMessage<Ping> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 14);
+  messageDesc(file_leaflow_fleet_control_v1_control, 13);
 
 /**
  * Answers a Ping (RFC 6455 §5.5.3).
@@ -870,7 +828,7 @@ export type Pong = Message<"leaflow.fleet.control.v1.Pong"> & {
  * Use `create(PongSchema)` to create a new message.
  */
 export const PongSchema: GenMessage<Pong> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 15);
+  messageDesc(file_leaflow_fleet_control_v1_control, 14);
 
 /**
  * A piece of the encoding of a ClientMessage or ServerMessage larger than
@@ -907,7 +865,7 @@ export type Fragment = Message<"leaflow.fleet.control.v1.Fragment"> & {
  * Use `create(FragmentSchema)` to create a new message.
  */
 export const FragmentSchema: GenMessage<Fragment> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 16);
+  messageDesc(file_leaflow_fleet_control_v1_control, 15);
 
 /**
  * Ends the connection in order. The sender then closes the WebSocket with
@@ -933,8 +891,7 @@ export type Close = Message<"leaflow.fleet.control.v1.Close"> & {
 
   /**
    * How long to wait at least before connecting again (see Reconnection).
-   * Always set with OVERLOADED; set with SERVER_UPGRADE and
-   * SESSION_RESTARTING.
+   * Always set with OVERLOADED; set with SERVER_UPGRADE.
    *
    * @generated from field: google.protobuf.Duration retry_delay = 3;
    */
@@ -946,17 +903,17 @@ export type Close = Message<"leaflow.fleet.control.v1.Close"> & {
  * Use `create(CloseSchema)` to create a new message.
  */
 export const CloseSchema: GenMessage<Close> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 17);
+  messageDesc(file_leaflow_fleet_control_v1_control, 16);
 
 /**
- * The request of AttachViewer.
+ * The request of AttachParticipant.
  *
- * @generated from message leaflow.fleet.control.v1.AttachViewerRequest
+ * @generated from message leaflow.fleet.control.v1.AttachParticipantRequest
  */
-export type AttachViewerRequest = Message<"leaflow.fleet.control.v1.AttachViewerRequest"> & {
+export type AttachParticipantRequest = Message<"leaflow.fleet.control.v1.AttachParticipantRequest"> & {
   /**
-   * The viewer's authorization, the same one the Fleet API returned for the
-   * viewer connection.
+   * The participant's authorization, the same one the Fleet API returned for
+   * the participant.
    *
    * @generated from field: leaflow.fleet.control.v1.SignedAuthorization authorization = 1;
    */
@@ -964,33 +921,33 @@ export type AttachViewerRequest = Message<"leaflow.fleet.control.v1.AttachViewer
 };
 
 /**
- * Describes the message leaflow.fleet.control.v1.AttachViewerRequest.
- * Use `create(AttachViewerRequestSchema)` to create a new message.
+ * Describes the message leaflow.fleet.control.v1.AttachParticipantRequest.
+ * Use `create(AttachParticipantRequestSchema)` to create a new message.
  */
-export const AttachViewerRequestSchema: GenMessage<AttachViewerRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 18);
+export const AttachParticipantRequestSchema: GenMessage<AttachParticipantRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_control_v1_control, 17);
 
 /**
- * The response of AttachViewer.
+ * The response of AttachParticipant.
  *
- * @generated from message leaflow.fleet.control.v1.AttachViewerResponse
+ * @generated from message leaflow.fleet.control.v1.AttachParticipantResponse
  */
-export type AttachViewerResponse = Message<"leaflow.fleet.control.v1.AttachViewerResponse"> & {
+export type AttachParticipantResponse = Message<"leaflow.fleet.control.v1.AttachParticipantResponse"> & {
 };
 
 /**
- * Describes the message leaflow.fleet.control.v1.AttachViewerResponse.
- * Use `create(AttachViewerResponseSchema)` to create a new message.
+ * Describes the message leaflow.fleet.control.v1.AttachParticipantResponse.
+ * Use `create(AttachParticipantResponseSchema)` to create a new message.
  */
-export const AttachViewerResponseSchema: GenMessage<AttachViewerResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 19);
+export const AttachParticipantResponseSchema: GenMessage<AttachParticipantResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_control_v1_control, 18);
 
 /**
- * The request of UpdateViewerAuthorization.
+ * The request of UpdateParticipantAuthorization.
  *
- * @generated from message leaflow.fleet.control.v1.UpdateViewerAuthorizationRequest
+ * @generated from message leaflow.fleet.control.v1.UpdateParticipantAuthorizationRequest
  */
-export type UpdateViewerAuthorizationRequest = Message<"leaflow.fleet.control.v1.UpdateViewerAuthorizationRequest"> & {
+export type UpdateParticipantAuthorizationRequest = Message<"leaflow.fleet.control.v1.UpdateParticipantAuthorizationRequest"> & {
   /**
    * The renewed authorization.
    *
@@ -1000,43 +957,43 @@ export type UpdateViewerAuthorizationRequest = Message<"leaflow.fleet.control.v1
 };
 
 /**
- * Describes the message leaflow.fleet.control.v1.UpdateViewerAuthorizationRequest.
- * Use `create(UpdateViewerAuthorizationRequestSchema)` to create a new message.
+ * Describes the message leaflow.fleet.control.v1.UpdateParticipantAuthorizationRequest.
+ * Use `create(UpdateParticipantAuthorizationRequestSchema)` to create a new message.
  */
-export const UpdateViewerAuthorizationRequestSchema: GenMessage<UpdateViewerAuthorizationRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 20);
+export const UpdateParticipantAuthorizationRequestSchema: GenMessage<UpdateParticipantAuthorizationRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_control_v1_control, 19);
 
 /**
- * The response of UpdateViewerAuthorization.
+ * The response of UpdateParticipantAuthorization.
  *
- * @generated from message leaflow.fleet.control.v1.UpdateViewerAuthorizationResponse
+ * @generated from message leaflow.fleet.control.v1.UpdateParticipantAuthorizationResponse
  */
-export type UpdateViewerAuthorizationResponse = Message<"leaflow.fleet.control.v1.UpdateViewerAuthorizationResponse"> & {
+export type UpdateParticipantAuthorizationResponse = Message<"leaflow.fleet.control.v1.UpdateParticipantAuthorizationResponse"> & {
 };
 
 /**
- * Describes the message leaflow.fleet.control.v1.UpdateViewerAuthorizationResponse.
- * Use `create(UpdateViewerAuthorizationResponseSchema)` to create a new message.
+ * Describes the message leaflow.fleet.control.v1.UpdateParticipantAuthorizationResponse.
+ * Use `create(UpdateParticipantAuthorizationResponseSchema)` to create a new message.
  */
-export const UpdateViewerAuthorizationResponseSchema: GenMessage<UpdateViewerAuthorizationResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 21);
+export const UpdateParticipantAuthorizationResponseSchema: GenMessage<UpdateParticipantAuthorizationResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_control_v1_control, 20);
 
 /**
- * The request of DetachViewer.
+ * The request of DetachParticipant.
  *
- * @generated from message leaflow.fleet.control.v1.DetachViewerRequest
+ * @generated from message leaflow.fleet.control.v1.DetachParticipantRequest
  */
-export type DetachViewerRequest = Message<"leaflow.fleet.control.v1.DetachViewerRequest"> & {
+export type DetachParticipantRequest = Message<"leaflow.fleet.control.v1.DetachParticipantRequest"> & {
   /**
-   * The viewer's connection.
+   * The participant's connection.
    *
    * @generated from field: uint64 connection_id = 1;
    */
   connectionId: bigint;
 
   /**
-   * Why it ends: the reason the service gave the viewer, or the one its
-   * connection ended with, such as CLIENT_EXIT.
+   * Why it ends, such as DETACH_REQUEST when it was ended through the Fleet
+   * API or PING_TIMEOUT when its lease ran out.
    *
    * @generated from field: leaflow.fleet.control.v1.CloseReason reason = 2;
    */
@@ -1044,29 +1001,30 @@ export type DetachViewerRequest = Message<"leaflow.fleet.control.v1.DetachViewer
 };
 
 /**
- * Describes the message leaflow.fleet.control.v1.DetachViewerRequest.
- * Use `create(DetachViewerRequestSchema)` to create a new message.
+ * Describes the message leaflow.fleet.control.v1.DetachParticipantRequest.
+ * Use `create(DetachParticipantRequestSchema)` to create a new message.
  */
-export const DetachViewerRequestSchema: GenMessage<DetachViewerRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 22);
+export const DetachParticipantRequestSchema: GenMessage<DetachParticipantRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_control_v1_control, 21);
 
 /**
- * The response of DetachViewer.
+ * The response of DetachParticipant.
  *
- * @generated from message leaflow.fleet.control.v1.DetachViewerResponse
+ * @generated from message leaflow.fleet.control.v1.DetachParticipantResponse
  */
-export type DetachViewerResponse = Message<"leaflow.fleet.control.v1.DetachViewerResponse"> & {
+export type DetachParticipantResponse = Message<"leaflow.fleet.control.v1.DetachParticipantResponse"> & {
 };
 
 /**
- * Describes the message leaflow.fleet.control.v1.DetachViewerResponse.
- * Use `create(DetachViewerResponseSchema)` to create a new message.
+ * Describes the message leaflow.fleet.control.v1.DetachParticipantResponse.
+ * Use `create(DetachParticipantResponseSchema)` to create a new message.
  */
-export const DetachViewerResponseSchema: GenMessage<DetachViewerResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_control_v1_control, 23);
+export const DetachParticipantResponseSchema: GenMessage<DetachParticipantResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_control_v1_control, 22);
 
 /**
- * Why a control connection ends.
+ * Why a control connection ends, and why a participant ends
+ * (DetachParticipantRequest.reason).
  *
  * @generated from enum leaflow.fleet.control.v1.CloseReason
  */
@@ -1084,7 +1042,7 @@ export enum CloseReason {
   DONE = 1,
 
   /**
-   * The endpoint goes away, such as a closed tab. Endpoint only.
+   * The endpoint goes away. Endpoint only.
    *
    * @generated from enum value: CLOSE_REASON_CLIENT_EXIT = 2;
    */
@@ -1105,7 +1063,8 @@ export enum CloseReason {
   SERVER_UPGRADE = 4,
 
   /**
-   * Nothing arrived for idle_timeout. Either side.
+   * Nothing arrived for idle_timeout. Either side. For a participant, its
+   * lease ran out.
    *
    * @generated from enum value: CLOSE_REASON_PING_TIMEOUT = 5;
    */
@@ -1134,9 +1093,9 @@ export enum CloseReason {
   MESSAGE_TOO_BIG = 8,
 
   /**
-   * The credential did not verify, or names an unknown machine, a used or
-   * expired ticket or another key. For a machine credential it is final: the
-   * daemon stops and its machine must enroll again. Service only.
+   * The credential did not verify, or names an unknown machine or another
+   * key. For a machine credential it is final: the daemon stops and its
+   * machine must enroll again. Service only.
    *
    * @generated from enum value: CLOSE_REASON_AUTHENTICATION_FAILED = 9;
    */
@@ -1144,7 +1103,7 @@ export enum CloseReason {
 
   /**
    * The endpoint is known but not allowed, such as a removed machine or a
-   * viewer whose rights were withdrawn. Service only.
+   * participant whose rights were withdrawn. Service only.
    *
    * @generated from enum value: CLOSE_REASON_PERMISSION_DENIED = 10;
    */
@@ -1168,23 +1127,24 @@ export enum CloseReason {
 
   /**
    * The session ended. The session process before it ends, and the service
-   * to the session's viewers.
+   * for the session's participants.
    *
    * @generated from enum value: CLOSE_REASON_SESSION_EXIT = 13;
    */
   SESSION_EXIT = 13,
 
   /**
-   * The session exists but its process is not connected, such as while it
-   * restarts; connect again after retry_delay. Service only, to viewers.
+   * The session's process did not connect again within
+   * Welcome.resume_grace. Service only, for the session's participants.
    *
    * @generated from enum value: CLOSE_REASON_SESSION_RESTARTING = 14;
    */
   SESSION_RESTARTING = 14,
 
   /**
-   * The viewer was detached on request, such as by an administrator or to
-   * change its rights; the session goes on. Service only, to viewers.
+   * The participant was ended on request, such as when it left or another
+   * member disconnected it; the session goes on. Service only, for
+   * participants.
    *
    * @generated from enum value: CLOSE_REASON_DETACH_REQUEST = 15;
    */
@@ -1228,62 +1188,63 @@ export const CloseReasonSchema: GenEnum<CloseReason> = /*@__PURE__*/
   enumDesc(file_leaflow_fleet_control_v1_control, 0);
 
 /**
- * Admits viewers to a session and ends them. Served by the session process
- * on its control connection; the service calls it when a viewer connection
+ * Admits participants to a session and ends them. Served by the session process
+ * on its control connection; the service calls it when a participant
  * is created, renewed or ends through the Fleet API.
  *
- * @generated from service leaflow.fleet.control.v1.ViewerService
+ * @generated from service leaflow.fleet.control.v1.ParticipantService
  */
-export const ViewerService: GenService<{
+export const ParticipantService: GenService<{
   /**
-   * Admits a viewer, before any of its signaling. The session verifies the
-   * signature with a key of ServiceKeys; that issuer, machine_id and
-   * session_id are its own; and the lifetime. It then accepts the
-   * PeerConnections of connection_id whose viewer Hello is signed with
-   * viewer_public_key. Attaching an attached viewer again with the same
-   * authorization succeeds.
+   * Admits a participant, before any of its signaling. The session verifies the
+   * signature with a key of ServiceKeys; that issuer, machine_id and session_id
+   * are its own; and the lifetime. It then accepts the PeerConnections of
+   * connection_id whose participant Hello is signed with
+   * participant_public_key. Attaching an attached participant again with the
+   * same authorization succeeds.
    *
    * Fails with PERMISSION_DENIED and reason AUTHORIZATION_INVALID when the
    * authorization does not verify.
    *
-   * @generated from rpc leaflow.fleet.control.v1.ViewerService.AttachViewer
+   * @generated from rpc leaflow.fleet.control.v1.ParticipantService.AttachParticipant
    */
-  attachViewer: {
+  attachParticipant: {
     methodKind: "unary";
-    input: typeof AttachViewerRequestSchema;
-    output: typeof AttachViewerResponseSchema;
+    input: typeof AttachParticipantRequestSchema;
+    output: typeof AttachParticipantResponseSchema;
   },
   /**
-   * Replaces an attached viewer's authorization with a renewed one, verified
-   * as in AttachViewer. Replacing it with the one the viewer holds already
-   * succeeds.
+   * Replaces an attached participant's authorization with a renewed one,
+   * verified as in AttachParticipant. Replacing it with the one the participant
+   * holds already succeeds.
    *
    * Fails with:
-   *   - NOT_FOUND and reason VIEWER_NOT_FOUND for a viewer not attached;
+   *   - NOT_FOUND and reason PARTICIPANT_NOT_FOUND for a participant not
+   *     attached;
    *   - PERMISSION_DENIED and reason AUTHORIZATION_INVALID when it does not
    *     verify;
    *   - FAILED_PRECONDITION and reason AUTHORIZATION_CHANGED when it differs
    *     from the current one in more than later issued_at and expires_at.
    *
-   * @generated from rpc leaflow.fleet.control.v1.ViewerService.UpdateViewerAuthorization
+   * @generated from rpc leaflow.fleet.control.v1.ParticipantService.UpdateParticipantAuthorization
    */
-  updateViewerAuthorization: {
+  updateParticipantAuthorization: {
     methodKind: "unary";
-    input: typeof UpdateViewerAuthorizationRequestSchema;
-    output: typeof UpdateViewerAuthorizationResponseSchema;
+    input: typeof UpdateParticipantAuthorizationRequestSchema;
+    output: typeof UpdateParticipantAuthorizationResponseSchema;
   },
   /**
-   * Ends a viewer. The session closes its PeerConnections and releases what
-   * it held, such as pressed keys and the input lease, and answers once the
-   * viewer can do nothing more in the session. Detaching a viewer that is not
-   * attached succeeds.
+   * Ends a participant. The session closes its PeerConnections and releases
+   * what it held, such as pressed keys and the input lease, and answers once
+   * the participant can do nothing more in the session. Detaching a participant
+   * that is not attached succeeds.
    *
-   * @generated from rpc leaflow.fleet.control.v1.ViewerService.DetachViewer
+   * @generated from rpc leaflow.fleet.control.v1.ParticipantService.DetachParticipant
    */
-  detachViewer: {
+  detachParticipant: {
     methodKind: "unary";
-    input: typeof DetachViewerRequestSchema;
-    output: typeof DetachViewerResponseSchema;
+    input: typeof DetachParticipantRequestSchema;
+    output: typeof DetachParticipantResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_leaflow_fleet_control_v1_control, 0);

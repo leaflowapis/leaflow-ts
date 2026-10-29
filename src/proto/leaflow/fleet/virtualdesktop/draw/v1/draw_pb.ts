@@ -15,7 +15,7 @@ export const file_leaflow_fleet_virtualdesktop_draw_v1_draw: GenFile = /*@__PURE
   fileDesc("Ci9sZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2RyYXcvdjEvZHJhdy5wcm90bxIkbGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kcmF3LnYxItoCCg1DbGllbnRNZXNzYWdlEkkKDGNsaWVudF9oZWxsbxgBIAEoCzIxLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZHJhdy52MS5DbGllbnRIZWxsb0gAElMKEWZyYW1lX2Fja25vd2xlZGdlGAIgASgLMjYubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kcmF3LnYxLkZyYW1lQWNrbm93bGVkZ2VIABJNCg53aW5kb3dfcmVmcmVzaBgDIAEoCzIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZHJhdy52MS5XaW5kb3dSZWZyZXNoSAASTwoPc3VwcHJlc3Nfb3V0cHV0GAQgASgLMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kcmF3LnYxLlN1cHByZXNzT3V0cHV0SABCCQoHbWVzc2FnZSKwAQoNU2VydmVyTWVzc2FnZRJJCgxzZXJ2ZXJfaGVsbG8YASABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRyYXcudjEuU2VydmVySGVsbG9IABJJCgxmcmFtZV9jYW5jZWwYAiABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRyYXcudjEuRnJhbWVDYW5jZWxIAEIJCgdtZXNzYWdlIvABCgxGcmFtZU1lc3NhZ2USRwoLZnJhbWVfc3RhcnQYASABKAsyMC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRyYXcudjEuRnJhbWVTdGFydEgAEkcKC3dpbmRvd19kcmF3GAIgASgLMjAubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kcmF3LnYxLldpbmRvd0RyYXdIABJDCglmcmFtZV9lbmQYAyABKAsyLi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRyYXcudjEuRnJhbWVFbmRIAEIJCgdtZXNzYWdlImAKC0NsaWVudEhlbGxvEkEKCWVuY29kaW5ncxgBIAMoDjIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZHJhdy52MS5FbmNvZGluZxIOCgZjb2RlY3MYAiADKAkiiQEKC1NlcnZlckhlbGxvEkEKCWVuY29kaW5ncxgBIAMoDjIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZHJhdy52MS5FbmNvZGluZxINCgVjb2RlYxgCIAEoCRITCgttaW5fcXVhbGl0eRgDIAEoDRITCgttYXhfcXVhbGl0eRgEIAEoDSJoCgpGcmFtZVN0YXJ0EhAKCGZyYW1lX2lkGAEgASgEEkgKCnJlZmVyZW5jZXMYAiADKAsyNC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRyYXcudjEuRnJhbWVSZWZlcmVuY2UiVwoORnJhbWVSZWZlcmVuY2USEQoJd2luZG93X2lkGAEgASgEEhoKEnJlZmVyZW5jZV9mcmFtZV9pZBgCIAEoBBIWCg5yZXNpemVfY291bnRlchgDIAEoBCKCAwoKV2luZG93RHJhdxIQCghmcmFtZV9pZBgBIAEoBBIRCgl3aW5kb3dfaWQYAiABKAQSCQoBeBgDIAEoDRIJCgF5GAQgASgNEg0KBXdpZHRoGAUgASgNEg4KBmhlaWdodBgGIAEoDRJACghlbmNvZGluZxgHIAEoDjIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZHJhdy52MS5FbmNvZGluZxIMCgRkYXRhGAggASgMEhIKCmZpbGxfcGl4ZWwYCSABKAcSEAoIc291cmNlX3gYCiABKA0SEAoIc291cmNlX3kYCyABKA0SQgoLc2NhbGVkX3NpemUYDCABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuU2l6ZRIRCglrZXlfZnJhbWUYDSABKAgSFAoMdGltZXN0YW1wX3VzGA4gASgDEg0KBWNvZGVjGA8gASgJEhYKDm1vcmVfZnJhZ21lbnRzGBAgASgIIjAKCEZyYW1lRW5kEhAKCGZyYW1lX2lkGAEgASgEEhIKCmRyYXdfY291bnQYAiABKA0iIAoLRnJhbWVDYW5jZWwSEQoJZnJhbWVfaWRzGAEgAygEIp4BChBGcmFtZUFja25vd2xlZGdlEiIKGmNvbXBsZXRlZF90aHJvdWdoX2ZyYW1lX2lkGAEgASgEEhsKE2NvbXBsZXRlZF9mcmFtZV9pZHMYAiADKAQSEwoLcXVldWVfZGVwdGgYAyABKA0SHAoUdG90YWxfZnJhbWVzX2RlY29kZWQYBCABKAQSFgoOZGVjb2RlX3RpbWVfdXMYBSABKA0iIgoNV2luZG93UmVmcmVzaBIRCgl3aW5kb3dfaWQYASABKAQiLwoOU3VwcHJlc3NPdXRwdXQSHQoVYWxsb3dfZGlzcGxheV91cGRhdGVzGAEgASgIKrIBCghFbmNvZGluZxIYChRFTkNPRElOR19VTlNQRUNJRklFRBAAEhAKDEVOQ09ESU5HX1JBVxABEhYKEkVOQ09ESU5HX0NPUFlfUkVDVBACEhcKE0VOQ09ESU5HX1NPTElEX0ZJTEwQAxIQCgxFTkNPRElOR19QTkcQBBIRCg1FTkNPRElOR19KUEVHEAUSEQoNRU5DT0RJTkdfV0VCUBAGEhEKDUVOQ09ESU5HX0gyNjQQB0JHWkVnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvZHJhdy92MTtkcmF3djFiBnByb3RvMw", [file_leaflow_fleet_virtualdesktop_display_v1_display]);
 
 /**
- * A message from the viewer on the draw channel.
+ * A message from the participant on the draw channel.
  *
  * @generated from message leaflow.fleet.virtualdesktop.draw.v1.ClientMessage
  */
@@ -27,7 +27,7 @@ export type ClientMessage = Message<"leaflow.fleet.virtualdesktop.draw.v1.Client
    */
   message: {
     /**
-     * The encodings the viewer decodes. The first message of the channel.
+     * The encodings the participant decodes. The first message of the channel.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.draw.v1.ClientHello client_hello = 1;
      */
@@ -35,7 +35,7 @@ export type ClientMessage = Message<"leaflow.fleet.virtualdesktop.draw.v1.Client
     case: "clientHello";
   } | {
     /**
-     * Frames the viewer finished with.
+     * Frames the participant finished with.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.draw.v1.FrameAcknowledge frame_acknowledge = 2;
      */
@@ -51,7 +51,7 @@ export type ClientMessage = Message<"leaflow.fleet.virtualdesktop.draw.v1.Client
     case: "windowRefresh";
   } | {
     /**
-     * Stops or resumes frames to this viewer.
+     * Stops or resumes frames to this participant.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.draw.v1.SuppressOutput suppress_output = 4;
      */
@@ -150,13 +150,13 @@ export const FrameMessageSchema: GenMessage<FrameMessage> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_draw_v1_draw, 2);
 
 /**
- * What the viewer can decode (RFC 6143 §7.5.2 SetEncodings).
+ * What the participant can decode (RFC 6143 §7.5.2 SetEncodings).
  *
  * @generated from message leaflow.fleet.virtualdesktop.draw.v1.ClientHello
  */
 export type ClientHello = Message<"leaflow.fleet.virtualdesktop.draw.v1.ClientHello"> & {
   /**
-   * Encodings the viewer decodes, most preferred first. COPY_RECT and
+   * Encodings the participant decodes, most preferred first. COPY_RECT and
    * SOLID_FILL are always supported and need not be listed.
    *
    * @generated from field: repeated leaflow.fleet.virtualdesktop.draw.v1.Encoding encodings = 1;
@@ -164,8 +164,8 @@ export type ClientHello = Message<"leaflow.fleet.virtualdesktop.draw.v1.ClientHe
   encodings: Encoding[];
 
   /**
-   * WebCodecs codec strings the viewer decodes, most preferred first, such as
-   * "avc1.42E01F". Empty: no video.
+   * WebCodecs codec strings the participant decodes, most preferred first, such
+   * as "avc1.42E01F". Empty: no video.
    *
    * @generated from field: repeated string codecs = 2;
    */
@@ -180,7 +180,7 @@ export const ClientHelloSchema: GenMessage<ClientHello> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_draw_v1_draw, 3);
 
 /**
- * What the session will send this viewer.
+ * What the session will send this participant.
  *
  * @generated from message leaflow.fleet.virtualdesktop.draw.v1.ServerHello
  */
@@ -222,10 +222,10 @@ export const ServerHelloSchema: GenMessage<ServerHello> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_draw_v1_draw, 4);
 
 /**
- * Starts a frame: draws the viewer presents together. The session sends one
- * frame per window with updates at each tick of its frame clock, and puts
- * several windows in one frame only when they must change together, such as
- * a menu opening while its window repaints.
+ * Starts a frame: draws the participant presents together. The session sends
+ * one frame per window with updates at each tick of its frame clock, and puts
+ * several windows in one frame only when they must change together, such as a
+ * menu opening while its window repaints.
  *
  * @generated from message leaflow.fleet.virtualdesktop.draw.v1.FrameStart
  */
@@ -259,15 +259,15 @@ export const FrameStartSchema: GenMessage<FrameStart> = /*@__PURE__*/
  */
 export type FrameReference = Message<"leaflow.fleet.virtualdesktop.draw.v1.FrameReference"> & {
   /**
-   * The window. When the viewer does not know it yet it holds the frame for
-   * up to one second.
+   * The window. When the participant does not know it yet it holds the frame
+   * for up to one second.
    *
    * @generated from field: uint64 window_id = 1;
    */
   windowId: bigint;
 
   /**
-   * The frame of this window the draws were encoded on top of. The viewer
+   * The frame of this window the draws were encoded on top of. The participant
    * presents the frame only when the window's last presented frame is not
    * older; with COPY_RECT or a video delta it must be exactly this frame.
    * 0: the frame repaints the window and depends on nothing. The first frame
@@ -280,8 +280,8 @@ export type FrameReference = Message<"leaflow.fleet.virtualdesktop.draw.v1.Frame
   referenceFrameId: bigint;
 
   /**
-   * Window.resize_counter the draws were encoded for. The viewer waits up to
-   * one second for the window with this counter and discards the frame once
+   * Window.resize_counter the draws were encoded for. The participant waits up
+   * to one second for the window with this counter and discards the frame once
    * a larger counter is shown. The new window size and the frame appear
    * together.
    *
@@ -383,8 +383,8 @@ export type WindowDraw = Message<"leaflow.fleet.virtualdesktop.draw.v1.WindowDra
 
   /**
    * The size of the encoded image when the session scaled it down; the
-   * viewer scales it to width × height. Unset: width × height. Not for RAW,
-   * COPY_RECT or SOLID_FILL.
+   * participant scales it to width × height. Unset: width × height. Not for
+   * RAW, COPY_RECT or SOLID_FILL.
    *
    * @generated from field: leaflow.fleet.virtualdesktop.display.v1.Size scaled_size = 12;
    */
@@ -407,7 +407,7 @@ export type WindowDraw = Message<"leaflow.fleet.virtualdesktop.draw.v1.WindowDra
   timestampUs: bigint;
 
   /**
-   * H264 only, on every key frame: the WebCodecs codec string. The viewer
+   * H264 only, on every key frame: the WebCodecs codec string. The participant
    * reconfigures the window's decoder when it changes.
    *
    * @generated from field: string codec = 15;
@@ -416,7 +416,7 @@ export type WindowDraw = Message<"leaflow.fleet.virtualdesktop.draw.v1.WindowDra
 
   /**
    * H264 only: the next WindowDraw of this frame continues the same access
-   * unit. The viewer joins the data of such draws before decoding.
+   * unit. The participant joins the data of such draws before decoding.
    *
    * @generated from field: bool more_fragments = 16;
    */
@@ -460,8 +460,8 @@ export const FrameEndSchema: GenMessage<FrameEnd> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_draw_v1_draw, 8);
 
 /**
- * Frames the session withdrew. The viewer treats each as completed: it drops
- * what it received of it and ignores the rest. One it already presented
+ * Frames the session withdrew. The participant treats each as completed: it
+ * drops what it received of it and ignores the rest. One it already presented
  * stays presented.
  *
  * @generated from message leaflow.fleet.virtualdesktop.draw.v1.FrameCancel
@@ -483,14 +483,14 @@ export const FrameCancelSchema: GenMessage<FrameCancel> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_draw_v1_draw, 9);
 
 /**
- * The frames the viewer has completed, sent after presenting them rather than
- * on receipt, so that the session sees decoding backlog as well as network
+ * The frames the participant has completed, sent after presenting them rather
+ * than on receipt, so that the session sees decoding backlog as well as network
  * delay and can pace itself (after MS-RDPEGFX RDPGFX_FRAME_ACKNOWLEDGE_PDU).
- * Frames of different windows complete out of order and a datagram may be
- * lost, so every acknowledgement states all completed frames: a watermark and
- * the completed frames above it. The viewer sends one per animation frame in
- * which it completed a frame, as a datagram when it can, and at least every
- * 250 milliseconds on the channel itself.
+ * Frames of different windows complete out of order and a datagram may be lost,
+ * so every acknowledgement states all completed frames: a watermark and the
+ * completed frames above it. The participant sends one per animation frame in
+ * which it completed a frame, as a datagram when it can, and at least every 250
+ * milliseconds on the channel itself.
  *
  * @generated from message leaflow.fleet.virtualdesktop.draw.v1.FrameAcknowledge
  */
@@ -563,9 +563,9 @@ export const WindowRefreshSchema: GenMessage<WindowRefresh> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_draw_v1_draw, 11);
 
 /**
- * Stops or resumes the frames sent to this viewer, such as while its window
- * is hidden (MS-RDPBCGR §2.2.11.3 Suppress Output PDU). While stopped the
- * session keeps the damage and sends one update covering it when frames
+ * Stops or resumes the frames sent to this participant, such as while its
+ * window is hidden (MS-RDPBCGR §2.2.11.3 Suppress Output PDU). While stopped
+ * the session keeps the damage and sends one update covering it when frames
  * resume. Nothing but frames is affected. Frames are allowed when the
  * connection starts.
  *
@@ -608,7 +608,7 @@ export enum Encoding {
   RAW = 1,
 
   /**
-   * A copy of another area of the same window as the viewer shows it now,
+   * A copy of another area of the same window as the participant shows it now,
    * from source_x and source_y; the areas may overlap. data is empty. The
    * frame needs an exact dependency (RFC 6143 CopyRect).
    *

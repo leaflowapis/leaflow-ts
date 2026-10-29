@@ -101,8 +101,8 @@ export type Session = Message<"leaflow.fleet.host.v1.Session"> & {
 
   /**
    * The state of what its options added, at most one of each type, such as
-   * leaflow.fleet.virtualdesktop.host.v1 DesktopState. A type the service does not
-   * know is ignored.
+   * leaflow.fleet.virtualdesktop.host.v1 DesktopState. A type the service does
+   * not know is ignored.
    *
    * @generated from field: repeated google.protobuf.Any details = 12;
    */
@@ -124,7 +124,7 @@ export const SessionSchema: GenMessage<Session> = /*@__PURE__*/
  */
 export type SessionPolicy = Message<"leaflow.fleet.host.v1.SessionPolicy"> & {
   /**
-   * Ends the session this long after its last viewer left (xrdp
+   * Ends the session this long after its last participant left (xrdp
    * DisconnectedTimeLimit).
    *
    * @generated from field: google.protobuf.Duration disconnected_timeout = 1;
@@ -139,7 +139,7 @@ export type SessionPolicy = Message<"leaflow.fleet.host.v1.SessionPolicy"> & {
   maxLifetime?: Duration | undefined;
 
   /**
-   * Ends the session when no viewer came this long after it opened.
+   * Ends the session when no participant came this long after it opened.
    *
    * @generated from field: google.protobuf.Duration no_client_timeout = 3;
    */
@@ -239,7 +239,7 @@ export type OpenSessionRequest = Message<"leaflow.fleet.host.v1.OpenSessionReque
   username: string;
 
   /**
-   * The address of the viewer that asked, for PAM_RHOST and logind's
+   * The address of the participant that asked, for PAM_RHOST and logind's
    * RemoteHost. Empty: the service's host name, so that the session is
    * always remote.
    *

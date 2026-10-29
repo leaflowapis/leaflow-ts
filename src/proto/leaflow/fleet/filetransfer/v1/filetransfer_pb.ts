@@ -106,7 +106,7 @@ export type FileTransferOffer = Message<"leaflow.fleet.filetransfer.v1.FileTrans
   totalSizeBytes: bigint;
 
   /**
-   * From the viewer only: the directory of the session user to store the
+   * From the participant only: the directory of the session user to store the
    * files in, which needs FileTransferPolicy.file_system_allowed. Empty: the
    * user's private transfer directory. Existing files are never overwritten.
    *
@@ -207,7 +207,7 @@ export type FileTransferRequest = Message<"leaflow.fleet.filetransfer.v1.FileTra
 
   /**
    * The files go to the receiver's clipboard once stored. Needs the matching
-   * direction of the viewer's ClipboardPolicy as well.
+   * direction of the participant's ClipboardPolicy as well.
    *
    * @generated from field: bool clipboard = 4;
    */
@@ -694,28 +694,28 @@ export const CreateFileOfferResponseSchema: GenMessage<CreateFileOfferResponse> 
   messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 20);
 
 /**
- * What a viewer may do with files. Carried in the viewer's signed
- * authorization; without it the viewer may do none of this.
+ * What a participant may do with files. Carried in the participant's signed
+ * authorization; without it the participant may do none of this.
  *
  * @generated from message leaflow.fleet.filetransfer.v1.FileTransferPolicy
  */
 export type FileTransferPolicy = Message<"leaflow.fleet.filetransfer.v1.FileTransferPolicy"> & {
   /**
-   * The viewer may send files to the session.
+   * The participant may send files to the session.
    *
    * @generated from field: bool upload_allowed = 1;
    */
   uploadAllowed: boolean;
 
   /**
-   * The viewer may receive files from the session.
+   * The participant may receive files from the session.
    *
    * @generated from field: bool download_allowed = 2;
    */
   downloadAllowed: boolean;
 
   /**
-   * The viewer may use FileSystemService and choose where uploads go.
+   * The participant may use FileSystemService and choose where uploads go.
    *
    * @generated from field: bool file_system_allowed = 3;
    */
@@ -827,7 +827,7 @@ export const FileSystemService: GenService<{
     output: typeof RemoveFileResponseSchema;
   },
   /**
-   * Offers files of the user to the viewer, which fetches them as for any
+   * Offers files of the user to the participant, which fetches them as for any
    * offer.
    *
    * @generated from rpc leaflow.fleet.filetransfer.v1.FileSystemService.CreateFileOffer

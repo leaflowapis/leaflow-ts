@@ -21,7 +21,7 @@ export const file_leaflow_fleet_privilege_v1_privilege: GenFile = /*@__PURE__*/
  */
 export type DecidePrivilegeRequestRequest = Message<"leaflow.fleet.privilege.v1.DecidePrivilegeRequestRequest"> & {
   /**
-   * The request, as the daemon shows it to viewers.
+   * The request, as the daemon shows it to participants.
    *
    * @generated from field: leaflow.fleet.privilege.v1.PrivilegeRequest request = 1;
    */
@@ -57,7 +57,7 @@ export const DecidePrivilegeRequestResponseSchema: GenMessage<DecidePrivilegeReq
   messageDesc(file_leaflow_fleet_privilege_v1_privilege, 1);
 
 /**
- * A message from the viewer.
+ * A message from the participant.
  *
  * @generated from message leaflow.fleet.privilege.v1.ClientMessage
  */
@@ -98,7 +98,7 @@ export type ServerMessage = Message<"leaflow.fleet.privilege.v1.ServerMessage"> 
    */
   message: {
     /**
-     * What this viewer may do. The first message.
+     * What this participant may do. The first message.
      *
      * @generated from field: leaflow.fleet.privilege.v1.ServerHello server_hello = 1;
      */
@@ -139,14 +139,14 @@ export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_privilege_v1_privilege, 3);
 
 /**
- * What this viewer may do.
+ * What this participant may do.
  *
  * @generated from message leaflow.fleet.privilege.v1.ServerHello
  */
 export type ServerHello = Message<"leaflow.fleet.privilege.v1.ServerHello"> & {
   /**
-   * The viewer's authorization allows it to approve requests. Without it the
-   * viewer sees requests and cannot decide them.
+   * The participant's authorization allows it to approve requests. Without it
+   * the participant sees requests and cannot decide them.
    *
    * @generated from field: bool approve_allowed = 1;
    */
@@ -168,7 +168,7 @@ export const ServerHelloSchema: GenMessage<ServerHello> = /*@__PURE__*/
 export type PrivilegePrompt = Message<"leaflow.fleet.privilege.v1.PrivilegePrompt"> & {
   /**
    * A serialized PrivilegeRequest, exactly as the daemon produced it. The
-   * viewer shows the request decoded from these bytes and signs their
+   * participant shows the request decoded from these bytes and signs their
    * SHA-256.
    *
    * @generated from field: bytes request = 1;
@@ -385,7 +385,7 @@ export const KeyringAccessSchema: GenMessage<KeyringAccess> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_privilege_v1_privilege, 8);
 
 /**
- * A person's decision, signed by the viewer.
+ * A person's decision, signed by the participant.
  *
  * @generated from message leaflow.fleet.privilege.v1.SignedPrivilegeDecision
  */
@@ -400,7 +400,7 @@ export type SignedPrivilegeDecision = Message<"leaflow.fleet.privilege.v1.Signed
   /**
    * The Ed25519 signature (RFC 8032) over the ASCII bytes
    * "leaflow.fleet.privilege.v1.PrivilegeDecision", one zero byte
-   * and decision, by the viewer key of the connection's authorization.
+   * and decision, by the participant key of the connection's authorization.
    *
    * @generated from field: bytes signature = 2;
    */
@@ -493,15 +493,15 @@ export const SnapshotEndSchema: GenMessage<SnapshotEnd> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_privilege_v1_privilege, 12);
 
 /**
- * What a viewer may do with privilege requests. Carried in the viewer's
- * signed authorization; the service grants approve_allowed only to the
- * devices of the session's person.
+ * What a participant may do with privilege requests. Carried in the
+ * participant's signed authorization; the service grants approve_allowed only
+ * to the devices of the session's person.
  *
  * @generated from message leaflow.fleet.privilege.v1.PrivilegePolicy
  */
 export type PrivilegePolicy = Message<"leaflow.fleet.privilege.v1.PrivilegePolicy"> & {
   /**
-   * The viewer may approve or deny requests.
+   * The participant may approve or deny requests.
    *
    * @generated from field: bool approve_allowed = 1;
    */
@@ -595,20 +595,20 @@ export const PrivilegeOutcomeSchema: GenEnum<PrivilegeOutcome> = /*@__PURE__*/
 
 /**
  * Decides on the platform the PAM authentications of directory accounts
- * (leaflow.fleet.directory.v1), so that sudo works where no viewer can
+ * (leaflow.fleet.directory.v1), so that sudo works where no participant can
  * approve, such as after an SSH login, and its owner can approve from any of
  * their devices. Served by the service on daemon connections
  * (leaflow.fleet.control.v1).
  *
- * The daemon asks for every PAM authentication of a directory account, at
- * the same time as it shows the request to the viewers of the session the
+ * The daemon asks for every PAM authentication of a directory account, at the
+ * same time as it shows the request to the participants of the session the
  * process belongs to, if any. The first decision counts: the daemon cancels
- * this call (CallCancel) once a viewer decides, and stops showing the request
- * once this call answers. A decision of the platform is not signed; the
+ * this call (CallCancel) once a participant decides, and stops showing the
+ * request once this call answers. A decision of the platform is not signed; the
  * daemon trusts it as it trusts the service for the directory.
  *
- * Unlike a viewer, the platform keeps the request's claims with the request
- * and shows them to the account's owner: at most the first 4 KiB of
+ * Unlike a participant, the platform keeps the request's claims with the
+ * request and shows them to the account's owner: at most the first 4 KiB of
  * command_line, and remote_host and tty.
  *
  * @generated from service leaflow.fleet.privilege.v1.PrivilegeService

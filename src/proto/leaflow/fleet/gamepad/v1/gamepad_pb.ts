@@ -15,7 +15,7 @@ export const file_leaflow_fleet_gamepad_v1_gamepad: GenFile = /*@__PURE__*/
   fileDesc("CiZsZWFmbG93L2ZsZWV0L2dhbWVwYWQvdjEvZ2FtZXBhZC5wcm90bxIYbGVhZmxvdy5mbGVldC5nYW1lcGFkLnYxIp0BChRHYW1lcGFkQ2xpZW50TWVzc2FnZRJBCgpkZXNjcmlwdG9yGAEgASgLMisubGVhZmxvdy5mbGVldC5nYW1lcGFkLnYxLkdhbWVwYWREZXNjcmlwdG9ySAASNwoFc3RhdGUYAiABKAsyJi5sZWFmbG93LmZsZWV0LmdhbWVwYWQudjEuR2FtZXBhZFN0YXRlSABCCQoHbWVzc2FnZSLOAQoUR2FtZXBhZFNlcnZlck1lc3NhZ2USNQoEb3BlbhgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuZ2FtZXBhZC52MS5HYW1lcGFkT3BlbkgAEjsKB2FwcGxpZWQYAiABKAsyKC5sZWFmbG93LmZsZWV0LmdhbWVwYWQudjEuR2FtZXBhZEFwcGxpZWRIABI3CgVjbG9zZRgDIAEoCzImLmxlYWZsb3cuZmxlZXQuZ2FtZXBhZC52MS5HYW1lcGFkQ2xvc2VIAEIJCgdtZXNzYWdlItYBChFHYW1lcGFkRGVzY3JpcHRvchIMCgRuYW1lGAEgASgJEhYKCXZlbmRvcl9pZBgCIAEoDUgAiAEBEhcKCnByb2R1Y3RfaWQYAyABKA1IAYgBARI5CgdtYXBwaW5nGAQgASgOMigubGVhZmxvdy5mbGVldC5nYW1lcGFkLnYxLkdhbWVwYWRNYXBwaW5nEhQKDGJ1dHRvbl9jb3VudBgFIAEoDRIUCgxuZXV0cmFsX2F4ZXMYBiADKAJCDAoKX3ZlbmRvcl9pZEINCgtfcHJvZHVjdF9pZCJOCgtHYW1lcGFkT3BlbhI/CgpkZXNjcmlwdG9yGAEgASgLMisubGVhZmxvdy5mbGVldC5nYW1lcGFkLnYxLkdhbWVwYWREZXNjcmlwdG9yIn4KDEdhbWVwYWRTdGF0ZRIQCghzZXF1ZW5jZRgBIAEoBBIUCgx0aW1lc3RhbXBfdXMYAiABKAMSDAoEYXhlcxgDIAMoAhI4CgdidXR0b25zGAQgAygLMicubGVhZmxvdy5mbGVldC5nYW1lcGFkLnYxLkdhbWVwYWRCdXR0b24iQAoNR2FtZXBhZEJ1dHRvbhIPCgdwcmVzc2VkGAEgASgIEg8KB3RvdWNoZWQYAiABKAgSDQoFdmFsdWUYAyABKAIiRQoOR2FtZXBhZEFwcGxpZWQSEAoIc2VxdWVuY2UYASABKAQSIQoFZXJyb3IYAiABKAsyEi5nb29nbGUucnBjLlN0YXR1cyJvCgxHYW1lcGFkQ2xvc2USPAoGcmVhc29uGAEgASgOMiwubGVhZmxvdy5mbGVldC5nYW1lcGFkLnYxLkdhbWVwYWRDbG9zZVJlYXNvbhIhCgVlcnJvchgCIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzKmgKDkdhbWVwYWRNYXBwaW5nEh8KG0dBTUVQQURfTUFQUElOR19VTlNQRUNJRklFRBAAEhwKGEdBTUVQQURfTUFQUElOR19TVEFOREFSRBABEhcKE0dBTUVQQURfTUFQUElOR19SQVcQAiqWAgoSR2FtZXBhZENsb3NlUmVhc29uEiQKIEdBTUVQQURfQ0xPU0VfUkVBU09OX1VOU1BFQ0lGSUVEEAASKgomR0FNRVBBRF9DTE9TRV9SRUFTT05fUEVSTUlTU0lPTl9ERU5JRUQQARIrCidHQU1FUEFEX0NMT1NFX1JFQVNPTl9QRVJNSVNTSU9OX1JFVk9LRUQQAhIrCidHQU1FUEFEX0NMT1NFX1JFQVNPTl9ERVZJQ0VfVU5BVkFJTEFCTEUQAxInCiNHQU1FUEFEX0NMT1NFX1JFQVNPTl9QUk9UT0NPTF9FUlJPUhAEEisKJ0dBTUVQQURfQ0xPU0VfUkVBU09OX1JFU09VUkNFX0VYSEFVU1RFRBAFQj5aPGdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9nYW1lcGFkL3YxO2dhbWVwYWR2MWIGcHJvdG8z", [file_google_rpc_status]);
 
 /**
- * A message from the viewer.
+ * A message from the participant.
  *
  * @generated from message leaflow.fleet.gamepad.v1.GamepadClientMessage
  */
@@ -161,7 +161,7 @@ export const GamepadDescriptorSchema: GenMessage<GamepadDescriptor> = /*@__PURE_
  */
 export type GamepadOpen = Message<"leaflow.fleet.gamepad.v1.GamepadOpen"> & {
   /**
-   * The descriptor in effect: the viewer's, with the standard mapping
+   * The descriptor in effect: the participant's, with the standard mapping
    * normalized.
    *
    * @generated from field: leaflow.fleet.gamepad.v1.GamepadDescriptor descriptor = 1;
@@ -190,7 +190,7 @@ export type GamepadState = Message<"leaflow.fleet.gamepad.v1.GamepadState"> & {
   sequence: bigint;
 
   /**
-   * When the viewer read it, in microseconds on its own clock
+   * When the participant read it, in microseconds on its own clock
    * (Gamepad.timestamp). Informational.
    *
    * @generated from field: int64 timestamp_us = 2;
@@ -356,14 +356,14 @@ export enum GamepadCloseReason {
   UNSPECIFIED = 0,
 
   /**
-   * The viewer's authorization does not allow it.
+   * The participant's authorization does not allow it.
    *
    * @generated from enum value: GAMEPAD_CLOSE_REASON_PERMISSION_DENIED = 1;
    */
   PERMISSION_DENIED = 1,
 
   /**
-   * The viewer's authorization no longer allows it.
+   * The participant's authorization no longer allows it.
    *
    * @generated from enum value: GAMEPAD_CLOSE_REASON_PERMISSION_REVOKED = 2;
    */
@@ -377,7 +377,7 @@ export enum GamepadCloseReason {
   DEVICE_UNAVAILABLE = 3,
 
   /**
-   * The viewer broke the rules above.
+   * The participant broke the rules above.
    *
    * @generated from enum value: GAMEPAD_CLOSE_REASON_PROTOCOL_ERROR = 4;
    */

@@ -15,7 +15,7 @@ export const file_leaflow_fleet_virtualdesktop_window_v1_window: GenFile = /*@__
   fileDesc("CjNsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL3dpbmRvdy92MS93aW5kb3cucHJvdG8SJmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxIoIFCg1DbGllbnRNZXNzYWdlEksKDGNsaWVudF9oZWxsbxgBIAEoCzIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLkNsaWVudEhlbGxvSAASSgoIc3RhY2tpbmcYAiABKAsyNi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5XaW5kb3dTdGFja2luZ0gAEkoKCGFjdGl2YXRlGAMgASgLMjYubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuV2luZG93QWN0aXZhdGVIABJMCgljb25maWd1cmUYBCABKAsyNy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5XaW5kb3dDb25maWd1cmVIABJECgVjbG9zZRgFIAEoCzIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLldpbmRvd0Nsb3NlSAASSgoIbWluaW1pemUYBiABKAsyNi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5XaW5kb3dNaW5pbWl6ZUgAElEKDHN0YXRlX2NoYW5nZRgHIAEoCzI5LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLldpbmRvd1N0YXRlQ2hhbmdlSAASTgoKdmlzaWJpbGl0eRgIIAEoCzI4LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLldpbmRvd1Zpc2liaWxpdHlIAEIJCgdtZXNzYWdlIsMFCg1TZXJ2ZXJNZXNzYWdlEkAKBndpbmRvdxgBIAEoCzIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLldpbmRvd0gAEkgKB2Rlc3Ryb3kYAiABKAsyNS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5XaW5kb3dEZXN0cm95SAASSgoIc3RhY2tpbmcYAyABKAsyNi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5XaW5kb3dTdGFja2luZ0gAEkoKCGFjdGl2YXRlGAQgASgLMjYubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuV2luZG93QWN0aXZhdGVIABJICgdyZXN0YWNrGAUgASgLMjUubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuV2luZG93UmVzdGFja0gAEmAKFGluaXRpYXRlX21vdmVfcmVzaXplGAYgASgLMkAubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuV2luZG93SW5pdGlhdGVNb3ZlUmVzaXplSAASQgoEZ3JhYhgHIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLldpbmRvd0dyYWJIABJGCgZ1bmdyYWIYCCABKAsyNC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5XaW5kb3dVbmdyYWJIABJLCgxzbmFwc2hvdF9lbmQYCSABKAsyMy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UiJQoLQ2xpZW50SGVsbG8SFgoObmF0aXZlX3dpbmRvd3MYASABKAgikAYKBldpbmRvdxIRCgl3aW5kb3dfaWQYASABKAQSRAoIZ2VvbWV0cnkYAiABKAsyMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuUmVjdGFuZ2xlEhYKDnJlc2l6ZV9jb3VudGVyGAMgASgEEhkKEW92ZXJyaWRlX3JlZGlyZWN0GAQgASgIEhoKDXRyYW5zaWVudF9mb3IYBSABKARIAIgBARIZCgx3aW5kb3dfZ3JvdXAYBiABKARIAYgBARJICgx3aW5kb3dfdHlwZXMYByADKA4yMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5XaW5kb3dUeXBlEkMKBnN0YXRlcxgIIAMoDjIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLldpbmRvd1N0YXRlEk0KD2FsbG93ZWRfYWN0aW9ucxgJIAMoDjI0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLldpbmRvd0FjdGlvbhJFCgpzaXplX2hpbnRzGAogASgLMjEubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuU2l6ZUhpbnRzEg0KBXRpdGxlGAsgASgJEhAKCHJlc19uYW1lGAwgASgJEhEKCXJlc19jbGFzcxgNIAEoCRITCgt3aW5kb3dfcm9sZRgOIAEoCRIXCg9kZXNrdG9wX2ZpbGVfaWQYDyABKAkSEgoKc3RhcnR1cF9pZBgQIAEoCRILCgNwaWQYESABKA0SGAoLZGVjb3JhdGlvbnMYEiABKAhIAogBARIRCgloYXNfYWxwaGEYEyABKAgSOwoEaWNvbhgUIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5JY29uQhAKDl90cmFuc2llbnRfZm9yQg8KDV93aW5kb3dfZ3JvdXBCDgoMX2RlY29yYXRpb25zIqkBCglTaXplSGludHMSEQoJbWluX3dpZHRoGAEgASgNEhIKCm1pbl9oZWlnaHQYAiABKA0SEQoJbWF4X3dpZHRoGAMgASgNEhIKCm1heF9oZWlnaHQYBCABKA0SEgoKYmFzZV93aWR0aBgFIAEoDRITCgtiYXNlX2hlaWdodBgGIAEoDRIRCgl3aWR0aF9pbmMYByABKA0SEgoKaGVpZ2h0X2luYxgIIAEoDSIiCg1XaW5kb3dEZXN0cm95EhEKCXdpbmRvd19pZBgBIAEoBCIkCg5XaW5kb3dTdGFja2luZxISCgp3aW5kb3dfaWRzGAEgAygEIiMKDldpbmRvd0FjdGl2YXRlEhEKCXdpbmRvd19pZBgBIAEoBCKLAQoNV2luZG93UmVzdGFjaxIRCgl3aW5kb3dfaWQYASABKAQSRQoKc3RhY2tfbW9kZRgCIAEoDjIxLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLlN0YWNrTW9kZRIUCgdzaWJsaW5nGAMgASgESACIAQFCCgoIX3NpYmxpbmciggEKD1dpbmRvd0NvbmZpZ3VyZRIRCgl3aW5kb3dfaWQYASABKAQSRAoIZ2VvbWV0cnkYAiABKAsyMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuUmVjdGFuZ2xlEhYKDnJlc2l6ZV9jb3VudGVyGAMgASgEIiAKC1dpbmRvd0Nsb3NlEhEKCXdpbmRvd19pZBgBIAEoBCIjCg5XaW5kb3dNaW5pbWl6ZRIRCgl3aW5kb3dfaWQYASABKAQivAEKEVdpbmRvd1N0YXRlQ2hhbmdlEhEKCXdpbmRvd19pZBgBIAEoBBJPCglvcGVyYXRpb24YAiABKA4yPC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5XaW5kb3dTdGF0ZU9wZXJhdGlvbhJDCgZzdGF0ZXMYAyADKA4yMy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5XaW5kb3dTdGF0ZSJyChBXaW5kb3dWaXNpYmlsaXR5EhEKCXdpbmRvd19pZBgBIAEoBBJLCgp2aXNpYmlsaXR5GAIgASgOMjcubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuVmlzaWJpbGl0eVN0YXRlItQBChhXaW5kb3dJbml0aWF0ZU1vdmVSZXNpemUSEQoJd2luZG93X2lkGAEgASgEEgkKAXgYAiABKBESCQoBeRgDIAEoERJOCglkaXJlY3Rpb24YBCABKA4yOy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5Nb3ZlUmVzaXplRGlyZWN0aW9uEg4KBmJ1dHRvbhgFIAEoDRIXCg9wcmVzc19pbnB1dF9zZXEYBiABKAQSFgoOcmVzaXplX2NvdW50ZXIYByABKAQiHwoKV2luZG93R3JhYhIRCgl3aW5kb3dfaWQYASABKAQiIQoMV2luZG93VW5ncmFiEhEKCXdpbmRvd19pZBgBIAEoBCINCgtTbmFwc2hvdEVuZCIqChVBY3RpdmF0ZVdpbmRvd1JlcXVlc3QSEQoJd2luZG93X2lkGAEgASgEIioKFkFjdGl2YXRlV2luZG93UmVzcG9uc2USEAoIcmV2aXNpb24YASABKAQiJwoSQ2xvc2VXaW5kb3dSZXF1ZXN0EhEKCXdpbmRvd19pZBgBIAEoBCInChNDbG9zZVdpbmRvd1Jlc3BvbnNlEhAKCHJldmlzaW9uGAEgASgEIioKFU1pbmltaXplV2luZG93UmVxdWVzdBIRCgl3aW5kb3dfaWQYASABKAQiKgoWTWluaW1pemVXaW5kb3dSZXNwb25zZRIQCghyZXZpc2lvbhgBIAEoBCJzChhTZXRXaW5kb3dHZW9tZXRyeVJlcXVlc3QSEQoJd2luZG93X2lkGAEgASgEEkQKCGdlb21ldHJ5GAIgASgLMjIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlJlY3RhbmdsZSKLAQoZU2V0V2luZG93R2VvbWV0cnlSZXNwb25zZRJECghnZW9tZXRyeRgBIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5SZWN0YW5nbGUSFgoOcmVzaXplX2NvdW50ZXIYAiABKAQSEAoIcmV2aXNpb24YAyABKAQiwwEKGENoYW5nZVdpbmRvd1N0YXRlUmVxdWVzdBIRCgl3aW5kb3dfaWQYASABKAQSTwoJb3BlcmF0aW9uGAIgASgOMjwubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuV2luZG93U3RhdGVPcGVyYXRpb24SQwoGc3RhdGVzGAMgAygOMjMubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuV2luZG93U3RhdGUi0AEKGUNoYW5nZVdpbmRvd1N0YXRlUmVzcG9uc2USQwoGc3RhdGVzGAEgAygOMjMubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuV2luZG93U3RhdGUSRAoIZ2VvbWV0cnkYAiABKAsyMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuUmVjdGFuZ2xlEhYKDnJlc2l6ZV9jb3VudGVyGAMgASgEEhAKCHJldmlzaW9uGAQgASgEKoYDCgpXaW5kb3dUeXBlEhsKF1dJTkRPV19UWVBFX1VOU1BFQ0lGSUVEEAASFgoSV0lORE9XX1RZUEVfTk9STUFMEAESFgoSV0lORE9XX1RZUEVfRElBTE9HEAISFwoTV0lORE9XX1RZUEVfREVTS1RPUBADEhQKEFdJTkRPV19UWVBFX0RPQ0sQBBIXChNXSU5ET1dfVFlQRV9UT09MQkFSEAUSFAoQV0lORE9XX1RZUEVfTUVOVRAGEhcKE1dJTkRPV19UWVBFX1VUSUxJVFkQBxIWChJXSU5ET1dfVFlQRV9TUExBU0gQCBIdChlXSU5ET1dfVFlQRV9EUk9QRE9XTl9NRU5VEAkSGgoWV0lORE9XX1RZUEVfUE9QVVBfTUVOVRAKEhcKE1dJTkRPV19UWVBFX1RPT0xUSVAQCxIcChhXSU5ET1dfVFlQRV9OT1RJRklDQVRJT04QDBIVChFXSU5ET1dfVFlQRV9DT01CTxANEhMKD1dJTkRPV19UWVBFX0RORBAOKpcDCgtXaW5kb3dTdGF0ZRIcChhXSU5ET1dfU1RBVEVfVU5TUEVDSUZJRUQQABIWChJXSU5ET1dfU1RBVEVfTU9EQUwQARIXChNXSU5ET1dfU1RBVEVfU1RJQ0tZEAISHwobV0lORE9XX1NUQVRFX01BWElNSVpFRF9WRVJUEAMSHwobV0lORE9XX1NUQVRFX01BWElNSVpFRF9IT1JaEAQSFwoTV0lORE9XX1NUQVRFX1NIQURFRBAFEh0KGVdJTkRPV19TVEFURV9TS0lQX1RBU0tCQVIQBhIbChdXSU5ET1dfU1RBVEVfU0tJUF9QQUdFUhAHEhcKE1dJTkRPV19TVEFURV9ISURERU4QCBIbChdXSU5ET1dfU1RBVEVfRlVMTFNDUkVFThAJEhYKEldJTkRPV19TVEFURV9BQk9WRRAKEhYKEldJTkRPV19TVEFURV9CRUxPVxALEiIKHldJTkRPV19TVEFURV9ERU1BTkRTX0FUVEVOVElPThAMEhgKFFdJTkRPV19TVEFURV9GT0NVU0VEEA0q+gIKDFdpbmRvd0FjdGlvbhIdChlXSU5ET1dfQUNUSU9OX1VOU1BFQ0lGSUVEEAASFgoSV0lORE9XX0FDVElPTl9NT1ZFEAESGAoUV0lORE9XX0FDVElPTl9SRVNJWkUQAhIaChZXSU5ET1dfQUNUSU9OX01JTklNSVpFEAMSFwoTV0lORE9XX0FDVElPTl9TSEFERRAEEhcKE1dJTkRPV19BQ1RJT05fU1RJQ0sQBRIfChtXSU5ET1dfQUNUSU9OX01BWElNSVpFX0hPUloQBhIfChtXSU5ET1dfQUNUSU9OX01BWElNSVpFX1ZFUlQQBxIcChhXSU5ET1dfQUNUSU9OX0ZVTExTQ1JFRU4QCBIgChxXSU5ET1dfQUNUSU9OX0NIQU5HRV9ERVNLVE9QEAkSFwoTV0lORE9XX0FDVElPTl9DTE9TRRAKEhcKE1dJTkRPV19BQ1RJT05fQUJPVkUQCxIXChNXSU5ET1dfQUNUSU9OX0JFTE9XEAwqnQEKCVN0YWNrTW9kZRIaChZTVEFDS19NT0RFX1VOU1BFQ0lGSUVEEAASFAoQU1RBQ0tfTU9ERV9BQk9WRRABEhQKEFNUQUNLX01PREVfQkVMT1cQAhIVChFTVEFDS19NT0RFX1RPUF9JRhADEhgKFFNUQUNLX01PREVfQk9UVE9NX0lGEAQSFwoTU1RBQ0tfTU9ERV9PUFBPU0lURRAFKqQBChRXaW5kb3dTdGF0ZU9wZXJhdGlvbhImCiJXSU5ET1dfU1RBVEVfT1BFUkFUSU9OX1VOU1BFQ0lGSUVEEAASIQodV0lORE9XX1NUQVRFX09QRVJBVElPTl9SRU1PVkUQARIeChpXSU5ET1dfU1RBVEVfT1BFUkFUSU9OX0FERBACEiEKHVdJTkRPV19TVEFURV9PUEVSQVRJT05fVE9HR0xFEAMqogEKD1Zpc2liaWxpdHlTdGF0ZRIgChxWSVNJQklMSVRZX1NUQVRFX1VOU1BFQ0lGSUVEEAASHwobVklTSUJJTElUWV9TVEFURV9VTk9CU0NVUkVEEAESJwojVklTSUJJTElUWV9TVEFURV9QQVJUSUFMTFlfT0JTQ1VSRUQQAhIjCh9WSVNJQklMSVRZX1NUQVRFX0ZVTExZX09CU0NVUkVEEAMqjgQKE01vdmVSZXNpemVEaXJlY3Rpb24SJQohTU9WRV9SRVNJWkVfRElSRUNUSU9OX1VOU1BFQ0lGSUVEEAASJgoiTU9WRV9SRVNJWkVfRElSRUNUSU9OX1NJWkVfVE9QTEVGVBABEiIKHk1PVkVfUkVTSVpFX0RJUkVDVElPTl9TSVpFX1RPUBACEicKI01PVkVfUkVTSVpFX0RJUkVDVElPTl9TSVpFX1RPUFJJR0hUEAMSJAogTU9WRV9SRVNJWkVfRElSRUNUSU9OX1NJWkVfUklHSFQQBBIqCiZNT1ZFX1JFU0laRV9ESVJFQ1RJT05fU0laRV9CT1RUT01SSUdIVBAFEiUKIU1PVkVfUkVTSVpFX0RJUkVDVElPTl9TSVpFX0JPVFRPTRAGEikKJU1PVkVfUkVTSVpFX0RJUkVDVElPTl9TSVpFX0JPVFRPTUxFRlQQBxIjCh9NT1ZFX1JFU0laRV9ESVJFQ1RJT05fU0laRV9MRUZUEAgSHgoaTU9WRV9SRVNJWkVfRElSRUNUSU9OX01PVkUQCRInCiNNT1ZFX1JFU0laRV9ESVJFQ1RJT05fU0laRV9LRVlCT0FSRBAKEicKI01PVkVfUkVTSVpFX0RJUkVDVElPTl9NT1ZFX0tFWUJPQVJEEAsSIAocTU9WRV9SRVNJWkVfRElSRUNUSU9OX0NBTkNFTBAMMvIFCg1XaW5kb3dTZXJ2aWNlEo8BCg5BY3RpdmF0ZVdpbmRvdxI9LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLkFjdGl2YXRlV2luZG93UmVxdWVzdBo+LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLkFjdGl2YXRlV2luZG93UmVzcG9uc2UShgEKC0Nsb3NlV2luZG93EjoubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuQ2xvc2VXaW5kb3dSZXF1ZXN0GjsubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuQ2xvc2VXaW5kb3dSZXNwb25zZRKPAQoOTWluaW1pemVXaW5kb3cSPS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5NaW5pbWl6ZVdpbmRvd1JlcXVlc3QaPi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLndpbmRvdy52MS5NaW5pbWl6ZVdpbmRvd1Jlc3BvbnNlEpgBChFTZXRXaW5kb3dHZW9tZXRyeRJALmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLlNldFdpbmRvd0dlb21ldHJ5UmVxdWVzdBpBLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aud2luZG93LnYxLlNldFdpbmRvd0dlb21ldHJ5UmVzcG9uc2USmAEKEUNoYW5nZVdpbmRvd1N0YXRlEkAubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuQ2hhbmdlV2luZG93U3RhdGVSZXF1ZXN0GkEubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC53aW5kb3cudjEuQ2hhbmdlV2luZG93U3RhdGVSZXNwb25zZUJLWklnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3Avd2luZG93L3YxO3dpbmRvd3YxYgZwcm90bzM", [file_leaflow_fleet_virtualdesktop_display_v1_display]);
 
 /**
- * A message from the viewer.
+ * A message from the participant.
  *
  * @generated from message leaflow.fleet.virtualdesktop.window.v1.ClientMessage
  */
@@ -27,7 +27,7 @@ export type ClientMessage = Message<"leaflow.fleet.virtualdesktop.window.v1.Clie
    */
   message: {
     /**
-     * How the viewer shows windows. The first message.
+     * How the participant shows windows. The first message.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.window.v1.ClientHello client_hello = 1;
      */
@@ -83,7 +83,7 @@ export type ClientMessage = Message<"leaflow.fleet.virtualdesktop.window.v1.Clie
     case: "stateChange";
   } | {
     /**
-     * How much of a window this viewer shows.
+     * How much of a window this participant shows.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.window.v1.WindowVisibility visibility = 8;
      */
@@ -112,8 +112,8 @@ export type ServerMessage = Message<"leaflow.fleet.virtualdesktop.window.v1.Serv
    */
   message: {
     /**
-     * A window as it is now, in full: new when the viewer does not know its
-     * window_id, otherwise replacing what the viewer had.
+     * A window as it is now, in full: new when the participant does not know
+     * its window_id, otherwise replacing what the participant had.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.window.v1.Window window = 1;
      */
@@ -194,13 +194,13 @@ export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_window_v1_window, 1);
 
 /**
- * How the viewer shows windows.
+ * How the participant shows windows.
  *
  * @generated from message leaflow.fleet.virtualdesktop.window.v1.ClientHello
  */
 export type ClientHello = Message<"leaflow.fleet.virtualdesktop.window.v1.ClientHello"> & {
   /**
-   * The viewer shows every window as a window of its own desktop (see
+   * The participant shows every window as a window of its own desktop (see
    * "Native windows"). Only in SESSION_MODE_SEAMLESS.
    *
    * @generated from field: bool native_windows = 1;
@@ -239,13 +239,13 @@ export type Window = Message<"leaflow.fleet.virtualdesktop.window.v1.Window"> & 
 
   /**
    * Counts the size changes of the window; see WindowConfigure. It never
-   * decreases and stays the same on a pure move. A size change that applies
-   * a WindowConfigure takes that request's value; any other size change adds
-   * one. Frames drawn after a size change carry the new value, and the first
-   * of them for this window depends on nothing. A value smaller than the
-   * largest the viewer has sent in a WindowConfigure confirms an older
-   * request: the viewer keeps its newer layout but records the size for this
-   * value, because frames drawn for it use it.
+   * decreases and stays the same on a pure move. A size change that applies a
+   * WindowConfigure takes that request's value; any other size change adds one.
+   * Frames drawn after a size change carry the new value, and the first of them
+   * for this window depends on nothing. A value smaller than the largest the
+   * participant has sent in a WindowConfigure confirms an older request: the
+   * participant keeps its newer layout but records the size for this value,
+   * because frames drawn for it use it.
    *
    * @generated from field: uint64 resize_counter = 3;
    */
@@ -268,8 +268,8 @@ export type Window = Message<"leaflow.fleet.virtualdesktop.window.v1.Window"> & 
   transientFor?: bigint | undefined;
 
   /**
-   * The leader of its group (ICCCM WM_HINTS window_group). The leader is
-   * often a window the viewer never sees; equal values mean the same group.
+   * The leader of its group (ICCCM WM_HINTS window_group). The leader is often
+   * a window the participant never sees; equal values mean the same group.
    *
    * @generated from field: optional uint64 window_group = 6;
    */
@@ -290,7 +290,7 @@ export type Window = Message<"leaflow.fleet.virtualdesktop.window.v1.Window"> & 
   states: WindowState[];
 
   /**
-   * The operations the viewer may offer (EWMH _NET_WM_ALLOWED_ACTIONS).
+   * The operations the participant may offer (EWMH _NET_WM_ALLOWED_ACTIONS).
    *
    * @generated from field: repeated leaflow.fleet.virtualdesktop.window.v1.WindowAction allowed_actions = 9;
    */
@@ -356,7 +356,7 @@ export type Window = Message<"leaflow.fleet.virtualdesktop.window.v1.Window"> & 
   pid: number;
 
   /**
-   * Whether the viewer draws a title bar and borders around it. False for
+   * Whether the participant draws a title bar and borders around it. False for
    * windows that draw their own. Unset: managed windows are decorated,
    * override-redirect windows are not.
    *
@@ -484,7 +484,7 @@ export const WindowDestroySchema: GenMessage<WindowDestroy> = /*@__PURE__*/
  * The managed windows from the bottom of the stack to the top (EWMH
  * _NET_CLIENT_LIST_STACKING). From the driver, the order it shows; the
  * session restacks the windows, keeping transient windows right above their
- * owner. From the session, the order now in effect, so that other viewers
+ * owner. From the session, the order now in effect, so that other participants
  * follow the driver. Override-redirect windows are not listed: they stay on
  * top in the order they appeared.
  *
@@ -508,8 +508,8 @@ export const WindowStackingSchema: GenMessage<WindowStacking> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_window_v1_window, 6);
 
 /**
- * From the viewer, the user activated a window; 0 means focus left every
- * window of the session, such as for a terminal of the viewer's own. The
+ * From the participant, the user activated a window; 0 means focus left every
+ * window of the session, such as for a terminal of the participant's own. The
  * session focuses it (ICCCM input focus), restores it when minimized and
  * clears DEMANDS_ATTENTION. Stacking follows separately in WindowStacking.
  * From the session, an application asks to activate a window (EWMH
@@ -595,11 +595,11 @@ export type WindowConfigure = Message<"leaflow.fleet.virtualdesktop.window.v1.Wi
   geometry?: Rectangle | undefined;
 
   /**
-   * Let M be the largest resize_counter the viewer has sent or received for
-   * the window. A request that changes the size carries M + 1, a pure move
+   * Let M be the largest resize_counter the participant has sent or received
+   * for the window. A request that changes the size carries M + 1, a pure move
    * carries M. The session drops a size change whose value is not larger than
    * its own counter, and a move whose value is smaller: the application or a
-   * newer request won, and the viewer sees the outcome in Window.
+   * newer request won, and the participant sees the outcome in Window.
    *
    * @generated from field: uint64 resize_counter = 3;
    */
@@ -698,10 +698,11 @@ export const WindowStateChangeSchema: GenMessage<WindowStateChange> = /*@__PURE_
   messageDesc(file_leaflow_fleet_virtualdesktop_window_v1_window, 12);
 
 /**
- * How much of a window this viewer shows, so that the session stops sending
- * frames of windows nobody sees. Only frames to this viewer change; the
- * window itself does not. Damage piles up while it is fully obscured and is
- * sent at once when it shows again. Every window starts unobscured.
+ * How much of a window this participant shows, so that the session stops
+ * sending frames of windows nobody sees. Only frames to this participant
+ * change; the window itself does not. Damage piles up while it is fully
+ * obscured and is sent at once when it shows again. Every window starts
+ * unobscured.
  *
  * @generated from message leaflow.fleet.virtualdesktop.window.v1.WindowVisibility
  */
@@ -714,7 +715,7 @@ export type WindowVisibility = Message<"leaflow.fleet.virtualdesktop.window.v1.W
   windowId: bigint;
 
   /**
-   * How much of it the viewer shows.
+   * How much of it the participant shows.
    *
    * @generated from field: leaflow.fleet.virtualdesktop.window.v1.VisibilityState visibility = 2;
    */
@@ -730,12 +731,12 @@ export const WindowVisibilitySchema: GenMessage<WindowVisibility> = /*@__PURE__*
 
 /**
  * An application started an interactive move or resize, usually because the
- * user dragged the title bar the window draws itself (EWMH
- * _NET_WM_MOVERESIZE). A pointer operation is sent only to the viewer whose
- * press the session applied and can bind the request to; one it cannot bind
- * to such a press is dropped. A keyboard operation is sent to the driver. The
- * viewer runs the drag with its own pointer until the button is released and
- * ends it with WindowConfigure; with CANCEL it stops the drag in progress.
+ * user dragged the title bar the window draws itself (EWMH _NET_WM_MOVERESIZE).
+ * A pointer operation is sent only to the participant whose press the session
+ * applied and can bind the request to; one it cannot bind to such a press is
+ * dropped. A keyboard operation is sent to the driver. The participant runs the
+ * drag with its own pointer until the button is released and ends it with
+ * WindowConfigure; with CANCEL it stops the drag in progress.
  *
  * @generated from message leaflow.fleet.virtualdesktop.window.v1.WindowInitiateMoveResize
  */
@@ -777,9 +778,9 @@ export type WindowInitiateMoveResize = Message<"leaflow.fleet.virtualdesktop.win
   button: number;
 
   /**
-   * PointerButton.input_seq of the viewer's press that the application's
-   * request was bound to. The viewer ignores the request when that press has
-   * already been released. 0 for keyboard operations.
+   * PointerButton.input_seq of the participant's press that the application's
+   * request was bound to. The participant ignores the request when that press
+   * has already been released. 0 for keyboard operations.
    *
    * @generated from field: uint64 press_input_seq = 6;
    */
@@ -802,7 +803,7 @@ export const WindowInitiateMoveResizeSchema: GenMessage<WindowInitiateMoveResize
 
 /**
  * An application grabbed the pointer, such as to run a popup menu (X11
- * GrabPointer). Until WindowUngrab the viewer sends every pointer event to
+ * GrabPointer). Until WindowUngrab the participant sends every pointer event to
  * this window, even outside it, so that a click outside the menu reaches the
  * application.
  *
@@ -1577,7 +1578,7 @@ export enum VisibilityState {
   PARTIALLY_OBSCURED = 2,
 
   /**
-   * None of it, including when this viewer minimized it in its own layout.
+   * None of it, including when this participant minimized it in its own layout.
    *
    * @generated from enum value: VISIBILITY_STATE_FULLY_OBSCURED = 3;
    */
@@ -1695,9 +1696,9 @@ export const MoveResizeDirectionSchema: GenEnum<MoveResizeDirection> = /*@__PURE
 
 /**
  * Operates windows through calls. Every call follows the rules for operation
- * calls (leaflow.fleet.virtualdesktop.lease.v1), never makes the caller the driver,
- * and returns the session revision at which it took effect. Besides those
- * rules, calls fail before anything happens with:
+ * calls (leaflow.fleet.virtualdesktop.lease.v1), never makes the caller the
+ * driver, and returns the session revision at which it took effect. Besides
+ * those rules, calls fail before anything happens with:
  *   - NOT_FOUND and reason WINDOW_NOT_FOUND for a window that is gone;
  *   - FAILED_PRECONDITION and reason WINDOW_NOT_MANAGED for a window the
  *     session does not place: an override-redirect window, which its

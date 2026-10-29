@@ -17,7 +17,7 @@ export const file_leaflow_fleet_sshagent_v1_sshagent: GenFile = /*@__PURE__*/
   fileDesc("CihsZWFmbG93L2ZsZWV0L3NzaGFnZW50L3YxL3NzaGFnZW50LnByb3RvEhlsZWFmbG93LmZsZWV0LnNzaGFnZW50LnYxIl4KDVByb3ZpZGVySGVsbG8SFAoMZGlzcGxheV9uYW1lGAEgASgJEh4KFm1heF9tZXNzYWdlX3NpemVfYnl0ZXMYAiABKA0SFwoPbWF4X2Nvbm5lY3Rpb25zGAMgASgNIoQBCg5Qcm92aWRlclN0YXR1cxI3CgVzdGF0ZRgBIAEoDjIoLmxlYWZsb3cuZmxlZXQuc3NoYWdlbnQudjEuUHJvdmlkZXJTdGF0ZRIWCg5hdXRoX3NvY2tfcGF0aBgCIAEoCRIhCgVlcnJvchgDIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIhwKDEFnZW50TWVzc2FnZRIMCgRkYXRhGAEgASgMIpgBCg5Tc2hBZ2VudFBvbGljeRIZChFwcm92aWRlcl9wcmlvcml0eRgBIAEoDRIXCg9tYXhfY29ubmVjdGlvbnMYAiABKA0SHgoWbWF4X21lc3NhZ2Vfc2l6ZV9ieXRlcxgDIAEoDRIyCg9yZXF1ZXN0X3RpbWVvdXQYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24qigEKDVByb3ZpZGVyU3RhdGUSHgoaUFJPVklERVJfU1RBVEVfVU5TUEVDSUZJRUQQABIcChhQUk9WSURFUl9TVEFURV9BVkFJTEFCTEUQARIbChdQUk9WSURFUl9TVEFURV9TRUxFQ1RFRBACEh4KGlBST1ZJREVSX1NUQVRFX1VOQVZBSUxBQkxFEANCQFo+Z2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3NzaGFnZW50L3YxO3NzaGFnZW50djFiBnByb3RvMw", [file_google_protobuf_duration, file_google_rpc_status]);
 
 /**
- * Offers the viewer's agent.
+ * Offers the participant's agent.
  *
  * @generated from message leaflow.fleet.sshagent.v1.ProviderHello
  */
@@ -31,14 +31,14 @@ export type ProviderHello = Message<"leaflow.fleet.sshagent.v1.ProviderHello"> &
   displayName: string;
 
   /**
-   * The largest agent message the viewer handles, at most 256 KiB.
+   * The largest agent message the participant handles, at most 256 KiB.
    *
    * @generated from field: uint32 max_message_size_bytes = 2;
    */
   maxMessageSizeBytes: number;
 
   /**
-   * The most connections the viewer handles at once.
+   * The most connections the participant handles at once.
    *
    * @generated from field: uint32 max_connections = 3;
    */
@@ -53,7 +53,7 @@ export const ProviderHelloSchema: GenMessage<ProviderHello> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_sshagent_v1_sshagent, 0);
 
 /**
- * The viewer's role as a provider.
+ * The participant's role as a provider.
  *
  * @generated from message leaflow.fleet.sshagent.v1.ProviderStatus
  */
@@ -113,14 +113,14 @@ export const AgentMessageSchema: GenMessage<AgentMessage> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_sshagent_v1_sshagent, 2);
 
 /**
- * What a viewer may do with SSH agents. Carried in the viewer's signed
- * authorization; without it the viewer offers no agent.
+ * What a participant may do with SSH agents. Carried in the participant's
+ * signed authorization; without it the participant offers no agent.
  *
  * @generated from message leaflow.fleet.sshagent.v1.SshAgentPolicy
  */
 export type SshAgentPolicy = Message<"leaflow.fleet.sshagent.v1.SshAgentPolicy"> & {
   /**
-   * Decides between viewers offering an agent: the higher is selected, and
+   * Decides between participants offering an agent: the higher is selected, and
    * on a tie the selected one stays.
    *
    * @generated from field: uint32 provider_priority = 1;
@@ -158,7 +158,7 @@ export const SshAgentPolicySchema: GenMessage<SshAgentPolicy> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_sshagent_v1_sshagent, 3);
 
 /**
- * The role of a viewer that offers its agent.
+ * The role of a participant that offers its agent.
  *
  * @generated from enum leaflow.fleet.sshagent.v1.ProviderState
  */
@@ -169,14 +169,14 @@ export enum ProviderState {
   UNSPECIFIED = 0,
 
   /**
-   * Another viewer is selected.
+   * Another participant is selected.
    *
    * @generated from enum value: PROVIDER_STATE_AVAILABLE = 1;
    */
   AVAILABLE = 1,
 
   /**
-   * This viewer is selected: new connections go to it.
+   * This participant is selected: new connections go to it.
    *
    * @generated from enum value: PROVIDER_STATE_SELECTED = 2;
    */

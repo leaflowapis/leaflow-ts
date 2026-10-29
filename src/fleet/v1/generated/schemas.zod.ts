@@ -4,15 +4,16 @@
  * Leaflow Fleet API
  * Machines that run the Leaflow Fleet Agent (`leaflow-fleet-agent`): adding machines, the
  * accounts and groups that log in to them, running commands, opening and closing sessions, with
- * or without a desktop, and admitting viewers to them.
+ * or without a desktop, and admitting participants to them.
  *
  * ## What this API sees
  *
- * This API coordinates. It admits viewers to sessions and passes the signaling of their
- * connections, but everything a session shows or receives — terminals, files, the screen,
- * input, the clipboard, printing and privilege approvals on a viewer — travels end to end
- * between the viewer and the session, encrypted with keys that never leave them. The platform
- * sees which machine, which session and who is connected, and nothing of what happens inside.
+ * This API coordinates. It admits participants to sessions and passes the signaling of their
+ * PeerConnections, but everything a session shows or receives — terminals, files, the screen,
+ * input, the clipboard, printing and privilege approvals on a participant — travels end to end
+ * between the participant and the session, encrypted with keys that never leave them. The
+ * platform sees which machine, which session and who is connected, and nothing of what happens
+ * inside.
  *
  * Commands and privilege requests decided on the platform are the exception: the platform passes
  * a command and its output between the caller and the machine, and keeps the command line of a
@@ -55,7 +56,7 @@
  *
  * ## Trusting a machine's key
  *
- * Each machine has an Ed25519 key that it generates itself and that never leaves it. Viewers
+ * Each machine has an Ed25519 key that it generates itself and that never leaves it. Participants
  * verify that key end to end before they exchange any data with a session, so a client must
  * decide which key belongs to a machine without relying on any party in between:
  *
@@ -126,9 +127,9 @@
  * - inside a command run through this API, by the request itself;
  * - at once, while the user has set the machine to approve without asking, for a while or for
  *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
- * - by the user, on any of their devices, for a request listed by
- *   `GET /api/v1/privilege-requests` (`POST …:approve` or `…:deny`), or on a viewer of the session
- *   the asking process belongs to. A request nobody decides expires, and sudo fails.
+ * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
+ *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
+ *   to. A request nobody decides expires, and sudo fails.
  *
  * Requests reach the user's devices as they happen through EventBus: the event
  * `leaflow.fleet.privilege.requested` when one is waiting and `leaflow.fleet.privilege.decided`
@@ -147,34 +148,40 @@
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
  * - A privilege request is decided only by the user whose account asks.
  *
- * ## Viewing a session
+ * ## Joining a session
  *
- * 1. Have an Ed25519 key, for as long as the client wants: one per viewer connection or one kept
- *    by the client. The private key must never leave the client; in a browser, use a
+ * 1. Have an Ed25519 key, for as long as the client wants: one per participant or one kept by
+ *    the client. The private key must never leave the client; in a browser, use a
  *    non-extractable WebCrypto key.
- * 2. Create a viewer connection for the public key with
- *    `POST /api/v1/sessions/{sessionId}/viewers`. The answer carries the viewer's signed
- *    authorization, the ICE servers, the keys the service signs with and a signaling ticket.
- * 3. To start a PeerConnection, open a WebSocket to the ticket's `url` with the subprotocol
- *    `leaflow.fleet.control.v1` and follow `leaflow/fleet/control/v1/control.proto` and
- *    `leaflow/fleet/transport/v1/transport.proto`. The ticket travels inside the protocol and
- *    never in a URL, and serves once within 60 seconds; for a later PeerConnection, such as
- *    after a path failed, ask for another with
- *    `POST /api/v1/sessions/{sessionId}/viewers/{connectionId}/signaling-tickets`. The
- *    WebSocket may be closed once the PeerConnection carries data.
- * 4. Renew the viewer connection with `POST …/viewers/{connectionId}:renew` well before
+ * 2. Get the ICE servers with `GET /api/v1/sessions/{sessionId}/rtc-configuration`, create a
+ *    PeerConnection with them and its data channels (`leaflow/fleet/transport/v1/transport.proto`)
+ *    and make an offer. Wait briefly for ICE candidates, such as until gathering completes or
+ *    one second has passed, so that the offer carries them.
+ * 3. Join with `POST /api/v1/sessions/{sessionId}/participants`, sending the public key and the
+ *    offer. The answer carries the participant's signed authorization, the keys the service
+ *    signs with, and the attempt: the session's SDP answer, its ICE candidates and the signed
+ *    PeerAuthorization. Pass candidates gathered later with
+ *    `POST …/participants/{connectionId}/attempts/{attemptId}/candidates`.
+ * 4. Renew the participant with `POST …/participants/{connectionId}:renew` well before
  *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
- *    PeerConnection; the answer renews them. A viewer connection whose lease runs out ends,
- *    and its PeerConnections stop within 30 seconds of their last lease.
- * 5. Leave with `DELETE …/viewers/{connectionId}`.
+ *    PeerConnection; the answer renews them. A participant whose lease runs out ends, and its
+ *    PeerConnections stop within 30 seconds of their last lease.
+ * 5. When a path fails, start another PeerConnection with
+ *    `POST …/participants/{connectionId}/attempts` and move the connection to it with
+ *    `:prepare-migration` and `:commit-migration`. Abandon an attempt with
+ *    `DELETE …/attempts/{attemptId}`.
+ * 6. Leave with `DELETE …/participants/{connectionId}`.
  *
- * What a viewer may do in a session is decided when its viewer connection is created, from the
- * caller's permissions and what the request asks for, and does not change afterwards. Viewers
- * are not told apart by kind: a person in a browser and a program that operates the session are
- * both viewers, named by the `client_id` label they choose, and either can be disconnected.
+ * Signaling travels only through these requests; a participant holds no other connection to
+ * the service.
  *
- * Every viewer connection that ends, including through `DELETE`, is announced through EventBus as
- * `leaflow.fleet.viewer.closed`, addressed to its user in the current project, with its
+ * What a participant may do in a session is decided when it is created, from the caller's
+ * permissions and what the request asks for, and does not change afterwards. Participants are not
+ * told apart by kind: a person in a browser and a program that operates the session are both
+ * participants, named by the `client_id` label they choose, and either can be disconnected.
+ *
+ * Every participant that ends, including through `DELETE`, is announced through EventBus as
+ * `leaflow.fleet.participant.closed`, addressed to its user in the current project, with its
  * `session_id`, `connection_id` (a decimal string) and `reason`: the name of the
  * `CloseReason` of `leaflow/fleet/control/v1/control.proto` in lower case without its prefix,
  * such as `detach_request` when it was ended through `DELETE`, `ping_timeout` when its lease
@@ -186,19 +193,25 @@ import * as zod from "zod";
 
 import { ApproveEnrollmentRequest } from "./validators/approveEnrollmentRequest.zod.js";
 
+import { CreateAttemptCandidatesRequest } from "./validators/createAttemptCandidatesRequest.zod.js";
+
+import { CreateAttemptRequest } from "./validators/createAttemptRequest.zod.js";
+
 import { CreateGroupMemberRequest } from "./validators/createGroupMemberRequest.zod.js";
 
 import { CreateGroupRequest } from "./validators/createGroupRequest.zod.js";
 
 import { CreateMachineRegistrationRequest } from "./validators/createMachineRegistrationRequest.zod.js";
 
+import { CreateParticipantRequest } from "./validators/createParticipantRequest.zod.js";
+
 import { CreateSessionRequest } from "./validators/createSessionRequest.zod.js";
 
-import { CreateViewerRequest } from "./validators/createViewerRequest.zod.js";
+import { MigrationStep } from "./validators/migrationStep.zod.js";
 
 import { PrivilegeApproval } from "./validators/privilegeApproval.zod.js";
 
-import { RenewViewerRequest } from "./validators/renewViewerRequest.zod.js";
+import { RenewParticipantRequest } from "./validators/renewParticipantRequest.zod.js";
 
 import { RunCommandRequest } from "./validators/runCommandRequest.zod.js";
 
@@ -258,9 +271,9 @@ export const UpdateMachineParams = zod.strictObject({
 export const UpdateMachineBody = UpdateMachineRequest;
 
 /**
- * Removes the machine from the project. Every viewer of its sessions is disconnected at once
- * and the Agent is refused from then on; to use the machine again, enroll it again. Sessions
- * still open on the machine can no longer be reached and end according to their own
+ * Removes the machine from the project. Every participant of its sessions is disconnected at
+ * once and the Agent is refused from then on; to use the machine again, enroll it again.
+ * Sessions still open on the machine can no longer be reached and end according to their own
  * timeouts. Nothing on the machine is deleted.
  *
  * Requires `fleet:machines.manage`.
@@ -775,7 +788,7 @@ export const ListSessionsQueryParams = zod.strictObject({
  *
  * On a machine an account has at most one session with a desktop and at most 8 sessions in
  * all. Sessions without a desktop run side by side, such as one for a program and one for a
- * person; several viewers can also share one session.
+ * person; several participants can also share one session.
  *
  * Fails with:
  * - `MACHINE_OFFLINE` when the machine is not connected;
@@ -857,138 +870,292 @@ export const TerminateSessionParams = zod.strictObject({
 });
 
 /**
- * Admits one viewer with the given public key to the session: signs its authorization,
- * has the session accept it, and returns it with a first signaling ticket. The viewer
- * connection lasts while it is renewed.
+ * Returns the STUN and TURN servers for the PeerConnections the caller starts to the session,
+ * with TURN credentials of its own, and the policy for using them. Ask again once
+ * `expires_at` has passed; the credentials of a PeerConnection already relayed last longer.
  *
- * The owner of a session may operate it. Viewing another member's session requires
+ * Requires that the caller may join the session, as for `create-participant`.
+ *
+ * Fails with:
+ * - `SESSION_CLOSED` when the session has ended;
+ * - `SESSION_ACCESS_DENIED` when the caller may not join the session.
+ * @summary Get the ICE servers for a session
+ */
+export const getSessionRtcConfigurationPathSessionIdMax = 40;
+
+export const getSessionRtcConfigurationPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+
+export const GetSessionRtcConfigurationParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(getSessionRtcConfigurationPathSessionIdMax)
+    .regex(getSessionRtcConfigurationPathSessionIdRegExp),
+});
+
+/**
+ * Admits one participant with the given public key to the session: signs its authorization,
+ * has the session accept it, and starts its first PeerConnection with the offer. The answer
+ * carries the participant, its authorization and the attempt with the session's answer. The
+ * participant lasts while it is renewed.
+ *
+ * The owner of a session may operate it. Joining another member's session requires
  * `fleet:sessions.view`, which admits watching only, or
  * `fleet:sessions.control`, which also admits operating it. Each further capability
  * of the session — file transfer, the clipboard, terminals and programs, port forwarding,
  * devices and audio, printing, SSH agent forwarding, approving privilege requests and
- * reading logs — is granted only with its permission; a viewer that may only watch gets
+ * reading logs — is granted only with its permission; a participant that may only watch gets
  * none of them. A request may ask for less: to watch only, or for some of the capabilities.
  *
- * Fails with:
+ * Fails with the following, and then no participant was created:
  * - `SESSION_CLOSED` when the session has ended;
- * - `SESSION_ACCESS_DENIED` when the caller may not view the session;
- * - `SESSION_UNAVAILABLE` when the session's process is not connected, such as while it
- *   restarts; try again after the error's `retry_delay`;
- * - `VIEWER_LIMIT_REACHED` when the session has as many viewers as it admits;
- * - `VIEWER_REFUSED` when the session refused the viewer.
- * @summary Create a viewer connection
+ * - `SESSION_ACCESS_DENIED` when the caller may not join the session;
+ * - `OFFER_INVALID` when the offer is not an SDP offer that names a SHA-256 DTLS fingerprint;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
+ *   time, such as while it restarts; try again after the error's `retry_delay`;
+ * - `PARTICIPANT_LIMIT_REACHED` when the session has as many participants as it admits;
+ * - `PARTICIPANT_REFUSED` when the session refused the participant;
+ * - `ATTEMPT_ABORTED` when the session gave up the PeerConnection; try again with a new
+ *   offer.
+ * @summary Join a session
  */
-export const createViewerPathSessionIdMax = 40;
+export const createParticipantPathSessionIdMax = 40;
 
-export const createViewerPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const createParticipantPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
 
-export const CreateViewerParams = zod.strictObject({
+export const CreateParticipantParams = zod.strictObject({
   sessionId: zod
     .string()
     .min(1)
-    .max(createViewerPathSessionIdMax)
-    .regex(createViewerPathSessionIdRegExp),
+    .max(createParticipantPathSessionIdMax)
+    .regex(createParticipantPathSessionIdRegExp),
 });
 
-export const CreateViewerBody = CreateViewerRequest;
+export const CreateParticipantBody = CreateParticipantRequest;
 
 /**
- * Returns the viewers connected to the session, in the order they connected.
- * @summary List the viewers of a session
+ * Returns the participants of the session, in the order they joined.
+ * @summary List the participants of a session
  */
-export const listSessionViewersPathSessionIdMax = 40;
+export const listSessionParticipantsPathSessionIdMax = 40;
 
-export const listSessionViewersPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const listSessionParticipantsPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
 
-export const ListSessionViewersParams = zod.strictObject({
+export const ListSessionParticipantsParams = zod.strictObject({
   sessionId: zod
     .string()
     .min(1)
-    .max(listSessionViewersPathSessionIdMax)
-    .regex(listSessionViewersPathSessionIdRegExp),
+    .max(listSessionParticipantsPathSessionIdMax)
+    .regex(listSessionParticipantsPathSessionIdRegExp),
 });
 
 /**
- * Extends the viewer connection's lease and returns renewed PeerAuthorizations for the
+ * Extends the participant's lease and returns renewed PeerAuthorizations for the
  * PeerConnections whose current ones the request presents; the session receives them too.
- * A presented authorization that the service did not sign for this viewer connection, or
- * whose attempt has ended, is left out of the answer. When the viewer's authorization nears
+ * A presented authorization that the service did not sign for this participant, or whose
+ * attempt has ended, is left out of the answer. When the participant's authorization nears
  * its end, the answer carries a renewed one, which the session already holds.
  *
- * Only the viewer connection's user may renew it.
+ * Only the participant's user may renew it.
  *
  * Fails with:
- * - `VIEWER_NOT_FOUND` when the viewer connection has ended; create another;
- * - `VIEWER_RIGHTS_CHANGED` when the caller's permissions no longer grant what the viewer
- *   connection holds; it has ended, and another can be created with the current rights.
- * @summary Renew a viewer connection
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended; create another;
+ * - `PARTICIPANT_RIGHTS_CHANGED` when the caller's permissions no longer grant what the
+ *   participant holds; it has ended, and another can be created with the current rights.
+ * @summary Renew a participant
  */
-export const renewViewerPathSessionIdMax = 40;
+export const renewParticipantPathSessionIdMax = 40;
 
-export const renewViewerPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const renewParticipantPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
 
-export const RenewViewerParams = zod.strictObject({
+export const RenewParticipantParams = zod.strictObject({
   sessionId: zod
     .string()
     .min(1)
-    .max(renewViewerPathSessionIdMax)
-    .regex(renewViewerPathSessionIdRegExp),
+    .max(renewParticipantPathSessionIdMax)
+    .regex(renewParticipantPathSessionIdRegExp),
   connectionId: zod.int().min(1),
 });
 
-export const RenewViewerBody = RenewViewerRequest;
+export const RenewParticipantBody = RenewParticipantRequest;
 
 /**
- * Issues a single-use ticket for one signaling WebSocket of the viewer connection, valid for
- * 60 seconds. Only the viewer connection's user may ask for one.
+ * Passes the participant's checkpoint for the next epoch to the session and returns the
+ * session's checkpoint for it: the `prepare` and `prepared` steps of `Migration` in
+ * `leaflow/fleet/transport/v1/transport.proto`. Repeating the step returns the same answer.
  *
- * Fails with `VIEWER_NOT_FOUND` when the viewer connection has ended.
- * @summary Create a signaling ticket
+ * Only the participant's user may migrate it.
+ *
+ * Fails with:
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
+ * - `CHECKPOINT_INVALID` when the checkpoint is not a serialized `Checkpoint`;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
+ *   time; try again after the error's `retry_delay`.
+ * @summary Prepare a migration
  */
-export const createSignalingTicketPathSessionIdMax = 40;
+export const prepareParticipantMigrationPathSessionIdMax = 40;
 
-export const createSignalingTicketPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const prepareParticipantMigrationPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
 
-export const CreateSignalingTicketParams = zod.strictObject({
+export const PrepareParticipantMigrationParams = zod.strictObject({
   sessionId: zod
     .string()
     .min(1)
-    .max(createSignalingTicketPathSessionIdMax)
-    .regex(createSignalingTicketPathSessionIdRegExp),
+    .max(prepareParticipantMigrationPathSessionIdMax)
+    .regex(prepareParticipantMigrationPathSessionIdRegExp),
   connectionId: zod.int().min(1),
 });
 
-/**
- * Returns a viewer connected to the session.
- * @summary Get a viewer of a session
- */
-export const getViewerPathSessionIdMax = 40;
-
-export const getViewerPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
-
-export const GetViewerParams = zod.strictObject({
-  sessionId: zod.string().min(1).max(getViewerPathSessionIdMax).regex(getViewerPathSessionIdRegExp),
-  connectionId: zod.int().min(1),
-});
+export const PrepareParticipantMigrationBody = MigrationStep;
 
 /**
- * Ends the viewer connection: the session detaches the viewer and closes its
- * PeerConnections, and the session goes on. A viewer leaves this way; others are
- * disconnected this way.
+ * Commits the epoch the participant prepared and returns the session's checkpoint once it
+ * committed it: the `commit` and `committed` steps of `Migration` in
+ * `leaflow/fleet/transport/v1/transport.proto`. Repeating the step returns the same answer.
  *
- * The viewer connection's user and the owner of the session may end it; otherwise this
+ * Only the participant's user may migrate it.
+ *
+ * Fails with:
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
+ * - `CHECKPOINT_INVALID` when the checkpoint is not a serialized `Checkpoint`;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
+ *   time; try again after the error's `retry_delay`.
+ * @summary Commit a migration
+ */
+export const commitParticipantMigrationPathSessionIdMax = 40;
+
+export const commitParticipantMigrationPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+
+export const CommitParticipantMigrationParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(commitParticipantMigrationPathSessionIdMax)
+    .regex(commitParticipantMigrationPathSessionIdRegExp),
+  connectionId: zod.int().min(1),
+});
+
+export const CommitParticipantMigrationBody = MigrationStep;
+
+/**
+ * Starts another PeerConnection of the participant with the offer, such as after a path
+ * failed, and returns the session's answer, its ICE candidates and the signed
+ * PeerAuthorization. Move the connection to it with `prepare-participant-migration` and
+ * `commit-participant-migration`.
+ *
+ * Only the participant's user may start one.
+ *
+ * Fails with:
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
+ * - `OFFER_INVALID` when the offer is not an SDP offer that names a SHA-256 DTLS fingerprint;
+ * - `TOO_MANY_ATTEMPTS` when the participant started too many PeerConnections in the last
+ *   minute; try again after the error's `retry_delay`;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
+ *   time; try again after the error's `retry_delay`;
+ * - `ATTEMPT_ABORTED` when the session gave up the PeerConnection; start another.
+ * @summary Start a PeerConnection
+ */
+export const createAttemptPathSessionIdMax = 40;
+
+export const createAttemptPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+
+export const CreateAttemptParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(createAttemptPathSessionIdMax)
+    .regex(createAttemptPathSessionIdRegExp),
+  connectionId: zod.int().min(1),
+});
+
+export const CreateAttemptBody = CreateAttemptRequest;
+
+/**
+ * Tells the session to give up the attempt and close its PeerConnection. Abandoning an
+ * attempt that has ended succeeds.
+ *
+ * Only the participant's user may abandon it.
+ *
+ * Fails with `PARTICIPANT_NOT_FOUND` when the participant has ended.
+ * @summary Abandon a PeerConnection
+ */
+export const deleteAttemptPathSessionIdMax = 40;
+
+export const deleteAttemptPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+
+export const DeleteAttemptParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(deleteAttemptPathSessionIdMax)
+    .regex(deleteAttemptPathSessionIdRegExp),
+  connectionId: zod.int().min(1),
+  attemptId: zod.uuid(),
+});
+
+/**
+ * Passes the ICE candidates the participant gathered after its offer to the session, and with
+ * `end_of_candidates`, that it has gathered all (RFC 8838). The session ignores those of an
+ * attempt that has ended.
+ *
+ * Only the participant's user may add them.
+ *
+ * Fails with:
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected; try again after the
+ *   error's `retry_delay`.
+ * @summary Add ICE candidates to a PeerConnection
+ */
+export const createAttemptCandidatesPathSessionIdMax = 40;
+
+export const createAttemptCandidatesPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+
+export const CreateAttemptCandidatesParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(createAttemptCandidatesPathSessionIdMax)
+    .regex(createAttemptCandidatesPathSessionIdRegExp),
+  connectionId: zod.int().min(1),
+  attemptId: zod.uuid(),
+});
+
+export const CreateAttemptCandidatesBody = CreateAttemptCandidatesRequest;
+
+/**
+ * Returns a participant of the session.
+ * @summary Get a participant of a session
+ */
+export const getParticipantPathSessionIdMax = 40;
+
+export const getParticipantPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+
+export const GetParticipantParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(getParticipantPathSessionIdMax)
+    .regex(getParticipantPathSessionIdRegExp),
+  connectionId: zod.int().min(1),
+});
+
+/**
+ * Ends the participant: the session detaches it and closes its PeerConnections, and the
+ * session goes on. A participant leaves this way; others are disconnected this way.
+ *
+ * The participant's user and the owner of the session may end it; otherwise this
  * requires `fleet:sessions.manage`.
- * @summary End a viewer connection
+ * @summary End a participant
  */
-export const deleteViewerPathSessionIdMax = 40;
+export const deleteParticipantPathSessionIdMax = 40;
 
-export const deleteViewerPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const deleteParticipantPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
 
-export const DeleteViewerParams = zod.strictObject({
+export const DeleteParticipantParams = zod.strictObject({
   sessionId: zod
     .string()
     .min(1)
-    .max(deleteViewerPathSessionIdMax)
-    .regex(deleteViewerPathSessionIdRegExp),
+    .max(deleteParticipantPathSessionIdMax)
+    .regex(deleteParticipantPathSessionIdRegExp),
   connectionId: zod.int().min(1),
 });

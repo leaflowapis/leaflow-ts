@@ -17,7 +17,7 @@ export const file_leaflow_fleet_virtualdesktop_notification_v1_notification: Gen
   fileDesc("Cj9sZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL25vdGlmaWNhdGlvbi92MS9ub3RpZmljYXRpb24ucHJvdG8SLGxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aubm90aWZpY2F0aW9uLnYxIqICCg1TZXJ2ZXJNZXNzYWdlElIKDG5vdGlmaWNhdGlvbhgBIAEoCzI6LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aubm90aWZpY2F0aW9uLnYxLk5vdGlmaWNhdGlvbkgAEl8KE25vdGlmaWNhdGlvbl9jbG9zZWQYAiABKAsyQC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLm5vdGlmaWNhdGlvbi52MS5Ob3RpZmljYXRpb25DbG9zZWRIABJRCgxzbmFwc2hvdF9lbmQYAyABKAsyOS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLm5vdGlmaWNhdGlvbi52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UisAQKDE5vdGlmaWNhdGlvbhIXCg9ub3RpZmljYXRpb25faWQYASABKAQSEAoIYXBwX25hbWUYAiABKAkSPwoIYXBwX2ljb24YAyABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSWNvbhIPCgdzdW1tYXJ5GAQgASgJEgwKBGJvZHkYBSABKAkSUQoHYWN0aW9ucxgGIAMoCzJALmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aubm90aWZpY2F0aW9uLnYxLk5vdGlmaWNhdGlvbkFjdGlvbhJGCgd1cmdlbmN5GAcgASgOMjUubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5ub3RpZmljYXRpb24udjEuVXJnZW5jeRIQCghjYXRlZ29yeRgIIAEoCRIXCg9kZXNrdG9wX2ZpbGVfaWQYCSABKAkSPQoFaW1hZ2UYCiABKAsyLi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSW1hZ2USEAoIcmVzaWRlbnQYCyABKAgSEQoJdHJhbnNpZW50GAwgASgIEgsKA3BpZBgNIAEoDRIuCgpjcmVhdGVkX2F0GA4gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJ0ChJOb3RpZmljYXRpb25BY3Rpb24SEgoKYWN0aW9uX2tleRgBIAEoCRINCgVsYWJlbBgCIAEoCRI7CgRpY29uGAMgASgLMi0ubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkljb24ihAEKEk5vdGlmaWNhdGlvbkNsb3NlZBIXCg9ub3RpZmljYXRpb25faWQYASABKAQSVQoGcmVhc29uGAIgASgOMkUubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5ub3RpZmljYXRpb24udjEuTm90aWZpY2F0aW9uQ2xvc2VSZWFzb24iDQoLU25hcHNob3RFbmQiTgofSW52b2tlTm90aWZpY2F0aW9uQWN0aW9uUmVxdWVzdBIXCg9ub3RpZmljYXRpb25faWQYASABKAQSEgoKYWN0aW9uX2tleRgCIAEoCSI0CiBJbnZva2VOb3RpZmljYXRpb25BY3Rpb25SZXNwb25zZRIQCghyZXZpc2lvbhgBIAEoBCI1ChpEaXNtaXNzTm90aWZpY2F0aW9uUmVxdWVzdBIXCg9ub3RpZmljYXRpb25faWQYASABKAQiLwobRGlzbWlzc05vdGlmaWNhdGlvblJlc3BvbnNlEhAKCHJldmlzaW9uGAEgASgEKl0KB1VyZ2VuY3kSFwoTVVJHRU5DWV9VTlNQRUNJRklFRBAAEg8KC1VSR0VOQ1lfTE9XEAESEgoOVVJHRU5DWV9OT1JNQUwQAhIUChBVUkdFTkNZX0NSSVRJQ0FMEAMq8gEKF05vdGlmaWNhdGlvbkNsb3NlUmVhc29uEikKJU5PVElGSUNBVElPTl9DTE9TRV9SRUFTT05fVU5TUEVDSUZJRUQQABIlCiFOT1RJRklDQVRJT05fQ0xPU0VfUkVBU09OX0VYUElSRUQQARInCiNOT1RJRklDQVRJT05fQ0xPU0VfUkVBU09OX0RJU01JU1NFRBACEjMKL05PVElGSUNBVElPTl9DTE9TRV9SRUFTT05fQ0xPU0VEX0JZX0FQUExJQ0FUSU9OEAMSJwojTk9USUZJQ0FUSU9OX0NMT1NFX1JFQVNPTl9VTkRFRklORUQQBDL+AgoTTm90aWZpY2F0aW9uU2VydmljZRK5AQoYSW52b2tlTm90aWZpY2F0aW9uQWN0aW9uEk0ubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5ub3RpZmljYXRpb24udjEuSW52b2tlTm90aWZpY2F0aW9uQWN0aW9uUmVxdWVzdBpOLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3Aubm90aWZpY2F0aW9uLnYxLkludm9rZU5vdGlmaWNhdGlvbkFjdGlvblJlc3BvbnNlEqoBChNEaXNtaXNzTm90aWZpY2F0aW9uEkgubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5ub3RpZmljYXRpb24udjEuRGlzbWlzc05vdGlmaWNhdGlvblJlcXVlc3QaSS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLm5vdGlmaWNhdGlvbi52MS5EaXNtaXNzTm90aWZpY2F0aW9uUmVzcG9uc2VCV1pVZ2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL25vdGlmaWNhdGlvbi92MTtub3RpZmljYXRpb252MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_leaflow_fleet_virtualdesktop_display_v1_display]);
 
 /**
- * A message from the session on the notification channel. The viewer sends
+ * A message from the session on the notification channel. The participant sends
  * nothing on it.
  *
  * @generated from message leaflow.fleet.virtualdesktop.notification.v1.ServerMessage
@@ -30,8 +30,8 @@ export type ServerMessage = Message<"leaflow.fleet.virtualdesktop.notification.v
    */
   message: {
     /**
-     * A notification as it is now, in full: new when the viewer does not know
-     * its notification_id, otherwise replacing it in place.
+     * A notification as it is now, in full: new when the participant does not
+     * know its notification_id, otherwise replacing it in place.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.notification.v1.Notification notification = 1;
      */
@@ -420,7 +420,7 @@ export enum NotificationCloseReason {
   EXPIRED = 1,
 
   /**
-   * A viewer dismissed it (2).
+   * A participant dismissed it (2).
    *
    * @generated from enum value: NOTIFICATION_CLOSE_REASON_DISMISSED = 2;
    */
@@ -448,9 +448,9 @@ export const NotificationCloseReasonSchema: GenEnum<NotificationCloseReason> = /
   enumDesc(file_leaflow_fleet_virtualdesktop_notification_v1_notification, 1);
 
 /**
- * Acts on notifications for the session's user. Read-only viewers fail with
- * PERMISSION_DENIED. An unknown or closed notification fails with NOT_FOUND
- * and reason NOTIFICATION_GONE.
+ * Acts on notifications for the session's user. Read-only participants fail
+ * with PERMISSION_DENIED. An unknown or closed notification fails with
+ * NOT_FOUND and reason NOTIFICATION_GONE.
  *
  * @generated from service leaflow.fleet.virtualdesktop.notification.v1.NotificationService
  */

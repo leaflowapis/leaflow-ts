@@ -47,7 +47,7 @@ export const DataTransferItemSchema: GenMessage<DataTransferItem> = /*@__PURE__*
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 0);
 
 /**
- * A message from the viewer on the clipboard channel.
+ * A message from the participant on the clipboard channel.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardClientMessage
  */
@@ -59,7 +59,7 @@ export type ClipboardClientMessage = Message<"leaflow.fleet.virtualdesktop.datat
    */
   message: {
     /**
-     * The viewer became the owner of a selection.
+     * The participant became the owner of a selection.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardFormatList format_list = 1;
      */
@@ -67,7 +67,7 @@ export type ClipboardClientMessage = Message<"leaflow.fleet.virtualdesktop.datat
     case: "formatList";
   } | {
     /**
-     * The viewer applied a format list of the session.
+     * The participant applied a format list of the session.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardFormatListResponse format_list_response = 2;
      */
@@ -96,7 +96,7 @@ export type ClipboardServerMessage = Message<"leaflow.fleet.virtualdesktop.datat
    */
   message: {
     /**
-     * What this viewer may do, first in the snapshot and again whenever it
+     * What this participant may do, first in the snapshot and again whenever it
      * changes.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardStatus status = 1;
@@ -113,7 +113,7 @@ export type ClipboardServerMessage = Message<"leaflow.fleet.virtualdesktop.datat
     case: "formatList";
   } | {
     /**
-     * The session applied a format list of the viewer.
+     * The session applied a format list of the participant.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardFormatListResponse format_list_response = 3;
      */
@@ -138,14 +138,14 @@ export const ClipboardServerMessageSchema: GenMessage<ClipboardServerMessage> = 
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 2);
 
 /**
- * What the viewer may do with the clipboard. The viewer does not offer, read
- * or accept what it forbids.
+ * What the participant may do with the clipboard. The participant does not
+ * offer, read or accept what it forbids.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardStatus
  */
 export type ClipboardStatus = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardStatus"> & {
   /**
-   * The viewer receives the session's format lists and reads their data
+   * The participant receives the session's format lists and reads their data
    * (ClipboardPolicy.read_allowed).
    *
    * @generated from field: bool read_allowed = 1;
@@ -153,7 +153,7 @@ export type ClipboardStatus = Message<"leaflow.fleet.virtualdesktop.datatransfer
   readAllowed: boolean;
 
   /**
-   * The viewer's format lists are applied to the session
+   * The participant's format lists are applied to the session
    * (ClipboardPolicy.write_allowed).
    *
    * @generated from field: bool write_allowed = 2;
@@ -178,8 +178,8 @@ export const ClipboardStatusSchema: GenMessage<ClipboardStatus> = /*@__PURE__*/
 /**
  * The sender became the owner of a selection (MS-RDPECLIP Format List PDU).
  * From the session: an application copied; the session read its targets. From
- * the viewer: its person copied, or is about to paste into a session window;
- * the session takes ownership of the selection, then answers.
+ * the participant: its person copied, or is about to paste into a session
+ * window; the session takes ownership of the selection, then answers.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardFormatList
  */
@@ -289,7 +289,7 @@ export const SnapshotEndSchema: GenMessage<SnapshotEnd> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 6);
 
 /**
- * A message from the viewer on the drag channel.
+ * A message from the participant on the drag channel.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.DragClientMessage
  */
@@ -317,7 +317,7 @@ export type DragClientMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "sourceCancel";
   } | {
     /**
-     * A drag of the viewer reaches the session.
+     * A drag of the participant reaches the session.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragStart start = 3;
      */
@@ -325,7 +325,7 @@ export type DragClientMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "start";
   } | {
     /**
-     * The viewer confirms a drag of the session.
+     * The participant confirms a drag of the session.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragStartResponse start_response = 4;
      */
@@ -333,7 +333,7 @@ export type DragClientMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "startResponse";
   } | {
     /**
-     * The viewer's drag loop entered a target.
+     * The participant's drag loop entered a target.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragEnter enter = 5;
      */
@@ -341,7 +341,7 @@ export type DragClientMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "enter";
   } | {
     /**
-     * The viewer's drag loop moved over its target.
+     * The participant's drag loop moved over its target.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragPosition position = 6;
      */
@@ -349,7 +349,7 @@ export type DragClientMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "position";
   } | {
     /**
-     * The viewer's drag loop left its target.
+     * The participant's drag loop left its target.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragLeave leave = 7;
      */
@@ -357,7 +357,7 @@ export type DragClientMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "leave";
   } | {
     /**
-     * The viewer's drag loop dropped on its target.
+     * The participant's drag loop dropped on its target.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragDrop drop = 8;
      */
@@ -365,7 +365,7 @@ export type DragClientMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "drop";
   } | {
     /**
-     * What a target of the viewer's desktop would do with a drop.
+     * What a target of the participant's desktop would do with a drop.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragStatus status = 9;
      */
@@ -373,7 +373,7 @@ export type DragClientMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "status";
   } | {
     /**
-     * A drag of the session ended on the viewer's desktop.
+     * A drag of the session ended on the participant's desktop.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragFinish finish = 10;
      */
@@ -381,7 +381,7 @@ export type DragClientMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "finish";
   } | {
     /**
-     * The viewer abandoned a drag.
+     * The participant abandoned a drag.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragCancel cancel = 11;
      */
@@ -418,7 +418,7 @@ export type DragServerMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "sourceResponse";
   } | {
     /**
-     * The session confirms a drag of the viewer.
+     * The session confirms a drag of the participant.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragStartResponse start_response = 2;
      */
@@ -434,7 +434,7 @@ export type DragServerMessage = Message<"leaflow.fleet.virtualdesktop.datatransf
     case: "status";
   } | {
     /**
-     * A drag of the viewer ended in the session.
+     * A drag of the participant ended in the session.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragFinish finish = 4;
      */
@@ -459,16 +459,16 @@ export const DragServerMessageSchema: GenMessage<DragServerMessage> = /*@__PURE_
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 8);
 
 /**
- * Asks the session for the native drag that a session window started with
- * the viewer's held button. The session answers with DragSourceResponse: the
- * DragStart once the source's XdndEnter reached the session's own XDND
- * target, or an error when no drag comes, such as on a timeout.
+ * Asks the session for the native drag that a session window started with the
+ * participant's held button. The session answers with DragSourceResponse: the
+ * DragStart once the source's XdndEnter reached the session's own XDND target,
+ * or an error when no drag comes, such as on a timeout.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.DragSourceRequest
  */
 export type DragSourceRequest = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1.DragSourceRequest"> & {
   /**
-   * Chosen by the viewer, never reused on the connection.
+   * Chosen by the participant, never reused on the connection.
    *
    * @generated from field: uint64 request_id = 1;
    */
@@ -482,7 +482,7 @@ export type DragSourceRequest = Message<"leaflow.fleet.virtualdesktop.datatransf
   sourceWindowId: bigint;
 
   /**
-   * input_seq of the viewer's latest input of the gesture.
+   * input_seq of the participant's latest input of the gesture.
    *
    * @generated from field: uint64 input_seq = 3;
    */
@@ -516,7 +516,7 @@ export type DragSourceResponse = Message<"leaflow.fleet.virtualdesktop.datatrans
    */
   result: {
     /**
-     * The drag. The viewer confirms it with DragStartResponse before
+     * The drag. The participant confirms it with DragStartResponse before
      * starting its own drag loop.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragStart start = 2;
@@ -579,7 +579,7 @@ export type DragStart = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1.Dr
   dragId: string;
 
   /**
-   * The session window the drag came from. 0 for a drag of the viewer.
+   * The session window the drag came from. 0 for a drag of the participant.
    *
    * @generated from field: uint64 source_window_id = 2;
    */
@@ -601,8 +601,8 @@ export type DragStart = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1.Dr
   actions: DragAction[];
 
   /**
-   * input_seq of the viewer's latest input of the gesture. 0 for a drag from
-   * the viewer's desktop into the session.
+   * input_seq of the participant's latest input of the gesture. 0 for a drag
+   * from the participant's desktop into the session.
    *
    * @generated from field: uint64 input_seq = 5;
    */
@@ -661,7 +661,7 @@ export const DragStartResponseSchema: GenMessage<DragStartResponse> = /*@__PURE_
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 13);
 
 /**
- * The viewer's drag loop entered a target.
+ * The participant's drag loop entered a target.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.DragEnter
  */
@@ -674,14 +674,14 @@ export type DragEnter = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1.Dr
   dragId: string;
 
   /**
-   * A new id for this target, chosen by the viewer.
+   * A new id for this target, chosen by the participant.
    *
    * @generated from field: string target_id = 2;
    */
   targetId: string;
 
   /**
-   * The session window under the pointer. 0: a target of the viewer's own
+   * The session window under the pointer. 0: a target of the participant's own
    * desktop.
    *
    * @generated from field: uint64 window_id = 3;
@@ -717,7 +717,7 @@ export type DragEnter = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1.Dr
   sequence: bigint;
 
   /**
-   * The action the viewer proposes, such as MOVE while Shift is held.
+   * The action the participant proposes, such as MOVE while Shift is held.
    *
    * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragAction proposed_action = 8;
    */
@@ -732,7 +732,7 @@ export const DragEnterSchema: GenMessage<DragEnter> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 14);
 
 /**
- * The viewer's drag loop moved over its current target.
+ * The participant's drag loop moved over its current target.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.DragPosition
  */
@@ -780,7 +780,7 @@ export type DragPosition = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1
   sequence: bigint;
 
   /**
-   * The action the viewer proposes.
+   * The action the participant proposes.
    *
    * @generated from field: leaflow.fleet.virtualdesktop.datatransfer.v1.DragAction proposed_action = 7;
    */
@@ -851,7 +851,7 @@ export const DragStatusSchema: GenMessage<DragStatus> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 16);
 
 /**
- * The viewer's drag loop left its target (XdndLeave). The drag goes on.
+ * The participant's drag loop left its target (XdndLeave). The drag goes on.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.DragLeave
  */
@@ -886,7 +886,7 @@ export const DragLeaveSchema: GenMessage<DragLeave> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 17);
 
 /**
- * The viewer's drag loop dropped on its target (XdndDrop).
+ * The participant's drag loop dropped on its target (XdndDrop).
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.DragDrop
  */
@@ -1459,21 +1459,21 @@ export const DropDataResponseSchema: GenMessage<DropDataResponse> = /*@__PURE__*
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 32);
 
 /**
- * What a viewer may do with the clipboard. Carried in the viewer's signed
- * authorization; without it the viewer shares no clipboard.
+ * What a participant may do with the clipboard. Carried in the participant's
+ * signed authorization; without it the participant shares no clipboard.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardPolicy
  */
 export type ClipboardPolicy = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1.ClipboardPolicy"> & {
   /**
-   * The viewer may read the session's clipboard.
+   * The participant may read the session's clipboard.
    *
    * @generated from field: bool read_allowed = 1;
    */
   readAllowed: boolean;
 
   /**
-   * The viewer may write the session's clipboard.
+   * The participant may write the session's clipboard.
    *
    * @generated from field: bool write_allowed = 2;
    */
@@ -1488,22 +1488,22 @@ export const ClipboardPolicySchema: GenMessage<ClipboardPolicy> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_datatransfer_v1_datatransfer, 33);
 
 /**
- * What a viewer may drag. Carried in the viewer's signed authorization;
- * without it the viewer drags nothing. Dragging files also needs the matching
- * direction of FileTransferPolicy.
+ * What a participant may drag. Carried in the participant's signed
+ * authorization; without it the participant drags nothing. Dragging files also
+ * needs the matching direction of FileTransferPolicy.
  *
  * @generated from message leaflow.fleet.virtualdesktop.datatransfer.v1.DragPolicy
  */
 export type DragPolicy = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1.DragPolicy"> & {
   /**
-   * The viewer may drag into the session.
+   * The participant may drag into the session.
    *
    * @generated from field: bool upload_allowed = 1;
    */
   uploadAllowed: boolean;
 
   /**
-   * The viewer may drag out of the session.
+   * The participant may drag out of the session.
    *
    * @generated from field: bool download_allowed = 2;
    */
@@ -1606,7 +1606,7 @@ export const DragActionSchema: GenEnum<DragAction> = /*@__PURE__*/
 
 /**
  * Copy and paste and drops through calls, and drops of uploaded files. Calls
- * need a viewer that is not read-only; drops also need the input lease.
+ * need a participant that is not read-only; drops also need the input lease.
  *
  * @generated from service leaflow.fleet.virtualdesktop.datatransfer.v1.DataTransferService
  */

@@ -53,7 +53,7 @@ export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
 
 /**
  * Who holds the input lease. Sent in the snapshot and whenever it changes,
- * so that every viewer sees who operates the session.
+ * so that every participant sees who operates the session.
  *
  * @generated from message leaflow.fleet.virtualdesktop.lease.v1.InputLease
  */

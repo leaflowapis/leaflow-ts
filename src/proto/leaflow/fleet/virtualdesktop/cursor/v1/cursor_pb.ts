@@ -43,7 +43,7 @@ export type ServerMessage = Message<"leaflow.fleet.virtualdesktop.cursor.v1.Serv
     case: "snapshotEnd";
   } | {
     /**
-     * The pointer moved, other than by this viewer.
+     * The pointer moved, other than by this participant.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.cursor.v1.PointerPosition pointer_position = 3;
      */
@@ -51,7 +51,7 @@ export type ServerMessage = Message<"leaflow.fleet.virtualdesktop.cursor.v1.Serv
     case: "pointerPosition";
   } | {
     /**
-     * Another viewer's operation call acted on an area.
+     * Another participant's operation call acted on an area.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.cursor.v1.Highlight highlight = 4;
      */
@@ -77,7 +77,7 @@ export type Cursor = Message<"leaflow.fleet.virtualdesktop.cursor.v1.Cursor"> & 
   /**
    * The CSS cursor keyword that matches the shape, such as "default", "text"
    * or "ew-resize" (CSS Basic User Interface Module Level 4); "none" hides
-   * the cursor. When the viewer supports the keyword it uses it instead of
+   * the cursor. When the participant supports the keyword it uses it instead of
    * the image. Empty: use the image.
    *
    * @generated from field: string name = 1;
@@ -123,10 +123,10 @@ export const CursorSchema: GenMessage<Cursor> = /*@__PURE__*/
 
 /**
  * Where the pointer is (RFB PointerPos pseudo-encoding; Xpra pointer-position),
- * so that a viewer can show the pointer of whoever else moves it, such as
- * another viewer holding the input lease. Sent when the pointer was moved
- * by another viewer or by an application, at most once per 16 milliseconds
- * with the latest position; never for this viewer's own input.
+ * so that a participant can show the pointer of whoever else moves it, such as
+ * another participant holding the input lease. Sent when the pointer was moved
+ * by another participant or by an application, at most once per 16 milliseconds
+ * with the latest position; never for this participant's own input.
  *
  * @generated from message leaflow.fleet.virtualdesktop.cursor.v1.PointerPosition
  */
@@ -153,8 +153,8 @@ export type PointerPosition = Message<"leaflow.fleet.virtualdesktop.cursor.v1.Po
   y: number;
 
   /**
-   * The connection whose input moved it, as in ViewerList. 0: an application
-   * moved it.
+   * The connection whose input moved it, as in ParticipantList. 0: an
+   * application moved it.
    *
    * @generated from field: uint64 connection_id = 4;
    */
@@ -169,17 +169,17 @@ export const PointerPositionSchema: GenMessage<PointerPosition> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_cursor_v1_cursor, 2);
 
 /**
- * The area an operation call acted on, so that the other viewers see what it
- * does (after the Chrome DevTools Protocol Overlay highlights). Sent to the
- * other viewers for every operation call that acts on a
- * place, such as an injected click or an action on an accessibility node.
- * The viewer draws it briefly.
+ * The area an operation call acted on, so that the other participants see what
+ * it does (after the Chrome DevTools Protocol Overlay highlights). Sent to the
+ * other participants for every operation call that acts on a place, such as an
+ * injected click or an action on an accessibility node. The participant draws
+ * it briefly.
  *
  * @generated from message leaflow.fleet.virtualdesktop.cursor.v1.Highlight
  */
 export type Highlight = Message<"leaflow.fleet.virtualdesktop.cursor.v1.Highlight"> & {
   /**
-   * The connection that acted, as in ViewerList.
+   * The connection that acted, as in ParticipantList.
    *
    * @generated from field: uint64 connection_id = 1;
    */

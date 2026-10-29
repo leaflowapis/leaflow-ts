@@ -252,14 +252,14 @@ export type ReportListenerReadyRequest = Message<"leaflow.fleet.portforward.v1.R
   forwardId: bigint;
 
   /**
-   * Where the viewer listens.
+   * Where the participant listens.
    *
    * @generated from field: leaflow.fleet.portforward.v1.Endpoint bound_endpoint = 2;
    */
   boundEndpoint?: Endpoint | undefined;
 
   /**
-   * Why the viewer could not listen; the forward then fails. Unset on
+   * Why the participant could not listen; the forward then fails. Unset on
    * success.
    *
    * @generated from field: google.rpc.Status error = 3;
@@ -465,8 +465,8 @@ export const UdpPacketSchema: GenMessage<UdpPacket> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_portforward_v1_portforward, 15);
 
 /**
- * What a viewer may forward. Carried in the viewer's signed authorization;
- * without it the viewer forwards nothing.
+ * What a participant may forward. Carried in the participant's signed
+ * authorization; without it the participant forwards nothing.
  *
  * @generated from message leaflow.fleet.portforward.v1.PortForwardPolicy
  */
@@ -486,7 +486,7 @@ export type PortForwardPolicy = Message<"leaflow.fleet.portforward.v1.PortForwar
   remoteToLocalAllowed: boolean;
 
   /**
-   * Where the viewer may listen for LOCAL_TO_REMOTE.
+   * Where the participant may listen for LOCAL_TO_REMOTE.
    *
    * @generated from field: leaflow.fleet.portforward.v1.EndpointPolicy local_listeners = 3;
    */
@@ -507,7 +507,7 @@ export type PortForwardPolicy = Message<"leaflow.fleet.portforward.v1.PortForwar
   remoteListeners?: EndpointPolicy | undefined;
 
   /**
-   * Where the viewer may connect for REMOTE_TO_LOCAL.
+   * Where the participant may connect for REMOTE_TO_LOCAL.
    *
    * @generated from field: leaflow.fleet.portforward.v1.EndpointPolicy local_targets = 6;
    */
@@ -650,14 +650,14 @@ export enum ForwardDirection {
   UNSPECIFIED = 0,
 
   /**
-   * The viewer listens; the session connects (ssh -L).
+   * The participant listens; the session connects (ssh -L).
    *
    * @generated from enum value: FORWARD_DIRECTION_LOCAL_TO_REMOTE = 1;
    */
   LOCAL_TO_REMOTE = 1,
 
   /**
-   * The session listens; the viewer connects (ssh -R).
+   * The session listens; the participant connects (ssh -R).
    *
    * @generated from enum value: FORWARD_DIRECTION_REMOTE_TO_LOCAL = 2;
    */
@@ -714,7 +714,8 @@ export enum ForwardState {
   UNSPECIFIED = 0,
 
   /**
-   * Created; the viewer's listener is not reported yet. Nothing is accepted.
+   * Created; the participant's listener is not reported yet. Nothing is
+   * accepted.
    *
    * @generated from enum value: FORWARD_STATE_PREPARING = 1;
    */
@@ -750,14 +751,14 @@ export const ForwardStateSchema: GenEnum<ForwardState> = /*@__PURE__*/
 
 /**
  * Creates and deletes forwards. The session checks every request against the
- * viewer's authorization before anything listens or connects.
+ * participant's authorization before anything listens or connects.
  *
  * @generated from service leaflow.fleet.portforward.v1.PortForwardService
  */
 export const PortForwardService: GenService<{
   /**
-   * Creates a forward. For REMOTE_TO_LOCAL the session listens and the
-   * forward is ACTIVE; for LOCAL_TO_REMOTE it is PREPARING until the viewer
+   * Creates a forward. For REMOTE_TO_LOCAL the session listens and the forward
+   * is ACTIVE; for LOCAL_TO_REMOTE it is PREPARING until the participant
    * listens and calls ReportListenerReady. Fails with PERMISSION_DENIED for
    * endpoints the policy does not allow and RESOURCE_EXHAUSTED beyond its
    * limits.
@@ -770,10 +771,10 @@ export const PortForwardService: GenService<{
     output: typeof CreateForwardResponseSchema;
   },
   /**
-   * Reports that the viewer listens for a LOCAL_TO_REMOTE forward, on the
+   * Reports that the participant listens for a LOCAL_TO_REMOTE forward, on the
    * endpoint it actually bound. The session checks the endpoint against the
-   * policy again and makes the forward ACTIVE; the viewer accepts no
-   * connection before. When it refuses, the viewer closes its listener.
+   * policy again and makes the forward ACTIVE; the participant accepts no
+   * connection before. When it refuses, the participant closes its listener.
    *
    * @generated from rpc leaflow.fleet.portforward.v1.PortForwardService.ReportListenerReady
    */

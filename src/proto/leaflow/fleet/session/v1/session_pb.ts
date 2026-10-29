@@ -10,10 +10,10 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/session/v1/session.proto.
  */
 export const file_leaflow_fleet_session_v1_session: GenFile = /*@__PURE__*/
-  fileDesc("CiZsZWFmbG93L2ZsZWV0L3Nlc3Npb24vdjEvc2Vzc2lvbi5wcm90bxIYbGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxIusBCg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuUG9uZ0gAEjAKBWNsb3NlGAQgASgLMh8ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLkNsb3NlSABCCQoHbWVzc2FnZSLnAgoNU2VydmVyTWVzc2FnZRI9CgxzZXJ2ZXJfaGVsbG8YASABKAsyJS5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuU2VydmVySGVsbG9IABIuCgRwaW5nGAIgASgLMh4ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBpbmdIABIuCgRwb25nGAMgASgLMh4ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBvbmdIABI7Cgt2aWV3ZXJfbGlzdBgEIAEoCzIkLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5WaWV3ZXJMaXN0SAASPQoMc25hcHNob3RfZW5kGAUgASgLMiUubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlNuYXBzaG90RW5kSAASMAoFY2xvc2UYBiABKAsyHy5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuQ2xvc2VIAEIJCgdtZXNzYWdlIk8KC0NsaWVudEhlbGxvEhUKDWNoYW5uZWxfdHlwZXMYASADKAkSFQoNbGFuZ3VhZ2VfY29kZRgCIAEoCRISCgp1c2VyX2FnZW50GAMgASgJIk4KC1NlcnZlckhlbGxvEhUKDWNoYW5uZWxfdHlwZXMYASADKAkSEQoJcmVhZF9vbmx5GAIgASgIEhUKDWNvbm5lY3Rpb25faWQYAyABKAQibAoGVmlld2VyEhUKDWNvbm5lY3Rpb25faWQYASABKAQSDwoHdXNlcl9pZBgCIAEoCRIUCgxkaXNwbGF5X25hbWUYAyABKAkSEQoJcmVhZF9vbmx5GAQgASgIEhEKCWNsaWVudF9pZBgFIAEoCSJdCgpWaWV3ZXJMaXN0EjEKB3ZpZXdlcnMYASADKAsyIC5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuVmlld2VyEhwKFGRyaXZlcl9jb25uZWN0aW9uX2lkGAIgASgEIg0KC1NuYXBzaG90RW5kIhwKBFBpbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIhwKBFBvbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIlUKBUNsb3NlEjUKBnJlYXNvbhgBIAEoDjIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5DbG9zZVJlYXNvbhIVCg1yZWFzb25fcGhyYXNlGAIgASgJKskCCgtDbG9zZVJlYXNvbhIcChhDTE9TRV9SRUFTT05fVU5TUEVDSUZJRUQQABIVChFDTE9TRV9SRUFTT05fRE9ORRABEhwKGENMT1NFX1JFQVNPTl9DTElFTlRfRVhJVBACEh0KGUNMT1NFX1JFQVNPTl9TRVNTSU9OX0VYSVQQAxIjCh9DTE9TRV9SRUFTT05fU0VTU0lPTl9SRVNUQVJUSU5HEAQSHgoaQ0xPU0VfUkVBU09OX0hFTExPX1RJTUVPVVQQBRIdChlDTE9TRV9SRUFTT05fUElOR19USU1FT1VUEAYSIgoeQ0xPU0VfUkVBU09OX1BFUk1JU1NJT05fREVOSUVEEAcSHwobQ0xPU0VfUkVBU09OX1BST1RPQ09MX0VSUk9SEAgSHwobQ0xPU0VfUkVBU09OX0lOVEVSTkFMX0VSUk9SEAlCPlo8Z2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3Nlc3Npb24vdjE7c2Vzc2lvbnYxYgZwcm90bzM");
+  fileDesc("CiZsZWFmbG93L2ZsZWV0L3Nlc3Npb24vdjEvc2Vzc2lvbi5wcm90bxIYbGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxIusBCg1DbGllbnRNZXNzYWdlEj0KDGNsaWVudF9oZWxsbxgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5DbGllbnRIZWxsb0gAEi4KBHBpbmcYAiABKAsyHi5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuUGluZ0gAEi4KBHBvbmcYAyABKAsyHi5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuUG9uZ0gAEjAKBWNsb3NlGAQgASgLMh8ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLkNsb3NlSABCCQoHbWVzc2FnZSLxAgoNU2VydmVyTWVzc2FnZRI9CgxzZXJ2ZXJfaGVsbG8YASABKAsyJS5sZWFmbG93LmZsZWV0LnNlc3Npb24udjEuU2VydmVySGVsbG9IABIuCgRwaW5nGAIgASgLMh4ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBpbmdIABIuCgRwb25nGAMgASgLMh4ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBvbmdIABJFChBwYXJ0aWNpcGFudF9saXN0GAQgASgLMikubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBhcnRpY2lwYW50TGlzdEgAEj0KDHNuYXBzaG90X2VuZBgFIAEoCzIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5TbmFwc2hvdEVuZEgAEjAKBWNsb3NlGAYgASgLMh8ubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLkNsb3NlSABCCQoHbWVzc2FnZSJPCgtDbGllbnRIZWxsbxIVCg1jaGFubmVsX3R5cGVzGAEgAygJEhUKDWxhbmd1YWdlX2NvZGUYAiABKAkSEgoKdXNlcl9hZ2VudBgDIAEoCSJOCgtTZXJ2ZXJIZWxsbxIVCg1jaGFubmVsX3R5cGVzGAEgAygJEhEKCXJlYWRfb25seRgCIAEoCBIVCg1jb25uZWN0aW9uX2lkGAMgASgEInEKC1BhcnRpY2lwYW50EhUKDWNvbm5lY3Rpb25faWQYASABKAQSDwoHdXNlcl9pZBgCIAEoCRIUCgxkaXNwbGF5X25hbWUYAyABKAkSEQoJcmVhZF9vbmx5GAQgASgIEhEKCWNsaWVudF9pZBgFIAEoCSJsCg9QYXJ0aWNpcGFudExpc3QSOwoMcGFydGljaXBhbnRzGAEgAygLMiUubGVhZmxvdy5mbGVldC5zZXNzaW9uLnYxLlBhcnRpY2lwYW50EhwKFGRyaXZlcl9jb25uZWN0aW9uX2lkGAIgASgEIg0KC1NuYXBzaG90RW5kIhwKBFBpbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIhwKBFBvbmcSFAoMbW9ub3RvbmljX21zGAEgASgEIlUKBUNsb3NlEjUKBnJlYXNvbhgBIAEoDjIlLmxlYWZsb3cuZmxlZXQuc2Vzc2lvbi52MS5DbG9zZVJlYXNvbhIVCg1yZWFzb25fcGhyYXNlGAIgASgJKskCCgtDbG9zZVJlYXNvbhIcChhDTE9TRV9SRUFTT05fVU5TUEVDSUZJRUQQABIVChFDTE9TRV9SRUFTT05fRE9ORRABEhwKGENMT1NFX1JFQVNPTl9DTElFTlRfRVhJVBACEh0KGUNMT1NFX1JFQVNPTl9TRVNTSU9OX0VYSVQQAxIjCh9DTE9TRV9SRUFTT05fU0VTU0lPTl9SRVNUQVJUSU5HEAQSHgoaQ0xPU0VfUkVBU09OX0hFTExPX1RJTUVPVVQQBRIdChlDTE9TRV9SRUFTT05fUElOR19USU1FT1VUEAYSIgoeQ0xPU0VfUkVBU09OX1BFUk1JU1NJT05fREVOSUVEEAcSHwobQ0xPU0VfUkVBU09OX1BST1RPQ09MX0VSUk9SEAgSHwobQ0xPU0VfUkVBU09OX0lOVEVSTkFMX0VSUk9SEAlCPlo8Z2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3Nlc3Npb24vdjE7c2Vzc2lvbnYxYgZwcm90bzM");
 
 /**
- * A message from the viewer.
+ * A message from the participant.
  *
  * @generated from message leaflow.fleet.session.v1.ClientMessage
  */
@@ -25,7 +25,7 @@ export type ClientMessage = Message<"leaflow.fleet.session.v1.ClientMessage"> & 
    */
   message: {
     /**
-     * The first message of the viewer.
+     * The first message of the participant.
      *
      * @generated from field: leaflow.fleet.session.v1.ClientHello client_hello = 1;
      */
@@ -49,7 +49,7 @@ export type ClientMessage = Message<"leaflow.fleet.session.v1.ClientMessage"> & 
     case: "pong";
   } | {
     /**
-     * The viewer leaves.
+     * The participant leaves.
      *
      * @generated from field: leaflow.fleet.session.v1.Close close = 4;
      */
@@ -94,7 +94,7 @@ export type ServerMessage = Message<"leaflow.fleet.session.v1.ServerMessage"> & 
     case: "ping";
   } | {
     /**
-     * Answers a Ping of the viewer.
+     * Answers a Ping of the participant.
      *
      * @generated from field: leaflow.fleet.session.v1.Pong pong = 3;
      */
@@ -102,12 +102,12 @@ export type ServerMessage = Message<"leaflow.fleet.session.v1.ServerMessage"> & 
     case: "pong";
   } | {
     /**
-     * The viewers of the session, in full.
+     * The participants of the session, in full.
      *
-     * @generated from field: leaflow.fleet.session.v1.ViewerList viewer_list = 4;
+     * @generated from field: leaflow.fleet.session.v1.ParticipantList participant_list = 4;
      */
-    value: ViewerList;
-    case: "viewerList";
+    value: ParticipantList;
+    case: "participantList";
   } | {
     /**
      * Ends the snapshot.
@@ -135,13 +135,13 @@ export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_session_v1_session, 1);
 
 /**
- * The viewer's side of the handshake.
+ * The participant's side of the handshake.
  *
  * @generated from message leaflow.fleet.session.v1.ClientHello
  */
 export type ClientHello = Message<"leaflow.fleet.session.v1.ClientHello"> & {
   /**
-   * The channel types the viewer can open or accept, such as
+   * The channel types the participant can open or accept, such as
    * "leaflow.fleet.terminal.v1" or
    * "leaflow.fleet.filetransfer.v1.FileSystemService". A channel type
    * missing on either side is not used on this connection.
@@ -151,16 +151,16 @@ export type ClientHello = Message<"leaflow.fleet.session.v1.ClientHello"> & {
   channelTypes: string[];
 
   /**
-   * The viewer's language as a BCP 47 tag, such as "zh-CN". The session uses
-   * it for the names of applications and menus it sends from now on. Empty:
-   * the session's own language.
+   * The participant's language as a BCP 47 tag, such as "zh-CN". The session
+   * uses it for the names of applications and menus it sends from now on.
+   * Empty: the session's own language.
    *
    * @generated from field: string language_code = 2;
    */
   languageCode: string;
 
   /**
-   * The viewer software, such as "leaflow-desktop/1.2.0" or the browser's
+   * The participant software, such as "leaflow-desktop/1.2.0" or the browser's
    * User-Agent (RFC 9110 §10.1.5). For display and diagnostics only.
    *
    * @generated from field: string user_agent = 3;
@@ -182,8 +182,8 @@ export const ClientHelloSchema: GenMessage<ClientHello> = /*@__PURE__*/
  */
 export type ServerHello = Message<"leaflow.fleet.session.v1.ServerHello"> & {
   /**
-   * The channel types the session offers this viewer: those of
-   * ClientHello.channel_types the session supports and the viewer's
+   * The channel types the session offers this participant: those of
+   * ClientHello.channel_types the session supports and the participant's
    * authorization allows.
    *
    * @generated from field: repeated string channel_types = 1;
@@ -191,7 +191,7 @@ export type ServerHello = Message<"leaflow.fleet.session.v1.ServerHello"> & {
   channelTypes: string[];
 
   /**
-   * The viewer may only watch. The session refuses or ignores everything
+   * The participant may only watch. The session refuses or ignores everything
    * that would change it.
    *
    * @generated from field: bool read_only = 2;
@@ -199,7 +199,7 @@ export type ServerHello = Message<"leaflow.fleet.session.v1.ServerHello"> & {
   readOnly: boolean;
 
   /**
-   * This viewer's connection, as it appears in ViewerList.
+   * This participant's connection, as it appears in ParticipantList.
    *
    * @generated from field: uint64 connection_id = 3;
    */
@@ -214,20 +214,20 @@ export const ServerHelloSchema: GenMessage<ServerHello> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_session_v1_session, 3);
 
 /**
- * One viewer attached to the session.
+ * One participant attached to the session.
  *
- * @generated from message leaflow.fleet.session.v1.Viewer
+ * @generated from message leaflow.fleet.session.v1.Participant
  */
-export type Viewer = Message<"leaflow.fleet.session.v1.Viewer"> & {
+export type Participant = Message<"leaflow.fleet.session.v1.Participant"> & {
   /**
-   * The viewer's connection.
+   * The participant's connection.
    *
    * @generated from field: uint64 connection_id = 1;
    */
   connectionId: bigint;
 
   /**
-   * The platform user the viewer acts for.
+   * The platform user the participant acts for.
    *
    * @generated from field: string user_id = 2;
    */
@@ -241,7 +241,7 @@ export type Viewer = Message<"leaflow.fleet.session.v1.Viewer"> & {
   displayName: string;
 
   /**
-   * The viewer may only watch.
+   * The participant may only watch.
    *
    * @generated from field: bool read_only = 4;
    */
@@ -257,30 +257,30 @@ export type Viewer = Message<"leaflow.fleet.session.v1.Viewer"> & {
 };
 
 /**
- * Describes the message leaflow.fleet.session.v1.Viewer.
- * Use `create(ViewerSchema)` to create a new message.
+ * Describes the message leaflow.fleet.session.v1.Participant.
+ * Use `create(ParticipantSchema)` to create a new message.
  */
-export const ViewerSchema: GenMessage<Viewer> = /*@__PURE__*/
+export const ParticipantSchema: GenMessage<Participant> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_session_v1_session, 4);
 
 /**
- * Every viewer attached to the session, this one included. Sent in the
- * snapshot and again whenever a viewer attaches or leaves or the driver
+ * Every participant attached to the session, this one included. Sent in the
+ * snapshot and again whenever a participant attaches or leaves or the driver
  * changes.
  *
- * @generated from message leaflow.fleet.session.v1.ViewerList
+ * @generated from message leaflow.fleet.session.v1.ParticipantList
  */
-export type ViewerList = Message<"leaflow.fleet.session.v1.ViewerList"> & {
+export type ParticipantList = Message<"leaflow.fleet.session.v1.ParticipantList"> & {
   /**
-   * The viewers.
+   * The participants.
    *
-   * @generated from field: repeated leaflow.fleet.session.v1.Viewer viewers = 1;
+   * @generated from field: repeated leaflow.fleet.session.v1.Participant participants = 1;
    */
-  viewers: Viewer[];
+  participants: Participant[];
 
   /**
-   * The viewer whose settings the session follows, such as the size of its
-   * desktop. 0 before any viewer has driven.
+   * The participant whose settings the session follows, such as the size of its
+   * desktop. 0 before any participant has driven.
    *
    * @generated from field: uint64 driver_connection_id = 2;
    */
@@ -288,14 +288,14 @@ export type ViewerList = Message<"leaflow.fleet.session.v1.ViewerList"> & {
 };
 
 /**
- * Describes the message leaflow.fleet.session.v1.ViewerList.
- * Use `create(ViewerListSchema)` to create a new message.
+ * Describes the message leaflow.fleet.session.v1.ParticipantList.
+ * Use `create(ParticipantListSchema)` to create a new message.
  */
-export const ViewerListSchema: GenMessage<ViewerList> = /*@__PURE__*/
+export const ParticipantListSchema: GenMessage<ParticipantList> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_session_v1_session, 5);
 
 /**
- * Ends the snapshot of this channel: the ViewerList has been sent.
+ * Ends the snapshot of this channel: the ParticipantList has been sent.
  *
  * @generated from message leaflow.fleet.session.v1.SnapshotEnd
  */
@@ -382,7 +382,7 @@ export const CloseSchema: GenMessage<Close> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_session_v1_session, 9);
 
 /**
- * Why a viewer connection ends.
+ * Why a participant ends.
  *
  * @generated from enum leaflow.fleet.session.v1.CloseReason
  */
@@ -400,7 +400,7 @@ export enum CloseReason {
   DONE = 1,
 
   /**
-   * The viewer goes away, such as a closed tab. Viewer only.
+   * The participant goes away, such as a closed tab. Participant only.
    *
    * @generated from enum value: CLOSE_REASON_CLIENT_EXIT = 2;
    */
@@ -436,7 +436,8 @@ export enum CloseReason {
   PING_TIMEOUT = 6,
 
   /**
-   * The viewer's authorization did not verify or has expired. Session only.
+   * The participant's authorization did not verify or has expired. Session
+   * only.
    *
    * @generated from enum value: CLOSE_REASON_PERMISSION_DENIED = 7;
    */

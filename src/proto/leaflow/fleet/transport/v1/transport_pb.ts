@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/transport/v1/transport.proto.
  */
 export const file_leaflow_fleet_transport_v1_transport: GenFile = /*@__PURE__*/
-  fileDesc("CipsZWFmbG93L2ZsZWV0L3RyYW5zcG9ydC92MS90cmFuc3BvcnQucHJvdG8SGmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxIqkCCgZQYWNrZXQSMgoFaGVsbG8YASABKAsyIS5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5IZWxsb0gAEjgKCGVudmVsb3BlGAIgASgLMiQubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuRW52ZWxvcGVIABI4CghkYXRhZ3JhbRgDIAEoCzIkLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkRhdGFncmFtSAASOQoHcmVjZWlwdBgEIAEoCzImLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkNoZWNrcG9pbnRIABIyCgVjbG9zZRgFIAEoCzIhLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkNsb3NlSABCCAoGcGFja2V0IpMCCgVIZWxsbxISCgphdHRlbXB0X2lkGAEgASgMEhUKDWNvbm5lY3Rpb25faWQYAiABKAQSDQoFZXBvY2gYAyABKAQSEQoJY2hhbGxlbmdlGAQgASgMEhAKCHJlc3BvbnNlGAUgASgMEhwKFGF1dGhvcml6YXRpb25fc2hhMjU2GAYgASgMEhIKCnB1YmxpY19rZXkYByABKAwSGAoQZHRsc19hdHRlc3RhdGlvbhgIIAEoDBIYChBtYXhfbWVzc2FnZV9zaXplGAkgASgNEhgKEGluaXRpYWxfbWF4X2RhdGEYCiABKAQSGQoRbWF4X2RhdGFncmFtX3NpemUYCyABKA0SEAoIb3duZXJfaWQYDCABKAwigAMKCEVudmVsb3BlEhIKCmNoYW5uZWxfaWQYASABKAQSEAoIc2VxdWVuY2UYAiABKAQSFAoMb3JpZ2luX2Vwb2NoGAMgASgEEjcKBG9wZW4YBCABKAsyJy5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGFubmVsT3BlbkgAElAKEW9wZW5fY29uZmlybWF0aW9uGAUgASgLMjMubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuQ2hhbm5lbE9wZW5Db25maXJtYXRpb25IABJGCgxvcGVuX2ZhaWx1cmUYBiABKAsyLi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGFubmVsT3BlbkZhaWx1cmVIABIOCgRkYXRhGAcgASgMSAASEgoIbWF4X2RhdGEYCCABKARIABI5CgVjbG9zZRgJIAEoCzIoLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkNoYW5uZWxDbG9zZUgAQgYKBGJvZHkiNQoLQ2hhbm5lbE9wZW4SFAoMY2hhbm5lbF90eXBlGAEgASgJEhAKCG1heF9kYXRhGAIgASgEIisKF0NoYW5uZWxPcGVuQ29uZmlybWF0aW9uEhAKCG1heF9kYXRhGAEgASgEIm8KEkNoYW5uZWxPcGVuRmFpbHVyZRJECgZyZWFzb24YASABKA4yNC5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGFubmVsT3BlbkZhaWx1cmVSZWFzb24SEwoLZGVzY3JpcHRpb24YAiABKAkiUAoMQ2hhbm5lbENsb3NlEkAKCmVycm9yX2NvZGUYASABKA4yLC5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGFubmVsRXJyb3JDb2RlIiwKCERhdGFncmFtEhIKCmNoYW5uZWxfaWQYASABKAQSDAoEZGF0YRgCIAEoDCKrAQoKQ2hlY2twb2ludBINCgVlcG9jaBgBIAEoBBIQCghvd25lcl9pZBgCIAEoDBI6CgdjdXJzb3JzGAMgAygLMikubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuQ2hhbm5lbEN1cnNvchJACg5yZXRpcmVkX3JhbmdlcxgEIAMoCzIoLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLlJldGlyZWRSYW5nZSI1Cg1DaGFubmVsQ3Vyc29yEhIKCmNoYW5uZWxfaWQYASABKAQSEAoIc2VxdWVuY2UYAiABKAQiQQoMUmV0aXJlZFJhbmdlEhgKEGZpcnN0X2NoYW5uZWxfaWQYASABKAQSFwoPbGFzdF9jaGFubmVsX2lkGAIgASgEIqsCCglNaWdyYXRpb24SFQoNY29ubmVjdGlvbl9pZBgBIAEoBBI5CgdwcmVwYXJlGAIgASgLMiYubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuQ2hlY2twb2ludEgAEjoKCHByZXBhcmVkGAMgASgLMiYubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuQ2hlY2twb2ludEgAEjgKBmNvbW1pdBgEIAEoCzImLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkNoZWNrcG9pbnRIABI7Cgljb21taXR0ZWQYBSABKAsyJi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGVja3BvaW50SAASEQoHcmVxdWVzdBgGIAEoCEgAQgYKBHN0ZXAiKwoFQ2xvc2USIgoGc3RhdHVzGAEgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXMilgMKBlNpZ25hbBISCgphdHRlbXB0X2lkGAEgASgMEhUKDWNvbm5lY3Rpb25faWQYAiABKAQSEAoIc2VxdWVuY2UYAyABKAQSQwoNY29uZmlndXJhdGlvbhgEIAEoCzIsLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLlJ0Y0NvbmZpZ3VyYXRpb24SRQoLZGVzY3JpcHRpb24YBSABKAsyLi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5TZXNzaW9uRGVzY3JpcHRpb25IABI9CgljYW5kaWRhdGUYBiABKAsyKC5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5JY2VDYW5kaWRhdGVIABIbChFlbmRfb2ZfY2FuZGlkYXRlcxgHIAEoCEgAEg8KBWFib3J0GAggASgISAASTAoNYXV0aG9yaXphdGlvbhgJIAEoCzIzLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLlNpZ25lZFBlZXJBdXRob3JpemF0aW9uSABCCAoGc2lnbmFsIlQKElNlc3Npb25EZXNjcmlwdGlvbhIxCgR0eXBlGAEgASgOMiMubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuU2RwVHlwZRILCgNzZHAYAiABKAkiMgoMSWNlQ2FuZGlkYXRlEhEKCWNhbmRpZGF0ZRgBIAEoCRIPCgdzZHBfbWlkGAIgASgJIswBChBSdGNDb25maWd1cmF0aW9uEjoKC2ljZV9zZXJ2ZXJzGAEgAygLMiUubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuSWNlU2VydmVyEkwKFGljZV90cmFuc3BvcnRfcG9saWN5GAIgASgOMi4ubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuSWNlVHJhbnNwb3J0UG9saWN5Ei4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIj8KCUljZVNlcnZlchIMCgR1cmxzGAEgAygJEhAKCHVzZXJuYW1lGAIgASgJEhIKCmNyZWRlbnRpYWwYAyABKAkiUwoXU2lnbmVkUGVlckF1dGhvcml6YXRpb24SDgoGa2V5X2lkGAEgASgJEhUKDWF1dGhvcml6YXRpb24YAiABKAwSEQoJc2lnbmF0dXJlGAMgASgMIvUCChFQZWVyQXV0aG9yaXphdGlvbhIOCgZpc3N1ZXIYASABKAkSEgoKbWFjaGluZV9pZBgCIAEoCRISCgpzZXNzaW9uX2lkGAMgASgJEhUKDWNvbm5lY3Rpb25faWQYBCABKAQSEgoKYXR0ZW1wdF9pZBgFIAEoDBIhChl2aWV3ZXJfZmluZ2VycHJpbnRfc2hhMjU2GAYgASgMEiAKGGFnZW50X2ZpbmdlcnByaW50X3NoYTI1NhgHIAEoDBIjCht2aWV3ZXJfYXV0aG9yaXphdGlvbl9zaGEyNTYYCCABKAwSLQoJaXNzdWVkX2F0GAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI0ChBsZWFzZV9leHBpcmVzX2F0GAsgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCqdAgoYQ2hhbm5lbE9wZW5GYWlsdXJlUmVhc29uEisKJ0NIQU5ORUxfT1BFTl9GQUlMVVJFX1JFQVNPTl9VTlNQRUNJRklFRBAAEjsKN0NIQU5ORUxfT1BFTl9GQUlMVVJFX1JFQVNPTl9BRE1JTklTVFJBVElWRUxZX1BST0hJQklURUQQARIuCipDSEFOTkVMX09QRU5fRkFJTFVSRV9SRUFTT05fQ09OTkVDVF9GQUlMRUQQAhI0CjBDSEFOTkVMX09QRU5fRkFJTFVSRV9SRUFTT05fVU5LTk9XTl9DSEFOTkVMX1RZUEUQAxIxCi1DSEFOTkVMX09QRU5fRkFJTFVSRV9SRUFTT05fUkVTT1VSQ0VfU0hPUlRBR0UQBCr2AQoQQ2hhbm5lbEVycm9yQ29kZRIiCh5DSEFOTkVMX0VSUk9SX0NPREVfVU5TUEVDSUZJRUQQABIfChtDSEFOTkVMX0VSUk9SX0NPREVfTk9fRVJST1IQARIgChxDSEFOTkVMX0VSUk9SX0NPREVfQ0FOQ0VMTEVEEAISKQolQ0hBTk5FTF9FUlJPUl9DT0RFX0ZMT1dfQ09OVFJPTF9FUlJPUhADEikKJUNIQU5ORUxfRVJST1JfQ09ERV9QUk9UT0NPTF9WSU9MQVRJT04QBBIlCiFDSEFOTkVMX0VSUk9SX0NPREVfSU5URVJOQUxfRVJST1IQBSpMCgdTZHBUeXBlEhgKFFNEUF9UWVBFX1VOU1BFQ0lGSUVEEAASEgoOU0RQX1RZUEVfT0ZGRVIQARITCg9TRFBfVFlQRV9BTlNXRVIQAip4ChJJY2VUcmFuc3BvcnRQb2xpY3kSJAogSUNFX1RSQU5TUE9SVF9QT0xJQ1lfVU5TUEVDSUZJRUQQABIcChhJQ0VfVFJBTlNQT1JUX1BPTElDWV9BTEwQARIeChpJQ0VfVFJBTlNQT1JUX1BPTElDWV9SRUxBWRACQkJaQGdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC90cmFuc3BvcnQvdjE7dHJhbnNwb3J0djFiBnByb3RvMw", [file_google_protobuf_timestamp, file_google_rpc_status]);
+  fileDesc("CipsZWFmbG93L2ZsZWV0L3RyYW5zcG9ydC92MS90cmFuc3BvcnQucHJvdG8SGmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxIqkCCgZQYWNrZXQSMgoFaGVsbG8YASABKAsyIS5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5IZWxsb0gAEjgKCGVudmVsb3BlGAIgASgLMiQubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuRW52ZWxvcGVIABI4CghkYXRhZ3JhbRgDIAEoCzIkLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkRhdGFncmFtSAASOQoHcmVjZWlwdBgEIAEoCzImLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkNoZWNrcG9pbnRIABIyCgVjbG9zZRgFIAEoCzIhLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkNsb3NlSABCCAoGcGFja2V0IpMCCgVIZWxsbxISCgphdHRlbXB0X2lkGAEgASgMEhUKDWNvbm5lY3Rpb25faWQYAiABKAQSDQoFZXBvY2gYAyABKAQSEQoJY2hhbGxlbmdlGAQgASgMEhAKCHJlc3BvbnNlGAUgASgMEhwKFGF1dGhvcml6YXRpb25fc2hhMjU2GAYgASgMEhIKCnB1YmxpY19rZXkYByABKAwSGAoQZHRsc19hdHRlc3RhdGlvbhgIIAEoDBIYChBtYXhfbWVzc2FnZV9zaXplGAkgASgNEhgKEGluaXRpYWxfbWF4X2RhdGEYCiABKAQSGQoRbWF4X2RhdGFncmFtX3NpemUYCyABKA0SEAoIb3duZXJfaWQYDCABKAwigAMKCEVudmVsb3BlEhIKCmNoYW5uZWxfaWQYASABKAQSEAoIc2VxdWVuY2UYAiABKAQSFAoMb3JpZ2luX2Vwb2NoGAMgASgEEjcKBG9wZW4YBCABKAsyJy5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGFubmVsT3BlbkgAElAKEW9wZW5fY29uZmlybWF0aW9uGAUgASgLMjMubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuQ2hhbm5lbE9wZW5Db25maXJtYXRpb25IABJGCgxvcGVuX2ZhaWx1cmUYBiABKAsyLi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGFubmVsT3BlbkZhaWx1cmVIABIOCgRkYXRhGAcgASgMSAASEgoIbWF4X2RhdGEYCCABKARIABI5CgVjbG9zZRgJIAEoCzIoLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkNoYW5uZWxDbG9zZUgAQgYKBGJvZHkiNQoLQ2hhbm5lbE9wZW4SFAoMY2hhbm5lbF90eXBlGAEgASgJEhAKCG1heF9kYXRhGAIgASgEIisKF0NoYW5uZWxPcGVuQ29uZmlybWF0aW9uEhAKCG1heF9kYXRhGAEgASgEIm8KEkNoYW5uZWxPcGVuRmFpbHVyZRJECgZyZWFzb24YASABKA4yNC5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGFubmVsT3BlbkZhaWx1cmVSZWFzb24SEwoLZGVzY3JpcHRpb24YAiABKAkiUAoMQ2hhbm5lbENsb3NlEkAKCmVycm9yX2NvZGUYASABKA4yLC5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGFubmVsRXJyb3JDb2RlIiwKCERhdGFncmFtEhIKCmNoYW5uZWxfaWQYASABKAQSDAoEZGF0YRgCIAEoDCKrAQoKQ2hlY2twb2ludBINCgVlcG9jaBgBIAEoBBIQCghvd25lcl9pZBgCIAEoDBI6CgdjdXJzb3JzGAMgAygLMikubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuQ2hhbm5lbEN1cnNvchJACg5yZXRpcmVkX3JhbmdlcxgEIAMoCzIoLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLlJldGlyZWRSYW5nZSI1Cg1DaGFubmVsQ3Vyc29yEhIKCmNoYW5uZWxfaWQYASABKAQSEAoIc2VxdWVuY2UYAiABKAQiQQoMUmV0aXJlZFJhbmdlEhgKEGZpcnN0X2NoYW5uZWxfaWQYASABKAQSFwoPbGFzdF9jaGFubmVsX2lkGAIgASgEIpgCCglNaWdyYXRpb24SFQoNY29ubmVjdGlvbl9pZBgBIAEoBBI5CgdwcmVwYXJlGAIgASgLMiYubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuQ2hlY2twb2ludEgAEjoKCHByZXBhcmVkGAMgASgLMiYubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuQ2hlY2twb2ludEgAEjgKBmNvbW1pdBgEIAEoCzImLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkNoZWNrcG9pbnRIABI7Cgljb21taXR0ZWQYBSABKAsyJi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5DaGVja3BvaW50SABCBgoEc3RlcCIrCgVDbG9zZRIiCgZzdGF0dXMYASABKAsyEi5nb29nbGUucnBjLlN0YXR1cyKWAwoGU2lnbmFsEhIKCmF0dGVtcHRfaWQYASABKAwSFQoNY29ubmVjdGlvbl9pZBgCIAEoBBIQCghzZXF1ZW5jZRgDIAEoBBJDCg1jb25maWd1cmF0aW9uGAQgASgLMiwubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuUnRjQ29uZmlndXJhdGlvbhJFCgtkZXNjcmlwdGlvbhgFIAEoCzIuLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLlNlc3Npb25EZXNjcmlwdGlvbkgAEj0KCWNhbmRpZGF0ZRgGIAEoCzIoLmxlYWZsb3cuZmxlZXQudHJhbnNwb3J0LnYxLkljZUNhbmRpZGF0ZUgAEhsKEWVuZF9vZl9jYW5kaWRhdGVzGAcgASgISAASDwoFYWJvcnQYCCABKAhIABJMCg1hdXRob3JpemF0aW9uGAkgASgLMjMubGVhZmxvdy5mbGVldC50cmFuc3BvcnQudjEuU2lnbmVkUGVlckF1dGhvcml6YXRpb25IAEIICgZzaWduYWwiVAoSU2Vzc2lvbkRlc2NyaXB0aW9uEjEKBHR5cGUYASABKA4yIy5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5TZHBUeXBlEgsKA3NkcBgCIAEoCSIyCgxJY2VDYW5kaWRhdGUSEQoJY2FuZGlkYXRlGAEgASgJEg8KB3NkcF9taWQYAiABKAkizAEKEFJ0Y0NvbmZpZ3VyYXRpb24SOgoLaWNlX3NlcnZlcnMYASADKAsyJS5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5JY2VTZXJ2ZXISTAoUaWNlX3RyYW5zcG9ydF9wb2xpY3kYAiABKA4yLi5sZWFmbG93LmZsZWV0LnRyYW5zcG9ydC52MS5JY2VUcmFuc3BvcnRQb2xpY3kSLgoKZXhwaXJlc19hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiPwoJSWNlU2VydmVyEgwKBHVybHMYASADKAkSEAoIdXNlcm5hbWUYAiABKAkSEgoKY3JlZGVudGlhbBgDIAEoCSJTChdTaWduZWRQZWVyQXV0aG9yaXphdGlvbhIOCgZrZXlfaWQYASABKAkSFQoNYXV0aG9yaXphdGlvbhgCIAEoDBIRCglzaWduYXR1cmUYAyABKAwi/wIKEVBlZXJBdXRob3JpemF0aW9uEg4KBmlzc3VlchgBIAEoCRISCgptYWNoaW5lX2lkGAIgASgJEhIKCnNlc3Npb25faWQYAyABKAkSFQoNY29ubmVjdGlvbl9pZBgEIAEoBBISCgphdHRlbXB0X2lkGAUgASgMEiYKHnBhcnRpY2lwYW50X2ZpbmdlcnByaW50X3NoYTI1NhgGIAEoDBIgChhhZ2VudF9maW5nZXJwcmludF9zaGEyNTYYByABKAwSKAogcGFydGljaXBhbnRfYXV0aG9yaXphdGlvbl9zaGEyNTYYCCABKAwSLQoJaXNzdWVkX2F0GAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgpleHBpcmVzX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBI0ChBsZWFzZV9leHBpcmVzX2F0GAsgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCqdAgoYQ2hhbm5lbE9wZW5GYWlsdXJlUmVhc29uEisKJ0NIQU5ORUxfT1BFTl9GQUlMVVJFX1JFQVNPTl9VTlNQRUNJRklFRBAAEjsKN0NIQU5ORUxfT1BFTl9GQUlMVVJFX1JFQVNPTl9BRE1JTklTVFJBVElWRUxZX1BST0hJQklURUQQARIuCipDSEFOTkVMX09QRU5fRkFJTFVSRV9SRUFTT05fQ09OTkVDVF9GQUlMRUQQAhI0CjBDSEFOTkVMX09QRU5fRkFJTFVSRV9SRUFTT05fVU5LTk9XTl9DSEFOTkVMX1RZUEUQAxIxCi1DSEFOTkVMX09QRU5fRkFJTFVSRV9SRUFTT05fUkVTT1VSQ0VfU0hPUlRBR0UQBCr2AQoQQ2hhbm5lbEVycm9yQ29kZRIiCh5DSEFOTkVMX0VSUk9SX0NPREVfVU5TUEVDSUZJRUQQABIfChtDSEFOTkVMX0VSUk9SX0NPREVfTk9fRVJST1IQARIgChxDSEFOTkVMX0VSUk9SX0NPREVfQ0FOQ0VMTEVEEAISKQolQ0hBTk5FTF9FUlJPUl9DT0RFX0ZMT1dfQ09OVFJPTF9FUlJPUhADEikKJUNIQU5ORUxfRVJST1JfQ09ERV9QUk9UT0NPTF9WSU9MQVRJT04QBBIlCiFDSEFOTkVMX0VSUk9SX0NPREVfSU5URVJOQUxfRVJST1IQBSpMCgdTZHBUeXBlEhgKFFNEUF9UWVBFX1VOU1BFQ0lGSUVEEAASEgoOU0RQX1RZUEVfT0ZGRVIQARITCg9TRFBfVFlQRV9BTlNXRVIQAip4ChJJY2VUcmFuc3BvcnRQb2xpY3kSJAogSUNFX1RSQU5TUE9SVF9QT0xJQ1lfVU5TUEVDSUZJRUQQABIcChhJQ0VfVFJBTlNQT1JUX1BPTElDWV9BTEwQARIeChpJQ0VfVFJBTlNQT1JUX1BPTElDWV9SRUxBWRACQkJaQGdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC90cmFuc3BvcnQvdjE7dHJhbnNwb3J0djFiBnByb3RvMw", [file_google_protobuf_timestamp, file_google_rpc_status]);
 
 /**
  * Exactly one message of a data channel.
@@ -103,11 +103,11 @@ export type Hello = Message<"leaflow.fleet.transport.v1.Hello"> & {
   connectionId: bigint;
 
   /**
-   * The epoch of this path, chosen by the viewer: 1 for the first attempt of
-   * the connection, then one more than the committed epoch, since the
-   * session may have taken an earlier attempt that the viewer did not. The
-   * session accepts one more than its committed epoch, or 1 while no path
-   * has carried the connection, and greets with the same epoch.
+   * The epoch of this path, chosen by the participant: 1 for the first attempt
+   * of the connection, then one more than the committed epoch, since the
+   * session may have taken an earlier attempt that the participant did not. The
+   * session accepts one more than its committed epoch, or 1 while no path has
+   * carried the connection, and greets with the same epoch.
    *
    * @generated from field: uint64 epoch = 3;
    */
@@ -128,7 +128,9 @@ export type Hello = Message<"leaflow.fleet.transport.v1.Hello"> & {
   response: Uint8Array;
 
   /**
-   * SHA-256 of the PeerAuthorization bytes signed for this attempt.
+   * SHA-256 of the bytes of the first PeerAuthorization the service signed
+   * for this attempt (SignedPeerAuthorization.authorization). Renewed ones do
+   * not change it.
    *
    * @generated from field: bytes authorization_sha256 = 6;
    */
@@ -136,10 +138,10 @@ export type Hello = Message<"leaflow.fleet.transport.v1.Hello"> & {
 
   /**
    * The Ed25519 public key (RFC 8032) that vouches for the sender's DTLS
-   * certificate: the machine key of the Agent, the viewer key of the viewer.
-   * The viewer refuses an Agent key other than the one it pinned for the
-   * machine; the session refuses a viewer key other than the one in the
-   * viewer's authorization.
+   * certificate: the machine key for the Agent, the participant's own key for
+   * the participant. The participant refuses an Agent key other than the one
+   * it pinned for the machine; the session refuses a participant key other
+   * than the one in the participant's authorization.
    *
    * @generated from field: bytes public_key = 7;
    */
@@ -148,9 +150,9 @@ export type Hello = Message<"leaflow.fleet.transport.v1.Hello"> & {
   /**
    * Ed25519 signature by public_key over the UTF-8 string
    * "leaflow.fleet.transport.v1.Hello", one zero byte, attempt_id,
-   * connection_id as 8 big-endian bytes, one byte for the role of the sender
-   * (1 viewer, 2 Agent) and the SHA-256 fingerprint of the sender's own DTLS
-   * certificate (RFC 8122).
+   * connection_id as 8 big-endian bytes, one byte for the role of the
+   * sender (1 participant, 2 Agent) and the SHA-256 fingerprint of the
+   * sender's own DTLS certificate (RFC 8122).
    *
    * @generated from field: bytes dtls_attestation = 8;
    */
@@ -539,11 +541,15 @@ export const RetiredRangeSchema: GenMessage<RetiredRange> = /*@__PURE__*/
 
 /**
  * A two-phase migration of a connection to a new path; RFC 9000 §9 calls the
- * same move connection migration. It travels over the control connections,
- * which stay up while paths fail. The viewer coordinates: it sends prepare,
- * the session answers prepared, the viewer sends commit and the session
- * answers committed. Both ends stop admitting envelopes of the old epoch at
- * prepare. A repeated step is answered again and never applied twice.
+ * same move connection migration. It does not depend on the failed path: the
+ * participant sends its steps through the Fleet API and receives the
+ * session's in the answers, and the session sends its own on its control
+ * connection. The participant coordinates: it sends prepare, the session
+ * answers prepared, the participant sends commit and the session answers
+ * committed. Both ends stop admitting envelopes of the old epoch at prepare. A
+ * repeated step is answered again and never applied twice. Only the
+ * participant starts a migration: when the session's side of the path fails,
+ * the participant's side fails too.
  *
  * @generated from message leaflow.fleet.transport.v1.Migration
  */
@@ -562,7 +568,7 @@ export type Migration = Message<"leaflow.fleet.transport.v1.Migration"> & {
    */
   step: {
     /**
-     * The viewer's checkpoint for the next epoch.
+     * The participant's checkpoint for the next epoch.
      *
      * @generated from field: leaflow.fleet.transport.v1.Checkpoint prepare = 2;
      */
@@ -578,7 +584,7 @@ export type Migration = Message<"leaflow.fleet.transport.v1.Migration"> & {
     case: "prepared";
   } | {
     /**
-     * The viewer commits the epoch.
+     * The participant commits the epoch.
      *
      * @generated from field: leaflow.fleet.transport.v1.Checkpoint commit = 4;
      */
@@ -592,15 +598,6 @@ export type Migration = Message<"leaflow.fleet.transport.v1.Migration"> & {
      */
     value: Checkpoint;
     case: "committed";
-  } | {
-    /**
-     * The session asks the viewer to migrate, such as after its side of the
-     * path failed. Only the viewer starts a migration.
-     *
-     * @generated from field: bool request = 6;
-     */
-    value: boolean;
-    case: "request";
   } | { case: undefined; value?: undefined };
 };
 
@@ -634,15 +631,20 @@ export const CloseSchema: GenMessage<Close> = /*@__PURE__*/
 
 /**
  * Signaling for one PeerConnection attempt (RFC 9429 JSEP; RFC 8838 trickle
- * ICE). It travels over the control connections of the viewer and the
- * session; the service derives the sender from the connection it came on and
- * passes it to the other end of the same connection_id.
+ * ICE) between the session process and the service, which stands for the
+ * participant: the participant sends its offer, its candidates and the end of
+ * an attempt through the Fleet API, and receives the session's answer,
+ * candidates and the PeerAuthorization in the answer of its request. The
+ * service passes on the session's candidates that arrive until the session
+ * sends end_of_candidates, and at most 2 seconds after the answer; the session
+ * therefore sends end_of_candidates as soon as it gathered.
  *
  * @generated from message leaflow.fleet.transport.v1.Signal
  */
 export type Signal = Message<"leaflow.fleet.transport.v1.Signal"> & {
   /**
-   * 16 random bytes the viewer chose for the attempt.
+   * 16 random bytes the service chose for the attempt: the attempt_id of the
+   * Fleet API, a UUID.
    *
    * @generated from field: bytes attempt_id = 1;
    */
@@ -663,8 +665,8 @@ export type Signal = Message<"leaflow.fleet.transport.v1.Signal"> & {
   sequence: bigint;
 
   /**
-   * The configuration the viewer was given for this attempt. Set by the
-   * service on the offer it passes to the session; never sent by a viewer.
+   * The ICE servers and policy for the session's end of the attempt. Set by
+   * the service on the offer.
    *
    * @generated from field: leaflow.fleet.transport.v1.RtcConfiguration configuration = 4;
    */
@@ -677,7 +679,7 @@ export type Signal = Message<"leaflow.fleet.transport.v1.Signal"> & {
    */
   signal: {
     /**
-     * An offer from the viewer or an answer from the session.
+     * An offer from the participant or an answer from the session.
      *
      * @generated from field: leaflow.fleet.transport.v1.SessionDescription description = 5;
      */
@@ -701,7 +703,9 @@ export type Signal = Message<"leaflow.fleet.transport.v1.Signal"> & {
     case: "endOfCandidates";
   } | {
     /**
-     * The sender gave up the attempt. The viewer starts another one at once.
+     * The sender gave up the attempt: the participant ended it through the
+     * Fleet API, or the session could not take it. The participant starts
+     * another one.
      *
      * @generated from field: bool abort = 8;
      */
@@ -709,10 +713,10 @@ export type Signal = Message<"leaflow.fleet.transport.v1.Signal"> & {
     case: "abort";
   } | {
     /**
-     * The service's authorization of the attempt, sent to both ends before
-     * either may send application data. Renewed authorizations reach the
-     * session this way too, and the viewer in the answer of its renewal
-     * through the Fleet API.
+     * The service's authorization of the attempt, sent to the session this
+     * way and to the participant with the answer, before either may send
+     * application data. Renewed ones reach the session this way too, and the
+     * participant in the answer of its renewal through the Fleet API.
      *
      * @generated from field: leaflow.fleet.transport.v1.SignedPeerAuthorization authorization = 9;
      */
@@ -895,10 +899,10 @@ export const SignedPeerAuthorizationSchema: GenMessage<SignedPeerAuthorization> 
   messageDesc(file_leaflow_fleet_transport_v1_transport, 18);
 
 /**
- * The service's statement that one attempt joins this viewer to this session
- * with these two DTLS certificates. Both ends check the signature, every
- * field and the lifetime before sending application data; DTLS alone does not
- * authorize.
+ * The service's statement that one attempt joins this participant to this
+ * session with these two DTLS certificates. Both ends check the signature,
+ * every field and the lifetime before sending application data; DTLS alone does
+ * not authorize.
  *
  * @generated from message leaflow.fleet.transport.v1.PeerAuthorization
  */
@@ -925,7 +929,7 @@ export type PeerAuthorization = Message<"leaflow.fleet.transport.v1.PeerAuthoriz
   sessionId: string;
 
   /**
-   * The logical connection of the viewer.
+   * The logical connection of the participant.
    *
    * @generated from field: uint64 connection_id = 4;
    */
@@ -939,11 +943,11 @@ export type PeerAuthorization = Message<"leaflow.fleet.transport.v1.PeerAuthoriz
   attemptId: Uint8Array;
 
   /**
-   * SHA-256 fingerprint of the viewer's DTLS certificate, from its offer.
+   * SHA-256 fingerprint of the participant's DTLS certificate, from its offer.
    *
-   * @generated from field: bytes viewer_fingerprint_sha256 = 6;
+   * @generated from field: bytes participant_fingerprint_sha256 = 6;
    */
-  viewerFingerprintSha256: Uint8Array;
+  participantFingerprintSha256: Uint8Array;
 
   /**
    * SHA-256 fingerprint of the Agent's DTLS certificate, from its answer.
@@ -953,14 +957,14 @@ export type PeerAuthorization = Message<"leaflow.fleet.transport.v1.PeerAuthoriz
   agentFingerprintSha256: Uint8Array;
 
   /**
-   * SHA-256 of the viewer's authorization that both ends hold for the
+   * SHA-256 of the participant's authorization that both ends hold for the
    * connection: the exact serialized bytes the service signed. A renewal
-   * names the viewer's current authorization, which may be a renewed one
+   * names the participant's current authorization, which may be a renewed one
    * through the Fleet API.
    *
-   * @generated from field: bytes viewer_authorization_sha256 = 8;
+   * @generated from field: bytes participant_authorization_sha256 = 8;
    */
-  viewerAuthorizationSha256: Uint8Array;
+  participantAuthorizationSha256: Uint8Array;
 
   /**
    * When the service signed it.
@@ -970,8 +974,8 @@ export type PeerAuthorization = Message<"leaflow.fleet.transport.v1.PeerAuthoriz
   issuedAt?: Timestamp | undefined;
 
   /**
-   * The end of the attempt's authorization: the end of the viewer's current
-   * authorization.
+   * The end of the attempt's authorization: the end of the participant's
+   * current authorization.
    *
    * @generated from field: google.protobuf.Timestamp expires_at = 10;
    */
@@ -979,7 +983,7 @@ export type PeerAuthorization = Message<"leaflow.fleet.transport.v1.PeerAuthoriz
 
   /**
    * The end of the current lease, at most 30 seconds after issued_at and no
-   * later than expires_at. The viewer renews it through the Fleet API with
+   * later than expires_at. The participant renews it through the Fleet API with
    * the PeerAuthorization it holds. Each end stops sending application data
    * when the lease runs out, and goes on once it holds a later one.
    *
@@ -1007,8 +1011,8 @@ export enum ChannelOpenFailureReason {
   UNSPECIFIED = 0,
 
   /**
-   * The viewer's authorization or the session's policy does not allow it, or
-   * the channel type allows one channel and one is open.
+   * The participant's authorization or the session's policy does not allow it,
+   * or the channel type allows one channel and one is open.
    *
    * @generated from enum value: CHANNEL_OPEN_FAILURE_REASON_ADMINISTRATIVELY_PROHIBITED = 1;
    */

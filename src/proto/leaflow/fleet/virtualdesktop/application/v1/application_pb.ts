@@ -37,8 +37,8 @@ export type ServerMessage = Message<"leaflow.fleet.virtualdesktop.application.v1
     case: "applicationMenu";
   } | {
     /**
-     * A desktop icon as it is now, in full: new when the viewer does not know
-     * its uri, otherwise replacing what the viewer had.
+     * A desktop icon as it is now, in full: new when the participant does not
+     * know its uri, otherwise replacing what the participant had.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.application.v1.DesktopIcon desktop_icon = 2;
      */
@@ -346,7 +346,7 @@ export const ApplicationActionSchema: GenMessage<ApplicationAction> = /*@__PURE_
   messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 6);
 
 /**
- * An icon on the desktop. Hidden files are not shown. Viewers keep icon
+ * An icon on the desktop. Hidden files are not shown. Participants keep icon
  * positions themselves, keyed by uri.
  *
  * @generated from message leaflow.fleet.virtualdesktop.application.v1.DesktopIcon
@@ -370,7 +370,7 @@ export type DesktopIcon = Message<"leaflow.fleet.virtualdesktop.application.v1.D
 
   /**
    * Its label: the Name of a launcher, or the file name. Empty for Home, File
-   * System and Trash, which viewers name.
+   * System and Trash, which participants name.
    *
    * @generated from field: string display_name = 3;
    */
@@ -510,7 +510,7 @@ export type ListApplicationsResponse = Message<"leaflow.fleet.virtualdesktop.app
 
   /**
    * ApplicationMenu.revision the page belongs to. When it changes between
-   * pages, the viewer starts again from the first page.
+   * pages, the participant starts again from the first page.
    *
    * @generated from field: uint64 revision = 3;
    */
@@ -620,7 +620,7 @@ export type OpenUriRequest = Message<"leaflow.fleet.virtualdesktop.application.v
   /**
    * How the person answered for an untrusted launcher. A launcher that is not
    * trusted fails with FAILED_PRECONDITION and reason UNTRUSTED_LAUNCHER,
-   * naming the launcher but not its Exec line; the viewer asks its person
+   * naming the launcher but not its Exec line; the participant asks its person
    * and, if they agree, calls again with their answer.
    *
    * @generated from field: leaflow.fleet.virtualdesktop.application.v1.LauncherConfirmation launcher_confirmation = 2;
@@ -837,8 +837,8 @@ export const TerminateProcessResponseSchema: GenMessage<TerminateProcessResponse
   messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 20);
 
 /**
- * Allows a viewer to launch applications and open URIs. Carried in the
- * viewer's signed authorization; without it the viewer can only look.
+ * Allows a participant to launch applications and open URIs. Carried in the
+ * participant's signed authorization; without it the participant can only look.
  *
  * @generated from message leaflow.fleet.virtualdesktop.application.v1.ApplicationPolicy
  */
@@ -948,8 +948,8 @@ export const LauncherConfirmationSchema: GenEnum<LauncherConfirmation> = /*@__PU
 
 /**
  * Lists applications and their processes, launches and ends them. Launching,
- * opening and terminating need an ApplicationPolicy and a viewer that is not
- * read-only; otherwise they fail with PERMISSION_DENIED.
+ * opening and terminating need an ApplicationPolicy and a participant that is
+ * not read-only; otherwise they fail with PERMISSION_DENIED.
  *
  * @generated from service leaflow.fleet.virtualdesktop.application.v1.ApplicationService
  */

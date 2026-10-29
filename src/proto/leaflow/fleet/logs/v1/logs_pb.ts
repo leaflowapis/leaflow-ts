@@ -95,14 +95,14 @@ export const LogsServerMessageSchema: GenMessage<LogsServerMessage> = /*@__PURE_
  */
 export type LogSubscriptionAccepted = Message<"leaflow.fleet.logs.v1.LogSubscriptionAccepted"> & {
   /**
-   * The most records queued for the viewer.
+   * The most records queued for the participant.
    *
    * @generated from field: uint32 max_queued_records = 1;
    */
   maxQueuedRecords: number;
 
   /**
-   * The most bytes queued for the viewer.
+   * The most bytes queued for the participant.
    *
    * @generated from field: uint32 max_queued_bytes = 2;
    */
@@ -130,7 +130,7 @@ export type LogRecordBatch = Message<"leaflow.fleet.logs.v1.LogRecordBatch"> & {
   records: LogRecord[];
 
   /**
-   * Records dropped since the previous batch because the viewer read too
+   * Records dropped since the previous batch because the participant read too
    * slowly.
    *
    * @generated from field: uint64 dropped_count = 2;
@@ -263,8 +263,8 @@ export const LogValueSchema: GenMessage<LogValue> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_logs_v1_logs, 5);
 
 /**
- * Allows a viewer to read the diagnostic records of this session only.
- * Carried in the viewer's signed authorization.
+ * Allows a participant to read the diagnostic records of this session only.
+ * Carried in the participant's signed authorization.
  *
  * @generated from message leaflow.fleet.logs.v1.LogsPolicy
  */

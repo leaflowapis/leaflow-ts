@@ -28,7 +28,7 @@ export type DesktopOptions = Message<"leaflow.fleet.virtualdesktop.host.v1.Deskt
   mode: SessionMode;
 
   /**
-   * The first size of the canvas, normally the viewer's. Unset: the
+   * The first size of the canvas, normally the participant's. Unset: the
    * Agent's default.
    *
    * @generated from field: leaflow.fleet.virtualdesktop.display.v1.Size size = 2;

@@ -15,8 +15,8 @@ export const file_leaflow_fleet_virtualdesktop_tray_v1_tray: GenFile = /*@__PURE
   fileDesc("Ci9sZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL3RyYXkvdjEvdHJheS5wcm90bxIkbGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxIs0CCg1TZXJ2ZXJNZXNzYWdlEkMKCXRyYXlfaWNvbhgBIAEoCzIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AudHJheS52MS5UcmF5SWNvbkgAElIKEXRyYXlfaWNvbl9yZW1vdmVkGAIgASgLMjUubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxLlRyYXlJY29uUmVtb3ZlZEgAEk0KDG1lbnVfdXBkYXRlZBgDIAEoCzI1LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AudHJheS52MS5UcmF5TWVudVVwZGF0ZWRIABJJCgxzbmFwc2hvdF9lbmQYBCABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLnRyYXkudjEuU25hcHNob3RFbmRIAEIJCgdtZXNzYWdlIoQFCghUcmF5SWNvbhIUCgx0cmF5X2ljb25faWQYASABKAQSSAoIcHJvdG9jb2wYAiABKA4yNi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLnRyYXkudjEuVHJheUljb25Qcm90b2NvbBIPCgdpdGVtX2lkGAMgASgJEkgKCGNhdGVnb3J5GAQgASgOMjYubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxLlRyYXlJY29uQ2F0ZWdvcnkSRAoGc3RhdHVzGAUgASgOMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxLlRyYXlJY29uU3RhdHVzEg0KBXRpdGxlGAYgASgJEj4KB3Rvb2x0aXAYByABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLnRyYXkudjEuVG9vbHRpcBI7CgRpY29uGAggASgLMi0ubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkljb24SQwoMb3ZlcmxheV9pY29uGAkgASgLMi0ubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkljb24SRQoOYXR0ZW50aW9uX2ljb24YCiABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSWNvbhIUCgxpdGVtX2lzX21lbnUYCyABKAgSEAoIaGFzX21lbnUYDCABKAgSEQoJd2luZG93X2lkGA0gASgEEhcKD2Rlc2t0b3BfZmlsZV9pZBgOIAEoCRILCgNwaWQYDyABKA0iagoHVG9vbHRpcBI7CgRpY29uGAEgASgLMi0ubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkljb24SDQoFdGl0bGUYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkiJwoPVHJheUljb25SZW1vdmVkEhQKDHRyYXlfaWNvbl9pZBgBIAEoBCJMCg9UcmF5TWVudVVwZGF0ZWQSFAoMdHJheV9pY29uX2lkGAEgASgEEhAKCHJldmlzaW9uGAIgASgNEhEKCXBhcmVudF9pZBgDIAEoBSINCgtTbmFwc2hvdEVuZCK3AQoUQ2xpY2tUcmF5SWNvblJlcXVlc3QSFAoMdHJheV9pY29uX2lkGAEgASgEEkIKBWNsaWNrGAIgASgOMjMubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxLlRyYXlJY29uQ2xpY2sSRQoJaWNvbl9hcmVhGAMgASgLMjIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlJlY3RhbmdsZSIpChVDbGlja1RyYXlJY29uUmVzcG9uc2USEAoIcmV2aXNpb24YASABKAQiTwoVU2Nyb2xsVHJheUljb25SZXF1ZXN0EhQKDHRyYXlfaWNvbl9pZBgBIAEoBBIPCgdkZWx0YV94GAIgASgREg8KB2RlbHRhX3kYAyABKBEiKgoWU2Nyb2xsVHJheUljb25SZXNwb25zZRIQCghyZXZpc2lvbhgBIAEoBCI9ChJHZXRUcmF5TWVudVJlcXVlc3QSFAoMdHJheV9pY29uX2lkGAEgASgEEhEKCXBhcmVudF9pZBgCIAEoBSJnChNHZXRUcmF5TWVudVJlc3BvbnNlEhAKCHJldmlzaW9uGAEgASgNEj4KBmxheW91dBgCIAEoCzIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AudHJheS52MS5NZW51SXRlbSLZBAoITWVudUl0ZW0SFAoMbWVudV9pdGVtX2lkGAEgASgFEkAKBHR5cGUYAiABKA4yMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLnRyYXkudjEuTWVudUl0ZW1UeXBlEg0KBWxhYmVsGAMgASgJEg8KB2VuYWJsZWQYBCABKAgSDwoHdmlzaWJsZRgFIAEoCBI7CgRpY29uGAYgASgLMi0ubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkljb24SQAoIc2hvcnRjdXQYByADKAsyLi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLnRyYXkudjEuS2V5Q2hvcmQSTQoLdG9nZ2xlX3R5cGUYCCABKA4yOC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLnRyYXkudjEuTWVudUl0ZW1Ub2dnbGVUeXBlEk8KDHRvZ2dsZV9zdGF0ZRgJIAEoDjI5LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AudHJheS52MS5NZW51SXRlbVRvZ2dsZVN0YXRlEhMKC2hhc19zdWJtZW51GAogASgIEk4KC2Rpc3Bvc2l0aW9uGAsgASgOMjkubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxLk1lbnVJdGVtRGlzcG9zaXRpb24SQAoIY2hpbGRyZW4YDCADKAsyLi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLnRyYXkudjEuTWVudUl0ZW0iGAoIS2V5Q2hvcmQSDAoEa2V5cxgBIAMoCSKJAQoYU2VuZFRyYXlNZW51RXZlbnRSZXF1ZXN0EhQKDHRyYXlfaWNvbl9pZBgBIAEoBBIUCgxtZW51X2l0ZW1faWQYAiABKAUSQQoEdHlwZRgDIAEoDjIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AudHJheS52MS5NZW51RXZlbnRUeXBlIi0KGVNlbmRUcmF5TWVudUV2ZW50UmVzcG9uc2USEAoIcmV2aXNpb24YASABKAQqggEKEFRyYXlJY29uUHJvdG9jb2wSIgoeVFJBWV9JQ09OX1BST1RPQ09MX1VOU1BFQ0lGSUVEEAASKwonVFJBWV9JQ09OX1BST1RPQ09MX1NUQVRVU19OT1RJRklFUl9JVEVNEAESHQoZVFJBWV9JQ09OX1BST1RPQ09MX1hFTUJFRBACKtEBChBUcmF5SWNvbkNhdGVnb3J5EiIKHlRSQVlfSUNPTl9DQVRFR09SWV9VTlNQRUNJRklFRBAAEikKJVRSQVlfSUNPTl9DQVRFR09SWV9BUFBMSUNBVElPTl9TVEFUVVMQARIlCiFUUkFZX0lDT05fQ0FURUdPUllfQ09NTVVOSUNBVElPTlMQAhImCiJUUkFZX0lDT05fQ0FURUdPUllfU1lTVEVNX1NFUlZJQ0VTEAMSHwobVFJBWV9JQ09OX0NBVEVHT1JZX0hBUkRXQVJFEAQqkwEKDlRyYXlJY29uU3RhdHVzEiAKHFRSQVlfSUNPTl9TVEFUVVNfVU5TUEVDSUZJRUQQABIcChhUUkFZX0lDT05fU1RBVFVTX1BBU1NJVkUQARIbChdUUkFZX0lDT05fU1RBVFVTX0FDVElWRRACEiQKIFRSQVlfSUNPTl9TVEFUVVNfTkVFRFNfQVRURU5USU9OEAMqjgEKDVRyYXlJY29uQ2xpY2sSHwobVFJBWV9JQ09OX0NMSUNLX1VOU1BFQ0lGSUVEEAASGwoXVFJBWV9JQ09OX0NMSUNLX1BSSU1BUlkQARIdChlUUkFZX0lDT05fQ0xJQ0tfU0VDT05EQVJZEAISIAocVFJBWV9JQ09OX0NMSUNLX0NPTlRFWFRfTUVOVRADKmkKDE1lbnVJdGVtVHlwZRIeChpNRU5VX0lURU1fVFlQRV9VTlNQRUNJRklFRBAAEhsKF01FTlVfSVRFTV9UWVBFX1NUQU5EQVJEEAESHAoYTUVOVV9JVEVNX1RZUEVfU0VQQVJBVE9SEAIqoQEKEk1lbnVJdGVtVG9nZ2xlVHlwZRIlCiFNRU5VX0lURU1fVE9HR0xFX1RZUEVfVU5TUEVDSUZJRUQQABIeChpNRU5VX0lURU1fVE9HR0xFX1RZUEVfTk9ORRABEiMKH01FTlVfSVRFTV9UT0dHTEVfVFlQRV9DSEVDS01BUksQAhIfChtNRU5VX0lURU1fVE9HR0xFX1RZUEVfUkFESU8QAyqmAQoTTWVudUl0ZW1Ub2dnbGVTdGF0ZRImCiJNRU5VX0lURU1fVE9HR0xFX1NUQVRFX1VOU1BFQ0lGSUVEEAASHgoaTUVOVV9JVEVNX1RPR0dMRV9TVEFURV9PRkYQARIdChlNRU5VX0lURU1fVE9HR0xFX1NUQVRFX09OEAISKAokTUVOVV9JVEVNX1RPR0dMRV9TVEFURV9JTkRFVEVSTUlOQVRFEAMqyQEKE01lbnVJdGVtRGlzcG9zaXRpb24SJQohTUVOVV9JVEVNX0RJU1BPU0lUSU9OX1VOU1BFQ0lGSUVEEAASIAocTUVOVV9JVEVNX0RJU1BPU0lUSU9OX05PUk1BTBABEiUKIU1FTlVfSVRFTV9ESVNQT1NJVElPTl9JTkZPUk1BVElWRRACEiEKHU1FTlVfSVRFTV9ESVNQT1NJVElPTl9XQVJOSU5HEAMSHwobTUVOVV9JVEVNX0RJU1BPU0lUSU9OX0FMRVJUEAQqogEKDU1lbnVFdmVudFR5cGUSHwobTUVOVV9FVkVOVF9UWVBFX1VOU1BFQ0lGSUVEEAASGwoXTUVOVV9FVkVOVF9UWVBFX0NMSUNLRUQQARIaChZNRU5VX0VWRU5UX1RZUEVfT1BFTkVEEAISGgoWTUVOVV9FVkVOVF9UWVBFX0NMT1NFRBADEhsKF01FTlVfRVZFTlRfVFlQRV9IT1ZFUkVEEAQywgQKC1RyYXlTZXJ2aWNlEogBCg1DbGlja1RyYXlJY29uEjoubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxLkNsaWNrVHJheUljb25SZXF1ZXN0GjsubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxLkNsaWNrVHJheUljb25SZXNwb25zZRKLAQoOU2Nyb2xsVHJheUljb24SOy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLnRyYXkudjEuU2Nyb2xsVHJheUljb25SZXF1ZXN0GjwubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxLlNjcm9sbFRyYXlJY29uUmVzcG9uc2USggEKC0dldFRyYXlNZW51EjgubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC50cmF5LnYxLkdldFRyYXlNZW51UmVxdWVzdBo5LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AudHJheS52MS5HZXRUcmF5TWVudVJlc3BvbnNlEpQBChFTZW5kVHJheU1lbnVFdmVudBI+LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AudHJheS52MS5TZW5kVHJheU1lbnVFdmVudFJlcXVlc3QaPy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLnRyYXkudjEuU2VuZFRyYXlNZW51RXZlbnRSZXNwb25zZUJHWkVnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvdHJheS92MTt0cmF5djFiBnByb3RvMw", [file_leaflow_fleet_virtualdesktop_display_v1_display]);
 
 /**
- * A message from the session on the tray channel. The viewer sends nothing on
- * it.
+ * A message from the session on the tray channel. The participant sends nothing
+ * on it.
  *
  * @generated from message leaflow.fleet.virtualdesktop.tray.v1.ServerMessage
  */
@@ -28,8 +28,8 @@ export type ServerMessage = Message<"leaflow.fleet.virtualdesktop.tray.v1.Server
    */
   message: {
     /**
-     * A tray icon as it is now, in full: new when the viewer does not know
-     * its tray_icon_id, otherwise replacing what the viewer had.
+     * A tray icon as it is now, in full: new when the participant does not know
+     * its tray_icon_id, otherwise replacing what the participant had.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.tray.v1.TrayIcon tray_icon = 1;
      */
@@ -45,7 +45,7 @@ export type ServerMessage = Message<"leaflow.fleet.virtualdesktop.tray.v1.Server
     case: "trayIconRemoved";
   } | {
     /**
-     * A menu changed while a viewer may be showing it.
+     * A menu changed while a participant may be showing it.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.tray.v1.TrayMenuUpdated menu_updated = 3;
      */
@@ -255,7 +255,7 @@ export const TrayIconRemovedSchema: GenMessage<TrayIconRemoved> = /*@__PURE__*/
 
 /**
  * A menu changed (dbusmenu LayoutUpdated and ItemsPropertiesUpdated). A
- * viewer showing the menu or the submenu reads it again with GetTrayMenu.
+ * participant showing the menu or the submenu reads it again with GetTrayMenu.
  *
  * @generated from message leaflow.fleet.virtualdesktop.tray.v1.TrayMenuUpdated
  */
@@ -325,7 +325,7 @@ export type ClickTrayIconRequest = Message<"leaflow.fleet.virtualdesktop.tray.v1
   click: TrayIconClick;
 
   /**
-   * Where the viewer shows the icon, in canvas coordinates, so that the
+   * Where the participant shows the icon, in canvas coordinates, so that the
    * application places what it opens next to it. Unset: the session picks a
    * place at the top right of the canvas.
    *
@@ -747,7 +747,7 @@ export enum TrayIconStatus {
   UNSPECIFIED = 0,
 
   /**
-   * Idle; the viewer may move it to an overflow area ("Passive").
+   * Idle; the participant may move it to an overflow area ("Passive").
    *
    * @generated from enum value: TRAY_ICON_STATUS_PASSIVE = 1;
    */
@@ -787,7 +787,7 @@ export enum TrayIconClick {
 
   /**
    * The primary click (Activate), usually the left button. For an icon with
-   * item_is_menu and has_menu, the viewer shows the menu instead.
+   * item_is_menu and has_menu, the participant shows the menu instead.
    *
    * @generated from enum value: TRAY_ICON_CLICK_PRIMARY = 1;
    */
@@ -983,7 +983,7 @@ export enum MenuEventType {
   UNSPECIFIED = 0,
 
   /**
-   * The item was activated ("clicked"). Viewers always send it.
+   * The item was activated ("clicked"). Participants always send it.
    *
    * @generated from enum value: MENU_EVENT_TYPE_CLICKED = 1;
    */
@@ -1018,8 +1018,8 @@ export const MenuEventTypeSchema: GenEnum<MenuEventType> = /*@__PURE__*/
   enumDesc(file_leaflow_fleet_virtualdesktop_tray_v1_tray, 8);
 
 /**
- * Acts on tray icons and their menus. These calls act on the applications,
- * so they need what input needs: a viewer that is not read-only, holding the
+ * Acts on tray icons and their menus. These calls act on the applications, so
+ * they need what input needs: a participant that is not read-only, holding the
  * input lease. GetTrayMenu counts as acting, because the application prepares
  * the menu for showing. An unknown icon fails with NOT_FOUND and reason
  * TRAY_ICON_GONE.

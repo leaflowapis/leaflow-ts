@@ -23,7 +23,7 @@ export const file_leaflow_fleet_camera_v1_camera: GenFile = /*@__PURE__*/
  */
 export type CameraRequest = Message<"leaflow.fleet.camera.v1.CameraRequest"> & {
   /**
-   * The formats the viewer can produce, most preferred first, at most 8.
+   * The formats the participant can produce, most preferred first, at most 8.
    *
    * @generated from field: repeated leaflow.fleet.camera.v1.CameraFormat formats = 1;
    */
@@ -118,8 +118,8 @@ export type CameraGrant = Message<"leaflow.fleet.camera.v1.CameraGrant"> & {
   maxQueueTime?: Duration | undefined;
 
   /**
-   * The viewer stops capturing after this long; the session ends the stream
-   * with DEADLINE_EXCEEDED then.
+   * The participant stops capturing after this long; the session ends the
+   * stream with DEADLINE_EXCEEDED then.
    *
    * @generated from field: google.protobuf.Duration max_capture_duration = 5;
    */
@@ -214,7 +214,7 @@ export type CameraFrame = Message<"leaflow.fleet.camera.v1.CameraFrame"> & {
   sequence: bigint;
 
   /**
-   * The capture time in microseconds, on the viewer's media clock.
+   * The capture time in microseconds, on the participant's media clock.
    *
    * @generated from field: int64 timestamp_us = 2;
    */
@@ -252,7 +252,7 @@ export const CameraFrameSchema: GenMessage<CameraFrame> = /*@__PURE__*/
 
 /**
  * Asks for a key frame after a frame was lost, abandoned or not decodable.
- * The session drops H264 frames until a key frame; the viewer sends one
+ * The session drops H264 frames until a key frame; the participant sends one
  * soon, or the session ends the stream.
  *
  * @generated from message leaflow.fleet.camera.v1.KeyFrameRequest
@@ -294,7 +294,7 @@ export enum CameraEncoding {
 
   /**
    * H.264, one complete access unit in AVC format per frame. Offered only
-   * when the viewer can encode it.
+   * when the participant can encode it.
    *
    * @generated from enum value: CAMERA_ENCODING_H264 = 2;
    */

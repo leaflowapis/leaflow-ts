@@ -13,7 +13,7 @@ export const file_leaflow_fleet_virtualdesktop_display_v1_display: GenFile = /*@
   fileDesc("CjVsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2Rpc3BsYXkvdjEvZGlzcGxheS5wcm90bxInbGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxImoKDUNsaWVudE1lc3NhZ2USTgoJY29uZmlndXJlGAEgASgLMjkubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkRpc3BsYXlDb25maWd1cmVIAEIJCgdtZXNzYWdlIq0BCg1TZXJ2ZXJNZXNzYWdlEkMKB2Rpc3BsYXkYASABKAsyMC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuRGlzcGxheUgAEkwKDHNuYXBzaG90X2VuZBgCIAEoCzI0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UiygIKB0Rpc3BsYXkSSgoMc2Vzc2lvbl9tb2RlGAEgASgOMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlNlc3Npb25Nb2RlEjsKBHNpemUYAiABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuU2l6ZRI/CghtYXhfc2l6ZRgDIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TaXplEkUKCXdvcmtfYXJlYRgEIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5SZWN0YW5nbGUSGwoOcm9vdF93aW5kb3dfaWQYBSABKARIAIgBAUIRCg9fcm9vdF93aW5kb3dfaWQijwIKEERpc3BsYXlDb25maWd1cmUSOwoEc2l6ZRgBIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TaXplEhoKEmRldmljZV9waXhlbF9yYXRpbxgCIAEoARJFCgl3b3JrX2FyZWEYAyABKAsyMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuUmVjdGFuZ2xlEkwKDWZyYW1lX2V4dGVudHMYBCABKAsyNS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuRnJhbWVFeHRlbnRzEg0KBWRyaXZlGAUgASgIIkgKDEZyYW1lRXh0ZW50cxIMCgRsZWZ0GAEgASgNEg0KBXJpZ2h0GAIgASgNEgsKA3RvcBgDIAEoDRIOCgZib3R0b20YBCABKA0iDQoLU25hcHNob3RFbmQiJQoEU2l6ZRINCgV3aWR0aBgBIAEoDRIOCgZoZWlnaHQYAiABKA0iQAoJUmVjdGFuZ2xlEgkKAXgYASABKBESCQoBeRgCIAEoERINCgV3aWR0aBgDIAEoDRIOCgZoZWlnaHQYBCABKA0iewoFSW1hZ2USEQoJbWltZV90eXBlGAEgASgJEgwKBGRhdGEYAiABKAwSOwoEc2l6ZRgDIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TaXplEhQKDGNvbnRlbnRfaGFzaBgEIAEoDCJZCgRJY29uEj4KBmltYWdlcxgBIAMoCzIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5JbWFnZRIRCglpY29uX25hbWUYAiABKAkqYAoLU2Vzc2lvbk1vZGUSHAoYU0VTU0lPTl9NT0RFX1VOU1BFQ0lGSUVEEAASGQoVU0VTU0lPTl9NT0RFX1NFQU1MRVNTEAESGAoUU0VTU0lPTl9NT0RFX0RFU0tUT1AQAkJNWktnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvZGlzcGxheS92MTtkaXNwbGF5djFiBnByb3RvMw");
 
 /**
- * A message from the viewer.
+ * A message from the participant.
  *
  * @generated from message leaflow.fleet.virtualdesktop.display.v1.ClientMessage
  */
@@ -25,7 +25,7 @@ export type ClientMessage = Message<"leaflow.fleet.virtualdesktop.display.v1.Cli
    */
   message: {
     /**
-     * The viewer's viewport changed.
+     * The participant's viewport changed.
      *
      * @generated from field: leaflow.fleet.virtualdesktop.display.v1.DisplayConfigure configure = 1;
      */
@@ -129,13 +129,13 @@ export const DisplaySchema: GenMessage<Display> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_display_v1_display, 2);
 
 /**
- * The viewer's viewport, sent when the channel opens and after the viewport
- * or the device pixel ratio changes, debounced (Xpra configure-display;
- * MS-RDPEDISP DISPLAYCONTROL_MONITOR_LAYOUT_PDU). The session remembers the
- * latest of every viewer and applies the driver's: the canvas follows one
- * viewer at a time (see the window channel). Read-only viewers never drive,
- * and the DisplayConfigure of a viewer that shows native windows is
- * ignored.
+ * The participant's viewport, sent when the channel opens and after the
+ * viewport or the device pixel ratio changes, debounced (Xpra
+ * configure-display; MS-RDPEDISP DISPLAYCONTROL_MONITOR_LAYOUT_PDU). The
+ * session remembers the latest of every participant and applies the driver's:
+ * the canvas follows one participant at a time (see the window channel).
+ * Read-only participants never drive, and the DisplayConfigure of a participant
+ * that shows native windows is ignored.
  *
  * @generated from message leaflow.fleet.virtualdesktop.display.v1.DisplayConfigure
  */
@@ -149,7 +149,7 @@ export type DisplayConfigure = Message<"leaflow.fleet.virtualdesktop.display.v1.
   size?: Size | undefined;
 
   /**
-   * window.devicePixelRatio of the viewer (CSSOM View), greater than 0 and
+   * window.devicePixelRatio of the participant (CSSOM View), greater than 0 and
    * at most 8.
    *
    * @generated from field: double device_pixel_ratio = 2;
@@ -157,7 +157,7 @@ export type DisplayConfigure = Message<"leaflow.fleet.virtualdesktop.display.v1.
   devicePixelRatio: number;
 
   /**
-   * The part of the viewport the viewer's own interface leaves free, in
+   * The part of the viewport the participant's own interface leaves free, in
    * canvas coordinates. Unset: all of it.
    *
    * @generated from field: leaflow.fleet.virtualdesktop.display.v1.Rectangle work_area = 3;
@@ -165,7 +165,7 @@ export type DisplayConfigure = Message<"leaflow.fleet.virtualdesktop.display.v1.
   workArea?: Rectangle | undefined;
 
   /**
-   * The decorations the viewer draws around decorated windows. The session
+   * The decorations the participant draws around decorated windows. The session
    * reports them to applications as _NET_FRAME_EXTENTS. Unset: none.
    *
    * @generated from field: leaflow.fleet.virtualdesktop.display.v1.FrameExtents frame_extents = 4;
@@ -173,9 +173,9 @@ export type DisplayConfigure = Message<"leaflow.fleet.virtualdesktop.display.v1.
   frameExtents?: FrameExtents | undefined;
 
   /**
-   * Makes this viewer the driver and applies its configuration now. A viewer
-   * leaves it false when it only reports its viewport, such as when it
-   * joins a session somebody else is using.
+   * Makes this participant the driver and applies its configuration now. A
+   * participant leaves it false when it only reports its viewport, such as when
+   * it joins a session somebody else is using.
    *
    * @generated from field: bool drive = 5;
    */
@@ -320,15 +320,15 @@ export const RectangleSchema: GenMessage<Rectangle> = /*@__PURE__*/
 
 /**
  * A still image, such as an icon, sent as PNG. It comes from the session, so
- * the viewer decodes it only as a bitmap.
+ * the participant decodes it only as a bitmap.
  *
- * Each channel caches the last 256 images it carried, keyed by content_hash
- * and evicting the least recently used; the cache starts empty when the
- * channel opens. Both ends apply every Image of a channel in order: the image
- * becomes the most recently used, and an Image with data adds its entry. The
- * session mirrors the viewer's cache and leaves data empty only for an image
- * the viewer holds. A viewer that still meets an unknown hash without data
- * falls back to Icon.icon_name or a placeholder.
+ * Each channel caches the last 256 images it carried, keyed by content_hash and
+ * evicting the least recently used; the cache starts empty when the channel
+ * opens. Both ends apply every Image of a channel in order: the image becomes
+ * the most recently used, and an Image with data adds its entry. The session
+ * mirrors the participant's cache and leaves data empty only for an image the
+ * participant holds. A participant that still meets an unknown hash without
+ * data falls back to Icon.icon_name or a placeholder.
  *
  * @generated from message leaflow.fleet.virtualdesktop.display.v1.Image
  */
@@ -412,7 +412,7 @@ export enum SessionMode {
   UNSPECIFIED = 0,
 
   /**
-   * Every application window is sent on its own and the viewer composes
+   * Every application window is sent on its own and the participant composes
    * them; the Agent is the window manager (Xpra seamless mode; MS-RDPERP
    * RemoteApp).
    *
