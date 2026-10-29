@@ -136,6 +136,17 @@
  * `id`. A client that subscribes to them needs no polling; one that does not can list the
  * pending requests.
  *
+ * ## Operations that do not exist
+ *
+ * Some resources lack an operation on purpose:
+ *
+ * - Accounts are created when they are first needed and are never deleted, so that files keep
+ *   their owner.
+ * - Enrollment requests are made only by machines.
+ * - A machine registration cannot be changed; revoke it and create another.
+ * - Machine events are a log: they are listed, never changed, and kept for 30 days.
+ * - A privilege request is decided only by the user whose account asks.
+ *
  * ## Viewing a session
  *
  * 1. Have an Ed25519 key, for as long as the client wants: one per connection or one kept by the
@@ -175,6 +186,7 @@ import type {
   ListMachineEventsParams,
   ListMachineRegistrationsParams,
   ListMachinesParams,
+  ListPrivilegeApprovalsParams,
   ListPrivilegeRequestsParams,
   ListSessionsParams,
   MachineEventList,
@@ -183,6 +195,7 @@ import type {
   MachineRegistrationResource,
   MachineResource,
   PrivilegeApproval,
+  PrivilegeApprovalList,
   PrivilegeRequestList,
   PrivilegeRequestResource,
   RunCommandRequest,
@@ -193,6 +206,7 @@ import type {
   UpdateGroupRequest,
   UpdateMachineRequest,
   ViewerList,
+  ViewerResource,
   ViewerTicketResource,
 } from "./models.js";
 
@@ -712,6 +726,65 @@ export const updatePrivilegeApproval = async (
 
   const data: updatePrivilegeApprovalResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as updatePrivilegeApprovalResponse;
+};
+
+export type listPrivilegeApprovalsResponse200 = {
+  data: PrivilegeApprovalList;
+  status: 200;
+};
+
+export type listPrivilegeApprovalsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listPrivilegeApprovalsResponseSuccess = listPrivilegeApprovalsResponse200 & {
+  headers: Headers;
+};
+export type listPrivilegeApprovalsResponseError = listPrivilegeApprovalsResponseDefault & {
+  headers: Headers;
+};
+
+export type listPrivilegeApprovalsResponse =
+  | listPrivilegeApprovalsResponseSuccess
+  | listPrivilegeApprovalsResponseError;
+
+export const getListPrivilegeApprovalsUrl = (params?: ListPrivilegeApprovalsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/privilege-approvals?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/privilege-approvals`;
+};
+
+/**
+ * Returns the machines of the current project on which the caller has set privilege requests
+ * to be approved without asking, with the setting of each, the most recently set first. A
+ * machine whose setting is `never`, or whose `until` has passed, is not listed.
+ * @summary List the caller's privilege approval settings
+ */
+export const listPrivilegeApprovals = async (
+  params?: ListPrivilegeApprovalsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listPrivilegeApprovalsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListPrivilegeApprovalsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listPrivilegeApprovalsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listPrivilegeApprovalsResponse;
 };
 
 export type listPrivilegeRequestsResponse200 = {
@@ -2273,6 +2346,50 @@ export const listSessionViewers = async (
   return { data, status: res.status, headers: res.headers } as listSessionViewersResponse;
 };
 
+export type getViewerResponse200 = {
+  data: ViewerResource;
+  status: 200;
+};
+
+export type getViewerResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getViewerResponseSuccess = getViewerResponse200 & {
+  headers: Headers;
+};
+export type getViewerResponseError = getViewerResponseDefault & {
+  headers: Headers;
+};
+
+export type getViewerResponse = getViewerResponseSuccess | getViewerResponseError;
+
+export const getGetViewerUrl = (sessionId: string, connectionId: number) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/viewers/${encodeURIComponent(String(connectionId))}`;
+};
+
+/**
+ * Returns a viewer connected to the session.
+ * @summary Get a viewer of a session
+ */
+export const getViewer = async (
+  sessionId: string,
+  connectionId: number,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getViewerResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetViewerUrl(sessionId, connectionId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getViewerResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getViewerResponse;
+};
+
 export type deleteViewerResponse204 = {
   data: void;
   status: 204;
@@ -2357,9 +2474,6 @@ export const getCreateViewerTicketUrl = (sessionId: string) => {
  * devices and audio, printing, SSH agent forwarding, approving privilege requests and
  * reading logs — is granted only with its permission; a viewer that may only watch gets
  * none of them. A ticket may ask for less: to watch only, or for some of the capabilities.
- *
- * A request made by a browser binds the ticket to its `Origin`, which the WebSocket
- * connection must carry too.
  *
  * Fails with:
  * - `SESSION_CLOSED` when the session has ended;

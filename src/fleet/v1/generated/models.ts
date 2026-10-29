@@ -136,6 +136,17 @@
  * `id`. A client that subscribes to them needs no polling; one that does not can list the
  * pending requests.
  *
+ * ## Operations that do not exist
+ *
+ * Some resources lack an operation on purpose:
+ *
+ * - Accounts are created when they are first needed and are never deleted, so that files keep
+ *   their owner.
+ * - Enrollment requests are made only by machines.
+ * - A machine registration cannot be changed; revoke it and create another.
+ * - Machine events are a log: they are listed, never changed, and kept for 30 days.
+ * - A privilege request is decided only by the user whose account asks.
+ *
  * ## Viewing a session
  *
  * 1. Have an Ed25519 key, for as long as the client wants: one per connection or one kept by the
@@ -740,6 +751,35 @@ export interface PrivilegeApproval {
 }
 
 /**
+ * `until` or `forever`; see PrivilegeApproval.
+ */
+export type PrivilegeApprovalResourceAutoApprove =
+  (typeof PrivilegeApprovalResourceAutoApprove)[keyof typeof PrivilegeApprovalResourceAutoApprove];
+
+export const PrivilegeApprovalResourceAutoApprove = {
+  until: "until",
+  forever: "forever",
+} as const;
+
+export interface PrivilegeApprovalResource {
+  machine_id: string;
+  /** `until` or `forever`; see PrivilegeApproval. */
+  auto_approve: PrivilegeApprovalResourceAutoApprove;
+  /** Only with `until`. */
+  auto_approve_until?: string;
+}
+
+export interface PrivilegeApprovalList {
+  items: PrivilegeApprovalResource[];
+  /** @minimum 0 */
+  total_count: number;
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+}
+
+/**
  * `pending` waits for a decision; `approved` and `denied` were decided by the user, a
  * viewer or the user's setting; `expired` was not decided in time; `cancelled` ended
  * because the asking program gave up or a viewer decided it.
@@ -916,6 +956,21 @@ export type ListMachineEventsParams = {
    * Return only events of this type
    */
   type?: MachineEventType;
+};
+
+export type ListPrivilegeApprovalsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
 };
 
 export type ListPrivilegeRequestsParams = {

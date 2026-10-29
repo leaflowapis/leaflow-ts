@@ -136,6 +136,17 @@
  * `id`. A client that subscribes to them needs no polling; one that does not can list the
  * pending requests.
  *
+ * ## Operations that do not exist
+ *
+ * Some resources lack an operation on purpose:
+ *
+ * - Accounts are created when they are first needed and are never deleted, so that files keep
+ *   their owner.
+ * - Enrollment requests are made only by machines.
+ * - A machine registration cannot be changed; revoke it and create another.
+ * - Machine events are a log: they are listed, never changed, and kept for 30 days.
+ * - A privilege request is decided only by the user whose account asks.
+ *
  * ## Viewing a session
  *
  * 1. Have an Ed25519 key, for as long as the client wants: one per connection or one kept by the
@@ -328,6 +339,33 @@ export const UpdatePrivilegeApprovalParams = zod.strictObject({
 });
 
 export const UpdatePrivilegeApprovalBody = PrivilegeApproval;
+
+/**
+ * Returns the machines of the current project on which the caller has set privilege requests
+ * to be approved without asking, with the setting of each, the most recently set first. A
+ * machine whose setting is `never`, or whose `until` has passed, is not listed.
+ * @summary List the caller's privilege approval settings
+ */
+export const listPrivilegeApprovalsQueryPageDefault = 1;
+export const listPrivilegeApprovalsQueryPageMax = 2147483647;
+
+export const listPrivilegeApprovalsQueryPageSizeDefault = 50;
+export const listPrivilegeApprovalsQueryPageSizeMax = 200;
+
+export const ListPrivilegeApprovalsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listPrivilegeApprovalsQueryPageMax)
+    .default(listPrivilegeApprovalsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listPrivilegeApprovalsQueryPageSizeMax)
+    .default(listPrivilegeApprovalsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
 
 /**
  * Returns the caller's privilege requests on the project's machines, newest first. Requests
@@ -809,6 +847,19 @@ export const ListSessionViewersParams = zod.strictObject({
 });
 
 /**
+ * Returns a viewer connected to the session.
+ * @summary Get a viewer of a session
+ */
+export const getViewerPathSessionIdMax = 40;
+
+export const getViewerPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+
+export const GetViewerParams = zod.strictObject({
+  sessionId: zod.string().min(1).max(getViewerPathSessionIdMax).regex(getViewerPathSessionIdRegExp),
+  connectionId: zod.int().min(1),
+});
+
+/**
  * Disconnects the viewer from the session; the session goes on. The viewer can connect
  * again only with a new ticket.
  *
@@ -840,9 +891,6 @@ export const DeleteViewerParams = zod.strictObject({
  * devices and audio, printing, SSH agent forwarding, approving privilege requests and
  * reading logs — is granted only with its permission; a viewer that may only watch gets
  * none of them. A ticket may ask for less: to watch only, or for some of the capabilities.
- *
- * A request made by a browser binds the ticket to its `Origin`, which the WebSocket
- * connection must carry too.
  *
  * Fails with:
  * - `SESSION_CLOSED` when the session has ended;

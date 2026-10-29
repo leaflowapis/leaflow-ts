@@ -164,6 +164,9 @@ export const CommandService: GenService<{
    *     start; nothing ran;
    *   - INTERNAL and reason COMMAND_LOST when the Agent lost the command
    *     while it ran: it may have run in part, and what it wrote is gone.
+   * Calling again runs the command again: a caller that lost the result,
+   * such as with CONNECTION_LOST, does not know whether it ran. A call
+   * without a timeout may run the command's timeout and 10 seconds more.
    *
    * @generated from rpc leaflow.fleet.command.v1.CommandService.RunCommand
    */

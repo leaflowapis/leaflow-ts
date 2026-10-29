@@ -136,6 +136,17 @@
  * `id`. A client that subscribes to them needs no polling; one that does not can list the
  * pending requests.
  *
+ * ## Operations that do not exist
+ *
+ * Some resources lack an operation on purpose:
+ *
+ * - Accounts are created when they are first needed and are never deleted, so that files keep
+ *   their owner.
+ * - Enrollment requests are made only by machines.
+ * - A machine registration cannot be changed; revoke it and create another.
+ * - Machine events are a log: they are listed, never changed, and kept for 30 days.
+ * - A privilege request is decided only by the user whose account asks.
+ *
  * ## Viewing a session
  *
  * 1. Have an Ed25519 key, for as long as the client wants: one per connection or one kept by the
