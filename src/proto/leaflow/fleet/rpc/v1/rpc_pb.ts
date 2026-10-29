@@ -24,9 +24,11 @@ export const file_leaflow_fleet_rpc_v1_rpc: GenFile = /*@__PURE__*/
 export type Call = Message<"leaflow.fleet.rpc.v1.Call"> & {
   /**
    * Identifies the call among the calls the sender has made on this carrier;
-   * CallResult and CallCancel echo it. A UUID (RFC 9562). It only correlates:
-   * resending a Call with the same request_id starts another call, so a
-   * method is retried safely only when the method itself is idempotent.
+   * CallResult and CallCancel echo it. A UUID (RFC 9562); the service's are
+   * unique across all control connections (leaflow.fleet.control.v1). It
+   * only correlates: resending a Call with the same request_id starts another
+   * call, so a method is retried safely only when the method itself is
+   * idempotent.
    *
    * @generated from field: string request_id = 1;
    */
@@ -78,8 +80,9 @@ export const CallSchema: GenMessage<Call> = /*@__PURE__*/
 /**
  * The result of a Call. Exactly one CallResult answers every Call, including
  * a cancelled one. Calls still outstanding when the carrier closes are never
- * resent; a control connection (leaflow.fleet.control.v1) carries their
- * results on the callee's next connection, other carriers drop them.
+ * resent, except a call that a control connection (leaflow.fleet.control.v1)
+ * shows never reached the callee; a control connection carries the results of
+ * the others on the callee's next connection, other carriers drop them.
  *
  * @generated from message leaflow.fleet.rpc.v1.CallResult
  */
