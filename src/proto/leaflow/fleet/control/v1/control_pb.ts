@@ -559,8 +559,9 @@ export type Welcome = Message<"leaflow.fleet.control.v1.Welcome"> & {
   signingKeys?: SigningKeys | undefined;
 
   /**
-   * How long the service keeps the session's participants when this connection
-   * drops. Session processes only.
+   * How long, after this connection drops, the service waits for the results
+   * of the calls the endpoint received on it (see Disconnection) and, for a
+   * session process, keeps the session's participants.
    *
    * @generated from field: google.protobuf.Duration resume_grace = 5;
    */

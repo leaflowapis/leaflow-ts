@@ -79,7 +79,7 @@
  *   exist on the machine; members log in over SSH with their keys and become root through sudo
  *   as their permissions allow;
  * - `leaflow.fleet.command.v1`: running commands;
- * - `leaflow.fleet.host.v1`: sessions, with terminals, programs, files, ports, sound, devices,
+ * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
  * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a desktop.
  *
@@ -136,6 +136,21 @@
  * when it ends, each addressed to the user in the current project and carrying the request's
  * `id`. A client that subscribes to them needs no polling; one that does not can list the
  * pending requests.
+ *
+ * ## Connections that drop
+ *
+ * A machine's Agent and a session's process each keep a connection to the service, and on a poor
+ * network it may drop and come back within seconds. Requests do not fail for that:
+ *
+ * - A request that needs the machine or the session's process waits while it connects again,
+ *   for as long as the request would wait for its answer, and fails with `MACHINE_OFFLINE` or
+ *   `SESSION_UNAVAILABLE` only when it does not come back in that time.
+ * - What the machine or the session's process received before its connection dropped, such as a
+ *   command or a session being opened, goes on, and its result is returned once it has
+ *   connected again within that time.
+ *
+ * A machine stays `online` for up to a minute after its connection was lost, while its Agent
+ * connects again; a machine whose Agent stops is offline at once.
  *
  * ## Operations that do not exist
  *
@@ -312,7 +327,10 @@ export interface MachineResource {
   /** The host name the machine last reported */
   hostname: string;
   public_key: PublicKey;
-  /** The machine's Agent is connected */
+  /**
+   * The machine's Agent is connected, or lost its connection less than a minute ago and
+   * may connect again
+   */
   online: boolean;
   /** Null until the machine has reported once */
   operating_system: OperatingSystem | null;
@@ -618,9 +636,10 @@ export const SessionState = {
 
 /**
  * Why a session ended. `close_requested` and `terminate_requested` follow a request;
- * `logout` the user logged out; `disconnected_timeout`, `no_participant_timeout` and
- * `max_lifetime` a time limit passed; `display_exit` and `process_lost` the session failed;
- * `open_failed` it never opened; `access_revoked` its user may no longer log in;
+ * `logout` the user logged out, such as when the shell of a terminal session exited;
+ * `disconnected_timeout`, `no_participant_timeout` and `max_lifetime` a time limit passed;
+ * `display_exit` and `process_lost` the session failed; `open_failed` it never opened;
+ * `access_revoked` its user may no longer log in;
  * `machine_restarted` the machine restarted; `unknown` the machine no longer reports it.
  */
 export type SessionCloseReason = (typeof SessionCloseReason)[keyof typeof SessionCloseReason];
@@ -657,8 +676,9 @@ export interface SessionResource {
   desktop: DesktopState | null;
   /**
    * The session's process is connected to the service, so participants can join and start
-   * PeerConnections. False while it restarts; such requests are then answered with
-   * `SESSION_UNAVAILABLE` and succeed again shortly.
+   * PeerConnections. False while it connects again, such as after it restarted; such
+   * requests then wait for it and fail with `SESSION_UNAVAILABLE` only if it does not come
+   * back in time.
    */
   process_connected: boolean;
   /**

@@ -79,7 +79,7 @@
  *   exist on the machine; members log in over SSH with their keys and become root through sudo
  *   as their permissions allow;
  * - `leaflow.fleet.command.v1`: running commands;
- * - `leaflow.fleet.host.v1`: sessions, with terminals, programs, files, ports, sound, devices,
+ * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
  * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a desktop.
  *
@@ -136,6 +136,21 @@
  * when it ends, each addressed to the user in the current project and carrying the request's
  * `id`. A client that subscribes to them needs no polling; one that does not can list the
  * pending requests.
+ *
+ * ## Connections that drop
+ *
+ * A machine's Agent and a session's process each keep a connection to the service, and on a poor
+ * network it may drop and come back within seconds. Requests do not fail for that:
+ *
+ * - A request that needs the machine or the session's process waits while it connects again,
+ *   for as long as the request would wait for its answer, and fails with `MACHINE_OFFLINE` or
+ *   `SESSION_UNAVAILABLE` only when it does not come back in that time.
+ * - What the machine or the session's process received before its connection dropped, such as a
+ *   command or a session being opened, goes on, and its result is returned once it has
+ *   connected again within that time.
+ *
+ * A machine stays `online` for up to a minute after its connection was lost, while its Agent
+ * connects again; a machine whose Agent stops is offline at once.
  *
  * ## Operations that do not exist
  *
@@ -596,7 +611,7 @@ export const getRunMachineCommandUrl = (machineId: string) => {
  * Requires `fleet:machines.login` on the machine.
  *
  * Fails with:
- * - `MACHINE_OFFLINE` when the machine is not connected;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
  * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.command.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
@@ -2135,16 +2150,19 @@ export const getCreateSessionUrl = () => {
 
 /**
  * Opens a session for the caller on a machine, as the caller's account, and returns once it
- * is ready. With `desktop` the session has a desktop; without, it offers terminals, programs,
- * files, ports, sound, devices, printers and privilege approvals. The account is created if
- * the caller has none yet. Requires `fleet:machines.login` on the machine.
+ * is ready. With `desktop` the session has a desktop. Without, it is a terminal session: its
+ * one terminal runs the caller's login shell from the start, every participant attaches to
+ * that terminal, and the session ends when the shell exits; a caller who wants another
+ * terminal opens another session. Either kind also offers programs, files, ports, sound,
+ * devices, printers and privilege approvals. The account is created if the caller has none
+ * yet. Requires `fleet:machines.login` on the machine.
  *
  * On a machine an account has at most one session with a desktop and at most 8 sessions in
  * all. Sessions without a desktop run side by side, such as one for a program and one for a
  * person; several participants can also share one session.
  *
  * Fails with:
- * - `MACHINE_OFFLINE` when the machine is not connected;
+ * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
  * - `FEATURE_UNAVAILABLE` when the machine does not offer sessions, or with `desktop`,
  *   desktops;
  * - `USER_HAS_DESKTOP_SESSION` with `desktop` when the account already has a session with a
@@ -2443,8 +2461,8 @@ export const getCreateParticipantUrl = (sessionId: string) => {
  * - `SESSION_CLOSED` when the session has ended;
  * - `SESSION_ACCESS_DENIED` when the caller may not join the session;
  * - `OFFER_INVALID` when the offer is not an SDP offer that names a SHA-256 DTLS fingerprint;
- * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
- *   time, such as while it restarts; try again after the error's `retry_delay`;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected and does not connect
+ *   again in time, or did not answer in time; try again after the error's `retry_delay`;
  * - `PARTICIPANT_LIMIT_REACHED` when the session has as many participants as it admits;
  * - `PARTICIPANT_REFUSED` when the session refused the participant;
  * - `PARTICIPANT_KEY_IN_USE` when the public key belongs to a participant of the session that
@@ -2655,8 +2673,8 @@ export const getPrepareParticipantMigrationUrl = (sessionId: string, participant
  * Fails with:
  * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
  * - `CHECKPOINT_INVALID` when the checkpoint is not a serialized `Checkpoint`;
- * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
- *   time; try again after the error's `retry_delay`.
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected and does not connect
+ *   again in time, or did not answer in time; try again after the error's `retry_delay`.
  * @summary Prepare a migration
  */
 export const prepareParticipantMigration = async (
@@ -2736,8 +2754,8 @@ export const getCommitParticipantMigrationUrl = (sessionId: string, participantI
  * Fails with:
  * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
  * - `CHECKPOINT_INVALID` when the checkpoint is not a serialized `Checkpoint`;
- * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
- *   time; try again after the error's `retry_delay`.
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected and does not connect
+ *   again in time, or did not answer in time; try again after the error's `retry_delay`.
  * @summary Commit a migration
  */
 export const commitParticipantMigration = async (
@@ -2817,8 +2835,8 @@ export const getCreatePeerConnectionUrl = (sessionId: string, participantId: num
  * - `OFFER_INVALID` when the offer is not an SDP offer that names a SHA-256 DTLS fingerprint;
  * - `RATE_LIMIT_EXCEEDED` when the participant started too many PeerConnections in the
  *   last minute; try again after the error's `retry_delay`;
- * - `SESSION_UNAVAILABLE` when the session's process is not connected or did not answer in
- *   time; try again after the error's `retry_delay`;
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected and does not connect
+ *   again in time, or did not answer in time; try again after the error's `retry_delay`;
  * - `PEER_CONNECTION_ABORTED` when the session gave up the PeerConnection; start another.
  * @summary Start a PeerConnection
  */
@@ -2960,8 +2978,8 @@ export const getCreatePeerConnectionCandidatesUrl = (
  *
  * Fails with:
  * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
- * - `SESSION_UNAVAILABLE` when the session's process is not connected; try again after the
- *   error's `retry_delay`.
+ * - `SESSION_UNAVAILABLE` when the session's process is not connected and does not connect
+ *   again in time; try again after the error's `retry_delay`.
  * @summary Add ICE candidates to a PeerConnection
  */
 export const createPeerConnectionCandidates = async (

@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/rpc/v1/rpc.proto.
  */
 export const file_leaflow_fleet_rpc_v1_rpc: GenFile = /*@__PURE__*/
-  fileDesc("Ch5sZWFmbG93L2ZsZWV0L3JwYy92MS9ycGMucHJvdG8SFGxlYWZsb3cuZmxlZXQucnBjLnYxImcKBENhbGwSEgoKcmVxdWVzdF9pZBgBIAEoCRIOCgZtZXRob2QYAiABKAkSDwoHcGF5bG9hZBgDIAEoDBIqCgd0aW1lb3V0GAQgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uImIKCkNhbGxSZXN1bHQSEgoKcmVxdWVzdF9pZBgBIAEoCRIRCgdwYXlsb2FkGAIgASgMSAASIwoFZXJyb3IYAyABKAsyEi5nb29nbGUucnBjLlN0YXR1c0gAQggKBnJlc3VsdCIgCgpDYWxsQ2FuY2VsEhIKCnJlcXVlc3RfaWQYASABKAkifwoNQ2xpZW50TWVzc2FnZRIqCgRjYWxsGAEgASgLMhoubGVhZmxvdy5mbGVldC5ycGMudjEuQ2FsbEgAEjcKC2NhbGxfY2FuY2VsGAIgASgLMiAubGVhZmxvdy5mbGVldC5ycGMudjEuQ2FsbENhbmNlbEgAQgkKB21lc3NhZ2UiUwoNU2VydmVyTWVzc2FnZRI3CgtjYWxsX3Jlc3VsdBgBIAEoCzIgLmxlYWZsb3cuZmxlZXQucnBjLnYxLkNhbGxSZXN1bHRIAEIJCgdtZXNzYWdlKo4BCg5FeGVjdXRpb25TdGF0ZRIfChtFWEVDVVRJT05fU1RBVEVfVU5TUEVDSUZJRUQQABIfChtFWEVDVVRJT05fU1RBVEVfTk9UX1NUQVJURUQQARIdChlFWEVDVVRJT05fU1RBVEVfQ09NUExFVEVEEAISGwoXRVhFQ1VUSU9OX1NUQVRFX1VOS05PV04QA0I2WjRnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvcnBjL3YxO3JwY3YxYgZwcm90bzM", [file_google_protobuf_duration, file_google_rpc_status]);
+  fileDesc("Ch5sZWFmbG93L2ZsZWV0L3JwYy92MS9ycGMucHJvdG8SFGxlYWZsb3cuZmxlZXQucnBjLnYxIn0KBENhbGwSEgoKcmVxdWVzdF9pZBgBIAEoCRIOCgZtZXRob2QYAiABKAkSDwoHcGF5bG9hZBgDIAEoDBIqCgd0aW1lb3V0GAQgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEhQKDHJlc3VtZV90b2tlbhgFIAEoDCJ4CgpDYWxsUmVzdWx0EhIKCnJlcXVlc3RfaWQYASABKAkSEQoHcGF5bG9hZBgCIAEoDEgAEiMKBWVycm9yGAMgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIABIUCgxyZXN1bWVfdG9rZW4YBCABKAxCCAoGcmVzdWx0IiAKCkNhbGxDYW5jZWwSEgoKcmVxdWVzdF9pZBgBIAEoCSJ/Cg1DbGllbnRNZXNzYWdlEioKBGNhbGwYASABKAsyGi5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsSAASNwoLY2FsbF9jYW5jZWwYAiABKAsyIC5sZWFmbG93LmZsZWV0LnJwYy52MS5DYWxsQ2FuY2VsSABCCQoHbWVzc2FnZSJTCg1TZXJ2ZXJNZXNzYWdlEjcKC2NhbGxfcmVzdWx0GAEgASgLMiAubGVhZmxvdy5mbGVldC5ycGMudjEuQ2FsbFJlc3VsdEgAQgkKB21lc3NhZ2UqjgEKDkV4ZWN1dGlvblN0YXRlEh8KG0VYRUNVVElPTl9TVEFURV9VTlNQRUNJRklFRBAAEh8KG0VYRUNVVElPTl9TVEFURV9OT1RfU1RBUlRFRBABEh0KGUVYRUNVVElPTl9TVEFURV9DT01QTEVURUQQAhIbChdFWEVDVVRJT05fU1RBVEVfVU5LTk9XThADQjZaNGdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9ycGMvdjE7cnBjdjFiBnByb3RvMw", [file_google_protobuf_duration, file_google_rpc_status]);
 
 /**
  * Invokes a method.
@@ -56,6 +56,16 @@ export type Call = Message<"leaflow.fleet.rpc.v1.Call"> & {
    * @generated from field: google.protobuf.Duration timeout = 4;
    */
   timeout?: Duration | undefined;
+
+  /**
+   * Set by the service on the calls it makes on a control connection
+   * (leaflow.fleet.control.v1): an opaque value of at most 256 bytes that the
+   * callee copies into the CallResult. It lets any address of the service
+   * pass on a result that arrives on a later connection.
+   *
+   * @generated from field: bytes resume_token = 5;
+   */
+  resumeToken: Uint8Array;
 };
 
 /**
@@ -67,8 +77,9 @@ export const CallSchema: GenMessage<Call> = /*@__PURE__*/
 
 /**
  * The result of a Call. Exactly one CallResult answers every Call, including
- * a cancelled one. Calls still outstanding when the carrier closes have no
- * result and are never resent.
+ * a cancelled one. Calls still outstanding when the carrier closes are never
+ * resent; a control connection (leaflow.fleet.control.v1) carries their
+ * results on the callee's next connection, other carriers drop them.
  *
  * @generated from message leaflow.fleet.rpc.v1.CallResult
  */
@@ -102,6 +113,13 @@ export type CallResult = Message<"leaflow.fleet.rpc.v1.CallResult"> & {
     value: Status;
     case: "error";
   } | { case: undefined; value?: undefined };
+
+  /**
+   * The resume_token of the Call, unchanged.
+   *
+   * @generated from field: bytes resume_token = 4;
+   */
+  resumeToken: Uint8Array;
 };
 
 /**

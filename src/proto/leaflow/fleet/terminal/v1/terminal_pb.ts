@@ -2,10 +2,8 @@
 // @generated from file leaflow/fleet/terminal/v1/terminal.proto (package leaflow.fleet.terminal.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
+import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
+import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
 import type { Status } from "../../../../google/rpc/status_pb.js";
 import { file_google_rpc_status } from "../../../../google/rpc/status_pb.js";
 import type { Message } from "@bufbuild/protobuf";
@@ -14,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/terminal/v1/terminal.proto.
  */
 export const file_leaflow_fleet_terminal_v1_terminal: GenFile = /*@__PURE__*/
-  fileDesc("CihsZWFmbG93L2ZsZWV0L3Rlcm1pbmFsL3YxL3Rlcm1pbmFsLnByb3RvEhlsZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxIoYCCg1DbGllbnRNZXNzYWdlEjcKBG9wZW4YASABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsT3BlbkgAEjsKBmF0dGFjaBgCIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hIABI5CgVpbnB1dBgDIAEoCzIoLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxJbnB1dEgAEjkKBnJlc2l6ZRgEIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplSABCCQoHbWVzc2FnZSKxAgoNU2VydmVyTWVzc2FnZRI/CghhdHRhY2hlZBgBIAEoCzIrLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hlZEgAEjsKBm91dHB1dBgCIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxPdXRwdXRIABI5CgZyZXNpemUYAyABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsU2l6ZUgAEjcKBGV4aXQYBCABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsRXhpdEgAEiMKBWVycm9yGAUgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIAEIJCgdtZXNzYWdlImIKDFRlcm1pbmFsT3BlbhIMCgR0ZXJtGAEgASgJEjUKBHNpemUYAiABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsU2l6ZRINCgVtb2RlcxgDIAEoDCI1Cg5UZXJtaW5hbEF0dGFjaBITCgt0ZXJtaW5hbF9pZBgBIAEoBBIOCgZvZmZzZXQYAiABKAQifQoQVGVybWluYWxBdHRhY2hlZBITCgt0ZXJtaW5hbF9pZBgBIAEoBBIOCgZvZmZzZXQYAiABKAQSDQoFcmVzZXQYAyABKAgSNQoEc2l6ZRgEIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplIh0KDVRlcm1pbmFsSW5wdXQSDAoEZGF0YRgBIAEoDCIeCg5UZXJtaW5hbE91dHB1dBIMCgRkYXRhGAEgASgMIlIKDFRlcm1pbmFsU2l6ZRIPCgdjb2x1bW5zGAEgASgNEgwKBHJvd3MYAiABKA0SEAoId2lkdGhfcHgYAyABKA0SEQoJaGVpZ2h0X3B4GAQgASgNIlkKDFRlcm1pbmFsRXhpdBITCglleGl0X2NvZGUYASABKA1IABIVCgtzaWduYWxfbmFtZRgCIAEoCUgAEhMKC2NvcmVfZHVtcGVkGAMgASgIQggKBnN0YXR1cyLoAQoIVGVybWluYWwSEwoLdGVybWluYWxfaWQYASABKAQSNQoEc2l6ZRgCIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplEi4KCmNyZWF0ZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhkKEXBhcnRpY2lwYW50X2NvdW50GAQgASgNEg4KBm9mZnNldBgFIAEoBBI1CgRleGl0GAYgASgLMicubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5UZXJtaW5hbEV4aXQiFgoUTGlzdFRlcm1pbmFsc1JlcXVlc3QiTwoVTGlzdFRlcm1pbmFsc1Jlc3BvbnNlEjYKCXRlcm1pbmFscxgBIAMoCzIjLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWwiKwoUQ2xvc2VUZXJtaW5hbFJlcXVlc3QSEwoLdGVybWluYWxfaWQYASABKAQiFwoVQ2xvc2VUZXJtaW5hbFJlc3BvbnNlIhAKDlRlcm1pbmFsUG9saWN5Mv4BCg9UZXJtaW5hbFNlcnZpY2USdwoNTGlzdFRlcm1pbmFscxIvLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuTGlzdFRlcm1pbmFsc1JlcXVlc3QaMC5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLkxpc3RUZXJtaW5hbHNSZXNwb25zZSIDkAIBEnIKDUNsb3NlVGVybWluYWwSLy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLkNsb3NlVGVybWluYWxSZXF1ZXN0GjAubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5DbG9zZVRlcm1pbmFsUmVzcG9uc2VCQFo+Z2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3Rlcm1pbmFsL3YxO3Rlcm1pbmFsdjFiBnByb3RvMw", [file_google_protobuf_timestamp, file_google_rpc_status]);
+  fileDesc("CihsZWFmbG93L2ZsZWV0L3Rlcm1pbmFsL3YxL3Rlcm1pbmFsLnByb3RvEhlsZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxIs0BCg1DbGllbnRNZXNzYWdlEjsKBmF0dGFjaBgBIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hIABI5CgVpbnB1dBgCIAEoCzIoLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxJbnB1dEgAEjkKBnJlc2l6ZRgDIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplSABCCQoHbWVzc2FnZSKxAgoNU2VydmVyTWVzc2FnZRI/CghhdHRhY2hlZBgBIAEoCzIrLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hlZEgAEjsKBm91dHB1dBgCIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxPdXRwdXRIABI5CgZyZXNpemUYAyABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsU2l6ZUgAEjcKBGV4aXQYBCABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsRXhpdEgAEiMKBWVycm9yGAUgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIAEIJCgdtZXNzYWdlIiAKDlRlcm1pbmFsQXR0YWNoEg4KBm9mZnNldBgBIAEoBCJoChBUZXJtaW5hbEF0dGFjaGVkEg4KBm9mZnNldBgBIAEoBBINCgVyZXNldBgCIAEoCBI1CgRzaXplGAMgASgLMicubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5UZXJtaW5hbFNpemUiHQoNVGVybWluYWxJbnB1dBIMCgRkYXRhGAEgASgMIh4KDlRlcm1pbmFsT3V0cHV0EgwKBGRhdGEYASABKAwiUgoMVGVybWluYWxTaXplEg8KB2NvbHVtbnMYASABKA0SDAoEcm93cxgCIAEoDRIQCgh3aWR0aF9weBgDIAEoDRIRCgloZWlnaHRfcHgYBCABKA0iWQoMVGVybWluYWxFeGl0EhMKCWV4aXRfY29kZRgBIAEoDUgAEhUKC3NpZ25hbF9uYW1lGAIgASgJSAASEwoLY29yZV9kdW1wZWQYAyABKAhCCAoGc3RhdHVzIhAKDlRlcm1pbmFsUG9saWN5QkBaPmdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC90ZXJtaW5hbC92MTt0ZXJtaW5hbHYxYgZwcm90bzM", [file_google_rpc_status]);
 
 /**
  * A message from the participant on the terminal channel.
@@ -29,17 +27,9 @@ export type ClientMessage = Message<"leaflow.fleet.terminal.v1.ClientMessage"> &
    */
   message: {
     /**
-     * Starts a new terminal. The first message, or TerminalAttach.
+     * Shows the terminal. The first message.
      *
-     * @generated from field: leaflow.fleet.terminal.v1.TerminalOpen open = 1;
-     */
-    value: TerminalOpen;
-    case: "open";
-  } | {
-    /**
-     * Shows a terminal of the session. The first message, or TerminalOpen.
-     *
-     * @generated from field: leaflow.fleet.terminal.v1.TerminalAttach attach = 2;
+     * @generated from field: leaflow.fleet.terminal.v1.TerminalAttach attach = 1;
      */
     value: TerminalAttach;
     case: "attach";
@@ -47,7 +37,7 @@ export type ClientMessage = Message<"leaflow.fleet.terminal.v1.ClientMessage"> &
     /**
      * Input for the terminal.
      *
-     * @generated from field: leaflow.fleet.terminal.v1.TerminalInput input = 3;
+     * @generated from field: leaflow.fleet.terminal.v1.TerminalInput input = 2;
      */
     value: TerminalInput;
     case: "input";
@@ -56,7 +46,7 @@ export type ClientMessage = Message<"leaflow.fleet.terminal.v1.ClientMessage"> &
      * The participant's terminal changed size. The latest size of any
      * participant applies, and the shell gets SIGWINCH.
      *
-     * @generated from field: leaflow.fleet.terminal.v1.TerminalSize resize = 4;
+     * @generated from field: leaflow.fleet.terminal.v1.TerminalSize resize = 3;
      */
     value: TerminalSize;
     case: "resize";
@@ -83,7 +73,7 @@ export type ServerMessage = Message<"leaflow.fleet.terminal.v1.ServerMessage"> &
    */
   message: {
     /**
-     * The terminal the channel shows. The first message.
+     * Where the output that follows starts. The first message.
      *
      * @generated from field: leaflow.fleet.terminal.v1.TerminalAttached attached = 1;
      */
@@ -115,10 +105,10 @@ export type ServerMessage = Message<"leaflow.fleet.terminal.v1.ServerMessage"> &
     case: "exit";
   } | {
     /**
-     * The terminal could not be opened or attached: RESOURCE_EXHAUSTED when
-     * no pseudo-terminal is left or there are too many, NOT_FOUND for a
-     * terminal that is gone, PERMISSION_DENIED without TerminalPolicy, or
-     * INTERNAL when the shell could not start. The only message.
+     * The terminal could not be attached: PERMISSION_DENIED without
+     * TerminalPolicy, RESOURCE_EXHAUSTED when as many participants are
+     * attached as the session admits, INVALID_ARGUMENT for an offset beyond
+     * the output, or NOT_FOUND once the shell has exited. The only message.
      *
      * @generated from field: google.rpc.Status error = 5;
      */
@@ -135,59 +125,15 @@ export const ServerMessageSchema: GenMessage<ServerMessage> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_terminal_v1_terminal, 1);
 
 /**
- * Starts a new terminal.
- *
- * @generated from message leaflow.fleet.terminal.v1.TerminalOpen
- */
-export type TerminalOpen = Message<"leaflow.fleet.terminal.v1.TerminalOpen"> & {
-  /**
-   * The TERM environment variable. Empty: "xterm-256color".
-   *
-   * @generated from field: string term = 1;
-   */
-  term: string;
-
-  /**
-   * The size.
-   *
-   * @generated from field: leaflow.fleet.terminal.v1.TerminalSize size = 2;
-   */
-  size?: TerminalSize | undefined;
-
-  /**
-   * Terminal modes encoded as in RFC 4254 §8: opcode and argument pairs
-   * ending with TTY_OP_END. Empty: the session's defaults. Unsupported
-   * opcodes are ignored.
-   *
-   * @generated from field: bytes modes = 3;
-   */
-  modes: Uint8Array;
-};
-
-/**
- * Describes the message leaflow.fleet.terminal.v1.TerminalOpen.
- * Use `create(TerminalOpenSchema)` to create a new message.
- */
-export const TerminalOpenSchema: GenMessage<TerminalOpen> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 2);
-
-/**
- * Shows a terminal of the session.
+ * Shows the terminal.
  *
  * @generated from message leaflow.fleet.terminal.v1.TerminalAttach
  */
 export type TerminalAttach = Message<"leaflow.fleet.terminal.v1.TerminalAttach"> & {
   /**
-   * The terminal.
-   *
-   * @generated from field: uint64 terminal_id = 1;
-   */
-  terminalId: bigint;
-
-  /**
    * The output offset the participant has applied up to. 0: nothing yet.
    *
-   * @generated from field: uint64 offset = 2;
+   * @generated from field: uint64 offset = 1;
    */
   offset: bigint;
 };
@@ -197,27 +143,19 @@ export type TerminalAttach = Message<"leaflow.fleet.terminal.v1.TerminalAttach">
  * Use `create(TerminalAttachSchema)` to create a new message.
  */
 export const TerminalAttachSchema: GenMessage<TerminalAttach> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 3);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 2);
 
 /**
- * The terminal the channel shows.
+ * Where the output that follows starts.
  *
  * @generated from message leaflow.fleet.terminal.v1.TerminalAttached
  */
 export type TerminalAttached = Message<"leaflow.fleet.terminal.v1.TerminalAttached"> & {
   /**
-   * The terminal, chosen by the session, never 0 and never reused in the
-   * session.
-   *
-   * @generated from field: uint64 terminal_id = 1;
-   */
-  terminalId: bigint;
-
-  /**
    * The offset of the first output that follows: the requested one when it
    * is still kept, otherwise the current end, and nothing is replayed.
    *
-   * @generated from field: uint64 offset = 2;
+   * @generated from field: uint64 offset = 1;
    */
   offset: bigint;
 
@@ -226,14 +164,14 @@ export type TerminalAttached = Message<"leaflow.fleet.terminal.v1.TerminalAttach
    * (ECMA-48 RIS) before applying what follows, and the session makes the
    * program redraw by changing the size and back (SIGWINCH).
    *
-   * @generated from field: bool reset = 3;
+   * @generated from field: bool reset = 2;
    */
   reset: boolean;
 
   /**
    * The size the terminal has now.
    *
-   * @generated from field: leaflow.fleet.terminal.v1.TerminalSize size = 4;
+   * @generated from field: leaflow.fleet.terminal.v1.TerminalSize size = 3;
    */
   size?: TerminalSize | undefined;
 };
@@ -243,7 +181,7 @@ export type TerminalAttached = Message<"leaflow.fleet.terminal.v1.TerminalAttach
  * Use `create(TerminalAttachedSchema)` to create a new message.
  */
 export const TerminalAttachedSchema: GenMessage<TerminalAttached> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 4);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 3);
 
 /**
  * Input for the terminal.
@@ -264,7 +202,7 @@ export type TerminalInput = Message<"leaflow.fleet.terminal.v1.TerminalInput"> &
  * Use `create(TerminalInputSchema)` to create a new message.
  */
 export const TerminalInputSchema: GenMessage<TerminalInput> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 5);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 4);
 
 /**
  * Output of the terminal.
@@ -285,7 +223,7 @@ export type TerminalOutput = Message<"leaflow.fleet.terminal.v1.TerminalOutput">
  * Use `create(TerminalOutputSchema)` to create a new message.
  */
 export const TerminalOutputSchema: GenMessage<TerminalOutput> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 6);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 5);
 
 /**
  * The size of a terminal (RFC 4254 §6.7 "window-change"; struct winsize).
@@ -327,7 +265,7 @@ export type TerminalSize = Message<"leaflow.fleet.terminal.v1.TerminalSize"> & {
  * Use `create(TerminalSizeSchema)` to create a new message.
  */
 export const TerminalSizeSchema: GenMessage<TerminalSize> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 7);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 6);
 
 /**
  * How the shell ended (RFC 4254 §6.10).
@@ -336,7 +274,8 @@ export const TerminalSizeSchema: GenMessage<TerminalSize> = /*@__PURE__*/
  */
 export type TerminalExit = Message<"leaflow.fleet.terminal.v1.TerminalExit"> & {
   /**
-   * How it ended. Unset when the terminal ended without its shell exiting.
+   * How it ended. Unset when the terminal ended without its shell exiting,
+   * such as when the session was closed.
    *
    * @generated from oneof leaflow.fleet.terminal.v1.TerminalExit.status
    */
@@ -372,139 +311,11 @@ export type TerminalExit = Message<"leaflow.fleet.terminal.v1.TerminalExit"> & {
  * Use `create(TerminalExitSchema)` to create a new message.
  */
 export const TerminalExitSchema: GenMessage<TerminalExit> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 8);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 7);
 
 /**
- * A terminal of the session.
- *
- * @generated from message leaflow.fleet.terminal.v1.Terminal
- */
-export type Terminal = Message<"leaflow.fleet.terminal.v1.Terminal"> & {
-  /**
-   * The terminal.
-   *
-   * @generated from field: uint64 terminal_id = 1;
-   */
-  terminalId: bigint;
-
-  /**
-   * Its size.
-   *
-   * @generated from field: leaflow.fleet.terminal.v1.TerminalSize size = 2;
-   */
-  size?: TerminalSize | undefined;
-
-  /**
-   * When it started.
-   *
-   * @generated from field: google.protobuf.Timestamp created_at = 3;
-   */
-  createdAt?: Timestamp | undefined;
-
-  /**
-   * The participants showing it now, across all connections.
-   *
-   * @generated from field: uint32 participant_count = 4;
-   */
-  participantCount: number;
-
-  /**
-   * The offset its output has reached.
-   *
-   * @generated from field: uint64 offset = 5;
-   */
-  offset: bigint;
-
-  /**
-   * How it ended. Unset while it runs.
-   *
-   * @generated from field: leaflow.fleet.terminal.v1.TerminalExit exit = 6;
-   */
-  exit?: TerminalExit | undefined;
-};
-
-/**
- * Describes the message leaflow.fleet.terminal.v1.Terminal.
- * Use `create(TerminalSchema)` to create a new message.
- */
-export const TerminalSchema: GenMessage<Terminal> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 9);
-
-/**
- * The request of ListTerminals.
- *
- * @generated from message leaflow.fleet.terminal.v1.ListTerminalsRequest
- */
-export type ListTerminalsRequest = Message<"leaflow.fleet.terminal.v1.ListTerminalsRequest"> & {
-};
-
-/**
- * Describes the message leaflow.fleet.terminal.v1.ListTerminalsRequest.
- * Use `create(ListTerminalsRequestSchema)` to create a new message.
- */
-export const ListTerminalsRequestSchema: GenMessage<ListTerminalsRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 10);
-
-/**
- * The response of ListTerminals.
- *
- * @generated from message leaflow.fleet.terminal.v1.ListTerminalsResponse
- */
-export type ListTerminalsResponse = Message<"leaflow.fleet.terminal.v1.ListTerminalsResponse"> & {
-  /**
-   * The terminals, oldest first.
-   *
-   * @generated from field: repeated leaflow.fleet.terminal.v1.Terminal terminals = 1;
-   */
-  terminals: Terminal[];
-};
-
-/**
- * Describes the message leaflow.fleet.terminal.v1.ListTerminalsResponse.
- * Use `create(ListTerminalsResponseSchema)` to create a new message.
- */
-export const ListTerminalsResponseSchema: GenMessage<ListTerminalsResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 11);
-
-/**
- * The request of CloseTerminal.
- *
- * @generated from message leaflow.fleet.terminal.v1.CloseTerminalRequest
- */
-export type CloseTerminalRequest = Message<"leaflow.fleet.terminal.v1.CloseTerminalRequest"> & {
-  /**
-   * The terminal.
-   *
-   * @generated from field: uint64 terminal_id = 1;
-   */
-  terminalId: bigint;
-};
-
-/**
- * Describes the message leaflow.fleet.terminal.v1.CloseTerminalRequest.
- * Use `create(CloseTerminalRequestSchema)` to create a new message.
- */
-export const CloseTerminalRequestSchema: GenMessage<CloseTerminalRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 12);
-
-/**
- * The response of CloseTerminal.
- *
- * @generated from message leaflow.fleet.terminal.v1.CloseTerminalResponse
- */
-export type CloseTerminalResponse = Message<"leaflow.fleet.terminal.v1.CloseTerminalResponse"> & {
-};
-
-/**
- * Describes the message leaflow.fleet.terminal.v1.CloseTerminalResponse.
- * Use `create(CloseTerminalResponseSchema)` to create a new message.
- */
-export const CloseTerminalResponseSchema: GenMessage<CloseTerminalResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 13);
-
-/**
- * Allows a participant to use terminals. Carried in the participant's signed
- * authorization.
+ * Allows a participant to use the terminal. Carried in the participant's
+ * signed authorization.
  *
  * @generated from message leaflow.fleet.terminal.v1.TerminalPolicy
  */
@@ -516,39 +327,5 @@ export type TerminalPolicy = Message<"leaflow.fleet.terminal.v1.TerminalPolicy">
  * Use `create(TerminalPolicySchema)` to create a new message.
  */
 export const TerminalPolicySchema: GenMessage<TerminalPolicy> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 14);
-
-/**
- * Lists and ends terminals. Needs TerminalPolicy.
- *
- * @generated from service leaflow.fleet.terminal.v1.TerminalService
- */
-export const TerminalService: GenService<{
-  /**
-   * Lists the terminals of the session, oldest first: the running ones, and
-   * ended ones whose last output the session still keeps for a while so that
-   * a participant can read it.
-   *
-   * @generated from rpc leaflow.fleet.terminal.v1.TerminalService.ListTerminals
-   */
-  listTerminals: {
-    methodKind: "unary";
-    input: typeof ListTerminalsRequestSchema;
-    output: typeof ListTerminalsResponseSchema;
-  },
-  /**
-   * Hangs up a terminal, as when its person closes it: the session closes
-   * the pseudo-terminal, the shell gets SIGHUP, and every channel showing it
-   * ends with TerminalExit once the shell exited. An unknown terminal fails
-   * with NOT_FOUND.
-   *
-   * @generated from rpc leaflow.fleet.terminal.v1.TerminalService.CloseTerminal
-   */
-  closeTerminal: {
-    methodKind: "unary";
-    input: typeof CloseTerminalRequestSchema;
-    output: typeof CloseTerminalResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_leaflow_fleet_terminal_v1_terminal, 0);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 8);
 

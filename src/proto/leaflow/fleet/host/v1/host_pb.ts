@@ -538,7 +538,8 @@ export enum SessionCloseReason {
   TERMINATE_REQUESTED = 2,
 
   /**
-   * The user logged out.
+   * The user logged out, such as when the shell of a terminal session
+   * exited.
    *
    * @generated from enum value: SESSION_CLOSE_REASON_LOGOUT = 3;
    */

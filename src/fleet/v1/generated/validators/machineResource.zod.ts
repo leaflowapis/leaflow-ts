@@ -79,7 +79,7 @@
  *   exist on the machine; members log in over SSH with their keys and become root through sudo
  *   as their permissions allow;
  * - `leaflow.fleet.command.v1`: running commands;
- * - `leaflow.fleet.host.v1`: sessions, with terminals, programs, files, ports, sound, devices,
+ * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
  * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a desktop.
  *
@@ -136,6 +136,21 @@
  * when it ends, each addressed to the user in the current project and carrying the request's
  * `id`. A client that subscribes to them needs no polling; one that does not can list the
  * pending requests.
+ *
+ * ## Connections that drop
+ *
+ * A machine's Agent and a session's process each keep a connection to the service, and on a poor
+ * network it may drop and come back within seconds. Requests do not fail for that:
+ *
+ * - A request that needs the machine or the session's process waits while it connects again,
+ *   for as long as the request would wait for its answer, and fails with `MACHINE_OFFLINE` or
+ *   `SESSION_UNAVAILABLE` only when it does not come back in that time.
+ * - What the machine or the session's process received before its connection dropped, such as a
+ *   command or a session being opened, goes on, and its result is returned once it has
+ *   connected again within that time.
+ *
+ * A machine stays `online` for up to a minute after its connection was lost, while its Agent
+ * connects again; a machine whose Agent stops is offline at once.
  *
  * ## Operations that do not exist
  *
@@ -202,7 +217,11 @@ export const MachineResource = zod.strictObject({
   name: zod.string().max(machineResourceNameMax),
   hostname: zod.string().describe("The host name the machine last reported"),
   public_key: PublicKey,
-  online: zod.boolean().describe("The machine's Agent is connected"),
+  online: zod
+    .boolean()
+    .describe(
+      "The machine's Agent is connected, or lost its connection less than a minute ago and\nmay connect again",
+    ),
   operating_system: zod
     .union([OperatingSystem, zod.null()])
     .describe("Null until the machine has reported once"),
