@@ -125,8 +125,8 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has set the machine to approve without asking, for a while or for
- *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - at once, while the user has approved their requests on the machine without asking, for a
+ *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
@@ -161,7 +161,8 @@
  * - Enrollment requests are made only by machines.
  * - A machine registration cannot be changed; revoke it and create another.
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
- * - A privilege request is decided only by the user whose account asks.
+ * - A privilege request is decided only by the user whose account asks, or on a participant of
+ *   the session it comes from.
  *
  * ## Joining a session
  *
@@ -207,24 +208,11 @@
  */
 import * as zod from "zod";
 
-export const listPrivilegeApprovalsParamsPageDefault = 1;
-export const listPrivilegeApprovalsParamsPageMax = 2147483647;
+export const PrivilegeDecider = zod
+  .enum(["user", "auto_approval"])
+  .describe(
+    "Who decided a request on the platform: `user` the user, or `auto_approval` the user's\nautomatic approval for the machine, at once.",
+  );
 
-export const listPrivilegeApprovalsParamsPageSizeDefault = 50;
-export const listPrivilegeApprovalsParamsPageSizeMax = 200;
-
-export const ListPrivilegeApprovalsParams = zod.strictObject({
-  page: zod
-    .int()
-    .min(1)
-    .max(listPrivilegeApprovalsParamsPageMax)
-    .default(listPrivilegeApprovalsParamsPageDefault),
-  page_size: zod
-    .int()
-    .min(1)
-    .max(listPrivilegeApprovalsParamsPageSizeMax)
-    .default(listPrivilegeApprovalsParamsPageSizeDefault),
-});
-
-export type ListPrivilegeApprovalsParams = zod.input<typeof ListPrivilegeApprovalsParams>;
-export type ListPrivilegeApprovalsParamsOutput = zod.output<typeof ListPrivilegeApprovalsParams>;
+export type PrivilegeDecider = zod.input<typeof PrivilegeDecider>;
+export type PrivilegeDeciderOutput = zod.output<typeof PrivilegeDecider>;

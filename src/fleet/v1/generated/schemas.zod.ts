@@ -125,8 +125,8 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has set the machine to approve without asking, for a while or for
- *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - at once, while the user has approved their requests on the machine without asking, for a
+ *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
@@ -161,7 +161,8 @@
  * - Enrollment requests are made only by machines.
  * - A machine registration cannot be changed; revoke it and create another.
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
- * - A privilege request is decided only by the user whose account asks.
+ * - A privilege request is decided only by the user whose account asks, or on a participant of
+ *   the session it comes from.
  *
  * ## Joining a session
  *
@@ -225,8 +226,6 @@ import { CreateSessionRequest } from "./validators/createSessionRequest.zod.js";
 
 import { MigrationStep } from "./validators/migrationStep.zod.js";
 
-import { PrivilegeApproval } from "./validators/privilegeApproval.zod.js";
-
 import { RenewParticipantRequest } from "./validators/renewParticipantRequest.zod.js";
 
 import { RunCommandRequest } from "./validators/runCommandRequest.zod.js";
@@ -236,6 +235,8 @@ import { UpdateAccountRequest } from "./validators/updateAccountRequest.zod.js";
 import { UpdateGroupRequest } from "./validators/updateGroupRequest.zod.js";
 
 import { UpdateMachineRequest } from "./validators/updateMachineRequest.zod.js";
+
+import { UpdatePrivilegeAutoApprovalRequest } from "./validators/updatePrivilegeAutoApprovalRequest.zod.js";
 
 /**
  * Returns the machines of the current project, newest first.
@@ -367,52 +368,61 @@ export const RunMachineCommandParams = zod.strictObject({
 export const RunMachineCommandBody = RunCommandRequest;
 
 /**
- * Returns whether the caller's elevations on the machine are approved without asking. A
- * caller who never set it gets `never`.
- * @summary Get the caller's privilege approval setting for a machine
+ * Returns the caller's automatic approval of their privilege requests on the machine. Fails
+ * with `PRIVILEGE_AUTO_APPROVAL_NOT_FOUND` while the caller is asked every time, including
+ * after its `expires_at` has passed.
+ * @summary Get the caller's automatic approval for a machine
  */
-export const GetPrivilegeApprovalParams = zod.strictObject({
+export const GetPrivilegeAutoApprovalParams = zod.strictObject({
   machineId: zod.uuid(),
 });
 
 /**
- * Sets whether the caller's elevations on the machine are approved without asking: `never`
- * asks every time, `until` approves without asking until `auto_approve_until`, `forever`
- * always does. It applies to the caller's own account only, and only while they may become
- * root on the machine. Fails with `INVALID_ARGUMENT` when `auto_approve_until` is missing
- * or past for `until`, or present otherwise.
- * @summary Set the caller's privilege approval setting for a machine
+ * Approves the caller's privilege requests on the machine at once, until `expires_at`, or
+ * until removed when `expires_at` is null, replacing any earlier automatic approval. It
+ * applies to the caller's own account only, which is created if the caller has none yet,
+ * and only while they may become root on the machine. Fails with `INVALID_ARGUMENT` when
+ * `expires_at` has passed.
+ * @summary Approve the caller's privilege requests on a machine without asking
  */
-export const UpdatePrivilegeApprovalParams = zod.strictObject({
+export const UpdatePrivilegeAutoApprovalParams = zod.strictObject({
   machineId: zod.uuid(),
 });
 
-export const UpdatePrivilegeApprovalBody = PrivilegeApproval;
+export const UpdatePrivilegeAutoApprovalBody = UpdatePrivilegeAutoApprovalRequest;
 
 /**
- * Returns the machines of the current project on which the caller has set privilege requests
- * to be approved without asking, with the setting of each, the most recently set first. A
- * machine whose setting is `never`, or whose `until` has passed, is not listed.
- * @summary List the caller's privilege approval settings
+ * Removes it: the caller is asked about every later privilege request on the machine.
+ * Removing one that does not exist succeeds.
+ * @summary Remove the caller's automatic approval for a machine
  */
-export const listPrivilegeApprovalsQueryPageDefault = 1;
-export const listPrivilegeApprovalsQueryPageMax = 2147483647;
+export const DeletePrivilegeAutoApprovalParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
 
-export const listPrivilegeApprovalsQueryPageSizeDefault = 50;
-export const listPrivilegeApprovalsQueryPageSizeMax = 200;
+/**
+ * Returns the caller's automatic approvals on the machines of the current project that are
+ * in effect, the most recently set first.
+ * @summary List the caller's automatic approvals
+ */
+export const listPrivilegeAutoApprovalsQueryPageDefault = 1;
+export const listPrivilegeAutoApprovalsQueryPageMax = 2147483647;
 
-export const ListPrivilegeApprovalsQueryParams = zod.strictObject({
+export const listPrivilegeAutoApprovalsQueryPageSizeDefault = 50;
+export const listPrivilegeAutoApprovalsQueryPageSizeMax = 200;
+
+export const ListPrivilegeAutoApprovalsQueryParams = zod.strictObject({
   page: zod
     .int()
     .min(1)
-    .max(listPrivilegeApprovalsQueryPageMax)
-    .default(listPrivilegeApprovalsQueryPageDefault)
+    .max(listPrivilegeAutoApprovalsQueryPageMax)
+    .default(listPrivilegeAutoApprovalsQueryPageDefault)
     .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
-    .max(listPrivilegeApprovalsQueryPageSizeMax)
-    .default(listPrivilegeApprovalsQueryPageSizeDefault)
+    .max(listPrivilegeAutoApprovalsQueryPageSizeMax)
+    .default(listPrivilegeAutoApprovalsQueryPageSizeDefault)
     .describe("Items per page. Defaults to 50; at most 200."),
 });
 

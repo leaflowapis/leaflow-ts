@@ -125,8 +125,8 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has set the machine to approve without asking, for a while or for
- *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - at once, while the user has approved their requests on the machine without asking, for a
+ *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
@@ -161,7 +161,8 @@
  * - Enrollment requests are made only by machines.
  * - A machine registration cannot be changed; revoke it and create another.
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
- * - A privilege request is decided only by the user whose account asks.
+ * - A privilege request is decided only by the user whose account asks, or on a participant of
+ *   the session it comes from.
  *
  * ## Joining a session
  *
@@ -206,13 +207,23 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { PrivilegeDecider } from "./privilegeDecider.zod.js";
 import { PrivilegeRequestState } from "./privilegeRequestState.zod.js";
+
+export const privilegeRequestResourceSessionIdMax = 40;
 
 export const PrivilegeRequestResource = zod.strictObject({
   id: zod.uuid(),
   machine_id: zod.uuid(),
+  session_id: zod
+    .string()
+    .max(privilegeRequestResourceSessionIdMax)
+    .nullable()
+    .describe(
+      "The session the asking program runs in; null when it runs in none, such as after an\nSSH login",
+    ),
   username: zod.string().describe("The account that asks to become root"),
-  service: zod.string().describe("The PAM service that asks, such as `sudo`"),
+  pam_service: zod.string().describe("The PAM service that asks, such as `sudo`"),
   command_line: zod
     .string()
     .describe(
@@ -221,9 +232,9 @@ export const PrivilegeRequestResource = zod.strictObject({
   remote_host: zod.string().describe("Where the login came from, when the machine knows it"),
   tty: zod.string().describe("The terminal, when the machine knows it, such as `/dev/pts/3`"),
   state: PrivilegeRequestState,
-  approved_without_asking: zod
-    .boolean()
-    .describe("The request was approved at once by the user's setting for the machine"),
+  decided_by: zod
+    .union([PrivilegeDecider, zod.null()])
+    .describe("Who decided an `approved` or `denied` request; null in any other state"),
   created_at: zod.iso.datetime({ offset: true }),
   expires_at: zod.iso.datetime({ offset: true }),
   decided_at: zod.iso

@@ -125,8 +125,8 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has set the machine to approve without asking, for a while or for
- *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - at once, while the user has approved their requests on the machine without asking, for a
+ *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
@@ -161,7 +161,8 @@
  * - Enrollment requests are made only by machines.
  * - A machine registration cannot be changed; revoke it and create another.
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
- * - A privilege request is decided only by the user whose account asks.
+ * - A privilege request is decided only by the user whose account asks, or on a participant of
+ *   the session it comes from.
  *
  * ## Joining a session
  *
@@ -230,7 +231,7 @@ import type {
   ListMachineEventsParams,
   ListMachineRegistrationsParams,
   ListMachinesParams,
-  ListPrivilegeApprovalsParams,
+  ListPrivilegeAutoApprovalsParams,
   ListPrivilegeRequestsParams,
   ListSessionsParams,
   MachineEventList,
@@ -242,8 +243,8 @@ import type {
   ParticipantList,
   ParticipantResource,
   PeerConnection,
-  PrivilegeApproval,
-  PrivilegeApprovalList,
+  PrivilegeAutoApprovalList,
+  PrivilegeAutoApprovalResource,
   PrivilegeRequestList,
   PrivilegeRequestResource,
   RenewParticipantRequest,
@@ -256,6 +257,7 @@ import type {
   UpdateAccountRequest,
   UpdateGroupRequest,
   UpdateMachineRequest,
+  UpdatePrivilegeAutoApprovalRequest,
 } from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
@@ -659,91 +661,93 @@ export const runMachineCommand = async (
   return { data, status: res.status, headers: res.headers } as runMachineCommandResponse;
 };
 
-export type getPrivilegeApprovalResponse200 = {
-  data: PrivilegeApproval;
+export type getPrivilegeAutoApprovalResponse200 = {
+  data: PrivilegeAutoApprovalResource;
   status: 200;
 };
 
-export type getPrivilegeApprovalResponseDefault = {
+export type getPrivilegeAutoApprovalResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type getPrivilegeApprovalResponseSuccess = getPrivilegeApprovalResponse200 & {
+export type getPrivilegeAutoApprovalResponseSuccess = getPrivilegeAutoApprovalResponse200 & {
   headers: Headers;
 };
-export type getPrivilegeApprovalResponseError = getPrivilegeApprovalResponseDefault & {
+export type getPrivilegeAutoApprovalResponseError = getPrivilegeAutoApprovalResponseDefault & {
   headers: Headers;
 };
 
-export type getPrivilegeApprovalResponse =
-  | getPrivilegeApprovalResponseSuccess
-  | getPrivilegeApprovalResponseError;
+export type getPrivilegeAutoApprovalResponse =
+  | getPrivilegeAutoApprovalResponseSuccess
+  | getPrivilegeAutoApprovalResponseError;
 
-export const getGetPrivilegeApprovalUrl = (machineId: string) => {
-  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/privilege-approval`;
+export const getGetPrivilegeAutoApprovalUrl = (machineId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/privilege-auto-approval`;
 };
 
 /**
- * Returns whether the caller's elevations on the machine are approved without asking. A
- * caller who never set it gets `never`.
- * @summary Get the caller's privilege approval setting for a machine
+ * Returns the caller's automatic approval of their privilege requests on the machine. Fails
+ * with `PRIVILEGE_AUTO_APPROVAL_NOT_FOUND` while the caller is asked every time, including
+ * after its `expires_at` has passed.
+ * @summary Get the caller's automatic approval for a machine
  */
-export const getPrivilegeApproval = async (
+export const getPrivilegeAutoApproval = async (
   machineId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<getPrivilegeApprovalResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetPrivilegeApprovalUrl(machineId), {
+): Promise<getPrivilegeAutoApprovalResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetPrivilegeAutoApprovalUrl(machineId), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getPrivilegeApprovalResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as getPrivilegeApprovalResponse;
+  const data: getPrivilegeAutoApprovalResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getPrivilegeAutoApprovalResponse;
 };
 
-export type updatePrivilegeApprovalResponse200 = {
-  data: PrivilegeApproval;
+export type updatePrivilegeAutoApprovalResponse200 = {
+  data: PrivilegeAutoApprovalResource;
   status: 200;
 };
 
-export type updatePrivilegeApprovalResponseDefault = {
+export type updatePrivilegeAutoApprovalResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type updatePrivilegeApprovalResponseSuccess = updatePrivilegeApprovalResponse200 & {
+export type updatePrivilegeAutoApprovalResponseSuccess = updatePrivilegeAutoApprovalResponse200 & {
   headers: Headers;
 };
-export type updatePrivilegeApprovalResponseError = updatePrivilegeApprovalResponseDefault & {
-  headers: Headers;
-};
+export type updatePrivilegeAutoApprovalResponseError =
+  updatePrivilegeAutoApprovalResponseDefault & {
+    headers: Headers;
+  };
 
-export type updatePrivilegeApprovalResponse =
-  | updatePrivilegeApprovalResponseSuccess
-  | updatePrivilegeApprovalResponseError;
+export type updatePrivilegeAutoApprovalResponse =
+  | updatePrivilegeAutoApprovalResponseSuccess
+  | updatePrivilegeAutoApprovalResponseError;
 
-export const getUpdatePrivilegeApprovalUrl = (machineId: string) => {
-  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/privilege-approval`;
+export const getUpdatePrivilegeAutoApprovalUrl = (machineId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/privilege-auto-approval`;
 };
 
 /**
- * Sets whether the caller's elevations on the machine are approved without asking: `never`
- * asks every time, `until` approves without asking until `auto_approve_until`, `forever`
- * always does. It applies to the caller's own account only, and only while they may become
- * root on the machine. Fails with `INVALID_ARGUMENT` when `auto_approve_until` is missing
- * or past for `until`, or present otherwise.
- * @summary Set the caller's privilege approval setting for a machine
+ * Approves the caller's privilege requests on the machine at once, until `expires_at`, or
+ * until removed when `expires_at` is null, replacing any earlier automatic approval. It
+ * applies to the caller's own account only, which is created if the caller has none yet,
+ * and only while they may become root on the machine. Fails with `INVALID_ARGUMENT` when
+ * `expires_at` has passed.
+ * @summary Approve the caller's privilege requests on a machine without asking
  */
-export const updatePrivilegeApproval = async (
+export const updatePrivilegeAutoApproval = async (
   machineId: string,
-  privilegeApproval: PrivilegeApproval,
+  updatePrivilegeAutoApprovalRequest: UpdatePrivilegeAutoApprovalRequest,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<updatePrivilegeApprovalResponse> => {
+): Promise<updatePrivilegeAutoApprovalResponse> => {
   const getHeaders = (
     h?: NonNullable<RequestInit["headers"]>,
   ): Record<string, string | readonly string[]> => {
@@ -763,41 +767,88 @@ export const updatePrivilegeApproval = async (
     }
     return headers;
   };
-  const res = await (fetchFn ?? fetch)(getUpdatePrivilegeApprovalUrl(machineId), {
+  const res = await (fetchFn ?? fetch)(getUpdatePrivilegeAutoApprovalUrl(machineId), {
     ...options,
     method: "PUT",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(privilegeApproval),
+    body: JSON.stringify(updatePrivilegeAutoApprovalRequest),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: updatePrivilegeApprovalResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as updatePrivilegeApprovalResponse;
+  const data: updatePrivilegeAutoApprovalResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as updatePrivilegeAutoApprovalResponse;
 };
 
-export type listPrivilegeApprovalsResponse200 = {
-  data: PrivilegeApprovalList;
+export type deletePrivilegeAutoApprovalResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deletePrivilegeAutoApprovalResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type deletePrivilegeAutoApprovalResponseSuccess = deletePrivilegeAutoApprovalResponse204 & {
+  headers: Headers;
+};
+export type deletePrivilegeAutoApprovalResponseError =
+  deletePrivilegeAutoApprovalResponseDefault & {
+    headers: Headers;
+  };
+
+export type deletePrivilegeAutoApprovalResponse =
+  | deletePrivilegeAutoApprovalResponseSuccess
+  | deletePrivilegeAutoApprovalResponseError;
+
+export const getDeletePrivilegeAutoApprovalUrl = (machineId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/privilege-auto-approval`;
+};
+
+/**
+ * Removes it: the caller is asked about every later privilege request on the machine.
+ * Removing one that does not exist succeeds.
+ * @summary Remove the caller's automatic approval for a machine
+ */
+export const deletePrivilegeAutoApproval = async (
+  machineId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deletePrivilegeAutoApprovalResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeletePrivilegeAutoApprovalUrl(machineId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deletePrivilegeAutoApprovalResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deletePrivilegeAutoApprovalResponse;
+};
+
+export type listPrivilegeAutoApprovalsResponse200 = {
+  data: PrivilegeAutoApprovalList;
   status: 200;
 };
 
-export type listPrivilegeApprovalsResponseDefault = {
+export type listPrivilegeAutoApprovalsResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type listPrivilegeApprovalsResponseSuccess = listPrivilegeApprovalsResponse200 & {
+export type listPrivilegeAutoApprovalsResponseSuccess = listPrivilegeAutoApprovalsResponse200 & {
   headers: Headers;
 };
-export type listPrivilegeApprovalsResponseError = listPrivilegeApprovalsResponseDefault & {
+export type listPrivilegeAutoApprovalsResponseError = listPrivilegeAutoApprovalsResponseDefault & {
   headers: Headers;
 };
 
-export type listPrivilegeApprovalsResponse =
-  | listPrivilegeApprovalsResponseSuccess
-  | listPrivilegeApprovalsResponseError;
+export type listPrivilegeAutoApprovalsResponse =
+  | listPrivilegeAutoApprovalsResponseSuccess
+  | listPrivilegeAutoApprovalsResponseError;
 
-export const getListPrivilegeApprovalsUrl = (params?: ListPrivilegeApprovalsParams) => {
+export const getListPrivilegeAutoApprovalsUrl = (params?: ListPrivilegeAutoApprovalsParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -809,30 +860,29 @@ export const getListPrivilegeApprovalsUrl = (params?: ListPrivilegeApprovalsPara
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://fleet.leaflow.cloud/api/v1/privilege-approvals?${stringifiedParams}`
-    : `https://fleet.leaflow.cloud/api/v1/privilege-approvals`;
+    ? `https://fleet.leaflow.cloud/api/v1/privilege-auto-approvals?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/privilege-auto-approvals`;
 };
 
 /**
- * Returns the machines of the current project on which the caller has set privilege requests
- * to be approved without asking, with the setting of each, the most recently set first. A
- * machine whose setting is `never`, or whose `until` has passed, is not listed.
- * @summary List the caller's privilege approval settings
+ * Returns the caller's automatic approvals on the machines of the current project that are
+ * in effect, the most recently set first.
+ * @summary List the caller's automatic approvals
  */
-export const listPrivilegeApprovals = async (
-  params?: ListPrivilegeApprovalsParams,
+export const listPrivilegeAutoApprovals = async (
+  params?: ListPrivilegeAutoApprovalsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<listPrivilegeApprovalsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListPrivilegeApprovalsUrl(params), {
+): Promise<listPrivilegeAutoApprovalsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListPrivilegeAutoApprovalsUrl(params), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listPrivilegeApprovalsResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listPrivilegeApprovalsResponse;
+  const data: listPrivilegeAutoApprovalsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listPrivilegeAutoApprovalsResponse;
 };
 
 export type listPrivilegeRequestsResponse200 = {

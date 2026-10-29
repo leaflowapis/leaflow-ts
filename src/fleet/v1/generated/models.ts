@@ -125,8 +125,8 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has set the machine to approve without asking, for a while or for
- *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - at once, while the user has approved their requests on the machine without asking, for a
+ *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
@@ -161,7 +161,8 @@
  * - Enrollment requests are made only by machines.
  * - A machine registration cannot be changed; revoke it and create another.
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
- * - A privilege request is decided only by the user whose account asks.
+ * - A privilege request is decided only by the user whose account asks, or on a participant of
+ *   the session it comes from.
  *
  * ## Joining a session
  *
@@ -772,50 +773,28 @@ export interface RunCommandResponse {
   stderr_truncated: boolean;
 }
 
-/**
- * `never` asks every time; `until` approves without asking until `auto_approve_until`;
- * `forever` always approves without asking.
- */
-export type PrivilegeApprovalAutoApprove =
-  (typeof PrivilegeApprovalAutoApprove)[keyof typeof PrivilegeApprovalAutoApprove];
-
-export const PrivilegeApprovalAutoApprove = {
-  never: "never",
-  until: "until",
-  forever: "forever",
-} as const;
-
-export interface PrivilegeApproval {
+export interface UpdatePrivilegeAutoApprovalRequest {
   /**
-   * `never` asks every time; `until` approves without asking until `auto_approve_until`;
-   * `forever` always approves without asking.
+   * When the automatic approval ends; null for one that lasts until removed
+   * @nullable
    */
-  auto_approve: PrivilegeApprovalAutoApprove;
-  /** Only with `until`. A setting whose time has passed reads as `never`. */
-  auto_approve_until?: string;
+  expires_at: string | null;
 }
 
-/**
- * `until` or `forever`; see PrivilegeApproval.
- */
-export type PrivilegeApprovalResourceAutoApprove =
-  (typeof PrivilegeApprovalResourceAutoApprove)[keyof typeof PrivilegeApprovalResourceAutoApprove];
-
-export const PrivilegeApprovalResourceAutoApprove = {
-  until: "until",
-  forever: "forever",
-} as const;
-
-export interface PrivilegeApprovalResource {
+export interface PrivilegeAutoApprovalResource {
+  id: string;
   machine_id: string;
-  /** `until` or `forever`; see PrivilegeApproval. */
-  auto_approve: PrivilegeApprovalResourceAutoApprove;
-  /** Only with `until`. */
-  auto_approve_until?: string;
+  /**
+   * When the automatic approval ends; null for one that lasts until removed
+   * @nullable
+   */
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
-export interface PrivilegeApprovalList {
-  items: PrivilegeApprovalResource[];
+export interface PrivilegeAutoApprovalList {
+  items: PrivilegeAutoApprovalResource[];
   /** @minimum 0 */
   total_count: number;
   /** @minimum 1 */
@@ -825,9 +804,21 @@ export interface PrivilegeApprovalList {
 }
 
 /**
- * `pending` waits for a decision; `approved` and `denied` were decided by the user, a
- * participant or the user's setting; `expired` was not decided in time; `cancelled` ended
- * because the asking program gave up or a participant decided it.
+ * Who decided a request on the platform: `user` the user, or `auto_approval` the user's
+ * automatic approval for the machine, at once.
+ */
+export type PrivilegeDecider = (typeof PrivilegeDecider)[keyof typeof PrivilegeDecider];
+
+export const PrivilegeDecider = {
+  user: "user",
+  auto_approval: "auto_approval",
+} as const;
+
+/**
+ * `pending` waits for a decision; `approved` and `denied` were decided on the platform, as
+ * `decided_by` tells; `expired` was not decided in time; `cancelled` means the machine
+ * stopped waiting for the platform, because a participant of the session decided first or
+ * the asking program gave up.
  */
 export type PrivilegeRequestState =
   (typeof PrivilegeRequestState)[keyof typeof PrivilegeRequestState];
@@ -843,10 +834,17 @@ export const PrivilegeRequestState = {
 export interface PrivilegeRequestResource {
   id: string;
   machine_id: string;
+  /**
+   * The session the asking program runs in; null when it runs in none, such as after an
+   * SSH login
+   * @maxLength 40
+   * @nullable
+   */
+  session_id: string | null;
   /** The account that asks to become root */
   username: string;
   /** The PAM service that asks, such as `sudo` */
-  service: string;
+  pam_service: string;
   /**
    * What the machine reports the asking program runs, at most 4 KiB, such as
    * `sudo apt install foo`. A claim of the machine.
@@ -857,8 +855,8 @@ export interface PrivilegeRequestResource {
   /** The terminal, when the machine knows it, such as `/dev/pts/3` */
   tty: string;
   state: PrivilegeRequestState;
-  /** The request was approved at once by the user's setting for the machine */
-  approved_without_asking: boolean;
+  /** Who decided an `approved` or `denied` request; null in any other state */
+  decided_by: PrivilegeDecider | null;
   created_at: string;
   expires_at: string;
   /**
@@ -1137,7 +1135,7 @@ export type ListMachineEventsParams = {
   type?: MachineEventType;
 };
 
-export type ListPrivilegeApprovalsParams = {
+export type ListPrivilegeAutoApprovalsParams = {
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1

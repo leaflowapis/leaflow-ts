@@ -125,8 +125,8 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has set the machine to approve without asking, for a while or for
- *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - at once, while the user has approved their requests on the machine without asking, for a
+ *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
@@ -161,7 +161,8 @@
  * - Enrollment requests are made only by machines.
  * - A machine registration cannot be changed; revoke it and create another.
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
- * - A privilege request is decided only by the user whose account asks.
+ * - A privilege request is decided only by the user whose account asks, or on a participant of
+ *   the session it comes from.
  *
  * ## Joining a session
  *
@@ -207,17 +208,16 @@
  */
 import * as zod from "zod";
 
-export const PrivilegeApproval = zod.strictObject({
-  auto_approve: zod
-    .enum(["never", "until", "forever"])
-    .describe(
-      "`never` asks every time; `until` approves without asking until `auto_approve_until`;\n`forever` always approves without asking.",
-    ),
-  auto_approve_until: zod.iso
+export const UpdatePrivilegeAutoApprovalRequest = zod.strictObject({
+  expires_at: zod.iso
     .datetime({ offset: true })
-    .optional()
-    .describe("Only with `until`. A setting whose time has passed reads as `never`."),
+    .nullable()
+    .describe("When the automatic approval ends; null for one that lasts until removed"),
 });
 
-export type PrivilegeApproval = zod.input<typeof PrivilegeApproval>;
-export type PrivilegeApprovalOutput = zod.output<typeof PrivilegeApproval>;
+export type UpdatePrivilegeAutoApprovalRequest = zod.input<
+  typeof UpdatePrivilegeAutoApprovalRequest
+>;
+export type UpdatePrivilegeAutoApprovalRequestOutput = zod.output<
+  typeof UpdatePrivilegeAutoApprovalRequest
+>;

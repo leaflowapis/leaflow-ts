@@ -125,8 +125,8 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has set the machine to approve without asking, for a while or for
- *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - at once, while the user has approved their requests on the machine without asking, for a
+ *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
@@ -161,7 +161,8 @@
  * - Enrollment requests are made only by machines.
  * - A machine registration cannot be changed; revoke it and create another.
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
- * - A privilege request is decided only by the user whose account asks.
+ * - A privilege request is decided only by the user whose account asks, or on a participant of
+ *   the session it comes from.
  *
  * ## Joining a session
  *
@@ -210,7 +211,7 @@ import * as zod from "zod";
 export const PrivilegeRequestState = zod
   .enum(["pending", "approved", "denied", "expired", "cancelled"])
   .describe(
-    "`pending` waits for a decision; `approved` and `denied` were decided by the user, a\nparticipant or the user's setting; `expired` was not decided in time; `cancelled` ended\nbecause the asking program gave up or a participant decided it.",
+    "`pending` waits for a decision; `approved` and `denied` were decided on the platform, as\n`decided_by` tells; `expired` was not decided in time; `cancelled` means the machine\nstopped waiting for the platform, because a participant of the session decided first or\nthe asking program gave up.",
   );
 
 export type PrivilegeRequestState = zod.input<typeof PrivilegeRequestState>;

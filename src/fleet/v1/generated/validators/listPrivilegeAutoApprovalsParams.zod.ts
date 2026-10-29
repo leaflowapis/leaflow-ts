@@ -125,8 +125,8 @@
  * applies:
  *
  * - inside a command run through this API, by the request itself;
- * - at once, while the user has set the machine to approve without asking, for a while or for
- *   good (`PUT /api/v1/machines/{machineId}/privilege-approval`);
+ * - at once, while the user has approved their requests on the machine without asking, for a
+ *   while or until removed (`PUT /api/v1/machines/{machineId}/privilege-auto-approval`);
  * - by the user, on any of their devices, for a request listed by `GET /api/v1/privilege-requests`
  *   (`POST …:approve` or `…:deny`), or on a participant of the session the asking process belongs
  *   to. A request nobody decides expires, and sudo fails.
@@ -161,7 +161,8 @@
  * - Enrollment requests are made only by machines.
  * - A machine registration cannot be changed; revoke it and create another.
  * - Machine events are a log: they are listed, never changed, and kept for 30 days.
- * - A privilege request is decided only by the user whose account asks.
+ * - A privilege request is decided only by the user whose account asks, or on a participant of
+ *   the session it comes from.
  *
  * ## Joining a session
  *
@@ -206,16 +207,27 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { PrivilegeApprovalResource } from "./privilegeApprovalResource.zod.js";
 
-export const privilegeApprovalListTotalCountMin = 0;
+export const listPrivilegeAutoApprovalsParamsPageDefault = 1;
+export const listPrivilegeAutoApprovalsParamsPageMax = 2147483647;
 
-export const PrivilegeApprovalList = zod.strictObject({
-  items: zod.array(PrivilegeApprovalResource),
-  total_count: zod.int().min(privilegeApprovalListTotalCountMin),
-  page: zod.int().min(1),
-  page_size: zod.int().min(1),
+export const listPrivilegeAutoApprovalsParamsPageSizeDefault = 50;
+export const listPrivilegeAutoApprovalsParamsPageSizeMax = 200;
+
+export const ListPrivilegeAutoApprovalsParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listPrivilegeAutoApprovalsParamsPageMax)
+    .default(listPrivilegeAutoApprovalsParamsPageDefault),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listPrivilegeAutoApprovalsParamsPageSizeMax)
+    .default(listPrivilegeAutoApprovalsParamsPageSizeDefault),
 });
 
-export type PrivilegeApprovalList = zod.input<typeof PrivilegeApprovalList>;
-export type PrivilegeApprovalListOutput = zod.output<typeof PrivilegeApprovalList>;
+export type ListPrivilegeAutoApprovalsParams = zod.input<typeof ListPrivilegeAutoApprovalsParams>;
+export type ListPrivilegeAutoApprovalsParamsOutput = zod.output<
+  typeof ListPrivilegeAutoApprovalsParams
+>;
