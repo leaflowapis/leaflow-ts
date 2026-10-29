@@ -538,7 +538,9 @@ export const SendMcpRequestBody = SendMcpRequestRequest;
  * arguments nor the result is hidden from the platform. Requires `fleet:machines.login` on
  * the machine.
  *
- * Fails as sending a request does.
+ * Fails as sending a request does, and with `MCP_REQUEST_FAILED` when the server answers
+ * with a JSON-RPC error, such as for a tool it does not offer or arguments it does not
+ * accept, with the error's `metadata.code` and `metadata.message`.
  * @summary Call an MCP tool
  */
 export const callMcpToolPathServerNameRegExp = new RegExp("^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$");
