@@ -1,12 +1,12 @@
 # Leaflow TypeScript SDK
 
-Native Orval fetch functions, a native models.ts and request-only Zod schemas live together under
-`src/<service>/v1/generated`. Module entry points stay outside that generated directory.
-Root namespaces, versioned subpath imports and each module's `schemas`
-export are preserved. `src/routes.ts` retains the static routing and authentication facts.
+TypeScript SDK for the Leaflow platform, generated from the [leaflowapis](https://github.com/leaflowapis/leaflowapis) contracts.
 
-Validate requests with generated schemas before invoking native operations. Responses retain their
-native models and return types. Credentials remain in RequestInit and the existing fetch transport.
+```sh
+npm install @leaflow/sdk
+```
+
+Clients, models, and request validation schemas live under `src/<service>/<version>/generated`. Validate requests with the generated schemas before calling an operation.
 
 ## Generate and build
 
@@ -18,15 +18,12 @@ npm run generate
 npm run build
 ```
 
-`orval.config.mjs` is plain official Orval configuration that recursively discovers OpenAPI entry documents. The Canopy hook chooses JSON or Blob for the chat completion response according to Content-Type,
-so JSON and SSE retain their respective response formats. No compatibility forwarding layer is used. For local generation, CONTRACTS_DIR
-may point to an existing clean checkout of the exact CONTRACTS_REF commit. CI checks out that commit.
+The contract version is recorded in `CONTRACTS_REF`. `CONTRACTS_DIR` may point to a clean checkout at that ref.
 
 ## Protocol messages
 
-The contract's protobuf messages, currently the Fleet protocol spoken by VirtualDesktop viewers, are
-generated with protoc-gen-es under `src/proto`, keeping their proto paths. Import a file by that
-path and encode or decode with `@bufbuild/protobuf`; no gRPC or Connect transport is involved:
+Protobuf messages from the contract are generated with protoc-gen-es under `src/proto`, preserving their
+proto paths. Import them by path and encode or decode with `@bufbuild/protobuf`:
 
 ```ts
 import { create, toBinary } from "@bufbuild/protobuf";
@@ -36,9 +33,3 @@ const bytes = toBinary(ClientMessageSchema, create(ClientMessageSchema, {}));
 ```
 
 `npm run generate` runs Orval and then `buf generate` on the same contract checkout.
-
-## Canopy migration
-
-Project inference and management are exported from `canopy` and `@leaflow/sdk/canopy/v1`.
-Replace `canopyInference` and `@leaflow/sdk/canopy/inference/v1` imports with the shared Canopy module.
-The OpenAI-compatible `/v1` paths, management `/api/v1` paths and scoped-token authentication are unchanged.

@@ -15,7 +15,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Generate from the pinned public contract
+      - name: Generate from the pinned contract
         run: |
           git clone --no-checkout https://github.com/leaflowapis/leaflowapis.git leaflowapis
           git -C leaflowapis checkout --detach "$(cat CONTRACTS_REF)"

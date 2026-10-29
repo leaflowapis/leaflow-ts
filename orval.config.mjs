@@ -61,7 +61,6 @@ export default defineConfig(
               for (const [method, operation] of Object.entries(item)) {
                 if (!isVerb(method)) continue;
                 const security = operation.security ?? document.security ?? [];
-                // 凭据可选写作一个空要求加一个方案：网关有会话时带上凭据，没有时匿名转发。
                 const required = security.filter((entry) => Object.keys(entry).length > 0);
                 const optional = security.length === 2 && required.length === 1;
                 if (
@@ -91,11 +90,9 @@ export default defineConfig(
           },
         },
       };
-      // 路由必须与客户端同批生成，避免已删除的方法仍被网关转发。
       const hooks = {
         afterAllFilesWrite: [
           async () => {
-            // HTTP header values are strings even when the contract uses an integer schema.
             if (module === "assistant/v1") {
               const path = `./src/${module}/generated/functions.ts`;
               const code = readFileSync(path, "utf8");
@@ -116,7 +113,6 @@ export default defineConfig(
               );
               writeFileSync(path, updated);
             }
-            // 单模块生成不能覆盖其他服务的完整路由表。
             const updatedContracts = new Set(
               [...routeModules.keys()].map((name) => name.replace(/\/v\d+$/, "")),
             );
