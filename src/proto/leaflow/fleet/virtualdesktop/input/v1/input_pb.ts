@@ -16,7 +16,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/virtualdesktop/input/v1/input.proto.
  */
 export const file_leaflow_fleet_virtualdesktop_input_v1_input: GenFile = /*@__PURE__*/
-  fileDesc("CjFsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2lucHV0L3YxL2lucHV0LnByb3RvEiVsZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxIuMDCg1DbGllbnRNZXNzYWdlEkQKCWtleV9ldmVudBgBIAEoCzIvLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuS2V5RXZlbnRIABJOCg5wb2ludGVyX21vdGlvbhgCIAEoCzI0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnRlck1vdGlvbkgAEk4KDnBvaW50ZXJfYnV0dG9uGAMgASgLMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5Qb2ludGVyQnV0dG9uSAASTAoNcG9pbnRlcl93aGVlbBgEIAEoCzIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnRlcldoZWVsSAASSAoLaW5zZXJ0X3RleHQYBSABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkluc2VydFRleHRIABJJCgtjb21wb3NpdGlvbhgGIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuQ29tcG9zaXRpb25IAEIJCgdtZXNzYWdlIooCCg1TZXJ2ZXJNZXNzYWdlElEKEHRleHRfaW5wdXRfc3RhdGUYASABKAsyNS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLlRleHRJbnB1dFN0YXRlSAASSAoLaW5wdXRfZXJyb3IYAiABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLklucHV0RXJyb3JIABJRChB0ZXh0X2lucHV0X2Vycm9yGAMgASgLMjUubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5UZXh0SW5wdXRFcnJvckgAQgkKB21lc3NhZ2Ui5AEKCEtleUV2ZW50EhEKCWlucHV0X3NlcRgBIAEoBBIPCgdwcmVzc2VkGAIgASgIEg4KBmtleXN5bRgDIAEoDRIMCgRjb2RlGAQgASgJEksKDmxvY2tfa2V5X3N0YXRlGAUgASgLMjMubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5Mb2NrS2V5U3RhdGUSEQoJd2luZG93X2lkGAYgASgEEh8KEmNsaXBib2FyZF9zZXF1ZW5jZRgHIAEoBEgAiAEBQhUKE19jbGlwYm9hcmRfc2VxdWVuY2UiSAoMTG9ja0tleVN0YXRlEhEKCWNhcHNfbG9jaxgBIAEoCBIQCghudW1fbG9jaxgCIAEoCBITCgtzY3JvbGxfbG9jaxgDIAEoCCJkCg1Qb2ludGVyTW90aW9uEhEKCWlucHV0X3NlcRgBIAEoBBIRCgl3aW5kb3dfaWQYAiABKAQSCQoBeBgDIAEoERIJCgF5GAQgASgREhcKD2FmdGVyX2lucHV0X3NlcRgFIAEoBCKkAQoNUG9pbnRlckJ1dHRvbhIRCglpbnB1dF9zZXEYASABKAQSEQoJd2luZG93X2lkGAIgASgEEgkKAXgYAyABKBESCQoBeRgEIAEoERIOCgZidXR0b24YBSABKA0SDwoHcHJlc3NlZBgGIAEoCBIfChJjbGlwYm9hcmRfc2VxdWVuY2UYByABKARIAIgBAUIVChNfY2xpcGJvYXJkX3NlcXVlbmNlImwKDFBvaW50ZXJXaGVlbBIRCglpbnB1dF9zZXEYASABKAQSEQoJd2luZG93X2lkGAIgASgEEgkKAXgYAyABKBESCQoBeRgEIAEoERIPCgdkZWx0YV94GAUgASgREg8KB2RlbHRhX3kYBiABKBEihAMKDlRleHRJbnB1dFN0YXRlEhEKCXdpbmRvd19pZBgBIAEoBBIPCgdlbmFibGVkGAIgASgIEkwKEGN1cnNvcl9yZWN0YW5nbGUYAyABKAsyMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuUmVjdGFuZ2xlEhYKDnJlc2l6ZV9jb3VudGVyGAQgASgEEkoKDWN1cnNvcl9zb3VyY2UYBSABKA4yMy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkN1cnNvclNvdXJjZRIYChBpbnB1dF9jb250ZXh0X2lkGAYgASgJEhQKDGZvY3VzX3NlcmlhbBgHIAEoBBJNChFjb250cm9sX3JlY3RhbmdsZRgIIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5SZWN0YW5nbGUSHQoVY29tcG9zaXRpb25fc3VwcG9ydGVkGAkgASgIIrYBCgpJbnNlcnRUZXh0EhEKCWlucHV0X3NlcRgBIAEoBBIMCgR0ZXh0GAIgASgJEhEKCXdpbmRvd19pZBgDIAEoBBIYChBpbnB1dF9jb250ZXh0X2lkGAQgASgJEhQKDGZvY3VzX3NlcmlhbBgFIAEoBBJECgppbnB1dF90eXBlGAYgASgOMjAubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5JbnB1dFR5cGUi3QIKC0NvbXBvc2l0aW9uEhEKCWlucHV0X3NlcRgBIAEoBBIRCgl3aW5kb3dfaWQYAiABKAQSGAoQaW5wdXRfY29udGV4dF9pZBgDIAEoCRIUCgxmb2N1c19zZXJpYWwYBCABKAQSFgoOcmVzaXplX2NvdW50ZXIYBSABKAQSFgoOY29tcG9zaXRpb25faWQYBiABKAQSRgoFcGhhc2UYByABKA4yNy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkNvbXBvc2l0aW9uUGhhc2USDAoEdGV4dBgIIAEoCRIXCg9zZWxlY3Rpb25fc3RhcnQYCSABKA0SFQoNc2VsZWN0aW9uX2VuZBgKIAEoDRJCCgNrZXkYCyABKAsyNS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkNvbXBvc2l0aW9uS2V5InwKDkNvbXBvc2l0aW9uS2V5Eg8KB3ByZXNzZWQYASABKAgSDAoEY29kZRgCIAEoCRJLCg5sb2NrX2tleV9zdGF0ZRgDIAEoCzIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuTG9ja0tleVN0YXRlIlUKCklucHV0RXJyb3ISEQoJaW5wdXRfc2VxGAEgASgEEhEKCXdpbmRvd19pZBgCIAEoBBIhCgVlcnJvchgDIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIrEBCg5UZXh0SW5wdXRFcnJvchIRCglpbnB1dF9zZXEYASABKAQSEQoJd2luZG93X2lkGAIgASgEEhgKEGlucHV0X2NvbnRleHRfaWQYAyABKAkSFAoMZm9jdXNfc2VyaWFsGAQgASgEEhYKDmNvbXBvc2l0aW9uX2lkGAUgASgEEg4KBnBhdXNlZBgGIAEoCBIhCgVlcnJvchgHIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIkgKBVBvaW50EhEKCXdpbmRvd19pZBgBIAEoBBIJCgF4GAIgASgREgkKAXkYAyABKBESFgoOcmVzaXplX2NvdW50ZXIYBCABKAQifQoMQ2xpY2tSZXF1ZXN0EjsKBXBvaW50GAEgASgLMiwubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5Qb2ludBIOCgZidXR0b24YAiABKA0SDQoFY291bnQYAyABKA0SEQoJbW9kaWZpZXJzGAQgAygJIjQKDUNsaWNrUmVzcG9uc2USEQoJd2luZG93X2lkGAEgASgEEhAKCHJldmlzaW9uGAIgASgEIlEKEk1vdmVQb2ludGVyUmVxdWVzdBI7CgVwb2ludBgBIAEoCzIsLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnQiOgoTTW92ZVBvaW50ZXJSZXNwb25zZRIRCgl3aW5kb3dfaWQYASABKAQSEAoIcmV2aXNpb24YAiABKAQigQEKDVNjcm9sbFJlcXVlc3QSOwoFcG9pbnQYASABKAsyLC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLlBvaW50Eg8KB2RlbHRhX3gYAiABKBESDwoHZGVsdGFfeRgDIAEoERIRCgltb2RpZmllcnMYBCADKAkiNQoOU2Nyb2xsUmVzcG9uc2USEQoJd2luZG93X2lkGAEgASgEEhAKCHJldmlzaW9uGAIgASgEItUBCgtEcmFnUmVxdWVzdBI7CgVzdGFydBgBIAEoCzIsLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnQSOQoDZW5kGAIgASgLMiwubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5Qb2ludBIOCgZidXR0b24YAyABKA0SEQoJbW9kaWZpZXJzGAQgAygJEisKCGR1cmF0aW9uGAUgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uIjMKDERyYWdSZXNwb25zZRIRCgl3aW5kb3dfaWQYASABKAQSEAoIcmV2aXNpb24YAiABKAQiMwoQUHJlc3NLZXlzUmVxdWVzdBIMCgRrZXlzGAEgAygJEhEKCXdpbmRvd19pZBgCIAEoBCI4ChFQcmVzc0tleXNSZXNwb25zZRIRCgl3aW5kb3dfaWQYASABKAQSEAoIcmV2aXNpb24YAiABKAQiHwoPVHlwZVRleHRSZXF1ZXN0EgwKBHRleHQYASABKAkiNwoQVHlwZVRleHRSZXNwb25zZRIRCgl3aW5kb3dfaWQYASABKAQSEAoIcmV2aXNpb24YAiABKAQifAocRGlzcGF0Y2hQb2ludGVyQnV0dG9uUmVxdWVzdBI7CgVwb2ludBgBIAEoCzIsLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnQSDgoGYnV0dG9uGAIgASgNEg8KB3ByZXNzZWQYAyABKAgiRAodRGlzcGF0Y2hQb2ludGVyQnV0dG9uUmVzcG9uc2USEQoJd2luZG93X2lkGAEgASgEEhAKCHJldmlzaW9uGAIgASgEIjIKEkRpc3BhdGNoS2V5UmVxdWVzdBILCgNrZXkYASABKAkSDwoHcHJlc3NlZBgCIAEoCCI6ChNEaXNwYXRjaEtleVJlc3BvbnNlEhEKCXdpbmRvd19pZBgBIAEoBBIQCghyZXZpc2lvbhgCIAEoBCIbChlHZXRQb2ludGVyUG9zaXRpb25SZXF1ZXN0IkUKGkdldFBvaW50ZXJQb3NpdGlvblJlc3BvbnNlEgkKAXgYASABKBESCQoBeRgCIAEoERIRCgl3aW5kb3dfaWQYAyABKAQqkgEKDEN1cnNvclNvdXJjZRIdChlDVVJTT1JfU09VUkNFX1VOU1BFQ0lGSUVEEAASHwobQ1VSU09SX1NPVVJDRV9JTlBVVF9DT05URVhUEAESHAoYQ1VSU09SX1NPVVJDRV9URVhUX1JBTkdFEAISJAogQ1VSU09SX1NPVVJDRV9DSEFSQUNURVJfQk9VTkRBUlkQAyprCglJbnB1dFR5cGUSGgoWSU5QVVRfVFlQRV9VTlNQRUNJRklFRBAAEhoKFklOUFVUX1RZUEVfSU5TRVJUX1RFWFQQARImCiJJTlBVVF9UWVBFX0lOU0VSVF9GUk9NX0NPTVBPU0lUSU9OEAIqxwEKEENvbXBvc2l0aW9uUGhhc2USIQodQ09NUE9TSVRJT05fUEhBU0VfVU5TUEVDSUZJRUQQABIbChdDT01QT1NJVElPTl9QSEFTRV9CRUdJThABEhwKGENPTVBPU0lUSU9OX1BIQVNFX1VQREFURRACEhkKFUNPTVBPU0lUSU9OX1BIQVNFX0tFWRADEhwKGENPTVBPU0lUSU9OX1BIQVNFX0NPTU1JVBAEEhwKGENPTVBPU0lUSU9OX1BIQVNFX0NBTkNFTBAFMrsJCgxJbnB1dFNlcnZpY2UScgoFQ2xpY2sSMy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkNsaWNrUmVxdWVzdBo0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuQ2xpY2tSZXNwb25zZRKEAQoLTW92ZVBvaW50ZXISOS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLk1vdmVQb2ludGVyUmVxdWVzdBo6LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuTW92ZVBvaW50ZXJSZXNwb25zZRJ1CgZTY3JvbGwSNC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLlNjcm9sbFJlcXVlc3QaNS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLlNjcm9sbFJlc3BvbnNlEm8KBERyYWcSMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkRyYWdSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5EcmFnUmVzcG9uc2USfgoJUHJlc3NLZXlzEjcubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5QcmVzc0tleXNSZXF1ZXN0GjgubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5QcmVzc0tleXNSZXNwb25zZRJ7CghUeXBlVGV4dBI2LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuVHlwZVRleHRSZXF1ZXN0GjcubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5UeXBlVGV4dFJlc3BvbnNlEqIBChVEaXNwYXRjaFBvaW50ZXJCdXR0b24SQy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkRpc3BhdGNoUG9pbnRlckJ1dHRvblJlcXVlc3QaRC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkRpc3BhdGNoUG9pbnRlckJ1dHRvblJlc3BvbnNlEoQBCgtEaXNwYXRjaEtleRI5LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuRGlzcGF0Y2hLZXlSZXF1ZXN0GjoubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5EaXNwYXRjaEtleVJlc3BvbnNlEp4BChJHZXRQb2ludGVyUG9zaXRpb24SQC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkdldFBvaW50ZXJQb3NpdGlvblJlcXVlc3QaQS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkdldFBvaW50ZXJQb3NpdGlvblJlc3BvbnNlIgOQAgFCSVpHZ2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2lucHV0L3YxO2lucHV0djFiBnByb3RvMw", [file_google_protobuf_duration, file_google_rpc_status, file_leaflow_fleet_virtualdesktop_display_v1_display]);
+  fileDesc("CjFsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2lucHV0L3YxL2lucHV0LnByb3RvEiVsZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxIuMDCg1DbGllbnRNZXNzYWdlEkQKCWtleV9ldmVudBgBIAEoCzIvLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuS2V5RXZlbnRIABJOCg5wb2ludGVyX21vdGlvbhgCIAEoCzI0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnRlck1vdGlvbkgAEk4KDnBvaW50ZXJfYnV0dG9uGAMgASgLMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5Qb2ludGVyQnV0dG9uSAASTAoNcG9pbnRlcl93aGVlbBgEIAEoCzIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnRlcldoZWVsSAASSAoLaW5zZXJ0X3RleHQYBSABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkluc2VydFRleHRIABJJCgtjb21wb3NpdGlvbhgGIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuQ29tcG9zaXRpb25IAEIJCgdtZXNzYWdlIooCCg1TZXJ2ZXJNZXNzYWdlElEKEHRleHRfaW5wdXRfc3RhdGUYASABKAsyNS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLlRleHRJbnB1dFN0YXRlSAASSAoLaW5wdXRfZXJyb3IYAiABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLklucHV0RXJyb3JIABJRChB0ZXh0X2lucHV0X2Vycm9yGAMgASgLMjUubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5UZXh0SW5wdXRFcnJvckgAQgkKB21lc3NhZ2Ui5AEKCEtleUV2ZW50EhEKCWlucHV0X3NlcRgBIAEoBBIPCgdwcmVzc2VkGAIgASgIEg4KBmtleXN5bRgDIAEoDRIMCgRjb2RlGAQgASgJEksKDmxvY2tfa2V5X3N0YXRlGAUgASgLMjMubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5Mb2NrS2V5U3RhdGUSEQoJd2luZG93X2lkGAYgASgEEh8KEmNsaXBib2FyZF9zZXF1ZW5jZRgHIAEoBEgAiAEBQhUKE19jbGlwYm9hcmRfc2VxdWVuY2UiSAoMTG9ja0tleVN0YXRlEhEKCWNhcHNfbG9jaxgBIAEoCBIQCghudW1fbG9jaxgCIAEoCBITCgtzY3JvbGxfbG9jaxgDIAEoCCJkCg1Qb2ludGVyTW90aW9uEhEKCWlucHV0X3NlcRgBIAEoBBIRCgl3aW5kb3dfaWQYAiABKAQSCQoBeBgDIAEoERIJCgF5GAQgASgREhcKD2FmdGVyX2lucHV0X3NlcRgFIAEoBCKkAQoNUG9pbnRlckJ1dHRvbhIRCglpbnB1dF9zZXEYASABKAQSEQoJd2luZG93X2lkGAIgASgEEgkKAXgYAyABKBESCQoBeRgEIAEoERIOCgZidXR0b24YBSABKA0SDwoHcHJlc3NlZBgGIAEoCBIfChJjbGlwYm9hcmRfc2VxdWVuY2UYByABKARIAIgBAUIVChNfY2xpcGJvYXJkX3NlcXVlbmNlImwKDFBvaW50ZXJXaGVlbBIRCglpbnB1dF9zZXEYASABKAQSEQoJd2luZG93X2lkGAIgASgEEgkKAXgYAyABKBESCQoBeRgEIAEoERIPCgdkZWx0YV94GAUgASgREg8KB2RlbHRhX3kYBiABKBEiiwQKDlRleHRJbnB1dFN0YXRlEhEKCXdpbmRvd19pZBgBIAEoBBIPCgdlbmFibGVkGAIgASgIEkwKEGN1cnNvcl9yZWN0YW5nbGUYAyABKAsyMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuUmVjdGFuZ2xlEhYKDnJlc2l6ZV9jb3VudGVyGAQgASgEEkoKDWN1cnNvcl9zb3VyY2UYBSABKA4yMy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkN1cnNvclNvdXJjZRIYChBpbnB1dF9jb250ZXh0X2lkGAYgASgJEhQKDGZvY3VzX3NlcmlhbBgHIAEoBBJNChFjb250cm9sX3JlY3RhbmdsZRgIIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5SZWN0YW5nbGUSHQoVY29tcG9zaXRpb25fc3VwcG9ydGVkGAkgASgIEkQKB3B1cnBvc2UYCiABKA4yMy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLklucHV0UHVycG9zZRI/CgVoaW50cxgLIAMoDjIwLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuSW5wdXRIaW50IrYBCgpJbnNlcnRUZXh0EhEKCWlucHV0X3NlcRgBIAEoBBIMCgR0ZXh0GAIgASgJEhEKCXdpbmRvd19pZBgDIAEoBBIYChBpbnB1dF9jb250ZXh0X2lkGAQgASgJEhQKDGZvY3VzX3NlcmlhbBgFIAEoBBJECgppbnB1dF90eXBlGAYgASgOMjAubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5JbnB1dFR5cGUi3QIKC0NvbXBvc2l0aW9uEhEKCWlucHV0X3NlcRgBIAEoBBIRCgl3aW5kb3dfaWQYAiABKAQSGAoQaW5wdXRfY29udGV4dF9pZBgDIAEoCRIUCgxmb2N1c19zZXJpYWwYBCABKAQSFgoOcmVzaXplX2NvdW50ZXIYBSABKAQSFgoOY29tcG9zaXRpb25faWQYBiABKAQSRgoFcGhhc2UYByABKA4yNy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkNvbXBvc2l0aW9uUGhhc2USDAoEdGV4dBgIIAEoCRIXCg9zZWxlY3Rpb25fc3RhcnQYCSABKA0SFQoNc2VsZWN0aW9uX2VuZBgKIAEoDRJCCgNrZXkYCyABKAsyNS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkNvbXBvc2l0aW9uS2V5InwKDkNvbXBvc2l0aW9uS2V5Eg8KB3ByZXNzZWQYASABKAgSDAoEY29kZRgCIAEoCRJLCg5sb2NrX2tleV9zdGF0ZRgDIAEoCzIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuTG9ja0tleVN0YXRlIlUKCklucHV0RXJyb3ISEQoJaW5wdXRfc2VxGAEgASgEEhEKCXdpbmRvd19pZBgCIAEoBBIhCgVlcnJvchgDIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIrEBCg5UZXh0SW5wdXRFcnJvchIRCglpbnB1dF9zZXEYASABKAQSEQoJd2luZG93X2lkGAIgASgEEhgKEGlucHV0X2NvbnRleHRfaWQYAyABKAkSFAoMZm9jdXNfc2VyaWFsGAQgASgEEhYKDmNvbXBvc2l0aW9uX2lkGAUgASgEEg4KBnBhdXNlZBgGIAEoCBIhCgVlcnJvchgHIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIkgKBVBvaW50EhEKCXdpbmRvd19pZBgBIAEoBBIJCgF4GAIgASgREgkKAXkYAyABKBESFgoOcmVzaXplX2NvdW50ZXIYBCABKAQifQoMQ2xpY2tSZXF1ZXN0EjsKBXBvaW50GAEgASgLMiwubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5Qb2ludBIOCgZidXR0b24YAiABKA0SDQoFY291bnQYAyABKA0SEQoJbW9kaWZpZXJzGAQgAygJIjQKDUNsaWNrUmVzcG9uc2USEQoJd2luZG93X2lkGAEgASgEEhAKCHJldmlzaW9uGAIgASgEIlEKEk1vdmVQb2ludGVyUmVxdWVzdBI7CgVwb2ludBgBIAEoCzIsLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnQiOgoTTW92ZVBvaW50ZXJSZXNwb25zZRIRCgl3aW5kb3dfaWQYASABKAQSEAoIcmV2aXNpb24YAiABKAQigQEKDVNjcm9sbFJlcXVlc3QSOwoFcG9pbnQYASABKAsyLC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLlBvaW50Eg8KB2RlbHRhX3gYAiABKBESDwoHZGVsdGFfeRgDIAEoERIRCgltb2RpZmllcnMYBCADKAkiNQoOU2Nyb2xsUmVzcG9uc2USEQoJd2luZG93X2lkGAEgASgEEhAKCHJldmlzaW9uGAIgASgEItUBCgtEcmFnUmVxdWVzdBI7CgVzdGFydBgBIAEoCzIsLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnQSOQoDZW5kGAIgASgLMiwubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5Qb2ludBIOCgZidXR0b24YAyABKA0SEQoJbW9kaWZpZXJzGAQgAygJEisKCGR1cmF0aW9uGAUgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uIjMKDERyYWdSZXNwb25zZRIRCgl3aW5kb3dfaWQYASABKAQSEAoIcmV2aXNpb24YAiABKAQiMwoQUHJlc3NLZXlzUmVxdWVzdBIMCgRrZXlzGAEgAygJEhEKCXdpbmRvd19pZBgCIAEoBCI4ChFQcmVzc0tleXNSZXNwb25zZRIRCgl3aW5kb3dfaWQYASABKAQSEAoIcmV2aXNpb24YAiABKAQiHwoPVHlwZVRleHRSZXF1ZXN0EgwKBHRleHQYASABKAkiNwoQVHlwZVRleHRSZXNwb25zZRIRCgl3aW5kb3dfaWQYASABKAQSEAoIcmV2aXNpb24YAiABKAQifAocRGlzcGF0Y2hQb2ludGVyQnV0dG9uUmVxdWVzdBI7CgVwb2ludBgBIAEoCzIsLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuUG9pbnQSDgoGYnV0dG9uGAIgASgNEg8KB3ByZXNzZWQYAyABKAgiRAodRGlzcGF0Y2hQb2ludGVyQnV0dG9uUmVzcG9uc2USEQoJd2luZG93X2lkGAEgASgEEhAKCHJldmlzaW9uGAIgASgEIjIKEkRpc3BhdGNoS2V5UmVxdWVzdBILCgNrZXkYASABKAkSDwoHcHJlc3NlZBgCIAEoCCI6ChNEaXNwYXRjaEtleVJlc3BvbnNlEhEKCXdpbmRvd19pZBgBIAEoBBIQCghyZXZpc2lvbhgCIAEoBCIbChlHZXRQb2ludGVyUG9zaXRpb25SZXF1ZXN0IkUKGkdldFBvaW50ZXJQb3NpdGlvblJlc3BvbnNlEgkKAXgYASABKBESCQoBeRgCIAEoERIRCgl3aW5kb3dfaWQYAyABKAQqxwIKDElucHV0UHVycG9zZRIdChlJTlBVVF9QVVJQT1NFX1VOU1BFQ0lGSUVEEAASGwoXSU5QVVRfUFVSUE9TRV9GUkVFX0ZPUk0QARIXChNJTlBVVF9QVVJQT1NFX0FMUEhBEAISGAoUSU5QVVRfUFVSUE9TRV9ESUdJVFMQAxIYChRJTlBVVF9QVVJQT1NFX05VTUJFUhAEEhcKE0lOUFVUX1BVUlBPU0VfUEhPTkUQBRIVChFJTlBVVF9QVVJQT1NFX1VSTBAGEhcKE0lOUFVUX1BVUlBPU0VfRU1BSUwQBxIWChJJTlBVVF9QVVJQT1NFX05BTUUQCBIaChZJTlBVVF9QVVJQT1NFX1BBU1NXT1JEEAkSFQoRSU5QVVRfUFVSUE9TRV9QSU4QChIaChZJTlBVVF9QVVJQT1NFX1RFUk1JTkFMEAsqggMKCUlucHV0SGludBIaChZJTlBVVF9ISU5UX1VOU1BFQ0lGSUVEEAASGQoVSU5QVVRfSElOVF9TUEVMTENIRUNLEAESHAoYSU5QVVRfSElOVF9OT19TUEVMTENIRUNLEAISHgoaSU5QVVRfSElOVF9XT1JEX0NPTVBMRVRJT04QAxIYChRJTlBVVF9ISU5UX0xPV0VSQ0FTRRAEEh4KGklOUFVUX0hJTlRfVVBQRVJDQVNFX0NIQVJTEAUSHgoaSU5QVVRfSElOVF9VUFBFUkNBU0VfV09SRFMQBhIiCh5JTlBVVF9ISU5UX1VQUEVSQ0FTRV9TRU5URU5DRVMQBxIaChZJTlBVVF9ISU5UX0lOSElCSVRfT1NLEAgSHwobSU5QVVRfSElOVF9WRVJUSUNBTF9XUklUSU5HEAkSFAoQSU5QVVRfSElOVF9FTU9KSRAKEhcKE0lOUFVUX0hJTlRfTk9fRU1PSkkQCxIWChJJTlBVVF9ISU5UX1BSSVZBVEUQDCqSAQoMQ3Vyc29yU291cmNlEh0KGUNVUlNPUl9TT1VSQ0VfVU5TUEVDSUZJRUQQABIfChtDVVJTT1JfU09VUkNFX0lOUFVUX0NPTlRFWFQQARIcChhDVVJTT1JfU09VUkNFX1RFWFRfUkFOR0UQAhIkCiBDVVJTT1JfU09VUkNFX0NIQVJBQ1RFUl9CT1VOREFSWRADKmsKCUlucHV0VHlwZRIaChZJTlBVVF9UWVBFX1VOU1BFQ0lGSUVEEAASGgoWSU5QVVRfVFlQRV9JTlNFUlRfVEVYVBABEiYKIklOUFVUX1RZUEVfSU5TRVJUX0ZST01fQ09NUE9TSVRJT04QAirHAQoQQ29tcG9zaXRpb25QaGFzZRIhCh1DT01QT1NJVElPTl9QSEFTRV9VTlNQRUNJRklFRBAAEhsKF0NPTVBPU0lUSU9OX1BIQVNFX0JFR0lOEAESHAoYQ09NUE9TSVRJT05fUEhBU0VfVVBEQVRFEAISGQoVQ09NUE9TSVRJT05fUEhBU0VfS0VZEAMSHAoYQ09NUE9TSVRJT05fUEhBU0VfQ09NTUlUEAQSHAoYQ09NUE9TSVRJT05fUEhBU0VfQ0FOQ0VMEAUyuwkKDElucHV0U2VydmljZRJyCgVDbGljaxIzLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuQ2xpY2tSZXF1ZXN0GjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5DbGlja1Jlc3BvbnNlEoQBCgtNb3ZlUG9pbnRlchI5LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuTW92ZVBvaW50ZXJSZXF1ZXN0GjoubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5Nb3ZlUG9pbnRlclJlc3BvbnNlEnUKBlNjcm9sbBI0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuU2Nyb2xsUmVxdWVzdBo1LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuU2Nyb2xsUmVzcG9uc2USbwoERHJhZxIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuRHJhZ1JlcXVlc3QaMy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkRyYWdSZXNwb25zZRJ+CglQcmVzc0tleXMSNy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLlByZXNzS2V5c1JlcXVlc3QaOC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLlByZXNzS2V5c1Jlc3BvbnNlEnsKCFR5cGVUZXh0EjYubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5UeXBlVGV4dFJlcXVlc3QaNy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLlR5cGVUZXh0UmVzcG9uc2USogEKFURpc3BhdGNoUG9pbnRlckJ1dHRvbhJDLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuRGlzcGF0Y2hQb2ludGVyQnV0dG9uUmVxdWVzdBpELmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuRGlzcGF0Y2hQb2ludGVyQnV0dG9uUmVzcG9uc2UShAEKC0Rpc3BhdGNoS2V5EjkubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5pbnB1dC52MS5EaXNwYXRjaEtleVJlcXVlc3QaOi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmlucHV0LnYxLkRpc3BhdGNoS2V5UmVzcG9uc2USngEKEkdldFBvaW50ZXJQb3NpdGlvbhJALmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuR2V0UG9pbnRlclBvc2l0aW9uUmVxdWVzdBpBLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuaW5wdXQudjEuR2V0UG9pbnRlclBvc2l0aW9uUmVzcG9uc2UiA5ACAUJJWkdnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvaW5wdXQvdjE7aW5wdXR2MWIGcHJvdG8z", [file_google_protobuf_duration, file_google_rpc_status, file_leaflow_fleet_virtualdesktop_display_v1_display]);
 
 /**
  * A message from the participant on the input channel.
@@ -429,16 +429,19 @@ export const PointerWheelSchema: GenMessage<PointerWheel> = /*@__PURE__*/
  */
 export type TextInputState = Message<"leaflow.fleet.virtualdesktop.input.v1.TextInputState"> & {
   /**
-   * The window of the focused editor. 0 when no window has focus.
+   * The window that has the keyboard focus. 0 when no window has it.
    *
    * @generated from field: uint64 window_id = 1;
    */
   windowId: bigint;
 
   /**
-   * An editable control or a terminal has focus and accepts text, whether
-   * or not its caret is known. The participant keeps a local text field focused
-   * while it is set, so that its own input method can start.
+   * The window takes typed text: an editor, a terminal, or any window that
+   * reads keys, whether or not the session knows its editor or caret. Unset
+   * while no window has the keyboard focus or an application grabbed the
+   * keyboard, as an open menu does. The participant keeps its own input
+   * method on while it is set, with a local text field focused where it needs
+   * one.
    *
    * @generated from field: bool enabled = 2;
    */
@@ -471,7 +474,8 @@ export type TextInputState = Message<"leaflow.fleet.virtualdesktop.input.v1.Text
   /**
    * Identifies the focused editor within the session, opaque. Different
    * editors of one window differ; moving the caret or resizing does not change
-   * it. Empty when nothing editable has focus or it cannot be verified.
+   * it. Empty when the session cannot tell which editor has the focus; text
+   * then goes where the keys go, as typed keys where nothing else takes it.
    *
    * @generated from field: string input_context_id = 6;
    */
@@ -496,13 +500,34 @@ export type TextInputState = Message<"leaflow.fleet.virtualdesktop.input.v1.Text
   controlRectangle?: Rectangle | undefined;
 
   /**
-   * The editor's native input context takes Composition messages: preedit
-   * text and the real keys consumed while composing. Otherwise the participant
-   * sends only InsertText.
+   * The editor shows preedit text itself: its native input context takes
+   * Composition messages, the preedit and the real keys consumed while
+   * composing, and the participant does not draw its input method's preedit.
+   * Otherwise the participant draws the preedit itself, at cursor_rectangle,
+   * else control_rectangle, else where the person last pressed in the window,
+   * and sends only InsertText.
    *
    * @generated from field: bool composition_supported = 9;
    */
   compositionSupported: boolean;
+
+  /**
+   * What the editor is for, as its application declared it to its input
+   * method (IBus ContentType, GTK input-purpose). A participant switches its
+   * input method off for PASSWORD and PIN, as a native one does. UNSPECIFIED
+   * when it declared nothing.
+   *
+   * @generated from field: leaflow.fleet.virtualdesktop.input.v1.InputPurpose purpose = 10;
+   */
+  purpose: InputPurpose;
+
+  /**
+   * How the editor wants its text, as its application declared it (IBus
+   * ContentType, GTK input-hints).
+   *
+   * @generated from field: repeated leaflow.fleet.virtualdesktop.input.v1.InputHint hints = 11;
+   */
+  hints: InputHint[];
 };
 
 /**
@@ -533,15 +558,15 @@ export type InsertText = Message<"leaflow.fleet.virtualdesktop.input.v1.InsertTe
   text: string;
 
   /**
-   * The window of the editor, from TextInputState. A window that is gone or
-   * no longer focused cancels the insertion; it is never activated for it.
+   * The window, from TextInputState. A window that is gone or no longer
+   * focused cancels the insertion; it is never activated for it.
    *
    * @generated from field: uint64 window_id = 3;
    */
   windowId: bigint;
 
   /**
-   * TextInputState.input_context_id of the editor.
+   * TextInputState.input_context_id of the editor. Empty when it named none.
    *
    * @generated from field: string input_context_id = 4;
    */
@@ -549,7 +574,7 @@ export type InsertText = Message<"leaflow.fleet.virtualdesktop.input.v1.InsertTe
 
   /**
    * TextInputState.focus_serial when the composition began. Checked for
-   * INSERT_FROM_COMPOSITION only.
+   * INSERT_FROM_COMPOSITION with an input_context_id only.
    *
    * @generated from field: uint64 focus_serial = 5;
    */
@@ -615,7 +640,7 @@ export type Composition = Message<"leaflow.fleet.virtualdesktop.input.v1.Composi
 
   /**
    * Chosen by the participant at BEGIN, unique on the connection; the later
-   * phases repeat it.
+   * phases repeat it. A KEY release may name any composition, or none.
    *
    * @generated from field: uint64 composition_id = 6;
    */
@@ -629,8 +654,9 @@ export type Composition = Message<"leaflow.fleet.virtualdesktop.input.v1.Composi
   phase: CompositionPhase;
 
   /**
-   * UPDATE and COMMIT: the preedit or committed text, UTF-8, at most 64 KiB.
-   * May be empty to end an empty composition. Empty for the other phases.
+   * UPDATE: the whole preedit text now. COMMIT: the whole result. UTF-8, at
+   * most 64 KiB. May be empty: an empty UPDATE hides the preedit, an empty
+   * COMMIT ends the composition without text. Empty for the other phases.
    *
    * @generated from field: string text = 8;
    */
@@ -668,7 +694,11 @@ export const CompositionSchema: GenMessage<Composition> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 9);
 
 /**
- * A real key consumed while composing. Never made up from text.
+ * A real key consumed while composing. Never made up from text. The session
+ * knows a key by the participant and its code, as a keyboard does: a release
+ * lets go the key of that code the participant holds, whatever composition it
+ * names, and a press of a key already held changes nothing. The key that ends
+ * a composition is released after it; its release is still sent.
  *
  * @generated from message leaflow.fleet.virtualdesktop.input.v1.CompositionKey
  */
@@ -749,8 +779,9 @@ export const InputErrorSchema: GenMessage<InputError> = /*@__PURE__*/
  *   TEXT_INPUT_NOT_DELIVERED      the text could not be handed over;
  *   TEXT_INPUT_UNCONFIRMED        the application did not confirm the text
  *                                 (see paused);
- *   NATIVE_COMPOSITION_CANCELLED  the native input context ended the
- *                                 composition.
+ *   NATIVE_COMPOSITION_CANCELLED  the composition ended without its COMMIT,
+ *                                 as when another participant typed into
+ *                                 its editor.
  *
  * @generated from message leaflow.fleet.virtualdesktop.input.v1.TextInputError
  */
@@ -1405,6 +1436,203 @@ export const GetPointerPositionResponseSchema: GenMessage<GetPointerPositionResp
   messageDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 31);
 
 /**
+ * What an editor is for (IBus InputPurpose, GTK GtkInputPurpose).
+ *
+ * @generated from enum leaflow.fleet.virtualdesktop.input.v1.InputPurpose
+ */
+export enum InputPurpose {
+  /**
+   * @generated from enum value: INPUT_PURPOSE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * Any text.
+   *
+   * @generated from enum value: INPUT_PURPOSE_FREE_FORM = 1;
+   */
+  FREE_FORM = 1,
+
+  /**
+   * Letters only.
+   *
+   * @generated from enum value: INPUT_PURPOSE_ALPHA = 2;
+   */
+  ALPHA = 2,
+
+  /**
+   * Digits only.
+   *
+   * @generated from enum value: INPUT_PURPOSE_DIGITS = 3;
+   */
+  DIGITS = 3,
+
+  /**
+   * A number.
+   *
+   * @generated from enum value: INPUT_PURPOSE_NUMBER = 4;
+   */
+  NUMBER = 4,
+
+  /**
+   * A phone number.
+   *
+   * @generated from enum value: INPUT_PURPOSE_PHONE = 5;
+   */
+  PHONE = 5,
+
+  /**
+   * A URL.
+   *
+   * @generated from enum value: INPUT_PURPOSE_URL = 6;
+   */
+  URL = 6,
+
+  /**
+   * An email address.
+   *
+   * @generated from enum value: INPUT_PURPOSE_EMAIL = 7;
+   */
+  EMAIL = 7,
+
+  /**
+   * The name of a person.
+   *
+   * @generated from enum value: INPUT_PURPOSE_NAME = 8;
+   */
+  NAME = 8,
+
+  /**
+   * A password: any text, hidden.
+   *
+   * @generated from enum value: INPUT_PURPOSE_PASSWORD = 9;
+   */
+  PASSWORD = 9,
+
+  /**
+   * A PIN: digits, hidden.
+   *
+   * @generated from enum value: INPUT_PURPOSE_PIN = 10;
+   */
+  PIN = 10,
+
+  /**
+   * A terminal: any text and control keys.
+   *
+   * @generated from enum value: INPUT_PURPOSE_TERMINAL = 11;
+   */
+  TERMINAL = 11,
+}
+
+/**
+ * Describes the enum leaflow.fleet.virtualdesktop.input.v1.InputPurpose.
+ */
+export const InputPurposeSchema: GenEnum<InputPurpose> = /*@__PURE__*/
+  enumDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 0);
+
+/**
+ * How an editor wants its text (IBus InputHints, GTK GtkInputHints).
+ *
+ * @generated from enum leaflow.fleet.virtualdesktop.input.v1.InputHint
+ */
+export enum InputHint {
+  /**
+   * @generated from enum value: INPUT_HINT_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * Check for typos.
+   *
+   * @generated from enum value: INPUT_HINT_SPELLCHECK = 1;
+   */
+  SPELLCHECK = 1,
+
+  /**
+   * Do not check for typos.
+   *
+   * @generated from enum value: INPUT_HINT_NO_SPELLCHECK = 2;
+   */
+  NO_SPELLCHECK = 2,
+
+  /**
+   * Offer word completion.
+   *
+   * @generated from enum value: INPUT_HINT_WORD_COMPLETION = 3;
+   */
+  WORD_COMPLETION = 3,
+
+  /**
+   * Lowercase text.
+   *
+   * @generated from enum value: INPUT_HINT_LOWERCASE = 4;
+   */
+  LOWERCASE = 4,
+
+  /**
+   * Uppercase every character.
+   *
+   * @generated from enum value: INPUT_HINT_UPPERCASE_CHARS = 5;
+   */
+  UPPERCASE_CHARS = 5,
+
+  /**
+   * Capitalize every word.
+   *
+   * @generated from enum value: INPUT_HINT_UPPERCASE_WORDS = 6;
+   */
+  UPPERCASE_WORDS = 6,
+
+  /**
+   * Capitalize every sentence.
+   *
+   * @generated from enum value: INPUT_HINT_UPPERCASE_SENTENCES = 7;
+   */
+  UPPERCASE_SENTENCES = 7,
+
+  /**
+   * Show no on-screen keyboard.
+   *
+   * @generated from enum value: INPUT_HINT_INHIBIT_OSK = 8;
+   */
+  INHIBIT_OSK = 8,
+
+  /**
+   * The text runs vertically.
+   *
+   * @generated from enum value: INPUT_HINT_VERTICAL_WRITING = 9;
+   */
+  VERTICAL_WRITING = 9,
+
+  /**
+   * Offer emoji.
+   *
+   * @generated from enum value: INPUT_HINT_EMOJI = 10;
+   */
+  EMOJI = 10,
+
+  /**
+   * Offer no emoji.
+   *
+   * @generated from enum value: INPUT_HINT_NO_EMOJI = 11;
+   */
+  NO_EMOJI = 11,
+
+  /**
+   * Keep no typing history of it.
+   *
+   * @generated from enum value: INPUT_HINT_PRIVATE = 12;
+   */
+  PRIVATE = 12,
+}
+
+/**
+ * Describes the enum leaflow.fleet.virtualdesktop.input.v1.InputHint.
+ */
+export const InputHintSchema: GenEnum<InputHint> = /*@__PURE__*/
+  enumDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 1);
+
+/**
  * Where a caret rectangle came from.
  *
  * @generated from enum leaflow.fleet.virtualdesktop.input.v1.CursorSource
@@ -1443,7 +1671,7 @@ export enum CursorSource {
  * Describes the enum leaflow.fleet.virtualdesktop.input.v1.CursorSource.
  */
 export const CursorSourceSchema: GenEnum<CursorSource> = /*@__PURE__*/
-  enumDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 0);
+  enumDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 2);
 
 /**
  * What an insertion is (W3C Input Events inputType).
@@ -1457,17 +1685,18 @@ export enum InputType {
   UNSPECIFIED = 0,
 
   /**
-   * Ordinary text ("insertText"), such as from a virtual keyboard. It goes to
-   * the editor focused once the input before it has been applied.
+   * Ordinary text ("insertText"), such as from a virtual keyboard. It goes
+   * where the keys go once the input before it has been applied.
    *
    * @generated from enum value: INPUT_TYPE_INSERT_TEXT = 1;
    */
   INSERT_TEXT = 1,
 
   /**
-   * The result of a composition ("insertFromComposition"). It goes only to
-   * the editor the composition began in, and is cancelled when that editor
-   * lost focus since.
+   * The result of a composition ("insertFromComposition"). With an
+   * input_context_id it goes only to the editor the composition began in, and
+   * is cancelled when that editor lost focus since; without one, as
+   * INSERT_TEXT.
    *
    * @generated from enum value: INPUT_TYPE_INSERT_FROM_COMPOSITION = 2;
    */
@@ -1478,10 +1707,12 @@ export enum InputType {
  * Describes the enum leaflow.fleet.virtualdesktop.input.v1.InputType.
  */
 export const InputTypeSchema: GenEnum<InputType> = /*@__PURE__*/
-  enumDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 1);
+  enumDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 3);
 
 /**
- * A step of a composition.
+ * A step of a composition. A composition ends with its COMMIT or CANCEL, or
+ * when its editor loses the focus (a TextInputState with another
+ * focus_serial); a step that did not reach the editor never ends it.
  *
  * @generated from enum leaflow.fleet.virtualdesktop.input.v1.CompositionPhase
  */
@@ -1492,14 +1723,17 @@ export enum CompositionPhase {
   UNSPECIFIED = 0,
 
   /**
-   * A composition begins ("compositionstart").
+   * A composition begins ("compositionstart"), in the editor the
+   * TextInputState names. It shows nothing yet.
    *
    * @generated from enum value: COMPOSITION_PHASE_BEGIN = 1;
    */
   BEGIN = 1,
 
   /**
-   * The preedit text changed ("compositionupdate").
+   * The preedit text changed ("compositionupdate"). The session shows the
+   * latest UPDATE and may skip earlier ones the editor has not caught up
+   * with.
    *
    * @generated from enum value: COMPOSITION_PHASE_UPDATE = 2;
    */
@@ -1507,22 +1741,24 @@ export enum CompositionPhase {
 
   /**
    * A real key the input method consumed while composing. The session hands
-   * it to the editor's native input context and waits until that context
-   * consumed it.
+   * it to the editor's native input context, which consumes it, so that the
+   * application sees the key but never as text. Its press or release never
+   * ends the composition.
    *
    * @generated from enum value: COMPOSITION_PHASE_KEY = 3;
    */
   KEY = 3,
 
   /**
-   * The composition ended with text ("compositionend").
+   * The composition ended with text ("compositionend"): the text is inserted
+   * and the preedit goes.
    *
    * @generated from enum value: COMPOSITION_PHASE_COMMIT = 4;
    */
   COMMIT = 4,
 
   /**
-   * The composition was abandoned.
+   * The composition was abandoned: the preedit goes.
    *
    * @generated from enum value: COMPOSITION_PHASE_CANCEL = 5;
    */
@@ -1533,7 +1769,7 @@ export enum CompositionPhase {
  * Describes the enum leaflow.fleet.virtualdesktop.input.v1.CompositionPhase.
  */
 export const CompositionPhaseSchema: GenEnum<CompositionPhase> = /*@__PURE__*/
-  enumDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 2);
+  enumDesc(file_leaflow_fleet_virtualdesktop_input_v1_input, 4);
 
 /**
  * Input through calls. Gestures run in the session as a whole, with the timing
@@ -1622,9 +1858,9 @@ export const InputService: GenService<{
     output: typeof PressKeysResponseSchema;
   },
   /**
-   * Types text into the focused editor the way a participant's InsertText goes:
-   * through its input method context when it has one, else its accessible
-   * text interface, and into a terminal as keys.
+   * Types text into the focused window the way a participant's InsertText
+   * goes: through its editor's input method context when it has one, else its
+   * accessible text interface, else as typed keys.
    *
    * @generated from rpc leaflow.fleet.virtualdesktop.input.v1.InputService.TypeText
    */
