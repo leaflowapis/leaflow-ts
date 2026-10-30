@@ -252,7 +252,7 @@ export const PeerConnection = zod
     candidates: zod
       .array(IceCandidate)
       .describe(
-        "The session's ICE candidates gathered until it reported the end of its candidates, or\nuntil 10 seconds after its answer",
+        "The session's ICE candidates that arrived until it reported the end of its candidates, or\n500 milliseconds after one candidate of each type its ICE servers yield had arrived\n(server reflexive when the RTC configuration has STUN servers and the policy is not\n`relay`, relayed when it has TURN servers), and at most until 10 seconds after its\nanswer. Candidates the session gathers later are not passed on.",
       ),
     authorization: SignedMessage.describe(
       "The signed `PeerAuthorization` of the PeerConnection, the same one the session holds",

@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/terminal/v1/terminal.proto.
  */
 export const file_leaflow_fleet_terminal_v1_terminal: GenFile = /*@__PURE__*/
-  fileDesc("CihsZWFmbG93L2ZsZWV0L3Rlcm1pbmFsL3YxL3Rlcm1pbmFsLnByb3RvEhlsZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxIs0BCg1DbGllbnRNZXNzYWdlEjsKBmF0dGFjaBgBIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hIABI5CgVpbnB1dBgCIAEoCzIoLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxJbnB1dEgAEjkKBnJlc2l6ZRgDIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplSABCCQoHbWVzc2FnZSKxAgoNU2VydmVyTWVzc2FnZRI/CghhdHRhY2hlZBgBIAEoCzIrLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hlZEgAEjsKBm91dHB1dBgCIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxPdXRwdXRIABI5CgZyZXNpemUYAyABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsU2l6ZUgAEjcKBGV4aXQYBCABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsRXhpdEgAEiMKBWVycm9yGAUgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNIAEIJCgdtZXNzYWdlIiAKDlRlcm1pbmFsQXR0YWNoEg4KBm9mZnNldBgBIAEoBCJoChBUZXJtaW5hbEF0dGFjaGVkEg4KBm9mZnNldBgBIAEoBBINCgVyZXNldBgCIAEoCBI1CgRzaXplGAMgASgLMicubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5UZXJtaW5hbFNpemUiHQoNVGVybWluYWxJbnB1dBIMCgRkYXRhGAEgASgMIh4KDlRlcm1pbmFsT3V0cHV0EgwKBGRhdGEYASABKAwiUgoMVGVybWluYWxTaXplEg8KB2NvbHVtbnMYASABKA0SDAoEcm93cxgCIAEoDRIQCgh3aWR0aF9weBgDIAEoDRIRCgloZWlnaHRfcHgYBCABKA0iWQoMVGVybWluYWxFeGl0EhMKCWV4aXRfY29kZRgBIAEoDUgAEhUKC3NpZ25hbF9uYW1lGAIgASgJSAASEwoLY29yZV9kdW1wZWQYAyABKAhCCAoGc3RhdHVzIhAKDlRlcm1pbmFsUG9saWN5QkBaPmdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC90ZXJtaW5hbC92MTt0ZXJtaW5hbHYxYgZwcm90bzM", [file_google_rpc_status]);
+  fileDesc("CihsZWFmbG93L2ZsZWV0L3Rlcm1pbmFsL3YxL3Rlcm1pbmFsLnByb3RvEhlsZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxIooCCg1DbGllbnRNZXNzYWdlEjsKBmF0dGFjaBgBIAEoCzIpLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxBdHRhY2hIABI5CgVpbnB1dBgCIAEoCzIoLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxJbnB1dEgAEjkKBnJlc2l6ZRgDIAEoCzInLmxlYWZsb3cuZmxlZXQudGVybWluYWwudjEuVGVybWluYWxTaXplSAASOwoGYW5zd2VyGAQgASgLMikubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5UZXJtaW5hbEFuc3dlckgAQgkKB21lc3NhZ2UisQIKDVNlcnZlck1lc3NhZ2USPwoIYXR0YWNoZWQYASABKAsyKy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsQXR0YWNoZWRIABI7CgZvdXRwdXQYAiABKAsyKS5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsT3V0cHV0SAASOQoGcmVzaXplGAMgASgLMicubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5UZXJtaW5hbFNpemVIABI3CgRleGl0GAQgASgLMicubGVhZmxvdy5mbGVldC50ZXJtaW5hbC52MS5UZXJtaW5hbEV4aXRIABIjCgVlcnJvchgFIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzSABCCQoHbWVzc2FnZSI5Cg5UZXJtaW5hbEF0dGFjaBIOCgZvZmZzZXQYASABKAQSFwoPYW5zd2Vyc19xdWVyaWVzGAIgASgIInwKEFRlcm1pbmFsQXR0YWNoZWQSDgoGb2Zmc2V0GAEgASgEEg0KBXJlc2V0GAIgASgIEjUKBHNpemUYAyABKAsyJy5sZWFmbG93LmZsZWV0LnRlcm1pbmFsLnYxLlRlcm1pbmFsU2l6ZRISCgpyZXBsYXlfZW5kGAQgASgEIh0KDVRlcm1pbmFsSW5wdXQSDAoEZGF0YRgBIAEoDCIeCg5UZXJtaW5hbEFuc3dlchIMCgRkYXRhGAEgASgMIh4KDlRlcm1pbmFsT3V0cHV0EgwKBGRhdGEYASABKAwiUgoMVGVybWluYWxTaXplEg8KB2NvbHVtbnMYASABKA0SDAoEcm93cxgCIAEoDRIQCgh3aWR0aF9weBgDIAEoDRIRCgloZWlnaHRfcHgYBCABKA0iWQoMVGVybWluYWxFeGl0EhMKCWV4aXRfY29kZRgBIAEoDUgAEhUKC3NpZ25hbF9uYW1lGAIgASgJSAASEwoLY29yZV9kdW1wZWQYAyABKAhCCAoGc3RhdHVzIhAKDlRlcm1pbmFsUG9saWN5QkBaPmdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC90ZXJtaW5hbC92MTt0ZXJtaW5hbHYxYgZwcm90bzM", [file_google_rpc_status]);
 
 /**
  * A message from the participant on the terminal channel.
@@ -50,6 +50,15 @@ export type ClientMessage = Message<"leaflow.fleet.terminal.v1.ClientMessage"> &
      */
     value: TerminalSize;
     case: "resize";
+  } | {
+    /**
+     * Answers of the participant's terminal to terminal queries, written to
+     * the terminal only when the participant is the answerer.
+     *
+     * @generated from field: leaflow.fleet.terminal.v1.TerminalAnswer answer = 4;
+     */
+    value: TerminalAnswer;
+    case: "answer";
   } | { case: undefined; value?: undefined };
 };
 
@@ -136,6 +145,14 @@ export type TerminalAttach = Message<"leaflow.fleet.terminal.v1.TerminalAttach">
    * @generated from field: uint64 offset = 1;
    */
   offset: bigint;
+
+  /**
+   * The participant's terminal answers terminal queries in the output, and
+   * the participant sends those answers as TerminalAnswer.
+   *
+   * @generated from field: bool answers_queries = 2;
+   */
+  answersQueries: boolean;
 };
 
 /**
@@ -174,6 +191,15 @@ export type TerminalAttached = Message<"leaflow.fleet.terminal.v1.TerminalAttach
    * @generated from field: leaflow.fleet.terminal.v1.TerminalSize size = 3;
    */
   size?: TerminalSize | undefined;
+
+  /**
+   * The end of the output when the participant attached: the output from
+   * offset up to here is replayed, what follows is new. Equal to offset when
+   * nothing is replayed.
+   *
+   * @generated from field: uint64 replay_end = 4;
+   */
+  replayEnd: bigint;
 };
 
 /**
@@ -205,6 +231,27 @@ export const TerminalInputSchema: GenMessage<TerminalInput> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_terminal_v1_terminal, 4);
 
 /**
+ * Answers of the participant's terminal to terminal queries in the output.
+ *
+ * @generated from message leaflow.fleet.terminal.v1.TerminalAnswer
+ */
+export type TerminalAnswer = Message<"leaflow.fleet.terminal.v1.TerminalAnswer"> & {
+  /**
+   * The bytes, at most 64 KiB.
+   *
+   * @generated from field: bytes data = 1;
+   */
+  data: Uint8Array;
+};
+
+/**
+ * Describes the message leaflow.fleet.terminal.v1.TerminalAnswer.
+ * Use `create(TerminalAnswerSchema)` to create a new message.
+ */
+export const TerminalAnswerSchema: GenMessage<TerminalAnswer> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 5);
+
+/**
  * Output of the terminal.
  *
  * @generated from message leaflow.fleet.terminal.v1.TerminalOutput
@@ -223,7 +270,7 @@ export type TerminalOutput = Message<"leaflow.fleet.terminal.v1.TerminalOutput">
  * Use `create(TerminalOutputSchema)` to create a new message.
  */
 export const TerminalOutputSchema: GenMessage<TerminalOutput> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 5);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 6);
 
 /**
  * The size of a terminal (RFC 4254 §6.7 "window-change"; struct winsize).
@@ -265,7 +312,7 @@ export type TerminalSize = Message<"leaflow.fleet.terminal.v1.TerminalSize"> & {
  * Use `create(TerminalSizeSchema)` to create a new message.
  */
 export const TerminalSizeSchema: GenMessage<TerminalSize> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 6);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 7);
 
 /**
  * How the shell ended (RFC 4254 §6.10).
@@ -311,7 +358,7 @@ export type TerminalExit = Message<"leaflow.fleet.terminal.v1.TerminalExit"> & {
  * Use `create(TerminalExitSchema)` to create a new message.
  */
 export const TerminalExitSchema: GenMessage<TerminalExit> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 7);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 8);
 
 /**
  * Allows a participant to use the terminal. Carried in the participant's
@@ -327,5 +374,5 @@ export type TerminalPolicy = Message<"leaflow.fleet.terminal.v1.TerminalPolicy">
  * Use `create(TerminalPolicySchema)` to create a new message.
  */
 export const TerminalPolicySchema: GenMessage<TerminalPolicy> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 8);
+  messageDesc(file_leaflow_fleet_terminal_v1_terminal, 9);
 
