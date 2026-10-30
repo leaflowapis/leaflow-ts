@@ -344,7 +344,7 @@ export interface MachineFeature {
   /** The protocol package that defines the feature, such as `leaflow.fleet.command.v1` */
   name: string;
   state: FeatureState;
-  /** Why it cannot be used, such as `Xvfb is not installed`; empty while available */
+  /** Why it cannot be used, such as `Xwayland is not installed`; empty while available */
   reason: string;
   /** What it can do on this machine, as the dotted names its package defines, such as `audio.pipewire` */
   details: string[];

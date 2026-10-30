@@ -128,7 +128,8 @@ export type SshAgentPolicy = Message<"leaflow.fleet.sshagent.v1.SshAgentPolicy">
   providerPriority: number;
 
   /**
-   * The most connections at once, at most 32. 0: the session's limit.
+   * The most connections at once. 0: as many as the provider takes
+   * (ProviderHello.max_connections).
    *
    * @generated from field: uint32 max_connections = 2;
    */

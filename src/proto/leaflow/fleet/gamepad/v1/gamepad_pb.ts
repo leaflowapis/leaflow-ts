@@ -255,14 +255,15 @@ export const GamepadButtonSchema: GenMessage<GamepadButton> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_gamepad_v1_gamepad, 5);
 
 /**
- * A state was written to the device and reported (SYN_REPORT), not merely
+ * States were written to the device and reported (SYN_REPORT), not merely
  * received.
  *
  * @generated from message leaflow.fleet.gamepad.v1.GamepadApplied
  */
 export type GamepadApplied = Message<"leaflow.fleet.gamepad.v1.GamepadApplied"> & {
   /**
-   * GamepadState.sequence.
+   * The newest state written (GamepadState.sequence). It covers every earlier
+   * state, those merged into it included.
    *
    * @generated from field: uint64 sequence = 1;
    */
@@ -384,7 +385,7 @@ export enum GamepadCloseReason {
   PROTOCOL_ERROR = 4,
 
   /**
-   * A limit of GamepadLimits was exceeded.
+   * The participant has as many gamepads as GamepadLimits allows.
    *
    * @generated from enum value: GAMEPAD_CLOSE_REASON_RESOURCE_EXHAUSTED = 5;
    */

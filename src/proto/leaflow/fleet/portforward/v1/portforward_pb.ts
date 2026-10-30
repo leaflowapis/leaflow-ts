@@ -514,14 +514,14 @@ export type PortForwardPolicy = Message<"leaflow.fleet.portforward.v1.PortForwar
   localTargets?: EndpointPolicy | undefined;
 
   /**
-   * The most forwards at once, at most 32. 0: 8.
+   * The most forwards at once. 0: no limit.
    *
    * @generated from field: uint32 max_forwards = 7;
    */
   maxForwards: number;
 
   /**
-   * The most connections and associations at once, at most 256. 0: 32.
+   * The most connections and associations at once. 0: no limit.
    *
    * @generated from field: uint32 max_connections = 8;
    */

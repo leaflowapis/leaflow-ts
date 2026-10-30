@@ -627,21 +627,21 @@ export const PrintDocumentEndSchema: GenMessage<PrintDocumentEnd> = /*@__PURE__*
  */
 export type PrintingPolicy = Message<"leaflow.fleet.printing.v1.PrintingPolicy"> & {
   /**
-   * The largest document, at most 128 MiB. 0: no documents.
+   * The largest document. 0: no documents.
    *
    * @generated from field: uint64 max_document_size_bytes = 1;
    */
   maxDocumentSizeBytes: bigint;
 
   /**
-   * The most jobs received or submitted at a time, at most 4. 0: no jobs.
+   * The most jobs received or submitted at a time. 0: no jobs.
    *
    * @generated from field: uint32 max_jobs = 2;
    */
   maxJobs: number;
 
   /**
-   * The most printers shared, at most 16. 0: none.
+   * The most printers shared. 0: none.
    *
    * @generated from field: uint32 max_printers = 3;
    */

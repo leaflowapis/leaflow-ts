@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/virtualdesktop/host/v1/host.proto.
  */
 export const file_leaflow_fleet_virtualdesktop_host_v1_host: GenFile = /*@__PURE__*/
-  fileDesc("Ci9sZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2hvc3QvdjEvaG9zdC5wcm90bxIkbGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5ob3N0LnYxIusBCg5EZXNrdG9wT3B0aW9ucxJCCgRtb2RlGAEgASgOMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlNlc3Npb25Nb2RlEjsKBHNpemUYAiABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuU2l6ZRI/CghtYXhfc2l6ZRgDIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TaXplEhcKD3Nlc3Npb25fZGVza3RvcBgEIAEoCSJjCgxEZXNrdG9wU3RhdGUSDwoHZGlzcGxheRgBIAEoCRJCCgRtb2RlGAIgASgOMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlNlc3Npb25Nb2RlQkdaRWdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC92aXJ0dWFsZGVza3RvcC9ob3N0L3YxO2hvc3R2MWIGcHJvdG8z", [file_leaflow_fleet_virtualdesktop_display_v1_display]);
+  fileDesc("Ci9sZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2hvc3QvdjEvaG9zdC5wcm90bxIkbGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5ob3N0LnYxIqoBCg5EZXNrdG9wT3B0aW9ucxJCCgRtb2RlGAEgASgOMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlNlc3Npb25Nb2RlEjsKBHNpemUYAiABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuU2l6ZRIXCg9zZXNzaW9uX2Rlc2t0b3AYBCABKAkiYwoMRGVza3RvcFN0YXRlEg8KB2Rpc3BsYXkYASABKAkSQgoEbW9kZRgCIAEoDjI0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TZXNzaW9uTW9kZUJHWkVnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvaG9zdC92MTtob3N0djFiBnByb3RvMw", [file_leaflow_fleet_virtualdesktop_display_v1_display]);
 
 /**
  * What a desktop session is opened with: an option of OpenSession.
@@ -34,13 +34,6 @@ export type DesktopOptions = Message<"leaflow.fleet.virtualdesktop.host.v1.Deskt
    * @generated from field: leaflow.fleet.virtualdesktop.display.v1.Size size = 2;
    */
   size?: Size | undefined;
-
-  /**
-   * The largest size the canvas may grow to. Unset: the Agent's default.
-   *
-   * @generated from field: leaflow.fleet.virtualdesktop.display.v1.Size max_size = 3;
-   */
-  maxSize?: Size | undefined;
 
   /**
    * SESSION_MODE_DESKTOP only: the desktop environment to start, one the

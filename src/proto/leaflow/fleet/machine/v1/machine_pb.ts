@@ -151,7 +151,7 @@ export type Feature = Message<"leaflow.fleet.machine.v1.Feature"> & {
 
   /**
    * UNAVAILABLE only: why, plain text for people, at most 1024 bytes, such
-   * as "Xvfb is not installed".
+   * as "Xwayland is not installed".
    *
    * @generated from field: string reason = 3;
    */

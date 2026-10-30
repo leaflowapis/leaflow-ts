@@ -245,7 +245,7 @@ export const MachineFeature = zod.strictObject({
   state: FeatureState,
   reason: zod
     .string()
-    .describe("Why it cannot be used, such as `Xvfb is not installed`; empty while available"),
+    .describe("Why it cannot be used, such as `Xwayland is not installed`; empty while available"),
   details: zod
     .array(zod.string())
     .describe(

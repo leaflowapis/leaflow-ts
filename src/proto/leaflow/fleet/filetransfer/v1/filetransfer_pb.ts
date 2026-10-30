@@ -722,7 +722,8 @@ export type FileTransferPolicy = Message<"leaflow.fleet.filetransfer.v1.FileTran
   fileSystemAllowed: boolean;
 
   /**
-   * The most entries, directories included, of one offer. 0: 1024.
+   * The most entries, directories included, of one offer. 0: as many as one
+   * offer holds.
    *
    * @generated from field: uint32 max_entries = 4;
    */
