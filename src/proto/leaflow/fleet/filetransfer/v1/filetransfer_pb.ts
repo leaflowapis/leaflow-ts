@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/filetransfer/v1/filetransfer.proto.
  */
 export const file_leaflow_fleet_filetransfer_v1_filetransfer: GenFile = /*@__PURE__*/
-  fileDesc("CjBsZWFmbG93L2ZsZWV0L2ZpbGV0cmFuc2Zlci92MS9maWxldHJhbnNmZXIucHJvdG8SHWxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxIv0CChNGaWxlVHJhbnNmZXJNZXNzYWdlEkEKBW9mZmVyGAEgASgLMjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyT2ZmZXJIABJFCgdyZXF1ZXN0GAIgASgLMjIubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyUmVxdWVzdEgAEkcKCHJlc3BvbnNlGAMgASgLMjMubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyUmVzcG9uc2VIABJDCgZjYW5jZWwYBCABKAsyMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHJhbnNmZXJDYW5jZWxIABJDCgZyZXN1bHQYBSABKAsyMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHJhbnNmZXJSZXN1bHRIAEIJCgdtZXNzYWdlIpwBChFGaWxlVHJhbnNmZXJPZmZlchITCgt0cmFuc2Zlcl9pZBgBIAEoCRI5CgdlbnRyaWVzGAIgAygLMigubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZUVudHJ5EhgKEHRvdGFsX3NpemVfYnl0ZXMYAyABKAQSHQoVZGVzdGluYXRpb25fZGlyZWN0b3J5GAQgASgJIpsBCglGaWxlRW50cnkSDwoHZmlsZV9pZBgBIAEoCRIRCglwYXJlbnRfaWQYAiABKAkSDAoEbmFtZRgDIAEoCRI1CgR0eXBlGAQgASgOMicubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVR5cGUSEgoKc2l6ZV9ieXRlcxgFIAEoBBIRCgltaW1lX3R5cGUYBiABKAkiYwoTRmlsZVRyYW5zZmVyUmVxdWVzdBISCgpyZXF1ZXN0X2lkGAEgASgEEhMKC3RyYW5zZmVyX2lkGAIgASgJEhAKCGZpbGVfaWRzGAMgAygJEhEKCWNsaXBib2FyZBgEIAEoCCJ0ChRGaWxlVHJhbnNmZXJSZXNwb25zZRISCgpyZXF1ZXN0X2lkGAEgASgEEhMKC3RyYW5zZmVyX2lkGAIgASgJEhAKCGZpbGVfaWRzGAMgAygJEiEKBWVycm9yGAQgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXMiKQoSRmlsZVRyYW5zZmVyQ2FuY2VsEhMKC3RyYW5zZmVyX2lkGAEgASgJIl4KEkZpbGVUcmFuc2ZlclJlc3VsdBITCgt0cmFuc2Zlcl9pZBgBIAEoCRIQCghmaWxlX2lkcxgCIAMoCRIhCgVlcnJvchgDIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIjoKEkZpbGVDb250ZW50UmVxdWVzdBITCgt0cmFuc2Zlcl9pZBgBIAEoCRIPCgdmaWxlX2lkGAIgASgJImMKC0ZpbGVDb250ZW50Eg4KBGRhdGEYASABKAxIABI8CgNlbmQYAiABKAsyLS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlQ29udGVudEVuZEgAQgYKBHBhcnQiQwoORmlsZUNvbnRlbnRFbmQSDgoGc2hhMjU2GAEgASgMEiEKBWVycm9yGAIgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXMiSwoUTGlzdERpcmVjdG9yeVJlcXVlc3QSDAoEcGF0aBgBIAEoCRIRCglwYWdlX3NpemUYAiABKA0SEgoKcGFnZV90b2tlbhgDIAEoCSJ+ChVMaXN0RGlyZWN0b3J5UmVzcG9uc2USDAoEcGF0aBgBIAEoCRI+CgdlbnRyaWVzGAIgAygLMi0ubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRGlyZWN0b3J5RW50cnkSFwoPbmV4dF9wYWdlX3Rva2VuGAMgASgJIqgBCg5EaXJlY3RvcnlFbnRyeRIMCgRuYW1lGAEgASgJEjUKBHR5cGUYAiABKA4yJy5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHlwZRISCgpzaXplX2J5dGVzGAMgASgEEi8KC21vZGlmaWVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIMCgRtb2RlGAUgASgNIiYKFkNyZWF0ZURpcmVjdG9yeVJlcXVlc3QSDAoEcGF0aBgBIAEoCSIZChdDcmVhdGVEaXJlY3RvcnlSZXNwb25zZSJCChFSZW5hbWVGaWxlUmVxdWVzdBITCgtzb3VyY2VfcGF0aBgBIAEoCRIYChBkZXN0aW5hdGlvbl9wYXRoGAIgASgJIhQKElJlbmFtZUZpbGVSZXNwb25zZSIhChFSZW1vdmVGaWxlUmVxdWVzdBIMCgRwYXRoGAEgASgJIhQKElJlbW92ZUZpbGVSZXNwb25zZSInChZDcmVhdGVGaWxlT2ZmZXJSZXF1ZXN0Eg0KBXBhdGhzGAEgAygJIloKF0NyZWF0ZUZpbGVPZmZlclJlc3BvbnNlEj8KBW9mZmVyGAEgASgLMjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyT2ZmZXIieAoSRmlsZVRyYW5zZmVyUG9saWN5EhYKDnVwbG9hZF9hbGxvd2VkGAEgASgIEhgKEGRvd25sb2FkX2FsbG93ZWQYAiABKAgSGwoTZmlsZV9zeXN0ZW1fYWxsb3dlZBgDIAEoCBITCgttYXhfZW50cmllcxgEIAEoDSpyCghGaWxlVHlwZRIZChVGSUxFX1RZUEVfVU5TUEVDSUZJRUQQABIVChFGSUxFX1RZUEVfUkVHVUxBUhABEhcKE0ZJTEVfVFlQRV9ESVJFQ1RPUlkQAhIbChdGSUxFX1RZUEVfU1lNQk9MSUNfTElOSxADMoAFChFGaWxlU3lzdGVtU2VydmljZRJ/Cg1MaXN0RGlyZWN0b3J5EjMubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuTGlzdERpcmVjdG9yeVJlcXVlc3QaNC5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5MaXN0RGlyZWN0b3J5UmVzcG9uc2UiA5ACARKAAQoPQ3JlYXRlRGlyZWN0b3J5EjUubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuQ3JlYXRlRGlyZWN0b3J5UmVxdWVzdBo2LmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkNyZWF0ZURpcmVjdG9yeVJlc3BvbnNlEnEKClJlbmFtZUZpbGUSMC5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5SZW5hbWVGaWxlUmVxdWVzdBoxLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLlJlbmFtZUZpbGVSZXNwb25zZRJxCgpSZW1vdmVGaWxlEjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuUmVtb3ZlRmlsZVJlcXVlc3QaMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5SZW1vdmVGaWxlUmVzcG9uc2USgAEKD0NyZWF0ZUZpbGVPZmZlchI1LmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkNyZWF0ZUZpbGVPZmZlclJlcXVlc3QaNi5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5DcmVhdGVGaWxlT2ZmZXJSZXNwb25zZUJIWkZnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvZmlsZXRyYW5zZmVyL3YxO2ZpbGV0cmFuc2ZlcnYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_google_rpc_status]);
+  fileDesc("CjBsZWFmbG93L2ZsZWV0L2ZpbGV0cmFuc2Zlci92MS9maWxldHJhbnNmZXIucHJvdG8SHWxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxIv0CChNGaWxlVHJhbnNmZXJNZXNzYWdlEkEKBW9mZmVyGAEgASgLMjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyT2ZmZXJIABJFCgdyZXF1ZXN0GAIgASgLMjIubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyUmVxdWVzdEgAEkcKCHJlc3BvbnNlGAMgASgLMjMubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyUmVzcG9uc2VIABJDCgZjYW5jZWwYBCABKAsyMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHJhbnNmZXJDYW5jZWxIABJDCgZyZXN1bHQYBSABKAsyMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHJhbnNmZXJSZXN1bHRIAEIJCgdtZXNzYWdlIpwBChFGaWxlVHJhbnNmZXJPZmZlchITCgt0cmFuc2Zlcl9pZBgBIAEoCRI5CgdlbnRyaWVzGAIgAygLMigubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZUVudHJ5EhgKEHRvdGFsX3NpemVfYnl0ZXMYAyABKAQSHQoVZGVzdGluYXRpb25fZGlyZWN0b3J5GAQgASgJIpsBCglGaWxlRW50cnkSDwoHZmlsZV9pZBgBIAEoCRIRCglwYXJlbnRfaWQYAiABKAkSDAoEbmFtZRgDIAEoCRI1CgR0eXBlGAQgASgOMicubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVR5cGUSEgoKc2l6ZV9ieXRlcxgFIAEoBBIRCgltaW1lX3R5cGUYBiABKAkiYwoTRmlsZVRyYW5zZmVyUmVxdWVzdBISCgpyZXF1ZXN0X2lkGAEgASgEEhMKC3RyYW5zZmVyX2lkGAIgASgJEhAKCGZpbGVfaWRzGAMgAygJEhEKCWNsaXBib2FyZBgEIAEoCCJ0ChRGaWxlVHJhbnNmZXJSZXNwb25zZRISCgpyZXF1ZXN0X2lkGAEgASgEEhMKC3RyYW5zZmVyX2lkGAIgASgJEhAKCGZpbGVfaWRzGAMgAygJEiEKBWVycm9yGAQgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXMiKQoSRmlsZVRyYW5zZmVyQ2FuY2VsEhMKC3RyYW5zZmVyX2lkGAEgASgJIl4KEkZpbGVUcmFuc2ZlclJlc3VsdBITCgt0cmFuc2Zlcl9pZBgBIAEoCRIQCghmaWxlX2lkcxgCIAMoCRIhCgVlcnJvchgDIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIjoKEkZpbGVDb250ZW50UmVxdWVzdBITCgt0cmFuc2Zlcl9pZBgBIAEoCRIPCgdmaWxlX2lkGAIgASgJImMKC0ZpbGVDb250ZW50Eg4KBGRhdGEYASABKAxIABI8CgNlbmQYAiABKAsyLS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlQ29udGVudEVuZEgAQgYKBHBhcnQiQwoORmlsZUNvbnRlbnRFbmQSDgoGc2hhMjU2GAEgASgMEiEKBWVycm9yGAIgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXMiSwoUTGlzdERpcmVjdG9yeVJlcXVlc3QSDAoEcGF0aBgBIAEoCRIRCglwYWdlX3NpemUYAiABKA0SEgoKcGFnZV90b2tlbhgDIAEoCSJ+ChVMaXN0RGlyZWN0b3J5UmVzcG9uc2USDAoEcGF0aBgBIAEoCRI+CgdlbnRyaWVzGAIgAygLMi0ubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRGlyZWN0b3J5RW50cnkSFwoPbmV4dF9wYWdlX3Rva2VuGAMgASgJIrsBCg5EaXJlY3RvcnlFbnRyeRIMCgRuYW1lGAEgASgJEjUKBHR5cGUYAiABKA4yJy5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHlwZRISCgpzaXplX2J5dGVzGAMgASgEEi8KC21vZGlmaWVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIMCgRtb2RlGAUgASgNEhEKCW1pbWVfdHlwZRgGIAEoCSImChZDcmVhdGVEaXJlY3RvcnlSZXF1ZXN0EgwKBHBhdGgYASABKAkiGQoXQ3JlYXRlRGlyZWN0b3J5UmVzcG9uc2UiQgoRUmVuYW1lRmlsZVJlcXVlc3QSEwoLc291cmNlX3BhdGgYASABKAkSGAoQZGVzdGluYXRpb25fcGF0aBgCIAEoCSIUChJSZW5hbWVGaWxlUmVzcG9uc2UiIQoRUmVtb3ZlRmlsZVJlcXVlc3QSDAoEcGF0aBgBIAEoCSIUChJSZW1vdmVGaWxlUmVzcG9uc2UiQAoPQ29weUZpbGVSZXF1ZXN0EhMKC3NvdXJjZV9wYXRoGAEgASgJEhgKEGRlc3RpbmF0aW9uX3BhdGgYAiABKAkiEgoQQ29weUZpbGVSZXNwb25zZSIgChBUcmFzaEZpbGVSZXF1ZXN0EgwKBHBhdGgYASABKAkiEwoRVHJhc2hGaWxlUmVzcG9uc2UiJwoWQ3JlYXRlRmlsZU9mZmVyUmVxdWVzdBINCgVwYXRocxgBIAMoCSJaChdDcmVhdGVGaWxlT2ZmZXJSZXNwb25zZRI/CgVvZmZlchgBIAEoCzIwLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkZpbGVUcmFuc2Zlck9mZmVyIngKEkZpbGVUcmFuc2ZlclBvbGljeRIWCg51cGxvYWRfYWxsb3dlZBgBIAEoCBIYChBkb3dubG9hZF9hbGxvd2VkGAIgASgIEhsKE2ZpbGVfc3lzdGVtX2FsbG93ZWQYAyABKAgSEwoLbWF4X2VudHJpZXMYBCABKA0qcgoIRmlsZVR5cGUSGQoVRklMRV9UWVBFX1VOU1BFQ0lGSUVEEAASFQoRRklMRV9UWVBFX1JFR1VMQVIQARIXChNGSUxFX1RZUEVfRElSRUNUT1JZEAISGwoXRklMRV9UWVBFX1NZTUJPTElDX0xJTksQAzLdBgoRRmlsZVN5c3RlbVNlcnZpY2USfwoNTGlzdERpcmVjdG9yeRIzLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkxpc3REaXJlY3RvcnlSZXF1ZXN0GjQubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuTGlzdERpcmVjdG9yeVJlc3BvbnNlIgOQAgESgAEKD0NyZWF0ZURpcmVjdG9yeRI1LmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkNyZWF0ZURpcmVjdG9yeVJlcXVlc3QaNi5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5DcmVhdGVEaXJlY3RvcnlSZXNwb25zZRJxCgpSZW5hbWVGaWxlEjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuUmVuYW1lRmlsZVJlcXVlc3QaMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5SZW5hbWVGaWxlUmVzcG9uc2UScQoKUmVtb3ZlRmlsZRIwLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLlJlbW92ZUZpbGVSZXF1ZXN0GjEubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuUmVtb3ZlRmlsZVJlc3BvbnNlEmsKCENvcHlGaWxlEi4ubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuQ29weUZpbGVSZXF1ZXN0Gi8ubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuQ29weUZpbGVSZXNwb25zZRJuCglUcmFzaEZpbGUSLy5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5UcmFzaEZpbGVSZXF1ZXN0GjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuVHJhc2hGaWxlUmVzcG9uc2USgAEKD0NyZWF0ZUZpbGVPZmZlchI1LmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkNyZWF0ZUZpbGVPZmZlclJlcXVlc3QaNi5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5DcmVhdGVGaWxlT2ZmZXJSZXNwb25zZUJIWkZnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvZmlsZXRyYW5zZmVyL3YxO2ZpbGV0cmFuc2ZlcnYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_google_rpc_status]);
 
 /**
  * A message on the filetransfer channel, from either end.
@@ -527,6 +527,17 @@ export type DirectoryEntry = Message<"leaflow.fleet.filetransfer.v1.DirectoryEnt
    * @generated from field: uint32 mode = 5;
    */
   mode: number;
+
+  /**
+   * Its media type (Shared MIME-info Database), as GIO's
+   * standard::content-type gives it: that of the target for a symbolic link,
+   * "inode/symlink" for one whose target is missing, "inode/directory" and the
+   * other inode types by kind, "application/x-zerosize" for an empty file,
+   * otherwise by name and, where the name leaves it open, by content.
+   *
+   * @generated from field: string mime_type = 6;
+   */
+  mimeType: string;
 };
 
 /**
@@ -652,6 +663,85 @@ export const RemoveFileResponseSchema: GenMessage<RemoveFileResponse> = /*@__PUR
   messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 18);
 
 /**
+ * The request of CopyFile.
+ *
+ * @generated from message leaflow.fleet.filetransfer.v1.CopyFileRequest
+ */
+export type CopyFileRequest = Message<"leaflow.fleet.filetransfer.v1.CopyFileRequest"> & {
+  /**
+   * The file, symbolic link or directory.
+   *
+   * @generated from field: string source_path = 1;
+   */
+  sourcePath: string;
+
+  /**
+   * The path of the copy. Its parent must exist.
+   *
+   * @generated from field: string destination_path = 2;
+   */
+  destinationPath: string;
+};
+
+/**
+ * Describes the message leaflow.fleet.filetransfer.v1.CopyFileRequest.
+ * Use `create(CopyFileRequestSchema)` to create a new message.
+ */
+export const CopyFileRequestSchema: GenMessage<CopyFileRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 19);
+
+/**
+ * The response of CopyFile.
+ *
+ * @generated from message leaflow.fleet.filetransfer.v1.CopyFileResponse
+ */
+export type CopyFileResponse = Message<"leaflow.fleet.filetransfer.v1.CopyFileResponse"> & {
+};
+
+/**
+ * Describes the message leaflow.fleet.filetransfer.v1.CopyFileResponse.
+ * Use `create(CopyFileResponseSchema)` to create a new message.
+ */
+export const CopyFileResponseSchema: GenMessage<CopyFileResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 20);
+
+/**
+ * The request of TrashFile.
+ *
+ * @generated from message leaflow.fleet.filetransfer.v1.TrashFileRequest
+ */
+export type TrashFileRequest = Message<"leaflow.fleet.filetransfer.v1.TrashFileRequest"> & {
+  /**
+   * The file or directory.
+   *
+   * @generated from field: string path = 1;
+   */
+  path: string;
+};
+
+/**
+ * Describes the message leaflow.fleet.filetransfer.v1.TrashFileRequest.
+ * Use `create(TrashFileRequestSchema)` to create a new message.
+ */
+export const TrashFileRequestSchema: GenMessage<TrashFileRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 21);
+
+/**
+ * The response of TrashFile.
+ *
+ * @generated from message leaflow.fleet.filetransfer.v1.TrashFileResponse
+ */
+export type TrashFileResponse = Message<"leaflow.fleet.filetransfer.v1.TrashFileResponse"> & {
+};
+
+/**
+ * Describes the message leaflow.fleet.filetransfer.v1.TrashFileResponse.
+ * Use `create(TrashFileResponseSchema)` to create a new message.
+ */
+export const TrashFileResponseSchema: GenMessage<TrashFileResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 22);
+
+/**
  * The request of CreateFileOffer.
  *
  * @generated from message leaflow.fleet.filetransfer.v1.CreateFileOfferRequest
@@ -670,7 +760,7 @@ export type CreateFileOfferRequest = Message<"leaflow.fleet.filetransfer.v1.Crea
  * Use `create(CreateFileOfferRequestSchema)` to create a new message.
  */
 export const CreateFileOfferRequestSchema: GenMessage<CreateFileOfferRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 19);
+  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 23);
 
 /**
  * The response of CreateFileOffer.
@@ -691,7 +781,7 @@ export type CreateFileOfferResponse = Message<"leaflow.fleet.filetransfer.v1.Cre
  * Use `create(CreateFileOfferResponseSchema)` to create a new message.
  */
 export const CreateFileOfferResponseSchema: GenMessage<CreateFileOfferResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 20);
+  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 24);
 
 /**
  * What a participant may do with files. Carried in the participant's signed
@@ -735,7 +825,7 @@ export type FileTransferPolicy = Message<"leaflow.fleet.filetransfer.v1.FileTran
  * Use `create(FileTransferPolicySchema)` to create a new message.
  */
 export const FileTransferPolicySchema: GenMessage<FileTransferPolicy> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 21);
+  messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 25);
 
 /**
  * The type of a file.
@@ -779,7 +869,8 @@ export const FileTypeSchema: GenEnum<FileType> = /*@__PURE__*/
 /**
  * The files of the session's user, by absolute path. Paths are resolved as
  * that user; an empty path is the user's home directory. Nothing is removed
- * recursively and nothing is overwritten implicitly. Needs
+ * recursively, a directory goes to the trash with its contents instead, and
+ * nothing is overwritten implicitly. Needs
  * FileTransferPolicy.file_system_allowed.
  *
  * @generated from service leaflow.fleet.filetransfer.v1.FileSystemService
@@ -826,6 +917,43 @@ export const FileSystemService: GenService<{
     methodKind: "unary";
     input: typeof RemoveFileRequestSchema;
     output: typeof RemoveFileResponseSchema;
+  },
+  /**
+   * Copies a file, a symbolic link (as the link) or a directory with its
+   * contents, keeping permission bits and modification times, as file
+   * managers copy (GIO g_file_copy with G_FILE_COPY_NOFOLLOW_SYMLINKS). It
+   * fails with ALREADY_EXISTS when something is at the destination. The copy
+   * appears whole or not at all: it is made under a hidden name in the
+   * destination's directory and renamed into place, and a copy that fails or
+   * is cancelled (leaflow.fleet.rpc.v1 CallCancel) leaves nothing behind.
+   * Copying a directory into itself fails with INVALID_ARGUMENT and reason
+   * FILE_COPY_INTO_ITSELF; a FIFO, socket or device, on its own or inside a
+   * directory, with FAILED_PRECONDITION and reason FILE_TYPE_UNSUPPORTED.
+   *
+   * @generated from rpc leaflow.fleet.filetransfer.v1.FileSystemService.CopyFile
+   */
+  copyFile: {
+    methodKind: "unary";
+    input: typeof CopyFileRequestSchema;
+    output: typeof CopyFileResponseSchema;
+  },
+  /**
+   * Moves a file or a directory with its contents to the user's trash
+   * (freedesktop Trash Specification 1.0), where the person can restore it
+   * from: the home trash ($XDG_DATA_HOME/Trash) for files on the file system
+   * of the home directory, otherwise the trash of the file's mount,
+   * $topdir/.Trash/$uid or $topdir/.Trash-$uid, as GIO g_file_trash chooses.
+   * Fails with FAILED_PRECONDITION and reason FILE_TRASH_UNAVAILABLE where the
+   * file system has no trash, such as a tmpfs or another mount of the system's
+   * own; with PERMISSION_DENIED for a directory holding files the user could
+   * not remove from the trash again.
+   *
+   * @generated from rpc leaflow.fleet.filetransfer.v1.FileSystemService.TrashFile
+   */
+  trashFile: {
+    methodKind: "unary";
+    input: typeof TrashFileRequestSchema;
+    output: typeof TrashFileResponseSchema;
   },
   /**
    * Offers files of the user to the participant, which fetches them as for any
