@@ -3726,6 +3726,15 @@ export const routes = [
   {
     service: "fleet",
     contract: "fleet",
+    method: "GET",
+    path: "/api/v1/sessions/{sessionId}/participants/{participantId}/peer-connections/{peerConnectionId}",
+    operationId: "get-peer-connection",
+    securityScheme: "ScopedToken",
+    upstreamUrl: "https://fleet.leaflow.cloud",
+  },
+  {
+    service: "fleet",
+    contract: "fleet",
     method: "DELETE",
     path: "/api/v1/sessions/{sessionId}/participants/{participantId}/peer-connections/{peerConnectionId}",
     operationId: "delete-peer-connection",

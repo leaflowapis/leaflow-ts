@@ -201,9 +201,12 @@
  *    one second has passed, so that the offer carries them.
  * 3. Join with `POST /api/v1/sessions/{sessionId}/participants`, sending the public key and the
  *    offer. The answer carries the participant's signed authorization, the keys the service
- *    signs with, and the first PeerConnection: the session's SDP answer, its ICE candidates and
- *    the signed PeerAuthorization. Pass candidates gathered later with
- *    `POST …/participants/{participantId}/peer-connections/{peerConnectionId}/candidates`.
+ *    signs with, and the first PeerConnection: the session's SDP answer, the ICE candidates it
+ *    has passed so far and the signed PeerAuthorization. Pass candidates gathered later with
+ *    `POST …/participants/{participantId}/peer-connections/{peerConnectionId}/candidates`, and
+ *    read the session's later ones with
+ *    `GET …/participants/{participantId}/peer-connections/{peerConnectionId}` until
+ *    `candidates_complete`.
  * 4. Renew the participant with `POST …/participants/{participantId}:renew` well before
  *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
  *    PeerConnection; the answer renews them. A participant whose lease runs out ends, and its
@@ -256,6 +259,7 @@ import type {
   Error,
   FindEnrollmentByPairingCodeParams,
   FindEnrollmentResponse,
+  GetPeerConnectionParams,
   GroupList,
   GroupResource,
   ListAccountsParams,
@@ -3073,7 +3077,8 @@ export const getCreateParticipantUrl = (sessionId: string) => {
  * Admits one participant with the given public key to the session: signs its authorization,
  * has the session accept it, and starts its first PeerConnection with the offer. The answer
  * carries the participant, its authorization and the PeerConnection with the session's
- * answer. The participant lasts while it is renewed.
+ * answer and the ICE candidates the session has passed so far; read its later candidates
+ * with `get-peer-connection`. The participant lasts while it is renewed.
  *
  * Joining again with the public key of one of the caller's participants of the session that
  * has not ended, with the same `client_name`, `read_only` and `permissions`, returns that
@@ -3460,8 +3465,9 @@ export const getCreatePeerConnectionUrl = (sessionId: string, participantId: num
 
 /**
  * Starts another PeerConnection of the participant with the offer, such as after a path
- * failed, and returns the session's answer, its ICE candidates and the signed
- * PeerAuthorization. Move the participant's connection to it with
+ * failed, and returns the session's answer, the ICE candidates it has passed so far and the
+ * signed PeerAuthorization; read its later candidates with `get-peer-connection`. Move the
+ * participant's connection to it with
  * `prepare-participant-migration` and `commit-participant-migration`.
  *
  * Only the participant's user may start one.
@@ -3513,6 +3519,90 @@ export const createPeerConnection = async (
 
   const data: createPeerConnectionResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as createPeerConnectionResponse;
+};
+
+export type getPeerConnectionResponse200 = {
+  data: PeerConnection;
+  status: 200;
+};
+
+export type getPeerConnectionResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getPeerConnectionResponseSuccess = getPeerConnectionResponse200 & {
+  headers: Headers;
+};
+export type getPeerConnectionResponseError = getPeerConnectionResponseDefault & {
+  headers: Headers;
+};
+
+export type getPeerConnectionResponse =
+  | getPeerConnectionResponseSuccess
+  | getPeerConnectionResponseError;
+
+export const getGetPeerConnectionUrl = (
+  sessionId: string,
+  participantId: number,
+  peerConnectionId: string,
+  params?: GetPeerConnectionParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(participantId))}/peer-connections/${encodeURIComponent(String(peerConnectionId))}?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/participants/${encodeURIComponent(String(participantId))}/peer-connections/${encodeURIComponent(String(peerConnectionId))}`;
+};
+
+/**
+ * Returns the PeerConnection with the ICE candidates the session has passed so far. The
+ * session passes its candidates as it gathers them (RFC 8838), so most arrive after the
+ * PeerConnection started: read it until `candidates_complete`, and add the candidates that
+ * are new since the last read to the PeerConnection. A client keeps those that arrive before
+ * it has set the answer as the remote description, and adds them once it has.
+ *
+ * With `known_candidates`, the request waits until the session has passed more candidates
+ * than that or reported the end of its candidates, for at most 20 seconds, and then returns
+ * the PeerConnection as it is.
+ *
+ * A PeerConnection can be read for 5 minutes after it started. Only the participant's user
+ * may read it.
+ *
+ * Fails with:
+ * - `PARTICIPANT_NOT_FOUND` when the participant has ended;
+ * - `PEER_CONNECTION_NOT_FOUND` when the participant has no such PeerConnection, it was
+ *   abandoned, the session gave it up, or it started more than 5 minutes ago.
+ * @summary Get a PeerConnection
+ */
+export const getPeerConnection = async (
+  sessionId: string,
+  participantId: number,
+  peerConnectionId: string,
+  params?: GetPeerConnectionParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getPeerConnectionResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetPeerConnectionUrl(sessionId, participantId, peerConnectionId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getPeerConnectionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getPeerConnectionResponse;
 };
 
 export type deletePeerConnectionResponse204 = {

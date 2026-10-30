@@ -201,9 +201,12 @@
  *    one second has passed, so that the offer carries them.
  * 3. Join with `POST /api/v1/sessions/{sessionId}/participants`, sending the public key and the
  *    offer. The answer carries the participant's signed authorization, the keys the service
- *    signs with, and the first PeerConnection: the session's SDP answer, its ICE candidates and
- *    the signed PeerAuthorization. Pass candidates gathered later with
- *    `POST …/participants/{participantId}/peer-connections/{peerConnectionId}/candidates`.
+ *    signs with, and the first PeerConnection: the session's SDP answer, the ICE candidates it
+ *    has passed so far and the signed PeerAuthorization. Pass candidates gathered later with
+ *    `POST …/participants/{participantId}/peer-connections/{peerConnectionId}/candidates`, and
+ *    read the session's later ones with
+ *    `GET …/participants/{participantId}/peer-connections/{peerConnectionId}` until
+ *    `candidates_complete`.
  * 4. Renew the participant with `POST …/participants/{participantId}:renew` well before
  *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
  *    PeerConnection; the answer renews them. A participant whose lease runs out ends, and its
@@ -239,6 +242,8 @@ import * as zod from "zod";
 import { IceCandidate } from "./iceCandidate.zod.js";
 import { SignedMessage } from "./signedMessage.zod.js";
 
+export const peerConnectionCandidatesMax = 64;
+
 export const PeerConnection = zod
   .strictObject({
     id: zod
@@ -251,9 +256,13 @@ export const PeerConnection = zod
       .describe("The session's SDP answer (RFC 8866); it holds ICE credentials, so never log it"),
     candidates: zod
       .array(IceCandidate)
+      .max(peerConnectionCandidatesMax)
       .describe(
-        "The session's ICE candidates that arrived until it reported the end of its candidates, or\n500 milliseconds after one candidate of each type its ICE servers yield had arrived\n(server reflexive when the RTC configuration has STUN servers and the policy is not\n`relay`, relayed when it has TURN servers), and at most until 10 seconds after its\nanswer. Candidates the session gathers later are not passed on.",
+        "The session's ICE candidates passed so far, at most 64, in the order the session sent\nthem. Later reads return the same ones first.",
       ),
+    candidates_complete: zod
+      .boolean()
+      .describe("The session reported that it has gathered all its candidates; no more follow"),
     authorization: SignedMessage.describe(
       "The signed `PeerAuthorization` of the PeerConnection, the same one the session holds",
     ),

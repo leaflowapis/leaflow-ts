@@ -201,9 +201,12 @@
  *    one second has passed, so that the offer carries them.
  * 3. Join with `POST /api/v1/sessions/{sessionId}/participants`, sending the public key and the
  *    offer. The answer carries the participant's signed authorization, the keys the service
- *    signs with, and the first PeerConnection: the session's SDP answer, its ICE candidates and
- *    the signed PeerAuthorization. Pass candidates gathered later with
- *    `POST …/participants/{participantId}/peer-connections/{peerConnectionId}/candidates`.
+ *    signs with, and the first PeerConnection: the session's SDP answer, the ICE candidates it
+ *    has passed so far and the signed PeerAuthorization. Pass candidates gathered later with
+ *    `POST …/participants/{participantId}/peer-connections/{peerConnectionId}/candidates`, and
+ *    read the session's later ones with
+ *    `GET …/participants/{participantId}/peer-connections/{peerConnectionId}` until
+ *    `candidates_complete`.
  * 4. Renew the participant with `POST …/participants/{participantId}:renew` well before
  *    `lease_expires_at`, every 15 seconds, presenting the PeerAuthorization of each
  *    PeerConnection; the answer renews them. A participant whose lease runs out ends, and its
