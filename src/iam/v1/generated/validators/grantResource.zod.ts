@@ -23,7 +23,7 @@ export const GrantResource = zod.strictObject({
     .array(RuleResource)
     .nullable()
     .describe(
-      "**The rules compiled from every policy that applies. Do not walk them to reach a decision.** They are here to render what a user may do; each request is decided by the service handling it",
+      "**The rules compiled from the roles and grants that apply. Do not walk them to reach a decision.** They are here to render what a user may do; each request is decided by the service handling it",
     ),
 });
 

@@ -82,25 +82,9 @@ export interface PermissionResource {
   resource_type: string;
 }
 
-export interface ResourceTypeResource {
-  /** The code of the resource type, such as dns:zone. There is no display name here either; what it reads as is decided by the layer rendering it */
-  name: string;
-}
-
-export interface CatalogResource {
+export interface PermissionListResponseBody {
   /** @nullable */
-  permissions: PermissionResource[] | null;
-  /**
-   * The resource types this service declares. A scoped rule can only land on one of them
-   * @nullable
-   */
-  resource_types: ResourceTypeResource[] | null;
-  service: string;
-}
-
-export interface CatalogListResponseBody {
-  /** @nullable */
-  items: CatalogResource[] | null;
+  items: PermissionResource[] | null;
 }
 
 export interface ResourceRefResource {
@@ -140,7 +124,7 @@ export interface GrantResource {
    */
   roles: string[] | null;
   /**
-   * **The rules compiled from every policy that applies. Do not walk them to reach a decision.** They are here to render what a user may do; each request is decided by the service handling it
+   * **The rules compiled from the roles and grants that apply. Do not walk them to reach a decision.** They are here to render what a user may do; each request is decided by the service handling it
    * @nullable
    */
   rules: RuleResource[] | null;
@@ -313,6 +297,39 @@ export interface BatchGetMembersResponseBody {
   items: ResolvedMemberResource[];
 }
 
+export type MemberPermissionResourceEffect =
+  (typeof MemberPermissionResourceEffect)[keyof typeof MemberPermissionResourceEffect];
+
+export const MemberPermissionResourceEffect = {
+  allow: "allow",
+  deny: "deny",
+} as const;
+
+export interface MemberPermissionResource {
+  /** The id of this grant, used to revoke it */
+  id: string;
+  /**
+   * The code of the permission, such as compute:instance.delete
+   * @maxLength 128
+   */
+  permission: string;
+  effect: MemberPermissionResourceEffect;
+  /**
+   * The kind of resource this grant holds on, such as fleet:machine. Null with `resource_id` means it holds project-wide
+   * @maxLength 128
+   * @nullable
+   */
+  resource_type: string | null;
+  /**
+   * The resource identifier, which may carry a glob. Null with `resource_type` means the grant holds project-wide
+   * @maxLength 255
+   * @nullable
+   */
+  resource_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface MemberResource {
   /** MD5 hash of the lowercased, trimmed email address, for use with Gravatar-compatible avatar services. Empty if the account has no email address. */
   avatar_hash: string;
@@ -322,6 +339,11 @@ export interface MemberResource {
   first_name: string;
   grant: GrantResource;
   last_name: string;
+  /**
+   * The permissions granted to this person directly, apart from their roles
+   * @nullable
+   */
+  permissions: MemberPermissionResource[] | null;
   user_id: string;
 }
 
@@ -344,125 +366,39 @@ export interface SetMemberRolesRequestBody {
   roles: string[] | null;
 }
 
-export interface SetMemberPermissionsRequestBody {
-  /**
-   * **Every** permission name to be attached directly to this person, replaced in full. The permissions a role grants are neither listed here nor touched by this write
-   * @nullable
-   */
-  permissions: string[] | null;
-}
-
-export type PolicyResourceEffect = (typeof PolicyResourceEffect)[keyof typeof PolicyResourceEffect];
-
-export const PolicyResourceEffect = {
-  allow: "allow",
-  deny: "deny",
-} as const;
-
-export interface PolicyResource {
-  /** The base policy is the one whose effect is `allow` and which covers every resource. Each member holds exactly one, and it carries their ordinary roles. Change it with PUT /members/{userId}/roles and PUT /members/{userId}/permissions */
-  base: boolean;
-  created_at: string;
-  /** Why it was granted, written for a reader */
-  description: string;
-  effect: PolicyResourceEffect;
-  id: string;
-  /**
-   * Permission names attached directly to this person, without passing through a role
-   * @nullable
-   */
-  permissions: string[] | null;
-  /**
-   * Empty means the whole project
-   * @nullable
-   */
-  resources: ResourceRefResource[] | null;
-  /**
-   * The role codes this policy carries
-   * @nullable
-   */
-  roles: string[] | null;
-  updated_at: string;
-  user_id: string;
-}
-
-export interface PolicyListResponseBody {
+export interface MemberPermissionListResponseBody {
   /** @nullable */
-  items: PolicyResource[] | null;
+  items: MemberPermissionResource[] | null;
 }
 
-export type AttachPolicyRequestBodyEffect =
-  (typeof AttachPolicyRequestBodyEffect)[keyof typeof AttachPolicyRequestBodyEffect];
+export type CreateMemberPermissionRequestBodyEffect =
+  (typeof CreateMemberPermissionRequestBodyEffect)[keyof typeof CreateMemberPermissionRequestBodyEffect];
 
-export const AttachPolicyRequestBodyEffect = {
+export const CreateMemberPermissionRequestBodyEffect = {
   allow: "allow",
   deny: "deny",
 } as const;
 
-export interface AttachPolicyRequestBody {
+export interface CreateMemberPermissionRequestBody {
   /**
-   * Why it was granted, written for a reader
-   * @maxLength 255
-   */
-  description?: string;
-  effect: AttachPolicyRequestBodyEffect;
-  /**
-   * Permission names attached directly, which avoids creating a role only one person holds
-   * @nullable
-   */
-  permissions?: string[] | null;
-  /**
-   * The policy holds only on these resources. Leaving it empty makes sense only together with `deny`, since an `allow` covering every resource is the base policy, which already exists
-   * @nullable
-   */
-  resources?: ResourceRefResource[] | null;
-  /**
-   * Each must be a role already defined in this project. `OWNER` and `ADMIN` are not accepted, being rules rather than sets of permissions
-   * @nullable
-   */
-  roles?: string[] | null;
-  /**
-   * Must already be a member of this project
+   * The code of the permission to grant
    * @minLength 1
+   * @maxLength 128
+   */
+  permission: string;
+  effect: CreateMemberPermissionRequestBodyEffect;
+  /**
+   * The kind of resource to hold on; give it together with `resource_id`. Both null grant the permission project-wide
+   * @maxLength 128
+   * @nullable
+   */
+  resource_type: string | null;
+  /**
+   * The resource identifier to hold on, which may carry a glob. Give it together with `resource_type`
    * @maxLength 255
-   */
-  user_id: string;
-}
-
-/**
- * Must match the current effect of the policy. The effect itself cannot be changed; delete the policy and create another instead. It is still required in the request because the write replaces the policy in full, and omitting it would let a caller believe an effect had been changed while the field was ignored. A mismatch answers PROJECT_POLICY_EFFECT_IMMUTABLE
- */
-export type UpdatePolicyRequestBodyEffect =
-  (typeof UpdatePolicyRequestBodyEffect)[keyof typeof UpdatePolicyRequestBodyEffect];
-
-export const UpdatePolicyRequestBodyEffect = {
-  allow: "allow",
-  deny: "deny",
-} as const;
-
-export interface UpdatePolicyRequestBody {
-  /**
-   * Why it was granted, written for a reader. It is replaced together with the change, so that what remains does not explain an earlier version
-   * @maxLength 255
-   */
-  description?: string;
-  /** Must match the current effect of the policy. The effect itself cannot be changed; delete the policy and create another instead. It is still required in the request because the write replaces the policy in full, and omitting it would let a caller believe an effect had been changed while the field was ignored. A mismatch answers PROJECT_POLICY_EFFECT_IMMUTABLE */
-  effect: UpdatePolicyRequestBodyEffect;
-  /**
-   * Permission names attached directly, replaced in full. Anything not listed is withdrawn rather than kept
    * @nullable
    */
-  permissions?: string[] | null;
-  /**
-   * The resource scope of this policy, replaced in full. What the scope contains can change; whether the policy has one cannot. A base policy cannot take a scope, and a scoped policy cannot have its scope cleared
-   * @nullable
-   */
-  resources?: ResourceRefResource[] | null;
-  /**
-   * Each must be a role already defined in this project, replaced in full. As when attaching, `OWNER` and `ADMIN` are not accepted
-   * @nullable
-   */
-  roles?: string[] | null;
+  resource_id: string | null;
 }
 
 export interface TransferOwnershipRequestBody {
@@ -714,7 +650,7 @@ export interface CursorPagination {
   next_cursor?: string | null;
 }
 
-export type ListProjectInvitationsParams = {
+export type ListInvitationsParams = {
   /**
    * Items returned in this page. Defaults to 50; at most 200.
    * @minimum 1
@@ -747,14 +683,6 @@ export type ListMembersParams = {
    * @maxLength 255
    */
   keyword?: string;
-};
-
-export type ListPoliciesParams = {
-  /**
-   * Restricts the result to one person. Omitting it covers the whole project
-   * @maxLength 255
-   */
-  userId?: string;
 };
 
 export type ListSshKeysParams = {

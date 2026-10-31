@@ -14,11 +14,11 @@
  */
 import * as zod from "zod";
 
-import { AttachPolicyRequestBody } from "./validators/attachPolicyRequestBody.zod.js";
-
 import { BatchGetMembersRequestBody } from "./validators/batchGetMembersRequestBody.zod.js";
 
 import { CreateApplicationRequestBody } from "./validators/createApplicationRequestBody.zod.js";
+
+import { CreateMemberPermissionRequestBody } from "./validators/createMemberPermissionRequestBody.zod.js";
 
 import { CreateRoleRequestBody } from "./validators/createRoleRequestBody.zod.js";
 
@@ -28,8 +28,6 @@ import { IssueInvitationRequestBody } from "./validators/issueInvitationRequestB
 
 import { RenameSSHKeyRequestBody } from "./validators/renameSSHKeyRequestBody.zod.js";
 
-import { SetMemberPermissionsRequestBody } from "./validators/setMemberPermissionsRequestBody.zod.js";
-
 import { SetMemberRolesRequestBody } from "./validators/setMemberRolesRequestBody.zod.js";
 
 import { SetProjectSlugRequestBody } from "./validators/setProjectSlugRequestBody.zod.js";
@@ -37,8 +35,6 @@ import { SetProjectSlugRequestBody } from "./validators/setProjectSlugRequestBod
 import { TransferOwnershipRequestBody } from "./validators/transferOwnershipRequestBody.zod.js";
 
 import { UpdateApplicationRequestBody } from "./validators/updateApplicationRequestBody.zod.js";
-
-import { UpdatePolicyRequestBody } from "./validators/updatePolicyRequestBody.zod.js";
 
 import { UpdateProjectRequestBody } from "./validators/updateProjectRequestBody.zod.js";
 
@@ -69,25 +65,25 @@ export const SetProjectSlugBody = SetProjectSlugRequestBody;
  * Visible to any member, on the same rule as the member list. Who has been invited is part of who is in the project.
  * @summary List the invitations this project is still waiting on
  */
-export const listProjectInvitationsQueryLimitDefault = 50;
-export const listProjectInvitationsQueryLimitMax = 200;
+export const listInvitationsQueryLimitDefault = 50;
+export const listInvitationsQueryLimitMax = 200;
 
-export const listProjectInvitationsQueryOffsetDefault = 0;
-export const listProjectInvitationsQueryOffsetMin = 0;
-export const listProjectInvitationsQueryOffsetMax = 10000;
+export const listInvitationsQueryOffsetDefault = 0;
+export const listInvitationsQueryOffsetMin = 0;
+export const listInvitationsQueryOffsetMax = 10000;
 
-export const ListProjectInvitationsQueryParams = zod.strictObject({
+export const ListInvitationsQueryParams = zod.strictObject({
   limit: zod
     .int()
     .min(1)
-    .max(listProjectInvitationsQueryLimitMax)
-    .default(listProjectInvitationsQueryLimitDefault)
+    .max(listInvitationsQueryLimitMax)
+    .default(listInvitationsQueryLimitDefault)
     .describe("Items returned in this page. Defaults to 50; at most 200."),
   offset: zod
     .int()
-    .min(listProjectInvitationsQueryOffsetMin)
-    .max(listProjectInvitationsQueryOffsetMax)
-    .default(listProjectInvitationsQueryOffsetDefault)
+    .min(listInvitationsQueryOffsetMin)
+    .max(listInvitationsQueryOffsetMax)
+    .default(listInvitationsQueryOffsetDefault)
     .describe("Items to skip. Defaults to 0; at most 10000."),
 });
 
@@ -169,61 +165,42 @@ export const SetMemberRolesParams = zod.strictObject({
 export const SetMemberRolesBody = SetMemberRolesRequestBody;
 
 /**
- * Replaces, in full, the permissions attached directly to the base policy. A direct permission grants one person something without creating a role only they hold, and it does not follow later changes to any role. Requires `iam:members.manage`.
- * @summary Set the permissions attached directly to a member
+ * Every row states one permission this person holds apart from their roles: project-wide when `resource_type` and `resource_id` are null, otherwise only on that resource. What a role grants is not listed here; the member's grant carries the roles and their compiled rules.
+ *
+ * Visible to any member, on the same rule as the member list.
+ * @summary List the permissions granted directly to a member
  */
-export const setMemberPermissionsPathUserIdMax = 255;
+export const listMemberPermissionsPathUserIdMax = 255;
 
-export const SetMemberPermissionsParams = zod.strictObject({
-  userId: zod.string().max(setMemberPermissionsPathUserIdMax),
-});
-
-export const SetMemberPermissionsBody = SetMemberPermissionsRequestBody;
-
-/**
- * Visible to any member, on the same rule as the member list. What has been granted to whom is part of who is in the project.
- * @summary List the policies in this project
- */
-export const listPoliciesQueryUserIdMax = 255;
-
-export const ListPoliciesQueryParams = zod.strictObject({
-  userId: zod
-    .string()
-    .max(listPoliciesQueryUserIdMax)
-    .optional()
-    .describe("Restricts the result to one person. Omitting it covers the whole project"),
+export const ListMemberPermissionsParams = zod.strictObject({
+  userId: zod.string().max(listMemberPermissionsPathUserIdMax),
 });
 
 /**
- * This creates an **additional** policy, which either carries a resource scope or has `deny` as its effect. An `allow` covering every resource is a base policy, of which each member holds exactly one, and it is changed with set-member-roles and set-member-permissions. `roles` cannot contain `OWNER` or `ADMIN`. Requires `iam:members.manage`.
- * @summary Attach a policy
+ * Creates one permission row. The same row twice answers 409; changing a grant means revoking the row and creating another, so that each row records when it was granted.
+ *
+ * `OWNER` and `ADMIN` cannot be granted here, being facts on the membership. A permission that carries no resource dimension cannot be scoped: IAM refuses the row at grant time rather than storing a scope that would never hold.
+ *
+ * Requires `iam:members.manage`.
+ * @summary Grant a permission to a member
  */
-export const AttachPolicyBody = AttachPolicyRequestBody;
+export const createMemberPermissionPathUserIdMax = 255;
 
-/**
- * Visible to any member, on the same rule as list-policies; no further permission is required.
- * @summary Get a policy
- */
-export const GetPolicyParams = zod.strictObject({
-  policyId: zod.uuid(),
+export const CreateMemberPermissionParams = zod.strictObject({
+  userId: zod.string().max(createMemberPermissionPathUserIdMax),
 });
 
-/**
- * Replaced in full rather than field by field — `resources`, `roles` and `permissions` are each overwritten, and an omitted one becomes empty. The **kind** of a policy cannot change — a base policy (an `allow` covering every resource) cannot take a resource scope, and a scoped policy cannot have its scope cleared. Delete and recreate to change the kind. Requires `iam:members.manage`.
- * @summary Update a policy
- */
-export const UpdatePolicyParams = zod.strictObject({
-  policyId: zod.uuid(),
-});
-
-export const UpdatePolicyBody = UpdatePolicyRequestBody;
+export const CreateMemberPermissionBody = CreateMemberPermissionRequestBody;
 
 /**
- * A base policy cannot be detached; it is where a member's roles sit. Use remove-member to take someone out of the project. Requires `iam:members.manage`.
- * @summary Detach a policy
+ * Removes that one row. Requires `iam:members.manage`.
+ * @summary Revoke a permission granted directly to a member
  */
-export const DetachPolicyParams = zod.strictObject({
-  policyId: zod.uuid(),
+export const deleteMemberPermissionPathUserIdMax = 255;
+
+export const DeleteMemberPermissionParams = zod.strictObject({
+  userId: zod.string().max(deleteMemberPermissionPathUserIdMax),
+  permissionId: zod.uuid(),
 });
 
 /**

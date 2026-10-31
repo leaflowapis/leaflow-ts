@@ -14,12 +14,11 @@
  */
 import type {
   ApplicationResource,
-  AttachPolicyRequestBody,
   BatchGetMembersRequestBody,
   BatchGetMembersResponseBody,
-  CatalogListResponseBody,
   CreateApplicationRequestBody,
   CreateApplicationResponseBody,
+  CreateMemberPermissionRequestBody,
   CreateRoleRequestBody,
   CreateSSHKeyRequestBody,
   Error,
@@ -30,15 +29,15 @@ import type {
   LengthAwarePageMemberResource,
   LengthAwarePageSSHKeyResource,
   ListApplicationsParams,
+  ListInvitationsParams,
   ListMembersParams,
-  ListPoliciesParams,
-  ListProjectInvitationsParams,
   ListSshKeysParams,
+  MemberPermissionListResponseBody,
+  MemberPermissionResource,
   MemberResource,
   MembershipResource,
   OwnershipTransferResponseBody,
-  PolicyListResponseBody,
-  PolicyResource,
+  PermissionListResponseBody,
   ProjectAccessResource,
   QuotaListResponseBody,
   RenameSSHKeyRequestBody,
@@ -46,12 +45,10 @@ import type {
   RoleResource,
   RotateApplicationSecretResponseBody,
   SSHKeyResource,
-  SetMemberPermissionsRequestBody,
   SetMemberRolesRequestBody,
   SetProjectSlugRequestBody,
   TransferOwnershipRequestBody,
   UpdateApplicationRequestBody,
-  UpdatePolicyRequestBody,
   UpdateProjectRequestBody,
   UpdateRoleRequestBody,
 } from "./models.js";
@@ -99,7 +96,7 @@ export type HTTPStatusCodes =
   | HTTPStatusCode5xx;
 
 export type listPermissionsResponse200 = {
-  data: CatalogListResponseBody;
+  data: PermissionListResponseBody;
   status: 200;
 };
 
@@ -122,7 +119,7 @@ export const getListPermissionsUrl = () => {
 };
 
 /**
- * Each service registers its own catalogue with IAM at start-up, so this is the platform-wide list rather than the permissions of IAM alone. **IAM does not decide anything with it** — each service decides using the caller's grant together with its own catalogue, and this list only serves to render the choices. A service that has never started does not appear here.
+ * Each service registers the permissions it enforces with IAM at start-up, so this is the platform-wide list rather than the permissions of IAM alone. **IAM does not decide anything with it** — each service decides using the caller's grant together with the permissions compiled into its own binary, and this list only serves to render the choices. A service that has never started does not appear here.
  * @summary List every permission the platform can grant
  */
 export const listPermissions = async (
@@ -387,7 +384,7 @@ export const getGetProjectMembershipUrl = () => {
 };
 
 /**
- * Facts rather than a conclusion. There is no `allowed` field here, because each service holds the catalogue mapping its operations to permissions and decides on its own.
+ * Facts rather than a conclusion. There is no `allowed` field here, because each service holds the permissions its operations need and decides on its own.
  * @summary Get the caller's standing in this project
  */
 export const getProjectMembership = async (
@@ -447,28 +444,26 @@ export const listQuotas = async (
   return { data, status: res.status, headers: res.headers } as listQuotasResponse;
 };
 
-export type listProjectInvitationsResponse200 = {
+export type listInvitationsResponse200 = {
   data: LengthAwarePageInvitationResource;
   status: 200;
 };
 
-export type listProjectInvitationsResponseDefault = {
+export type listInvitationsResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type listProjectInvitationsResponseSuccess = listProjectInvitationsResponse200 & {
+export type listInvitationsResponseSuccess = listInvitationsResponse200 & {
   headers: Headers;
 };
-export type listProjectInvitationsResponseError = listProjectInvitationsResponseDefault & {
+export type listInvitationsResponseError = listInvitationsResponseDefault & {
   headers: Headers;
 };
 
-export type listProjectInvitationsResponse =
-  | listProjectInvitationsResponseSuccess
-  | listProjectInvitationsResponseError;
+export type listInvitationsResponse = listInvitationsResponseSuccess | listInvitationsResponseError;
 
-export const getListProjectInvitationsUrl = (params?: ListProjectInvitationsParams) => {
+export const getListInvitationsUrl = (params?: ListInvitationsParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -488,20 +483,20 @@ export const getListProjectInvitationsUrl = (params?: ListProjectInvitationsPara
  * Visible to any member, on the same rule as the member list. Who has been invited is part of who is in the project.
  * @summary List the invitations this project is still waiting on
  */
-export const listProjectInvitations = async (
-  params?: ListProjectInvitationsParams,
+export const listInvitations = async (
+  params?: ListInvitationsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<listProjectInvitationsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListProjectInvitationsUrl(params), {
+): Promise<listInvitationsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListInvitationsUrl(params), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listProjectInvitationsResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listProjectInvitationsResponse;
+  const data: listInvitationsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listInvitationsResponse;
 };
 
 export type issueInvitationResponse201 = {
@@ -842,160 +837,92 @@ export const setMemberRoles = async (
   return { data, status: res.status, headers: res.headers } as setMemberRolesResponse;
 };
 
-export type setMemberPermissionsResponse200 = {
-  data: PolicyResource;
+export type listMemberPermissionsResponse200 = {
+  data: MemberPermissionListResponseBody;
   status: 200;
 };
 
-export type setMemberPermissionsResponseDefault = {
+export type listMemberPermissionsResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type setMemberPermissionsResponseSuccess = setMemberPermissionsResponse200 & {
+export type listMemberPermissionsResponseSuccess = listMemberPermissionsResponse200 & {
   headers: Headers;
 };
-export type setMemberPermissionsResponseError = setMemberPermissionsResponseDefault & {
+export type listMemberPermissionsResponseError = listMemberPermissionsResponseDefault & {
   headers: Headers;
 };
 
-export type setMemberPermissionsResponse =
-  | setMemberPermissionsResponseSuccess
-  | setMemberPermissionsResponseError;
+export type listMemberPermissionsResponse =
+  | listMemberPermissionsResponseSuccess
+  | listMemberPermissionsResponseError;
 
-export const getSetMemberPermissionsUrl = (userId: string) => {
+export const getListMemberPermissionsUrl = (userId: string) => {
   return `https://iam.leaflow.cloud/api/v1/members/${encodeURIComponent(String(userId))}/permissions`;
 };
 
 /**
- * Replaces, in full, the permissions attached directly to the base policy. A direct permission grants one person something without creating a role only they hold, and it does not follow later changes to any role. Requires `iam:members.manage`.
- * @summary Set the permissions attached directly to a member
+ * Every row states one permission this person holds apart from their roles: project-wide when `resource_type` and `resource_id` are null, otherwise only on that resource. What a role grants is not listed here; the member's grant carries the roles and their compiled rules.
+ *
+ * Visible to any member, on the same rule as the member list.
+ * @summary List the permissions granted directly to a member
  */
-export const setMemberPermissions = async (
+export const listMemberPermissions = async (
   userId: string,
-  setMemberPermissionsRequestBody: SetMemberPermissionsRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<setMemberPermissionsResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getSetMemberPermissionsUrl(userId), {
-    ...options,
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(setMemberPermissionsRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: setMemberPermissionsResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as setMemberPermissionsResponse;
-};
-
-export type listPoliciesResponse200 = {
-  data: PolicyListResponseBody;
-  status: 200;
-};
-
-export type listPoliciesResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type listPoliciesResponseSuccess = listPoliciesResponse200 & {
-  headers: Headers;
-};
-export type listPoliciesResponseError = listPoliciesResponseDefault & {
-  headers: Headers;
-};
-
-export type listPoliciesResponse = listPoliciesResponseSuccess | listPoliciesResponseError;
-
-export const getListPoliciesUrl = (params?: ListPoliciesParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `https://iam.leaflow.cloud/api/v1/policies?${stringifiedParams}`
-    : `https://iam.leaflow.cloud/api/v1/policies`;
-};
-
-/**
- * Visible to any member, on the same rule as the member list. What has been granted to whom is part of who is in the project.
- * @summary List the policies in this project
- */
-export const listPolicies = async (
-  params?: ListPoliciesParams,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<listPoliciesResponse> => {
-  const res = await (fetchFn ?? fetch)(getListPoliciesUrl(params), {
+): Promise<listMemberPermissionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListMemberPermissionsUrl(userId), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listPoliciesResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listPoliciesResponse;
+  const data: listMemberPermissionsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listMemberPermissionsResponse;
 };
 
-export type attachPolicyResponse201 = {
-  data: PolicyResource;
+export type createMemberPermissionResponse201 = {
+  data: MemberPermissionResource;
   status: 201;
 };
 
-export type attachPolicyResponseDefault = {
+export type createMemberPermissionResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
-export type attachPolicyResponseSuccess = attachPolicyResponse201 & {
+export type createMemberPermissionResponseSuccess = createMemberPermissionResponse201 & {
   headers: Headers;
 };
-export type attachPolicyResponseError = attachPolicyResponseDefault & {
+export type createMemberPermissionResponseError = createMemberPermissionResponseDefault & {
   headers: Headers;
 };
 
-export type attachPolicyResponse = attachPolicyResponseSuccess | attachPolicyResponseError;
+export type createMemberPermissionResponse =
+  | createMemberPermissionResponseSuccess
+  | createMemberPermissionResponseError;
 
-export const getAttachPolicyUrl = () => {
-  return `https://iam.leaflow.cloud/api/v1/policies`;
+export const getCreateMemberPermissionUrl = (userId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/members/${encodeURIComponent(String(userId))}/permissions`;
 };
 
 /**
- * This creates an **additional** policy, which either carries a resource scope or has `deny` as its effect. An `allow` covering every resource is a base policy, of which each member holds exactly one, and it is changed with set-member-roles and set-member-permissions. `roles` cannot contain `OWNER` or `ADMIN`. Requires `iam:members.manage`.
- * @summary Attach a policy
+ * Creates one permission row. The same row twice answers 409; changing a grant means revoking the row and creating another, so that each row records when it was granted.
+ *
+ * `OWNER` and `ADMIN` cannot be granted here, being facts on the membership. A permission that carries no resource dimension cannot be scoped: IAM refuses the row at grant time rather than storing a scope that would never hold.
+ *
+ * Requires `iam:members.manage`.
+ * @summary Grant a permission to a member
  */
-export const attachPolicy = async (
-  attachPolicyRequestBody: AttachPolicyRequestBody,
+export const createMemberPermission = async (
+  userId: string,
+  createMemberPermissionRequestBody: CreateMemberPermissionRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<attachPolicyResponse> => {
+): Promise<createMemberPermissionResponse> => {
   const getHeaders = (
     h?: NonNullable<RequestInit["headers"]>,
   ): Record<string, string | readonly string[]> => {
@@ -1015,168 +942,63 @@ export const attachPolicy = async (
     }
     return headers;
   };
-  const res = await (fetchFn ?? fetch)(getAttachPolicyUrl(), {
+  const res = await (fetchFn ?? fetch)(getCreateMemberPermissionUrl(userId), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(attachPolicyRequestBody),
+    body: JSON.stringify(createMemberPermissionRequestBody),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: attachPolicyResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as attachPolicyResponse;
+  const data: createMemberPermissionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createMemberPermissionResponse;
 };
 
-export type getPolicyResponse200 = {
-  data: PolicyResource;
-  status: 200;
-};
-
-export type getPolicyResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type getPolicyResponseSuccess = getPolicyResponse200 & {
-  headers: Headers;
-};
-export type getPolicyResponseError = getPolicyResponseDefault & {
-  headers: Headers;
-};
-
-export type getPolicyResponse = getPolicyResponseSuccess | getPolicyResponseError;
-
-export const getGetPolicyUrl = (policyId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/policies/${encodeURIComponent(String(policyId))}`;
-};
-
-/**
- * Visible to any member, on the same rule as list-policies; no further permission is required.
- * @summary Get a policy
- */
-export const getPolicy = async (
-  policyId: string,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<getPolicyResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetPolicyUrl(policyId), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getPolicyResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as getPolicyResponse;
-};
-
-export type updatePolicyResponse200 = {
-  data: PolicyResource;
-  status: 200;
-};
-
-export type updatePolicyResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type updatePolicyResponseSuccess = updatePolicyResponse200 & {
-  headers: Headers;
-};
-export type updatePolicyResponseError = updatePolicyResponseDefault & {
-  headers: Headers;
-};
-
-export type updatePolicyResponse = updatePolicyResponseSuccess | updatePolicyResponseError;
-
-export const getUpdatePolicyUrl = (policyId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/policies/${encodeURIComponent(String(policyId))}`;
-};
-
-/**
- * Replaced in full rather than field by field — `resources`, `roles` and `permissions` are each overwritten, and an omitted one becomes empty. The **kind** of a policy cannot change — a base policy (an `allow` covering every resource) cannot take a resource scope, and a scoped policy cannot have its scope cleared. Delete and recreate to change the kind. Requires `iam:members.manage`.
- * @summary Update a policy
- */
-export const updatePolicy = async (
-  policyId: string,
-  updatePolicyRequestBody: UpdatePolicyRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<updatePolicyResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getUpdatePolicyUrl(policyId), {
-    ...options,
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(updatePolicyRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: updatePolicyResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as updatePolicyResponse;
-};
-
-export type detachPolicyResponse204 = {
+export type deleteMemberPermissionResponse204 = {
   data: void;
   status: 204;
 };
 
-export type detachPolicyResponseDefault = {
+export type deleteMemberPermissionResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
-export type detachPolicyResponseSuccess = detachPolicyResponse204 & {
+export type deleteMemberPermissionResponseSuccess = deleteMemberPermissionResponse204 & {
   headers: Headers;
 };
-export type detachPolicyResponseError = detachPolicyResponseDefault & {
+export type deleteMemberPermissionResponseError = deleteMemberPermissionResponseDefault & {
   headers: Headers;
 };
 
-export type detachPolicyResponse = detachPolicyResponseSuccess | detachPolicyResponseError;
+export type deleteMemberPermissionResponse =
+  | deleteMemberPermissionResponseSuccess
+  | deleteMemberPermissionResponseError;
 
-export const getDetachPolicyUrl = (policyId: string) => {
-  return `https://iam.leaflow.cloud/api/v1/policies/${encodeURIComponent(String(policyId))}`;
+export const getDeleteMemberPermissionUrl = (userId: string, permissionId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/members/${encodeURIComponent(String(userId))}/permissions/${encodeURIComponent(String(permissionId))}`;
 };
 
 /**
- * A base policy cannot be detached; it is where a member's roles sit. Use remove-member to take someone out of the project. Requires `iam:members.manage`.
- * @summary Detach a policy
+ * Removes that one row. Requires `iam:members.manage`.
+ * @summary Revoke a permission granted directly to a member
  */
-export const detachPolicy = async (
-  policyId: string,
+export const deleteMemberPermission = async (
+  userId: string,
+  permissionId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<detachPolicyResponse> => {
-  const res = await (fetchFn ?? fetch)(getDetachPolicyUrl(policyId), {
+): Promise<deleteMemberPermissionResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteMemberPermissionUrl(userId, permissionId), {
     ...options,
     method: "DELETE",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: detachPolicyResponse["data"] = body ? JSON.parse(body) : undefined;
-  return { data, status: res.status, headers: res.headers } as detachPolicyResponse;
+  const data: deleteMemberPermissionResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteMemberPermissionResponse;
 };
 
 export type transferProjectOwnershipResponse200 = {

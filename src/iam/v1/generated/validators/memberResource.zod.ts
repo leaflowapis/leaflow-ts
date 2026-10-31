@@ -14,6 +14,7 @@
  */
 import * as zod from "zod";
 import { GrantResource } from "./grantResource.zod.js";
+import { MemberPermissionResource } from "./memberPermissionResource.zod.js";
 
 export const MemberResource = zod.strictObject({
   avatar_hash: zod
@@ -27,6 +28,10 @@ export const MemberResource = zod.strictObject({
   first_name: zod.string(),
   grant: GrantResource,
   last_name: zod.string(),
+  permissions: zod
+    .array(MemberPermissionResource)
+    .nullable()
+    .describe("The permissions granted to this person directly, apart from their roles"),
   user_id: zod.string(),
 });
 

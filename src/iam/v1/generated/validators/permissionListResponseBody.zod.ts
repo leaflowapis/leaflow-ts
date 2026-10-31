@@ -13,16 +13,11 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { PermissionResource } from "./permissionResource.zod.js";
 
-export const listPoliciesParamsUserIdMax = 255;
-
-export const ListPoliciesParams = zod.strictObject({
-  userId: zod
-    .string()
-    .max(listPoliciesParamsUserIdMax)
-    .optional()
-    .describe("Restricts the result to one person. Omitting it covers the whole project"),
+export const PermissionListResponseBody = zod.strictObject({
+  items: zod.array(PermissionResource).nullable(),
 });
 
-export type ListPoliciesParams = zod.input<typeof ListPoliciesParams>;
-export type ListPoliciesParamsOutput = zod.output<typeof ListPoliciesParams>;
+export type PermissionListResponseBody = zod.input<typeof PermissionListResponseBody>;
+export type PermissionListResponseBodyOutput = zod.output<typeof PermissionListResponseBody>;

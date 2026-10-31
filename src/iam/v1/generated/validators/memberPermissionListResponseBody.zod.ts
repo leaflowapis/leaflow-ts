@@ -13,19 +13,13 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { PermissionResource } from "./permissionResource.zod.js";
-import { ResourceTypeResource } from "./resourceTypeResource.zod.js";
+import { MemberPermissionResource } from "./memberPermissionResource.zod.js";
 
-export const CatalogResource = zod.strictObject({
-  permissions: zod.array(PermissionResource).nullable(),
-  resource_types: zod
-    .array(ResourceTypeResource)
-    .nullable()
-    .describe(
-      "The resource types this service declares. A scoped rule can only land on one of them",
-    ),
-  service: zod.string(),
+export const MemberPermissionListResponseBody = zod.strictObject({
+  items: zod.array(MemberPermissionResource).nullable(),
 });
 
-export type CatalogResource = zod.input<typeof CatalogResource>;
-export type CatalogResourceOutput = zod.output<typeof CatalogResource>;
+export type MemberPermissionListResponseBody = zod.input<typeof MemberPermissionListResponseBody>;
+export type MemberPermissionListResponseBodyOutput = zod.output<
+  typeof MemberPermissionListResponseBody
+>;
