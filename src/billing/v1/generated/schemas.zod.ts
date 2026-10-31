@@ -11,6 +11,8 @@ import { AutoRenewSet } from "./validators/autoRenewSet.zod.js";
 
 import { BillingAccountCreate } from "./validators/billingAccountCreate.zod.js";
 
+import { BillingAccountStatus } from "./validators/billingAccountStatus.zod.js";
+
 import { BillingAccountUpdate } from "./validators/billingAccountUpdate.zod.js";
 
 import { CancelSubscriptionRequest } from "./validators/cancelSubscriptionRequest.zod.js";
@@ -204,7 +206,7 @@ export const ListCurrenciesQueryParams = zod.strictObject({
 });
 
 /**
- * Billing accounts owned by the authenticated user.
+ * Billing accounts owned by the authenticated user. Filter by status with `status`; omit it to list every status.
  * @summary List billing accounts
  */
 export const listBillingAccountsQueryPageDefault = 1;
@@ -212,6 +214,8 @@ export const listBillingAccountsQueryPageMax = 2147483647;
 
 export const listBillingAccountsQueryPageSizeDefault = 50;
 export const listBillingAccountsQueryPageSizeMax = 200;
+
+export const listBillingAccountsQueryStatusMax = 3;
 
 export const ListBillingAccountsQueryParams = zod.strictObject({
   page: zod
@@ -226,6 +230,14 @@ export const ListBillingAccountsQueryParams = zod.strictObject({
     .max(listBillingAccountsQueryPageSizeMax)
     .default(listBillingAccountsQueryPageSizeDefault)
     .describe("Items per page. Defaults to 50; at most 200."),
+  status: zod
+    .array(BillingAccountStatus)
+    .min(1)
+    .max(listBillingAccountsQueryStatusMax)
+    .optional()
+    .describe(
+      "Only accounts in these statuses. Omit for all statuses. Comma-separated, for example `status=suspended,closed`.",
+    ),
 });
 
 /**

@@ -683,14 +683,6 @@ export interface Product {
   description?: string;
 }
 
-export type BillingAccountStatus = (typeof BillingAccountStatus)[keyof typeof BillingAccountStatus];
-
-export const BillingAccountStatus = {
-  active: "active",
-  suspended: "suspended",
-  closed: "closed",
-} as const;
-
 /**
  * Who suspended the account: `owner` (you), `operator` (Leaflow), or `none` while it is not suspended. Only a suspension by `owner` can be resumed by you.
  */
@@ -701,6 +693,17 @@ export const BillingAccountSuspendedBy = {
   none: "none",
   owner: "owner",
   operator: "operator",
+} as const;
+
+/**
+ * Whether the account is usable, suspended, or closed.
+ */
+export type BillingAccountStatus = (typeof BillingAccountStatus)[keyof typeof BillingAccountStatus];
+
+export const BillingAccountStatus = {
+  active: "active",
+  suspended: "suspended",
+  closed: "closed",
 } as const;
 
 export interface BillingAccount {
@@ -3773,6 +3776,12 @@ export type ListBillingAccountsParams = {
    * @maximum 200
    */
   page_size?: number;
+  /**
+   * Only accounts in these statuses. Omit for all statuses. Comma-separated, for example `status=suspended,closed`.
+   * @minItems 1
+   * @maxItems 3
+   */
+  status?: BillingAccountStatus[];
 };
 
 export type ListPaymentOptionsParams = {

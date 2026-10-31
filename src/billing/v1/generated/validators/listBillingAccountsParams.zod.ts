@@ -6,12 +6,15 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { BillingAccountStatus } from "./billingAccountStatus.zod.js";
 
 export const listBillingAccountsParamsPageDefault = 1;
 export const listBillingAccountsParamsPageMax = 2147483647;
 
 export const listBillingAccountsParamsPageSizeDefault = 50;
 export const listBillingAccountsParamsPageSizeMax = 200;
+
+export const listBillingAccountsParamsStatusMax = 3;
 
 export const ListBillingAccountsParams = zod.strictObject({
   page: zod
@@ -24,6 +27,7 @@ export const ListBillingAccountsParams = zod.strictObject({
     .min(1)
     .max(listBillingAccountsParamsPageSizeMax)
     .default(listBillingAccountsParamsPageSizeDefault),
+  status: zod.array(BillingAccountStatus).min(1).max(listBillingAccountsParamsStatusMax).optional(),
 });
 
 export type ListBillingAccountsParams = zod.input<typeof ListBillingAccountsParams>;

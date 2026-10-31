@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { BillingAccountStatus } from "./billingAccountStatus.zod.js";
 
 export const BillingAccount = zod.strictObject({
   invoice_contact_id: zod
@@ -15,7 +16,7 @@ export const BillingAccount = zod.strictObject({
   id: zod.int(),
   name: zod.string().optional().describe("Your name for the account."),
   currency: zod.string().describe("Fixed when the account was opened."),
-  status: zod.enum(["active", "suspended", "closed"]),
+  status: BillingAccountStatus,
   suspended_by: zod
     .enum(["none", "owner", "operator"])
     .describe(

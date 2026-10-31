@@ -845,7 +845,7 @@ export const getListBillingAccountsUrl = (params?: ListBillingAccountsParams) =>
 };
 
 /**
- * Billing accounts owned by the authenticated user.
+ * Billing accounts owned by the authenticated user. Filter by status with `status`; omit it to list every status.
  * @summary List billing accounts
  */
 export const listBillingAccounts = async (
