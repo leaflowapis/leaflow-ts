@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/virtualdesktop/display/v1/display.proto.
  */
 export const file_leaflow_fleet_virtualdesktop_display_v1_display: GenFile = /*@__PURE__*/
-  fileDesc("CjVsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2Rpc3BsYXkvdjEvZGlzcGxheS5wcm90bxInbGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxImoKDUNsaWVudE1lc3NhZ2USTgoJY29uZmlndXJlGAEgASgLMjkubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkRpc3BsYXlDb25maWd1cmVIAEIJCgdtZXNzYWdlIq0BCg1TZXJ2ZXJNZXNzYWdlEkMKB2Rpc3BsYXkYASABKAsyMC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuRGlzcGxheUgAEkwKDHNuYXBzaG90X2VuZBgCIAEoCzI0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UiygIKB0Rpc3BsYXkSSgoMc2Vzc2lvbl9tb2RlGAEgASgOMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlNlc3Npb25Nb2RlEjsKBHNpemUYAiABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuU2l6ZRI/CghtYXhfc2l6ZRgDIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TaXplEkUKCXdvcmtfYXJlYRgEIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5SZWN0YW5nbGUSGwoOcm9vdF93aW5kb3dfaWQYBSABKARIAIgBAUIRCg9fcm9vdF93aW5kb3dfaWQijwIKEERpc3BsYXlDb25maWd1cmUSOwoEc2l6ZRgBIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TaXplEhoKEmRldmljZV9waXhlbF9yYXRpbxgCIAEoARJFCgl3b3JrX2FyZWEYAyABKAsyMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuUmVjdGFuZ2xlEkwKDWZyYW1lX2V4dGVudHMYBCABKAsyNS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuRnJhbWVFeHRlbnRzEg0KBWRyaXZlGAUgASgIIkgKDEZyYW1lRXh0ZW50cxIMCgRsZWZ0GAEgASgNEg0KBXJpZ2h0GAIgASgNEgsKA3RvcBgDIAEoDRIOCgZib3R0b20YBCABKA0iDQoLU25hcHNob3RFbmQiJQoEU2l6ZRINCgV3aWR0aBgBIAEoDRIOCgZoZWlnaHQYAiABKA0iQAoJUmVjdGFuZ2xlEgkKAXgYASABKBESCQoBeRgCIAEoERINCgV3aWR0aBgDIAEoDRIOCgZoZWlnaHQYBCABKA0iewoFSW1hZ2USEQoJbWltZV90eXBlGAEgASgJEgwKBGRhdGEYAiABKAwSOwoEc2l6ZRgDIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TaXplEhQKDGNvbnRlbnRfaGFzaBgEIAEoDCJZCgRJY29uEj4KBmltYWdlcxgBIAMoCzIuLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5JbWFnZRIRCglpY29uX25hbWUYAiABKAkqYAoLU2Vzc2lvbk1vZGUSHAoYU0VTU0lPTl9NT0RFX1VOU1BFQ0lGSUVEEAASGQoVU0VTU0lPTl9NT0RFX1NFQU1MRVNTEAESGAoUU0VTU0lPTl9NT0RFX0RFU0tUT1AQAkJNWktnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvZGlzcGxheS92MTtkaXNwbGF5djFiBnByb3RvMw");
+  fileDesc("CjVsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2Rpc3BsYXkvdjEvZGlzcGxheS5wcm90bxInbGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxImoKDUNsaWVudE1lc3NhZ2USTgoJY29uZmlndXJlGAEgASgLMjkubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLkRpc3BsYXlDb25maWd1cmVIAEIJCgdtZXNzYWdlIq0BCg1TZXJ2ZXJNZXNzYWdlEkMKB2Rpc3BsYXkYASABKAsyMC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuRGlzcGxheUgAEkwKDHNuYXBzaG90X2VuZBgCIAEoCzI0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UiygIKB0Rpc3BsYXkSSgoMc2Vzc2lvbl9tb2RlGAEgASgOMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlNlc3Npb25Nb2RlEjsKBHNpemUYAiABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuU2l6ZRI/CghtYXhfc2l6ZRgDIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TaXplEkUKCXdvcmtfYXJlYRgEIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5SZWN0YW5nbGUSGwoOcm9vdF93aW5kb3dfaWQYBSABKARIAIgBAUIRCg9fcm9vdF93aW5kb3dfaWQijwIKEERpc3BsYXlDb25maWd1cmUSOwoEc2l6ZRgBIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5TaXplEhoKEmRldmljZV9waXhlbF9yYXRpbxgCIAEoARJFCgl3b3JrX2FyZWEYAyABKAsyMi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuUmVjdGFuZ2xlEkwKDWZyYW1lX2V4dGVudHMYBCABKAsyNS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuRnJhbWVFeHRlbnRzEg0KBWRyaXZlGAUgASgIIkgKDEZyYW1lRXh0ZW50cxIMCgRsZWZ0GAEgASgNEg0KBXJpZ2h0GAIgASgNEgsKA3RvcBgDIAEoDRIOCgZib3R0b20YBCABKA0iDQoLU25hcHNob3RFbmQiJQoEU2l6ZRINCgV3aWR0aBgBIAEoDRIOCgZoZWlnaHQYAiABKA0iHQoFUG9pbnQSCQoBeBgBIAEoERIJCgF5GAIgASgRIkAKCVJlY3RhbmdsZRIJCgF4GAEgASgREgkKAXkYAiABKBESDQoFd2lkdGgYAyABKA0SDgoGaGVpZ2h0GAQgASgNInsKBUltYWdlEhEKCW1pbWVfdHlwZRgBIAEoCRIMCgRkYXRhGAIgASgMEjsKBHNpemUYAyABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuU2l6ZRIUCgxjb250ZW50X2hhc2gYBCABKAwiWQoESWNvbhI+CgZpbWFnZXMYASADKAsyLi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSW1hZ2USEQoJaWNvbl9uYW1lGAIgASgJKmAKC1Nlc3Npb25Nb2RlEhwKGFNFU1NJT05fTU9ERV9VTlNQRUNJRklFRBAAEhkKFVNFU1NJT05fTU9ERV9TRUFNTEVTUxABEhgKFFNFU1NJT05fTU9ERV9ERVNLVE9QEAJCTVpLZ2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2Rpc3BsYXkvdjE7ZGlzcGxheXYxYgZwcm90bzM");
 
 /**
  * A message from the participant.
@@ -276,6 +276,35 @@ export const SizeSchema: GenMessage<Size> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_virtualdesktop_display_v1_display, 6);
 
 /**
+ * A point in pixels (X11 x, y). The field that holds it states the coordinate
+ * space.
+ *
+ * @generated from message leaflow.fleet.virtualdesktop.display.v1.Point
+ */
+export type Point = Message<"leaflow.fleet.virtualdesktop.display.v1.Point"> & {
+  /**
+   * The horizontal coordinate. Negative when it lies left of the origin.
+   *
+   * @generated from field: sint32 x = 1;
+   */
+  x: number;
+
+  /**
+   * The vertical coordinate. Negative when it lies above the origin.
+   *
+   * @generated from field: sint32 y = 2;
+   */
+  y: number;
+};
+
+/**
+ * Describes the message leaflow.fleet.virtualdesktop.display.v1.Point.
+ * Use `create(PointSchema)` to create a new message.
+ */
+export const PointSchema: GenMessage<Point> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_virtualdesktop_display_v1_display, 7);
+
+/**
  * An axis-aligned rectangle in pixels (X11 RECTANGLE). The field that holds it
  * states the coordinate space.
  *
@@ -316,7 +345,7 @@ export type Rectangle = Message<"leaflow.fleet.virtualdesktop.display.v1.Rectang
  * Use `create(RectangleSchema)` to create a new message.
  */
 export const RectangleSchema: GenMessage<Rectangle> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_display_v1_display, 7);
+  messageDesc(file_leaflow_fleet_virtualdesktop_display_v1_display, 8);
 
 /**
  * A still image, such as an icon, sent as PNG. It comes from the session, so
@@ -368,7 +397,7 @@ export type Image = Message<"leaflow.fleet.virtualdesktop.display.v1.Image"> & {
  * Use `create(ImageSchema)` to create a new message.
  */
 export const ImageSchema: GenMessage<Image> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_display_v1_display, 8);
+  messageDesc(file_leaflow_fleet_virtualdesktop_display_v1_display, 9);
 
 /**
  * One icon at one or more sizes (EWMH _NET_WM_ICON; StatusNotifierItem
@@ -398,7 +427,7 @@ export type Icon = Message<"leaflow.fleet.virtualdesktop.display.v1.Icon"> & {
  * Use `create(IconSchema)` to create a new message.
  */
 export const IconSchema: GenMessage<Icon> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_display_v1_display, 9);
+  messageDesc(file_leaflow_fleet_virtualdesktop_display_v1_display, 10);
 
 /**
  * How the session presents its windows. Fixed for the life of the session.
