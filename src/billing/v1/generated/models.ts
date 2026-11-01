@@ -4485,6 +4485,14 @@ export type ListPricesByPlanParams = {
    */
   page_size?: number;
   currency?: string;
+  /**
+   * Narrows to one price type.
+   */
+  type?: PriceType;
+  /**
+   * Narrows to one usage type.
+   */
+  usage_type?: UsageType;
 };
 
 export type ListPricesByPlanHeaders = {
