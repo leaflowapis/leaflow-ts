@@ -39,9 +39,14 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { VideoDurationRange } from "./videoDurationRange.zod.js";
 
 export const VideoCapabilities = zod
   .strictObject({
+    duration_range: zod
+      .union([VideoDurationRange, zod.null()])
+      .optional()
+      .describe("Continuous duration capability. Mutually exclusive with nonempty seconds."),
     seconds: zod
       .array(zod.int().min(1))
       .nullable()

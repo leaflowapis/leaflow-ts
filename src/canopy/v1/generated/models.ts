@@ -192,9 +192,23 @@ export interface AudioCapabilities {
 }
 
 /**
+ * Accepted durations are min + n * step seconds, up to max. Independent of per-second pricing.
+ */
+export interface VideoDurationRange {
+  /** @minimum 1 */
+  min: number;
+  /** @minimum 1 */
+  max: number;
+  /** @minimum 1 */
+  step: number;
+}
+
+/**
  * The video parameters this endpoint accepts. Video is asynchronous on every endpoint that supports it. Create returns a task, and the task is polled separately.
  */
 export interface VideoCapabilities {
+  /** Continuous duration capability. Mutually exclusive with nonempty seconds. */
+  duration_range?: VideoDurationRange | null;
   /**
    * Durations the upstream accepts, in seconds. Null means unknown.
    * @nullable
