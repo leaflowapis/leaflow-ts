@@ -6,6 +6,8 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { PriceType } from "./priceType.zod.js";
+import { UsageType } from "./usageType.zod.js";
 
 export const listPricesByPlanParamsPageDefault = 1;
 export const listPricesByPlanParamsPageMax = 2147483647;
@@ -25,6 +27,8 @@ export const ListPricesByPlanParams = zod.strictObject({
     .max(listPricesByPlanParamsPageSizeMax)
     .default(listPricesByPlanParamsPageSizeDefault),
   currency: zod.string().optional(),
+  type: PriceType.optional(),
+  usage_type: UsageType.optional(),
 });
 
 export type ListPricesByPlanParams = zod.input<typeof ListPricesByPlanParams>;

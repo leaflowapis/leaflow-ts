@@ -1777,6 +1777,8 @@ export const ListPricesByPlanQueryParams = zod.strictObject({
     .default(listPricesByPlanQueryPageSizeDefault)
     .describe("Items per page. Defaults to 50; at most 200."),
   currency: zod.string().optional(),
+  type: zod.enum(["one_time", "recurring"]).optional().describe("Narrows to one price type."),
+  usage_type: zod.enum(["licensed", "metered"]).optional().describe("Narrows to one usage type."),
 });
 
 export const ListPricesByPlanHeader = zod.strictObject({
