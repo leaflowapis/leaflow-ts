@@ -21,10 +21,15 @@
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
+ *
+ * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working.
  * OpenAPI spec version: 2.0.0
  */
 import type {
   AnswerQuestionRequestBody,
+  AttachmentFileResource,
+  AttachmentListResponseBody,
   BindingCodeResponseBody,
   BindingResource,
   ChannelResource,
@@ -62,6 +67,7 @@ import type {
   RevertRequestBody,
   RevertedCountResponseBody,
   RotateSecretRequestBody,
+  SearchAttachmentsRequestBody,
   SearchTasksRequestBody,
   SearchThreadsRequestBody,
   SendMessageRequestBody,
@@ -84,6 +90,7 @@ import type {
   ThreadTurnListResponseBody,
   ToolResultRequestBody,
   TurnStartedResponseBody,
+  UpdateAttachmentRequestBody,
   UpdateChannelRequestBody,
   UpdateFolderRequestBody,
   UpdateSettingsRequestBody,
@@ -2403,6 +2410,242 @@ export const uploadAttachment = async (
   return { data, status: res.status, headers: res.headers } as uploadAttachmentResponse;
 };
 
+export type searchAttachmentsResponse200 = {
+  data: AttachmentListResponseBody;
+  status: 200;
+};
+
+export type searchAttachmentsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type searchAttachmentsResponseSuccess = searchAttachmentsResponse200 & {
+  headers: Headers;
+};
+export type searchAttachmentsResponseError = searchAttachmentsResponseDefault & {
+  headers: Headers;
+};
+
+export type searchAttachmentsResponse =
+  | searchAttachmentsResponseSuccess
+  | searchAttachmentsResponseError;
+
+export const getSearchAttachmentsUrl = () => {
+  return `https://assistant.leaflow.cloud/api/v1/attachments`;
+};
+
+/**
+ * The caller's files in this project, most recently uploaded first. These are the files
+ * uploaded while composing messages, plus uploads that no message has referenced yet.
+ *
+ * A file with no message referencing it is a draft: `draftExpiresAt` says when it is cleared.
+ * Sending a message with the id makes it permanent and that field becomes null.
+ *
+ * Files removed from the library are not listed, but conversations that already use them keep
+ * them and download-by-id still works.
+ * @summary Search attachments
+ */
+export const searchAttachments = async (
+  searchAttachmentsRequestBody: SearchAttachmentsRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<searchAttachmentsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getSearchAttachmentsUrl(), {
+    ...options,
+    method: "QUERY",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(searchAttachmentsRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: searchAttachmentsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as searchAttachmentsResponse;
+};
+
+export type getAttachmentResponse200 = {
+  data: AttachmentFileResource;
+  status: 200;
+};
+
+export type getAttachmentResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getAttachmentResponseSuccess = getAttachmentResponse200 & {
+  headers: Headers;
+};
+export type getAttachmentResponseError = getAttachmentResponseDefault & {
+  headers: Headers;
+};
+
+export type getAttachmentResponse = getAttachmentResponseSuccess | getAttachmentResponseError;
+
+export const getGetAttachmentUrl = (attachment: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}`;
+};
+
+/**
+ * Metadata for one attachment. The bytes are at /api/v1/attachments/{attachment}:download.
+ *
+ * Returns 404 when the attachment does not exist, does not belong to the current user, or was
+ * removed from the library. Removed files stay readable through their conversations but are no
+ * longer described here.
+ * @summary Get a file
+ */
+export const getAttachment = async (
+  attachment: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAttachmentResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetAttachmentUrl(attachment), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAttachmentResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getAttachmentResponse;
+};
+
+export type updateAttachmentResponse200 = {
+  data: AttachmentFileResource;
+  status: 200;
+};
+
+export type updateAttachmentResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updateAttachmentResponseSuccess = updateAttachmentResponse200 & {
+  headers: Headers;
+};
+export type updateAttachmentResponseError = updateAttachmentResponseDefault & {
+  headers: Headers;
+};
+
+export type updateAttachmentResponse =
+  | updateAttachmentResponseSuccess
+  | updateAttachmentResponseError;
+
+export const getUpdateAttachmentUrl = (attachment: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}`;
+};
+
+/**
+ * Changes the name shown in the library and given to the assistant. The bytes and the attachment
+ * id do not change; conversations that already use it see the new name from their next request
+ * on.
+ * @summary Rename a file
+ */
+export const updateAttachment = async (
+  attachment: string,
+  updateAttachmentRequestBody: UpdateAttachmentRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateAttachmentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateAttachmentUrl(attachment), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateAttachmentRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateAttachmentResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as updateAttachmentResponse;
+};
+
+export type deleteAttachmentResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteAttachmentResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type deleteAttachmentResponseSuccess = deleteAttachmentResponse204 & {
+  headers: Headers;
+};
+export type deleteAttachmentResponseError = deleteAttachmentResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteAttachmentResponse =
+  | deleteAttachmentResponseSuccess
+  | deleteAttachmentResponseError;
+
+export const getDeleteAttachmentUrl = (attachment: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}`;
+};
+
+/**
+ * Hides the file from the library. Conversations that already use it keep it: the attachment
+ * stays readable by id and keeps rendering in their history. Its bytes are released when the
+ * project is deleted. A draft is cleared for good when its expiry passes. Idempotent.
+ * @summary Remove a file from the library
+ */
+export const deleteAttachment = async (
+  attachment: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteAttachmentResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteAttachmentUrl(attachment), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteAttachmentResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteAttachmentResponse;
+};
+
 export type downloadAttachmentResponse200 = {
   data: Blob;
   status: 200;
@@ -2425,11 +2668,11 @@ export type downloadAttachmentResponse =
   | downloadAttachmentResponseError;
 
 export const getDownloadAttachmentUrl = (attachment: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}`;
+  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}:download`;
 };
 
 /**
- * Returns the original bytes for an attachment id. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
+ * Returns the original bytes for an attachment id, including one removed from the library. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
  *
  * Only an attachment whose `type` is `image` comes back with its own image type and is usable as the address of an `<img>`. Everything else is served as `application/octet-stream` with `Content-Disposition: attachment`, deliberately: an uploaded file is arbitrary bytes under a name its uploader chose, and serving it back inline would run it on this origin.
  * @summary Download a file

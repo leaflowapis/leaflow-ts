@@ -21,6 +21,9 @@
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
+ *
+ * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";

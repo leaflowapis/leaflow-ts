@@ -21,6 +21,9 @@
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
+ *
+ * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
@@ -58,6 +61,8 @@ import { SkillEnabledRequestBody } from "./validators/skillEnabledRequestBody.zo
 import { SkillRequestBody } from "./validators/skillRequestBody.zod.js";
 
 import { ToolResultRequestBody } from "./validators/toolResultRequestBody.zod.js";
+
+import { UpdateAttachmentRequestBody } from "./validators/updateAttachmentRequestBody.zod.js";
 
 import { UpdateChannelRequestBody } from "./validators/updateChannelRequestBody.zod.js";
 
@@ -711,7 +716,41 @@ export const UploadAttachmentQueryParams = zod.strictObject({
 });
 
 /**
- * Returns the original bytes for an attachment id. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
+ * Metadata for one attachment. The bytes are at /api/v1/attachments/{attachment}:download.
+ *
+ * Returns 404 when the attachment does not exist, does not belong to the current user, or was
+ * removed from the library. Removed files stay readable through their conversations but are no
+ * longer described here.
+ * @summary Get a file
+ */
+export const GetAttachmentParams = zod.strictObject({
+  attachment: zod.string(),
+});
+
+/**
+ * Changes the name shown in the library and given to the assistant. The bytes and the attachment
+ * id do not change; conversations that already use it see the new name from their next request
+ * on.
+ * @summary Rename a file
+ */
+export const UpdateAttachmentParams = zod.strictObject({
+  attachment: zod.string(),
+});
+
+export const UpdateAttachmentBody = UpdateAttachmentRequestBody;
+
+/**
+ * Hides the file from the library. Conversations that already use it keep it: the attachment
+ * stays readable by id and keeps rendering in their history. Its bytes are released when the
+ * project is deleted. A draft is cleared for good when its expiry passes. Idempotent.
+ * @summary Remove a file from the library
+ */
+export const DeleteAttachmentParams = zod.strictObject({
+  attachment: zod.string(),
+});
+
+/**
+ * Returns the original bytes for an attachment id, including one removed from the library. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
  *
  * Only an attachment whose `type` is `image` comes back with its own image type and is usable as the address of an `<img>`. Everything else is served as `application/octet-stream` with `Content-Disposition: attachment`, deliberately: an uploaded file is arbitrary bytes under a name its uploader chose, and serving it back inline would run it on this origin.
  * @summary Download a file

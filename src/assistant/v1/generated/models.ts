@@ -21,6 +21,9 @@
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
  * parts, then complete the upload and send its attachment id in a message.
+ *
+ * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working.
  * OpenAPI spec version: 2.0.0
  */
 export interface FieldViolation {
@@ -1664,6 +1667,119 @@ export interface UpdateSettingsRequestBody {
    */
   defaultModelId?: string | null;
   defaultReasoningEffort?: ReasoningEffort | null;
+}
+
+/**
+ * Counts over everything the criteria match, ignoring `ids` and the cursor.
+ */
+export interface AttachmentCountsResource {
+  total: number;
+  totalBytes: number;
+}
+
+/**
+ * How the assistant will see this file.
+ */
+export type AttachmentFileResourceType =
+  (typeof AttachmentFileResourceType)[keyof typeof AttachmentFileResourceType];
+
+export const AttachmentFileResourceType = {
+  image: "image",
+  text: "text",
+  binary: "binary",
+} as const;
+
+export interface AttachmentFileResource {
+  byteSize: number;
+  createdAt: string;
+  /**
+   * When this draft is cleared if no message ever references it. Null once a message uses it —
+   * a file that belongs to a conversation is kept as long as the conversation is.
+   * @nullable
+   */
+  draftExpiresAt: string | null;
+  filename: string;
+  /**
+   * Null unless type is image.
+   * @nullable
+   */
+  height: number | null;
+  id: string;
+  /** Detected at intake, not the Content-Type the client sent. */
+  mime: string;
+  /** How the assistant will see this file. */
+  type: AttachmentFileResourceType;
+  updatedAt: string;
+  /**
+   * Null unless type is image.
+   * @nullable
+   */
+  width: number | null;
+}
+
+export interface AttachmentListResponseBody {
+  attachments: AttachmentFileResource[];
+  /**
+   * Null on the last page.
+   * @nullable
+   */
+  nextCursor: string | null;
+  /** Null unless `include` asked for it. */
+  counts: AttachmentCountsResource | null;
+}
+
+/**
+ * How the assistant sees the file.
+ */
+export type SearchAttachmentsRequestBodyType =
+  (typeof SearchAttachmentsRequestBodyType)[keyof typeof SearchAttachmentsRequestBodyType];
+
+export const SearchAttachmentsRequestBodyType = {
+  image: "image",
+  text: "text",
+  binary: "binary",
+} as const;
+
+export type SearchAttachmentsRequestBodyIncludeItem =
+  (typeof SearchAttachmentsRequestBodyIncludeItem)[keyof typeof SearchAttachmentsRequestBodyIncludeItem];
+
+export const SearchAttachmentsRequestBodyIncludeItem = {
+  counts: "counts",
+} as const;
+
+export interface SearchAttachmentsRequestBody {
+  /**
+   * Read these attachments. Cannot be combined with cursor.
+   * @minItems 1
+   * @maxItems 200
+   */
+  ids?: string[];
+  /**
+   * Matches filenames, case-insensitively.
+   * @maxLength 100
+   */
+  q?: string;
+  /** How the assistant sees the file. */
+  type?: SearchAttachmentsRequestBodyType;
+  /** True for uploads no message references, false for the rest. */
+  draft?: boolean;
+  /** @maxLength 1024 */
+  cursor?: string;
+  /**
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /** Optional parts of the response. `counts` adds `counts`. */
+  include?: SearchAttachmentsRequestBodyIncludeItem[];
+}
+
+export interface UpdateAttachmentRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  filename: string;
 }
 
 /**
