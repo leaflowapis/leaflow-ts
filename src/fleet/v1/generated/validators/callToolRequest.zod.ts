@@ -243,7 +243,8 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { ToolRef } from "./toolRef.zod.js";
+
+export const callToolRequestToolMax = 194;
 
 export const callToolRequestReadOnlyDefault = false;
 export const callToolRequestTimeoutSecondsDefault = 60;
@@ -251,7 +252,13 @@ export const callToolRequestTimeoutSecondsMax = 240;
 
 export const CallToolRequest = zod.strictObject({
   client_instance_id: zod.uuid(),
-  tool: ToolRef,
+  tool: zod
+    .string()
+    .min(1)
+    .max(callToolRequestToolMax)
+    .describe(
+      "The name from list-tools. Builtin tools are computer.*; MCP tools are\n`<server>__<tool>`. The name selects the tool; source is not part of the call.",
+    ),
   arguments: zod
     .record(zod.string(), zod.unknown())
     .describe("A JSON object, at most 256 KiB when encoded"),

@@ -1041,27 +1041,15 @@ export interface SendMcpRequestResponse {
   response: SendMcpRequestResponseResponse;
 }
 
-export type ToolRefSource = (typeof ToolRefSource)[keyof typeof ToolRefSource];
+/**
+ * Whether the tool is builtin or comes from an MCP server. For filtering only.
+ */
+export type ToolDescriptorSource = (typeof ToolDescriptorSource)[keyof typeof ToolDescriptorSource];
 
-export const ToolRefSource = {
+export const ToolDescriptorSource = {
   builtin: "builtin",
   mcp: "mcp",
 } as const;
-
-export interface ToolRef {
-  source: ToolRefSource;
-  /**
-   * @minLength 1
-   * @maxLength 128
-   */
-  name: string;
-  /**
-   * Required only for mcp; forbidden for builtin
-   * @minLength 1
-   * @maxLength 64
-   */
-  server?: string;
-}
 
 export type ToolDescriptorInputSchema = { [key: string]: unknown };
 
@@ -1073,8 +1061,15 @@ export type ToolDescriptorOutputSchema = { [key: string]: unknown };
 export type ToolDescriptorMetadata = { [key: string]: unknown };
 
 export interface ToolDescriptor {
-  tool: ToolRef;
+  /**
+   * The name to call it by. Builtin tools are named computer.*; MCP tools are named
+   * `<server>__<tool>`, so a name selects exactly one tool.
+   * @minLength 1
+   * @maxLength 194
+   */
   name: string;
+  /** Whether the tool is builtin or comes from an MCP server. For filtering only. */
+  source: ToolDescriptorSource;
   title: string;
   description: string;
   input_schema: ToolDescriptorInputSchema;
@@ -1112,7 +1107,13 @@ export type CallToolRequestArguments = { [key: string]: unknown };
 
 export interface CallToolRequest {
   client_instance_id: string;
-  tool: ToolRef;
+  /**
+   * The name from list-tools. Builtin tools are computer.*; MCP tools are
+   * `<server>__<tool>`. The name selects the tool; source is not part of the call.
+   * @minLength 1
+   * @maxLength 194
+   */
+  tool: string;
   /** A JSON object, at most 256 KiB when encoded */
   arguments: CallToolRequestArguments;
   read_only?: boolean;
@@ -1647,16 +1648,28 @@ export type DeleteMcpServerParams = {
 };
 
 export type ListToolsParams = {
+  /**
+   * A UUID generated once per running client and reused for its lifetime. It separates
+   * concurrent callers of the same user and is not an authorization credential.
+   */
   client_instance_id: string;
+  /**
+   * Return only tools of this source. A filter, not part of a tool's identity.
+   */
   source?: ListToolsSource;
   /**
+   * Return only this MCP server's tools.
    * @maxLength 64
    */
   mcp_server?: string;
   /**
+   * Words that each must occur in a tool's name, title or description, ignoring case.
    * @maxLength 256
    */
   query?: string;
+  /**
+   * Sign the control authorization as read-only, so mutating tools are refused.
+   */
   read_only?: boolean;
   /**
    * @minimum 1

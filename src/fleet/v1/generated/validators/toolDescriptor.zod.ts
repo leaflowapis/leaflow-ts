@@ -243,11 +243,20 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
-import { ToolRef } from "./toolRef.zod.js";
+
+export const toolDescriptorNameMax = 194;
 
 export const ToolDescriptor = zod.strictObject({
-  tool: ToolRef,
-  name: zod.string(),
+  name: zod
+    .string()
+    .min(1)
+    .max(toolDescriptorNameMax)
+    .describe(
+      "The name to call it by. Builtin tools are named computer.*; MCP tools are named\n`<server>__<tool>`, so a name selects exactly one tool.",
+    ),
+  source: zod
+    .enum(["builtin", "mcp"])
+    .describe("Whether the tool is builtin or comes from an MCP server. For filtering only."),
   title: zod.string(),
   description: zod.string(),
   input_schema: zod.record(zod.string(), zod.unknown()),
