@@ -83,11 +83,15 @@
  *   and remote ones it connects to;
  * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
- * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a desktop.
+ * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a graphical backend;
+ * - `leaflow.fleet.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
+ *   the virtual desktop capability is actually available; MCP is a separate source.
  *
- * A machine installed without a desktop does not offer `leaflow.fleet.virtualdesktop.host.v1`. A
- * request that needs a feature the machine does not report available fails with
- * `FEATURE_UNAVAILABLE`, whose `metadata.feature` names the feature.
+ * A graphical backend does not require a full desktop environment. Terminal logins, commands
+ * and MCP server initialization prepare or reuse the account's lightweight graphical context,
+ * in addition to their own session or job. Configuration reads and writes do not initialize a
+ * server and do not require this preparation. A request that needs a feature the machine does
+ * not report available fails with `FEATURE_UNAVAILABLE`, whose `metadata.feature` names it.
  *
  * ## Directory
  *
@@ -1037,6 +1041,173 @@ export interface SendMcpRequestResponse {
   response: SendMcpRequestResponseResponse;
 }
 
+export type ToolRefSource = (typeof ToolRefSource)[keyof typeof ToolRefSource];
+
+export const ToolRefSource = {
+  builtin: "builtin",
+  mcp: "mcp",
+} as const;
+
+export interface ToolRef {
+  source: ToolRefSource;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name: string;
+  /**
+   * Required only for mcp; forbidden for builtin
+   * @minLength 1
+   * @maxLength 64
+   */
+  server?: string;
+}
+
+export type ToolDescriptorInputSchema = { [key: string]: unknown };
+
+export type ToolDescriptorOutputSchema = { [key: string]: unknown };
+
+/**
+ * Untrusted display metadata; never grants authorization
+ */
+export type ToolDescriptorMetadata = { [key: string]: unknown };
+
+export interface ToolDescriptor {
+  tool: ToolRef;
+  name: string;
+  title: string;
+  description: string;
+  input_schema: ToolDescriptorInputSchema;
+  output_schema?: ToolDescriptorOutputSchema;
+  /** Untrusted display metadata; never grants authorization */
+  metadata?: ToolDescriptorMetadata;
+}
+
+export type ToolListUnavailableSourcesItemSource =
+  (typeof ToolListUnavailableSourcesItemSource)[keyof typeof ToolListUnavailableSourcesItemSource];
+
+export const ToolListUnavailableSourcesItemSource = {
+  builtin: "builtin",
+  mcp: "mcp",
+} as const;
+
+export type ToolListUnavailableSourcesItem = {
+  source: ToolListUnavailableSourcesItemSource;
+  mcp_server: string;
+  code: number;
+  reason: string;
+};
+
+export interface ToolList {
+  session_id: string;
+  items: ToolDescriptor[];
+  next_page_token: string;
+  unavailable_sources: ToolListUnavailableSourcesItem[];
+}
+
+/**
+ * A JSON object, at most 256 KiB when encoded
+ */
+export type CallToolRequestArguments = { [key: string]: unknown };
+
+export interface CallToolRequest {
+  client_instance_id: string;
+  tool: ToolRef;
+  /** A JSON object, at most 256 KiB when encoded */
+  arguments: CallToolRequestArguments;
+  read_only?: boolean;
+  /**
+   * @minimum 1
+   * @maximum 240
+   */
+  timeout_seconds?: number;
+}
+
+/**
+ * Untrusted content extensions such as MCP annotations or _meta, without duplicated body or image data
+ */
+export type ToolContentMetadata = { [key: string]: unknown };
+
+/**
+ * An unrecognized external content block, preserved as data
+ */
+export type ToolContentJson = { [key: string]: unknown };
+
+export type ToolImageMimeType = (typeof ToolImageMimeType)[keyof typeof ToolImageMimeType];
+
+export const ToolImageMimeType = {
+  "image/png": "image/png",
+  "image/jpeg": "image/jpeg",
+  "image/webp": "image/webp",
+} as const;
+
+/**
+ * ScreenshotContext in protobuf JSON with original field names: reference, window_id,
+ * area, windows (including resize_counter and shape_counter), captured_at, revision,
+ * quiet. uint64 values are decimal strings to preserve precision. Images do not change
+ * this original geometry. The opaque reference binds coordinate actions to this capture.
+ */
+export type ToolImageScreenshot = { [key: string]: unknown };
+
+export interface ToolImage {
+  /** Base64 of Agent's original encoded image bytes, never a URL */
+  data: string;
+  mime_type: ToolImageMimeType;
+  /** @minimum 1 */
+  width: number;
+  /** @minimum 1 */
+  height: number;
+  /**
+   * ScreenshotContext in protobuf JSON with original field names: reference, window_id,
+   * area, windows (including resize_counter and shape_counter), captured_at, revision,
+   * quiet. uint64 values are decimal strings to preserve precision. Images do not change
+   * this original geometry. The opaque reference binds coordinate actions to this capture.
+   */
+  screenshot?: ToolImageScreenshot;
+}
+
+/**
+ * Exactly one of text, image or json is present
+ */
+export interface ToolContent {
+  /** Untrusted content extensions such as MCP annotations or _meta, without duplicated body or image data */
+  metadata?: ToolContentMetadata;
+  text?: string;
+  image?: ToolImage;
+  /** An unrecognized external content block, preserved as data */
+  json?: ToolContentJson;
+}
+
+export type CallToolResponseStructuredContent = { [key: string]: unknown };
+
+/**
+ * Untrusted result extensions such as MCP _meta, without duplicated content or images
+ */
+export type CallToolResponseMetadata = { [key: string]: unknown };
+
+export interface CallToolResponse {
+  session_id: string;
+  operation_id: string;
+  content: ToolContent[];
+  structured_content?: CallToolResponseStructuredContent;
+  /** Untrusted result extensions such as MCP _meta, without duplicated content or images */
+  metadata?: CallToolResponseMetadata;
+  is_error: boolean;
+}
+
+/**
+ * ToolActivity in protobuf JSON with original field names. Includes session_id,
+ * participant_id, operation_id, instance_id, sequence, observed_at, phase, action and
+ * optional target (window_id, position x/y, resize_counter, shape_counter). All uint64
+ * values are decimal strings. No input text, key values, arguments or image data.
+ */
+export type ToolActivityListItemsItem = { [key: string]: unknown };
+
+export interface ToolActivityList {
+  /** @maxItems 64 */
+  items: ToolActivityListItemsItem[];
+}
+
 /**
  * The tool's arguments, as its `input_schema` describes them
  */
@@ -1527,6 +1698,37 @@ export type DeleteMcpServerParams = {
    */
   expected_revision?: string;
 };
+
+export type ListToolsParams = {
+  client_instance_id: string;
+  source?: ListToolsSource;
+  /**
+   * @maxLength 64
+   */
+  mcp_server?: string;
+  /**
+   * @maxLength 256
+   */
+  query?: string;
+  read_only?: boolean;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  /**
+   * @maxLength 4096
+   */
+  page_token?: string;
+};
+
+export type ListToolsSource = (typeof ListToolsSource)[keyof typeof ListToolsSource];
+
+export const ListToolsSource = {
+  all: "all",
+  builtin: "builtin",
+  mcp: "mcp",
+} as const;
 
 export type ListMcpToolsParams = {
   /**

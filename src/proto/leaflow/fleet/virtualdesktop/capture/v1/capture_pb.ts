@@ -6,7 +6,7 @@ import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobu
 import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_duration, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Rectangle, Size } from "../../display/v1/display_pb.js";
+import type { Rectangle, Region, Size } from "../../display/v1/display_pb.js";
 import { file_leaflow_fleet_virtualdesktop_display_v1_display } from "../../display/v1/display_pb.js";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/virtualdesktop/capture/v1/capture.proto.
  */
 export const file_leaflow_fleet_virtualdesktop_capture_v1_capture: GenFile = /*@__PURE__*/
-  fileDesc("CjVsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2NhcHR1cmUvdjEvY2FwdHVyZS5wcm90bxInbGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5jYXB0dXJlLnYxIvQCChhDYXB0dXJlU2NyZWVuc2hvdFJlcXVlc3QSEQoJd2luZG93X2lkGAEgASgEEkIKBG1vZGUYAiABKA4yNC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmNhcHR1cmUudjEuQ2FwdHVyZU1vZGUSQAoEY2xpcBgDIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5SZWN0YW5nbGUSEQoJbWF4X3dpZHRoGAQgASgNEhIKCm1heF9oZWlnaHQYBSABKA0SEQoJbWltZV90eXBlGAYgASgJEg8KB3F1YWxpdHkYByABKA0SFwoPaW5jbHVkZV9wb2ludGVyGAggASgIEi8KDHF1aWV0X3BlcmlvZBgJIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIqCgd0aW1lb3V0GAogASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uItcCChlDYXB0dXJlU2NyZWVuc2hvdFJlc3BvbnNlEgwKBGRhdGEYASABKAwSEQoJbWltZV90eXBlGAIgASgJEjsKBHNpemUYAyABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuU2l6ZRJACgRhcmVhGAQgASgLMjIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlJlY3RhbmdsZRJICgd3aW5kb3dzGAUgAygLMjcubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5jYXB0dXJlLnYxLkNhcHR1cmVkV2luZG93Ei8KC2NhcHR1cmVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBINCgVxdWlldBgIIAEoCBIQCghyZXZpc2lvbhgJIAEoBCKBAQoOQ2FwdHVyZWRXaW5kb3cSEQoJd2luZG93X2lkGAEgASgEEkQKCGdlb21ldHJ5GAIgASgLMjIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlJlY3RhbmdsZRIWCg5yZXNpemVfY291bnRlchgDIAEoBCpjCgtDYXB0dXJlTW9kZRIcChhDQVBUVVJFX01PREVfVU5TUEVDSUZJRUQQABIcChhDQVBUVVJFX01PREVfV0lUSF9QT1BVUFMQARIYChRDQVBUVVJFX01PREVfQ09OVEVOVBACMrIBCg5DYXB0dXJlU2VydmljZRKfAQoRQ2FwdHVyZVNjcmVlbnNob3QSQS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmNhcHR1cmUudjEuQ2FwdHVyZVNjcmVlbnNob3RSZXF1ZXN0GkIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5jYXB0dXJlLnYxLkNhcHR1cmVTY3JlZW5zaG90UmVzcG9uc2UiA5ACAUJNWktnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvY2FwdHVyZS92MTtjYXB0dXJldjFiBnByb3RvMw", [file_google_protobuf_duration, file_google_protobuf_timestamp, file_leaflow_fleet_virtualdesktop_display_v1_display]);
+  fileDesc("CjVsZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2NhcHR1cmUvdjEvY2FwdHVyZS5wcm90bxInbGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5jYXB0dXJlLnYxIvQCChhDYXB0dXJlU2NyZWVuc2hvdFJlcXVlc3QSEQoJd2luZG93X2lkGAEgASgEEkIKBG1vZGUYAiABKA4yNC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmNhcHR1cmUudjEuQ2FwdHVyZU1vZGUSQAoEY2xpcBgDIAEoCzIyLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5SZWN0YW5nbGUSEQoJbWF4X3dpZHRoGAQgASgNEhIKCm1heF9oZWlnaHQYBSABKA0SEQoJbWltZV90eXBlGAYgASgJEg8KB3F1YWxpdHkYByABKA0SFwoPaW5jbHVkZV9wb2ludGVyGAggASgIEi8KDHF1aWV0X3BlcmlvZBgJIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIqCgd0aW1lb3V0GAogASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uItcCChlDYXB0dXJlU2NyZWVuc2hvdFJlc3BvbnNlEgwKBGRhdGEYASABKAwSEQoJbWltZV90eXBlGAIgASgJEjsKBHNpemUYAyABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuU2l6ZRJACgRhcmVhGAQgASgLMjIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlJlY3RhbmdsZRJICgd3aW5kb3dzGAUgAygLMjcubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5jYXB0dXJlLnYxLkNhcHR1cmVkV2luZG93Ei8KC2NhcHR1cmVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBINCgVxdWlldBgIIAEoCBIQCghyZXZpc2lvbhgJIAEoBCKpAgoOQ2FwdHVyZWRXaW5kb3cSEQoJd2luZG93X2lkGAEgASgEEkQKCGdlb21ldHJ5GAIgASgLMjIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlJlY3RhbmdsZRIWCg5yZXNpemVfY291bnRlchgDIAEoBBIVCg1zaGFwZV9jb3VudGVyGAQgASgEEkgKD2JvdW5kaW5nX3JlZ2lvbhgFIAEoCzIvLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5SZWdpb24SRQoMaW5wdXRfcmVnaW9uGAYgASgLMi8ubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5kaXNwbGF5LnYxLlJlZ2lvbipjCgtDYXB0dXJlTW9kZRIcChhDQVBUVVJFX01PREVfVU5TUEVDSUZJRUQQABIcChhDQVBUVVJFX01PREVfV0lUSF9QT1BVUFMQARIYChRDQVBUVVJFX01PREVfQ09OVEVOVBACMrIBCg5DYXB0dXJlU2VydmljZRKfAQoRQ2FwdHVyZVNjcmVlbnNob3QSQS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmNhcHR1cmUudjEuQ2FwdHVyZVNjcmVlbnNob3RSZXF1ZXN0GkIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5jYXB0dXJlLnYxLkNhcHR1cmVTY3JlZW5zaG90UmVzcG9uc2UiA5ACAUJNWktnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvY2FwdHVyZS92MTtjYXB0dXJldjFiBnByb3RvMw", [file_google_protobuf_duration, file_google_protobuf_timestamp, file_leaflow_fleet_virtualdesktop_display_v1_display]);
 
 /**
  * The request of CaptureScreenshot.
@@ -67,6 +67,9 @@ export type CaptureScreenshotRequest = Message<"leaflow.fleet.virtualdesktop.cap
   /**
    * The image format: "image/png" (W3C PNG), "image/jpeg" (ISO/IEC 10918-1)
    * or "image/webp" (RFC 9649). Empty: the session chooses.
+   * PNG/WebP 保留单窗口及弹层合成的透明度，包括 Shape 区域外的透明像素；
+   * 画布没有窗口的区域仍为不透明黑色。JPEG 仅适用于实际不透明的合成结果；
+   * 否则返回 INVALID_ARGUMENT / IMAGE_FORMAT_LOSES_TRANSPARENCY，不静默丢失 alpha。
    *
    * @generated from field: string mime_type = 6;
    */
@@ -209,6 +212,26 @@ export type CapturedWindow = Message<"leaflow.fleet.virtualdesktop.capture.v1.Ca
    * @generated from field: uint64 resize_counter = 3;
    */
   resizeCounter: bigint;
+
+  /**
+   * 捕获时的 Window.shape_counter，供依赖截图的动作拒绝过期区域状态。
+   *
+   * @generated from field: uint64 shape_counter = 4;
+   */
+  shapeCounter: bigint;
+
+  /**
+   * 捕获时的窗口局部 X Shape 区域，presence 含义与 Window 相同；geometry 则仍在
+   * 整张截图的原始坐标空间。不能把相对窗口的区域直接当作画布或缩放后图像坐标。
+   *
+   * @generated from field: leaflow.fleet.virtualdesktop.display.v1.Region bounding_region = 5;
+   */
+  boundingRegion?: Region | undefined;
+
+  /**
+   * @generated from field: leaflow.fleet.virtualdesktop.display.v1.Region input_region = 6;
+   */
+  inputRegion?: Region | undefined;
 };
 
 /**
