@@ -7,7 +7,7 @@
  */
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
-import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
+import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { PaymentCancellationReason } from "./paymentCancellationReason.zod.js";
 import { TransactionType } from "./transactionType.zod.js";
 
@@ -19,7 +19,7 @@ export const Transaction = zod
       .uuid()
       .optional()
       .describe("The credit grant that paid, or for a refund, the credit grant restored."),
-    credit_grant: ObjectIdentity4b96100.optional(),
+    credit_grant: ObjectIdentity.optional(),
     refund_id: zod.uuid().optional(),
     refund_destination: zod
       .enum(["balance", "credit", "gateway"])

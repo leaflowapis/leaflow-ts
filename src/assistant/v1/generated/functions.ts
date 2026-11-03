@@ -43,7 +43,6 @@ import type {
   CreateThreadResponseBody,
   CreateUploadRequestBody,
   DecideToolCallsRequestBody,
-  Error,
   ErrorResponse,
   FolderListResponseBody,
   FolderResource,
@@ -156,7 +155,7 @@ export type createThreadResponse201 = {
 };
 
 export type createThreadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -228,7 +227,7 @@ export type searchThreadsResponse200 = {
 };
 
 export type searchThreadsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -300,7 +299,7 @@ export type getThreadResponse200 = {
 };
 
 export type getThreadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -345,7 +344,7 @@ export type updateThreadResponse200 = {
 };
 
 export type updateThreadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -418,7 +417,7 @@ export type deleteThreadResponse204 = {
 };
 
 export type deleteThreadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -465,7 +464,7 @@ export type interruptThreadResponse204 = {
 };
 
 export type interruptThreadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -512,7 +511,7 @@ export type resumeThreadResponse202 = {
 };
 
 export type resumeThreadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 202>;
 };
 
@@ -580,7 +579,7 @@ export type compactThreadResponse202 = {
 };
 
 export type compactThreadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 202>;
 };
 
@@ -628,7 +627,7 @@ export type revertThreadResponse200 = {
 };
 
 export type revertThreadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -695,7 +694,7 @@ export type markThreadReadResponse204 = {
 };
 
 export type markThreadReadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -738,7 +737,7 @@ export type listThreadItemsResponse200 = {
 };
 
 export type listThreadItemsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -808,7 +807,7 @@ export type getThreadItemResponse200 = {
 };
 
 export type getThreadItemResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -852,7 +851,7 @@ export type listThreadMessagesResponse200 = {
 };
 
 export type listThreadMessagesResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -917,7 +916,7 @@ export type sendMessageResponse202 = {
 };
 
 export type sendMessageResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 202>;
 };
 
@@ -986,7 +985,7 @@ export type decideToolCallsResponse204 = {
 };
 
 export type decideToolCallsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -1056,7 +1055,7 @@ export type answerQuestionResponse204 = {
 };
 
 export type answerQuestionResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -1124,7 +1123,7 @@ export type submitToolResultResponse204 = {
 };
 
 export type submitToolResultResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -1195,7 +1194,7 @@ export type listThreadTurnsResponse200 = {
 };
 
 export type listThreadTurnsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1258,7 +1257,7 @@ export type listFoldersResponse200 = {
 };
 
 export type listFoldersResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1302,7 +1301,7 @@ export type createFolderResponse201 = {
 };
 
 export type createFolderResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -1370,7 +1369,7 @@ export type getFolderResponse200 = {
 };
 
 export type getFolderResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1413,7 +1412,7 @@ export type updateFolderResponse200 = {
 };
 
 export type updateFolderResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1478,7 +1477,7 @@ export type deleteFolderResponse204 = {
 };
 
 export type deleteFolderResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -1523,7 +1522,7 @@ export type moveFolderResponse200 = {
 };
 
 export type moveFolderResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1590,7 +1589,7 @@ export type placeThreadResponse200 = {
 };
 
 export type placeThreadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1661,7 +1660,7 @@ export type createTaskResponse201 = {
 };
 
 export type createTaskResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -1734,7 +1733,7 @@ export type searchTasksResponse200 = {
 };
 
 export type searchTasksResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1798,7 +1797,7 @@ export type getTaskResponse200 = {
 };
 
 export type getTaskResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1840,7 +1839,7 @@ export type updateTaskResponse200 = {
 };
 
 export type updateTaskResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1906,7 +1905,7 @@ export type deleteTaskResponse204 = {
 };
 
 export type deleteTaskResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -1949,7 +1948,7 @@ export type runTaskResponse202 = {
 };
 
 export type runTaskResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 202>;
 };
 
@@ -1993,7 +1992,7 @@ export type pauseTaskResponse200 = {
 };
 
 export type pauseTaskResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2036,7 +2035,7 @@ export type resumeTaskResponse200 = {
 };
 
 export type resumeTaskResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2079,7 +2078,7 @@ export type cancelTaskRunResponse200 = {
 };
 
 export type cancelTaskRunResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2122,7 +2121,7 @@ export type listTaskRunsResponse200 = {
 };
 
 export type listTaskRunsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2178,7 +2177,7 @@ export type getTaskRunResponse200 = {
 };
 
 export type getTaskRunResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2222,7 +2221,7 @@ export type getSettingsResponse200 = {
 };
 
 export type getSettingsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2266,7 +2265,7 @@ export type updateSettingsResponse200 = {
 };
 
 export type updateSettingsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2334,7 +2333,7 @@ export type uploadAttachmentResponse201 = {
 };
 
 export type uploadAttachmentResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -2417,7 +2416,7 @@ export type searchAttachmentsResponse200 = {
 };
 
 export type searchAttachmentsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2490,7 +2489,7 @@ export type getAttachmentResponse200 = {
 };
 
 export type getAttachmentResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2537,7 +2536,7 @@ export type updateAttachmentResponse200 = {
 };
 
 export type updateAttachmentResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2606,7 +2605,7 @@ export type deleteAttachmentResponse204 = {
 };
 
 export type deleteAttachmentResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -2653,7 +2652,7 @@ export type downloadAttachmentResponse200 = {
 };
 
 export type downloadAttachmentResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2699,7 +2698,7 @@ export type getUploadConfigurationResponse200 = {
 };
 
 export type getUploadConfigurationResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2742,7 +2741,7 @@ export type createUploadResponse200 = {
 };
 
 export type createUploadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2805,7 +2804,7 @@ export type listUploadsResponse200 = {
 };
 
 export type listUploadsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2846,7 +2845,7 @@ export type getUploadResponse200 = {
 };
 
 export type getUploadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2888,7 +2887,7 @@ export type updateUploadResponse200 = {
 };
 
 export type updateUploadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2952,7 +2951,7 @@ export type deleteUploadResponse200 = {
 };
 
 export type deleteUploadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2994,7 +2993,7 @@ export type cancelUploadResponse200 = {
 };
 
 export type cancelUploadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3036,7 +3035,7 @@ export type completeUploadResponse200 = {
 };
 
 export type completeUploadResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3100,7 +3099,7 @@ export type putUploadPartResponse200 = {
 };
 
 export type putUploadPartResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3183,7 +3182,7 @@ export type listMemoriesResponse200 = {
 };
 
 export type listMemoriesResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3225,7 +3224,7 @@ export type deleteMemoryResponse204 = {
 };
 
 export type deleteMemoryResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -3268,7 +3267,7 @@ export type listSkillsResponse200 = {
 };
 
 export type listSkillsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3314,7 +3313,7 @@ export type putSkillResponse200 = {
 };
 
 export type putSkillResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3383,7 +3382,7 @@ export type getSkillResponse200 = {
 };
 
 export type getSkillResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3426,7 +3425,7 @@ export type setSkillEnabledResponse200 = {
 };
 
 export type setSkillEnabledResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3495,7 +3494,7 @@ export type deleteSkillResponse204 = {
 };
 
 export type deleteSkillResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -3538,7 +3537,7 @@ export type listBindingsResponse200 = {
 };
 
 export type listBindingsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3593,7 +3592,7 @@ export type getBindingResponse200 = {
 };
 
 export type getBindingResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3635,7 +3634,7 @@ export type deleteBindingResponse204 = {
 };
 
 export type deleteBindingResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -3677,7 +3676,7 @@ export type listChannelsResponse200 = {
 };
 
 export type listChannelsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3731,7 +3730,7 @@ export type createChannelResponse201 = {
 };
 
 export type createChannelResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -3795,7 +3794,7 @@ export type getChannelResponse200 = {
 };
 
 export type getChannelResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3837,7 +3836,7 @@ export type updateChannelResponse200 = {
 };
 
 export type updateChannelResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3902,7 +3901,7 @@ export type deleteChannelResponse204 = {
 };
 
 export type deleteChannelResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -3945,7 +3944,7 @@ export type createBindingCodeResponse201 = {
 };
 
 export type createBindingCodeResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -3990,7 +3989,7 @@ export type listChannelRejectionsResponse200 = {
 };
 
 export type listChannelRejectionsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4051,7 +4050,7 @@ export type rotateChannelSecretResponse200 = {
 };
 
 export type rotateChannelSecretResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4118,7 +4117,7 @@ export type checkSenderResponse200 = {
 };
 
 export type checkSenderResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4174,7 +4173,7 @@ export type beginWeixinLoginResponse201 = {
 };
 
 export type beginWeixinLoginResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -4219,7 +4218,7 @@ export type listPlatformsResponse200 = {
 };
 
 export type listPlatformsResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4261,7 +4260,7 @@ export type getWeixinLoginResponse200 = {
 };
 
 export type getWeixinLoginResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4304,7 +4303,7 @@ export type submitWeixinVerifyCodeResponse200 = {
 };
 
 export type submitWeixinVerifyCodeResponseDefault = {
-  data: Error;
+  data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 

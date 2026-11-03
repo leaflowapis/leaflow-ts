@@ -27,13 +27,13 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { TurnStatus4b96100 } from "./turnStatus4b96100.zod.js";
+import { TurnStatus } from "./turnStatus.zod.js";
 import { TurnType } from "./turnType.zod.js";
 
 export const LastTurnResource = zod.strictObject({
   id: zod.string(),
   type: TurnType,
-  status: TurnStatus4b96100,
+  status: TurnStatus,
   failureCode: zod
     .string()
     .nullable()

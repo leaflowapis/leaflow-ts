@@ -9,7 +9,7 @@ import * as zod from "zod";
 import { BillingScheme } from "./billingScheme.zod.js";
 import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { Money } from "./money.zod.js";
-import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
+import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
@@ -27,14 +27,14 @@ export const Price = zod.strictObject({
     ),
   lookup_key: zod.string().optional(),
   product: Product,
-  plan: ObjectIdentity4b96100,
+  plan: ObjectIdentity,
   meter_id: zod
     .uuid()
     .optional()
     .describe(
       "For a metered price with its own amounts, the meter it charges. For a licensed price, the meter its quantity is held on. Absent otherwise.",
     ),
-  meter: ObjectIdentity4b96100.optional(),
+  meter: ObjectIdentity.optional(),
   unit_quantity: zod.string(),
   active: zod
     .boolean()

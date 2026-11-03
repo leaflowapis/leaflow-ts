@@ -27,7 +27,7 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { ReasoningEffort4b96100 } from "./reasoningEffort4b96100.zod.js";
+import { ReasoningEffort } from "./reasoningEffort.zod.js";
 
 export const DefaultModelResource = zod
   .strictObject({
@@ -35,7 +35,7 @@ export const DefaultModelResource = zod
       .string()
       .nullable()
       .describe("Null when the catalogue has no model that can run an agent."),
-    reasoningEffort: zod.union([ReasoningEffort4b96100, zod.null()]),
+    reasoningEffort: zod.union([ReasoningEffort, zod.null()]),
     source: zod
       .enum(["user", "catalog"])
       .describe(

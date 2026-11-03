@@ -27,13 +27,13 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { ReasoningEffort4b96100 } from "./reasoningEffort4b96100.zod.js";
+import { ReasoningEffort } from "./reasoningEffort.zod.js";
 
 export const updateSettingsRequestBodyDefaultModelIdMax = 128;
 
 export const UpdateSettingsRequestBody = zod.strictObject({
   defaultModelId: zod.string().min(1).max(updateSettingsRequestBodyDefaultModelIdMax).nullish(),
-  defaultReasoningEffort: zod.union([ReasoningEffort4b96100, zod.null()]).optional(),
+  defaultReasoningEffort: zod.union([ReasoningEffort, zod.null()]).optional(),
 });
 
 export type UpdateSettingsRequestBody = zod.input<typeof UpdateSettingsRequestBody>;

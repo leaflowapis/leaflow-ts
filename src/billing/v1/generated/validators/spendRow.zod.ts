@@ -7,7 +7,7 @@
  */
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
-import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
+import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Product } from "./product.zod.js";
 
 export const SpendRow = zod.strictObject({
@@ -15,7 +15,7 @@ export const SpendRow = zod.strictObject({
   plan_id: zod.uuid().optional(),
   plan_name: zod.string().optional(),
   resource_id: zod.string().optional().describe("Present only when grouped by resource."),
-  meter: ObjectIdentity4b96100.optional().describe("Present only when grouped by meter."),
+  meter: ObjectIdentity.optional().describe("Present only when grouped by meter."),
   unit: zod.string().optional().describe("Present only when grouped by meter."),
   quantity: zod
     .string()

@@ -27,11 +27,11 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { ApprovalMode4b96100 } from "./approvalMode4b96100.zod.js";
-import { ReasoningEffort4b96100 } from "./reasoningEffort4b96100.zod.js";
-import { TurnStatus4b96100 } from "./turnStatus4b96100.zod.js";
+import { ApprovalMode } from "./approvalMode.zod.js";
+import { ReasoningEffort } from "./reasoningEffort.zod.js";
+import { TurnStatus } from "./turnStatus.zod.js";
 import { TurnType } from "./turnType.zod.js";
-import { Usage4b96100 } from "./usage4b96100.zod.js";
+import { Usage } from "./usage.zod.js";
 
 export const threadTurnResourceToolCallsMin = 0;
 
@@ -42,7 +42,7 @@ export const ThreadTurnResource = zod
     id: zod.string(),
     threadId: zod.string(),
     type: TurnType,
-    status: TurnStatus4b96100,
+    status: TurnStatus,
     firstOrdinal: zod
       .int()
       .nullable()
@@ -55,8 +55,8 @@ export const ThreadTurnResource = zod
         "The beginning of the message that started the turn. Null for compaction turns and turns started by the assistant itself.",
       ),
     modelId: zod.string(),
-    reasoningEffort: zod.union([ReasoningEffort4b96100, zod.null()]),
-    approvalMode: ApprovalMode4b96100,
+    reasoningEffort: zod.union([ReasoningEffort, zod.null()]),
+    approvalMode: ApprovalMode,
     failureCode: zod
       .string()
       .nullable()
@@ -65,7 +65,9 @@ export const ThreadTurnResource = zod
       .int()
       .min(threadTurnResourceToolCallsMin)
       .describe("How many tools the turn called."),
-    usage: Usage4b96100,
+    usage: Usage.describe(
+      "Tokens used by every model request of this turn, including title generation, review and compaction.",
+    ),
     streamingOutputTokens: zod
       .int()
       .min(threadTurnResourceStreamingOutputTokensMin)

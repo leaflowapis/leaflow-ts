@@ -9,7 +9,7 @@ import * as zod from "zod";
 import { AccountIdentity } from "./accountIdentity.zod.js";
 import { InvoiceSummary } from "./invoiceSummary.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
-import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
+import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { OrderItem } from "./orderItem.zod.js";
 import { OrderStatus } from "./orderStatus.zod.js";
 import { PaidWith } from "./paidWith.zod.js";
@@ -17,7 +17,7 @@ import { PaidWith } from "./paidWith.zod.js";
 export const Order = zod
   .strictObject({
     coupon_id: zod.uuid().optional(),
-    coupon: ObjectIdentity4b96100.optional(),
+    coupon: ObjectIdentity.optional(),
     promotion_code_id: zod.uuid().optional(),
     promotion_code: zod
       .string()

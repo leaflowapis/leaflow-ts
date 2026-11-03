@@ -28,12 +28,12 @@
  */
 import * as zod from "zod";
 import { DefaultModelResource } from "./defaultModelResource.zod.js";
-import { ReasoningEffort4b96100 } from "./reasoningEffort4b96100.zod.js";
+import { ReasoningEffort } from "./reasoningEffort.zod.js";
 
 export const SettingsResource = zod.strictObject({
   defaultModelId: zod.string().nullable().describe("The caller's choice. Null when none is set."),
   defaultReasoningEffort: zod
-    .union([ReasoningEffort4b96100, zod.null()])
+    .union([ReasoningEffort, zod.null()])
     .describe("The caller's choice. Null when none is set."),
   defaultModel: DefaultModelResource,
 });

@@ -8,7 +8,7 @@
 import * as zod from "zod";
 import { BillingScheme } from "./billingScheme.zod.js";
 import { Money } from "./money.zod.js";
-import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
+import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { UsageType } from "./usageType.zod.js";
@@ -16,7 +16,7 @@ import { UsageType } from "./usageType.zod.js";
 export const PriceOption = zod
   .strictObject({
     product: Product,
-    plan: ObjectIdentity4b96100,
+    plan: ObjectIdentity,
     billing_scheme: BillingScheme.optional().describe(
       "Absent when the price delegates to a rate card.",
     ),

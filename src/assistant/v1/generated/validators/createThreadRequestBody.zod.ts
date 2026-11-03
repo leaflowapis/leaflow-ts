@@ -27,8 +27,8 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { ApprovalMode4b96100 } from "./approvalMode4b96100.zod.js";
-import { ReasoningEffort4b96100 } from "./reasoningEffort4b96100.zod.js";
+import { ApprovalMode } from "./approvalMode.zod.js";
+import { ReasoningEffort } from "./reasoningEffort.zod.js";
 import { SendMessageRequestBody } from "./sendMessageRequestBody.zod.js";
 
 export const createThreadRequestBodyTitleMax = 255;
@@ -50,8 +50,10 @@ export const CreateThreadRequestBody = zod.strictObject({
     .max(createThreadRequestBodyModelIdMax)
     .optional()
     .describe("Omit to use the caller's default model."),
-  reasoningEffort: ReasoningEffort4b96100.optional(),
-  approvalMode: ApprovalMode4b96100.optional(),
+  reasoningEffort: ReasoningEffort.optional().describe(
+    "Omit to use the caller's default effort, or medium.",
+  ),
+  approvalMode: ApprovalMode.optional(),
   message: SendMessageRequestBody.optional(),
 });
 

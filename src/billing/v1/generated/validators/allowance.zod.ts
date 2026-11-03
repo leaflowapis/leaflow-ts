@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
+import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Product } from "./product.zod.js";
 
 export const Allowance = zod.strictObject({
@@ -18,7 +18,7 @@ export const Allowance = zod.strictObject({
   id: zod.uuid(),
   billing_account_id: zod.int().optional(),
   product: Product,
-  meter: ObjectIdentity4b96100,
+  meter: ObjectIdentity,
   unit: zod.string().optional().describe("The unit it is counted in, such as `MiB`."),
   category: zod
     .enum(["paid", "promotional"])

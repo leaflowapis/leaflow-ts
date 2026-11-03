@@ -798,7 +798,7 @@ export interface ApplicablePlan {
 /**
  * A catalog object, inlined for display.
  */
-export interface ObjectIdentity4b96100 {
+export interface ObjectIdentity {
   lookup_key?: string;
   id: string;
   name: string;
@@ -828,7 +828,7 @@ export const PriceOptionInterval = {
  */
 export interface PriceOption {
   product: Product;
-  plan: ObjectIdentity4b96100;
+  plan: ObjectIdentity;
   /** Absent when the price delegates to a rate card. */
   billing_scheme?: BillingScheme;
   unit_quantity: string;
@@ -1290,7 +1290,7 @@ export interface Transaction {
   transaction_id?: string;
   /** The credit grant that paid, or for a refund, the credit grant restored. */
   credit_grant_id?: string;
-  credit_grant?: ObjectIdentity4b96100;
+  credit_grant?: ObjectIdentity;
   refund_id?: string;
   /** Present on refunds: where this part goes. `balance`: the account balance. `credit`: the credit grant that paid, keeping its original expiry. `gateway`: the payment method it was paid with. */
   refund_destination?: TransactionRefundDestination;
@@ -1759,7 +1759,7 @@ export interface UsageCharge {
   product: Product;
   /** Which resource this was charged for. Empty for charges not tied to one. */
   resource_id?: string;
-  meter: ObjectIdentity4b96100;
+  meter: ObjectIdentity;
   unit?: string;
   /** The dimension values the rate was matched by, such as region and machine type. */
   dimensions?: UsageChargeDimensions;
@@ -1918,7 +1918,7 @@ export interface Subscription {
   monthly_list_amount?: string;
   order_item_id?: string;
   coupon_id?: string;
-  coupon?: ObjectIdentity4b96100;
+  coupon?: ObjectIdentity;
   /** @minimum 0 */
   discounted_renewals_remaining?: number;
   /** The operations currently prevented on the subscription, sorted; it is suspended while this contains `billing.subscriptions.use`. */
@@ -2455,7 +2455,7 @@ export interface OrderItem {
  */
 export interface Order {
   coupon_id?: string;
-  coupon?: ObjectIdentity4b96100;
+  coupon?: ObjectIdentity;
   promotion_code_id?: string;
   /** The promotion code applied. Absent for an account discount. */
   promotion_code?: string;
@@ -2620,7 +2620,7 @@ export interface Allowance {
   id: string;
   billing_account_id?: number;
   product: Product;
-  meter: ObjectIdentity4b96100;
+  meter: ObjectIdentity;
   /** The unit it is counted in, such as `MiB`. */
   unit?: string;
   /** Whether the quantity was paid for or granted free; both are consumed the same way. */
@@ -2667,7 +2667,7 @@ export interface FeatureGrant {
   id: string;
   billing_account_id: number;
   product: Product;
-  feature: ObjectIdentity4b96100;
+  feature: ObjectIdentity;
   name: string;
   valid_from: string;
   /**
@@ -2685,7 +2685,7 @@ export interface FeatureGrantList {
 
 export interface Entitlement {
   product: Product;
-  feature: ObjectIdentity4b96100;
+  feature: ObjectIdentity;
   name?: string;
   enabled: boolean;
   /**
@@ -2700,22 +2700,13 @@ export interface EntitlementList {
   pagination: OffsetPagination;
 }
 
-/**
- * A catalog object, inlined for display.
- */
-export interface ObjectIdentity {
-  lookup_key?: string;
-  id: string;
-  name: string;
-}
-
 export interface ProductList {
   items: Product[];
   pagination: OffsetPagination;
 }
 
 export interface PlanFeature {
-  feature: ObjectIdentity4b96100;
+  feature: ObjectIdentity;
   name: string;
 }
 
@@ -2796,7 +2787,7 @@ export interface Tier {
 export type RateDimensions = { [key: string]: string };
 
 export interface Rate {
-  meter: ObjectIdentity4b96100;
+  meter: ObjectIdentity;
   /** The unit readings are reported in, such as `core-second`. */
   unit?: string;
   /** The dimension values this rate applies to, such as region and machine type. */
@@ -2830,10 +2821,10 @@ export interface Price {
   rates?: Rate[] | null;
   lookup_key?: string;
   product: Product;
-  plan: ObjectIdentity4b96100;
+  plan: ObjectIdentity;
   /** For a metered price with its own amounts, the meter it charges. For a licensed price, the meter its quantity is held on. Absent otherwise. */
   meter_id?: string;
-  meter?: ObjectIdentity4b96100;
+  meter?: ObjectIdentity;
   unit_quantity: string;
   /** False once archived. An archived price cannot be bought until it is active again. */
   active: boolean;
@@ -2933,7 +2924,7 @@ export interface SpendRow {
   /** Present only when grouped by resource. */
   resource_id?: string;
   /** Present only when grouped by meter. */
-  meter?: ObjectIdentity4b96100;
+  meter?: ObjectIdentity;
   /** Present only when grouped by meter. */
   unit?: string;
   /** Net usage quantity, present only when grouped by meter. */
@@ -2977,7 +2968,7 @@ export interface ActiveResource {
   product: Product;
   /** The resource type, as the owning service names it. */
   resource_type?: string;
-  meter: ObjectIdentity4b96100;
+  meter: ObjectIdentity;
   unit?: string;
   /** How much is held, such as cores, MiB or cards; not how much was used. */
   quantity: string;
@@ -3493,262 +3484,6 @@ export interface ContactList {
   pagination: OffsetPagination;
 }
 
-export type CancellationPolicy4b96100 = CancellationPolicy;
-
-export type RefundPolicy4b96100 = RefundPolicy;
-
-export type OrderCancel4b96100 = OrderCancel;
-
-export type QuoteRenewal4b96100 = QuoteRenewal;
-
-export type QuoteRenewalResult4b96100 = QuoteRenewalResult;
-
-export type QuoteItem4b96100 = QuoteItem;
-
-export type Quote4b96100 = Quote;
-
-export type QuotedDiscount4b96100 = QuotedDiscount;
-
-export type CancellationPreviewRequest4b96100 = CancellationPreviewRequest;
-
-export type CancellationPreview4b96100 = CancellationPreview;
-
-export type CancellationPreviewItem4b96100 = CancellationPreviewItem;
-
-export type CancellationCreate4b96100 = CancellationCreate;
-
-export type Cancellation4b96100 = Cancellation;
-
-export type CancellationItem4b96100 = CancellationItem;
-
-export type CancellationList4b96100 = CancellationList;
-
-export type SubscriptionCancellation4b96100 = SubscriptionCancellation;
-
-export type Error4b96100 = Error;
-
-export type Product4b96100 = Product;
-
-export type ProductID4b96100 = ProductID;
-
-export type BillingAccount4b96100 = BillingAccount;
-
-export type Currency4b96100 = Currency;
-
-export type CurrencyList4b96100 = CurrencyList;
-
-export type BillingAccountCreate4b96100 = BillingAccountCreate;
-
-export type BillingAccountUpdate4b96100 = BillingAccountUpdate;
-
-export type BillingAccountList4b96100 = BillingAccountList;
-
-export type AccountBalance4b96100 = AccountBalance;
-
-export type CreditGroup4b96100 = CreditGroup;
-
-export type AccountDeletionReadiness4b96100 = AccountDeletionReadiness;
-
-export type AccountDeletionReadinessItem4b96100 = AccountDeletionReadinessItem;
-
-export type AccountDeletionObjection4b96100 = AccountDeletionObjection;
-
-export type ProjectAssignment4b96100 = ProjectAssignment;
-
-export type ProjectAssignmentList4b96100 = ProjectAssignmentList;
-
-export type SetProjectAssignmentRequest4b96100 = SetProjectAssignmentRequest;
-
-export type TopUp4b96100 = TopUp;
-
-export type TopUpCreate4b96100 = TopUpCreate;
-
-export type AccountIdentity4b96100 = AccountIdentity;
-
-export type TopUpList4b96100 = TopUpList;
-
-export type PaymentCancellationReason4b96100 = PaymentCancellationReason;
-
-export type PaymentOption4b96100 = PaymentOption;
-
-export type PaymentOptionMethod4b96100 = PaymentOptionMethod;
-
-export type PaymentOptionList4b96100 = PaymentOptionList;
-
-export type PaymentMethod4b96100 = PaymentMethod;
-
-export type PaymentMethodList4b96100 = PaymentMethodList;
-
-export type PaymentMethodSetup4b96100 = PaymentMethodSetup;
-
-export type PaymentMethodSetupResult4b96100 = PaymentMethodSetupResult;
-
-export type PayInvoiceRequest4b96100 = PayInvoiceRequest;
-
-export type PayTogetherRequest4b96100 = PayTogetherRequest;
-
-export type PaymentAction4b96100 = PaymentAction;
-
-export type PaymentStatus4b96100 = PaymentStatus;
-
-export type AppliedCredit4b96100 = AppliedCredit;
-
-export type PaymentPreviewInvoice4b96100 = PaymentPreviewInvoice;
-
-export type PaymentPreview4b96100 = PaymentPreview;
-
-export type PaymentResult4b96100 = PaymentResult;
-
-export type InvoiceStatus4b96100 = InvoiceStatus;
-
-export type Invoice4b96100 = Invoice;
-
-export type InvoiceList4b96100 = InvoiceList;
-
-export type InvoiceItem4b96100 = InvoiceItem;
-
-export type InvoiceItemList4b96100 = InvoiceItemList;
-
-export type TransactionType4b96100 = TransactionType;
-
-export type Transaction4b96100 = Transaction;
-
-export type TransactionList4b96100 = TransactionList;
-
-export type CreditGrant4b96100 = CreditGrant;
-
-export type CreditGrantList4b96100 = CreditGrantList;
-
-export type CreditNote4b96100 = CreditNote;
-
-export type CreditNoteItem4b96100 = CreditNoteItem;
-
-export type CreditNoteList4b96100 = CreditNoteList;
-
-export type CreditNoteItemList4b96100 = CreditNoteItemList;
-
-export type Refund4b96100 = Refund;
-
-export type RefundReason4b96100 = RefundReason;
-
-export type RefundList4b96100 = RefundList;
-
-export type UsageCharge4b96100 = UsageCharge;
-
-export type UsageChargeList4b96100 = UsageChargeList;
-
-export type SubscriptionList4b96100 = SubscriptionList;
-
-export type Subscription4b96100 = Subscription;
-
-export type RenewalPrice4b96100 = RenewalPrice;
-
-export type RenewalPriceList4b96100 = RenewalPriceList;
-
-export type RenewRequest4b96100 = RenewRequest;
-
-export type AutoRenewSet4b96100 = AutoRenewSet;
-
-export type CheckoutSessionStatus4b96100 = CheckoutSessionStatus;
-
-export type CheckoutSession4b96100 = CheckoutSession;
-
-export type CheckoutSessionList4b96100 = CheckoutSessionList;
-
-export type CheckoutSessionItem4b96100 = CheckoutSessionItem;
-
-export type CheckoutSessionItemList4b96100 = CheckoutSessionItemList;
-
-export type CheckoutSessionCreate4b96100 = CheckoutSessionCreate;
-
-export type CheckoutSessionConfirm4b96100 = CheckoutSessionConfirm;
-
-export type CheckoutSessionResult4b96100 = CheckoutSessionResult;
-
-export type OrderStatus4b96100 = OrderStatus;
-
-export type OrderItemStatus4b96100 = OrderItemStatus;
-
-export type Order4b96100 = Order;
-
-export type OrderList4b96100 = OrderList;
-
-export type PaidWith4b96100 = PaidWith;
-
-export type PurchaseOperation4b96100 = PurchaseOperation;
-
-export type Discount4b96100 = Discount;
-
-export type DiscountList4b96100 = DiscountList;
-
-export type PriceOption4b96100 = PriceOption;
-
-export type SubscriptionRestriction4b96100 = SubscriptionRestriction;
-
-export type Applicability4b96100 = Applicability;
-
-export type ApplicablePlan4b96100 = ApplicablePlan;
-
-export type OrderItem4b96100 = OrderItem;
-
-export type OrderItemList4b96100 = OrderItemList;
-
-export type Allowance4b96100 = Allowance;
-
-export type AllowanceList4b96100 = AllowanceList;
-
-export type FeatureGrantStatus4b96100 = FeatureGrantStatus;
-
-export type FeatureGrant4b96100 = FeatureGrant;
-
-export type FeatureGrantList4b96100 = FeatureGrantList;
-
-export type Entitlement4b96100 = Entitlement;
-
-export type EntitlementList4b96100 = EntitlementList;
-
-export type InvoiceSummary4b96100 = InvoiceSummary;
-
-export type TaxItem4b96100 = TaxItem;
-
-export type ProductList4b96100 = ProductList;
-
-export type Plan4b96100 = Plan;
-
-export type PlanList4b96100 = PlanList;
-
-export type Price4b96100 = Price;
-
-export type PriceList4b96100 = PriceList;
-
-export type Rate4b96100 = Rate;
-
-export type Tier4b96100 = Tier;
-
-export type PlanFeature4b96100 = PlanFeature;
-
-export type QuoteItemInput4b96100 = QuoteItemInput;
-
-export type SpendRow4b96100 = SpendRow;
-
-export type SpendRowList4b96100 = SpendRowList;
-
-export type ActiveResource4b96100 = ActiveResource;
-
-export type ActiveResourceList4b96100 = ActiveResourceList;
-
-export type OrderRefundPreview4b96100 = OrderRefundPreview;
-
-export type UsageEstimateRequest4b96100 = UsageEstimateRequest;
-
-export type UsageEstimateInput4b96100 = UsageEstimateInput;
-
-export type UsageEstimate4b96100 = UsageEstimate;
-
-export type UsageEstimateItem4b96100 = UsageEstimateItem;
-
-export type QuoteRequest4b96100 = QuoteRequest;
-
 export type PriceSearchDimensionsItem = { [key: string]: string };
 
 /**
@@ -4083,7 +3818,7 @@ export type ListProjectAssignmentsParams = {
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
 };
 
 export type ListTopUpsParams = {
@@ -4102,7 +3837,7 @@ export type ListTopUpsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
 };
 
 export type ListPaymentMethodsParams = {
@@ -4121,7 +3856,7 @@ export type ListPaymentMethodsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
 };
 
 export type PreviewInvoicePaymentParams = {
@@ -4151,17 +3886,17 @@ export type ListInvoicesParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   status?: InvoiceStatus;
   /**
    * Only invoices with a charge from this subscription; amounts are for the whole invoice.
    */
   subscription_id?: string;
-  from?: string;
+  from?: FromParameter;
   /**
    * Exclusive.
    */
-  to?: string;
+  to?: ToParameter;
 };
 
 export type ListInvoiceItemsParams = {
@@ -4195,12 +3930,12 @@ export type ListTransactionsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
-  from?: string;
+  billing_account_id?: AccountIdQueryParameter;
+  from?: FromParameter;
   /**
    * Exclusive.
    */
-  to?: string;
+  to?: ToParameter;
 };
 
 export type ListAccountDiscountsParams = {
@@ -4219,7 +3954,7 @@ export type ListAccountDiscountsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
 };
 
 export type ListCreditGrantsParams = {
@@ -4238,7 +3973,7 @@ export type ListCreditGrantsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   status?: ListCreditGrantsStatus;
 };
 
@@ -4268,7 +4003,7 @@ export type ListCreditNotesParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   /**
    * Only the notes for this invoice.
    */
@@ -4306,7 +4041,7 @@ export type ListRefundsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   /**
    * Only the refunds of this invoice.
    */
@@ -4333,24 +4068,24 @@ export type ListUsageChargesParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   product_id?: ProductID;
   resource_id?: string;
   /**
    * Only the charges summed into this usage invoice line.
    */
   invoice_item_id?: string;
-  from?: string;
+  from?: FromParameter;
   /**
    * Exclusive.
    */
-  to?: string;
+  to?: ToParameter;
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
   meter_id?: string;
   statement_id?: string;
 };
@@ -4372,13 +4107,13 @@ export type ListSubscriptionsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
 };
 
 export type ListCancellationsParams = {
@@ -4397,7 +4132,7 @@ export type ListCancellationsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   /**
    * Only cancellations that include this subscription.
    */
@@ -4411,7 +4146,7 @@ export type ListCancellationsParams = {
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
 };
 
 export type ListCancellationsStatus =
@@ -4458,7 +4193,7 @@ export type ListAllowancesParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   /**
    * Filter by the meter UUID.
    */
@@ -4470,7 +4205,7 @@ export type ListAllowancesParams = {
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
 };
 
 export type ListAllowancesStatus = (typeof ListAllowancesStatus)[keyof typeof ListAllowancesStatus];
@@ -4498,14 +4233,14 @@ export type ListCheckoutSessionsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   status?: CheckoutSessionStatus;
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
 };
 
 export type ListCheckoutSessionItemsParams = {
@@ -4547,19 +4282,19 @@ export type ListOrdersParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   status?: OrderStatus;
-  from?: string;
+  from?: FromParameter;
   /**
    * Exclusive.
    */
-  to?: string;
+  to?: ToParameter;
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
 };
 
 export type PreviewOrderRefundParams = {
@@ -4602,13 +4337,13 @@ export type ListEntitlementsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
   product_id?: ProductID;
 };
 
@@ -4628,7 +4363,7 @@ export type ListFeatureGrantsParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   product_id?: ProductID;
   status?: FeatureGrantStatus;
 };
@@ -4667,7 +4402,7 @@ export type ListPricesHeaders = {
   /**
    * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
-  "If-None-Match"?: string;
+  "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type ListProductsParams = {
@@ -4689,28 +4424,28 @@ export type ListProductsHeaders = {
   /**
    * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
-  "If-None-Match"?: string;
+  "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type GetProductHeaders = {
   /**
    * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
-  "If-None-Match"?: string;
+  "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type GetPlanHeaders = {
   /**
    * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
-  "If-None-Match"?: string;
+  "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type GetPriceHeaders = {
   /**
    * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
-  "If-None-Match"?: string;
+  "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type ListPlansParams = {
@@ -4733,7 +4468,7 @@ export type ListPlansHeaders = {
   /**
    * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
-  "If-None-Match"?: string;
+  "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type ListPricesByPlanParams = {
@@ -4764,7 +4499,7 @@ export type ListPricesByPlanHeaders = {
   /**
    * The `ETag` of an earlier response. When the catalogue has not changed since, the response is `304` with no body.
    */
-  "If-None-Match"?: string;
+  "If-None-Match"?: IfNoneMatchParameter;
 };
 
 export type ListActiveResourcesParams = {
@@ -4784,13 +4519,13 @@ export type ListActiveResourcesParams = {
   /**
    * Only this account; all of yours when omitted.
    */
-  billing_account_id?: number;
+  billing_account_id?: AccountIdQueryParameter;
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
   meter_id?: string;
   product_id?: ProductID;
   status?: ListActiveResourcesStatus;
@@ -4807,11 +4542,11 @@ export const ListActiveResourcesStatus = {
 } as const;
 
 export type ListSpendParams = {
-  from: string;
+  from: FromRequiredParameter;
   /**
    * Exclusive. One month is `[2026-09-01, 2026-10-01)`.
    */
-  to: string;
+  to: ToRequiredParameter;
   /**
    * `plan` groups by the plan of the price each charge was priced with, unchanged after the subscription changes plan. `resource` groups by the resource each charge names; a disk or an address billed under its own identifier is its own row. `meter` groups by meter and the values of its presentation dimensions, such as the model and token kind, and includes the quantity used.
    */
@@ -4841,7 +4576,7 @@ export type ListSpendParams = {
    * @minItems 1
    * @maxItems 100
    */
-  project_ids?: string[];
+  project_ids?: ProjectIdsQueryParameter;
 };
 
 export type ListSpendGroupBy = (typeof ListSpendGroupBy)[keyof typeof ListSpendGroupBy];

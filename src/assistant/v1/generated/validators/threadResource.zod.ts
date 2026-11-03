@@ -27,15 +27,15 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { ApprovalMode4b96100 } from "./approvalMode4b96100.zod.js";
+import { ApprovalMode } from "./approvalMode.zod.js";
 import { ContextUsageResource } from "./contextUsageResource.zod.js";
 import { LastTurnResource } from "./lastTurnResource.zod.js";
 import { PendingActionResource } from "./pendingActionResource.zod.js";
-import { ReasoningEffort4b96100 } from "./reasoningEffort4b96100.zod.js";
+import { ReasoningEffort } from "./reasoningEffort.zod.js";
 import { SubagentCountResource } from "./subagentCountResource.zod.js";
-import { ThreadStatus4b96100 } from "./threadStatus4b96100.zod.js";
+import { ThreadStatus } from "./threadStatus.zod.js";
 import { TodoResource } from "./todoResource.zod.js";
-import { Usage4b96100 } from "./usage4b96100.zod.js";
+import { Usage } from "./usage.zod.js";
 
 export const threadResourceOrderVersionMin = 0;
 
@@ -74,10 +74,10 @@ export const ThreadResource = zod
       ),
     modelId: zod.string().describe("The Canopy model the next model request uses."),
     reasoningEffort: zod
-      .union([ReasoningEffort4b96100, zod.null()])
+      .union([ReasoningEffort, zod.null()])
       .describe("Null when the model does not reason."),
-    approvalMode: ApprovalMode4b96100,
-    status: ThreadStatus4b96100,
+    approvalMode: ApprovalMode,
+    status: ThreadStatus,
     activity: zod
       .string()
       .nullable()
@@ -101,7 +101,9 @@ export const ThreadResource = zod
       .union([LastTurnResource, zod.null()])
       .describe("The most recent turn. Null before the first message."),
     context: ContextUsageResource,
-    usage: Usage4b96100,
+    usage: Usage.describe(
+      "Token usage over the whole conversation. For a main conversation this includes its subagents.",
+    ),
     unread: zod
       .boolean()
       .describe("The assistant replied after the conversation was last marked read."),

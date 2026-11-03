@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
+import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Product } from "./product.zod.js";
 
 export const ActiveResource = zod
@@ -24,7 +24,7 @@ export const ActiveResource = zod
       .string()
       .optional()
       .describe("The resource type, as the owning service names it."),
-    meter: ObjectIdentity4b96100,
+    meter: ObjectIdentity,
     unit: zod.string().optional(),
     quantity: zod
       .string()
