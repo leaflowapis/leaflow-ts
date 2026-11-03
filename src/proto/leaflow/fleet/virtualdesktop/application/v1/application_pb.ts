@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/virtualdesktop/application/v1/application.proto.
  */
 export const file_leaflow_fleet_virtualdesktop_application_v1_application: GenFile = /*@__PURE__*/
-  fileDesc("Cj1sZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2FwcGxpY2F0aW9uL3YxL2FwcGxpY2F0aW9uLnByb3RvEitsZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxIvkCCg1TZXJ2ZXJNZXNzYWdlElgKEGFwcGxpY2F0aW9uX21lbnUYASABKAsyPC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkFwcGxpY2F0aW9uTWVudUgAElAKDGRlc2t0b3BfaWNvbhgCIAEoCzI4LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuRGVza3RvcEljb25IABJfChRkZXNrdG9wX2ljb25fcmVtb3ZlZBgDIAEoCzI/LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuRGVza3RvcEljb25SZW1vdmVkSAASUAoMc25hcHNob3RfZW5kGAQgASgLMjgubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5hcHBsaWNhdGlvbi52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UiZAoPQXBwbGljYXRpb25NZW51EhAKCHJldmlzaW9uGAEgASgEEj8KBHJvb3QYAiABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLk1lbnUiyQEKBE1lbnUSEQoJbWVudV9wYXRoGAEgASgJEhQKDGRpc3BsYXlfbmFtZRgCIAEoCRIPCgdjb21tZW50GAMgASgJEjsKBGljb24YBCABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSWNvbhJKCghlbGVtZW50cxgFIAMoCzI4LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuTWVudUVsZW1lbnQiwwEKC01lbnVFbGVtZW50EkEKBG1lbnUYASABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLk1lbnVIABIZCg9kZXNrdG9wX2ZpbGVfaWQYAiABKAlIABJLCglzZXBhcmF0b3IYAyABKAsyNi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLlNlcGFyYXRvckgAQgkKB2VsZW1lbnQiCwoJU2VwYXJhdG9yItECCgtBcHBsaWNhdGlvbhIXCg9kZXNrdG9wX2ZpbGVfaWQYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJEhQKDGdlbmVyaWNfbmFtZRgDIAEoCRIPCgdjb21tZW50GAQgASgJEjsKBGljb24YBSABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSWNvbhISCgpjYXRlZ29yaWVzGAYgAygJEhAKCGtleXdvcmRzGAcgAygJEhAKCHRlcm1pbmFsGAggASgIEk8KB2FjdGlvbnMYCSADKAsyPi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkFwcGxpY2F0aW9uQWN0aW9uEhIKCm1pbWVfdHlwZXMYCiADKAkSEgoKbm9fZGlzcGxheRgLIAEoCCJ5ChFBcHBsaWNhdGlvbkFjdGlvbhIRCglhY3Rpb25faWQYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJEjsKBGljb24YAyABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSWNvbiKoAgoLRGVza3RvcEljb24SCwoDdXJpGAEgASgJEkoKBHR5cGUYAiABKA4yPC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkRlc2t0b3BJY29uVHlwZRIUCgxkaXNwbGF5X25hbWUYAyABKAkSOwoEaWNvbhgEIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5JY29uEhEKCW1pbWVfdHlwZRgFIAEoCRIVCg1zeW1ib2xpY19saW5rGAYgASgIEg8KB3RydXN0ZWQYByABKAgSHQoQdHJhc2hfaXRlbV9jb3VudBgIIAEoDUgAiAEBQhMKEV90cmFzaF9pdGVtX2NvdW50IiEKEkRlc2t0b3BJY29uUmVtb3ZlZBILCgN1cmkYASABKAkiDQoLU25hcHNob3RFbmQiQAoXTGlzdEFwcGxpY2F0aW9uc1JlcXVlc3QSEQoJcGFnZV9zaXplGAEgASgNEhIKCnBhZ2VfdG9rZW4YAiABKAkilQEKGExpc3RBcHBsaWNhdGlvbnNSZXNwb25zZRJOCgxhcHBsaWNhdGlvbnMYASADKAsyOC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkFwcGxpY2F0aW9uEhcKD25leHRfcGFnZV90b2tlbhgCIAEoCRIQCghyZXZpc2lvbhgDIAEoBCJUChhMYXVuY2hBcHBsaWNhdGlvblJlcXVlc3QSFwoPZGVza3RvcF9maWxlX2lkGAEgASgJEhEKCWFjdGlvbl9pZBgCIAEoCRIMCgR1cmlzGAMgAygJImcKGUxhdW5jaEFwcGxpY2F0aW9uUmVzcG9uc2USEgoKc3RhcnR1cF9pZBgBIAEoCRIWCgl3aW5kb3dfaWQYAiABKARIAIgBARIQCghyZXZpc2lvbhgDIAEoBEIMCgpfd2luZG93X2lkIn8KDk9wZW5VcmlSZXF1ZXN0EgsKA3VyaRgBIAEoCRJgChVsYXVuY2hlcl9jb25maXJtYXRpb24YAiABKA4yQS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkxhdW5jaGVyQ29uZmlybWF0aW9uIl0KD09wZW5VcmlSZXNwb25zZRISCgpzdGFydHVwX2lkGAEgASgJEhYKCXdpbmRvd19pZBgCIAEoBEgAiAEBEhAKCHJldmlzaW9uGAMgASgEQgwKCl93aW5kb3dfaWQigQEKB1Byb2Nlc3MSCwoDcGlkGAEgASgNEgwKBG5hbWUYAiABKAkSFwoPZGVza3RvcF9maWxlX2lkGAMgASgJEhIKCndpbmRvd19pZHMYBCADKAQSLgoKc3RhcnRlZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiUgoUTGlzdFByb2Nlc3Nlc1JlcXVlc3QSEQoJcGFnZV9zaXplGAEgASgNEhIKCnBhZ2VfdG9rZW4YAiABKAkSEwoLaW5jbHVkZV9hbGwYAyABKAgieQoVTGlzdFByb2Nlc3Nlc1Jlc3BvbnNlEkcKCXByb2Nlc3NlcxgBIAMoCzI0LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuUHJvY2VzcxIXCg9uZXh0X3BhZ2VfdG9rZW4YAiABKAkiNQoXVGVybWluYXRlUHJvY2Vzc1JlcXVlc3QSCwoDcGlkGAEgASgNEg0KBWZvcmNlGAIgASgIIiwKGFRlcm1pbmF0ZVByb2Nlc3NSZXNwb25zZRIQCghyZXZpc2lvbhgBIAEoBCITChFBcHBsaWNhdGlvblBvbGljeSrRAQoPRGVza3RvcEljb25UeXBlEiEKHURFU0tUT1BfSUNPTl9UWVBFX1VOU1BFQ0lGSUVEEAASGgoWREVTS1RPUF9JQ09OX1RZUEVfSE9NRRABEiAKHERFU0tUT1BfSUNPTl9UWVBFX0ZJTEVTWVNURU0QAhIbChdERVNLVE9QX0lDT05fVFlQRV9UUkFTSBADEhwKGERFU0tUT1BfSUNPTl9UWVBFX1ZPTFVNRRAEEiIKHkRFU0tUT1BfSUNPTl9UWVBFX1JFR1VMQVJfRklMRRAFKq4BChRMYXVuY2hlckNvbmZpcm1hdGlvbhIlCiFMQVVOQ0hFUl9DT05GSVJNQVRJT05fVU5TUEVDSUZJRUQQABIeChpMQVVOQ0hFUl9DT05GSVJNQVRJT05fTk9ORRABEicKI0xBVU5DSEVSX0NPTkZJUk1BVElPTl9MQVVOQ0hfQU5ZV0FZEAISJgoiTEFVTkNIRVJfQ09ORklSTUFUSU9OX01BUktfVFJVU1RFRBADMqcGChJBcHBsaWNhdGlvblNlcnZpY2USpAEKEExpc3RBcHBsaWNhdGlvbnMSRC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkxpc3RBcHBsaWNhdGlvbnNSZXF1ZXN0GkUubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5hcHBsaWNhdGlvbi52MS5MaXN0QXBwbGljYXRpb25zUmVzcG9uc2UiA5ACARKiAQoRTGF1bmNoQXBwbGljYXRpb24SRS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkxhdW5jaEFwcGxpY2F0aW9uUmVxdWVzdBpGLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuTGF1bmNoQXBwbGljYXRpb25SZXNwb25zZRKEAQoHT3BlblVyaRI7LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuT3BlblVyaVJlcXVlc3QaPC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLk9wZW5VcmlSZXNwb25zZRKbAQoNTGlzdFByb2Nlc3NlcxJBLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuTGlzdFByb2Nlc3Nlc1JlcXVlc3QaQi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkxpc3RQcm9jZXNzZXNSZXNwb25zZSIDkAIBEp8BChBUZXJtaW5hdGVQcm9jZXNzEkQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5hcHBsaWNhdGlvbi52MS5UZXJtaW5hdGVQcm9jZXNzUmVxdWVzdBpFLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuVGVybWluYXRlUHJvY2Vzc1Jlc3BvbnNlQlVaU2dpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC92aXJ0dWFsZGVza3RvcC9hcHBsaWNhdGlvbi92MTthcHBsaWNhdGlvbnYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_leaflow_fleet_virtualdesktop_display_v1_display]);
+  fileDesc("Cj1sZWFmbG93L2ZsZWV0L3ZpcnR1YWxkZXNrdG9wL2FwcGxpY2F0aW9uL3YxL2FwcGxpY2F0aW9uLnByb3RvEitsZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxIvkCCg1TZXJ2ZXJNZXNzYWdlElgKEGFwcGxpY2F0aW9uX21lbnUYASABKAsyPC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkFwcGxpY2F0aW9uTWVudUgAElAKDGRlc2t0b3BfaWNvbhgCIAEoCzI4LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuRGVza3RvcEljb25IABJfChRkZXNrdG9wX2ljb25fcmVtb3ZlZBgDIAEoCzI/LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuRGVza3RvcEljb25SZW1vdmVkSAASUAoMc25hcHNob3RfZW5kGAQgASgLMjgubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5hcHBsaWNhdGlvbi52MS5TbmFwc2hvdEVuZEgAQgkKB21lc3NhZ2UiZAoPQXBwbGljYXRpb25NZW51EhAKCHJldmlzaW9uGAEgASgEEj8KBHJvb3QYAiABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLk1lbnUiyQEKBE1lbnUSEQoJbWVudV9wYXRoGAEgASgJEhQKDGRpc3BsYXlfbmFtZRgCIAEoCRIPCgdjb21tZW50GAMgASgJEjsKBGljb24YBCABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSWNvbhJKCghlbGVtZW50cxgFIAMoCzI4LmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuTWVudUVsZW1lbnQiwwEKC01lbnVFbGVtZW50EkEKBG1lbnUYASABKAsyMS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLk1lbnVIABIZCg9kZXNrdG9wX2ZpbGVfaWQYAiABKAlIABJLCglzZXBhcmF0b3IYAyABKAsyNi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLlNlcGFyYXRvckgAQgkKB2VsZW1lbnQiCwoJU2VwYXJhdG9yItECCgtBcHBsaWNhdGlvbhIXCg9kZXNrdG9wX2ZpbGVfaWQYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJEhQKDGdlbmVyaWNfbmFtZRgDIAEoCRIPCgdjb21tZW50GAQgASgJEjsKBGljb24YBSABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSWNvbhISCgpjYXRlZ29yaWVzGAYgAygJEhAKCGtleXdvcmRzGAcgAygJEhAKCHRlcm1pbmFsGAggASgIEk8KB2FjdGlvbnMYCSADKAsyPi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkFwcGxpY2F0aW9uQWN0aW9uEhIKCm1pbWVfdHlwZXMYCiADKAkSEgoKbm9fZGlzcGxheRgLIAEoCCJ5ChFBcHBsaWNhdGlvbkFjdGlvbhIRCglhY3Rpb25faWQYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJEjsKBGljb24YAyABKAsyLS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmRpc3BsYXkudjEuSWNvbiKoAgoLRGVza3RvcEljb24SCwoDdXJpGAEgASgJEkoKBHR5cGUYAiABKA4yPC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkRlc2t0b3BJY29uVHlwZRIUCgxkaXNwbGF5X25hbWUYAyABKAkSOwoEaWNvbhgEIAEoCzItLmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuZGlzcGxheS52MS5JY29uEhEKCW1pbWVfdHlwZRgFIAEoCRIVCg1zeW1ib2xpY19saW5rGAYgASgIEg8KB3RydXN0ZWQYByABKAgSHQoQdHJhc2hfaXRlbV9jb3VudBgIIAEoDUgAiAEBQhMKEV90cmFzaF9pdGVtX2NvdW50IiEKEkRlc2t0b3BJY29uUmVtb3ZlZBILCgN1cmkYASABKAkiDQoLU25hcHNob3RFbmQiQAoXTGlzdEFwcGxpY2F0aW9uc1JlcXVlc3QSEQoJcGFnZV9zaXplGAEgASgNEhIKCnBhZ2VfdG9rZW4YAiABKAkilQEKGExpc3RBcHBsaWNhdGlvbnNSZXNwb25zZRJOCgxhcHBsaWNhdGlvbnMYASADKAsyOC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkFwcGxpY2F0aW9uEhcKD25leHRfcGFnZV90b2tlbhgCIAEoCRIQCghyZXZpc2lvbhgDIAEoBCKzAQoLT3BlblJlcXVlc3QSDgoGdGFyZ2V0GAEgASgJEhEKCWFyZ3VtZW50cxgCIAMoCRIRCglhY3Rpb25faWQYAyABKAkSDAoEdXJpcxgEIAMoCRJgChVsYXVuY2hlcl9jb25maXJtYXRpb24YBSABKA4yQS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkxhdW5jaGVyQ29uZmlybWF0aW9uInQKDE9wZW5SZXNwb25zZRISCgpzdGFydHVwX2lkGAEgASgJEhYKCXdpbmRvd19pZBgCIAEoBEgAiAEBEhAKCHJldmlzaW9uGAMgASgEEhAKA3BpZBgEIAEoDUgBiAEBQgwKCl93aW5kb3dfaWRCBgoEX3BpZCJUChhMYXVuY2hBcHBsaWNhdGlvblJlcXVlc3QSFwoPZGVza3RvcF9maWxlX2lkGAEgASgJEhEKCWFjdGlvbl9pZBgCIAEoCRIMCgR1cmlzGAMgAygJIoEBChlMYXVuY2hBcHBsaWNhdGlvblJlc3BvbnNlEhIKCnN0YXJ0dXBfaWQYASABKAkSFgoJd2luZG93X2lkGAIgASgESACIAQESEAoIcmV2aXNpb24YAyABKAQSEAoDcGlkGAQgASgNSAGIAQFCDAoKX3dpbmRvd19pZEIGCgRfcGlkIn8KDk9wZW5VcmlSZXF1ZXN0EgsKA3VyaRgBIAEoCRJgChVsYXVuY2hlcl9jb25maXJtYXRpb24YAiABKA4yQS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkxhdW5jaGVyQ29uZmlybWF0aW9uIncKD09wZW5VcmlSZXNwb25zZRISCgpzdGFydHVwX2lkGAEgASgJEhYKCXdpbmRvd19pZBgCIAEoBEgAiAEBEhAKCHJldmlzaW9uGAMgASgEEhAKA3BpZBgEIAEoDUgBiAEBQgwKCl93aW5kb3dfaWRCBgoEX3BpZCKBAQoHUHJvY2VzcxILCgNwaWQYASABKA0SDAoEbmFtZRgCIAEoCRIXCg9kZXNrdG9wX2ZpbGVfaWQYAyABKAkSEgoKd2luZG93X2lkcxgEIAMoBBIuCgpzdGFydGVkX2F0GAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJSChRMaXN0UHJvY2Vzc2VzUmVxdWVzdBIRCglwYWdlX3NpemUYASABKA0SEgoKcGFnZV90b2tlbhgCIAEoCRITCgtpbmNsdWRlX2FsbBgDIAEoCCJ5ChVMaXN0UHJvY2Vzc2VzUmVzcG9uc2USRwoJcHJvY2Vzc2VzGAEgAygLMjQubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5hcHBsaWNhdGlvbi52MS5Qcm9jZXNzEhcKD25leHRfcGFnZV90b2tlbhgCIAEoCSI1ChdUZXJtaW5hdGVQcm9jZXNzUmVxdWVzdBILCgNwaWQYASABKA0SDQoFZm9yY2UYAiABKAgiLAoYVGVybWluYXRlUHJvY2Vzc1Jlc3BvbnNlEhAKCHJldmlzaW9uGAEgASgEIhMKEUFwcGxpY2F0aW9uUG9saWN5KtEBCg9EZXNrdG9wSWNvblR5cGUSIQodREVTS1RPUF9JQ09OX1RZUEVfVU5TUEVDSUZJRUQQABIaChZERVNLVE9QX0lDT05fVFlQRV9IT01FEAESIAocREVTS1RPUF9JQ09OX1RZUEVfRklMRVNZU1RFTRACEhsKF0RFU0tUT1BfSUNPTl9UWVBFX1RSQVNIEAMSHAoYREVTS1RPUF9JQ09OX1RZUEVfVk9MVU1FEAQSIgoeREVTS1RPUF9JQ09OX1RZUEVfUkVHVUxBUl9GSUxFEAUqrgEKFExhdW5jaGVyQ29uZmlybWF0aW9uEiUKIUxBVU5DSEVSX0NPTkZJUk1BVElPTl9VTlNQRUNJRklFRBAAEh4KGkxBVU5DSEVSX0NPTkZJUk1BVElPTl9OT05FEAESJwojTEFVTkNIRVJfQ09ORklSTUFUSU9OX0xBVU5DSF9BTllXQVkQAhImCiJMQVVOQ0hFUl9DT05GSVJNQVRJT05fTUFSS19UUlVTVEVEEAMypAcKEkFwcGxpY2F0aW9uU2VydmljZRKkAQoQTGlzdEFwcGxpY2F0aW9ucxJELmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuTGlzdEFwcGxpY2F0aW9uc1JlcXVlc3QaRS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkxpc3RBcHBsaWNhdGlvbnNSZXNwb25zZSIDkAIBEnsKBE9wZW4SOC5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLk9wZW5SZXF1ZXN0GjkubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5hcHBsaWNhdGlvbi52MS5PcGVuUmVzcG9uc2USogEKEUxhdW5jaEFwcGxpY2F0aW9uEkUubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5hcHBsaWNhdGlvbi52MS5MYXVuY2hBcHBsaWNhdGlvblJlcXVlc3QaRi5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkxhdW5jaEFwcGxpY2F0aW9uUmVzcG9uc2UShAEKB09wZW5VcmkSOy5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLk9wZW5VcmlSZXF1ZXN0GjwubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5hcHBsaWNhdGlvbi52MS5PcGVuVXJpUmVzcG9uc2USmwEKDUxpc3RQcm9jZXNzZXMSQS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLkxpc3RQcm9jZXNzZXNSZXF1ZXN0GkIubGVhZmxvdy5mbGVldC52aXJ0dWFsZGVza3RvcC5hcHBsaWNhdGlvbi52MS5MaXN0UHJvY2Vzc2VzUmVzcG9uc2UiA5ACARKfAQoQVGVybWluYXRlUHJvY2VzcxJELmxlYWZsb3cuZmxlZXQudmlydHVhbGRlc2t0b3AuYXBwbGljYXRpb24udjEuVGVybWluYXRlUHJvY2Vzc1JlcXVlc3QaRS5sZWFmbG93LmZsZWV0LnZpcnR1YWxkZXNrdG9wLmFwcGxpY2F0aW9uLnYxLlRlcm1pbmF0ZVByb2Nlc3NSZXNwb25zZUJVWlNnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvdmlydHVhbGRlc2t0b3AvYXBwbGljYXRpb24vdjE7YXBwbGljYXRpb252MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_leaflow_fleet_virtualdesktop_display_v1_display]);
 
 /**
  * A message from the session on the application channel.
@@ -525,14 +525,139 @@ export const ListApplicationsResponseSchema: GenMessage<ListApplicationsResponse
   messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 11);
 
 /**
- * The request of LaunchApplication.
+ * The request of Open. The session resolves one object; callers do not need
+ * to choose an executable-versus-document mode. Permission and lease checks
+ * are the same as for launching or opening through ApplicationService.
+ *
+ * @generated from message leaflow.fleet.virtualdesktop.application.v1.OpenRequest
+ */
+export type OpenRequest = Message<"leaflow.fleet.virtualdesktop.application.v1.OpenRequest"> & {
+  /**
+   * One absolute local path, absolute URI, or installed desktop file ID.
+   * Paths are canonicalized; NUL, relative paths and parent-directory path
+   * components are invalid. Local paths are limited to 4096 UTF-8 bytes,
+   * desktop IDs to 1024 and the complete target to 8192.
+   * Executable programs, including AppImages and native binaries, are run
+   * directly; ordinary documents and folders open in their default handler.
+   * File classification uses the filesystem and MIME information, not an
+   * application-name or filename-extension allowlist. An executable bit on
+   * an otherwise ordinary document does not turn its content into code.
+   * Empty: OPEN_TARGET_REQUIRED. Invalid: OPEN_TARGET_INVALID. Missing local
+   * objects: FILE_NOT_FOUND. Unknown desktop IDs: APPLICATION_NOT_FOUND.
+   * Error details identify field=target and the concrete issue.
+   *
+   * @generated from field: string target = 1;
+   */
+  target: string;
+
+  /**
+   * Program arguments after argv[0], passed unchanged without shell expansion,
+   * interpolation or joining. At most 256 arguments, each at most 8192 UTF-8
+   * bytes, and at most 65536 bytes together; NUL is invalid. A malformed vector
+   * fails with OPEN_ARGUMENTS_INVALID and identifies its index or size limit.
+   * Arguments on a document, directory, URI handler or desktop entry fail with
+   * OPEN_OPTIONS_NOT_APPLICABLE; they are never silently ignored.
+   *
+   * @generated from field: repeated string arguments = 2;
+   */
+  arguments: string[];
+
+  /**
+   * An action of a desktop entry. Not valid for other target kinds.
+   *
+   * @generated from field: string action_id = 3;
+   */
+  actionId: string;
+
+  /**
+   * Files or URLs supplied to a desktop entry's Exec field codes. Not valid
+   * for other target kinds; document open uses target instead.
+   *
+   * @generated from field: repeated string uris = 4;
+   */
+  uris: string[];
+
+  /**
+   * The same trust decision as OpenUri. Unspecified never approves an
+   * untrusted desktop launcher on behalf of the person.
+   *
+   * @generated from field: leaflow.fleet.virtualdesktop.application.v1.LauncherConfirmation launcher_confirmation = 5;
+   */
+  launcherConfirmation: LauncherConfirmation;
+};
+
+/**
+ * Describes the message leaflow.fleet.virtualdesktop.application.v1.OpenRequest.
+ * Use `create(OpenRequestSchema)` to create a new message.
+ */
+export const OpenRequestSchema: GenMessage<OpenRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 12);
+
+/**
+ * Open was accepted. The started application belongs to the session, not this
+ * call: cancelling, timing out or disconnecting never terminates it. Session
+ * lifetime and explicit termination still apply. Waiting for a matched window
+ * is bounded (at most 30 seconds for StartupNotify, otherwise 5 seconds).
+ * No matched window is a successful result, not a reason to repeat Open: an
+ * application may still be starting, have no window, or reuse another process.
+ * A registered alternative handler may be tried only when the previous handler
+ * was definitely not started. Missing associations fail with
+ * URI_HANDLER_NOT_FOUND and report the detected MIME and bounded candidate
+ * desktop IDs when known. A spawn failure or nonzero startup exit fails with
+ * APPLICATION_START_FAILED, with stage, started, pid and exit status when
+ * known. Started or uncertain failures must not be automatically replayed.
+ *
+ * @generated from message leaflow.fleet.virtualdesktop.application.v1.OpenResponse
+ */
+export type OpenResponse = Message<"leaflow.fleet.virtualdesktop.application.v1.OpenResponse"> & {
+  /**
+   * The startup notification ID, when one was used.
+   *
+   * @generated from field: string startup_id = 1;
+   */
+  startupId: string;
+
+  /**
+   * The matched window; unset when none was observed or required.
+   *
+   * @generated from field: optional uint64 window_id = 2;
+   */
+  windowId?: bigint | undefined;
+
+  /**
+   * The session revision at which the request was accepted or wait ended.
+   *
+   * @generated from field: uint64 revision = 3;
+   */
+  revision: bigint;
+
+  /**
+   * The initial process actually spawned. Unset for activation of an existing
+   * handler without an observable spawn; never guessed from an unrelated
+   * window. This is not necessarily the eventual window-owning process.
+   *
+   * @generated from field: optional uint32 pid = 4;
+   */
+  pid?: number | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.virtualdesktop.application.v1.OpenResponse.
+ * Use `create(OpenResponseSchema)` to create a new message.
+ */
+export const OpenResponseSchema: GenMessage<OpenResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 13);
+
+/**
+ * The request of LaunchApplication, for a menu entry or its action.
+ * Open accepts general paths and URIs.
  *
  * @generated from message leaflow.fleet.virtualdesktop.application.v1.LaunchApplicationRequest
  */
 export type LaunchApplicationRequest = Message<"leaflow.fleet.virtualdesktop.application.v1.LaunchApplicationRequest"> & {
   /**
-   * The application. An unknown one, or one whose TryExec fails, fails with
-   * NOT_FOUND.
+   * The application. An unknown entry, or one whose TryExec fails, fails with
+   * NOT_FOUND and reason APPLICATION_NOT_FOUND.
    *
    * @generated from field: string desktop_file_id = 1;
    */
@@ -561,13 +686,19 @@ export type LaunchApplicationRequest = Message<"leaflow.fleet.virtualdesktop.app
  * Use `create(LaunchApplicationRequestSchema)` to create a new message.
  */
 export const LaunchApplicationRequestSchema: GenMessage<LaunchApplicationRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 12);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 14);
 
 /**
- * The response of LaunchApplication. When the program exits with a failure
- * before showing a window the call fails with ABORTED; when no window appears
- * within 30 seconds (StartupNotify) or 5 seconds (otherwise) it fails with
- * DEADLINE_EXCEEDED, though the program may still be running.
+ * The response of LaunchApplication. A spawned application belongs to the
+ * session, not to this RPC: cancelling, timing out or disconnecting this call
+ * never terminates the application. Session lifetime and explicit termination
+ * still apply. A spawn failure, or a nonzero exit before a window appears,
+ * fails with reason APPLICATION_START_FAILED; metadata distinguishes whether
+ * a process was already started and its pid when known. Do not blindly retry.
+ * When no window appears within the bounded startup wait (at most 30 seconds
+ * for StartupNotify, otherwise 5 seconds), the call succeeds with no window_id;
+ * this is not a failed launch and must not trigger another launch. The program
+ * may still be starting, forward to an existing instance, or have no window.
  *
  * @generated from message leaflow.fleet.virtualdesktop.application.v1.LaunchApplicationResponse
  */
@@ -593,6 +724,16 @@ export type LaunchApplicationResponse = Message<"leaflow.fleet.virtualdesktop.ap
    * @generated from field: uint64 revision = 3;
    */
   revision: bigint;
+
+  /**
+   * The initial process spawned for this launch. It may exit after forwarding
+   * to another process; it is not necessarily the process owning window_id.
+   * Unset when activation happened without an observable spawned process,
+   * such as D-Bus activation.
+   *
+   * @generated from field: optional uint32 pid = 4;
+   */
+  pid?: number | undefined;
 };
 
 /**
@@ -600,7 +741,7 @@ export type LaunchApplicationResponse = Message<"leaflow.fleet.virtualdesktop.ap
  * Use `create(LaunchApplicationResponseSchema)` to create a new message.
  */
 export const LaunchApplicationResponseSchema: GenMessage<LaunchApplicationResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 13);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 15);
 
 /**
  * The request of OpenUri.
@@ -633,7 +774,7 @@ export type OpenUriRequest = Message<"leaflow.fleet.virtualdesktop.application.v
  * Use `create(OpenUriRequestSchema)` to create a new message.
  */
 export const OpenUriRequestSchema: GenMessage<OpenUriRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 14);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 16);
 
 /**
  * The response of OpenUri. It fails as LaunchApplication does.
@@ -663,6 +804,14 @@ export type OpenUriResponse = Message<"leaflow.fleet.virtualdesktop.application.
    * @generated from field: uint64 revision = 3;
    */
   revision: bigint;
+
+  /**
+   * The initial spawned process, when one was observable. Unset for a
+   * successful request handled by an existing application over D-Bus.
+   *
+   * @generated from field: optional uint32 pid = 4;
+   */
+  pid?: number | undefined;
 };
 
 /**
@@ -670,7 +819,7 @@ export type OpenUriResponse = Message<"leaflow.fleet.virtualdesktop.application.
  * Use `create(OpenUriResponseSchema)` to create a new message.
  */
 export const OpenUriResponseSchema: GenMessage<OpenUriResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 15);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 17);
 
 /**
  * A process of the session.
@@ -719,7 +868,7 @@ export type Process = Message<"leaflow.fleet.virtualdesktop.application.v1.Proce
  * Use `create(ProcessSchema)` to create a new message.
  */
 export const ProcessSchema: GenMessage<Process> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 16);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 18);
 
 /**
  * The request of ListProcesses.
@@ -755,7 +904,7 @@ export type ListProcessesRequest = Message<"leaflow.fleet.virtualdesktop.applica
  * Use `create(ListProcessesRequestSchema)` to create a new message.
  */
 export const ListProcessesRequestSchema: GenMessage<ListProcessesRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 17);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 19);
 
 /**
  * The response of ListProcesses.
@@ -783,7 +932,7 @@ export type ListProcessesResponse = Message<"leaflow.fleet.virtualdesktop.applic
  * Use `create(ListProcessesResponseSchema)` to create a new message.
  */
 export const ListProcessesResponseSchema: GenMessage<ListProcessesResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 18);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 20);
 
 /**
  * The request of TerminateProcess.
@@ -812,7 +961,7 @@ export type TerminateProcessRequest = Message<"leaflow.fleet.virtualdesktop.appl
  * Use `create(TerminateProcessRequestSchema)` to create a new message.
  */
 export const TerminateProcessRequestSchema: GenMessage<TerminateProcessRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 19);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 21);
 
 /**
  * The response of TerminateProcess. The process may take a while to end; its
@@ -834,7 +983,7 @@ export type TerminateProcessResponse = Message<"leaflow.fleet.virtualdesktop.app
  * Use `create(TerminateProcessResponseSchema)` to create a new message.
  */
 export const TerminateProcessResponseSchema: GenMessage<TerminateProcessResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 20);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 22);
 
 /**
  * Allows a participant to launch applications and open URIs. Carried in the
@@ -850,7 +999,7 @@ export type ApplicationPolicy = Message<"leaflow.fleet.virtualdesktop.applicatio
  * Use `create(ApplicationPolicySchema)` to create a new message.
  */
 export const ApplicationPolicySchema: GenMessage<ApplicationPolicy> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 21);
+  messageDesc(file_leaflow_fleet_virtualdesktop_application_v1_application, 23);
 
 /**
  * What a desktop icon shows.
@@ -963,6 +1112,18 @@ export const ApplicationService: GenService<{
     methodKind: "unary";
     input: typeof ListApplicationsRequestSchema;
     output: typeof ListApplicationsResponseSchema;
+  },
+  /**
+   * Opens an absolute path, URI or desktop entry, as a desktop open action:
+   * programs execute directly, documents and folders use registered handlers.
+   * It never interprets a shell command line or changes the default handler.
+   *
+   * @generated from rpc leaflow.fleet.virtualdesktop.application.v1.ApplicationService.Open
+   */
+  open: {
+    methodKind: "unary";
+    input: typeof OpenRequestSchema;
+    output: typeof OpenResponseSchema;
   },
   /**
    * Starts an application, or one of its actions, possibly with files or
