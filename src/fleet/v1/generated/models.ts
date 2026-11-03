@@ -1235,59 +1235,6 @@ export interface CallMcpToolResponse {
 }
 
 /**
- * The JSON Schema of its arguments
- */
-export type McpToolResourceInputSchema = { [key: string]: unknown };
-
-/**
- * The JSON Schema of its structured result; null when it has none
- * @nullable
- */
-export type McpToolResourceOutputSchema = { [key: string]: unknown } | null;
-
-/**
- * Its MCP `ToolAnnotations`, such as `readOnlyHint`; hints of the server, not guarantees
- * @nullable
- */
-export type McpToolResourceAnnotations = { [key: string]: unknown } | null;
-
-export interface McpToolResource {
-  /** The server that offers it */
-  server: string;
-  name: string;
-  title: string;
-  description: string;
-  /** The JSON Schema of its arguments */
-  input_schema: McpToolResourceInputSchema;
-  /**
-   * The JSON Schema of its structured result; null when it has none
-   * @nullable
-   */
-  output_schema: McpToolResourceOutputSchema;
-  /**
-   * Its MCP `ToolAnnotations`, such as `readOnlyHint`; hints of the server, not guarantees
-   * @nullable
-   */
-  annotations: McpToolResourceAnnotations;
-}
-
-export interface McpUnavailableServer {
-  name: string;
-  failure: McpServerFailure;
-}
-
-export interface McpToolList {
-  items: McpToolResource[];
-  /**
-   * Null on the last page
-   * @nullable
-   */
-  next_page_token: string | null;
-  /** Servers whose tools are missing because they could not be started or reached */
-  unavailable_servers: McpUnavailableServer[];
-}
-
-/**
  * How the caller's privilege requests on the machine are decided without asking them:
  * - `automatic_review`, recommended: a large language model reviews each request from what
  *   the machine reports about it, chiefly the command line, and approves or denies it with
@@ -1729,29 +1676,6 @@ export const ListToolsSource = {
   builtin: "builtin",
   mcp: "mcp",
 } as const;
-
-export type ListMcpToolsParams = {
-  /**
-   * Only this server's tools
-   * @maxLength 64
-   */
-  server?: string;
-  /**
-   * Words that each must occur in a tool's name, title or description
-   * @maxLength 256
-   */
-  query?: string;
-  /**
-   * @minimum 1
-   * @maximum 500
-   */
-  page_size?: number;
-  /**
-   * `next_page_token` of the previous page
-   * @maxLength 1024
-   */
-  page_token?: string;
-};
 
 export type ListPrivilegeAutoApprovalsParams = {
   /**

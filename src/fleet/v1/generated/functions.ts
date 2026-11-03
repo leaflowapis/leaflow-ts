@@ -274,7 +274,6 @@ import type {
   ListMachineEventsParams,
   ListMachineRegistrationsParams,
   ListMachinesParams,
-  ListMcpToolsParams,
   ListPrivilegeAutoApprovalsParams,
   ListPrivilegeRequestsParams,
   ListSessionsParams,
@@ -286,7 +285,6 @@ import type {
   MachineResource,
   McpConfigurationFile,
   McpConfigurationResource,
-  McpToolList,
   MigrationStep,
   ParticipantList,
   ParticipantResource,
@@ -1092,12 +1090,12 @@ export const getCallToolUrl = (machineId: string) => {
 };
 
 /**
- * Uses the same current permissions, directory account and graphical session as listTools.
+ * Uses the same current permissions, directory account and graphical session as list-tools.
  * Listing is not a precondition: callers may use a previously discovered ToolRef, and this
  * operation never sends a discovery request or refreshes schemas before executing it.
  * A removed tool or MCP server returns TOOL_NOT_FOUND, as does a direct builtin computer.*
  * call while virtual desktop capability is unavailable. Actual permission errors remain
- * permission errors; a missing target window is not a missing tool. Use listTools only when
+ * permission errors; a missing target window is not a missing tool. Use list-tools only when
  * discovery or refresh is needed, and do not cache or reuse execution results.
  * Source is explicit: MCP names never select or impersonate builtin tools. The arguments
  * object is at most 256 KiB. The complete result is at most 8 MiB in the protobuf transport,
@@ -1359,78 +1357,6 @@ export const callMcpTool = async (
 
   const data: callMcpToolResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as callMcpToolResponse;
-};
-
-export type listMcpToolsResponse200 = {
-  data: McpToolList;
-  status: 200;
-};
-
-export type listMcpToolsResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type listMcpToolsResponseSuccess = listMcpToolsResponse200 & {
-  headers: Headers;
-};
-export type listMcpToolsResponseError = listMcpToolsResponseDefault & {
-  headers: Headers;
-};
-
-export type listMcpToolsResponse = listMcpToolsResponseSuccess | listMcpToolsResponseError;
-
-export const getListMcpToolsUrl = (machineId: string, params?: ListMcpToolsParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-tools?${stringifiedParams}`
-    : `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/mcp-tools`;
-};
-
-/**
- * Lists the tools of the caller's servers on the machine, or of one of them, that match
- * `query`: every word of it, ignoring case, in the tool's name, title or description. They
- * are ordered by server, then by tool name. Servers that are not running are started to
- * learn their tools; one that cannot be is named in `unavailable_servers`, and the others are
- * listed anyway. Slow servers do not hold the request up: those still starting are named
- * with `timeout` and go on starting, so that a later request lists their tools. Requires
- * `fleet:machines.login` on the machine.
- *
- * Fails with:
- * - `MCP_SERVER_NOT_FOUND` when `server` is not configured;
- * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
- * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
- *   the machine refuses the account, as for opening a session;
- * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
- * - `MACHINE_TIMEOUT` when the machine did not answer in time.
- * @deprecated
- * @summary List the caller's MCP tools on a machine
- */
-export const listMcpTools = async (
-  machineId: string,
-  params?: ListMcpToolsParams,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<listMcpToolsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListMcpToolsUrl(machineId, params), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: listMcpToolsResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listMcpToolsResponse;
 };
 
 export type getPrivilegeAutoApprovalResponse200 = {

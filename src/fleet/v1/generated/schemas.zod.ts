@@ -566,12 +566,12 @@ export const ListToolsQueryParams = zod.strictObject({
 });
 
 /**
- * Uses the same current permissions, directory account and graphical session as listTools.
+ * Uses the same current permissions, directory account and graphical session as list-tools.
  * Listing is not a precondition: callers may use a previously discovered ToolRef, and this
  * operation never sends a discovery request or refreshes schemas before executing it.
  * A removed tool or MCP server returns TOOL_NOT_FOUND, as does a direct builtin computer.*
  * call while virtual desktop capability is unavailable. Actual permission errors remain
- * permission errors; a missing target window is not a missing tool. Use listTools only when
+ * permission errors; a missing target window is not a missing tool. Use list-tools only when
  * discovery or refresh is needed, and do not cache or reuse execution results.
  * Source is explicit: MCP names never select or impersonate builtin tools. The arguments
  * object is at most 256 KiB. The complete result is at most 8 MiB in the protobuf transport,
@@ -678,62 +678,6 @@ export const CallMcpToolParams = zod.strictObject({
 });
 
 export const CallMcpToolBody = CallMcpToolRequest;
-
-/**
- * Lists the tools of the caller's servers on the machine, or of one of them, that match
- * `query`: every word of it, ignoring case, in the tool's name, title or description. They
- * are ordered by server, then by tool name. Servers that are not running are started to
- * learn their tools; one that cannot be is named in `unavailable_servers`, and the others are
- * listed anyway. Slow servers do not hold the request up: those still starting are named
- * with `timeout` and go on starting, so that a later request lists their tools. Requires
- * `fleet:machines.login` on the machine.
- *
- * Fails with:
- * - `MCP_SERVER_NOT_FOUND` when `server` is not configured;
- * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
- * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
- *   the machine refuses the account, as for opening a session;
- * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
- * - `MACHINE_TIMEOUT` when the machine did not answer in time.
- * @deprecated
- * @summary List the caller's MCP tools on a machine
- */
-export const ListMcpToolsParams = zod.strictObject({
-  machineId: zod.uuid(),
-});
-
-export const listMcpToolsQueryServerMax = 64;
-
-export const listMcpToolsQueryQueryMax = 256;
-
-export const listMcpToolsQueryPageSizeDefault = 100;
-export const listMcpToolsQueryPageSizeMax = 500;
-
-export const listMcpToolsQueryPageTokenMax = 1024;
-
-export const ListMcpToolsQueryParams = zod.strictObject({
-  server: zod
-    .string()
-    .max(listMcpToolsQueryServerMax)
-    .optional()
-    .describe("Only this server's tools"),
-  query: zod
-    .string()
-    .max(listMcpToolsQueryQueryMax)
-    .optional()
-    .describe("Words that each must occur in a tool's name, title or description"),
-  page_size: zod
-    .int()
-    .min(1)
-    .max(listMcpToolsQueryPageSizeMax)
-    .default(listMcpToolsQueryPageSizeDefault),
-  page_token: zod
-    .string()
-    .max(listMcpToolsQueryPageTokenMax)
-    .optional()
-    .describe("`next_page_token` of the previous page"),
-});
 
 /**
  * Returns the caller's automatic approval of their privilege requests on the machine. Fails
