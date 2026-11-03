@@ -87,11 +87,14 @@
  * - `leaflow.fleet.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
  *   the virtual desktop capability is actually available; MCP is a separate source.
  *
- * A graphical backend does not require a full desktop environment. Terminal logins, commands
- * and MCP server initialization prepare or reuse the account's lightweight graphical context,
- * in addition to their own session or job. Configuration reads and writes do not initialize a
- * server and do not require this preparation. A request that needs a feature the machine does
- * not report available fails with `FEATURE_UNAVAILABLE`, whose `metadata.feature` names it.
+ * A graphical backend does not require a full desktop environment. When the machine reports
+ * graphical capability available, terminal logins and commands prepare or reuse the account's
+ * lightweight graphical context, in addition to their own session or job. Without graphical
+ * capability, ordinary commands and terminal sessions run without creating a graphical context
+ * or injecting X environment variables. MCP server initialization prepares or reuses a graphical
+ * context; configuration reads and writes do not initialize a server or require this preparation.
+ * A request that needs a feature the machine does not report available fails with
+ * `FEATURE_UNAVAILABLE`, whose `metadata.feature` names it.
  *
  * ## Directory
  *
