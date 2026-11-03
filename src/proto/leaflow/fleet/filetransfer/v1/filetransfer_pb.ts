@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/filetransfer/v1/filetransfer.proto.
  */
 export const file_leaflow_fleet_filetransfer_v1_filetransfer: GenFile = /*@__PURE__*/
-  fileDesc("CjBsZWFmbG93L2ZsZWV0L2ZpbGV0cmFuc2Zlci92MS9maWxldHJhbnNmZXIucHJvdG8SHWxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxIv0CChNGaWxlVHJhbnNmZXJNZXNzYWdlEkEKBW9mZmVyGAEgASgLMjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyT2ZmZXJIABJFCgdyZXF1ZXN0GAIgASgLMjIubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyUmVxdWVzdEgAEkcKCHJlc3BvbnNlGAMgASgLMjMubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyUmVzcG9uc2VIABJDCgZjYW5jZWwYBCABKAsyMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHJhbnNmZXJDYW5jZWxIABJDCgZyZXN1bHQYBSABKAsyMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHJhbnNmZXJSZXN1bHRIAEIJCgdtZXNzYWdlIpwBChFGaWxlVHJhbnNmZXJPZmZlchITCgt0cmFuc2Zlcl9pZBgBIAEoCRI5CgdlbnRyaWVzGAIgAygLMigubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZUVudHJ5EhgKEHRvdGFsX3NpemVfYnl0ZXMYAyABKAQSHQoVZGVzdGluYXRpb25fZGlyZWN0b3J5GAQgASgJIpsBCglGaWxlRW50cnkSDwoHZmlsZV9pZBgBIAEoCRIRCglwYXJlbnRfaWQYAiABKAkSDAoEbmFtZRgDIAEoCRI1CgR0eXBlGAQgASgOMicubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVR5cGUSEgoKc2l6ZV9ieXRlcxgFIAEoBBIRCgltaW1lX3R5cGUYBiABKAkiYwoTRmlsZVRyYW5zZmVyUmVxdWVzdBISCgpyZXF1ZXN0X2lkGAEgASgEEhMKC3RyYW5zZmVyX2lkGAIgASgJEhAKCGZpbGVfaWRzGAMgAygJEhEKCWNsaXBib2FyZBgEIAEoCCJ0ChRGaWxlVHJhbnNmZXJSZXNwb25zZRISCgpyZXF1ZXN0X2lkGAEgASgEEhMKC3RyYW5zZmVyX2lkGAIgASgJEhAKCGZpbGVfaWRzGAMgAygJEiEKBWVycm9yGAQgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXMiKQoSRmlsZVRyYW5zZmVyQ2FuY2VsEhMKC3RyYW5zZmVyX2lkGAEgASgJIl4KEkZpbGVUcmFuc2ZlclJlc3VsdBITCgt0cmFuc2Zlcl9pZBgBIAEoCRIQCghmaWxlX2lkcxgCIAMoCRIhCgVlcnJvchgDIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIjoKEkZpbGVDb250ZW50UmVxdWVzdBITCgt0cmFuc2Zlcl9pZBgBIAEoCRIPCgdmaWxlX2lkGAIgASgJImMKC0ZpbGVDb250ZW50Eg4KBGRhdGEYASABKAxIABI8CgNlbmQYAiABKAsyLS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlQ29udGVudEVuZEgAQgYKBHBhcnQiQwoORmlsZUNvbnRlbnRFbmQSDgoGc2hhMjU2GAEgASgMEiEKBWVycm9yGAIgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXMiSwoUTGlzdERpcmVjdG9yeVJlcXVlc3QSDAoEcGF0aBgBIAEoCRIRCglwYWdlX3NpemUYAiABKA0SEgoKcGFnZV90b2tlbhgDIAEoCSJ+ChVMaXN0RGlyZWN0b3J5UmVzcG9uc2USDAoEcGF0aBgBIAEoCRI+CgdlbnRyaWVzGAIgAygLMi0ubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRGlyZWN0b3J5RW50cnkSFwoPbmV4dF9wYWdlX3Rva2VuGAMgASgJIrsBCg5EaXJlY3RvcnlFbnRyeRIMCgRuYW1lGAEgASgJEjUKBHR5cGUYAiABKA4yJy5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHlwZRISCgpzaXplX2J5dGVzGAMgASgEEi8KC21vZGlmaWVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIMCgRtb2RlGAUgASgNEhEKCW1pbWVfdHlwZRgGIAEoCSImChZDcmVhdGVEaXJlY3RvcnlSZXF1ZXN0EgwKBHBhdGgYASABKAkiGQoXQ3JlYXRlRGlyZWN0b3J5UmVzcG9uc2UiQgoRUmVuYW1lRmlsZVJlcXVlc3QSEwoLc291cmNlX3BhdGgYASABKAkSGAoQZGVzdGluYXRpb25fcGF0aBgCIAEoCSIUChJSZW5hbWVGaWxlUmVzcG9uc2UiIQoRUmVtb3ZlRmlsZVJlcXVlc3QSDAoEcGF0aBgBIAEoCSIUChJSZW1vdmVGaWxlUmVzcG9uc2UiQAoPQ29weUZpbGVSZXF1ZXN0EhMKC3NvdXJjZV9wYXRoGAEgASgJEhgKEGRlc3RpbmF0aW9uX3BhdGgYAiABKAkiEgoQQ29weUZpbGVSZXNwb25zZSIgChBUcmFzaEZpbGVSZXF1ZXN0EgwKBHBhdGgYASABKAkiEwoRVHJhc2hGaWxlUmVzcG9uc2UiJwoWQ3JlYXRlRmlsZU9mZmVyUmVxdWVzdBINCgVwYXRocxgBIAMoCSJaChdDcmVhdGVGaWxlT2ZmZXJSZXNwb25zZRI/CgVvZmZlchgBIAEoCzIwLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkZpbGVUcmFuc2Zlck9mZmVyIngKEkZpbGVUcmFuc2ZlclBvbGljeRIWCg51cGxvYWRfYWxsb3dlZBgBIAEoCBIYChBkb3dubG9hZF9hbGxvd2VkGAIgASgIEhsKE2ZpbGVfc3lzdGVtX2FsbG93ZWQYAyABKAgSEwoLbWF4X2VudHJpZXMYBCABKA0qcgoIRmlsZVR5cGUSGQoVRklMRV9UWVBFX1VOU1BFQ0lGSUVEEAASFQoRRklMRV9UWVBFX1JFR1VMQVIQARIXChNGSUxFX1RZUEVfRElSRUNUT1JZEAISGwoXRklMRV9UWVBFX1NZTUJPTElDX0xJTksQAzLdBgoRRmlsZVN5c3RlbVNlcnZpY2USfwoNTGlzdERpcmVjdG9yeRIzLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkxpc3REaXJlY3RvcnlSZXF1ZXN0GjQubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuTGlzdERpcmVjdG9yeVJlc3BvbnNlIgOQAgESgAEKD0NyZWF0ZURpcmVjdG9yeRI1LmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkNyZWF0ZURpcmVjdG9yeVJlcXVlc3QaNi5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5DcmVhdGVEaXJlY3RvcnlSZXNwb25zZRJxCgpSZW5hbWVGaWxlEjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuUmVuYW1lRmlsZVJlcXVlc3QaMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5SZW5hbWVGaWxlUmVzcG9uc2UScQoKUmVtb3ZlRmlsZRIwLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLlJlbW92ZUZpbGVSZXF1ZXN0GjEubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuUmVtb3ZlRmlsZVJlc3BvbnNlEmsKCENvcHlGaWxlEi4ubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuQ29weUZpbGVSZXF1ZXN0Gi8ubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuQ29weUZpbGVSZXNwb25zZRJuCglUcmFzaEZpbGUSLy5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5UcmFzaEZpbGVSZXF1ZXN0GjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuVHJhc2hGaWxlUmVzcG9uc2USgAEKD0NyZWF0ZUZpbGVPZmZlchI1LmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkNyZWF0ZUZpbGVPZmZlclJlcXVlc3QaNi5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5DcmVhdGVGaWxlT2ZmZXJSZXNwb25zZUJIWkZnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvZmlsZXRyYW5zZmVyL3YxO2ZpbGV0cmFuc2ZlcnYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_google_rpc_status]);
+  fileDesc("CjBsZWFmbG93L2ZsZWV0L2ZpbGV0cmFuc2Zlci92MS9maWxldHJhbnNmZXIucHJvdG8SHWxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxIv0CChNGaWxlVHJhbnNmZXJNZXNzYWdlEkEKBW9mZmVyGAEgASgLMjAubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyT2ZmZXJIABJFCgdyZXF1ZXN0GAIgASgLMjIubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyUmVxdWVzdEgAEkcKCHJlc3BvbnNlGAMgASgLMjMubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVRyYW5zZmVyUmVzcG9uc2VIABJDCgZjYW5jZWwYBCABKAsyMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHJhbnNmZXJDYW5jZWxIABJDCgZyZXN1bHQYBSABKAsyMS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHJhbnNmZXJSZXN1bHRIAEIJCgdtZXNzYWdlIoUBChFGaWxlVHJhbnNmZXJPZmZlchITCgt0cmFuc2Zlcl9pZBgBIAEoCRIYChB0b3RhbF9zaXplX2J5dGVzGAMgASgEEh0KFWRlc3RpbmF0aW9uX2RpcmVjdG9yeRgEIAEoCRITCgtlbnRyeV9jb3VudBgFIAEoBEoECAIQA1IHZW50cmllcyKbAQoJRmlsZUVudHJ5Eg8KB2ZpbGVfaWQYASABKAkSEQoJcGFyZW50X2lkGAIgASgJEgwKBG5hbWUYAyABKAkSNQoEdHlwZRgEIAEoDjInLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkZpbGVUeXBlEhIKCnNpemVfYnl0ZXMYBSABKAQSEQoJbWltZV90eXBlGAYgASgJIooBChNGaWxlVHJhbnNmZXJSZXF1ZXN0EhIKCnJlcXVlc3RfaWQYASABKAQSEwoLdHJhbnNmZXJfaWQYAiABKAkSEAoIZmlsZV9pZHMYAyADKAkSEQoJY2xpcGJvYXJkGAQgASgIEhIKCnBhcnRfaW5kZXgYBSABKAQSEQoJbGFzdF9wYXJ0GAYgASgIIpsBChRGaWxlVHJhbnNmZXJSZXNwb25zZRISCgpyZXF1ZXN0X2lkGAEgASgEEhMKC3RyYW5zZmVyX2lkGAIgASgJEhAKCGZpbGVfaWRzGAMgAygJEiEKBWVycm9yGAQgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXMSEgoKcGFydF9pbmRleBgFIAEoBBIRCglsYXN0X3BhcnQYBiABKAgiKQoSRmlsZVRyYW5zZmVyQ2FuY2VsEhMKC3RyYW5zZmVyX2lkGAEgASgJIoUBChJGaWxlVHJhbnNmZXJSZXN1bHQSEwoLdHJhbnNmZXJfaWQYASABKAkSEAoIZmlsZV9pZHMYAiADKAkSIQoFZXJyb3IYAyABKAsyEi5nb29nbGUucnBjLlN0YXR1cxISCgpwYXJ0X2luZGV4GAQgASgEEhEKCWxhc3RfcGFydBgFIAEoCCJbChJGaWxlQ29udGVudFJlcXVlc3QSEwoLdHJhbnNmZXJfaWQYASABKAkSEQoHZmlsZV9pZBgCIAEoCUgAEhIKCG1hbmlmZXN0GAMgASgISABCCQoHY29udGVudCJjCgtGaWxlQ29udGVudBIOCgRkYXRhGAEgASgMSAASPAoDZW5kGAIgASgLMi0ubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZUNvbnRlbnRFbmRIAEIGCgRwYXJ0IkMKDkZpbGVDb250ZW50RW5kEg4KBnNoYTI1NhgBIAEoDBIhCgVlcnJvchgCIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIksKFExpc3REaXJlY3RvcnlSZXF1ZXN0EgwKBHBhdGgYASABKAkSEQoJcGFnZV9zaXplGAIgASgNEhIKCnBhZ2VfdG9rZW4YAyABKAkifgoVTGlzdERpcmVjdG9yeVJlc3BvbnNlEgwKBHBhdGgYASABKAkSPgoHZW50cmllcxgCIAMoCzItLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkRpcmVjdG9yeUVudHJ5EhcKD25leHRfcGFnZV90b2tlbhgDIAEoCSK7AQoORGlyZWN0b3J5RW50cnkSDAoEbmFtZRgBIAEoCRI1CgR0eXBlGAIgASgOMicubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuRmlsZVR5cGUSEgoKc2l6ZV9ieXRlcxgDIAEoBBIvCgttb2RpZmllZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDAoEbW9kZRgFIAEoDRIRCgltaW1lX3R5cGUYBiABKAkiJgoWQ3JlYXRlRGlyZWN0b3J5UmVxdWVzdBIMCgRwYXRoGAEgASgJIhkKF0NyZWF0ZURpcmVjdG9yeVJlc3BvbnNlIkIKEVJlbmFtZUZpbGVSZXF1ZXN0EhMKC3NvdXJjZV9wYXRoGAEgASgJEhgKEGRlc3RpbmF0aW9uX3BhdGgYAiABKAkiFAoSUmVuYW1lRmlsZVJlc3BvbnNlIiEKEVJlbW92ZUZpbGVSZXF1ZXN0EgwKBHBhdGgYASABKAkiFAoSUmVtb3ZlRmlsZVJlc3BvbnNlIkAKD0NvcHlGaWxlUmVxdWVzdBITCgtzb3VyY2VfcGF0aBgBIAEoCRIYChBkZXN0aW5hdGlvbl9wYXRoGAIgASgJIhIKEENvcHlGaWxlUmVzcG9uc2UiIAoQVHJhc2hGaWxlUmVxdWVzdBIMCgRwYXRoGAEgASgJIhMKEVRyYXNoRmlsZVJlc3BvbnNlIicKFkNyZWF0ZUZpbGVPZmZlclJlcXVlc3QSDQoFcGF0aHMYASADKAkiWgoXQ3JlYXRlRmlsZU9mZmVyUmVzcG9uc2USPwoFb2ZmZXIYASABKAsyMC5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5GaWxlVHJhbnNmZXJPZmZlciJ4ChJGaWxlVHJhbnNmZXJQb2xpY3kSFgoOdXBsb2FkX2FsbG93ZWQYASABKAgSGAoQZG93bmxvYWRfYWxsb3dlZBgCIAEoCBIbChNmaWxlX3N5c3RlbV9hbGxvd2VkGAMgASgIEhMKC21heF9lbnRyaWVzGAQgASgNKnIKCEZpbGVUeXBlEhkKFUZJTEVfVFlQRV9VTlNQRUNJRklFRBAAEhUKEUZJTEVfVFlQRV9SRUdVTEFSEAESFwoTRklMRV9UWVBFX0RJUkVDVE9SWRACEhsKF0ZJTEVfVFlQRV9TWU1CT0xJQ19MSU5LEAMy3QYKEUZpbGVTeXN0ZW1TZXJ2aWNlEn8KDUxpc3REaXJlY3RvcnkSMy5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5MaXN0RGlyZWN0b3J5UmVxdWVzdBo0LmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkxpc3REaXJlY3RvcnlSZXNwb25zZSIDkAIBEoABCg9DcmVhdGVEaXJlY3RvcnkSNS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5DcmVhdGVEaXJlY3RvcnlSZXF1ZXN0GjYubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuQ3JlYXRlRGlyZWN0b3J5UmVzcG9uc2UScQoKUmVuYW1lRmlsZRIwLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLlJlbmFtZUZpbGVSZXF1ZXN0GjEubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuUmVuYW1lRmlsZVJlc3BvbnNlEnEKClJlbW92ZUZpbGUSMC5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5SZW1vdmVGaWxlUmVxdWVzdBoxLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLlJlbW92ZUZpbGVSZXNwb25zZRJrCghDb3B5RmlsZRIuLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkNvcHlGaWxlUmVxdWVzdBovLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLkNvcHlGaWxlUmVzcG9uc2USbgoJVHJhc2hGaWxlEi8ubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuVHJhc2hGaWxlUmVxdWVzdBowLmxlYWZsb3cuZmxlZXQuZmlsZXRyYW5zZmVyLnYxLlRyYXNoRmlsZVJlc3BvbnNlEoABCg9DcmVhdGVGaWxlT2ZmZXISNS5sZWFmbG93LmZsZWV0LmZpbGV0cmFuc2Zlci52MS5DcmVhdGVGaWxlT2ZmZXJSZXF1ZXN0GjYubGVhZmxvdy5mbGVldC5maWxldHJhbnNmZXIudjEuQ3JlYXRlRmlsZU9mZmVyUmVzcG9uc2VCSFpGZ2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L2ZpbGV0cmFuc2Zlci92MTtmaWxldHJhbnNmZXJ2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_google_rpc_status]);
 
 /**
  * A message on the filetransfer channel, from either end.
@@ -78,8 +78,8 @@ export const FileTransferMessageSchema: GenMessage<FileTransferMessage> = /*@__P
   messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 0);
 
 /**
- * Files the sender offers. At most FileTransferPolicy.max_entries entries and
- * 512 KiB.
+ * 文件声明，不携带清单正文。清单通过 FileContentRequest.manifest 按需读取，
+ * 剪贴板、拖拽、文件管理和直接传输都引用同一份连接内声明。
  *
  * @generated from message leaflow.fleet.filetransfer.v1.FileTransferOffer
  */
@@ -90,13 +90,6 @@ export type FileTransferOffer = Message<"leaflow.fleet.filetransfer.v1.FileTrans
    * @generated from field: string transfer_id = 1;
    */
   transferId: string;
-
-  /**
-   * The files and directories. A directory comes before its contents.
-   *
-   * @generated from field: repeated leaflow.fleet.filetransfer.v1.FileEntry entries = 2;
-   */
-  entries: FileEntry[];
 
   /**
    * The sum of the regular files' sizes.
@@ -113,6 +106,14 @@ export type FileTransferOffer = Message<"leaflow.fleet.filetransfer.v1.FileTrans
    * @generated from field: string destination_directory = 4;
    */
   destinationDirectory: string;
+
+  /**
+   * 清单的准确条目数，包含目录，必须大于 0。只受 FileTransferPolicy.max_entries
+   * 约束；不能按一条控制消息可以容纳多少条目再缩减。
+   *
+   * @generated from field: uint64 entry_count = 5;
+   */
+  entryCount: bigint;
 };
 
 /**
@@ -212,6 +213,20 @@ export type FileTransferRequest = Message<"leaflow.fleet.filetransfer.v1.FileTra
    * @generated from field: bool clipboard = 4;
    */
   clipboard: boolean;
+
+  /**
+   * 本请求的分片序号，从 0 连续增加。
+   *
+   * @generated from field: uint64 part_index = 5;
+   */
+  partIndex: bigint;
+
+  /**
+   * 本请求的最后一片。完整选择到齐后才能确认和读取正文。
+   *
+   * @generated from field: bool last_part = 6;
+   */
+  lastPart: boolean;
 };
 
 /**
@@ -249,11 +264,25 @@ export type FileTransferResponse = Message<"leaflow.fleet.filetransfer.v1.FileTr
   fileIds: string[];
 
   /**
-   * Why the sender refused. Unset on success.
+   * 拒绝原因，仅最后一片可携带。成功时不设置；失败时此前分片不授权读取。
    *
    * @generated from field: google.rpc.Status error = 4;
    */
   error?: Status | undefined;
+
+  /**
+   * 本响应的分片序号，从 0 连续增加。
+   *
+   * @generated from field: uint64 part_index = 5;
+   */
+  partIndex: bigint;
+
+  /**
+   * 本响应的最后一片，收到后才生效。
+   *
+   * @generated from field: bool last_part = 6;
+   */
+  lastPart: boolean;
 };
 
 /**
@@ -286,8 +315,8 @@ export const FileTransferCancelSchema: GenMessage<FileTransferCancel> = /*@__PUR
   messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 5);
 
 /**
- * What the receiver stored of an offer. Sent once, when it has fetched
- * everything it chose, or on failure.
+ * 接收方交付的文件。选择的文件全部完成或发生失败时发送一个逻辑结果，可由多个
+ * 分片组成。只有最后一片到齐后才能发布终态并释放整项传输的来源。
  *
  * @generated from message leaflow.fleet.filetransfer.v1.FileTransferResult
  */
@@ -307,11 +336,25 @@ export type FileTransferResult = Message<"leaflow.fleet.filetransfer.v1.FileTran
   fileIds: string[];
 
   /**
-   * Why the rest failed. Unset when nothing failed.
+   * 其余文件的失败原因，仅最后一片可携带。全部成功时不设置。
    *
    * @generated from field: google.rpc.Status error = 3;
    */
   error?: Status | undefined;
+
+  /**
+   * 本结果的分片序号，从 0 连续增加。
+   *
+   * @generated from field: uint64 part_index = 4;
+   */
+  partIndex: bigint;
+
+  /**
+   * 本结果的最后一片，收到后才生效。
+   *
+   * @generated from field: bool last_part = 5;
+   */
+  lastPart: boolean;
 };
 
 /**
@@ -322,8 +365,7 @@ export const FileTransferResultSchema: GenMessage<FileTransferResult> = /*@__PUR
   messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 6);
 
 /**
- * Asks for the content of one regular file the sender confirmed. The only
- * message the opener of a content channel sends.
+ * 请求声明的清单或已确认的一个普通文件。这是 content 通道发起方发送的唯一消息。
  *
  * @generated from message leaflow.fleet.filetransfer.v1.FileContentRequest
  */
@@ -336,11 +378,32 @@ export type FileContentRequest = Message<"leaflow.fleet.filetransfer.v1.FileCont
   transferId: string;
 
   /**
-   * The file.
+   * 必须选择一项，不能以空文件 id 代指清单。
    *
-   * @generated from field: string file_id = 2;
+   * @generated from oneof leaflow.fleet.filetransfer.v1.FileContentRequest.content
    */
-  fileId: string;
+  content: {
+    /**
+     * 已确认的普通文件的 id。
+     *
+     * @generated from field: string file_id = 2;
+     */
+    value: string;
+    case: "fileId";
+  } | {
+    /**
+     * 必须为 true。清单是逐条 FileEntry 的 protobuf 长度前缀编码：每条先发送
+     * protobuf varint 长度，再发送该 FileEntry 的编码字节；目录先于其内容。
+     * FileContent.data 可在任意字节处拆分，包括长度前缀和单个条目内部。
+     * 接收方递增校验条目 id、父目录、名称和类型，最后核对 entry_count、
+     * total_size_bytes 和 FileContentEnd.sha256。摘要覆盖全部长度前缀和条目字节。
+     * 清单读取成功仅确认元数据，不选择文件、不发送 FileTransferResult。
+     *
+     * @generated from field: bool manifest = 3;
+     */
+    value: boolean;
+    case: "manifest";
+  } | { case: undefined; value?: undefined };
 };
 
 /**
@@ -351,7 +414,7 @@ export const FileContentRequestSchema: GenMessage<FileContentRequest> = /*@__PUR
   messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 7);
 
 /**
- * Part of a file's content, from the source.
+ * 来源发送的文件正文或清单字节。
  *
  * @generated from message leaflow.fleet.filetransfer.v1.FileContent
  */
@@ -388,8 +451,8 @@ export const FileContentSchema: GenMessage<FileContent> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_filetransfer_v1_filetransfer, 8);
 
 /**
- * The end of a file. The receiver checks the size and the digest before
- * storing it.
+ * 文件正文或清单的结束。接收方校验摘要，并核对文件长度或清单条目及总大小，
+ * 校验通过后才交付。
  *
  * @generated from message leaflow.fleet.filetransfer.v1.FileContentEnd
  */
@@ -812,8 +875,8 @@ export type FileTransferPolicy = Message<"leaflow.fleet.filetransfer.v1.FileTran
   fileSystemAllowed: boolean;
 
   /**
-   * The most entries, directories included, of one offer. 0: as many as one
-   * offer holds.
+   * 一份声明最多可含的条目数，包含目录。0 表示不限制；不能再按控制消息大小设置
+   * 额外的条目数上限。清单通过受通道额度约束的 content 流读取。
    *
    * @generated from field: uint32 max_entries = 4;
    */
