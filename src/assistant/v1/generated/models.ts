@@ -187,6 +187,43 @@ export const ThreadResourceRole = {
 } as const;
 
 /**
+ * How much the model reasons before answering. Sent to the model unchanged.
+ */
+export type ReasoningEffort4b96100 =
+  (typeof ReasoningEffort4b96100)[keyof typeof ReasoningEffort4b96100];
+
+export const ReasoningEffort4b96100 = {
+  low: "low",
+  medium: "medium",
+  high: "high",
+} as const;
+
+/**
+ * `manual` asks a person before tools that change something, `guardian` lets an automatic reviewer decide, `yolo` runs them without asking.
+ */
+export type ApprovalMode4b96100 = (typeof ApprovalMode4b96100)[keyof typeof ApprovalMode4b96100];
+
+export const ApprovalMode4b96100 = {
+  manual: "manual",
+  guardian: "guardian",
+  yolo: "yolo",
+} as const;
+
+/**
+ * What the thread is doing. `waiting` is waiting for subagents or tasks it started; `awaiting_approval` and `awaiting_input` wait for a person.
+ */
+export type ThreadStatus4b96100 = (typeof ThreadStatus4b96100)[keyof typeof ThreadStatus4b96100];
+
+export const ThreadStatus4b96100 = {
+  idle: "idle",
+  starting: "starting",
+  running: "running",
+  waiting: "waiting",
+  awaiting_approval: "awaiting_approval",
+  awaiting_input: "awaiting_input",
+} as const;
+
+/**
  * Where this step stands. At most one step is in_progress at any time.
  */
 export type TodoResourceStatus = (typeof TodoResourceStatus)[keyof typeof TodoResourceStatus];
@@ -245,10 +282,23 @@ export const TurnType = {
   compaction: "compaction",
 } as const;
 
+/**
+ * `declined` ended because a person declined a tool call; `cancelled` was stopped.
+ */
+export type TurnStatus4b96100 = (typeof TurnStatus4b96100)[keyof typeof TurnStatus4b96100];
+
+export const TurnStatus4b96100 = {
+  running: "running",
+  completed: "completed",
+  failed: "failed",
+  declined: "declined",
+  cancelled: "cancelled",
+} as const;
+
 export interface LastTurnResource {
   id: string;
   type: TurnType;
-  status: TurnStatus;
+  status: TurnStatus4b96100;
   /**
    * Why the turn failed. Null unless status is failed.
    * @nullable
@@ -272,6 +322,46 @@ export interface ContextUsageResource {
    * @nullable
    */
   windowTokens: number | null;
+}
+
+/**
+ * Tokens reported by Canopy. Cache hit rate is cachedInputTokens / inputTokens.
+ */
+export interface Usage4b96100 {
+  /**
+   * Prompt tokens, including cached ones.
+   * @minimum 0
+   */
+  inputTokens: number;
+  /**
+   * Prompt tokens read from the provider's cache.
+   * @minimum 0
+   */
+  cachedInputTokens: number;
+  /**
+   * Prompt tokens written to the provider's cache. Zero for providers that do not report it.
+   * @minimum 0
+   */
+  cacheWriteTokens: number;
+  /**
+   * Output tokens, including reasoning.
+   * @minimum 0
+   */
+  outputTokens: number;
+  /**
+   * Output tokens spent on reasoning.
+   * @minimum 0
+   */
+  reasoningTokens: number;
+  /** @minimum 0 */
+  totalTokens: number;
+  /**
+   * Model requests made.
+   * @minimum 0
+   */
+  requests: number;
+  /** False while a request has not reported its usage yet, so the numbers may still grow. */
+  complete: boolean;
 }
 
 /**
@@ -310,9 +400,9 @@ export interface ThreadResource {
   /** The Canopy model the next model request uses. */
   modelId: string;
   /** Null when the model does not reason. */
-  reasoningEffort: ReasoningEffort | null;
-  approvalMode: ApprovalMode;
-  status: ThreadStatus;
+  reasoningEffort: ReasoningEffort4b96100 | null;
+  approvalMode: ApprovalMode4b96100;
+  status: ThreadStatus4b96100;
   /**
    * What the assistant is doing right now, for example "Reading nginx.conf". Null when idle.
    * @nullable
@@ -331,8 +421,7 @@ export interface ThreadResource {
   /** The most recent turn. Null before the first message. */
   lastTurn: LastTurnResource | null;
   context: ContextUsageResource;
-  /** Token usage over the whole conversation. For a main conversation this includes its subagents. */
-  usage: Usage;
+  usage: Usage4b96100;
   /** The assistant replied after the conversation was last marked read. */
   unread: boolean;
   archived: boolean;
@@ -486,9 +575,8 @@ export interface CreateThreadRequestBody {
    * @maxLength 128
    */
   modelId?: string;
-  /** Omit to use the caller's default effort, or medium. */
-  reasoningEffort?: ReasoningEffort;
-  approvalMode?: ApprovalMode;
+  reasoningEffort?: ReasoningEffort4b96100;
+  approvalMode?: ApprovalMode4b96100;
   message?: SendMessageRequestBody;
 }
 
@@ -630,8 +718,8 @@ export interface UpdateThreadRequestBody {
    * @maxLength 128
    */
   modelId?: string;
-  reasoningEffort?: ReasoningEffort | null;
-  approvalMode?: ApprovalMode;
+  reasoningEffort?: ReasoningEffort4b96100 | null;
+  approvalMode?: ApprovalMode4b96100;
   archived?: boolean;
 }
 
@@ -660,93 +748,7 @@ export interface RevertedCountResponseBody {
   reverted: number;
 }
 
-/**
- * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
- */
-export interface OffsetPagination {
-  /** @minimum 1 */
-  page: number;
-  /** @minimum 1 */
-  page_size: number;
-  /** @minimum 0 */
-  total_count?: number;
-}
-
-/**
- * Pagination metadata for keyset traversal. Pass next_cursor as cursor to read the following page; null means there is no following page.
- */
-export interface CursorPagination {
-  /** @minimum 1 */
-  page_size: number;
-  /** @nullable */
-  next_cursor?: string | null;
-}
-
-/**
- * One run of the agent, from the message that started it until it stopped.
- */
-export interface ThreadTurnResource {
-  id: string;
-  threadId: string;
-  type: TurnType;
-  status: TurnStatus;
-  /**
-   * The first item the turn wrote. Null before it has written one.
-   * @nullable
-   */
-  firstOrdinal: number | null;
-  /**
-   * The last item the turn wrote so far.
-   * @nullable
-   */
-  lastOrdinal: number | null;
-  /**
-   * The beginning of the message that started the turn. Null for compaction turns and turns started by the assistant itself.
-   * @nullable
-   */
-  preview: string | null;
-  modelId: string;
-  reasoningEffort: ReasoningEffort | null;
-  approvalMode: ApprovalMode;
-  /**
-   * Why the turn failed. Null unless status is failed.
-   * @nullable
-   */
-  failureCode: string | null;
-  /**
-   * How many tools the turn called.
-   * @minimum 0
-   */
-  toolCalls: number;
-  /** Tokens used by every model request of this turn, including title generation, review and compaction. */
-  usage: Usage;
-  /**
-   * An estimate of the output tokens of the model request in progress, which `usage` does not
-   * count yet. It grows about once a second while the model writes and returns to 0 when the
-   * request ends and its exact usage is added. Show `usage.outputTokens` plus this while the turn
-   * runs.
-   * @minimum 0
-   */
-  streamingOutputTokens: number;
-  startedAt: string;
-  /**
-   * When the first output token arrived. Null until then.
-   * @nullable
-   */
-  firstTokenAt: string | null;
-  /**
-   * Null while the turn is running.
-   * @nullable
-   */
-  completedAt: string | null;
-}
-
-export interface ThreadTurnListResponseBody {
-  /** Newest first. */
-  turns: ThreadTurnResource[];
-  /** @nullable */
-  nextCursor: string | null;
-}
+export type Error4b96100 = Error;
 
 export type ThreadItemResourceType =
   (typeof ThreadItemResourceType)[keyof typeof ThreadItemResourceType];
@@ -1200,6 +1202,93 @@ export interface ToolResultRequestBody {
 }
 
 /**
+ * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
+ */
+export interface OffsetPagination {
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+  /** @minimum 0 */
+  total_count?: number;
+}
+
+/**
+ * Pagination metadata for keyset traversal. Pass next_cursor as cursor to read the following page; null means there is no following page.
+ */
+export interface CursorPagination {
+  /** @minimum 1 */
+  page_size: number;
+  /** @nullable */
+  next_cursor?: string | null;
+}
+
+/**
+ * One run of the agent, from the message that started it until it stopped.
+ */
+export interface ThreadTurnResource {
+  id: string;
+  threadId: string;
+  type: TurnType;
+  status: TurnStatus4b96100;
+  /**
+   * The first item the turn wrote. Null before it has written one.
+   * @nullable
+   */
+  firstOrdinal: number | null;
+  /**
+   * The last item the turn wrote so far.
+   * @nullable
+   */
+  lastOrdinal: number | null;
+  /**
+   * The beginning of the message that started the turn. Null for compaction turns and turns started by the assistant itself.
+   * @nullable
+   */
+  preview: string | null;
+  modelId: string;
+  reasoningEffort: ReasoningEffort4b96100 | null;
+  approvalMode: ApprovalMode4b96100;
+  /**
+   * Why the turn failed. Null unless status is failed.
+   * @nullable
+   */
+  failureCode: string | null;
+  /**
+   * How many tools the turn called.
+   * @minimum 0
+   */
+  toolCalls: number;
+  usage: Usage4b96100;
+  /**
+   * An estimate of the output tokens of the model request in progress, which `usage` does not
+   * count yet. It grows about once a second while the model writes and returns to 0 when the
+   * request ends and its exact usage is added. Show `usage.outputTokens` plus this while the turn
+   * runs.
+   * @minimum 0
+   */
+  streamingOutputTokens: number;
+  startedAt: string;
+  /**
+   * When the first output token arrived. Null until then.
+   * @nullable
+   */
+  firstTokenAt: string | null;
+  /**
+   * Null while the turn is running.
+   * @nullable
+   */
+  completedAt: string | null;
+}
+
+export interface ThreadTurnListResponseBody {
+  /** Newest first. */
+  turns: ThreadTurnResource[];
+  /** @nullable */
+  nextCursor: string | null;
+}
+
+/**
  * `inbox` holds the conversations nobody filed. Each caller has one per project.
  */
 export type FolderResourceType = (typeof FolderResourceType)[keyof typeof FolderResourceType];
@@ -1643,7 +1732,7 @@ export interface DefaultModelResource {
    * @nullable
    */
   modelId: string | null;
-  reasoningEffort: ReasoningEffort | null;
+  reasoningEffort: ReasoningEffort4b96100 | null;
   /** `user` when it is the caller's choice, `catalog` when it comes from the Canopy catalogue. */
   source: DefaultModelResourceSource;
 }
@@ -1655,7 +1744,7 @@ export interface SettingsResource {
    */
   defaultModelId: string | null;
   /** The caller's choice. Null when none is set. */
-  defaultReasoningEffort: ReasoningEffort | null;
+  defaultReasoningEffort: ReasoningEffort4b96100 | null;
   defaultModel: DefaultModelResource;
 }
 
@@ -1666,7 +1755,7 @@ export interface UpdateSettingsRequestBody {
    * @nullable
    */
   defaultModelId?: string | null;
-  defaultReasoningEffort?: ReasoningEffort | null;
+  defaultReasoningEffort?: ReasoningEffort4b96100 | null;
 }
 
 /**

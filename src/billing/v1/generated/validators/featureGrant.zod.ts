@@ -7,14 +7,14 @@
  */
 import * as zod from "zod";
 import { FeatureGrantStatus } from "./featureGrantStatus.zod.js";
-import { ObjectIdentity } from "./objectIdentity.zod.js";
+import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
 import { Product } from "./product.zod.js";
 
 export const FeatureGrant = zod.strictObject({
   id: zod.uuid(),
   billing_account_id: zod.int(),
   product: Product,
-  feature: ObjectIdentity,
+  feature: ObjectIdentity4b96100,
   name: zod.string(),
   valid_from: zod.iso.datetime({ offset: true }),
   valid_until: zod.iso

@@ -27,8 +27,8 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { ApprovalMode } from "./approvalMode.zod.js";
-import { ReasoningEffort } from "./reasoningEffort.zod.js";
+import { ApprovalMode4b96100 } from "./approvalMode4b96100.zod.js";
+import { ReasoningEffort4b96100 } from "./reasoningEffort4b96100.zod.js";
 
 export const updateThreadRequestBodyTitleMax = 255;
 
@@ -37,8 +37,8 @@ export const updateThreadRequestBodyModelIdMax = 128;
 export const UpdateThreadRequestBody = zod.strictObject({
   title: zod.string().min(1).max(updateThreadRequestBodyTitleMax).optional(),
   modelId: zod.string().min(1).max(updateThreadRequestBodyModelIdMax).optional(),
-  reasoningEffort: zod.union([ReasoningEffort, zod.null()]).optional(),
-  approvalMode: ApprovalMode.optional(),
+  reasoningEffort: zod.union([ReasoningEffort4b96100, zod.null()]).optional(),
+  approvalMode: ApprovalMode4b96100.optional(),
   archived: zod.boolean().optional(),
 });
 

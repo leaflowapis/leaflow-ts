@@ -39,7 +39,6 @@ import type {
   AvailabilityZoneID,
   AvailabilityZoneListResponseBody,
   AvailabilityZoneResource,
-  ConflictResponse,
   ConsoleResponseBody,
   CreateElasticIPRequestBody,
   CreateElasticIPResponseBody,
@@ -512,7 +511,7 @@ export type createElasticIpResponse202 = {
 };
 
 export type createElasticIpResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -641,7 +640,7 @@ export type updateElasticIpResponse202 = {
 };
 
 export type updateElasticIpResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -728,7 +727,7 @@ export type deleteElasticIpResponse202 = {
 };
 
 export type deleteElasticIpResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -906,7 +905,7 @@ export type associateElasticIpResponse202 = {
 };
 
 export type associateElasticIpResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -985,7 +984,7 @@ export type disassociateElasticIpResponse202 = {
 };
 
 export type disassociateElasticIpResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -1295,7 +1294,7 @@ export type createInstanceResponse202 = {
 };
 
 export type createInstanceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -1427,7 +1426,7 @@ export type updateInstanceResponse202 = {
 };
 
 export type updateInstanceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -1515,7 +1514,7 @@ export type deleteInstanceResponse202 = {
 };
 
 export type deleteInstanceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -1585,7 +1584,7 @@ export type startInstanceResponse202 = {
 };
 
 export type startInstanceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -1638,7 +1637,7 @@ export type stopInstanceResponse202 = {
 };
 
 export type stopInstanceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -1818,7 +1817,7 @@ export type resetInstancePasswordResponse200 = {
 };
 
 export type resetInstancePasswordResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -1897,7 +1896,7 @@ export type rebootInstanceResponse202 = {
 };
 
 export type rebootInstanceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -1978,7 +1977,7 @@ export type rebuildInstanceResponse202 = {
 };
 
 export type rebuildInstanceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -2117,7 +2116,7 @@ export type attachInstanceVolumeResponse202 = {
 };
 
 export type attachInstanceVolumeResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -2192,7 +2191,7 @@ export type detachInstanceVolumeResponse202 = {
 };
 
 export type detachInstanceVolumeResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -2316,7 +2315,7 @@ export type attachInstanceNetworkInterfaceResponse202 = {
 };
 
 export type attachInstanceNetworkInterfaceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -2396,7 +2395,7 @@ export type detachInstanceNetworkInterfaceResponse202 = {
 };
 
 export type detachInstanceNetworkInterfaceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -2463,7 +2462,7 @@ export type rescueInstanceResponse202 = {
 };
 
 export type rescueInstanceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -2542,7 +2541,7 @@ export type unrescueInstanceResponse202 = {
 };
 
 export type unrescueInstanceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -3357,7 +3356,7 @@ export type deleteNetworkInterfaceResponse202 = {
 };
 
 export type deleteNetworkInterfaceResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -3710,7 +3709,7 @@ export type createPrivateImageResponse202 = {
 };
 
 export type createPrivateImageResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -3898,7 +3897,7 @@ export type deletePrivateImageResponse202 = {
 };
 
 export type deletePrivateImageResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -4977,7 +4976,7 @@ export type deleteVirtualPrivateCloudPeeringResponse202 = {
 };
 
 export type deleteVirtualPrivateCloudPeeringResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -5039,7 +5038,7 @@ export type acceptVirtualPrivateCloudPeeringResponse202 = {
 };
 
 export type acceptVirtualPrivateCloudPeeringResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -5102,7 +5101,7 @@ export type rejectVirtualPrivateCloudPeeringResponse200 = {
 };
 
 export type rejectVirtualPrivateCloudPeeringResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -5995,7 +5994,7 @@ export type deleteVirtualPrivateCloudResponse202 = {
 };
 
 export type deleteVirtualPrivateCloudResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -6048,7 +6047,7 @@ export type enableVirtualPrivateCloudIpv6Response202 = {
 };
 
 export type enableVirtualPrivateCloudIpv6Response409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -6110,7 +6109,7 @@ export type disableVirtualPrivateCloudIpv6Response202 = {
 };
 
 export type disableVirtualPrivateCloudIpv6Response409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -6299,7 +6298,7 @@ export type createVolumeBackupResponse202 = {
 };
 
 export type createVolumeBackupResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -6487,7 +6486,7 @@ export type deleteVolumeBackupResponse202 = {
 };
 
 export type deleteVolumeBackupResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -6618,7 +6617,7 @@ export type createVolumeSnapshotResponse202 = {
 };
 
 export type createVolumeSnapshotResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -6807,7 +6806,7 @@ export type deleteVolumeSnapshotResponse202 = {
 };
 
 export type deleteVolumeSnapshotResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -7033,7 +7032,7 @@ export type createVolumeResponse202 = {
 };
 
 export type createVolumeResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -7163,7 +7162,7 @@ export type updateVolumeResponse202 = {
 };
 
 export type updateVolumeResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -7243,7 +7242,7 @@ export type deleteVolumeResponse202 = {
 };
 
 export type deleteVolumeResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 
@@ -7308,7 +7307,7 @@ export type revertVolumeResponse202 = {
 };
 
 export type revertVolumeResponse409 = {
-  data: ConflictResponse;
+  data: Error;
   status: 409;
 };
 

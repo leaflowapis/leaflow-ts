@@ -39,7 +39,6 @@ import type {
   DiscountList,
   EntitlementList,
   Error,
-  ErrorResponse,
   FeatureGrantList,
   GetCheckoutSessionQuoteParams,
   GetPlanHeaders,
@@ -90,7 +89,6 @@ import type {
   ListWithdrawalItemsParams,
   ListWithdrawalsParams,
   MonthlyStatementList,
-  NotModifiedResponse,
   Order,
   OrderCancel,
   OrderItemList,
@@ -192,7 +190,7 @@ export type listWithdrawalItemsResponse200 = {
 };
 
 export type listWithdrawalItemsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -253,7 +251,7 @@ export type listWithdrawalsResponse200 = {
 };
 
 export type listWithdrawalsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -308,7 +306,7 @@ export type createWithdrawalResponse201 = {
 };
 
 export type createWithdrawalResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -374,7 +372,7 @@ export type previewWithdrawalResponse200 = {
 };
 
 export type previewWithdrawalResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -440,7 +438,7 @@ export type getWithdrawalResponse200 = {
 };
 
 export type getWithdrawalResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -483,7 +481,7 @@ export type listContactsResponse200 = {
 };
 
 export type listContactsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -539,7 +537,7 @@ export type createContactResponse201 = {
 };
 
 export type createContactResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -604,7 +602,7 @@ export type getContactResponse200 = {
 };
 
 export type getContactResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -648,7 +646,7 @@ export type updateContactResponse200 = {
 };
 
 export type updateContactResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -714,7 +712,7 @@ export type deleteContactResponse204 = {
 };
 
 export type deleteContactResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -758,7 +756,7 @@ export type listCurrenciesResponse200 = {
 };
 
 export type listCurrenciesResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -813,7 +811,7 @@ export type listBillingAccountsResponse200 = {
 };
 
 export type listBillingAccountsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -870,7 +868,7 @@ export type createBillingAccountResponse201 = {
 };
 
 export type createBillingAccountResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -936,7 +934,7 @@ export type getBillingAccountResponse200 = {
 };
 
 export type getBillingAccountResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -981,7 +979,7 @@ export type updateBillingAccountResponse200 = {
 };
 
 export type updateBillingAccountResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1048,7 +1046,7 @@ export type suspendBillingAccountResponse200 = {
 };
 
 export type suspendBillingAccountResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1097,7 +1095,7 @@ export type resumeBillingAccountResponse200 = {
 };
 
 export type resumeBillingAccountResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1143,7 +1141,7 @@ export type getAccountBalanceResponse200 = {
 };
 
 export type getAccountBalanceResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1188,7 +1186,7 @@ export type listPaymentOptionsResponse200 = {
 };
 
 export type listPaymentOptionsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1246,7 +1244,7 @@ export type getAccountDeletionReadinessResponse200 = {
 };
 
 export type getAccountDeletionReadinessResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1296,7 +1294,7 @@ export type listProjectAssignmentsResponse200 = {
 };
 
 export type listProjectAssignmentsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1353,7 +1351,7 @@ export type getProjectAssignmentResponse200 = {
 };
 
 export type getProjectAssignmentResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1398,7 +1396,7 @@ export type setProjectAssignmentResponse200 = {
 };
 
 export type setProjectAssignmentResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1472,7 +1470,7 @@ export type unlinkProjectBillingAccountResponse204 = {
 };
 
 export type unlinkProjectBillingAccountResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -1518,7 +1516,7 @@ export type listTopUpsResponse200 = {
 };
 
 export type listTopUpsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1573,7 +1571,7 @@ export type createTopUpResponse201 = {
 };
 
 export type createTopUpResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -1637,7 +1635,7 @@ export type getTopUpResponse200 = {
 };
 
 export type getTopUpResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1685,7 +1683,7 @@ export type cancelTopUpResponse409 = {
 };
 
 export type cancelTopUpResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 409>;
 };
 
@@ -1735,7 +1733,7 @@ export type listPaymentMethodsResponse200 = {
 };
 
 export type listPaymentMethodsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1792,7 +1790,7 @@ export type createPaymentMethodSetupResponse201 = {
 };
 
 export type createPaymentMethodSetupResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
@@ -1858,7 +1856,7 @@ export type setDefaultPaymentMethodResponse200 = {
 };
 
 export type setDefaultPaymentMethodResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -1903,7 +1901,7 @@ export type deletePaymentMethodResponse204 = {
 };
 
 export type deletePaymentMethodResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -1948,7 +1946,7 @@ export type payInvoiceResponse200 = {
 };
 
 export type payInvoiceResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2034,7 +2032,7 @@ export type previewInvoicePaymentResponse200 = {
 };
 
 export type previewInvoicePaymentResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2101,7 +2099,7 @@ export type payTogetherResponse200 = {
 };
 
 export type payTogetherResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2175,7 +2173,7 @@ export type previewPayTogetherResponse200 = {
 };
 
 export type previewPayTogetherResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2241,7 +2239,7 @@ export type listInvoicesResponse200 = {
 };
 
 export type listInvoicesResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2296,7 +2294,7 @@ export type getInvoiceResponse200 = {
 };
 
 export type getInvoiceResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2339,7 +2337,7 @@ export type listInvoiceItemsResponse200 = {
 };
 
 export type listInvoiceItemsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2397,7 +2395,7 @@ export type listTransactionsResponse200 = {
 };
 
 export type listTransactionsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2454,7 +2452,7 @@ export type listAccountDiscountsResponse200 = {
 };
 
 export type listAccountDiscountsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2511,7 +2509,7 @@ export type listCreditGrantsResponse200 = {
 };
 
 export type listCreditGrantsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2568,7 +2566,7 @@ export type listCreditNotesResponse200 = {
 };
 
 export type listCreditNotesResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2623,7 +2621,7 @@ export type getCreditNoteResponse200 = {
 };
 
 export type getCreditNoteResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2666,7 +2664,7 @@ export type listCreditNoteItemsResponse200 = {
 };
 
 export type listCreditNoteItemsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2727,7 +2725,7 @@ export type listRefundsResponse200 = {
 };
 
 export type listRefundsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2782,7 +2780,7 @@ export type listUsageChargesResponse200 = {
 };
 
 export type listUsageChargesResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2839,7 +2837,7 @@ export type listSubscriptionsResponse200 = {
 };
 
 export type listSubscriptionsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2896,7 +2894,7 @@ export type getSubscriptionResponse200 = {
 };
 
 export type getSubscriptionResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -2939,7 +2937,7 @@ export type deleteSubscriptionResponse204 = {
 };
 
 export type deleteSubscriptionResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
@@ -2984,7 +2982,7 @@ export type cancelSubscriptionResponse202 = {
 };
 
 export type cancelSubscriptionResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 202>;
 };
 
@@ -3060,7 +3058,7 @@ export type getQuoteResponse200 = {
 };
 
 export type getQuoteResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3138,7 +3136,7 @@ export type estimateUsageResponse200 = {
 };
 
 export type estimateUsageResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3205,7 +3203,7 @@ export type listCancellationsResponse200 = {
 };
 
 export type listCancellationsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3267,7 +3265,7 @@ export type createCancellationResponse201 = {
 };
 
 export type createCancellationResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 201>;
 };
 
@@ -3367,7 +3365,7 @@ export type previewCancellationResponse200 = {
 };
 
 export type previewCancellationResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3433,7 +3431,7 @@ export type getCancellationResponse200 = {
 };
 
 export type getCancellationResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3476,7 +3474,7 @@ export type withdrawCancellationResponse200 = {
 };
 
 export type withdrawCancellationResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3521,7 +3519,7 @@ export type listRenewalPricesResponse200 = {
 };
 
 export type listRenewalPricesResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3587,7 +3585,7 @@ export type renewSubscriptionResponse409 = {
 };
 
 export type renewSubscriptionResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 409>;
 };
 
@@ -3668,7 +3666,7 @@ export type setAutoRenewResponse200 = {
 };
 
 export type setAutoRenewResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3733,7 +3731,7 @@ export type listAllowancesResponse200 = {
 };
 
 export type listAllowancesResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3788,7 +3786,7 @@ export type listCheckoutSessionsResponse200 = {
 };
 
 export type listCheckoutSessionsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3850,7 +3848,7 @@ export type createCheckoutSessionResponse409 = {
 };
 
 export type createCheckoutSessionResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 201 | 409>;
 };
 
@@ -3927,7 +3925,7 @@ export type getCheckoutSessionResponse200 = {
 };
 
 export type getCheckoutSessionResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -3972,7 +3970,7 @@ export type listCheckoutSessionItemsResponse200 = {
 };
 
 export type listCheckoutSessionItemsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4033,7 +4031,7 @@ export type getCheckoutSessionQuoteResponse200 = {
 };
 
 export type getCheckoutSessionQuoteResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4108,7 +4106,7 @@ export type confirmCheckoutSessionResponse409 = {
 };
 
 export type confirmCheckoutSessionResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 409>;
 };
 
@@ -4193,7 +4191,7 @@ export type expireCheckoutSessionResponse409 = {
 };
 
 export type expireCheckoutSessionResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 409>;
 };
 
@@ -4241,7 +4239,7 @@ export type listOrdersResponse200 = {
 };
 
 export type listOrdersResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4296,7 +4294,7 @@ export type getOrderResponse200 = {
 };
 
 export type getOrderResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4339,7 +4337,7 @@ export type previewOrderRefundResponse200 = {
 };
 
 export type previewOrderRefundResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4402,7 +4400,7 @@ export type cancelOrderResponse409 = {
 };
 
 export type cancelOrderResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 409>;
 };
 
@@ -4478,7 +4476,7 @@ export type listOrderItemsResponse200 = {
 };
 
 export type listOrderItemsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4534,7 +4532,7 @@ export type listEntitlementsResponse200 = {
 };
 
 export type listEntitlementsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4591,7 +4589,7 @@ export type listFeatureGrantsResponse200 = {
 };
 
 export type listFeatureGrantsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4653,7 +4651,7 @@ export type listPricesResponse304 = {
 };
 
 export type listPricesResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 304>;
 };
 
@@ -4729,7 +4727,7 @@ export type searchPricesResponse200 = {
 };
 
 export type searchPricesResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -4796,12 +4794,12 @@ export type listProductsResponse200 = {
 };
 
 export type listProductsResponse304 = {
-  data: NotModifiedResponse;
+  data: void;
   status: 304;
 };
 
 export type listProductsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 304>;
 };
 
@@ -4882,7 +4880,7 @@ export type getProductResponse304 = {
 };
 
 export type getProductResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 304>;
 };
 
@@ -4951,7 +4949,7 @@ export type getPlanResponse304 = {
 };
 
 export type getPlanResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 304>;
 };
 
@@ -5020,7 +5018,7 @@ export type getPriceResponse304 = {
 };
 
 export type getPriceResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 304>;
 };
 
@@ -5084,12 +5082,12 @@ export type listPlansResponse200 = {
 };
 
 export type listPlansResponse304 = {
-  data: NotModifiedResponse;
+  data: void;
   status: 304;
 };
 
 export type listPlansResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 304>;
 };
 
@@ -5165,12 +5163,12 @@ export type listPricesByPlanResponse200 = {
 };
 
 export type listPricesByPlanResponse304 = {
-  data: NotModifiedResponse;
+  data: void;
   status: 304;
 };
 
 export type listPricesByPlanResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200 | 304>;
 };
 
@@ -5252,7 +5250,7 @@ export type listActiveResourcesResponse200 = {
 };
 
 export type listActiveResourcesResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -5309,7 +5307,7 @@ export type listSpendResponse200 = {
 };
 
 export type listSpendResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -5371,7 +5369,7 @@ export type listMonthlyStatementsResponse200 = {
 };
 
 export type listMonthlyStatementsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -5428,7 +5426,7 @@ export type listStatementsResponse200 = {
 };
 
 export type listStatementsResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -5483,7 +5481,7 @@ export type getStatementResponse200 = {
 };
 
 export type getStatementResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
@@ -5526,7 +5524,7 @@ export type getStatementUsageResponse200 = {
 };
 
 export type getStatementUsageResponseDefault = {
-  data: ErrorResponse;
+  data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 

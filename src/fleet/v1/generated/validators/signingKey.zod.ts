@@ -83,11 +83,15 @@
  *   and remote ones it connects to;
  * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
- * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a desktop.
+ * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a graphical backend;
+ * - `leaflow.fleet.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
+ *   the virtual desktop capability is actually available; MCP is a separate source.
  *
- * A machine installed without a desktop does not offer `leaflow.fleet.virtualdesktop.host.v1`. A
- * request that needs a feature the machine does not report available fails with
- * `FEATURE_UNAVAILABLE`, whose `metadata.feature` names the feature.
+ * A graphical backend does not require a full desktop environment. Terminal logins, commands
+ * and MCP server initialization prepare or reuse the account's lightweight graphical context,
+ * in addition to their own session or job. Configuration reads and writes do not initialize a
+ * server and do not require this preparation. A request that needs a feature the machine does
+ * not report available fails with `FEATURE_UNAVAILABLE`, whose `metadata.feature` names it.
  *
  * ## Directory
  *

@@ -9,7 +9,7 @@ import * as zod from "zod";
 import { AccountIdentity } from "./accountIdentity.zod.js";
 import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
-import { ObjectIdentity } from "./objectIdentity.zod.js";
+import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
 import { ProductID } from "./productID.zod.js";
@@ -63,7 +63,7 @@ export const Subscription = zod
       ),
     order_item_id: zod.uuid().optional(),
     coupon_id: zod.uuid().optional(),
-    coupon: ObjectIdentity.optional(),
+    coupon: ObjectIdentity4b96100.optional(),
     discounted_renewals_remaining: zod
       .int()
       .min(subscriptionDiscountedRenewalsRemainingMin)

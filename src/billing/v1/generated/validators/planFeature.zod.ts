@@ -6,10 +6,10 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { ObjectIdentity } from "./objectIdentity.zod.js";
+import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
 
 export const PlanFeature = zod.strictObject({
-  feature: ObjectIdentity,
+  feature: ObjectIdentity4b96100,
   name: zod.string(),
 });
 

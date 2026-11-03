@@ -83,11 +83,15 @@
  *   and remote ones it connects to;
  * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
- * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a desktop.
+ * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a graphical backend;
+ * - `leaflow.fleet.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
+ *   the virtual desktop capability is actually available; MCP is a separate source.
  *
- * A machine installed without a desktop does not offer `leaflow.fleet.virtualdesktop.host.v1`. A
- * request that needs a feature the machine does not report available fails with
- * `FEATURE_UNAVAILABLE`, whose `metadata.feature` names the feature.
+ * A graphical backend does not require a full desktop environment. Terminal logins, commands
+ * and MCP server initialization prepare or reuse the account's lightweight graphical context,
+ * in addition to their own session or job. Configuration reads and writes do not initialize a
+ * server and do not require this preparation. A request that needs a feature the machine does
+ * not report available fails with `FEATURE_UNAVAILABLE`, whose `metadata.feature` names it.
  *
  * ## Directory
  *
@@ -244,6 +248,8 @@ import type {
   ApproveEnrollmentRequest,
   CallMcpToolRequest,
   CallMcpToolResponse,
+  CallToolRequest,
+  CallToolResponse,
   CreateGroupMemberRequest,
   CreateGroupRequest,
   CreateMachineRegistrationRequest,
@@ -272,6 +278,7 @@ import type {
   ListPrivilegeAutoApprovalsParams,
   ListPrivilegeRequestsParams,
   ListSessionsParams,
+  ListToolsParams,
   MachineEventList,
   MachineList,
   MachineRegistrationList,
@@ -298,6 +305,8 @@ import type {
   SendMcpRequestResponse,
   SessionList,
   SessionResource,
+  ToolActivityList,
+  ToolList,
   UpdateAccountRequest,
   UpdateGroupRequest,
   UpdateMachineRequest,
@@ -648,19 +657,23 @@ export const getRunMachineCommandUrl = (machineId: string) => {
  * redirection and `&&` work; there is no terminal and no standard input. The machine admits
  * the account through PAM as for a login. The account is created if the caller has none yet.
  * A command that fails is still a successful request: its exit status is its result.
+ * Before starting it, Fleet prepares or reuses the account's ready lightweight graphical
+ * session, without starting a full desktop environment. The command has its own job scope;
+ * its timeout or exit must not close the account's graphical context.
  *
  * Inside the command, `sudo` works without a prompt while the caller has
  * `fleet:machines.admin` on the machine, and refuses otherwise.
  *
- * The request is held until the command ends, at most `timeout_seconds` and a few seconds
- * more. Neither the command nor its output is hidden from the platform: do not put secrets
+ * After graphical context preparation, the request is held until the command ends, at most
+ * `timeout_seconds` and a few seconds more. Neither the command nor its output is hidden from the platform: do not put secrets
  * into either.
  *
  * Requires `fleet:machines.login` on the machine.
  *
  * Fails with:
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.command.v1`;
+ * - `FEATURE_UNAVAILABLE` when the command, session or graphical backend is unavailable;
+ * - `SESSION_UNAVAILABLE` or `SESSION_CLOSED` when the account context is not ready or closing;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `COMMAND_START_FAILED` when the shell could not start; nothing ran;
@@ -991,6 +1004,197 @@ export const deleteMcpServer = async (
   return { data, status: res.status, headers: res.headers } as deleteMcpServerResponse;
 };
 
+export type listToolsResponse200 = {
+  data: ToolList;
+  status: 200;
+};
+
+export type listToolsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listToolsResponseSuccess = listToolsResponse200 & {
+  headers: Headers;
+};
+export type listToolsResponseError = listToolsResponseDefault & {
+  headers: Headers;
+};
+
+export type listToolsResponse = listToolsResponseSuccess | listToolsResponseError;
+
+export const getListToolsUrl = (machineId: string, params: ListToolsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/tools?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/tools`;
+};
+
+/**
+ * Queries Agent's builtin tools and the caller's configured MCP servers live. No directory,
+ * result or image is cached. Requires fleet:machines.login; builtin capabilities retain
+ * their native policies and read-only restrictions. Ensures or reuses the caller's single
+ * open graphical session, without launching a desktop environment. The client instance is
+ * a UUID generated once per running client, not an authorization credential. Each request
+ * checks current IAM permissions and signs a short-lived control-only authorization.
+ * Tool arguments, results and images traverse Fleet with hop-by-hop TLS and are visible to
+ * Fleet. Existing desktop streaming remains end-to-end encrypted. TOOL_LIST_CHANGED means
+ * restart listing from the first page, never replay a CallTool. At most 100 tools per page.
+ * @summary List live tools available to the caller on a machine
+ */
+export const listTools = async (
+  machineId: string,
+  params: ListToolsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listToolsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListToolsUrl(machineId, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listToolsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listToolsResponse;
+};
+
+export type callToolResponse200 = {
+  data: CallToolResponse;
+  status: 200;
+};
+
+export type callToolResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type callToolResponseSuccess = callToolResponse200 & {
+  headers: Headers;
+};
+export type callToolResponseError = callToolResponseDefault & {
+  headers: Headers;
+};
+
+export type callToolResponse = callToolResponseSuccess | callToolResponseError;
+
+export const getCallToolUrl = (machineId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/tools:call`;
+};
+
+/**
+ * Uses the same current permissions, directory account and graphical session as listTools.
+ * Listing is not a precondition: callers may use a previously discovered ToolRef, and this
+ * operation never sends a discovery request or refreshes schemas before executing it.
+ * A removed tool or MCP server returns TOOL_NOT_FOUND, as does a direct builtin computer.*
+ * call while virtual desktop capability is unavailable. Actual permission errors remain
+ * permission errors; a missing target window is not a missing tool. Use listTools only when
+ * discovery or refresh is needed, and do not cache or reuse execution results.
+ * Source is explicit: MCP names never select or impersonate builtin tools. The arguments
+ * object is at most 256 KiB. The complete result is at most 8 MiB in the protobuf transport,
+ * with each encoded image at most 4 MiB; images are converted to base64 once at this JSON
+ * boundary, without recompression or persistence. Cancellation is propagated. A timeout,
+ * disconnect or failed response does not prove that side effects did not happen; do not
+ * automatically replay. operation_id only correlates live activity, not idempotency.
+ * @summary Call a live builtin or external MCP tool
+ */
+export const callTool = async (
+  machineId: string,
+  callToolRequest: CallToolRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<callToolResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCallToolUrl(machineId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(callToolRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: callToolResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as callToolResponse;
+};
+
+export type pollToolActivitiesResponse200 = {
+  data: ToolActivityList;
+  status: 200;
+};
+
+export type pollToolActivitiesResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type pollToolActivitiesResponseSuccess = pollToolActivitiesResponse200 & {
+  headers: Headers;
+};
+export type pollToolActivitiesResponseError = pollToolActivitiesResponseDefault & {
+  headers: Headers;
+};
+
+export type pollToolActivitiesResponse =
+  | pollToolActivitiesResponseSuccess
+  | pollToolActivitiesResponseError;
+
+export const getPollToolActivitiesUrl = (sessionId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/tool-activities`;
+};
+
+/**
+ * Checks current session viewing permission for each request and again before returning
+ * events. Subscribes only while this request is pending, returning on the first batch or
+ * after at most 20 idle seconds. At most 64 events, no offline queue, event database, cursor
+ * history or replay guarantee. Missing events never mean repeat an action. Coordinates
+ * are window-client-local (window_id=0 means canvas), not CSS or image pixels. The frontend
+ * applies its own zoom and DPI. Compare sequence only within the same instance_id.
+ * @summary Receive live tool activity for an authorized session
+ */
+export const pollToolActivities = async (
+  sessionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<pollToolActivitiesResponse> => {
+  const res = await (fetchFn ?? fetch)(getPollToolActivitiesUrl(sessionId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: pollToolActivitiesResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as pollToolActivitiesResponse;
+};
+
 export type sendMcpRequestResponse200 = {
   data: SendMcpRequestResponse;
   status: 200;
@@ -1018,7 +1222,9 @@ export const getSendMcpRequestUrl = (machineId: string, serverName: string) => {
  * Sends one JSON-RPC request of MCP to one of the caller's servers on the machine, such as
  * `tools/call`, `resources/read` or `prompts/get`, and returns the server's response. The
  * machine starts or connects to the server if it is not running, and handles its
- * initialization itself; a request still running when `timeout_seconds` passes is cancelled
+ * initialization itself. Before any such request, Fleet prepares or reuses the caller's
+ * ready lightweight account graphical session, including for resources and prompts; no full
+ * desktop environment is needed. A request still running when `timeout_seconds` passes is cancelled
  * at the server. Requests the server makes of the client are answered as by a client that
  * offers no sampling, elicitation or roots, and its notifications, such as of progress, are
  * dropped. A response with a JSON-RPC error is a successful request. Neither the request nor
@@ -1032,7 +1238,8 @@ export const getSendMcpRequestUrl = (machineId: string, serverName: string) => {
  *   is one of initialization;
  * - `RESULT_TOO_LARGE` when the response is larger than 8 MiB;
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `FEATURE_UNAVAILABLE` when the MCP, session or graphical backend is unavailable;
+ * - `SESSION_UNAVAILABLE` or `SESSION_CLOSED` when the account context is not ready or closing;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
@@ -1111,6 +1318,7 @@ export const getCallMcpToolUrl = (machineId: string, serverName: string, toolNam
  * Fails as sending a request does, and with `MCP_REQUEST_FAILED` when the server answers
  * with a JSON-RPC error, such as for a tool it does not offer or arguments it does not
  * accept, with the error's `metadata.code` and `metadata.message`.
+ * @deprecated
  * @summary Call an MCP tool
  */
 export const callMcpTool = async (
@@ -1205,6 +1413,7 @@ export const getListMcpToolsUrl = (machineId: string, params?: ListMcpToolsParam
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
  * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @deprecated
  * @summary List the caller's MCP tools on a machine
  */
 export const listMcpTools = async (
@@ -2787,12 +2996,19 @@ export const getCreateSessionUrl = () => {
 
 /**
  * Opens a session for the caller on a machine, as the caller's account, and returns once it
- * is ready. With `desktop` the session has a desktop. Without, it is a terminal session: its
+ * is ready. With `desktop` the session has a desktop. Without, Fleet first prepares or reuses
+ * the account's separate ready lightweight graphical session, then creates a terminal session
+ * with its own SID and lifetime; closing that terminal does not close the account context. Its
  * one terminal runs the caller's login shell from the start, every participant attaches to
  * that terminal, and the session ends when the shell exits; a caller who wants another
  * terminal opens another session. Either kind also offers programs, files, ports, sound,
  * devices, printers and privilege approvals. The account is created if the caller has none
  * yet. Requires `fleet:machines.login` on the machine.
+ * All newly created graphical account sessions, including desktop-first FullDesktop and
+ * Seamless sessions, keep running when no viewer has joined or the last viewer disconnects.
+ * Configured maximum lifetime, resource limits and explicit close/terminate still apply.
+ * This create API has no client-selected idle policy; existing running policies are not
+ * silently rewritten when tools, commands or terminals reuse the account context.
  *
  * On a machine an account has at most one session with a desktop and at most 8 sessions in
  * all. Sessions without a desktop run side by side, such as one for a program and one for a
@@ -2800,8 +3016,8 @@ export const getCreateSessionUrl = () => {
  *
  * Fails with:
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer sessions, or with `desktop`,
- *   desktops;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer sessions or the graphical backend;
+ * - `SESSION_UNAVAILABLE` or `SESSION_CLOSED` when its shared account context is not ready or closing;
  * - `USER_HAS_DESKTOP_SESSION` with `desktop` when the account already has a session with a
  *   desktop on the machine, which `metadata.sessionId` names; connect to it instead;
  * - `SESSION_LIMIT_REACHED` when the account already has 8 open sessions on the machine;

@@ -8,7 +8,7 @@
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
-import { ObjectIdentity } from "./objectIdentity.zod.js";
+import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
 import { Product } from "./product.zod.js";
 
 export const UsageCharge = zod.strictObject({
@@ -26,7 +26,7 @@ export const UsageCharge = zod.strictObject({
     .string()
     .optional()
     .describe("Which resource this was charged for. Empty for charges not tied to one."),
-  meter: ObjectIdentity,
+  meter: ObjectIdentity4b96100,
   unit: zod.string().optional(),
   dimensions: zod
     .record(zod.string(), zod.string())

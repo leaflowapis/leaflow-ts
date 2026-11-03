@@ -8,12 +8,12 @@
 import * as zod from "zod";
 import { BillingScheme } from "./billingScheme.zod.js";
 import { Money } from "./money.zod.js";
-import { ObjectIdentity } from "./objectIdentity.zod.js";
+import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
 import { Tier } from "./tier.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const Rate = zod.strictObject({
-  meter: ObjectIdentity,
+  meter: ObjectIdentity4b96100,
   unit: zod
     .string()
     .optional()

@@ -33,14 +33,10 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { CancellationMode } from "./cancellationMode.zod.js";
 
 export const DeletePrivateImageParams = zod.strictObject({
-  cancellation_mode: zod
-    .enum(["immediate", "period_end"])
-    .optional()
-    .describe(
-      "When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end\nends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which\nmodes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the\nend of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422\nBILLING_CANCELLATION_MODE_FIXED.",
-    ),
+  cancellation_mode: CancellationMode.optional(),
 });
 
 export type DeletePrivateImageParams = zod.input<typeof DeletePrivateImageParams>;

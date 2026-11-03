@@ -3346,6 +3346,395 @@ export interface Error {
   error: ErrorStatus;
 }
 
+export type AvailabilityZoneResource4b96100 = AvailabilityZoneResource;
+
+export type AvailabilityZoneListResponseBody4b96100 = AvailabilityZoneListResponseBody;
+
+export type BillingPeriod4b96100 = BillingPeriod;
+
+export type BillingChoice4b96100 = BillingChoice;
+
+export type TerminationPolicy4b96100 = TerminationPolicy;
+
+export type CheckoutOptions4b96100 = CheckoutOptions;
+
+export type BillingComponent4b96100 = BillingComponent;
+
+export type BillingQuantity4b96100 = BillingQuantity;
+
+export type BillingLineQuantity4b96100 = BillingLineQuantity;
+
+export type BillingMeter4b96100 = BillingMeter;
+
+export type BillingCancellation4b96100 = BillingCancellation;
+
+export type ElasticIPLine4b96100 = ElasticIPLine;
+
+export type ElasticIPLineListResponseBody4b96100 = ElasticIPLineListResponseBody;
+
+export type DeleteElasticIPResponseBody4b96100 = DeleteElasticIPResponseBody;
+
+export type InternetChargeType4b96100 = InternetChargeType;
+
+export type IPv4HostAddress4b96100 = IPv4HostAddress;
+
+export type ElasticIP4b96100 = ElasticIP;
+
+export type TrafficUsage4b96100 = TrafficUsage;
+
+export type TrafficUsageListResponseBody4b96100 = TrafficUsageListResponseBody;
+
+export type ElasticIPListResponseBody4b96100 = ElasticIPListResponseBody;
+
+export type CreateElasticIPRequestBody4b96100 = CreateElasticIPRequestBody;
+
+export type UpdateElasticIPRequestBody4b96100 = UpdateElasticIPRequestBody;
+
+export type AssociateElasticIPRequestBody4b96100 = AssociateElasticIPRequestBody;
+
+export type InstanceAssociationTarget4b96100 = InstanceAssociationTarget;
+
+export type NetworkInterfaceAddressAssociationTarget4b96100 =
+  NetworkInterfaceAddressAssociationTarget;
+
+export type CreateElasticIPResponseBody4b96100 = CreateElasticIPResponseBody;
+
+export type UpdateElasticIPResponseBody4b96100 = UpdateElasticIPResponseBody;
+
+export type ElasticIPAssociation4b96100 = ElasticIPAssociation;
+
+export type InstanceID4b96100 = InstanceID;
+
+export type NetworkInterfaceID4b96100 = NetworkInterfaceID;
+
+export type LaunchTemplateID4b96100 = LaunchTemplateID;
+
+export type VirtualPrivateCloudID4b96100 = VirtualPrivateCloudID;
+
+export type VirtualPrivateCloudIDOrWildcard4b96100 = VirtualPrivateCloudIDOrWildcard;
+
+export type ElasticIPID4b96100 = ElasticIPID;
+
+export type ElasticIPLineID4b96100 = ElasticIPLineID;
+
+export type RegionID4b96100 = RegionID;
+
+export type InstanceTypeID4b96100 = InstanceTypeID;
+
+export type InstanceFamilyID4b96100 = InstanceFamilyID;
+
+export type AvailabilityZoneID4b96100 = AvailabilityZoneID;
+
+export type VolumeID4b96100 = VolumeID;
+
+export type VolumeBackupID4b96100 = VolumeBackupID;
+
+export type VolumeTypeID4b96100 = VolumeTypeID;
+
+export type VolumeSnapshotID4b96100 = VolumeSnapshotID;
+
+export type InstanceVolumeID4b96100 = InstanceVolumeID;
+
+export type NetworkInterfaceAddressID4b96100 = NetworkInterfaceAddressID;
+
+export type ElasticIPAssociationID4b96100 = ElasticIPAssociationID;
+
+export type ImageID4b96100 = ImageID;
+
+export type SecurityGroupID4b96100 = SecurityGroupID;
+
+export type SecurityGroupIDOrWildcard4b96100 = SecurityGroupIDOrWildcard;
+
+export type SubnetID4b96100 = SubnetID;
+
+export type InstanceNetworkInterfaceID4b96100 = InstanceNetworkInterfaceID;
+
+export type OperationLogID4b96100 = OperationLogID;
+
+export type VirtualPrivateCloudPeeringID4b96100 = VirtualPrivateCloudPeeringID;
+
+export type VirtualPrivateCloudRouteID4b96100 = VirtualPrivateCloudRouteID;
+
+export type SecurityGroupRuleID4b96100 = SecurityGroupRuleID;
+
+export type InstanceFamily4b96100 = InstanceFamily;
+
+export type InstanceFamilyCategory4b96100 = InstanceFamilyCategory;
+
+export type InstanceFamilyListResponseBody4b96100 = InstanceFamilyListResponseBody;
+
+export type InstanceType4b96100 = InstanceType;
+
+export type InstanceTypeListResponseBody4b96100 = InstanceTypeListResponseBody;
+
+export type DeleteInstanceResponseBody4b96100 = DeleteInstanceResponseBody;
+
+export type Instance4b96100 = Instance;
+
+export type InstanceListResponseBody4b96100 = InstanceListResponseBody;
+
+export type CreateInstanceRequestBody4b96100 = CreateInstanceRequestBody;
+
+export type UpdateInstanceRequestBody4b96100 = UpdateInstanceRequestBody;
+
+export type RebootInstanceRequestBody4b96100 = RebootInstanceRequestBody;
+
+export type RunInstanceCommandRequestBody4b96100 = RunInstanceCommandRequestBody;
+
+export type RunInstanceCommandResponseBody4b96100 = RunInstanceCommandResponseBody;
+
+export type ConsoleResponseBody4b96100 = ConsoleResponseBody;
+
+export type ResetInstancePasswordResponseBody4b96100 = ResetInstancePasswordResponseBody;
+
+export type RebuildInstanceRequestBody4b96100 = RebuildInstanceRequestBody;
+
+export type RebuildInstanceResponseBody4b96100 = RebuildInstanceResponseBody;
+
+export type PasswordChoice4b96100 = PasswordChoice;
+
+export type GeneratedPassword4b96100 = GeneratedPassword;
+
+export type SuppliedPassword4b96100 = SuppliedPassword;
+
+export type NewCompute4b96100 = NewCompute;
+
+export type LaunchTemplateReference4b96100 = LaunchTemplateReference;
+
+export type BootVolume4b96100 = BootVolume;
+
+export type ExistingBootVolume4b96100 = ExistingBootVolume;
+
+export type UpdateInstanceResponseBody4b96100 = UpdateInstanceResponseBody;
+
+export type NewBootVolume4b96100 = NewBootVolume;
+
+export type NewDataVolume4b96100 = NewDataVolume;
+
+export type PrimaryNetworkInterface4b96100 = PrimaryNetworkInterface;
+
+export type NewPrimaryNetworkInterface4b96100 = NewPrimaryNetworkInterface;
+
+export type ExistingPrimaryNetworkInterface4b96100 = ExistingPrimaryNetworkInterface;
+
+export type InstanceElasticIP4b96100 = InstanceElasticIP;
+
+export type NewElasticIP4b96100 = NewElasticIP;
+
+export type ExistingElasticIP4b96100 = ExistingElasticIP;
+
+export type InstanceRestriction4b96100 = InstanceRestriction;
+
+export type CreateInstanceResponseBody4b96100 = CreateInstanceResponseBody;
+
+export type RescueInstanceRequestBody4b96100 = RescueInstanceRequestBody;
+
+export type RescueInstanceResponseBody4b96100 = RescueInstanceResponseBody;
+
+export type LaunchTemplate4b96100 = LaunchTemplate;
+
+export type LaunchTemplateListResponseBody4b96100 = LaunchTemplateListResponseBody;
+
+export type CreateLaunchTemplateRequestBody4b96100 = CreateLaunchTemplateRequestBody;
+
+export type CreateLaunchTemplateResponseBody4b96100 = CreateLaunchTemplateResponseBody;
+
+export type UpdateLaunchTemplateRequestBody4b96100 = UpdateLaunchTemplateRequestBody;
+
+export type NewLaunchTemplateVersion4b96100 = NewLaunchTemplateVersion;
+
+export type LaunchTemplateVersion4b96100 = LaunchTemplateVersion;
+
+export type LaunchTemplateVersionListResponseBody4b96100 = LaunchTemplateVersionListResponseBody;
+
+export type LaunchTemplateBootVolume4b96100 = LaunchTemplateBootVolume;
+
+export type LaunchTemplateDataVolume4b96100 = LaunchTemplateDataVolume;
+
+export type LaunchTemplateNetworkInterface4b96100 = LaunchTemplateNetworkInterface;
+
+export type LaunchTemplateElasticIP4b96100 = LaunchTemplateElasticIP;
+
+export type NetworkInterface4b96100 = NetworkInterface;
+
+export type NetworkInterfaceListResponseBody4b96100 = NetworkInterfaceListResponseBody;
+
+export type AttachNetworkInterfaceRequestBody4b96100 = AttachNetworkInterfaceRequestBody;
+
+export type CreateNetworkInterfaceRequestBody4b96100 = CreateNetworkInterfaceRequestBody;
+
+export type UpdateNetworkInterfaceRequestBody4b96100 = UpdateNetworkInterfaceRequestBody;
+
+export type CreateNetworkInterfaceAddressRequestBody4b96100 =
+  CreateNetworkInterfaceAddressRequestBody;
+
+export type NetworkInterfaceAddress4b96100 = NetworkInterfaceAddress;
+
+export type NetworkInterfaceAttachment4b96100 = NetworkInterfaceAttachment;
+
+export type NetworkInterfaceAttachmentList4b96100 = NetworkInterfaceAttachmentList;
+
+export type OperationLogResource4b96100 = OperationLogResource;
+
+export type OperationLogListResponseBody4b96100 = OperationLogListResponseBody;
+
+export type DeletePrivateImageResponseBody4b96100 = DeletePrivateImageResponseBody;
+
+export type PrivateImageResource4b96100 = PrivateImageResource;
+
+export type PrivateImageListResponseBody4b96100 = PrivateImageListResponseBody;
+
+export type CreatePrivateImageRequestBody4b96100 = CreatePrivateImageRequestBody;
+
+export type UpdatePrivateImageRequestBody4b96100 = UpdatePrivateImageRequestBody;
+
+export type CreatePrivateImageResponseBody4b96100 = CreatePrivateImageResponseBody;
+
+export type PublicImageResource4b96100 = PublicImageResource;
+
+export type PublicImageListResponseBody4b96100 = PublicImageListResponseBody;
+
+export type QuotaResourceType4b96100 = QuotaResourceType;
+
+export type QuotaSource4b96100 = QuotaSource;
+
+export type ProjectQuota4b96100 = ProjectQuota;
+
+export type ProjectQuotaListResponseBody4b96100 = ProjectQuotaListResponseBody;
+
+export type RegionResource4b96100 = RegionResource;
+
+export type RegionListResponseBody4b96100 = RegionListResponseBody;
+
+export type LatestOperation4b96100 = LatestOperation;
+
+export type ReleaseSetItem4b96100 = ReleaseSetItem;
+
+export type ReleaseResource4b96100 = ReleaseResource;
+
+export type InstanceReleaseResource4b96100 = InstanceReleaseResource;
+
+export type VolumeReleaseResource4b96100 = VolumeReleaseResource;
+
+export type ElasticIPReleaseResource4b96100 = ElasticIPReleaseResource;
+
+export type VolumeSnapshotReleaseResource4b96100 = VolumeSnapshotReleaseResource;
+
+export type VolumeBackupReleaseResource4b96100 = VolumeBackupReleaseResource;
+
+export type PrivateImageReleaseResource4b96100 = PrivateImageReleaseResource;
+
+export type SecurityGroupRuleDirection4b96100 = SecurityGroupRuleDirection;
+
+export type SecurityGroupRule4b96100 = SecurityGroupRule;
+
+export type SecurityGroupRuleListResponseBody4b96100 = SecurityGroupRuleListResponseBody;
+
+export type CreateSecurityGroupRuleRequestBody4b96100 = CreateSecurityGroupRuleRequestBody;
+
+export type SecurityGroup4b96100 = SecurityGroup;
+
+export type SecurityGroupListResponseBody4b96100 = SecurityGroupListResponseBody;
+
+export type CreateSecurityGroupRequestBody4b96100 = CreateSecurityGroupRequestBody;
+
+export type UpdateSecurityGroupRequestBody4b96100 = UpdateSecurityGroupRequestBody;
+
+export type VirtualPrivateCloudPeeringResource4b96100 = VirtualPrivateCloudPeeringResource;
+
+export type VirtualPrivateCloudPeeringListResponseBody4b96100 =
+  VirtualPrivateCloudPeeringListResponseBody;
+
+export type CreateVirtualPrivateCloudPeeringRequestBody4b96100 =
+  CreateVirtualPrivateCloudPeeringRequestBody;
+
+export type VirtualPrivateCloudRouteType4b96100 = VirtualPrivateCloudRouteType;
+
+export type VirtualPrivateCloudRouteResource4b96100 = VirtualPrivateCloudRouteResource;
+
+export type VirtualPrivateCloudRouteListResponseBody4b96100 =
+  VirtualPrivateCloudRouteListResponseBody;
+
+export type CreateVirtualPrivateCloudRouteRequestBody4b96100 =
+  CreateVirtualPrivateCloudRouteRequestBody;
+
+export type VirtualPrivateCloudSubnet4b96100 = VirtualPrivateCloudSubnet;
+
+export type VirtualPrivateCloudSubnetListResponseBody4b96100 =
+  VirtualPrivateCloudSubnetListResponseBody;
+
+export type CreateVirtualPrivateCloudSubnetRequestBody4b96100 =
+  CreateVirtualPrivateCloudSubnetRequestBody;
+
+export type UpdateVirtualPrivateCloudSubnetRequestBody4b96100 =
+  UpdateVirtualPrivateCloudSubnetRequestBody;
+
+export type VirtualPrivateCloud4b96100 = VirtualPrivateCloud;
+
+export type VirtualPrivateCloudListResponseBody4b96100 = VirtualPrivateCloudListResponseBody;
+
+export type CreateVirtualPrivateCloudRequestBody4b96100 = CreateVirtualPrivateCloudRequestBody;
+
+export type UpdateVirtualPrivateCloudRequestBody4b96100 = UpdateVirtualPrivateCloudRequestBody;
+
+export type FreeSubnetCidr4b96100 = FreeSubnetCidr;
+
+export type DeleteVolumeBackupResponseBody4b96100 = DeleteVolumeBackupResponseBody;
+
+export type VolumeBackupResource4b96100 = VolumeBackupResource;
+
+export type VolumeBackupListResponseBody4b96100 = VolumeBackupListResponseBody;
+
+export type CreateVolumeBackupRequestBody4b96100 = CreateVolumeBackupRequestBody;
+
+export type UpdateVolumeBackupRequestBody4b96100 = UpdateVolumeBackupRequestBody;
+
+export type CreateVolumeBackupResponseBody4b96100 = CreateVolumeBackupResponseBody;
+
+export type DeleteVolumeSnapshotResponseBody4b96100 = DeleteVolumeSnapshotResponseBody;
+
+export type VolumeSnapshotResource4b96100 = VolumeSnapshotResource;
+
+export type VolumeSnapshotListResponseBody4b96100 = VolumeSnapshotListResponseBody;
+
+export type CreateVolumeSnapshotRequestBody4b96100 = CreateVolumeSnapshotRequestBody;
+
+export type UpdateVolumeSnapshotRequestBody4b96100 = UpdateVolumeSnapshotRequestBody;
+
+export type CreateVolumeSnapshotResponseBody4b96100 = CreateVolumeSnapshotResponseBody;
+
+export type VolumeTypeResource4b96100 = VolumeTypeResource;
+
+export type PerformanceFormula4b96100 = PerformanceFormula;
+
+export type VolumeTypePerformance4b96100 = VolumeTypePerformance;
+
+export type VolumeTypeListResponseBody4b96100 = VolumeTypeListResponseBody;
+
+export type DeleteVolumeResponseBody4b96100 = DeleteVolumeResponseBody;
+
+export type VolumeResource4b96100 = VolumeResource;
+
+export type VolumeListResponseBody4b96100 = VolumeListResponseBody;
+
+export type CreateVolumeRequestBody4b96100 = CreateVolumeRequestBody;
+
+export type UpdateVolumeRequestBody4b96100 = UpdateVolumeRequestBody;
+
+export type RevertVolumeRequestBody4b96100 = RevertVolumeRequestBody;
+
+export type AttachVolumeRequestBody4b96100 = AttachVolumeRequestBody;
+
+export type CreateVolumeResponseBody4b96100 = CreateVolumeResponseBody;
+
+export type UpdateVolumeResponseBody4b96100 = UpdateVolumeResponseBody;
+
+export type VolumeAttachment4b96100 = VolumeAttachment;
+
+export type VolumePerformance4b96100 = VolumePerformance;
+
+export type VolumeAttachmentList4b96100 = VolumeAttachmentList;
+
 /**
  * The request conflicts with the current state of a resource or offering it involves. `COMPUTE_RESOURCE_BUSY`
  * means a resource has an operation in progress: `meta.resource_type`, such as `instance` or `elastic_ip`, and
@@ -3415,13 +3804,11 @@ export type ListElasticIpsParams = {
 
 export type DeleteElasticIpParams = {
   /**
-   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
-   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
-   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
-   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
-   * BILLING_CANCELLATION_MODE_FIXED.
+   * When the subscriptions that pay for what is deleted end. `immediate` cancels them now and refunds a licensed one under its terms; `period_end` cancels them at the end of their paid period and keeps what is deleted working until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period, since one cancellation releases the whole set at one instant.
+   *
+   * Billing alone judges the mode against the terms each subscription was bought with. It refuses with 422 `BILLING_CANCELLATION_MODE_FIXED` a mode those terms do not allow: a pay-as-you-go subscription ends only now, and a prepaid one whose terms allow only the end of its period only then. It refuses `period_end` with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again answers with that one as it is.
    */
-  cancellation_mode?: CancellationModeParameter;
+  cancellation_mode?: CancellationMode;
 };
 
 export type ListElasticIpTrafficUsageParams = {
@@ -3512,13 +3899,11 @@ export type ListInstancesParams = {
 
 export type DeleteInstanceParams = {
   /**
-   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
-   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
-   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
-   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
-   * BILLING_CANCELLATION_MODE_FIXED.
+   * When the subscriptions that pay for what is deleted end. `immediate` cancels them now and refunds a licensed one under its terms; `period_end` cancels them at the end of their paid period and keeps what is deleted working until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period, since one cancellation releases the whole set at one instant.
+   *
+   * Billing alone judges the mode against the terms each subscription was bought with. It refuses with 422 `BILLING_CANCELLATION_MODE_FIXED` a mode those terms do not allow: a pay-as-you-go subscription ends only now, and a prepaid one whose terms allow only the end of its period only then. It refuses `period_end` with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again answers with that one as it is.
    */
-  cancellation_mode?: CancellationModeParameter;
+  cancellation_mode?: CancellationMode;
 };
 
 export type ListInstanceVolumesParams = {
@@ -3641,13 +4026,11 @@ export type ListPrivateImagesParams = {
 
 export type DeletePrivateImageParams = {
   /**
-   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
-   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
-   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
-   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
-   * BILLING_CANCELLATION_MODE_FIXED.
+   * When the subscriptions that pay for what is deleted end. `immediate` cancels them now and refunds a licensed one under its terms; `period_end` cancels them at the end of their paid period and keeps what is deleted working until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period, since one cancellation releases the whole set at one instant.
+   *
+   * Billing alone judges the mode against the terms each subscription was bought with. It refuses with 422 `BILLING_CANCELLATION_MODE_FIXED` a mode those terms do not allow: a pay-as-you-go subscription ends only now, and a prepaid one whose terms allow only the end of its period only then. It refuses `period_end` with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again answers with that one as it is.
    */
-  cancellation_mode?: CancellationModeParameter;
+  cancellation_mode?: CancellationMode;
 };
 
 export type ListPublicImagesParams = {
@@ -3830,13 +4213,11 @@ export type ListVolumeBackupsParams = {
 
 export type DeleteVolumeBackupParams = {
   /**
-   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
-   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
-   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
-   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
-   * BILLING_CANCELLATION_MODE_FIXED.
+   * When the subscriptions that pay for what is deleted end. `immediate` cancels them now and refunds a licensed one under its terms; `period_end` cancels them at the end of their paid period and keeps what is deleted working until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period, since one cancellation releases the whole set at one instant.
+   *
+   * Billing alone judges the mode against the terms each subscription was bought with. It refuses with 422 `BILLING_CANCELLATION_MODE_FIXED` a mode those terms do not allow: a pay-as-you-go subscription ends only now, and a prepaid one whose terms allow only the end of its period only then. It refuses `period_end` with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again answers with that one as it is.
    */
-  cancellation_mode?: CancellationModeParameter;
+  cancellation_mode?: CancellationMode;
 };
 
 export type ListVolumeSnapshotsParams = {
@@ -3860,13 +4241,11 @@ export type ListVolumeSnapshotsParams = {
 
 export type DeleteVolumeSnapshotParams = {
   /**
-   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
-   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
-   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
-   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
-   * BILLING_CANCELLATION_MODE_FIXED.
+   * When the subscriptions that pay for what is deleted end. `immediate` cancels them now and refunds a licensed one under its terms; `period_end` cancels them at the end of their paid period and keeps what is deleted working until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period, since one cancellation releases the whole set at one instant.
+   *
+   * Billing alone judges the mode against the terms each subscription was bought with. It refuses with 422 `BILLING_CANCELLATION_MODE_FIXED` a mode those terms do not allow: a pay-as-you-go subscription ends only now, and a prepaid one whose terms allow only the end of its period only then. It refuses `period_end` with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again answers with that one as it is.
    */
-  cancellation_mode?: CancellationModeParameter;
+  cancellation_mode?: CancellationMode;
 };
 
 export type ListVolumeTypesParams = {
@@ -3911,11 +4290,9 @@ export type ListVolumesParams = {
 
 export type DeleteVolumeParams = {
   /**
-   * When subscriptions end. immediate ends them now and refunds the unused value under their refund terms; period_end
-   * ends them at the end of their paid period. The cancellation terms fixed when a subscription was bought decide which
-   * modes it allows: a pay-as-you-go subscription ends only immediately, and a prepaid one whose terms allow only the
-   * end of its paid period ends only then. Billing refuses a mode the terms do not allow with HTTP 422
-   * BILLING_CANCELLATION_MODE_FIXED.
+   * When the subscriptions that pay for what is deleted end. `immediate` cancels them now and refunds a licensed one under its terms; `period_end` cancels them at the end of their paid period and keeps what is deleted working until then. Omitted, they are canceled now where the terms of every one of them allow it, and otherwise all at the end of the paid period, since one cancellation releases the whole set at one instant.
+   *
+   * Billing alone judges the mode against the terms each subscription was bought with. It refuses with 422 `BILLING_CANCELLATION_MODE_FIXED` a mode those terms do not allow: a pay-as-you-go subscription ends only now, and a prepaid one whose terms allow only the end of its period only then. It refuses `period_end` with 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when the paid periods end at different times. Ignored when nothing is subscribed, and when a cancellation is already open: deleting again answers with that one as it is.
    */
-  cancellation_mode?: CancellationModeParameter;
+  cancellation_mode?: CancellationMode;
 };

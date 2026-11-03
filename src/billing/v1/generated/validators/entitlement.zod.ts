@@ -6,12 +6,12 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { ObjectIdentity } from "./objectIdentity.zod.js";
+import { ObjectIdentity4b96100 } from "./objectIdentity4b96100.zod.js";
 import { Product } from "./product.zod.js";
 
 export const Entitlement = zod.strictObject({
   product: Product,
-  feature: ObjectIdentity,
+  feature: ObjectIdentity4b96100,
   name: zod.string().optional(),
   enabled: zod.boolean(),
   expires_at: zod.iso

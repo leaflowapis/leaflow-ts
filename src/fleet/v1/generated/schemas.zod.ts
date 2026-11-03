@@ -83,11 +83,15 @@
  *   and remote ones it connects to;
  * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
- * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a desktop.
+ * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a graphical backend;
+ * - `leaflow.fleet.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
+ *   the virtual desktop capability is actually available; MCP is a separate source.
  *
- * A machine installed without a desktop does not offer `leaflow.fleet.virtualdesktop.host.v1`. A
- * request that needs a feature the machine does not report available fails with
- * `FEATURE_UNAVAILABLE`, whose `metadata.feature` names the feature.
+ * A graphical backend does not require a full desktop environment. Terminal logins, commands
+ * and MCP server initialization prepare or reuse the account's lightweight graphical context,
+ * in addition to their own session or job. Configuration reads and writes do not initialize a
+ * server and do not require this preparation. A request that needs a feature the machine does
+ * not report available fails with `FEATURE_UNAVAILABLE`, whose `metadata.feature` names it.
  *
  * ## Directory
  *
@@ -244,6 +248,8 @@ import { ApproveEnrollmentRequest } from "./validators/approveEnrollmentRequest.
 
 import { CallMcpToolRequest } from "./validators/callMcpToolRequest.zod.js";
 
+import { CallToolRequest } from "./validators/callToolRequest.zod.js";
+
 import { CreateGroupMemberRequest } from "./validators/createGroupMemberRequest.zod.js";
 
 import { CreateGroupRequest } from "./validators/createGroupRequest.zod.js";
@@ -382,19 +388,23 @@ export const ListMachineEventsQueryParams = zod.strictObject({
  * redirection and `&&` work; there is no terminal and no standard input. The machine admits
  * the account through PAM as for a login. The account is created if the caller has none yet.
  * A command that fails is still a successful request: its exit status is its result.
+ * Before starting it, Fleet prepares or reuses the account's ready lightweight graphical
+ * session, without starting a full desktop environment. The command has its own job scope;
+ * its timeout or exit must not close the account's graphical context.
  *
  * Inside the command, `sudo` works without a prompt while the caller has
  * `fleet:machines.admin` on the machine, and refuses otherwise.
  *
- * The request is held until the command ends, at most `timeout_seconds` and a few seconds
- * more. Neither the command nor its output is hidden from the platform: do not put secrets
+ * After graphical context preparation, the request is held until the command ends, at most
+ * `timeout_seconds` and a few seconds more. Neither the command nor its output is hidden from the platform: do not put secrets
  * into either.
  *
  * Requires `fleet:machines.login` on the machine.
  *
  * Fails with:
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.command.v1`;
+ * - `FEATURE_UNAVAILABLE` when the command, session or graphical backend is unavailable;
+ * - `SESSION_UNAVAILABLE` or `SESSION_CLOSED` when the account context is not ready or closing;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `COMMAND_START_FAILED` when the shell could not start; nothing ran;
@@ -519,10 +529,92 @@ export const DeleteMcpServerQueryParams = zod.strictObject({
 });
 
 /**
+ * Queries Agent's builtin tools and the caller's configured MCP servers live. No directory,
+ * result or image is cached. Requires fleet:machines.login; builtin capabilities retain
+ * their native policies and read-only restrictions. Ensures or reuses the caller's single
+ * open graphical session, without launching a desktop environment. The client instance is
+ * a UUID generated once per running client, not an authorization credential. Each request
+ * checks current IAM permissions and signs a short-lived control-only authorization.
+ * Tool arguments, results and images traverse Fleet with hop-by-hop TLS and are visible to
+ * Fleet. Existing desktop streaming remains end-to-end encrypted. TOOL_LIST_CHANGED means
+ * restart listing from the first page, never replay a CallTool. At most 100 tools per page.
+ * @summary List live tools available to the caller on a machine
+ */
+export const ListToolsParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+export const listToolsQuerySourceDefault = `all`;
+export const listToolsQueryMcpServerMax = 64;
+
+export const listToolsQueryQueryMax = 256;
+
+export const listToolsQueryReadOnlyDefault = false;
+export const listToolsQueryPageSizeDefault = 100;
+export const listToolsQueryPageSizeMax = 100;
+
+export const listToolsQueryPageTokenMax = 4096;
+
+export const ListToolsQueryParams = zod.strictObject({
+  client_instance_id: zod.uuid(),
+  source: zod.enum(["all", "builtin", "mcp"]).default(listToolsQuerySourceDefault),
+  mcp_server: zod.string().max(listToolsQueryMcpServerMax).optional(),
+  query: zod.string().max(listToolsQueryQueryMax).optional(),
+  read_only: zod.boolean().default(listToolsQueryReadOnlyDefault),
+  page_size: zod.int().min(1).max(listToolsQueryPageSizeMax).default(listToolsQueryPageSizeDefault),
+  page_token: zod.string().max(listToolsQueryPageTokenMax).optional(),
+});
+
+/**
+ * Uses the same current permissions, directory account and graphical session as listTools.
+ * Listing is not a precondition: callers may use a previously discovered ToolRef, and this
+ * operation never sends a discovery request or refreshes schemas before executing it.
+ * A removed tool or MCP server returns TOOL_NOT_FOUND, as does a direct builtin computer.*
+ * call while virtual desktop capability is unavailable. Actual permission errors remain
+ * permission errors; a missing target window is not a missing tool. Use listTools only when
+ * discovery or refresh is needed, and do not cache or reuse execution results.
+ * Source is explicit: MCP names never select or impersonate builtin tools. The arguments
+ * object is at most 256 KiB. The complete result is at most 8 MiB in the protobuf transport,
+ * with each encoded image at most 4 MiB; images are converted to base64 once at this JSON
+ * boundary, without recompression or persistence. Cancellation is propagated. A timeout,
+ * disconnect or failed response does not prove that side effects did not happen; do not
+ * automatically replay. operation_id only correlates live activity, not idempotency.
+ * @summary Call a live builtin or external MCP tool
+ */
+export const CallToolParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+export const CallToolBody = CallToolRequest;
+
+/**
+ * Checks current session viewing permission for each request and again before returning
+ * events. Subscribes only while this request is pending, returning on the first batch or
+ * after at most 20 idle seconds. At most 64 events, no offline queue, event database, cursor
+ * history or replay guarantee. Missing events never mean repeat an action. Coordinates
+ * are window-client-local (window_id=0 means canvas), not CSS or image pixels. The frontend
+ * applies its own zoom and DPI. Compare sequence only within the same instance_id.
+ * @summary Receive live tool activity for an authorized session
+ */
+export const pollToolActivitiesPathSessionIdMax = 40;
+
+export const pollToolActivitiesPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+
+export const PollToolActivitiesParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(pollToolActivitiesPathSessionIdMax)
+    .regex(pollToolActivitiesPathSessionIdRegExp),
+});
+
+/**
  * Sends one JSON-RPC request of MCP to one of the caller's servers on the machine, such as
  * `tools/call`, `resources/read` or `prompts/get`, and returns the server's response. The
  * machine starts or connects to the server if it is not running, and handles its
- * initialization itself; a request still running when `timeout_seconds` passes is cancelled
+ * initialization itself. Before any such request, Fleet prepares or reuses the caller's
+ * ready lightweight account graphical session, including for resources and prompts; no full
+ * desktop environment is needed. A request still running when `timeout_seconds` passes is cancelled
  * at the server. Requests the server makes of the client are answered as by a client that
  * offers no sampling, elicitation or roots, and its notifications, such as of progress, are
  * dropped. A response with a JSON-RPC error is a successful request. Neither the request nor
@@ -536,7 +628,8 @@ export const DeleteMcpServerQueryParams = zod.strictObject({
  *   is one of initialization;
  * - `RESULT_TOO_LARGE` when the response is larger than 8 MiB;
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `FEATURE_UNAVAILABLE` when the MCP, session or graphical backend is unavailable;
+ * - `SESSION_UNAVAILABLE` or `SESSION_CLOSED` when the account context is not ready or closing;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
@@ -567,6 +660,7 @@ export const SendMcpRequestBody = SendMcpRequestRequest;
  * Fails as sending a request does, and with `MCP_REQUEST_FAILED` when the server answers
  * with a JSON-RPC error, such as for a tool it does not offer or arguments it does not
  * accept, with the error's `metadata.code` and `metadata.message`.
+ * @deprecated
  * @summary Call an MCP tool
  */
 export const callMcpToolPathServerNameRegExp = new RegExp("^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$");
@@ -602,6 +696,7 @@ export const CallMcpToolBody = CallMcpToolRequest;
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
  * - `MACHINE_TIMEOUT` when the machine did not answer in time.
+ * @deprecated
  * @summary List the caller's MCP tools on a machine
  */
 export const ListMcpToolsParams = zod.strictObject({
@@ -1085,12 +1180,19 @@ export const ListSessionsQueryParams = zod.strictObject({
 
 /**
  * Opens a session for the caller on a machine, as the caller's account, and returns once it
- * is ready. With `desktop` the session has a desktop. Without, it is a terminal session: its
+ * is ready. With `desktop` the session has a desktop. Without, Fleet first prepares or reuses
+ * the account's separate ready lightweight graphical session, then creates a terminal session
+ * with its own SID and lifetime; closing that terminal does not close the account context. Its
  * one terminal runs the caller's login shell from the start, every participant attaches to
  * that terminal, and the session ends when the shell exits; a caller who wants another
  * terminal opens another session. Either kind also offers programs, files, ports, sound,
  * devices, printers and privilege approvals. The account is created if the caller has none
  * yet. Requires `fleet:machines.login` on the machine.
+ * All newly created graphical account sessions, including desktop-first FullDesktop and
+ * Seamless sessions, keep running when no viewer has joined or the last viewer disconnects.
+ * Configured maximum lifetime, resource limits and explicit close/terminate still apply.
+ * This create API has no client-selected idle policy; existing running policies are not
+ * silently rewritten when tools, commands or terminals reuse the account context.
  *
  * On a machine an account has at most one session with a desktop and at most 8 sessions in
  * all. Sessions without a desktop run side by side, such as one for a program and one for a
@@ -1098,8 +1200,8 @@ export const ListSessionsQueryParams = zod.strictObject({
  *
  * Fails with:
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer sessions, or with `desktop`,
- *   desktops;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer sessions or the graphical backend;
+ * - `SESSION_UNAVAILABLE` or `SESSION_CLOSED` when its shared account context is not ready or closing;
  * - `USER_HAS_DESKTOP_SESSION` with `desktop` when the account already has a session with a
  *   desktop on the machine, which `metadata.sessionId` names; connect to it instead;
  * - `SESSION_LIMIT_REACHED` when the account already has 8 open sessions on the machine;
