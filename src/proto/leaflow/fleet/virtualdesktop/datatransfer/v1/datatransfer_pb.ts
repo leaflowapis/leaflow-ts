@@ -586,8 +586,10 @@ export type DragStart = Message<"leaflow.fleet.virtualdesktop.datatransfer.v1.Dr
   sourceWindowId: bigint;
 
   /**
-   * The formats the source provides, most faithful first, at most 32 unique
-   * ones of at most 255 bytes each.
+   * The formats the source provides, most faithful first. Names are non-empty,
+   * distinct media types without control characters. Do not truncate the list
+   * or its names; the channel's message framing applies to the declaration,
+   * while format data is read on demand over the data channel.
    *
    * @generated from field: repeated string mime_types = 3;
    */
