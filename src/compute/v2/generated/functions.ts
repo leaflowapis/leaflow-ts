@@ -150,7 +150,6 @@ import type {
   RegionID,
   RegionListResponseBody,
   RegionResource,
-  RescueInstanceRequestBody,
   RescueInstanceResponseBody,
   ResetInstancePasswordResponseBody,
   RevertVolumeRequestBody,
@@ -2493,6 +2492,8 @@ export const getRescueInstanceUrl = (instanceId: InstanceID) => {
  *
  * In rescue mode, everything only the instance's own system can take is refused with 409 `INSTANCE_UNRESCUE_REQUIRED`: starting, stopping, rebooting, rebuilding, resetting the password, changing `instance_type_id`, attaching or detaching volumes and network interfaces, capturing a private image and running commands. Leave rescue mode with `:unrescue` first. The console stays available, releasing the instance works as usual, and the instance is charged as when running. A suspension that begins in rescue mode takes the instance out of rescue before stopping it, and starting it again once the suspension ends boots its own system.
  *
+ * The rescue environment does not accept passwords. The remote console signs in as `login_username` automatically, and SSH accepts `login_username` with the public keys the instance was created or last rebuilt with.
+ *
  * A rescue the compute service could not boot leaves the instance as it was, or in `error`; request it again or reboot the instance.
  *
  * The request does not name an image. The rescue image is the region's enabled rescue image for the architecture of the instance's boot volume. A region and architecture with no enabled rescue image is refused with `RESCUE_IMAGE_NOT_CONFIGURED` (409).
@@ -2500,34 +2501,12 @@ export const getRescueInstanceUrl = (instanceId: InstanceID) => {
  */
 export const rescueInstance = async (
   instanceId: InstanceID,
-  rescueInstanceRequestBody: RescueInstanceRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<rescueInstanceResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
   const res = await (fetchFn ?? fetch)(getRescueInstanceUrl(instanceId), {
     ...options,
     method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(rescueInstanceRequestBody),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();

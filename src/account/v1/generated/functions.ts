@@ -16,6 +16,24 @@
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
  *
+ * ## Applications
+ *
+ * An application registered by a project signs its users in at auth.leaflow.net in the same manner as any other OAuth client. To call the Leaflow API on behalf of a user, the application requests the `iam` scope, and the user must then authorize the application for each project in which it is to act:
+ *
+ * 1. The application directs the user to the authorization page of the console:
+ *
+ *    ```
+ *    https://console.leaflow.net/applications/authorize?client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>
+ *    ```
+ *
+ *    All three parameters are required. The `redirect_uri` is URL-encoded and must exactly match one of the redirect URIs registered for the application; a custom scheme registered for a public application is accepted in the same way. If a parameter is missing, if the `redirect_uri` does not match, or if the application does not exist or is not active, the page reports the problem to the user and does not redirect. A user who is not signed in, or who has not yet completed registration and accepted the agreements, does so first and then returns to the page.
+ * 2. The user selects a project and confirms the authorization. The console calls `POST /account/v1/me/authorized-applications` and returns the user to the `redirect_uri` with the query parameters `project_id` and `state`. If the user declines, the console returns the user to the `redirect_uri` with `error=access_denied` and `state`. In both cases the existing query parameters of the `redirect_uri` are retained, and a parameter of the same name is replaced. The application must verify that `state` equals the value it supplied before it uses the response.
+ * 3. The application exchanges its access token for a scoped token at `POST /account/v1/projects/{projectId}/scoped-tokens`, as described in the preceding section.
+ *
+ * Within an authorized project, the application holds exactly the permissions of the user in that project and none beyond them. The user may revoke an authorization at any time at https://console.leaflow.net/account/applications, and an authorization ends when the user leaves the project.
+ *
+ * An access token issued to an application is accepted only by `create-scoped-token`, `list-authorized-applications` and `revoke-authorized-application`. Every other endpoint rejects it with 403 `APPLICATION_TOKEN_NOT_ACCEPTED`; consequently, an application cannot authorize itself.
+ *
  * ## SSH keys
  *
  * The SSH keys of an account belong to its holder rather than to any project, and a key is active on one account at most. Keys shared by a project, such as one used by CI, belong to the project instead and are managed through the IAM API.
@@ -34,15 +52,20 @@ import type {
   AccountDeletionResource,
   AccountResource,
   AgreementListResponseBody,
+  ApplicationResource,
+  AuthorizeApplicationRequestBody,
+  AuthorizedApplicationResource,
   ConsentListResponseBody,
   CreateProjectRequestBody,
   CreateSSHKeyRequestBody,
   Error,
   IdentityVerificationResource,
   InvitationPreviewResource,
+  LengthAwarePageAuthorizedApplicationResource,
   LengthAwarePageInvitationResource,
   LengthAwarePageProjectAccessResource,
   LengthAwarePageSSHKeyResource,
+  ListAuthorizedApplicationsParams,
   ListMyInvitationsParams,
   ListProjectsParams,
   ListSshKeysParams,
@@ -1059,6 +1082,230 @@ export const revokeSshKey = async (
   return { data, status: res.status, headers: res.headers } as revokeSshKeyResponse;
 };
 
+export type getApplicationResponse200 = {
+  data: ApplicationResource;
+  status: 200;
+};
+
+export type getApplicationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getApplicationResponseSuccess = getApplicationResponse200 & {
+  headers: Headers;
+};
+export type getApplicationResponseError = getApplicationResponseDefault & {
+  headers: Headers;
+};
+
+export type getApplicationResponse = getApplicationResponseSuccess | getApplicationResponseError;
+
+export const getGetApplicationUrl = (clientId: string) => {
+  return `https://account.leaflow.cloud/account/v1/applications/${encodeURIComponent(String(clientId))}`;
+};
+
+/**
+ * Returns the application requesting authorization, so that the authorization page can identify the requester. Any authenticated account may read it, since the `client_id` is part of every authorization request.
+ *
+ * A deleted application is reported as not found. A disabled application is returned with `status` `DISABLED` and cannot be authorized.
+ *
+ * The authorization page returns the user only to a `redirect_uri` that exactly matches one of `redirect_uris`; if none matches, the user is not redirected.
+ * @summary Get an application by its client ID
+ */
+export const getApplication = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getApplicationResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetApplicationUrl(clientId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getApplicationResponse;
+};
+
+export type listAuthorizedApplicationsResponse200 = {
+  data: LengthAwarePageAuthorizedApplicationResource;
+  status: 200;
+};
+
+export type listAuthorizedApplicationsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listAuthorizedApplicationsResponseSuccess = listAuthorizedApplicationsResponse200 & {
+  headers: Headers;
+};
+export type listAuthorizedApplicationsResponseError = listAuthorizedApplicationsResponseDefault & {
+  headers: Headers;
+};
+
+export type listAuthorizedApplicationsResponse =
+  | listAuthorizedApplicationsResponseSuccess
+  | listAuthorizedApplicationsResponseError;
+
+export const getListAuthorizedApplicationsUrl = (params?: ListAuthorizedApplicationsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://account.leaflow.cloud/account/v1/me/authorized-applications?${stringifiedParams}`
+    : `https://account.leaflow.cloud/account/v1/me/authorized-applications`;
+};
+
+/**
+ * Returns one item for each application and project, most recent first. An authorization is omitted once it has been revoked, once the membership under which it was granted has ended, or once the application has been deleted.
+ *
+ * When called with an access token issued to an application, only the authorizations of that application are returned.
+ * @summary List the applications the current account has authorized
+ */
+export const listAuthorizedApplications = async (
+  params?: ListAuthorizedApplicationsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAuthorizedApplicationsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAuthorizedApplicationsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAuthorizedApplicationsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listAuthorizedApplicationsResponse;
+};
+
+export type authorizeApplicationResponse201 = {
+  data: AuthorizedApplicationResource;
+  status: 201;
+};
+
+export type authorizeApplicationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type authorizeApplicationResponseSuccess = authorizeApplicationResponse201 & {
+  headers: Headers;
+};
+export type authorizeApplicationResponseError = authorizeApplicationResponseDefault & {
+  headers: Headers;
+};
+
+export type authorizeApplicationResponse =
+  | authorizeApplicationResponseSuccess
+  | authorizeApplicationResponseError;
+
+export const getAuthorizeApplicationUrl = () => {
+  return `https://account.leaflow.cloud/account/v1/me/authorized-applications`;
+};
+
+/**
+ * Permits the application to exchange the access tokens of this account for scoped tokens of the project. Within the project, the application then holds exactly the permissions of this account and none beyond them.
+ *
+ * The caller must be a member of the project. Repeating the request returns the existing authorization. Authorizing a disabled application fails with 412 `APPLICATION_DISABLED`.
+ *
+ * An access token issued to an application is rejected, so that an application cannot authorize itself.
+ * @summary Authorize an application to act in a project
+ */
+export const authorizeApplication = async (
+  authorizeApplicationRequestBody: AuthorizeApplicationRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<authorizeApplicationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getAuthorizeApplicationUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(authorizeApplicationRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: authorizeApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as authorizeApplicationResponse;
+};
+
+export type revokeAuthorizedApplicationResponse200 = {
+  data: AuthorizedApplicationResource;
+  status: 200;
+};
+
+export type revokeAuthorizedApplicationResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type revokeAuthorizedApplicationResponseSuccess = revokeAuthorizedApplicationResponse200 & {
+  headers: Headers;
+};
+export type revokeAuthorizedApplicationResponseError =
+  revokeAuthorizedApplicationResponseDefault & {
+    headers: Headers;
+  };
+
+export type revokeAuthorizedApplicationResponse =
+  | revokeAuthorizedApplicationResponseSuccess
+  | revokeAuthorizedApplicationResponseError;
+
+export const getRevokeAuthorizedApplicationUrl = (authorizationId: string) => {
+  return `https://account.leaflow.cloud/account/v1/me/authorized-applications/${encodeURIComponent(String(authorizationId))}`;
+};
+
+/**
+ * After revocation, the application can no longer exchange tokens for the project. A scoped token already issued to it remains valid until it expires. Repeating the request returns the same authorization.
+ *
+ * When called with an access token issued to an application, only the authorizations of that application can be revoked; this allows an application to disconnect itself.
+ * @summary Revoke an application's authorization
+ */
+export const revokeAuthorizedApplication = async (
+  authorizationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<revokeAuthorizedApplicationResponse> => {
+  const res = await (fetchFn ?? fetch)(getRevokeAuthorizedApplicationUrl(authorizationId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: revokeAuthorizedApplicationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as revokeAuthorizedApplicationResponse;
+};
+
 export type listMyInvitationsResponse200 = {
   data: LengthAwarePageInvitationResource;
   status: 200;
@@ -1662,6 +1909,8 @@ export const getCreateScopedTokenUrl = (projectId: string) => {
  * A scoped token states identity only — the user and the project — and **carries no permissions**. Permissions are evaluated on every request, so a change of role takes effect immediately rather than at the next expiry.
  *
  * A project that is suspended, banned or being deleted still issues tokens; those states restrict writes, and the project remains readable.
+ *
+ * An access token issued to an application is exchanged only for a project for which the user has authorized that application. Otherwise, the exchange fails with 403 `APPLICATION_AUTHORIZATION_REQUIRED`, whose `meta` contains the `client_id` and the `project_id`; the application should then direct the user to the authorization page. For a disabled application the exchange fails with 412 `APPLICATION_DISABLED`, and for a deleted application with 404 `APPLICATION_NOT_FOUND`, even if its access token has not yet expired.
  * @summary Exchange the access token for a scoped token
  */
 export const createScopedToken = async (

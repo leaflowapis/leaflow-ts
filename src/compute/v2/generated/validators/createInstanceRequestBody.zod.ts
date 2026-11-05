@@ -88,6 +88,12 @@ export const CreateInstanceRequestBody = zod
       .max(createInstanceRequestBodyDescriptionMax)
       .optional()
       .describe("A free-text note about each instance. Do not put credentials here"),
+    join_fleet: zod
+      .boolean()
+      .optional()
+      .describe(
+        "Whether each instance joins Leaflow Fleet. An instance that joins enrolls automatically on its first boot, without a pairing code, and project members can then access it through Fleet using their own accounts. If omitted, the value from the launch template is used; if the template does not specify one, each instance joins when its image supports Fleet (`supports_fleet`).\n\nSetting the value to `true` for an image that does not support Fleet, or when booting from an existing volume, is rejected with 422 `INSTANCE_FLEET_UNSUPPORTED` before an order is placed. If Fleet is unavailable when an instance is created, the instance is still created and its `fleet_machine_id` is null.",
+      ),
     checkout: CheckoutOptions.optional(),
   })
   .describe(

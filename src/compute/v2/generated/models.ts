@@ -1262,6 +1262,15 @@ export interface Instance {
   launch_template_version_number: number | null;
   /** The most recent operation started on the instance; null when none has been recorded. */
   latest_operation: LatestOperation | null;
+  /** Whether the instance is configured to join Leaflow Fleet. The value is set at creation and retained across rebuilds unless a rebuild specifies a new value. */
+  join_fleet: boolean;
+  /** Whether the operating system with which the instance was created or last rebuilt supports Leaflow Fleet. The value reflects that specific image build; other builds of the same operating system may differ. */
+  supports_fleet: boolean;
+  /**
+   * The identifier of the Leaflow Fleet machine reserved for this instance. The instance enrolls as this machine on its first boot after creation or a rebuild, and its enrollment status is available from Fleet. Null if the instance is not configured to join Fleet, if its operating system does not support Fleet, or if Fleet was unavailable when the instance was created or last rebuilt.
+   * @nullable
+   */
+  fleet_machine_id: string | null;
 }
 
 /**
@@ -1527,6 +1536,12 @@ export interface CreateInstanceRequestBody {
    * @maxLength 4096
    */
   description?: string;
+  /**
+   * Whether each instance joins Leaflow Fleet. An instance that joins enrolls automatically on its first boot, without a pairing code, and project members can then access it through Fleet using their own accounts. If omitted, the value from the launch template is used; if the template does not specify one, each instance joins when its image supports Fleet (`supports_fleet`).
+   *
+   * Setting the value to `true` for an image that does not support Fleet, or when booting from an existing volume, is rejected with 422 `INSTANCE_FLEET_UNSUPPORTED` before an order is placed. If Fleet is unavailable when an instance is created, the instance is still created and its `fleet_machine_id` is null.
+   */
+  join_fleet?: boolean;
   checkout?: CheckoutOptions;
 }
 
@@ -1609,6 +1624,8 @@ export interface ResetInstancePasswordResponseBody {
 export interface RebuildInstanceRequestBody {
   image_id: ImageID;
   password?: PasswordChoice;
+  /** Whether the rebuilt instance joins Leaflow Fleet. If omitted, the instance's current value is retained. Because a rebuild replaces the operating system, the instance enrolls as a new Fleet machine and the previous machine is removed from Fleet. Setting the value to `true` for an image that does not support Fleet is rejected with 422 `INSTANCE_FLEET_UNSUPPORTED`. */
+  join_fleet?: boolean;
 }
 
 export interface RebuildInstanceResponseBody {
@@ -1662,15 +1679,6 @@ export interface CreateInstanceResponseBody {
    * @nullable
    */
   password: string | null;
-}
-
-export interface RescueInstanceRequestBody {
-  /**
-   * Password for the rescue environment. Generate and retain a strong password before calling.
-   * @minLength 12
-   * @maxLength 128
-   */
-  password: string;
 }
 
 export interface RescueInstanceResponseBody {
@@ -1780,6 +1788,8 @@ export interface NewLaunchTemplateVersion {
   labels?: NewLaunchTemplateVersionLabels;
   /** @maxLength 4096 */
   description?: string;
+  /** Whether instances created from this version join Leaflow Fleet, as described for `join_fleet` on instance creation. If omitted, instances join when their image supports Fleet. */
+  join_fleet?: boolean;
 }
 
 export interface CreateLaunchTemplateRequestBody {
@@ -1819,6 +1829,11 @@ export interface LaunchTemplateVersion {
    * @nullable
    */
   description: string | null;
+  /**
+   * Null if the version does not specify a value, in which case the image determines it.
+   * @nullable
+   */
+  join_fleet: boolean | null;
   created_at: string;
 }
 
@@ -2146,6 +2161,8 @@ export interface PrivateImageResource {
   min_memory_mib: number;
   /** False means a new password can only be set by rebuilding an instance created from this image */
   supports_password_reset: boolean;
+  /** Whether instances created from this image can join Leaflow Fleet (`join_fleet`). The value is true when the operating system captured from the source instance supports Fleet */
+  supports_fleet: boolean;
   /** Only available images can install instances. A capture is pending until it finishes, then becomes available. Failed means no usable image was produced; failure describes the outcome. Error means the image service broke the image or no longer holds it, and nothing can be installed from it. A value naming an operation in progress (`suspending`, `resuming`, `deleting`) is shown while that operation runs. */
   status: PrivateImageResourceStatus;
   /**
@@ -2274,6 +2291,8 @@ export interface PublicImageResource {
   min_memory_mib: number;
   /** False means a new password can only be set by rebuilding an instance created from this image */
   supports_password_reset: boolean;
+  /** Whether instances created from this image can join Leaflow Fleet (`join_fleet`). The value applies to this specific image build; other builds of the same operating system may differ */
+  supports_fleet: boolean;
   /** `on_sale` images can install new instances. `off_sale` means the platform withdrew the image: it stops new purchases only, and instances already running it keep running and can still be rebuilt onto it. */
   sale_status: PublicImageResourceSaleStatus;
   created_at: string;

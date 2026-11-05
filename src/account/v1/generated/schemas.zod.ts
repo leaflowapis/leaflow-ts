@@ -16,6 +16,24 @@
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
  *
+ * ## Applications
+ *
+ * An application registered by a project signs its users in at auth.leaflow.net in the same manner as any other OAuth client. To call the Leaflow API on behalf of a user, the application requests the `iam` scope, and the user must then authorize the application for each project in which it is to act:
+ *
+ * 1. The application directs the user to the authorization page of the console:
+ *
+ *    ```
+ *    https://console.leaflow.net/applications/authorize?client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>
+ *    ```
+ *
+ *    All three parameters are required. The `redirect_uri` is URL-encoded and must exactly match one of the redirect URIs registered for the application; a custom scheme registered for a public application is accepted in the same way. If a parameter is missing, if the `redirect_uri` does not match, or if the application does not exist or is not active, the page reports the problem to the user and does not redirect. A user who is not signed in, or who has not yet completed registration and accepted the agreements, does so first and then returns to the page.
+ * 2. The user selects a project and confirms the authorization. The console calls `POST /account/v1/me/authorized-applications` and returns the user to the `redirect_uri` with the query parameters `project_id` and `state`. If the user declines, the console returns the user to the `redirect_uri` with `error=access_denied` and `state`. In both cases the existing query parameters of the `redirect_uri` are retained, and a parameter of the same name is replaced. The application must verify that `state` equals the value it supplied before it uses the response.
+ * 3. The application exchanges its access token for a scoped token at `POST /account/v1/projects/{projectId}/scoped-tokens`, as described in the preceding section.
+ *
+ * Within an authorized project, the application holds exactly the permissions of the user in that project and none beyond them. The user may revoke an authorization at any time at https://console.leaflow.net/account/applications, and an authorization ends when the user leaves the project.
+ *
+ * An access token issued to an application is accepted only by `create-scoped-token`, `list-authorized-applications` and `revoke-authorized-application`. Every other endpoint rejects it with 403 `APPLICATION_TOKEN_NOT_ACCEPTED`; consequently, an application cannot authorize itself.
+ *
  * ## SSH keys
  *
  * The SSH keys of an account belong to its holder rather than to any project, and a key is active on one account at most. Keys shared by a project, such as one used by CI, belong to the project instead and are managed through the IAM API.
@@ -32,6 +50,8 @@ import * as zod from "zod";
 import { AcceptConsentsRequestBody } from "./validators/acceptConsentsRequestBody.zod.js";
 
 import { AcceptInvitationByTokenRequestBody } from "./validators/acceptInvitationByTokenRequestBody.zod.js";
+
+import { AuthorizeApplicationRequestBody } from "./validators/authorizeApplicationRequestBody.zod.js";
 
 import { CreateProjectRequestBody } from "./validators/createProjectRequestBody.zod.js";
 
@@ -153,6 +173,68 @@ export const RenameSshKeyBody = RenameSSHKeyRequestBody;
  */
 export const RevokeSshKeyParams = zod.strictObject({
   keyId: zod.uuid(),
+});
+
+/**
+ * Returns the application requesting authorization, so that the authorization page can identify the requester. Any authenticated account may read it, since the `client_id` is part of every authorization request.
+ *
+ * A deleted application is reported as not found. A disabled application is returned with `status` `DISABLED` and cannot be authorized.
+ *
+ * The authorization page returns the user only to a `redirect_uri` that exactly matches one of `redirect_uris`; if none matches, the user is not redirected.
+ * @summary Get an application by its client ID
+ */
+export const getApplicationPathClientIdMax = 255;
+
+export const GetApplicationParams = zod.strictObject({
+  clientId: zod.string().min(1).max(getApplicationPathClientIdMax),
+});
+
+/**
+ * Returns one item for each application and project, most recent first. An authorization is omitted once it has been revoked, once the membership under which it was granted has ended, or once the application has been deleted.
+ *
+ * When called with an access token issued to an application, only the authorizations of that application are returned.
+ * @summary List the applications the current account has authorized
+ */
+export const listAuthorizedApplicationsQueryLimitDefault = 50;
+export const listAuthorizedApplicationsQueryLimitMax = 200;
+
+export const listAuthorizedApplicationsQueryOffsetDefault = 0;
+export const listAuthorizedApplicationsQueryOffsetMin = 0;
+export const listAuthorizedApplicationsQueryOffsetMax = 10000;
+
+export const ListAuthorizedApplicationsQueryParams = zod.strictObject({
+  limit: zod
+    .int()
+    .min(1)
+    .max(listAuthorizedApplicationsQueryLimitMax)
+    .default(listAuthorizedApplicationsQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
+  offset: zod
+    .int()
+    .min(listAuthorizedApplicationsQueryOffsetMin)
+    .max(listAuthorizedApplicationsQueryOffsetMax)
+    .default(listAuthorizedApplicationsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
+});
+
+/**
+ * Permits the application to exchange the access tokens of this account for scoped tokens of the project. Within the project, the application then holds exactly the permissions of this account and none beyond them.
+ *
+ * The caller must be a member of the project. Repeating the request returns the existing authorization. Authorizing a disabled application fails with 412 `APPLICATION_DISABLED`.
+ *
+ * An access token issued to an application is rejected, so that an application cannot authorize itself.
+ * @summary Authorize an application to act in a project
+ */
+export const AuthorizeApplicationBody = AuthorizeApplicationRequestBody;
+
+/**
+ * After revocation, the application can no longer exchange tokens for the project. A scoped token already issued to it remains valid until it expires. Repeating the request returns the same authorization.
+ *
+ * When called with an access token issued to an application, only the authorizations of that application can be revoked; this allows an application to disconnect itself.
+ * @summary Revoke an application's authorization
+ */
+export const RevokeAuthorizedApplicationParams = zod.strictObject({
+  authorizationId: zod.uuid(),
 });
 
 /**
@@ -318,6 +400,8 @@ export const GetProjectSlugAvailabilityParams = zod.strictObject({
  * A scoped token states identity only — the user and the project — and **carries no permissions**. Permissions are evaluated on every request, so a change of role takes effect immediately rather than at the next expiry.
  *
  * A project that is suspended, banned or being deleted still issues tokens; those states restrict writes, and the project remains readable.
+ *
+ * An access token issued to an application is exchanged only for a project for which the user has authorized that application. Otherwise, the exchange fails with 403 `APPLICATION_AUTHORIZATION_REQUIRED`, whose `meta` contains the `client_id` and the `project_id`; the application should then direct the user to the authorization page. For a disabled application the exchange fails with 412 `APPLICATION_DISABLED`, and for a deleted application with 404 `APPLICATION_NOT_FOUND`, even if its access token has not yet expired.
  * @summary Exchange the access token for a scoped token
  */
 export const CreateScopedTokenParams = zod.strictObject({
