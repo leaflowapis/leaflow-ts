@@ -67,6 +67,11 @@ export const PublicImageResource = zod
       .describe(
         "False means a new password can only be set by rebuilding an instance created from this image",
       ),
+    supports_fleet: zod
+      .boolean()
+      .describe(
+        "Whether instances created from this image can join Leaflow Fleet (`join_fleet`). The value applies to this specific image build; other builds of the same operating system may differ",
+      ),
     sale_status: zod
       .enum(["on_sale", "off_sale"])
       .describe(

@@ -39,6 +39,12 @@ import { PasswordChoice } from "./passwordChoice.zod.js";
 export const RebuildInstanceRequestBody = zod.strictObject({
   image_id: ImageID,
   password: PasswordChoice.optional(),
+  join_fleet: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Whether the rebuilt instance joins Leaflow Fleet. If omitted, the instance's current value is retained. Because a rebuild replaces the operating system, the instance enrolls as a new Fleet machine and the previous machine is removed from Fleet. Setting the value to `true` for an image that does not support Fleet is rejected with 422 `INSTANCE_FLEET_UNSUPPORTED`.",
+    ),
 });
 
 export type RebuildInstanceRequestBody = zod.input<typeof RebuildInstanceRequestBody>;

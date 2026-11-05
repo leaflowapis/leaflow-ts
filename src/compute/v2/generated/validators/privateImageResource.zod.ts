@@ -70,6 +70,11 @@ export const PrivateImageResource = zod
       .describe(
         "False means a new password can only be set by rebuilding an instance created from this image",
       ),
+    supports_fleet: zod
+      .boolean()
+      .describe(
+        "Whether instances created from this image can join Leaflow Fleet (`join_fleet`). The value is true when the operating system captured from the source instance supports Fleet",
+      ),
     status: zod
       .enum([
         "pending",

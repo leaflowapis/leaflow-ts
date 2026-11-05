@@ -16,6 +16,24 @@
  *
  * A scoped token cannot be renewed. Repeat step 2 for a new one, and sign in again at auth.leaflow.net once the access token itself has expired.
  *
+ * ## Applications
+ *
+ * An application registered by a project signs its users in at auth.leaflow.net in the same manner as any other OAuth client. To call the Leaflow API on behalf of a user, the application requests the `iam` scope, and the user must then authorize the application for each project in which it is to act:
+ *
+ * 1. The application directs the user to the authorization page of the console:
+ *
+ *    ```
+ *    https://console.leaflow.net/applications/authorize?client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>
+ *    ```
+ *
+ *    All three parameters are required. The `redirect_uri` is URL-encoded and must exactly match one of the redirect URIs registered for the application; a custom scheme registered for a public application is accepted in the same way. If a parameter is missing, if the `redirect_uri` does not match, or if the application does not exist or is not active, the page reports the problem to the user and does not redirect. A user who is not signed in, or who has not yet completed registration and accepted the agreements, does so first and then returns to the page.
+ * 2. The user selects a project and confirms the authorization. The console calls `POST /account/v1/me/authorized-applications` and returns the user to the `redirect_uri` with the query parameters `project_id` and `state`. If the user declines, the console returns the user to the `redirect_uri` with `error=access_denied` and `state`. In both cases the existing query parameters of the `redirect_uri` are retained, and a parameter of the same name is replaced. The application must verify that `state` equals the value it supplied before it uses the response.
+ * 3. The application exchanges its access token for a scoped token at `POST /account/v1/projects/{projectId}/scoped-tokens`, as described in the preceding section.
+ *
+ * Within an authorized project, the application holds exactly the permissions of the user in that project and none beyond them. The user may revoke an authorization at any time at https://console.leaflow.net/account/applications, and an authorization ends when the user leaves the project.
+ *
+ * An access token issued to an application is accepted only by `create-scoped-token`, `list-authorized-applications` and `revoke-authorized-application`. Every other endpoint rejects it with 403 `APPLICATION_TOKEN_NOT_ACCEPTED`; consequently, an application cannot authorize itself.
+ *
  * ## SSH keys
  *
  * The SSH keys of an account belong to its holder rather than to any project, and a key is active on one account at most. Keys shared by a project, such as one used by CI, belong to the project instead and are managed through the IAM API.
@@ -475,6 +493,69 @@ export interface RenameSSHKeyRequestBody {
 }
 
 /**
+ * `ARCHIVED` appears only within an authorization, after the application has been deleted
+ */
+export type ApplicationResourceStatus =
+  (typeof ApplicationResourceStatus)[keyof typeof ApplicationResourceStatus];
+
+export const ApplicationResourceStatus = {
+  ACTIVE: "ACTIVE",
+  DISABLED: "DISABLED",
+  ARCHIVED: "ARCHIVED",
+} as const;
+
+/**
+ * An application, as presented to an account that is asked to authorize it
+ */
+export interface ApplicationResource {
+  client_id: string;
+  name: string;
+  /** The URIs to which the user may be returned; a `redirect_uri` must match one of them exactly */
+  redirect_uris: string[];
+  /** `ARCHIVED` appears only within an authorization, after the application has been deleted */
+  status: ApplicationResourceStatus;
+}
+
+export type AuthorizedApplicationResourceStatus =
+  (typeof AuthorizedApplicationResourceStatus)[keyof typeof AuthorizedApplicationResourceStatus];
+
+export const AuthorizedApplicationResourceStatus = {
+  ACTIVE: "ACTIVE",
+  REVOKED: "REVOKED",
+} as const;
+
+/**
+ * An application that the account has authorized to act in one of its projects
+ */
+export interface AuthorizedApplicationResource {
+  id: string;
+  application: ApplicationResource;
+  project: ProjectResource;
+  status: AuthorizedApplicationResourceStatus;
+  created_at: string;
+}
+
+export interface LengthAwarePageAuthorizedApplicationResource {
+  /** The items in this page */
+  items: AuthorizedApplicationResource[];
+  /** Maximum number of items in this page, echoing the request */
+  limit: number;
+  /** Number of items skipped, echoing the request */
+  offset: number;
+  /** Total number of matches, not only this page */
+  total: number;
+}
+
+export interface AuthorizeApplicationRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  client_id: string;
+  project_id: string;
+}
+
+/**
  * What an invitation states before it is accepted. It carries neither the invitation id nor the full recipient address; the invitations listed against the current account are returned by `list-my-invitations`
  */
 export interface InvitationPreviewResource {
@@ -731,6 +812,21 @@ export const ListSshKeysStatus = {
   ACTIVE: "ACTIVE",
   REVOKED: "REVOKED",
 } as const;
+
+export type ListAuthorizedApplicationsParams = {
+  /**
+   * Items returned in this page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * Items to skip. Defaults to 0; at most 10000.
+   * @minimum 0
+   * @maximum 10000
+   */
+  offset?: number;
+};
 
 export type ListMyInvitationsParams = {
   /**

@@ -54,6 +54,12 @@ export const LaunchTemplateVersion = zod.strictObject({
     .nullable()
     .describe("Null when the version describes no labels."),
   description: zod.string().nullable().describe("Null when the version describes no note."),
+  join_fleet: zod
+    .boolean()
+    .nullable()
+    .describe(
+      "Null if the version does not specify a value, in which case the image determines it.",
+    ),
   created_at: zod.iso.datetime({ offset: true }),
 });
 

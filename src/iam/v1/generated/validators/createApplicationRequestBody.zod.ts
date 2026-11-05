@@ -31,7 +31,7 @@ export const CreateApplicationRequestBody = zod.strictObject({
     .array(zod.string())
     .optional()
     .describe(
-      "The scopes the application may request. Omitted means the defaults, `profile` and `email`; a scope not in the platform's list is refused",
+      "The scopes the application may request. Omitted means the defaults, `profile` and `email`; a scope not in the platform's list is refused. `profile` and `email` are granted at every sign-in, and any other scope only when the authorization request names it explicitly",
     ),
 });
 

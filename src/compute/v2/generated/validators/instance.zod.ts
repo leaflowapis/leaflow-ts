@@ -194,6 +194,22 @@ export const Instance = zod.strictObject({
     .describe(
       "The most recent operation started on the instance; null when none has been recorded.",
     ),
+  join_fleet: zod
+    .boolean()
+    .describe(
+      "Whether the instance is configured to join Leaflow Fleet. The value is set at creation and retained across rebuilds unless a rebuild specifies a new value.",
+    ),
+  supports_fleet: zod
+    .boolean()
+    .describe(
+      "Whether the operating system with which the instance was created or last rebuilt supports Leaflow Fleet. The value reflects that specific image build; other builds of the same operating system may differ.",
+    ),
+  fleet_machine_id: zod
+    .uuid()
+    .nullable()
+    .describe(
+      "The identifier of the Leaflow Fleet machine reserved for this instance. The instance enrolls as this machine on its first boot after creation or a rebuild, and its enrollment status is available from Fleet. Null if the instance is not configured to join Fleet, if its operating system does not support Fleet, or if Fleet was unavailable when the instance was created or last rebuilt.",
+    ),
 });
 
 export type Instance = zod.input<typeof Instance>;

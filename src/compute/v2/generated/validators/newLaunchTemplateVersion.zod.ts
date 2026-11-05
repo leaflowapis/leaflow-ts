@@ -63,6 +63,12 @@ export const NewLaunchTemplateVersion = zod
       .optional()
       .describe("A key may not contain a colon, whitespace or control characters."),
     description: zod.string().max(newLaunchTemplateVersionDescriptionMax).optional(),
+    join_fleet: zod
+      .boolean()
+      .optional()
+      .describe(
+        "Whether instances created from this version join Leaflow Fleet, as described for `join_fleet` on instance creation. If omitted, instances join when their image supports Fleet.",
+      ),
   })
   .describe(
     "What a version describes. Every part is optional; an instance created from the version supplies what is left out and may override what is given.",
