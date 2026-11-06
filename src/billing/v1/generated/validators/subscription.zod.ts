@@ -17,6 +17,7 @@ import { RefundPolicy } from "./refundPolicy.zod.js";
 import { ScheduledChange } from "./scheduledChange.zod.js";
 import { SubscriptionCancellation } from "./subscriptionCancellation.zod.js";
 import { SubscriptionRestriction } from "./subscriptionRestriction.zod.js";
+import { SubscriptionStatus } from "./subscriptionStatus.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const subscriptionDiscountedRenewalsRemainingMin = 0;
@@ -137,11 +138,7 @@ export const Subscription = zod
       .describe(
         "Whether a licensed subscription renews automatically. A metered subscription continues until it is canceled; for it this is true until a cancellation is requested, and cannot be set.",
       ),
-    status: zod
-      .enum(["pending", "provisioning", "active", "suspended", "canceled", "terminated"])
-      .describe(
-        "`pending`: the order has not been accepted. `provisioning`: the owning service accepted the order and is delivering. `active`: delivery was confirmed; payment alone does not make a subscription active. `suspended`: service is stopped while a lien restricts its use. `canceled`: cancellation completed, or an undelivered purchase was canceled or failed. `terminated`: an operator or the owning service ended it immediately.",
-      ),
+    status: SubscriptionStatus,
     started_at: zod.iso
       .datetime({ offset: true })
       .nullish()

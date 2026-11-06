@@ -15,6 +15,8 @@ export const listFeatureGrantsParamsPageMax = 2147483647;
 export const listFeatureGrantsParamsPageSizeDefault = 50;
 export const listFeatureGrantsParamsPageSizeMax = 200;
 
+export const listFeatureGrantsParamsStatusMax = 4;
+
 export const ListFeatureGrantsParams = zod.strictObject({
   page: zod
     .int()
@@ -28,7 +30,7 @@ export const ListFeatureGrantsParams = zod.strictObject({
     .default(listFeatureGrantsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
   product_id: ProductID.optional(),
-  status: FeatureGrantStatus.optional(),
+  status: zod.array(FeatureGrantStatus).min(1).max(listFeatureGrantsParamsStatusMax).optional(),
 });
 
 export type ListFeatureGrantsParams = zod.input<typeof ListFeatureGrantsParams>;

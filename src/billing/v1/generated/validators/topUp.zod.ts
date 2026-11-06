@@ -10,6 +10,7 @@ import { AccountIdentity } from "./accountIdentity.zod.js";
 import { Money } from "./money.zod.js";
 import { PaymentAction } from "./paymentAction.zod.js";
 import { PaymentCancellationReason } from "./paymentCancellationReason.zod.js";
+import { TopUpStatus } from "./topUpStatus.zod.js";
 
 export const TopUp = zod
   .strictObject({
@@ -21,11 +22,7 @@ export const TopUp = zod
     remaining_amount: Money.optional().describe(
       "The part of this top-up still in the balance. Pending refunds may hold part of it, so not all of it is necessarily withdrawable.",
     ),
-    status: zod
-      .enum(["pending", "succeeded", "failed", "canceled"])
-      .describe(
-        "`pending` until the payment gateway reaches a result; the balance increases on `succeeded`. `failed`: the gateway declined the payment, which is withdrawn at the gateway; create a new top-up to pay another way. `canceled`: withdrawn without collecting money, for the reason in `cancellation_reason`. Unknown gateway outcomes stay `pending`; a browser redirect is not proof of payment. `failed` and `canceled` are final; a payment the gateway collects afterwards is credited as a separate `succeeded` top-up.",
-      ),
+    status: TopUpStatus,
     cancellation_reason: PaymentCancellationReason.optional(),
     payment_gateway: zod.string().optional().describe("Which payment gateway collected it."),
     method_type: zod

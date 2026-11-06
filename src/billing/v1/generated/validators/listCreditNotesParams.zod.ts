@@ -6,12 +6,15 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CreditNoteStatus } from "./creditNoteStatus.zod.js";
 
 export const listCreditNotesParamsPageDefault = 1;
 export const listCreditNotesParamsPageMax = 2147483647;
 
 export const listCreditNotesParamsPageSizeDefault = 50;
 export const listCreditNotesParamsPageSizeMax = 200;
+
+export const listCreditNotesParamsStatusMax = 2;
 
 export const ListCreditNotesParams = zod.strictObject({
   page: zod
@@ -26,6 +29,7 @@ export const ListCreditNotesParams = zod.strictObject({
     .default(listCreditNotesParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
   invoice_id: zod.uuid().optional(),
+  status: zod.array(CreditNoteStatus).min(1).max(listCreditNotesParamsStatusMax).optional(),
 });
 
 export type ListCreditNotesParams = zod.input<typeof ListCreditNotesParams>;

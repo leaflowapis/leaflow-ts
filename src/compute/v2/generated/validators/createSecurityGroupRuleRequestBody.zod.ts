@@ -63,7 +63,9 @@ export const CreateSecurityGroupRuleRequestBody = zod.strictObject({
     .string()
     .max(createSecurityGroupRuleRequestBodyRemoteCidrMax)
     .optional()
-    .describe("A CIDR of the rule's IP version. Every address when omitted."),
+    .describe(
+      "An IP address or CIDR block of the rule's IP version. A single address admits only itself, and a block is recorded with its host bits cleared. Every address when omitted.",
+    ),
   description: zod.string().max(createSecurityGroupRuleRequestBodyDescriptionMax).optional(),
 });
 

@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { ActiveResourceStatus } from "./activeResourceStatus.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Product } from "./product.zod.js";
 
@@ -30,7 +31,7 @@ export const ActiveResource = zod
       .string()
       .describe("How much is held, such as cores, MiB or cards; not how much was used."),
     dimensions: zod.record(zod.string(), zod.string()).optional(),
-    status: zod.enum(["active", "suspended", "closing", "closed"]),
+    status: ActiveResourceStatus,
     started_at: zod.iso.datetime({ offset: true }),
     project_id: zod.uuid().optional(),
     usage_generated_until: zod.iso

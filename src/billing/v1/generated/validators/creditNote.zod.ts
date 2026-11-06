@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CreditNoteStatus } from "./creditNoteStatus.zod.js";
 import { Money } from "./money.zod.js";
 
 export const CreditNote = zod
@@ -14,7 +15,7 @@ export const CreditNote = zod
     invoice_id: zod.uuid(),
     currency: zod.string(),
     issued_at: zod.iso.datetime({ offset: true }),
-    status: zod.enum(["issued", "void"]),
+    status: CreditNoteStatus,
     voided_at: zod.iso
       .datetime({ offset: true })
       .nullable()

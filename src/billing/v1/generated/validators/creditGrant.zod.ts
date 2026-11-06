@@ -7,6 +7,7 @@
  */
 import * as zod from "zod";
 import { Applicability } from "./applicability.zod.js";
+import { CreditGrantStatus } from "./creditGrantStatus.zod.js";
 import { Money } from "./money.zod.js";
 
 export const CreditGrant = zod.strictObject({
@@ -24,7 +25,7 @@ export const CreditGrant = zod.strictObject({
     .boolean()
     .optional()
     .describe("Restricted to your first purchase of anything it applies to."),
-  status: zod.enum(["active", "depleted", "expired", "voided"]),
+  status: CreditGrantStatus,
   valid_from: zod.iso.datetime({ offset: true }),
   valid_until: zod.iso.datetime({ offset: true }).nullish(),
 });

@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { ActiveResourceStatus } from "./activeResourceStatus.zod.js";
 import { ProductID } from "./productID.zod.js";
 
 export const listActiveResourcesParamsPageDefault = 1;
@@ -15,6 +16,8 @@ export const listActiveResourcesParamsPageSizeDefault = 50;
 export const listActiveResourcesParamsPageSizeMax = 200;
 
 export const listActiveResourcesParamsProjectIdsMax = 100;
+
+export const listActiveResourcesParamsStatusMax = 4;
 
 export const ListActiveResourcesParams = zod.strictObject({
   page: zod
@@ -32,7 +35,7 @@ export const ListActiveResourcesParams = zod.strictObject({
   project_ids: zod.array(zod.uuid()).min(1).max(listActiveResourcesParamsProjectIdsMax).optional(),
   meter_id: zod.uuid().optional(),
   product_id: ProductID.optional(),
-  status: zod.enum(["active", "suspended", "closing", "closed"]).optional(),
+  status: zod.array(ActiveResourceStatus).min(1).max(listActiveResourcesParamsStatusMax).optional(),
 });
 
 export type ListActiveResourcesParams = zod.input<typeof ListActiveResourcesParams>;

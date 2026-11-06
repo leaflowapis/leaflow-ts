@@ -14,6 +14,8 @@ export const listInvoicesParamsPageMax = 2147483647;
 export const listInvoicesParamsPageSizeDefault = 50;
 export const listInvoicesParamsPageSizeMax = 200;
 
+export const listInvoicesParamsStatusMax = 3;
+
 export const ListInvoicesParams = zod.strictObject({
   page: zod.int().min(1).max(listInvoicesParamsPageMax).default(listInvoicesParamsPageDefault),
   page_size: zod
@@ -22,7 +24,7 @@ export const ListInvoicesParams = zod.strictObject({
     .max(listInvoicesParamsPageSizeMax)
     .default(listInvoicesParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
-  status: InvoiceStatus.optional(),
+  status: zod.array(InvoiceStatus).min(1).max(listInvoicesParamsStatusMax).optional(),
   subscription_id: zod.uuid().optional(),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional(),

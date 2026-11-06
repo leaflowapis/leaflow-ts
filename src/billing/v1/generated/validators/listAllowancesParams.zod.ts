@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { AllowanceStatus } from "./allowanceStatus.zod.js";
 import { ProductID } from "./productID.zod.js";
 
 export const listAllowancesParamsPageDefault = 1;
@@ -13,6 +14,8 @@ export const listAllowancesParamsPageMax = 2147483647;
 
 export const listAllowancesParamsPageSizeDefault = 50;
 export const listAllowancesParamsPageSizeMax = 200;
+
+export const listAllowancesParamsStatusMax = 4;
 
 export const listAllowancesParamsProjectIdsMax = 100;
 
@@ -25,7 +28,7 @@ export const ListAllowancesParams = zod.strictObject({
     .default(listAllowancesParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
   meter_id: zod.uuid().optional(),
-  status: zod.enum(["active", "depleted", "expired", "voided"]).optional(),
+  status: zod.array(AllowanceStatus).min(1).max(listAllowancesParamsStatusMax).optional(),
   product_id: ProductID.optional(),
   project_ids: zod.array(zod.uuid()).min(1).max(listAllowancesParamsProjectIdsMax).optional(),
 });

@@ -13,6 +13,8 @@ export const listPaymentMethodsParamsPageMax = 2147483647;
 export const listPaymentMethodsParamsPageSizeDefault = 50;
 export const listPaymentMethodsParamsPageSizeMax = 200;
 
+export const listPaymentMethodsParamsStatusMax = 2;
+
 export const ListPaymentMethodsParams = zod.strictObject({
   page: zod
     .int()
@@ -25,6 +27,11 @@ export const ListPaymentMethodsParams = zod.strictObject({
     .max(listPaymentMethodsParamsPageSizeMax)
     .default(listPaymentMethodsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
+  status: zod
+    .array(zod.enum(["active", "expired"]))
+    .min(1)
+    .max(listPaymentMethodsParamsStatusMax)
+    .optional(),
 });
 
 export type ListPaymentMethodsParams = zod.input<typeof ListPaymentMethodsParams>;

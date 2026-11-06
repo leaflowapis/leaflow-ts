@@ -8,6 +8,8 @@
 import * as zod from "zod";
 import { StatementStatus } from "./statementStatus.zod.js";
 
+export const listStatementsParamsStatusMax = 2;
+
 export const listStatementsParamsPageDefault = 1;
 export const listStatementsParamsPageMax = 2147483647;
 
@@ -16,7 +18,7 @@ export const listStatementsParamsPageSizeMax = 200;
 
 export const ListStatementsParams = zod.strictObject({
   billing_account_id: zod.int().optional(),
-  status: StatementStatus.optional(),
+  status: zod.array(StatementStatus).min(1).max(listStatementsParamsStatusMax).optional(),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional(),
   page: zod.int().min(1).max(listStatementsParamsPageMax).default(listStatementsParamsPageDefault),
