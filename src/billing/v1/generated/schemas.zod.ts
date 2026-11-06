@@ -7,6 +7,10 @@
  */
 import * as zod from "zod";
 
+import { ActiveResourceStatus } from "./validators/activeResourceStatus.zod.js";
+
+import { AllowanceStatus } from "./validators/allowanceStatus.zod.js";
+
 import { AutoRenewSet } from "./validators/autoRenewSet.zod.js";
 
 import { BillingAccountCreate } from "./validators/billingAccountCreate.zod.js";
@@ -23,11 +27,25 @@ import { CheckoutSessionConfirm } from "./validators/checkoutSessionConfirm.zod.
 
 import { CheckoutSessionCreate } from "./validators/checkoutSessionCreate.zod.js";
 
+import { CheckoutSessionStatus } from "./validators/checkoutSessionStatus.zod.js";
+
 import { ContactCreate } from "./validators/contactCreate.zod.js";
 
 import { ContactUpdate } from "./validators/contactUpdate.zod.js";
 
+import { CreditGrantStatus } from "./validators/creditGrantStatus.zod.js";
+
+import { CreditNoteStatus } from "./validators/creditNoteStatus.zod.js";
+
+import { DiscountStatus } from "./validators/discountStatus.zod.js";
+
+import { FeatureGrantStatus } from "./validators/featureGrantStatus.zod.js";
+
+import { InvoiceStatus } from "./validators/invoiceStatus.zod.js";
+
 import { OrderCancel } from "./validators/orderCancel.zod.js";
+
+import { OrderStatus } from "./validators/orderStatus.zod.js";
 
 import { PayInvoiceRequest } from "./validators/payInvoiceRequest.zod.js";
 
@@ -35,13 +53,27 @@ import { PayTogetherRequest } from "./validators/payTogetherRequest.zod.js";
 
 import { PaymentMethodSetup } from "./validators/paymentMethodSetup.zod.js";
 
+import { RefundStatus } from "./validators/refundStatus.zod.js";
+
 import { RenewRequest } from "./validators/renewRequest.zod.js";
 
 import { SetProjectAssignmentRequest } from "./validators/setProjectAssignmentRequest.zod.js";
 
+import { StatementStatus } from "./validators/statementStatus.zod.js";
+
+import { SubscriptionStatus } from "./validators/subscriptionStatus.zod.js";
+
 import { TopUpCreate } from "./validators/topUpCreate.zod.js";
 
+import { TopUpStatus } from "./validators/topUpStatus.zod.js";
+
+import { TransactionStatus } from "./validators/transactionStatus.zod.js";
+
+import { TransactionType } from "./validators/transactionType.zod.js";
+
 import { WithdrawalCreate } from "./validators/withdrawalCreate.zod.js";
+
+import { WithdrawalStatus } from "./validators/withdrawalStatus.zod.js";
 
 /**
  * The withdrawal's items and their outcomes. A failed item does not undo refunds completed through other items.
@@ -82,6 +114,8 @@ export const listWithdrawalsQueryPageMax = 2147483647;
 export const listWithdrawalsQueryPageSizeDefault = 50;
 export const listWithdrawalsQueryPageSizeMax = 200;
 
+export const listWithdrawalsQueryStatusMax = 6;
+
 export const ListWithdrawalsQueryParams = zod.strictObject({
   page: zod
     .int()
@@ -96,6 +130,14 @@ export const ListWithdrawalsQueryParams = zod.strictObject({
     .default(listWithdrawalsQueryPageSizeDefault)
     .describe("Items per page. Defaults to 50; at most 200."),
   billing_account_id: zod.int().optional(),
+  status: zod
+    .array(WithdrawalStatus)
+    .min(1)
+    .max(listWithdrawalsQueryStatusMax)
+    .optional()
+    .describe(
+      "Only withdrawals in these statuses; omit for every status. Comma-separated, for example `status=pending,processing`.",
+    ),
 });
 
 /**
@@ -401,6 +443,8 @@ export const listTopUpsQueryPageMax = 2147483647;
 export const listTopUpsQueryPageSizeDefault = 50;
 export const listTopUpsQueryPageSizeMax = 200;
 
+export const listTopUpsQueryStatusMax = 4;
+
 export const ListTopUpsQueryParams = zod.strictObject({
   page: zod
     .int()
@@ -418,6 +462,14 @@ export const ListTopUpsQueryParams = zod.strictObject({
     .int()
     .optional()
     .describe("Only this account; all of yours when omitted."),
+  status: zod
+    .array(TopUpStatus)
+    .min(1)
+    .max(listTopUpsQueryStatusMax)
+    .optional()
+    .describe(
+      "Only top-ups in these statuses; omit for every status. Comma-separated, for example `status=pending,succeeded`.",
+    ),
 });
 
 /**
@@ -459,6 +511,8 @@ export const listPaymentMethodsQueryPageMax = 2147483647;
 export const listPaymentMethodsQueryPageSizeDefault = 50;
 export const listPaymentMethodsQueryPageSizeMax = 200;
 
+export const listPaymentMethodsQueryStatusMax = 2;
+
 export const ListPaymentMethodsQueryParams = zod.strictObject({
   page: zod
     .int()
@@ -476,6 +530,14 @@ export const ListPaymentMethodsQueryParams = zod.strictObject({
     .int()
     .optional()
     .describe("Only this account; all of yours when omitted."),
+  status: zod
+    .array(zod.enum(["active", "expired"]))
+    .min(1)
+    .max(listPaymentMethodsQueryStatusMax)
+    .optional()
+    .describe(
+      "Only payment methods in these statuses; omit for both. Removed payment methods are not listed. Comma-separated.",
+    ),
 });
 
 /**
@@ -585,6 +647,8 @@ export const listInvoicesQueryPageMax = 2147483647;
 export const listInvoicesQueryPageSizeDefault = 50;
 export const listInvoicesQueryPageSizeMax = 200;
 
+export const listInvoicesQueryStatusMax = 3;
+
 export const ListInvoicesQueryParams = zod.strictObject({
   page: zod
     .int()
@@ -603,10 +667,12 @@ export const ListInvoicesQueryParams = zod.strictObject({
     .optional()
     .describe("Only this account; all of yours when omitted."),
   status: zod
-    .enum(["open", "paid", "void"])
+    .array(InvoiceStatus)
+    .min(1)
+    .max(listInvoicesQueryStatusMax)
     .optional()
     .describe(
-      "`open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage not yet invoiced is not on any invoice.",
+      "Only invoices in these statuses; omit for every status. Comma-separated, for example `status=open,paid`.",
     ),
   subscription_id: zod
     .uuid()
@@ -665,6 +731,10 @@ export const listTransactionsQueryPageMax = 2147483647;
 export const listTransactionsQueryPageSizeDefault = 50;
 export const listTransactionsQueryPageSizeMax = 200;
 
+export const listTransactionsQueryTypeMax = 5;
+
+export const listTransactionsQueryStatusMax = 4;
+
 export const ListTransactionsQueryParams = zod.strictObject({
   page: zod
     .int()
@@ -684,6 +754,22 @@ export const ListTransactionsQueryParams = zod.strictObject({
     .describe("Only this account; all of yours when omitted."),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
+  type: zod
+    .array(TransactionType)
+    .min(1)
+    .max(listTransactionsQueryTypeMax)
+    .optional()
+    .describe(
+      "Only transactions of these types; omit for every type. Comma-separated, for example `type=topup,refund`.",
+    ),
+  status: zod
+    .array(TransactionStatus)
+    .min(1)
+    .max(listTransactionsQueryStatusMax)
+    .optional()
+    .describe(
+      "Only transactions in these statuses; omit for every status. Comma-separated, for example `status=pending,failed`.",
+    ),
 });
 
 /**
@@ -695,6 +781,8 @@ export const listAccountDiscountsQueryPageMax = 2147483647;
 
 export const listAccountDiscountsQueryPageSizeDefault = 50;
 export const listAccountDiscountsQueryPageSizeMax = 200;
+
+export const listAccountDiscountsQueryStatusMax = 4;
 
 export const ListAccountDiscountsQueryParams = zod.strictObject({
   page: zod
@@ -713,6 +801,14 @@ export const ListAccountDiscountsQueryParams = zod.strictObject({
     .int()
     .optional()
     .describe("Only this account; all of yours when omitted."),
+  status: zod
+    .array(DiscountStatus)
+    .min(1)
+    .max(listAccountDiscountsQueryStatusMax)
+    .optional()
+    .describe(
+      "Only discounts in these statuses; omit for every status. Comma-separated, for example `status=scheduled,active`.",
+    ),
 });
 
 /**
@@ -724,6 +820,8 @@ export const listCreditGrantsQueryPageMax = 2147483647;
 
 export const listCreditGrantsQueryPageSizeDefault = 50;
 export const listCreditGrantsQueryPageSizeMax = 200;
+
+export const listCreditGrantsQueryStatusMax = 4;
 
 export const ListCreditGrantsQueryParams = zod.strictObject({
   page: zod
@@ -742,7 +840,14 @@ export const ListCreditGrantsQueryParams = zod.strictObject({
     .int()
     .optional()
     .describe("Only this account; all of yours when omitted."),
-  status: zod.enum(["active", "depleted", "expired", "voided"]).optional(),
+  status: zod
+    .array(CreditGrantStatus)
+    .min(1)
+    .max(listCreditGrantsQueryStatusMax)
+    .optional()
+    .describe(
+      "Only credit grants in these statuses; omit for every status. Comma-separated, for example `status=active,depleted`.",
+    ),
 });
 
 /**
@@ -754,6 +859,8 @@ export const listCreditNotesQueryPageMax = 2147483647;
 
 export const listCreditNotesQueryPageSizeDefault = 50;
 export const listCreditNotesQueryPageSizeMax = 200;
+
+export const listCreditNotesQueryStatusMax = 2;
 
 export const ListCreditNotesQueryParams = zod.strictObject({
   page: zod
@@ -773,6 +880,12 @@ export const ListCreditNotesQueryParams = zod.strictObject({
     .optional()
     .describe("Only this account; all of yours when omitted."),
   invoice_id: zod.uuid().optional().describe("Only the notes for this invoice."),
+  status: zod
+    .array(CreditNoteStatus)
+    .min(1)
+    .max(listCreditNotesQueryStatusMax)
+    .optional()
+    .describe("Only credit notes in these statuses; omit for both. Comma-separated."),
 });
 
 /**
@@ -822,6 +935,8 @@ export const listRefundsQueryPageMax = 2147483647;
 export const listRefundsQueryPageSizeDefault = 50;
 export const listRefundsQueryPageSizeMax = 200;
 
+export const listRefundsQueryStatusMax = 4;
+
 export const ListRefundsQueryParams = zod.strictObject({
   page: zod
     .int()
@@ -845,6 +960,14 @@ export const ListRefundsQueryParams = zod.strictObject({
     .optional()
     .describe(
       "Refunds of this order: those of its invoice, such as for an undeliverable purchase, and those it caused on an earlier invoice, such as a downgrade difference.",
+    ),
+  status: zod
+    .array(RefundStatus)
+    .min(1)
+    .max(listRefundsQueryStatusMax)
+    .optional()
+    .describe(
+      "Only refunds in these statuses; omit for every status. Comma-separated, for example `status=pending,processing`.",
     ),
 });
 
@@ -918,6 +1041,8 @@ export const listSubscriptionsQueryPageSizeMax = 200;
 
 export const listSubscriptionsQueryProjectIdsMax = 100;
 
+export const listSubscriptionsQueryStatusMax = 6;
+
 export const ListSubscriptionsQueryParams = zod.strictObject({
   expiring_before: zod.iso.datetime({ offset: true }).optional(),
   page: zod
@@ -943,6 +1068,14 @@ export const ListSubscriptionsQueryParams = zod.strictObject({
     .optional()
     .describe(
       "Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.",
+    ),
+  status: zod
+    .array(SubscriptionStatus)
+    .min(1)
+    .max(listSubscriptionsQueryStatusMax)
+    .optional()
+    .describe(
+      "Only subscriptions in these statuses; omit for every status. Comma-separated, for example `status=active,suspended`.",
     ),
 });
 
@@ -991,6 +1124,8 @@ export const listCancellationsQueryPageMax = 2147483647;
 export const listCancellationsQueryPageSizeDefault = 50;
 export const listCancellationsQueryPageSizeMax = 200;
 
+export const listCancellationsQueryStatusMax = 7;
+
 export const listCancellationsQueryProjectIdsMax = 100;
 
 export const ListCancellationsQueryParams = zod.strictObject({
@@ -1015,9 +1150,15 @@ export const ListCancellationsQueryParams = zod.strictObject({
     .optional()
     .describe("Only cancellations that include this subscription."),
   status: zod
-    .enum(["open", "requested", "scheduled", "releasing", "completed", "canceled", "failed"])
+    .array(
+      zod.enum(["open", "requested", "scheduled", "releasing", "completed", "canceled", "failed"]),
+    )
+    .min(1)
+    .max(listCancellationsQueryStatusMax)
     .optional()
-    .describe("Only cancellations in this status. `open` means requested, scheduled or releasing."),
+    .describe(
+      "Only cancellations in these statuses; omit for every status. `open` means requested, scheduled or releasing. Comma-separated, for example `status=open,failed`.",
+    ),
   project_ids: zod
     .array(zod.uuid())
     .min(1)
@@ -1151,6 +1292,8 @@ export const listAllowancesQueryPageMax = 2147483647;
 export const listAllowancesQueryPageSizeDefault = 50;
 export const listAllowancesQueryPageSizeMax = 200;
 
+export const listAllowancesQueryStatusMax = 4;
+
 export const listAllowancesQueryProductIdMax = 64;
 
 export const listAllowancesQueryProductIdRegExp = new RegExp("^[a-z][a-z0-9]*(-[a-z0-9]+)*$");
@@ -1174,7 +1317,14 @@ export const ListAllowancesQueryParams = zod.strictObject({
     .optional()
     .describe("Only this account; all of yours when omitted."),
   meter_id: zod.uuid().optional().describe("Filter by the meter UUID."),
-  status: zod.enum(["active", "depleted", "expired", "voided"]).optional(),
+  status: zod
+    .array(AllowanceStatus)
+    .min(1)
+    .max(listAllowancesQueryStatusMax)
+    .optional()
+    .describe(
+      "Only allowances in these statuses; omit for every status. Comma-separated, for example `status=active,depleted`.",
+    ),
   product_id: zod
     .string()
     .min(1)
@@ -1202,6 +1352,8 @@ export const listCheckoutSessionsQueryPageMax = 2147483647;
 export const listCheckoutSessionsQueryPageSizeDefault = 50;
 export const listCheckoutSessionsQueryPageSizeMax = 200;
 
+export const listCheckoutSessionsQueryStatusMax = 3;
+
 export const listCheckoutSessionsQueryProjectIdsMax = 100;
 
 export const ListCheckoutSessionsQueryParams = zod.strictObject({
@@ -1222,10 +1374,12 @@ export const ListCheckoutSessionsQueryParams = zod.strictObject({
     .optional()
     .describe("Only this account; all of yours when omitted."),
   status: zod
-    .enum(["open", "complete", "expired"])
+    .array(CheckoutSessionStatus)
+    .min(1)
+    .max(listCheckoutSessionsQueryStatusMax)
     .optional()
     .describe(
-      "`open`: waiting for you to complete checkout; nothing is ordered, invoiced or reserved. `complete`: the order and its issued invoice exist; read the order for payment and delivery. `expired`: ended without an order.",
+      "Only sessions in these statuses; omit for every status. Comma-separated, for example `status=open,expired`.",
     ),
   project_ids: zod
     .array(zod.uuid())
@@ -1349,6 +1503,8 @@ export const listOrdersQueryPageMax = 2147483647;
 export const listOrdersQueryPageSizeDefault = 50;
 export const listOrdersQueryPageSizeMax = 200;
 
+export const listOrdersQueryStatusMax = 6;
+
 export const listOrdersQueryProjectIdsMax = 100;
 
 export const ListOrdersQueryParams = zod.strictObject({
@@ -1369,10 +1525,12 @@ export const ListOrdersQueryParams = zod.strictObject({
     .optional()
     .describe("Only this account; all of yours when omitted."),
   status: zod
-    .enum(["pending", "accepted", "completed", "partially_completed", "failed", "canceled"])
+    .array(OrderStatus)
+    .min(1)
+    .max(listOrdersQueryStatusMax)
     .optional()
     .describe(
-      "Follows the items. `pending`: not yet accepted, paid or unpaid; its invoice shows whether payment is needed, and it can expire or be canceled. `accepted`: items are being set up. `completed`: every item was set up. `partially_completed`: some items were set up and the others failed or were canceled and refunded to their original payment sources. `failed`: no item was delivered and at least one failed; amounts collected for undelivered items are refunded. `canceled`: every item was withdrawn without delivery; collected amounts are returned to their original payment sources. No status by itself means the service was delivered.",
+      "Only orders in these statuses; omit for every status. Comma-separated, for example `status=pending,accepted`.",
     ),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional().describe("Exclusive."),
@@ -1526,6 +1684,7 @@ export const listFeatureGrantsQueryPageSizeMax = 200;
 export const listFeatureGrantsQueryProductIdMax = 64;
 
 export const listFeatureGrantsQueryProductIdRegExp = new RegExp("^[a-z][a-z0-9]*(-[a-z0-9]+)*$");
+export const listFeatureGrantsQueryStatusMax = 4;
 
 export const ListFeatureGrantsQueryParams = zod.strictObject({
   page: zod
@@ -1552,9 +1711,13 @@ export const ListFeatureGrantsQueryParams = zod.strictObject({
     .optional()
     .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
   status: zod
-    .enum(["scheduled", "active", "expired", "voided"])
+    .array(FeatureGrantStatus)
+    .min(1)
+    .max(listFeatureGrantsQueryStatusMax)
     .optional()
-    .describe("Derived from the validity period. scheduled means valid_from has not yet arrived."),
+    .describe(
+      "Only feature grants in these statuses; omit for every status. Comma-separated, for example `status=scheduled,active`.",
+    ),
 });
 
 /**
@@ -1805,6 +1968,7 @@ export const listActiveResourcesQueryProjectIdsMax = 100;
 export const listActiveResourcesQueryProductIdMax = 64;
 
 export const listActiveResourcesQueryProductIdRegExp = new RegExp("^[a-z][a-z0-9]*(-[a-z0-9]+)*$");
+export const listActiveResourcesQueryStatusMax = 4;
 
 export const ListActiveResourcesQueryParams = zod.strictObject({
   page: zod
@@ -1840,7 +2004,14 @@ export const ListActiveResourcesQueryParams = zod.strictObject({
     .regex(listActiveResourcesQueryProductIdRegExp)
     .optional()
     .describe("The platform service's fixed identifier, such as compute, canopy or assistant."),
-  status: zod.enum(["active", "suspended", "closing", "closed"]).optional(),
+  status: zod
+    .array(ActiveResourceStatus)
+    .min(1)
+    .max(listActiveResourcesQueryStatusMax)
+    .optional()
+    .describe(
+      "Only metering in these statuses; omit for every status. Comma-separated, for example `status=active,suspended`.",
+    ),
 });
 
 /**
@@ -1943,6 +2114,8 @@ export const ListMonthlyStatementsQueryParams = zod.strictObject({
  * Statements of your billing accounts, filtered by billing_account_id, open or closed and period start. A closed statement does not mean the month is complete.
  * @summary List statements
  */
+export const listStatementsQueryStatusMax = 2;
+
 export const listStatementsQueryPageDefault = 1;
 export const listStatementsQueryPageMax = 2147483647;
 
@@ -1951,7 +2124,12 @@ export const listStatementsQueryPageSizeMax = 200;
 
 export const ListStatementsQueryParams = zod.strictObject({
   billing_account_id: zod.int().optional(),
-  status: zod.enum(["open", "closed"]).optional(),
+  status: zod
+    .array(StatementStatus)
+    .min(1)
+    .max(listStatementsQueryStatusMax)
+    .optional()
+    .describe("Only statements in these statuses; omit for every status. Comma-separated."),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional(),
   page: zod

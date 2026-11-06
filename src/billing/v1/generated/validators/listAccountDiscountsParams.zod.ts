@@ -6,12 +6,15 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { DiscountStatus } from "./discountStatus.zod.js";
 
 export const listAccountDiscountsParamsPageDefault = 1;
 export const listAccountDiscountsParamsPageMax = 2147483647;
 
 export const listAccountDiscountsParamsPageSizeDefault = 50;
 export const listAccountDiscountsParamsPageSizeMax = 200;
+
+export const listAccountDiscountsParamsStatusMax = 4;
 
 export const ListAccountDiscountsParams = zod.strictObject({
   page: zod
@@ -25,6 +28,7 @@ export const ListAccountDiscountsParams = zod.strictObject({
     .max(listAccountDiscountsParamsPageSizeMax)
     .default(listAccountDiscountsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
+  status: zod.array(DiscountStatus).min(1).max(listAccountDiscountsParamsStatusMax).optional(),
 });
 
 export type ListAccountDiscountsParams = zod.input<typeof ListAccountDiscountsParams>;

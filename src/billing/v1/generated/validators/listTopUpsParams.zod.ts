@@ -6,12 +6,15 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { TopUpStatus } from "./topUpStatus.zod.js";
 
 export const listTopUpsParamsPageDefault = 1;
 export const listTopUpsParamsPageMax = 2147483647;
 
 export const listTopUpsParamsPageSizeDefault = 50;
 export const listTopUpsParamsPageSizeMax = 200;
+
+export const listTopUpsParamsStatusMax = 4;
 
 export const ListTopUpsParams = zod.strictObject({
   page: zod.int().min(1).max(listTopUpsParamsPageMax).default(listTopUpsParamsPageDefault),
@@ -21,6 +24,7 @@ export const ListTopUpsParams = zod.strictObject({
     .max(listTopUpsParamsPageSizeMax)
     .default(listTopUpsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
+  status: zod.array(TopUpStatus).min(1).max(listTopUpsParamsStatusMax).optional(),
 });
 
 export type ListTopUpsParams = zod.input<typeof ListTopUpsParams>;

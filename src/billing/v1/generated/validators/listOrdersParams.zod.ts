@@ -14,6 +14,8 @@ export const listOrdersParamsPageMax = 2147483647;
 export const listOrdersParamsPageSizeDefault = 50;
 export const listOrdersParamsPageSizeMax = 200;
 
+export const listOrdersParamsStatusMax = 6;
+
 export const listOrdersParamsProjectIdsMax = 100;
 
 export const ListOrdersParams = zod.strictObject({
@@ -24,7 +26,7 @@ export const ListOrdersParams = zod.strictObject({
     .max(listOrdersParamsPageSizeMax)
     .default(listOrdersParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
-  status: OrderStatus.optional(),
+  status: zod.array(OrderStatus).min(1).max(listOrdersParamsStatusMax).optional(),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional(),
   project_ids: zod.array(zod.uuid()).min(1).max(listOrdersParamsProjectIdsMax).optional(),

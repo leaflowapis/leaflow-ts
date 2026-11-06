@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { AllowanceStatus } from "./allowanceStatus.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Product } from "./product.zod.js";
 
@@ -37,7 +38,7 @@ export const Allowance = zod.strictObject({
     .describe(
       "Lower values are consumed first; at equal priority, earlier expiry and then earlier issuance.",
     ),
-  status: zod.enum(["active", "depleted", "expired", "voided"]),
+  status: AllowanceStatus,
   valid_from: zod.iso.datetime({ offset: true }),
   valid_until: zod.iso
     .datetime({ offset: true })

@@ -6,12 +6,15 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CreditGrantStatus } from "./creditGrantStatus.zod.js";
 
 export const listCreditGrantsParamsPageDefault = 1;
 export const listCreditGrantsParamsPageMax = 2147483647;
 
 export const listCreditGrantsParamsPageSizeDefault = 50;
 export const listCreditGrantsParamsPageSizeMax = 200;
+
+export const listCreditGrantsParamsStatusMax = 4;
 
 export const ListCreditGrantsParams = zod.strictObject({
   page: zod
@@ -25,7 +28,7 @@ export const ListCreditGrantsParams = zod.strictObject({
     .max(listCreditGrantsParamsPageSizeMax)
     .default(listCreditGrantsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
-  status: zod.enum(["active", "depleted", "expired", "voided"]).optional(),
+  status: zod.array(CreditGrantStatus).min(1).max(listCreditGrantsParamsStatusMax).optional(),
 });
 
 export type ListCreditGrantsParams = zod.input<typeof ListCreditGrantsParams>;

@@ -8,6 +8,7 @@
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
 import { RefundReason } from "./refundReason.zod.js";
+import { RefundStatus } from "./refundStatus.zod.js";
 import { Transaction } from "./transaction.zod.js";
 
 export const Refund = zod.strictObject({
@@ -41,11 +42,7 @@ export const Refund = zod.strictObject({
     .describe(
       "Use balance_amount, credit_amount and gateway_amount, which also show a refund split between destinations.",
     ),
-  status: zod
-    .enum(["pending", "processing", "succeeded", "failed"])
-    .describe(
-      "Summary of the parts in `transactions`.\n\n- `pending`: nothing has been returned yet, and at least one part is in progress.\n- `processing`: some parts have been returned, and at least one is still in progress.\n- `succeeded`: every part has been returned.\n- `failed`: no part is in progress and at least one has failed. What was returned is in\n  settled_amount.\n\nReturns to the balance and to credit grants complete shortly after the refund is made; a\nreturn to a payment method completes when the gateway confirms it.",
-    ),
+  status: RefundStatus,
   settled_at: zod.iso
     .datetime({ offset: true })
     .optional()

@@ -6,12 +6,18 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { TransactionStatus } from "./transactionStatus.zod.js";
+import { TransactionType } from "./transactionType.zod.js";
 
 export const listTransactionsParamsPageDefault = 1;
 export const listTransactionsParamsPageMax = 2147483647;
 
 export const listTransactionsParamsPageSizeDefault = 50;
 export const listTransactionsParamsPageSizeMax = 200;
+
+export const listTransactionsParamsTypeMax = 5;
+
+export const listTransactionsParamsStatusMax = 4;
 
 export const ListTransactionsParams = zod.strictObject({
   page: zod
@@ -27,6 +33,8 @@ export const ListTransactionsParams = zod.strictObject({
   billing_account_id: zod.int().optional(),
   from: zod.iso.datetime({ offset: true }).optional(),
   to: zod.iso.datetime({ offset: true }).optional(),
+  type: zod.array(TransactionType).min(1).max(listTransactionsParamsTypeMax).optional(),
+  status: zod.array(TransactionStatus).min(1).max(listTransactionsParamsStatusMax).optional(),
 });
 
 export type ListTransactionsParams = zod.input<typeof ListTransactionsParams>;

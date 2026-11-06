@@ -967,6 +967,12 @@ export interface SetProjectAssignmentRequest {
   billing_account_id: number;
 }
 
+export interface AccountIdentity {
+  id: number;
+  name: string;
+  currency: string;
+}
+
 /**
  * `pending` until the payment gateway reaches a result; the balance increases on `succeeded`. `failed`: the gateway declined the payment, which is withdrawn at the gateway; create a new top-up to pay another way. `canceled`: withdrawn without collecting money, for the reason in `cancellation_reason`. Unknown gateway outcomes stay `pending`; a browser redirect is not proof of payment. `failed` and `canceled` are final; a payment the gateway collects afterwards is credited as a separate `succeeded` top-up.
  */
@@ -978,12 +984,6 @@ export const TopUpStatus = {
   failed: "failed",
   canceled: "canceled",
 } as const;
-
-export interface AccountIdentity {
-  id: number;
-  name: string;
-  currency: string;
-}
 
 /**
  * Why a gateway payment was withdrawn: `abandoned` when the customer did not complete it in time, `requested_by_customer` when the customer canceled it.
@@ -1031,7 +1031,6 @@ export interface TopUp {
   currency: string;
   /** The part of this top-up still in the balance. Pending refunds may hold part of it, so not all of it is necessarily withdrawable. */
   remaining_amount?: Money;
-  /** `pending` until the payment gateway reaches a result; the balance increases on `succeeded`. `failed`: the gateway declined the payment, which is withdrawn at the gateway; create a new top-up to pay another way. `canceled`: withdrawn without collecting money, for the reason in `cancellation_reason`. Unknown gateway outcomes stay `pending`; a browser redirect is not proof of payment. `failed` and `canceled` are final; a payment the gateway collects afterwards is credited as a separate `succeeded` top-up. */
   status: TopUpStatus;
   cancellation_reason?: PaymentCancellationReason;
   /** Which payment gateway collected it. */
@@ -1294,7 +1293,6 @@ export interface Transaction {
   refund_id?: string;
   /** Present on refunds: where this part goes. `balance`: the account balance. `credit`: the credit grant that paid, keeping its original expiry. `gateway`: the payment method it was paid with. */
   refund_destination?: TransactionRefundDestination;
-  /** `failed`: the operation did not succeed; for a gateway payment, the gateway declined it. `canceled`: a gateway payment was withdrawn without collecting money. Either way, the invoice it was for stays open. */
   status?: TransactionStatus;
   cancellation_reason?: PaymentCancellationReason;
   payment_gateway?: string;
@@ -1556,13 +1554,6 @@ export interface CreditGrantList {
   pagination: OffsetPagination;
 }
 
-export type CreditNoteStatus = (typeof CreditNoteStatus)[keyof typeof CreditNoteStatus];
-
-export const CreditNoteStatus = {
-  issued: "issued",
-  void: "void",
-} as const;
-
 /**
  * Why the note was issued. Notes for canceled, expired or failed orders carry the order's reason; `usage_true_up` returns a tier price reduction settled after the original invoice; `operator` was issued on request.
  */
@@ -1577,6 +1568,13 @@ export const CreditNoteReason = {
   subscription_canceled: "subscription_canceled",
   usage_true_up: "usage_true_up",
   operator: "operator",
+} as const;
+
+export type CreditNoteStatus = (typeof CreditNoteStatus)[keyof typeof CreditNoteStatus];
+
+export const CreditNoteStatus = {
+  issued: "issued",
+  void: "void",
 } as const;
 
 /**
@@ -1721,18 +1719,6 @@ export interface Refund {
    * @deprecated
    */
   destination?: RefundDestination;
-  /**
-   * Summary of the parts in `transactions`.
-   *
-   * - `pending`: nothing has been returned yet, and at least one part is in progress.
-   * - `processing`: some parts have been returned, and at least one is still in progress.
-   * - `succeeded`: every part has been returned.
-   * - `failed`: no part is in progress and at least one has failed. What was returned is in
-   *   settled_amount.
-   *
-   * Returns to the balance and to credit grants complete shortly after the refund is made; a
-   * return to a payment method completes when the gateway confirms it.
-   */
   status: RefundStatus;
   /** When the last part was returned. Present with `succeeded`. */
   settled_at?: string;
@@ -1967,7 +1953,6 @@ export interface Subscription {
   current_period_end?: string | null;
   /** Whether a licensed subscription renews automatically. A metered subscription continues until it is canceled; for it this is true until a cancellation is requested, and cannot be set. */
   auto_renew: boolean;
-  /** `pending`: the order has not been accepted. `provisioning`: the owning service accepted the order and is delivering. `active`: delivery was confirmed; payment alone does not make a subscription active. `suspended`: service is stopped while a lien restricts its use. `canceled`: cancellation completed, or an undelivered purchase was canceled or failed. `terminated`: an operator or the owning service ended it immediately. */
   status: SubscriptionStatus;
   /**
    * When service started. Null until a new subscription becomes active, also after payment.
@@ -2510,18 +2495,6 @@ export interface OrderList {
   pagination: OffsetPagination;
 }
 
-/**
- * `scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or `voided` once withdrawn.
- */
-export type DiscountStatus = (typeof DiscountStatus)[keyof typeof DiscountStatus];
-
-export const DiscountStatus = {
-  scheduled: "scheduled",
-  active: "active",
-  expired: "expired",
-  voided: "voided",
-} as const;
-
 export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType];
 
 export const DiscountType = {
@@ -2543,6 +2516,18 @@ export const DiscountFrequency = {
 } as const;
 
 /**
+ * `scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or `voided` once withdrawn.
+ */
+export type DiscountStatus = (typeof DiscountStatus)[keyof typeof DiscountStatus];
+
+export const DiscountStatus = {
+  scheduled: "scheduled",
+  active: "active",
+  expired: "expired",
+  voided: "voided",
+} as const;
+
+/**
  * A coupon held by the account for a period, applying without a code to the purchases and metered usage it covers.
  */
 export interface Discount {
@@ -2550,7 +2535,6 @@ export interface Discount {
   billing_account_id?: number;
   coupon_id: string;
   promotion_code_id?: string;
-  /** `scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or `voided` once withdrawn. */
   status: DiscountStatus;
   voided_at?: string;
   type: DiscountType;
@@ -3731,6 +3715,12 @@ export type ListWithdrawalsParams = {
    */
   page_size?: number;
   billing_account_id?: number;
+  /**
+   * Only withdrawals in these statuses; omit for every status. Comma-separated, for example `status=pending,processing`.
+   * @minItems 1
+   * @maxItems 6
+   */
+  status?: WithdrawalStatus[];
 };
 
 export type ListContactsParams = {
@@ -3838,6 +3828,12 @@ export type ListTopUpsParams = {
    * Only this account; all of yours when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
+  /**
+   * Only top-ups in these statuses; omit for every status. Comma-separated, for example `status=pending,succeeded`.
+   * @minItems 1
+   * @maxItems 4
+   */
+  status?: TopUpStatus[];
 };
 
 export type ListPaymentMethodsParams = {
@@ -3857,7 +3853,21 @@ export type ListPaymentMethodsParams = {
    * Only this account; all of yours when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
+  /**
+   * Only payment methods in these statuses; omit for both. Removed payment methods are not listed. Comma-separated.
+   * @minItems 1
+   * @maxItems 2
+   */
+  status?: ListPaymentMethodsStatusItem[];
 };
+
+export type ListPaymentMethodsStatusItem =
+  (typeof ListPaymentMethodsStatusItem)[keyof typeof ListPaymentMethodsStatusItem];
+
+export const ListPaymentMethodsStatusItem = {
+  active: "active",
+  expired: "expired",
+} as const;
 
 export type PreviewInvoicePaymentParams = {
   /**
@@ -3887,7 +3897,12 @@ export type ListInvoicesParams = {
    * Only this account; all of yours when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
-  status?: InvoiceStatus;
+  /**
+   * Only invoices in these statuses; omit for every status. Comma-separated, for example `status=open,paid`.
+   * @minItems 1
+   * @maxItems 3
+   */
+  status?: InvoiceStatus[];
   /**
    * Only invoices with a charge from this subscription; amounts are for the whole invoice.
    */
@@ -3936,6 +3951,18 @@ export type ListTransactionsParams = {
    * Exclusive.
    */
   to?: ToParameter;
+  /**
+   * Only transactions of these types; omit for every type. Comma-separated, for example `type=topup,refund`.
+   * @minItems 1
+   * @maxItems 5
+   */
+  type?: TransactionType[];
+  /**
+   * Only transactions in these statuses; omit for every status. Comma-separated, for example `status=pending,failed`.
+   * @minItems 1
+   * @maxItems 4
+   */
+  status?: TransactionStatus[];
 };
 
 export type ListAccountDiscountsParams = {
@@ -3955,6 +3982,12 @@ export type ListAccountDiscountsParams = {
    * Only this account; all of yours when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
+  /**
+   * Only discounts in these statuses; omit for every status. Comma-separated, for example `status=scheduled,active`.
+   * @minItems 1
+   * @maxItems 4
+   */
+  status?: DiscountStatus[];
 };
 
 export type ListCreditGrantsParams = {
@@ -3974,18 +4007,13 @@ export type ListCreditGrantsParams = {
    * Only this account; all of yours when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
-  status?: ListCreditGrantsStatus;
+  /**
+   * Only credit grants in these statuses; omit for every status. Comma-separated, for example `status=active,depleted`.
+   * @minItems 1
+   * @maxItems 4
+   */
+  status?: CreditGrantStatus[];
 };
-
-export type ListCreditGrantsStatus =
-  (typeof ListCreditGrantsStatus)[keyof typeof ListCreditGrantsStatus];
-
-export const ListCreditGrantsStatus = {
-  active: "active",
-  depleted: "depleted",
-  expired: "expired",
-  voided: "voided",
-} as const;
 
 export type ListCreditNotesParams = {
   /**
@@ -4008,6 +4036,12 @@ export type ListCreditNotesParams = {
    * Only the notes for this invoice.
    */
   invoice_id?: string;
+  /**
+   * Only credit notes in these statuses; omit for both. Comma-separated.
+   * @minItems 1
+   * @maxItems 2
+   */
+  status?: CreditNoteStatus[];
 };
 
 export type ListCreditNoteItemsParams = {
@@ -4050,6 +4084,12 @@ export type ListRefundsParams = {
    * Refunds of this order: those of its invoice, such as for an undeliverable purchase, and those it caused on an earlier invoice, such as a downgrade difference.
    */
   order_id?: string;
+  /**
+   * Only refunds in these statuses; omit for every status. Comma-separated, for example `status=pending,processing`.
+   * @minItems 1
+   * @maxItems 4
+   */
+  status?: RefundStatus[];
 };
 
 export type ListUsageChargesParams = {
@@ -4114,6 +4154,12 @@ export type ListSubscriptionsParams = {
    * @maxItems 100
    */
   project_ids?: ProjectIdsQueryParameter;
+  /**
+   * Only subscriptions in these statuses; omit for every status. Comma-separated, for example `status=active,suspended`.
+   * @minItems 1
+   * @maxItems 6
+   */
+  status?: SubscriptionStatus[];
 };
 
 export type ListCancellationsParams = {
@@ -4138,9 +4184,11 @@ export type ListCancellationsParams = {
    */
   subscription_id?: string;
   /**
-   * Only cancellations in this status. `open` means requested, scheduled or releasing.
+   * Only cancellations in these statuses; omit for every status. `open` means requested, scheduled or releasing. Comma-separated, for example `status=open,failed`.
+   * @minItems 1
+   * @maxItems 7
    */
-  status?: ListCancellationsStatus;
+  status?: ListCancellationsStatusItem[];
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
    * @minItems 1
@@ -4149,10 +4197,10 @@ export type ListCancellationsParams = {
   project_ids?: ProjectIdsQueryParameter;
 };
 
-export type ListCancellationsStatus =
-  (typeof ListCancellationsStatus)[keyof typeof ListCancellationsStatus];
+export type ListCancellationsStatusItem =
+  (typeof ListCancellationsStatusItem)[keyof typeof ListCancellationsStatusItem];
 
-export const ListCancellationsStatus = {
+export const ListCancellationsStatusItem = {
   open: "open",
   requested: "requested",
   scheduled: "scheduled",
@@ -4198,7 +4246,12 @@ export type ListAllowancesParams = {
    * Filter by the meter UUID.
    */
   meter_id?: string;
-  status?: ListAllowancesStatus;
+  /**
+   * Only allowances in these statuses; omit for every status. Comma-separated, for example `status=active,depleted`.
+   * @minItems 1
+   * @maxItems 4
+   */
+  status?: AllowanceStatus[];
   product_id?: ProductID;
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
@@ -4207,15 +4260,6 @@ export type ListAllowancesParams = {
    */
   project_ids?: ProjectIdsQueryParameter;
 };
-
-export type ListAllowancesStatus = (typeof ListAllowancesStatus)[keyof typeof ListAllowancesStatus];
-
-export const ListAllowancesStatus = {
-  active: "active",
-  depleted: "depleted",
-  expired: "expired",
-  voided: "voided",
-} as const;
 
 export type ListCheckoutSessionsParams = {
   /**
@@ -4234,7 +4278,12 @@ export type ListCheckoutSessionsParams = {
    * Only this account; all of yours when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
-  status?: CheckoutSessionStatus;
+  /**
+   * Only sessions in these statuses; omit for every status. Comma-separated, for example `status=open,expired`.
+   * @minItems 1
+   * @maxItems 3
+   */
+  status?: CheckoutSessionStatus[];
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
    * @minItems 1
@@ -4283,7 +4332,12 @@ export type ListOrdersParams = {
    * Only this account; all of yours when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
-  status?: OrderStatus;
+  /**
+   * Only orders in these statuses; omit for every status. Comma-separated, for example `status=pending,accepted`.
+   * @minItems 1
+   * @maxItems 6
+   */
+  status?: OrderStatus[];
   from?: FromParameter;
   /**
    * Exclusive.
@@ -4365,7 +4419,12 @@ export type ListFeatureGrantsParams = {
    */
   billing_account_id?: AccountIdQueryParameter;
   product_id?: ProductID;
-  status?: FeatureGrantStatus;
+  /**
+   * Only feature grants in these statuses; omit for every status. Comma-separated, for example `status=scheduled,active`.
+   * @minItems 1
+   * @maxItems 4
+   */
+  status?: FeatureGrantStatus[];
 };
 
 export type ListPricesParams = {
@@ -4528,18 +4587,13 @@ export type ListActiveResourcesParams = {
   project_ids?: ProjectIdsQueryParameter;
   meter_id?: string;
   product_id?: ProductID;
-  status?: ListActiveResourcesStatus;
+  /**
+   * Only metering in these statuses; omit for every status. Comma-separated, for example `status=active,suspended`.
+   * @minItems 1
+   * @maxItems 4
+   */
+  status?: ActiveResourceStatus[];
 };
-
-export type ListActiveResourcesStatus =
-  (typeof ListActiveResourcesStatus)[keyof typeof ListActiveResourcesStatus];
-
-export const ListActiveResourcesStatus = {
-  active: "active",
-  suspended: "suspended",
-  closing: "closing",
-  closed: "closed",
-} as const;
 
 export type ListSpendParams = {
   from: FromRequiredParameter;
@@ -4614,7 +4668,12 @@ export type ListMonthlyStatementsParams = {
 
 export type ListStatementsParams = {
   billing_account_id?: number;
-  status?: StatementStatus;
+  /**
+   * Only statements in these statuses; omit for every status. Comma-separated.
+   * @minItems 1
+   * @maxItems 2
+   */
+  status?: StatementStatus[];
   from?: string;
   to?: string;
   /**

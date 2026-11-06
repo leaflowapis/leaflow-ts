@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { WithdrawalStatus } from "./withdrawalStatus.zod.js";
 
 export const withdrawalCurrencyMin = 3;
 export const withdrawalCurrencyMax = 3;
@@ -28,14 +29,7 @@ export const Withdrawal = zod
     deducted_amount: zod.string().regex(withdrawalDeductedAmountRegExp),
     settled_amount: zod.string().regex(withdrawalSettledAmountRegExp),
     charged_fee_amount: zod.string().regex(withdrawalChargedFeeAmountRegExp),
-    status: zod.enum([
-      "pending",
-      "processing",
-      "succeeded",
-      "partially_completed",
-      "failed",
-      "reversed",
-    ]),
+    status: WithdrawalStatus,
     created_at: zod.iso.datetime({ offset: true }),
     completed_at: zod.iso.datetime({ offset: true }).optional(),
     created_by: zod

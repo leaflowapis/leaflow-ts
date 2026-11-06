@@ -2445,7 +2445,7 @@ export interface CreateSecurityGroupRuleRequestBody {
   /** The last port, or the ICMP code (0–255) when the protocol is ICMP. */
   port_range_max?: number;
   /**
-   * A CIDR of the rule's IP version. Every address when omitted.
+   * An IP address or CIDR block of the rule's IP version. A single address admits only itself, and a block is recorded with its host bits cleared. Every address when omitted.
    * @maxLength 64
    */
   remote_cidr?: string;

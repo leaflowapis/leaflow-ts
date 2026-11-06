@@ -9,6 +9,7 @@ import * as zod from "zod";
 import { Money } from "./money.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { PaymentCancellationReason } from "./paymentCancellationReason.zod.js";
+import { TransactionStatus } from "./transactionStatus.zod.js";
 import { TransactionType } from "./transactionType.zod.js";
 
 export const Transaction = zod
@@ -27,12 +28,7 @@ export const Transaction = zod
       .describe(
         "Present on refunds: where this part goes. `balance`: the account balance. `credit`: the credit grant that paid, keeping its original expiry. `gateway`: the payment method it was paid with.",
       ),
-    status: zod
-      .enum(["pending", "succeeded", "failed", "canceled"])
-      .optional()
-      .describe(
-        "`failed`: the operation did not succeed; for a gateway payment, the gateway declined it. `canceled`: a gateway payment was withdrawn without collecting money. Either way, the invoice it was for stays open.",
-      ),
+    status: TransactionStatus.optional(),
     cancellation_reason: PaymentCancellationReason.optional(),
     payment_gateway: zod.string().optional(),
     method_type: zod.string().optional(),

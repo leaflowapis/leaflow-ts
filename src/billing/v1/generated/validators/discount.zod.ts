@@ -7,6 +7,7 @@
  */
 import * as zod from "zod";
 import { Applicability } from "./applicability.zod.js";
+import { DiscountStatus } from "./discountStatus.zod.js";
 import { Money } from "./money.zod.js";
 
 export const Discount = zod
@@ -15,11 +16,7 @@ export const Discount = zod
     billing_account_id: zod.int().optional(),
     coupon_id: zod.uuid(),
     promotion_code_id: zod.uuid().optional(),
-    status: zod
-      .enum(["scheduled", "active", "expired", "voided"])
-      .describe(
-        "`scheduled` before valid_from, `active` within the validity, `expired` after valid_until, or `voided` once withdrawn.",
-      ),
+    status: DiscountStatus,
     voided_at: zod.iso.datetime({ offset: true }).optional(),
     type: zod.enum(["percentage", "fixed_amount", "price_override", "free_setup"]),
     frequency: zod
