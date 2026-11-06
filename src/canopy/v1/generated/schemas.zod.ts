@@ -54,6 +54,41 @@ import { ResponseCreate } from "./validators/responseCreate.zod.js";
 
 import { UpdateAPIKeyRequestBody } from "./validators/updateAPIKeyRequestBody.zod.js";
 
+import { VideoCreateRequest } from "./validators/videoCreateRequest.zod.js";
+
+/**
+ * Create an asynchronous video task in the verified project. Model and upstream support
+ * determine the accepted duration, resolution and references. Poll the returned task id.
+ * `reference_media` is a Canopy extension for ordered, typed image, video and audio URLs.
+ * Existing `input_reference` remains a first frame.
+ * The runtime also accepts OpenAI multipart uploads; send reference_media as a JSON text field.
+ * No remote reference is downloaded or retained by Canopy during request preparation.
+ * @summary Create a video
+ */
+export const CreateVideoBody = VideoCreateRequest;
+
+/**
+ * Read an existing task owned by the verified project; does not create another video.
+ * @summary Get a video task
+ */
+
+export const GetVideoParams = zod.strictObject({
+  video: zod.string().min(1),
+});
+
+/**
+ * Stream a completed video owned by the verified project. Supports HTTP Range.
+ * @summary Get generated video content
+ */
+
+export const GetVideoContentParams = zod.strictObject({
+  video: zod.string().min(1),
+});
+
+export const GetVideoContentHeader = zod.strictObject({
+  Range: zod.string().optional(),
+});
+
 /**
  * Supports JSON, SSE and native upstream response storage. Stored continuation is restricted to the current project and original provider credential. WebSocket clients connect with GET /v1/responses and send response.create events; one response may be active on a connection at a time. The connection stays on its initial model and provider credential.
  * @summary Create a model response

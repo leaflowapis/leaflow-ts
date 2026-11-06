@@ -1061,6 +1061,109 @@ export interface CreateServiceResponseBody {
   order_id: string | null;
 }
 
+export type VideoReferenceMediaType =
+  (typeof VideoReferenceMediaType)[keyof typeof VideoReferenceMediaType];
+
+export const VideoReferenceMediaType = {
+  first_frame: "first_frame",
+  last_frame: "last_frame",
+  reference_image: "reference_image",
+  reference_video: "reference_video",
+  reference_audio: "reference_audio",
+} as const;
+
+/**
+ * A typed reference asset. Order is preserved, including order within each media type.
+ * Wan 3.0 accepts at most one first frame, one last frame, ten reference images,
+ * five reference videos and five reference audio clips. A last frame needs a first frame.
+ * First/last frames cannot be combined with reference_image, reference_video or reference_audio.
+ * Reference images, videos and audio may be combined. Other models can accept fewer roles.
+ * Images accept public HTTP(S) or base64 image data URLs. Video and audio accept public
+ * HTTP(S) URLs only. Wan 3.0 limits reference videos and audio to 1-15 seconds each and
+ * 15 seconds total per media type; input video plus output duration must not exceed 30 seconds.
+ * The upstream validates remote asset size, format and duration. Canopy does not fetch them.
+ */
+export interface VideoReferenceMedia {
+  type: VideoReferenceMediaType;
+  /** @minLength 1 */
+  url: string;
+}
+
+/**
+ * Provide a prompt, reference media, or both. Extra fields depend on the selected model and adapter.
+ */
+export interface VideoCreateRequest {
+  /** @minLength 1 */
+  model: string;
+  prompt?: string;
+  /** @minimum 1 */
+  seconds?: number;
+  size?: string;
+  resolution?: string;
+  /**
+   * Backward-compatible first-frame image URL. May be combined with a last_frame, not another first_frame.
+   * @minLength 1
+   */
+  input_reference?: string;
+  /**
+   * @minItems 1
+   * @maxItems 20
+   */
+  reference_media?: VideoReferenceMedia[];
+  /** Whether the output has audio; separate from a reference_audio input. */
+  audio?: boolean;
+  prompt_extend?: boolean;
+  watermark?: boolean;
+  seed?: number;
+  negative_prompt?: string;
+  [key: string]: unknown;
+}
+
+export type VideoTaskStatus = (typeof VideoTaskStatus)[keyof typeof VideoTaskStatus];
+
+export const VideoTaskStatus = {
+  queued: "queued",
+  in_progress: "in_progress",
+  completed: "completed",
+  failed: "failed",
+} as const;
+
+export type VideoTaskError = {
+  code?: string;
+  message?: string;
+  [key: string]: unknown;
+};
+
+export interface VideoTask {
+  id: string;
+  object: string;
+  status: VideoTaskStatus;
+  model?: string;
+  /** Output duration, not the duration of input references. */
+  seconds?: string;
+  size?: string;
+  created_at?: number;
+  completed_at?: number;
+  expires_at?: number;
+  progress?: number;
+  error?: VideoTaskError;
+  [key: string]: unknown;
+}
+
+/**
+ * A request body in the endpoint's own protocol. Canopy reads only the model name and forwards the rest unchanged.
+ */
+export interface NativeRequest {
+  [key: string]: unknown;
+}
+
+/**
+ * A response body in the endpoint's own protocol, as the upstream returned it.
+ */
+export interface NativeResponse {
+  [key: string]: unknown;
+}
+
 export type ResponseCreateReasoning = { [key: string]: unknown };
 
 export type ResponseCreateToolsItem = { [key: string]: unknown };
@@ -1095,20 +1198,6 @@ export interface ResponseDeleted {
 }
 
 /**
- * A request body in the endpoint's own protocol. Canopy reads only the model name and forwards the rest unchanged.
- */
-export interface NativeRequest {
-  [key: string]: unknown;
-}
-
-/**
- * A response body in the endpoint's own protocol, as the upstream returned it.
- */
-export interface NativeResponse {
-  [key: string]: unknown;
-}
-
-/**
  * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
  */
 export interface OffsetPagination {
@@ -1134,6 +1223,10 @@ export interface CursorPagination {
  * The request conflicts with the current state of the service. The codes are described where they apply.
  */
 export type ConflictResponse = Error;
+
+export type GetVideoContentHeaders = {
+  Range?: string;
+};
 
 export type StreamGenerateContentParams = {
   alt?: StreamGenerateContentAlt;
