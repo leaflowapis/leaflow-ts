@@ -682,6 +682,31 @@ export interface ModelListResponseBody {
   items: ModelResource[];
 }
 
+export type MediaUsageDetailsReferenceCounts = { [key: string]: number };
+
+/**
+ * Per-request media measurements. Omitted values are unknown, not zero.
+ * Reference counts are audit data, not an additional billable quantity.
+ * video_quantity is the exact decimal quantity for the existing video_seconds
+ * meter; video_seconds in the summary remains a rounded compatibility counter.
+ * No monetary price or refund is calculated by Canopy.
+ */
+export interface MediaUsageDetails {
+  /** @minimum 0 */
+  input_video_seconds?: number;
+  /** @minimum 0 */
+  output_video_seconds?: number;
+  /** @minimum 0 */
+  input_audio_seconds?: number;
+  /** @minimum 0 */
+  input_images?: number;
+  /** @minimum 0 */
+  output_images?: number;
+  /** @pattern ^[0-9]+([.][0-9]+)?$ */
+  video_quantity?: string;
+  reference_counts?: MediaUsageDetailsReferenceCounts;
+}
+
 export type RequestResourceStatus =
   (typeof RequestResourceStatus)[keyof typeof RequestResourceStatus];
 
@@ -767,6 +792,7 @@ export interface RequestResource {
   reasoning: ReasoningDiagnostics | null;
   /** Media quantities and their rate dimensions. Null for a token-only request. */
   media?: MediaUsage | null;
+  media_details?: MediaUsageDetails;
 }
 
 export interface CursorPageRequestResource {
@@ -1119,6 +1145,28 @@ export interface VideoCreateRequest {
   [key: string]: unknown;
 }
 
+/**
+ * Provider measurements on a task; only completed tasks are settled.
+ */
+export interface VideoUsage {
+  /**
+   * Output duration, kept for compatibility.
+   * @minimum 0
+   */
+  seconds?: number;
+  resolution?: string;
+  /** @minimum 0 */
+  input_seconds?: number;
+  /** @minimum 0 */
+  output_seconds?: number;
+  /**
+   * Total measured input and output video duration, not a monetary quote.
+   * @minimum 0
+   */
+  billable_seconds?: number;
+  [key: string]: unknown;
+}
+
 export type VideoTaskStatus = (typeof VideoTaskStatus)[keyof typeof VideoTaskStatus];
 
 export const VideoTaskStatus = {
@@ -1139,6 +1187,7 @@ export interface VideoTask {
   object: string;
   status: VideoTaskStatus;
   model?: string;
+  usage?: VideoUsage;
   /** Output duration, not the duration of input references. */
   seconds?: string;
   size?: string;

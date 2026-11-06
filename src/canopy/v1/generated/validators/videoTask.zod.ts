@@ -39,12 +39,14 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { VideoUsage } from "./videoUsage.zod.js";
 
 export const VideoTask = zod.strictObject({
   id: zod.string(),
   object: zod.string(),
   status: zod.enum(["queued", "in_progress", "completed", "failed"]),
   model: zod.string().optional(),
+  usage: VideoUsage.optional(),
   seconds: zod
     .string()
     .optional()

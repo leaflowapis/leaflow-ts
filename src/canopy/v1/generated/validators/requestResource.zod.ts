@@ -40,6 +40,7 @@
  */
 import * as zod from "zod";
 import { MediaUsage } from "./mediaUsage.zod.js";
+import { MediaUsageDetails } from "./mediaUsageDetails.zod.js";
 import { ReasoningDiagnostics } from "./reasoningDiagnostics.zod.js";
 
 export const requestResourceSourceMax = 64;
@@ -121,6 +122,7 @@ export const RequestResource = zod.strictObject({
     .union([MediaUsage, zod.null()])
     .optional()
     .describe("Media quantities and their rate dimensions. Null for a token-only request."),
+  media_details: MediaUsageDetails.optional(),
 });
 
 export type RequestResource = zod.input<typeof RequestResource>;
