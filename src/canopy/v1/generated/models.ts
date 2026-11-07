@@ -682,6 +682,36 @@ export interface ModelListResponseBody {
   items: ModelResource[];
 }
 
+export type MediaUsageDetailsReferenceCounts = { [key: string]: number };
+
+/**
+ * Per-request media measurements. Omitted values are unknown, not zero.
+ * Reference counts are audit data, not an additional billable quantity.
+ * video_quantity is the exact decimal quantity for the existing video_seconds
+ * meter; video_seconds in the summary remains a rounded compatibility counter.
+ * No monetary price or refund is calculated by Canopy.
+ */
+export interface MediaUsageDetails {
+  /** @minimum 0 */
+  input_video_seconds?: number;
+  /** @minimum 0 */
+  output_video_seconds?: number;
+  /** @minimum 0 */
+  input_audio_seconds?: number;
+  /**
+   * Recorded input quantity for the input_images meter, independent of its Billing price. Absent when unmeasured or not separately metered.
+   * @pattern ^[0-9]+$
+   */
+  input_image_quantity?: string;
+  /** @minimum 0 */
+  input_images?: number;
+  /** @minimum 0 */
+  output_images?: number;
+  /** @pattern ^[0-9]+([.][0-9]+)?$ */
+  video_quantity?: string;
+  reference_counts?: MediaUsageDetailsReferenceCounts;
+}
+
 export type RequestResourceStatus =
   (typeof RequestResourceStatus)[keyof typeof RequestResourceStatus];
 
@@ -767,6 +797,7 @@ export interface RequestResource {
   reasoning: ReasoningDiagnostics | null;
   /** Media quantities and their rate dimensions. Null for a token-only request. */
   media?: MediaUsage | null;
+  media_details?: MediaUsageDetails;
 }
 
 export interface CursorPageRequestResource {
@@ -1061,6 +1092,132 @@ export interface CreateServiceResponseBody {
   order_id: string | null;
 }
 
+export type VideoReferenceMediaType =
+  (typeof VideoReferenceMediaType)[keyof typeof VideoReferenceMediaType];
+
+export const VideoReferenceMediaType = {
+  first_frame: "first_frame",
+  last_frame: "last_frame",
+  reference_image: "reference_image",
+  reference_video: "reference_video",
+  reference_audio: "reference_audio",
+} as const;
+
+/**
+ * A typed reference asset. Order is preserved, including order within each media type.
+ * Wan 3.0 accepts at most one first frame, one last frame, ten reference images,
+ * five reference videos and five reference audio clips. A last frame needs a first frame.
+ * First/last frames cannot be combined with reference_image, reference_video or reference_audio.
+ * Reference images, videos and audio may be combined. Other models can accept fewer roles.
+ * Images accept public HTTP(S) or base64 image data URLs. Video and audio accept public
+ * HTTP(S) URLs only. Wan 3.0 limits reference videos and audio to 1-15 seconds each and
+ * 15 seconds total per media type; input video plus output duration must not exceed 30 seconds.
+ * The upstream validates remote asset size, format and duration. Canopy does not fetch them.
+ */
+export interface VideoReferenceMedia {
+  type: VideoReferenceMediaType;
+  /** @minLength 1 */
+  url: string;
+}
+
+/**
+ * Provide a prompt, reference media, or both. Extra fields depend on the selected model and adapter.
+ */
+export interface VideoCreateRequest {
+  /** @minLength 1 */
+  model: string;
+  prompt?: string;
+  /** @minimum 1 */
+  seconds?: number;
+  size?: string;
+  resolution?: string;
+  /**
+   * Backward-compatible first-frame image URL. May be combined with a last_frame, not another first_frame.
+   * @minLength 1
+   */
+  input_reference?: string;
+  /**
+   * @minItems 1
+   * @maxItems 20
+   */
+  reference_media?: VideoReferenceMedia[];
+  /** Whether the output has audio; separate from a reference_audio input. */
+  audio?: boolean;
+  prompt_extend?: boolean;
+  watermark?: boolean;
+  seed?: number;
+  negative_prompt?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Provider measurements on a task; only completed tasks are settled.
+ */
+export interface VideoUsage {
+  /**
+   * Output duration, kept for compatibility.
+   * @minimum 0
+   */
+  seconds?: number;
+  resolution?: string;
+  /** @minimum 0 */
+  input_seconds?: number;
+  /** @minimum 0 */
+  output_seconds?: number;
+  /**
+   * Total measured input and output video duration, not a monetary quote.
+   * @minimum 0
+   */
+  billable_seconds?: number;
+  [key: string]: unknown;
+}
+
+export type VideoTaskStatus = (typeof VideoTaskStatus)[keyof typeof VideoTaskStatus];
+
+export const VideoTaskStatus = {
+  queued: "queued",
+  in_progress: "in_progress",
+  completed: "completed",
+  failed: "failed",
+} as const;
+
+export type VideoTaskError = {
+  code?: string;
+  message?: string;
+  [key: string]: unknown;
+};
+
+export interface VideoTask {
+  id: string;
+  object: string;
+  status: VideoTaskStatus;
+  model?: string;
+  usage?: VideoUsage;
+  /** Output duration, not the duration of input references. */
+  seconds?: string;
+  size?: string;
+  created_at?: number;
+  completed_at?: number;
+  expires_at?: number;
+  progress?: number;
+  error?: VideoTaskError;
+  [key: string]: unknown;
+}
+
+/**
+ * A request body in the endpoint's own protocol. Canopy reads only the model name and forwards the rest unchanged.
+ */
+export interface NativeRequest {
+  [key: string]: unknown;
+}
+
+/**
+ * A response body in the endpoint's own protocol, as the upstream returned it.
+ */
+export interface NativeResponse {
+  [key: string]: unknown;
+}
+
 export type ResponseCreateReasoning = { [key: string]: unknown };
 
 export type ResponseCreateToolsItem = { [key: string]: unknown };
@@ -1095,20 +1252,6 @@ export interface ResponseDeleted {
 }
 
 /**
- * A request body in the endpoint's own protocol. Canopy reads only the model name and forwards the rest unchanged.
- */
-export interface NativeRequest {
-  [key: string]: unknown;
-}
-
-/**
- * A response body in the endpoint's own protocol, as the upstream returned it.
- */
-export interface NativeResponse {
-  [key: string]: unknown;
-}
-
-/**
  * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
  */
 export interface OffsetPagination {
@@ -1134,6 +1277,10 @@ export interface CursorPagination {
  * The request conflicts with the current state of the service. The codes are described where they apply.
  */
 export type ConflictResponse = Error;
+
+export type GetVideoContentHeaders = {
+  Range?: string;
+};
 
 export type StreamGenerateContentParams = {
   alt?: StreamGenerateContentAlt;

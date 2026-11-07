@@ -53,6 +53,7 @@ import type {
   Error,
   GetUsageSummaryParams,
   GetUsageTimelineParams,
+  GetVideoContentHeaders,
   InferenceError,
   IssuedAPIKeyResource,
   LengthAwarePageAPIKeyResource,
@@ -76,6 +77,8 @@ import type {
   TotalsResource,
   UpdateAPIKeyRequestBody,
   UsageTimelineResponseBody,
+  VideoCreateRequest,
+  VideoTask,
 } from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
@@ -119,6 +122,193 @@ export type HTTPStatusCodes =
   | HTTPStatusCode3xx
   | HTTPStatusCode4xx
   | HTTPStatusCode5xx;
+
+export type createVideoResponse200 = {
+  data: VideoTask;
+  status: 200;
+};
+
+export type createVideoResponseDefault = {
+  data: InferenceError;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type createVideoResponseSuccess = createVideoResponse200 & {
+  headers: Headers;
+};
+export type createVideoResponseError = createVideoResponseDefault & {
+  headers: Headers;
+};
+
+export type createVideoResponse = createVideoResponseSuccess | createVideoResponseError;
+
+export const getCreateVideoUrl = () => {
+  return `https://canopy.leaflow.cloud/v1/videos`;
+};
+
+/**
+ * Create an asynchronous video task in the verified project. Model and upstream support
+ * determine the accepted duration, resolution and references. Poll the returned task id.
+ * `reference_media` is a Canopy extension for ordered, typed image, video and audio URLs.
+ * Existing `input_reference` remains a first frame.
+ * The runtime also accepts OpenAI multipart uploads; send reference_media as a JSON text field.
+ * No remote reference is downloaded or retained by Canopy during request preparation.
+ * @summary Create a video
+ */
+export const createVideo = async (
+  videoCreateRequest: VideoCreateRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createVideoResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateVideoUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(videoCreateRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createVideoResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createVideoResponse;
+};
+
+export type getVideoResponse200 = {
+  data: VideoTask;
+  status: 200;
+};
+
+export type getVideoResponseDefault = {
+  data: InferenceError;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getVideoResponseSuccess = getVideoResponse200 & {
+  headers: Headers;
+};
+export type getVideoResponseError = getVideoResponseDefault & {
+  headers: Headers;
+};
+
+export type getVideoResponse = getVideoResponseSuccess | getVideoResponseError;
+
+export const getGetVideoUrl = (video: string) => {
+  return `https://canopy.leaflow.cloud/v1/videos/${encodeURIComponent(String(video))}`;
+};
+
+/**
+ * Read an existing task owned by the verified project; does not create another video.
+ * @summary Get a video task
+ */
+export const getVideo = async (
+  video: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getVideoResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetVideoUrl(video), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getVideoResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getVideoResponse;
+};
+
+export type getVideoContentResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getVideoContentResponse206 = {
+  data: Blob;
+  status: 206;
+};
+
+export type getVideoContentResponseDefault = {
+  data: InferenceError;
+  status: Exclude<HTTPStatusCodes, 200 | 206>;
+};
+
+export type getVideoContentResponseSuccess = (
+  | getVideoContentResponse200
+  | getVideoContentResponse206
+) & {
+  headers: Headers;
+};
+export type getVideoContentResponseError = getVideoContentResponseDefault & {
+  headers: Headers;
+};
+
+export type getVideoContentResponse = getVideoContentResponseSuccess | getVideoContentResponseError;
+
+export const getGetVideoContentUrl = (video: string) => {
+  return `https://canopy.leaflow.cloud/v1/videos/${encodeURIComponent(String(video))}/content`;
+};
+
+/**
+ * Stream a completed video owned by the verified project. Supports HTTP Range.
+ * @summary Get generated video content
+ */
+export const getVideoContent = async (
+  video: string,
+  headers?: GetVideoContentHeaders,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getVideoContentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getGetVideoContentUrl(video), {
+    ...options,
+    method: "GET",
+    headers: { ...headers, ...getHeaders(options?.headers) },
+  });
+
+  const body = [204, 205, 304].includes(res.status)
+    ? null
+    : res.headers.get("content-type")?.includes("application/json")
+      ? JSON.parse(await res.text())
+      : await res.blob();
+  const data: getVideoContentResponse["data"] = body as getVideoContentResponse["data"];
+  return { data, status: res.status, headers: res.headers } as getVideoContentResponse;
+};
 
 export type createResponseResponse200ApplicationJson = {
   data: ResponseResource;
@@ -186,11 +376,7 @@ export const createResponse = async (
     body: JSON.stringify(responseCreate),
   });
 
-  const body = [204, 205, 304].includes(res.status)
-    ? null
-    : res.headers.get("content-type")?.includes("application/json")
-      ? JSON.parse(await res.text())
-      : await res.blob();
+  const body = [204, 205, 304].includes(res.status) ? null : res.headers.get("content-type")?.includes("application/json") ? JSON.parse(await res.text()) : await res.blob();
   const data: createResponseResponse["data"] = body as createResponseResponse["data"];
   return { data, status: res.status, headers: res.headers } as createResponseResponse;
 };
@@ -347,7 +533,7 @@ export const createChatCompletion = async (
     body: JSON.stringify(chatCompletionRequest),
   });
 
-  const body = [204, 205, 304].includes(res.status) ? null : res.headers.get("content-type")?.includes("application/json") ? JSON.parse(await res.text()) : await res.blob();
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
   const data: createChatCompletionResponse["data"] = body as createChatCompletionResponse["data"];
   return { data, status: res.status, headers: res.headers } as createChatCompletionResponse;
 };
