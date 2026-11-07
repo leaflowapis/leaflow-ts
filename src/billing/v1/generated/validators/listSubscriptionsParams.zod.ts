@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { SubscriptionStatus } from "./subscriptionStatus.zod.js";
 
 export const listSubscriptionsParamsPageDefault = 1;
 export const listSubscriptionsParamsPageMax = 2147483647;
@@ -14,6 +15,8 @@ export const listSubscriptionsParamsPageSizeDefault = 50;
 export const listSubscriptionsParamsPageSizeMax = 200;
 
 export const listSubscriptionsParamsProjectIdsMax = 100;
+
+export const listSubscriptionsParamsStatusMax = 6;
 
 export const ListSubscriptionsParams = zod.strictObject({
   expiring_before: zod.iso.datetime({ offset: true }).optional(),
@@ -29,6 +32,7 @@ export const ListSubscriptionsParams = zod.strictObject({
     .default(listSubscriptionsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
   project_ids: zod.array(zod.uuid()).min(1).max(listSubscriptionsParamsProjectIdsMax).optional(),
+  status: zod.array(SubscriptionStatus).min(1).max(listSubscriptionsParamsStatusMax).optional(),
 });
 
 export type ListSubscriptionsParams = zod.input<typeof ListSubscriptionsParams>;

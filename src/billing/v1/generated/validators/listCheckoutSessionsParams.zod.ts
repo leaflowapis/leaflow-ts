@@ -14,6 +14,8 @@ export const listCheckoutSessionsParamsPageMax = 2147483647;
 export const listCheckoutSessionsParamsPageSizeDefault = 50;
 export const listCheckoutSessionsParamsPageSizeMax = 200;
 
+export const listCheckoutSessionsParamsStatusMax = 3;
+
 export const listCheckoutSessionsParamsProjectIdsMax = 100;
 
 export const ListCheckoutSessionsParams = zod.strictObject({
@@ -28,7 +30,11 @@ export const ListCheckoutSessionsParams = zod.strictObject({
     .max(listCheckoutSessionsParamsPageSizeMax)
     .default(listCheckoutSessionsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
-  status: CheckoutSessionStatus.optional(),
+  status: zod
+    .array(CheckoutSessionStatus)
+    .min(1)
+    .max(listCheckoutSessionsParamsStatusMax)
+    .optional(),
   project_ids: zod.array(zod.uuid()).min(1).max(listCheckoutSessionsParamsProjectIdsMax).optional(),
 });
 

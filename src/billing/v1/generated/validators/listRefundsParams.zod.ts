@@ -6,12 +6,15 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { RefundStatus } from "./refundStatus.zod.js";
 
 export const listRefundsParamsPageDefault = 1;
 export const listRefundsParamsPageMax = 2147483647;
 
 export const listRefundsParamsPageSizeDefault = 50;
 export const listRefundsParamsPageSizeMax = 200;
+
+export const listRefundsParamsStatusMax = 4;
 
 export const ListRefundsParams = zod.strictObject({
   page: zod.int().min(1).max(listRefundsParamsPageMax).default(listRefundsParamsPageDefault),
@@ -23,6 +26,7 @@ export const ListRefundsParams = zod.strictObject({
   billing_account_id: zod.int().optional(),
   invoice_id: zod.uuid().optional(),
   order_id: zod.uuid().optional(),
+  status: zod.array(RefundStatus).min(1).max(listRefundsParamsStatusMax).optional(),
 });
 
 export type ListRefundsParams = zod.input<typeof ListRefundsParams>;

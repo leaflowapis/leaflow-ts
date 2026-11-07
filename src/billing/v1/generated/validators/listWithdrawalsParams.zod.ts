@@ -6,12 +6,15 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { WithdrawalStatus } from "./withdrawalStatus.zod.js";
 
 export const listWithdrawalsParamsPageDefault = 1;
 export const listWithdrawalsParamsPageMax = 2147483647;
 
 export const listWithdrawalsParamsPageSizeDefault = 50;
 export const listWithdrawalsParamsPageSizeMax = 200;
+
+export const listWithdrawalsParamsStatusMax = 6;
 
 export const ListWithdrawalsParams = zod.strictObject({
   page: zod
@@ -25,6 +28,7 @@ export const ListWithdrawalsParams = zod.strictObject({
     .max(listWithdrawalsParamsPageSizeMax)
     .default(listWithdrawalsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
+  status: zod.array(WithdrawalStatus).min(1).max(listWithdrawalsParamsStatusMax).optional(),
 });
 
 export type ListWithdrawalsParams = zod.input<typeof ListWithdrawalsParams>;
