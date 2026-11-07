@@ -376,11 +376,7 @@ export const createResponse = async (
     body: JSON.stringify(responseCreate),
   });
 
-  const body = [204, 205, 304].includes(res.status)
-    ? null
-    : res.headers.get("content-type")?.includes("application/json")
-      ? JSON.parse(await res.text())
-      : await res.blob();
+  const body = [204, 205, 304].includes(res.status) ? null : res.headers.get("content-type")?.includes("application/json") ? JSON.parse(await res.text()) : await res.blob();
   const data: createResponseResponse["data"] = body as createResponseResponse["data"];
   return { data, status: res.status, headers: res.headers } as createResponseResponse;
 };
