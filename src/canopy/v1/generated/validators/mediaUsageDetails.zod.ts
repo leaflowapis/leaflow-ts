@@ -46,6 +46,7 @@ export const mediaUsageDetailsOutputVideoSecondsMin = 0;
 
 export const mediaUsageDetailsInputAudioSecondsMin = 0;
 
+export const mediaUsageDetailsInputImageQuantityRegExp = new RegExp("^[0-9]+$");
 export const mediaUsageDetailsInputImagesMin = 0;
 
 export const mediaUsageDetailsOutputImagesMin = 0;
@@ -58,6 +59,13 @@ export const MediaUsageDetails = zod
     input_video_seconds: zod.number().min(mediaUsageDetailsInputVideoSecondsMin).optional(),
     output_video_seconds: zod.number().min(mediaUsageDetailsOutputVideoSecondsMin).optional(),
     input_audio_seconds: zod.number().min(mediaUsageDetailsInputAudioSecondsMin).optional(),
+    input_image_quantity: zod
+      .string()
+      .regex(mediaUsageDetailsInputImageQuantityRegExp)
+      .optional()
+      .describe(
+        "Recorded input quantity for the input_images meter, independent of its Billing price. Absent when unmeasured or not separately metered.",
+      ),
     input_images: zod.int().min(mediaUsageDetailsInputImagesMin).optional(),
     output_images: zod.int().min(mediaUsageDetailsOutputImagesMin).optional(),
     video_quantity: zod.string().regex(mediaUsageDetailsVideoQuantityRegExp).optional(),

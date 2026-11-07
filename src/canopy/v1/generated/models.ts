@@ -698,6 +698,11 @@ export interface MediaUsageDetails {
   output_video_seconds?: number;
   /** @minimum 0 */
   input_audio_seconds?: number;
+  /**
+   * Recorded input quantity for the input_images meter, independent of its Billing price. Absent when unmeasured or not separately metered.
+   * @pattern ^[0-9]+$
+   */
+  input_image_quantity?: string;
   /** @minimum 0 */
   input_images?: number;
   /** @minimum 0 */
