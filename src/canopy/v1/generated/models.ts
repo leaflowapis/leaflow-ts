@@ -4,17 +4,26 @@
  * Leaflow Canopy API
  * Canopy model inference, API keys, model catalogue, service enablement and recorded usage.
  *
- * Project inference is served on this host in each provider's own protocol:
+ * Project inference is served on this host at each protocol's own endpoints:
  *
  * - OpenAI: `/v1/chat/completions`, `/v1/responses` and `/v1/embeddings`; use
  *   `https://canopy.leaflow.cloud/v1` as the OpenAI SDK base URL.
  * - Anthropic: `/v1/messages`; use `https://canopy.leaflow.cloud` as the Anthropic SDK base URL.
  * - Gemini: `/v1beta/models/{model}:generateContent` and `:streamGenerateContent`.
  *
- * Canopy does not convert between protocols. A request is accepted only for a model whose
- * `supported_endpoints` lists the endpoint it was sent to, and it is forwarded unchanged except for
- * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
- * through as written; a model's `capabilities` lists the values its upstream accepts.
+ * Every chat model accepts all four chat protocols: Chat Completions, Responses, Messages and Gemini
+ * generateContent. A request is forwarded unchanged, apart from the model name and the credentials, when a
+ * provider of the model speaks the protocol it was sent in; otherwise it is translated into a protocol a
+ * provider speaks, and the response is translated back. Content that cannot be translated, such as a tool
+ * that runs on another provider's servers or a reference to a file stored with another provider, is refused
+ * with 400 rather than dropped. Reasoning settings such as `reasoning_effort` are passed through as written;
+ * a model's `capabilities` lists the values it accepts.
+ *
+ * Responses is stateless: `store` must be false, and a response cannot be retrieved after it is returned.
+ * Send the output items of a response back unchanged, in their order, as input to the next request.
+ *
+ * What a model does follows from its `input_modalities`, `output_modalities` and the media blocks of its
+ * `capabilities`. Embeddings, images, audio and videos are accepted for a model whose providers serve them.
  *
  * Management operations use `/api/v1`. The management model catalogue names how each model is billed in Billing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
@@ -127,7 +136,7 @@ export interface ReasoningCapabilities {
 }
 
 /**
- * The image parameters this endpoint accepts. The client chooses among them; a value outside the list is rejected before the upstream is called.
+ * The image parameters this model accepts. The client chooses among them; a value outside the list is rejected before the upstream is called.
  */
 export interface ImageCapabilities {
   /**
@@ -153,14 +162,14 @@ export interface ImageCapabilities {
    */
   max_n: number | null;
   /**
-   * Whether the endpoint can stream partial images. Null means unknown.
+   * Whether partial images can be streamed. Null means unknown.
    * @nullable
    */
   supports_stream: boolean | null;
 }
 
 /**
- * The audio parameters this endpoint accepts.
+ * The audio parameters this model accepts.
  */
 export interface AudioCapabilities {
   /**
@@ -169,7 +178,7 @@ export interface AudioCapabilities {
    */
   voices: string[] | null;
   /**
-   * Audio container or codec values the endpoint accepts. Null means unknown.
+   * Audio container or codec values the model accepts. Null means unknown.
    * @nullable
    */
   formats: string[] | null;
@@ -179,13 +188,13 @@ export interface AudioCapabilities {
    */
   response_formats: string[] | null;
   /**
-   * The largest upload the endpoint accepts, in bytes. Null means unknown.
+   * The largest upload the model accepts, in bytes. Null means unknown.
    * @minimum 0
    * @nullable
    */
   max_input_bytes: number | null;
   /**
-   * Whether the endpoint can stream its response. Null means unknown.
+   * Whether the response can be streamed. Null means unknown.
    * @nullable
    */
   supports_stream: boolean | null;
@@ -204,7 +213,7 @@ export interface VideoDurationRange {
 }
 
 /**
- * The video parameters this endpoint accepts. Video is asynchronous on every endpoint that supports it. Create returns a task, and the task is polled separately.
+ * The video parameters this model accepts. Video is asynchronous; create returns a task, and the task is polled separately.
  */
 export interface VideoCapabilities {
   /** Continuous duration capability. Mutually exclusive with nonempty seconds. */
@@ -254,7 +263,7 @@ export const ModelParameterType = {
 } as const;
 
 /**
- * A non-standard request field this endpoint accepts. OpenAI SDK callers pass it through `extra_body`, which places it at the top level of the body.
+ * A non-standard request field this model accepts. OpenAI SDK callers pass it through `extra_body`, which places it at the top level of the body.
  */
 export interface ModelParameter {
   name: string;
@@ -270,60 +279,27 @@ export interface ModelParameter {
   values?: string[] | null;
 }
 
-export interface EndpointCapabilities {
+/**
+ * Verified capabilities of the model, the same whichever endpoint it is called through. Null values mean unknown. Current route availability is separate.
+ */
+export interface ModelCapabilities {
   /** @nullable */
   function_calling: boolean | null;
   /** @nullable */
   structured_output: boolean | null;
   reasoning: ReasoningCapabilities | null;
-  /** Present on image generation and edit endpoints. Null or absent elsewhere. */
+  /** Present on a model that generates or edits images. Null or absent otherwise. */
   image?: ImageCapabilities | null;
-  /** Present on speech and transcription endpoints. Null or absent elsewhere. */
+  /** Present on a model that synthesizes speech or transcribes audio. Null or absent otherwise. */
   audio?: AudioCapabilities | null;
-  /** Present on the videos endpoint. Null or absent elsewhere. */
+  /** Present on a model that generates videos. Null or absent otherwise. */
   video?: VideoCapabilities | null;
   /**
-   * Non-standard request fields this endpoint accepts, sent at the top level of the request body. Null or absent means none are declared.
+   * Non-standard request fields this model accepts, sent at the top level of the request body. Null or absent means none are declared.
    * @nullable
    */
   parameters?: ModelParameter[] | null;
 }
-
-/**
- * Verified capabilities keyed by API endpoint, for example /v1/chat/completions or /v1/responses. Missing keys and null values mean unknown. Current route availability is separate.
- */
-export interface ModelCapabilities {
-  [key: string]: EndpointCapabilities;
-}
-
-export type ModelEndpoint = (typeof ModelEndpoint)[keyof typeof ModelEndpoint];
-
-export const ModelEndpoint = {
-  "/v1/chat/completions": "/v1/chat/completions",
-  "/v1/responses": "/v1/responses",
-  "/v1/embeddings": "/v1/embeddings",
-  "/v1/messages": "/v1/messages",
-  "/v1beta/models/{model}:generateContent": "/v1beta/models/{model}:generateContent",
-  "/v1/images/generations": "/v1/images/generations",
-  "/v1/images/edits": "/v1/images/edits",
-  "/v1/audio/transcriptions": "/v1/audio/transcriptions",
-  "/v1/audio/translations": "/v1/audio/translations",
-  "/v1/audio/speech": "/v1/audio/speech",
-  "/v1/realtime": "/v1/realtime",
-  "/v1/completions": "/v1/completions",
-  "/v1/rerank": "/v1/rerank",
-  "/v1/moderations": "/v1/moderations",
-  "/v1/images/variations": "/v1/images/variations",
-  "/v1/files": "/v1/files",
-  "/v1/uploads": "/v1/uploads",
-  "/v1/batches": "/v1/batches",
-  "/v1/fine_tuning/jobs": "/v1/fine_tuning/jobs",
-  "/v1/assistants": "/v1/assistants",
-  "/v1/threads": "/v1/threads",
-  "/v1/vector_stores": "/v1/vector_stores",
-  "/v1/containers": "/v1/containers",
-  "/v1/videos": "/v1/videos",
-} as const;
 
 export interface Model {
   id: string;
@@ -347,8 +323,6 @@ export interface Model {
    */
   output_modalities: Modality[] | null;
   capabilities: ModelCapabilities;
-  /** Explicitly supported API endpoints. Requests to any other endpoint are rejected before upstream admission. */
-  supported_endpoints: ModelEndpoint[];
 }
 
 export interface ModelList {
@@ -645,8 +619,6 @@ export interface ModelResource {
    */
   output_modalities: Modality[] | null;
   capabilities: ModelCapabilities;
-  /** Explicitly supported API endpoints. Requests to any other endpoint are rejected before upstream admission. */
-  supported_endpoints: ModelEndpoint[];
 }
 
 /**
@@ -1205,14 +1177,14 @@ export interface VideoTask {
 }
 
 /**
- * A request body in the endpoint's own protocol. Canopy reads only the model name and forwards the rest unchanged.
+ * A request body in the endpoint's own protocol.
  */
 export interface NativeRequest {
   [key: string]: unknown;
 }
 
 /**
- * A response body in the endpoint's own protocol, as the upstream returned it.
+ * A response body in the endpoint's own protocol.
  */
 export interface NativeResponse {
   [key: string]: unknown;
@@ -1223,16 +1195,20 @@ export type ResponseCreateReasoning = { [key: string]: unknown };
 export type ResponseCreateToolsItem = { [key: string]: unknown };
 
 /**
- * Native Responses request. model may be omitted when continuing a project-owned stored response. store defaults to false. Only caller-executed function and custom tools are supported. background, conversation and WebSocket-only fields are rejected over HTTP.
+ * Native Responses request. Only caller-executed function and custom tools are supported. background, conversation and WebSocket-only fields are rejected over HTTP.
  */
 export interface ResponseCreate {
   model?: string;
   input?: unknown;
   /** @nullable */
   instructions?: string | null;
+  /** Must be false. True is refused with 400 `RESPONSES_STORE_UNSUPPORTED`. */
   store?: boolean;
   stream?: boolean;
-  /** @nullable */
+  /**
+   * Continues a response created earlier on the same WebSocket connection. Over HTTP no response can be continued, and a request carrying it is refused with 404 `RESPONSE_NOT_FOUND`.
+   * @nullable
+   */
   previous_response_id?: string | null;
   reasoning?: ResponseCreateReasoning;
   tools?: ResponseCreateToolsItem[];
@@ -1243,12 +1219,6 @@ export interface ResponseCreate {
 
 export interface ResponseResource {
   [key: string]: unknown;
-}
-
-export interface ResponseDeleted {
-  id: string;
-  object: string;
-  deleted: boolean;
 }
 
 /**

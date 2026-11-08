@@ -4,17 +4,26 @@
  * Leaflow Canopy API
  * Canopy model inference, API keys, model catalogue, service enablement and recorded usage.
  *
- * Project inference is served on this host in each provider's own protocol:
+ * Project inference is served on this host at each protocol's own endpoints:
  *
  * - OpenAI: `/v1/chat/completions`, `/v1/responses` and `/v1/embeddings`; use
  *   `https://canopy.leaflow.cloud/v1` as the OpenAI SDK base URL.
  * - Anthropic: `/v1/messages`; use `https://canopy.leaflow.cloud` as the Anthropic SDK base URL.
  * - Gemini: `/v1beta/models/{model}:generateContent` and `:streamGenerateContent`.
  *
- * Canopy does not convert between protocols. A request is accepted only for a model whose
- * `supported_endpoints` lists the endpoint it was sent to, and it is forwarded unchanged except for
- * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
- * through as written; a model's `capabilities` lists the values its upstream accepts.
+ * Every chat model accepts all four chat protocols: Chat Completions, Responses, Messages and Gemini
+ * generateContent. A request is forwarded unchanged, apart from the model name and the credentials, when a
+ * provider of the model speaks the protocol it was sent in; otherwise it is translated into a protocol a
+ * provider speaks, and the response is translated back. Content that cannot be translated, such as a tool
+ * that runs on another provider's servers or a reference to a file stored with another provider, is refused
+ * with 400 rather than dropped. Reasoning settings such as `reasoning_effort` are passed through as written;
+ * a model's `capabilities` lists the values it accepts.
+ *
+ * Responses is stateless: `store` must be false, and a response cannot be retrieved after it is returned.
+ * Send the output items of a response back unchanged, in their order, as input to the next request.
+ *
+ * What a model does follows from its `input_modalities`, `output_modalities` and the media blocks of its
+ * `capabilities`. Embeddings, images, audio and videos are accepted for a model whose providers serve them.
  *
  * Management operations use `/api/v1`. The management model catalogue names how each model is billed in Billing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
@@ -70,7 +79,6 @@ import type {
   NativeResponse,
   RequestResource,
   ResponseCreate,
-  ResponseDeleted,
   ResponseResource,
   ServiceResource,
   StreamGenerateContentParams,
@@ -342,7 +350,7 @@ export const getCreateResponseUrl = () => {
 };
 
 /**
- * Supports JSON, SSE and native upstream response storage. Stored continuation is restricted to the current project and original provider credential. WebSocket clients connect with GET /v1/responses and send response.create events; one response may be active on a connection at a time. The connection stays on its initial model and provider credential.
+ * Returns JSON, or Responses SSE events when `stream` is true. Accepted for every chat model, whichever protocol its providers speak. Responses are not stored, so `store` must be false; send the output items of a response back unchanged, in their order, as input to the next request. Reasoning items carry `encrypted_content`, which has to be returned as received. WebSocket clients connect with GET /v1/responses and send response.create events; one response may be active on a connection at a time, and `previous_response_id` continues a response created earlier on the same connection. The connection stays on its initial model and provider credential.
  * @summary Create a model response
  */
 export const createResponse = async (
@@ -381,90 +389,6 @@ export const createResponse = async (
   return { data, status: res.status, headers: res.headers } as createResponseResponse;
 };
 
-export type getResponseResponse200 = {
-  data: ResponseResource;
-  status: 200;
-};
-
-export type getResponseResponseDefault = {
-  data: InferenceError;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type getResponseResponseSuccess = getResponseResponse200 & {
-  headers: Headers;
-};
-export type getResponseResponseError = getResponseResponseDefault & {
-  headers: Headers;
-};
-
-export type getResponseResponse = getResponseResponseSuccess | getResponseResponseError;
-
-export const getGetResponseUrl = (response: string) => {
-  return `https://canopy.leaflow.cloud/v1/responses/${encodeURIComponent(String(response))}`;
-};
-
-/**
- * @summary Get a stored response
- */
-export const getResponse = async (
-  response: string,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<getResponseResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetResponseUrl(response), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getResponseResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as getResponseResponse;
-};
-
-export type deleteResponseResponse200 = {
-  data: ResponseDeleted;
-  status: 200;
-};
-
-export type deleteResponseResponseDefault = {
-  data: InferenceError;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type deleteResponseResponseSuccess = deleteResponseResponse200 & {
-  headers: Headers;
-};
-export type deleteResponseResponseError = deleteResponseResponseDefault & {
-  headers: Headers;
-};
-
-export type deleteResponseResponse = deleteResponseResponseSuccess | deleteResponseResponseError;
-
-export const getDeleteResponseUrl = (response: string) => {
-  return `https://canopy.leaflow.cloud/v1/responses/${encodeURIComponent(String(response))}`;
-};
-
-/**
- * @summary Delete a stored response
- */
-export const deleteResponse = async (
-  response: string,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<deleteResponseResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteResponseUrl(response), {
-    ...options,
-    method: "DELETE",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: deleteResponseResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as deleteResponseResponse;
-};
-
 export type createChatCompletionResponse200ApplicationJson = {
   data: ChatCompletion;
   status: 200;
@@ -499,7 +423,7 @@ export const getCreateChatCompletionUrl = () => {
 };
 
 /**
- * Authenticated project inference in the OpenAI Chat Completions protocol, forwarded unchanged to an upstream that speaks it. Billing ownership comes only from the verified project token.
+ * Authenticated project inference in the OpenAI Chat Completions protocol. Accepted for every chat model, whichever protocol its providers speak. Billing ownership comes only from the verified project token.
  * @summary Create a chat completion
  */
 export const createChatCompletion = async (
@@ -636,7 +560,7 @@ export const getCreateMessageUrl = () => {
 };
 
 /**
- * Authenticated project inference in the Anthropic Messages protocol, forwarded unchanged to an upstream that speaks it. Accepts the `x-api-key` header as well as Authorization. Streams Anthropic SSE events when `stream` is true.
+ * Authenticated project inference in the Anthropic Messages protocol. Accepted for every chat model, whichever protocol its providers speak. Accepts the `x-api-key` header as well as Authorization. Streams Anthropic SSE events when `stream` is true.
  * @summary Create a message
  */
 export const createMessage = async (
@@ -699,7 +623,7 @@ export const getGenerateContentUrl = (model: string) => {
 };
 
 /**
- * Authenticated project inference in the Gemini protocol, forwarded unchanged to an upstream that speaks it. Accepts the `x-goog-api-key` header as well as Authorization.
+ * Authenticated project inference in the Gemini protocol. Accepted for every chat model, whichever protocol its providers speak. Accepts the `x-goog-api-key` header as well as Authorization.
  * @summary Generate content
  */
 export const generateContent = async (

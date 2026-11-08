@@ -4,17 +4,26 @@
  * Leaflow Canopy API
  * Canopy model inference, API keys, model catalogue, service enablement and recorded usage.
  *
- * Project inference is served on this host in each provider's own protocol:
+ * Project inference is served on this host at each protocol's own endpoints:
  *
  * - OpenAI: `/v1/chat/completions`, `/v1/responses` and `/v1/embeddings`; use
  *   `https://canopy.leaflow.cloud/v1` as the OpenAI SDK base URL.
  * - Anthropic: `/v1/messages`; use `https://canopy.leaflow.cloud` as the Anthropic SDK base URL.
  * - Gemini: `/v1beta/models/{model}:generateContent` and `:streamGenerateContent`.
  *
- * Canopy does not convert between protocols. A request is accepted only for a model whose
- * `supported_endpoints` lists the endpoint it was sent to, and it is forwarded unchanged except for
- * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
- * through as written; a model's `capabilities` lists the values its upstream accepts.
+ * Every chat model accepts all four chat protocols: Chat Completions, Responses, Messages and Gemini
+ * generateContent. A request is forwarded unchanged, apart from the model name and the credentials, when a
+ * provider of the model speaks the protocol it was sent in; otherwise it is translated into a protocol a
+ * provider speaks, and the response is translated back. Content that cannot be translated, such as a tool
+ * that runs on another provider's servers or a reference to a file stored with another provider, is refused
+ * with 400 rather than dropped. Reasoning settings such as `reasoning_effort` are passed through as written;
+ * a model's `capabilities` lists the values it accepts.
+ *
+ * Responses is stateless: `store` must be false, and a response cannot be retrieved after it is returned.
+ * Send the output items of a response back unchanged, in their order, as input to the next request.
+ *
+ * What a model does follows from its `input_modalities`, `output_modalities` and the media blocks of its
+ * `capabilities`. Embeddings, images, audio and videos are accepted for a model whose providers serve them.
  *
  * Management operations use `/api/v1`. The management model catalogue names how each model is billed in Billing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
@@ -42,7 +51,7 @@ import * as zod from "zod";
 
 export const NativeResponse = zod
   .record(zod.string(), zod.unknown())
-  .describe("A response body in the endpoint's own protocol, as the upstream returned it.");
+  .describe("A response body in the endpoint's own protocol.");
 
 export type NativeResponse = zod.input<typeof NativeResponse>;
 export type NativeResponseOutput = zod.output<typeof NativeResponse>;
