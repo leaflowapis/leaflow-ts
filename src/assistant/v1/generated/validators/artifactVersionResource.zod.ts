@@ -20,31 +20,40 @@
  * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
- * parts, then complete the upload and send its attachment id in a message.
+ * parts, then complete the upload and send its file id in a message.
  *
- * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
- * the conversations that already use it; downloading keeps working.
+ * Files the person attached are listed by search-files. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working. Files the assistant hands over
+ * are artifacts: they appear on the tool call that created them and are listed by list-artifacts.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { FileResource } from "./fileResource.zod.js";
 
-export const AttachmentFileResource = zod.strictObject({
-  byteSize: zod.int(),
-  createdAt: zod.iso.datetime({ offset: true }),
-  draftExpiresAt: zod.iso
-    .datetime({ offset: true })
+export const ArtifactVersionResource = zod.strictObject({
+  id: zod.string(),
+  artifactId: zod.string(),
+  title: zod.string().describe("The artifact's current title."),
+  version: zod.int().min(1).describe("The position among the artifact's versions, from 1."),
+  file: FileResource,
+  threadId: zod
+    .string()
     .nullable()
     .describe(
-      "When this draft is cleared if no message ever references it. Null once a message uses it —\na file that belongs to a conversation is kept as long as the conversation is.",
+      "The conversation whose tool call created this version. Null for a version added through the API.",
     ),
-  filename: zod.string(),
-  height: zod.int().nullable().describe("Null unless type is image."),
-  id: zod.string(),
-  mime: zod.string().describe("Detected at intake, not the Content-Type the client sent."),
-  type: zod.enum(["image", "text", "binary"]).describe("How the assistant will see this file."),
-  updatedAt: zod.iso.datetime({ offset: true }),
-  width: zod.int().nullable().describe("Null unless type is image."),
+  turnId: zod
+    .string()
+    .nullable()
+    .describe(
+      "The turn whose tool call created this version. Null for a version added through the API.",
+    ),
+  itemId: zod
+    .string()
+    .nullable()
+    .describe("The tool call that created this version. Null for a version added through the API."),
+  createdAt: zod.iso.datetime({ offset: true }),
 });
 
-export type AttachmentFileResource = zod.input<typeof AttachmentFileResource>;
-export type AttachmentFileResourceOutput = zod.output<typeof AttachmentFileResource>;
+export type ArtifactVersionResource = zod.input<typeof ArtifactVersionResource>;
+export type ArtifactVersionResourceOutput = zod.output<typeof ArtifactVersionResource>;

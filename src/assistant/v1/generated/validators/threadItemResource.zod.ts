@@ -20,14 +20,14 @@
  * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
- * parts, then complete the upload and send its attachment id in a message.
+ * parts, then complete the upload and send its file id in a message.
  *
- * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
- * the conversations that already use it; downloading keeps working.
+ * Files the person attached are listed by search-files. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working. Files the assistant hands over
+ * are artifacts: they appear on the tool call that created them and are listed by list-artifacts.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { AttachmentResource } from "./attachmentResource.zod.js";
 import { ClientContextPart } from "./clientContextPart.zod.js";
 import { ItemSourceResource } from "./itemSourceResource.zod.js";
 import { PartResource } from "./partResource.zod.js";
@@ -87,9 +87,8 @@ export const ThreadItemResource = zod
     parts: zod
       .array(PartResource)
       .describe(
-        "The content, in the order it was written. Text arrives as `append` frames on the realtime\nstream. An attachment belongs where it was written, so render parts in order. Empty for\ntool calls; their outcome is in `toolCall.detail` and `toolCall.presentation`.",
+        "The content, in the order it was written. Text arrives as `append` frames on the realtime\nstream. A file the person attached belongs where it was written, so render parts in order.\nEmpty for tool calls; their outcome is in `toolCall`.",
       ),
-    attachments: zod.array(AttachmentResource),
     clientContext: zod
       .array(ClientContextPart)
       .describe(

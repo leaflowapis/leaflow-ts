@@ -20,27 +20,20 @@
  * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
- * parts, then complete the upload and send its attachment id in a message.
+ * parts, then complete the upload and send its file id in a message.
  *
- * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
- * the conversations that already use it; downloading keeps working.
+ * Files the person attached are listed by search-files. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working. Files the assistant hands over
+ * are artifacts: they appear on the tool call that created them and are listed by list-artifacts.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { ArtifactResource } from "./artifactResource.zod.js";
 
-export const AttachmentResource = zod.strictObject({
-  id: zod.string(),
-  type: zod
-    .enum(["image", "text", "binary"])
-    .describe("A client renders an image in place and everything else as a file to download."),
-  filename: zod.string(),
-  byteSize: zod.int(),
-  width: zod
-    .int()
-    .nullable()
-    .describe("Null unless type is image. Lets a client hold the space before the image loads."),
-  height: zod.int().nullable().describe("Null unless type is image."),
+export const ArtifactListResponseBody = zod.strictObject({
+  artifacts: zod.array(ArtifactResource),
+  nextCursor: zod.string().nullable().describe("Null on the last page."),
 });
 
-export type AttachmentResource = zod.input<typeof AttachmentResource>;
-export type AttachmentResourceOutput = zod.output<typeof AttachmentResource>;
+export type ArtifactListResponseBody = zod.input<typeof ArtifactListResponseBody>;
+export type ArtifactListResponseBodyOutput = zod.output<typeof ArtifactListResponseBody>;

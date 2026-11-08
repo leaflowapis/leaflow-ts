@@ -20,10 +20,11 @@
  * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
- * parts, then complete the upload and send its attachment id in a message.
+ * parts, then complete the upload and send its file id in a message.
  *
- * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
- * the conversations that already use it; downloading keeps working.
+ * Files the person attached are listed by search-files. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working. Files the assistant hands over
+ * are artifacts: they appear on the tool call that created them and are listed by list-artifacts.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
@@ -34,14 +35,14 @@ export const MessagePart = zod
   .strictObject({
     type: zod.string().min(1).max(messagePartTypeMax),
     text: zod.string().nullish(),
-    attachmentId: zod
+    fileId: zod
       .string()
       .nullish()
-      .describe("The attachment must have been uploaded and not yet sent with another message."),
+      .describe("The file must have been uploaded and not yet sent with another message."),
     data: zod.record(zod.string(), zod.unknown()).nullish(),
   })
   .describe(
-    "One piece of a message. `type` says which field carries it:\n\n- `text` — the words, in `text`\n- `file` — an attachment uploaded earlier, by id in `attachmentId`\n- `data-<name>` — context from the client, in `data`. The name is shown to the assistant so it\n  can tell one block from another.",
+    "One piece of a message. `type` says which field carries it:\n\n- `text` — the words, in `text`\n- `file` — a file uploaded earlier, by id in `fileId`\n- `data-<name>` — context from the client, in `data`. The name is shown to the assistant so it\n  can tell one block from another.",
   );
 
 export type MessagePart = zod.input<typeof MessagePart>;

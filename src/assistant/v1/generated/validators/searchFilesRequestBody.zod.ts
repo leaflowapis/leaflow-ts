@@ -20,54 +20,55 @@
  * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
- * parts, then complete the upload and send its attachment id in a message.
+ * parts, then complete the upload and send its file id in a message.
  *
- * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
- * the conversations that already use it; downloading keeps working.
+ * Files the person attached are listed by search-files. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working. Files the assistant hands over
+ * are artifacts: they appear on the tool call that created them and are listed by list-artifacts.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
 
-export const searchAttachmentsRequestBodyIdsMax = 200;
+export const searchFilesRequestBodyIdsMax = 200;
 
-export const searchAttachmentsRequestBodyQMax = 100;
+export const searchFilesRequestBodyQMax = 100;
 
-export const searchAttachmentsRequestBodyCursorMax = 1024;
+export const searchFilesRequestBodyCursorMax = 1024;
 
-export const searchAttachmentsRequestBodyLimitDefault = 50;
-export const searchAttachmentsRequestBodyLimitMax = 200;
+export const searchFilesRequestBodyLimitDefault = 50;
+export const searchFilesRequestBodyLimitMax = 200;
 
-export const SearchAttachmentsRequestBody = zod.strictObject({
+export const SearchFilesRequestBody = zod.strictObject({
   ids: zod
     .array(zod.string())
     .min(1)
-    .max(searchAttachmentsRequestBodyIdsMax)
+    .max(searchFilesRequestBodyIdsMax)
     .optional()
-    .describe("Read these attachments. Cannot be combined with cursor."),
+    .describe("Read these files. Cannot be combined with cursor."),
   q: zod
     .string()
-    .max(searchAttachmentsRequestBodyQMax)
+    .max(searchFilesRequestBodyQMax)
     .optional()
     .describe("Matches filenames, case-insensitively."),
   type: zod
     .enum(["image", "text", "binary"])
     .optional()
-    .describe("How the assistant sees the file."),
+    .describe("How the assistant reads the file."),
   draft: zod
     .boolean()
     .optional()
     .describe("True for uploads no message references, false for the rest."),
-  cursor: zod.string().max(searchAttachmentsRequestBodyCursorMax).optional(),
+  cursor: zod.string().max(searchFilesRequestBodyCursorMax).optional(),
   limit: zod
     .int()
     .min(1)
-    .max(searchAttachmentsRequestBodyLimitMax)
-    .default(searchAttachmentsRequestBodyLimitDefault),
+    .max(searchFilesRequestBodyLimitMax)
+    .default(searchFilesRequestBodyLimitDefault),
   include: zod
     .array(zod.enum(["counts"]))
     .optional()
     .describe("Optional parts of the response. `counts` adds `counts`."),
 });
 
-export type SearchAttachmentsRequestBody = zod.input<typeof SearchAttachmentsRequestBody>;
-export type SearchAttachmentsRequestBodyOutput = zod.output<typeof SearchAttachmentsRequestBody>;
+export type SearchFilesRequestBody = zod.input<typeof SearchFilesRequestBody>;
+export type SearchFilesRequestBodyOutput = zod.output<typeof SearchFilesRequestBody>;

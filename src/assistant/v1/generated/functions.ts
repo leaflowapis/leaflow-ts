@@ -20,22 +20,27 @@
  * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
- * parts, then complete the upload and send its attachment id in a message.
+ * parts, then complete the upload and send its file id in a message.
  *
- * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
- * the conversations that already use it; downloading keeps working.
+ * Files the person attached are listed by search-files. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working. Files the assistant hands over
+ * are artifacts: they appear on the tool call that created them and are listed by list-artifacts.
  * OpenAPI spec version: 2.0.0
  */
 import type {
   AnswerQuestionRequestBody,
-  AttachmentFileResource,
-  AttachmentListResponseBody,
+  ArtifactListResponseBody,
+  ArtifactResource,
+  ArtifactVersionListResponseBody,
+  ArtifactVersionResource,
   BindingCodeResponseBody,
   BindingResource,
   ChannelResource,
   ChannelWithSecretResponseBody,
   CheckSenderParams,
   CompleteUploadRequestBody,
+  CreateArtifactRequestBody,
+  CreateArtifactVersionRequestBody,
   CreateChannelRequestBody,
   CreateFolderRequestBody,
   CreateTaskRequestBody,
@@ -44,10 +49,14 @@ import type {
   CreateUploadRequestBody,
   DecideToolCallsRequestBody,
   ErrorResponse,
+  FileListResponseBody,
+  FileResource,
   FolderListResponseBody,
   FolderResource,
   LengthAwarePageBindingResource,
   LengthAwarePageChannelResource,
+  ListArtifactVersionsParams,
+  ListArtifactsParams,
   ListBindingsParams,
   ListChannelRejectionsParams,
   ListChannelsParams,
@@ -67,7 +76,7 @@ import type {
   RevertRequestBody,
   RevertedCountResponseBody,
   RotateSecretRequestBody,
-  SearchAttachmentsRequestBody,
+  SearchFilesRequestBody,
   SearchTasksRequestBody,
   SearchThreadsRequestBody,
   SendMessageRequestBody,
@@ -90,19 +99,19 @@ import type {
   ThreadTurnListResponseBody,
   ToolResultRequestBody,
   TurnStartedResponseBody,
-  UpdateAttachmentRequestBody,
+  UpdateArtifactRequestBody,
   UpdateChannelRequestBody,
+  UpdateFileRequestBody,
   UpdateFolderRequestBody,
   UpdateSettingsRequestBody,
   UpdateTaskRequestBody,
   UpdateThreadRequestBody,
   UpdateUploadRequestBody,
-  UploadAttachmentParams,
   UploadConfigurationResource,
+  UploadFileParams,
   UploadListResponseBody,
   UploadPartResource,
   UploadResource,
-  UploadedResource,
   VerifyCodeRequestBody,
   WebhookSecretResponseBody,
 } from "./models.js";
@@ -2327,28 +2336,26 @@ export const updateSettings = async (
   return { data, status: res.status, headers: res.headers } as updateSettingsResponse;
 };
 
-export type uploadAttachmentResponse201 = {
-  data: UploadedResource;
+export type uploadFileResponse201 = {
+  data: FileResource;
   status: 201;
 };
 
-export type uploadAttachmentResponseDefault = {
+export type uploadFileResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 201>;
 };
 
-export type uploadAttachmentResponseSuccess = uploadAttachmentResponse201 & {
+export type uploadFileResponseSuccess = uploadFileResponse201 & {
   headers: Headers;
 };
-export type uploadAttachmentResponseError = uploadAttachmentResponseDefault & {
+export type uploadFileResponseError = uploadFileResponseDefault & {
   headers: Headers;
 };
 
-export type uploadAttachmentResponse =
-  | uploadAttachmentResponseSuccess
-  | uploadAttachmentResponseError;
+export type uploadFileResponse = uploadFileResponseSuccess | uploadFileResponseError;
 
-export const getUploadAttachmentUrl = (params?: UploadAttachmentParams) => {
+export const getUploadFileUrl = (params?: UploadFileParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -2360,24 +2367,24 @@ export const getUploadAttachmentUrl = (params?: UploadAttachmentParams) => {
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://assistant.leaflow.cloud/api/v1/attachments?${stringifiedParams}`
-    : `https://assistant.leaflow.cloud/api/v1/attachments`;
+    ? `https://assistant.leaflow.cloud/api/v1/files?${stringifiedParams}`
+    : `https://assistant.leaflow.cloud/api/v1/files`;
 };
 
 /**
- * The body is the file bytes themselves, not multipart, one file per request. The type is determined from the content, not from Content-Type or from the name. Put the returned id in attachmentIds when sending a message.
+ * The body is the file bytes themselves, not multipart, one file per request. The type is determined from the content, not from Content-Type or from the name. Put the returned id in a `file` part when sending a message.
  *
  * An upload that no message ever references is a draft, and drafts are collected — `draftExpiresAt` in the response says when this one goes. Sending a message with the id makes it permanent.
  *
  * The returned `type` says how the assistant will see it. An `image` is read directly, and only by models that accept image input. A small `text` file is placed inline in the message. A large `text` file, and anything `binary`, arrives as a reference the assistant reads on demand — for a binary that usually means downloading it onto one of the project's cloud instances.
  * @summary Upload a file
  */
-export const uploadAttachment = async (
-  uploadAttachmentBody: Blob,
-  params?: UploadAttachmentParams,
+export const uploadFile = async (
+  uploadFileBody: Blob,
+  params?: UploadFileParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<uploadAttachmentResponse> => {
+): Promise<uploadFileResponse> => {
   const getHeaders = (
     h?: NonNullable<RequestInit["headers"]>,
   ): Record<string, string | readonly string[]> => {
@@ -2397,60 +2404,60 @@ export const uploadAttachment = async (
     }
     return headers;
   };
-  const res = await (fetchFn ?? fetch)(getUploadAttachmentUrl(params), {
+  const res = await (fetchFn ?? fetch)(getUploadFileUrl(params), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "*/*", ...getHeaders(options?.headers) },
-    body: uploadAttachmentBody,
+    body: uploadFileBody,
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: uploadAttachmentResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as uploadAttachmentResponse;
+  const data: uploadFileResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as uploadFileResponse;
 };
 
-export type searchAttachmentsResponse200 = {
-  data: AttachmentListResponseBody;
+export type searchFilesResponse200 = {
+  data: FileListResponseBody;
   status: 200;
 };
 
-export type searchAttachmentsResponseDefault = {
+export type searchFilesResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type searchAttachmentsResponseSuccess = searchAttachmentsResponse200 & {
+export type searchFilesResponseSuccess = searchFilesResponse200 & {
   headers: Headers;
 };
-export type searchAttachmentsResponseError = searchAttachmentsResponseDefault & {
+export type searchFilesResponseError = searchFilesResponseDefault & {
   headers: Headers;
 };
 
-export type searchAttachmentsResponse =
-  | searchAttachmentsResponseSuccess
-  | searchAttachmentsResponseError;
+export type searchFilesResponse = searchFilesResponseSuccess | searchFilesResponseError;
 
-export const getSearchAttachmentsUrl = () => {
-  return `https://assistant.leaflow.cloud/api/v1/attachments`;
+export const getSearchFilesUrl = () => {
+  return `https://assistant.leaflow.cloud/api/v1/files`;
 };
 
 /**
- * The caller's files in this project, most recently uploaded first. These are the files
- * uploaded while composing messages, plus uploads that no message has referenced yet.
+ * The caller's library in this project, most recently uploaded first: the files they attached to
+ * messages, plus uploads that no message has referenced yet. Files that tools produced and
+ * artifacts the assistant handed over are not listed here; artifacts are listed by
+ * list-artifacts.
  *
  * A file with no message referencing it is a draft: `draftExpiresAt` says when it is cleared.
  * Sending a message with the id makes it permanent and that field becomes null.
  *
  * Files removed from the library are not listed, but conversations that already use them keep
  * them and download-by-id still works.
- * @summary Search attachments
+ * @summary Search files
  */
-export const searchAttachments = async (
-  searchAttachmentsRequestBody: SearchAttachmentsRequestBody,
+export const searchFiles = async (
+  searchFilesRequestBody: SearchFilesRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<searchAttachmentsResponse> => {
+): Promise<searchFilesResponse> => {
   const getHeaders = (
     h?: NonNullable<RequestInit["headers"]>,
   ): Record<string, string | readonly string[]> => {
@@ -2470,103 +2477,100 @@ export const searchAttachments = async (
     }
     return headers;
   };
-  const res = await (fetchFn ?? fetch)(getSearchAttachmentsUrl(), {
+  const res = await (fetchFn ?? fetch)(getSearchFilesUrl(), {
     ...options,
     method: "QUERY",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(searchAttachmentsRequestBody),
+    body: JSON.stringify(searchFilesRequestBody),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: searchAttachmentsResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as searchAttachmentsResponse;
+  const data: searchFilesResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as searchFilesResponse;
 };
 
-export type getAttachmentResponse200 = {
-  data: AttachmentFileResource;
+export type getFileResponse200 = {
+  data: FileResource;
   status: 200;
 };
 
-export type getAttachmentResponseDefault = {
+export type getFileResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type getAttachmentResponseSuccess = getAttachmentResponse200 & {
+export type getFileResponseSuccess = getFileResponse200 & {
   headers: Headers;
 };
-export type getAttachmentResponseError = getAttachmentResponseDefault & {
+export type getFileResponseError = getFileResponseDefault & {
   headers: Headers;
 };
 
-export type getAttachmentResponse = getAttachmentResponseSuccess | getAttachmentResponseError;
+export type getFileResponse = getFileResponseSuccess | getFileResponseError;
 
-export const getGetAttachmentUrl = (attachment: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}`;
+export const getGetFileUrl = (file: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/files/${encodeURIComponent(String(file))}`;
 };
 
 /**
- * Metadata for one attachment. The bytes are at /api/v1/attachments/{attachment}:download.
+ * Metadata for one file. The bytes are at /api/v1/files/{file}:download.
  *
- * Returns 404 when the attachment does not exist, does not belong to the current user, or was
- * removed from the library. Removed files stay readable through their conversations but are no
- * longer described here.
+ * Returns 404 when the file does not exist, does not belong to the current user, or was removed
+ * from the library. Removed files stay readable through their conversations but are no longer
+ * described here.
  * @summary Get a file
  */
-export const getAttachment = async (
-  attachment: string,
+export const getFile = async (
+  file: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<getAttachmentResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetAttachmentUrl(attachment), {
+): Promise<getFileResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetFileUrl(file), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getAttachmentResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as getAttachmentResponse;
+  const data: getFileResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getFileResponse;
 };
 
-export type updateAttachmentResponse200 = {
-  data: AttachmentFileResource;
+export type updateFileResponse200 = {
+  data: FileResource;
   status: 200;
 };
 
-export type updateAttachmentResponseDefault = {
+export type updateFileResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type updateAttachmentResponseSuccess = updateAttachmentResponse200 & {
+export type updateFileResponseSuccess = updateFileResponse200 & {
   headers: Headers;
 };
-export type updateAttachmentResponseError = updateAttachmentResponseDefault & {
+export type updateFileResponseError = updateFileResponseDefault & {
   headers: Headers;
 };
 
-export type updateAttachmentResponse =
-  | updateAttachmentResponseSuccess
-  | updateAttachmentResponseError;
+export type updateFileResponse = updateFileResponseSuccess | updateFileResponseError;
 
-export const getUpdateAttachmentUrl = (attachment: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}`;
+export const getUpdateFileUrl = (file: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/files/${encodeURIComponent(String(file))}`;
 };
 
 /**
- * Changes the name shown in the library and given to the assistant. The bytes and the attachment
- * id do not change; conversations that already use it see the new name from their next request
- * on.
+ * Changes the name shown in the library and given to the assistant. The bytes and the file id do
+ * not change; conversations that already use it see the new name from their next request on.
  * @summary Rename a file
  */
-export const updateAttachment = async (
-  attachment: string,
-  updateAttachmentRequestBody: UpdateAttachmentRequestBody,
+export const updateFile = async (
+  file: string,
+  updateFileRequestBody: UpdateFileRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<updateAttachmentResponse> => {
+): Promise<updateFileResponse> => {
   const getHeaders = (
     h?: NonNullable<RequestInit["headers"]>,
   ): Record<string, string | readonly string[]> => {
@@ -2586,110 +2590,106 @@ export const updateAttachment = async (
     }
     return headers;
   };
-  const res = await (fetchFn ?? fetch)(getUpdateAttachmentUrl(attachment), {
+  const res = await (fetchFn ?? fetch)(getUpdateFileUrl(file), {
     ...options,
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(updateAttachmentRequestBody),
+    body: JSON.stringify(updateFileRequestBody),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: updateAttachmentResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as updateAttachmentResponse;
+  const data: updateFileResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as updateFileResponse;
 };
 
-export type deleteAttachmentResponse204 = {
+export type deleteFileResponse204 = {
   data: void;
   status: 204;
 };
 
-export type deleteAttachmentResponseDefault = {
+export type deleteFileResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 204>;
 };
 
-export type deleteAttachmentResponseSuccess = deleteAttachmentResponse204 & {
+export type deleteFileResponseSuccess = deleteFileResponse204 & {
   headers: Headers;
 };
-export type deleteAttachmentResponseError = deleteAttachmentResponseDefault & {
+export type deleteFileResponseError = deleteFileResponseDefault & {
   headers: Headers;
 };
 
-export type deleteAttachmentResponse =
-  | deleteAttachmentResponseSuccess
-  | deleteAttachmentResponseError;
+export type deleteFileResponse = deleteFileResponseSuccess | deleteFileResponseError;
 
-export const getDeleteAttachmentUrl = (attachment: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}`;
+export const getDeleteFileUrl = (file: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/files/${encodeURIComponent(String(file))}`;
 };
 
 /**
- * Hides the file from the library. Conversations that already use it keep it: the attachment
- * stays readable by id and keeps rendering in their history. Its bytes are released when the
- * project is deleted. A draft is cleared for good when its expiry passes. Idempotent.
+ * Hides the file from the library. Conversations that already use it keep it: the file stays
+ * readable by id and keeps rendering in their history. Its bytes are released when the project
+ * is deleted. A draft is cleared for good when its expiry passes. Idempotent.
  * @summary Remove a file from the library
  */
-export const deleteAttachment = async (
-  attachment: string,
+export const deleteFile = async (
+  file: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<deleteAttachmentResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteAttachmentUrl(attachment), {
+): Promise<deleteFileResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteFileUrl(file), {
     ...options,
     method: "DELETE",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: deleteAttachmentResponse["data"] = body ? JSON.parse(body) : undefined;
-  return { data, status: res.status, headers: res.headers } as deleteAttachmentResponse;
+  const data: deleteFileResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteFileResponse;
 };
 
-export type downloadAttachmentResponse200 = {
+export type downloadFileResponse200 = {
   data: Blob;
   status: 200;
 };
 
-export type downloadAttachmentResponseDefault = {
+export type downloadFileResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type downloadAttachmentResponseSuccess = downloadAttachmentResponse200 & {
+export type downloadFileResponseSuccess = downloadFileResponse200 & {
   headers: Headers;
 };
-export type downloadAttachmentResponseError = downloadAttachmentResponseDefault & {
+export type downloadFileResponseError = downloadFileResponseDefault & {
   headers: Headers;
 };
 
-export type downloadAttachmentResponse =
-  | downloadAttachmentResponseSuccess
-  | downloadAttachmentResponseError;
+export type downloadFileResponse = downloadFileResponseSuccess | downloadFileResponseError;
 
-export const getDownloadAttachmentUrl = (attachment: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/attachments/${encodeURIComponent(String(attachment))}:download`;
+export const getDownloadFileUrl = (file: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/files/${encodeURIComponent(String(file))}:download`;
 };
 
 /**
- * Returns the original bytes for an attachment id, including one removed from the library. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
+ * Returns the original bytes of a file, including one removed from the library, a file a tool produced and an artifact version. The response carries long-lived cache headers because the content never changes. Returns 404 when the file does not exist or does not belong to the current user.
  *
- * Only an attachment whose `type` is `image` comes back with its own image type and is usable as the address of an `<img>`. Everything else is served as `application/octet-stream` with `Content-Disposition: attachment`, deliberately: an uploaded file is arbitrary bytes under a name its uploader chose, and serving it back inline would run it on this origin.
+ * Only a file whose `type` is `image` comes back with its own image type and is usable as the address of an `<img>`. Everything else is served as `application/octet-stream` with `Content-Disposition: attachment`, deliberately: a file is arbitrary bytes under a name chosen elsewhere, and serving it back inline would run it on this origin.
  * @summary Download a file
  */
-export const downloadAttachment = async (
-  attachment: string,
+export const downloadFile = async (
+  file: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<downloadAttachmentResponse> => {
-  const res = await (fetchFn ?? fetch)(getDownloadAttachmentUrl(attachment), {
+): Promise<downloadFileResponse> => {
+  const res = await (fetchFn ?? fetch)(getDownloadFileUrl(file), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
-  const data: downloadAttachmentResponse["data"] = body as downloadAttachmentResponse["data"];
-  return { data, status: res.status, headers: res.headers } as downloadAttachmentResponse;
+  const data: downloadFileResponse["data"] = body as downloadFileResponse["data"];
+  return { data, status: res.status, headers: res.headers } as downloadFileResponse;
 };
 
 export type getUploadConfigurationResponse200 = {
@@ -3030,7 +3030,7 @@ export const cancelUpload = async (
 };
 
 export type completeUploadResponse200 = {
-  data: UploadedResource;
+  data: FileResource;
   status: 200;
 };
 
@@ -3174,6 +3174,456 @@ export const putUploadPart = async (
 
   const data: putUploadPartResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as putUploadPartResponse;
+};
+
+export type listArtifactsResponse200 = {
+  data: ArtifactListResponseBody;
+  status: 200;
+};
+
+export type listArtifactsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listArtifactsResponseSuccess = listArtifactsResponse200 & {
+  headers: Headers;
+};
+export type listArtifactsResponseError = listArtifactsResponseDefault & {
+  headers: Headers;
+};
+
+export type listArtifactsResponse = listArtifactsResponseSuccess | listArtifactsResponseError;
+
+export const getListArtifactsUrl = (params?: ListArtifactsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://assistant.leaflow.cloud/api/v1/artifacts?${stringifiedParams}`
+    : `https://assistant.leaflow.cloud/api/v1/artifacts`;
+};
+
+/**
+ * The caller's artifacts in this project, most recently updated first. An artifact is a file the
+ * assistant handed over, kept under one title across its versions: a later version replaces what
+ * the person sees, and earlier versions stay readable.
+ *
+ * With `thread`, only artifacts that have a version created in that conversation are listed.
+ * @summary List artifacts
+ */
+export const listArtifacts = async (
+  params?: ListArtifactsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listArtifactsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListArtifactsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listArtifactsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listArtifactsResponse;
+};
+
+export type createArtifactResponse201 = {
+  data: ArtifactResource;
+  status: 201;
+};
+
+export type createArtifactResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createArtifactResponseSuccess = createArtifactResponse201 & {
+  headers: Headers;
+};
+export type createArtifactResponseError = createArtifactResponseDefault & {
+  headers: Headers;
+};
+
+export type createArtifactResponse = createArtifactResponseSuccess | createArtifactResponseError;
+
+export const getCreateArtifactUrl = () => {
+  return `https://assistant.leaflow.cloud/api/v1/artifacts`;
+};
+
+/**
+ * Makes a file the first version of a new artifact. The file must belong to the caller in this
+ * project. Fails with 404 and code FILE_NOT_FOUND when it does not.
+ * @summary Create an artifact
+ */
+export const createArtifact = async (
+  createArtifactRequestBody: CreateArtifactRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createArtifactResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateArtifactUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createArtifactRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createArtifactResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createArtifactResponse;
+};
+
+export type getArtifactResponse200 = {
+  data: ArtifactResource;
+  status: 200;
+};
+
+export type getArtifactResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getArtifactResponseSuccess = getArtifactResponse200 & {
+  headers: Headers;
+};
+export type getArtifactResponseError = getArtifactResponseDefault & {
+  headers: Headers;
+};
+
+export type getArtifactResponse = getArtifactResponseSuccess | getArtifactResponseError;
+
+export const getGetArtifactUrl = (artifact: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/artifacts/${encodeURIComponent(String(artifact))}`;
+};
+
+/**
+ * @summary Get an artifact
+ */
+export const getArtifact = async (
+  artifact: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getArtifactResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetArtifactUrl(artifact), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getArtifactResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getArtifactResponse;
+};
+
+export type updateArtifactResponse200 = {
+  data: ArtifactResource;
+  status: 200;
+};
+
+export type updateArtifactResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updateArtifactResponseSuccess = updateArtifactResponse200 & {
+  headers: Headers;
+};
+export type updateArtifactResponseError = updateArtifactResponseDefault & {
+  headers: Headers;
+};
+
+export type updateArtifactResponse = updateArtifactResponseSuccess | updateArtifactResponseError;
+
+export const getUpdateArtifactUrl = (artifact: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/artifacts/${encodeURIComponent(String(artifact))}`;
+};
+
+/**
+ * Changes the title shown for every version. The versions and their files do not change.
+ * @summary Rename an artifact
+ */
+export const updateArtifact = async (
+  artifact: string,
+  updateArtifactRequestBody: UpdateArtifactRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateArtifactResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateArtifactUrl(artifact), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateArtifactRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateArtifactResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as updateArtifactResponse;
+};
+
+export type deleteArtifactResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteArtifactResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type deleteArtifactResponseSuccess = deleteArtifactResponse204 & {
+  headers: Headers;
+};
+export type deleteArtifactResponseError = deleteArtifactResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteArtifactResponse = deleteArtifactResponseSuccess | deleteArtifactResponseError;
+
+export const getDeleteArtifactUrl = (artifact: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/artifacts/${encodeURIComponent(String(artifact))}`;
+};
+
+/**
+ * Removes the artifact and its versions from lists, and the assistant can no longer add versions
+ * to it. Conversations that showed a version keep showing it, and its file stays downloadable.
+ * Idempotent.
+ * @summary Delete an artifact
+ */
+export const deleteArtifact = async (
+  artifact: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteArtifactResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteArtifactUrl(artifact), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteArtifactResponse["data"] = body ? JSON.parse(body) : undefined;
+  return { data, status: res.status, headers: res.headers } as deleteArtifactResponse;
+};
+
+export type listArtifactVersionsResponse200 = {
+  data: ArtifactVersionListResponseBody;
+  status: 200;
+};
+
+export type listArtifactVersionsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listArtifactVersionsResponseSuccess = listArtifactVersionsResponse200 & {
+  headers: Headers;
+};
+export type listArtifactVersionsResponseError = listArtifactVersionsResponseDefault & {
+  headers: Headers;
+};
+
+export type listArtifactVersionsResponse =
+  | listArtifactVersionsResponseSuccess
+  | listArtifactVersionsResponseError;
+
+export const getListArtifactVersionsUrl = (
+  artifact: string,
+  params?: ListArtifactVersionsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://assistant.leaflow.cloud/api/v1/artifacts/${encodeURIComponent(String(artifact))}/versions?${stringifiedParams}`
+    : `https://assistant.leaflow.cloud/api/v1/artifacts/${encodeURIComponent(String(artifact))}/versions`;
+};
+
+/**
+ * The versions of an artifact, newest first.
+ * @summary List artifact versions
+ */
+export const listArtifactVersions = async (
+  artifact: string,
+  params?: ListArtifactVersionsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listArtifactVersionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListArtifactVersionsUrl(artifact, params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listArtifactVersionsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listArtifactVersionsResponse;
+};
+
+export type createArtifactVersionResponse201 = {
+  data: ArtifactVersionResource;
+  status: 201;
+};
+
+export type createArtifactVersionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createArtifactVersionResponseSuccess = createArtifactVersionResponse201 & {
+  headers: Headers;
+};
+export type createArtifactVersionResponseError = createArtifactVersionResponseDefault & {
+  headers: Headers;
+};
+
+export type createArtifactVersionResponse =
+  | createArtifactVersionResponseSuccess
+  | createArtifactVersionResponseError;
+
+export const getCreateArtifactVersionUrl = (artifact: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/artifacts/${encodeURIComponent(String(artifact))}/versions`;
+};
+
+/**
+ * Makes a file the newest version of the artifact. The file must belong to the caller in this
+ * project. Fails with 404 and code FILE_NOT_FOUND when it does not.
+ * @summary Add a version
+ */
+export const createArtifactVersion = async (
+  artifact: string,
+  createArtifactVersionRequestBody: CreateArtifactVersionRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createArtifactVersionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateArtifactVersionUrl(artifact), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createArtifactVersionRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createArtifactVersionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createArtifactVersionResponse;
+};
+
+export type getArtifactVersionResponse200 = {
+  data: ArtifactVersionResource;
+  status: 200;
+};
+
+export type getArtifactVersionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getArtifactVersionResponseSuccess = getArtifactVersionResponse200 & {
+  headers: Headers;
+};
+export type getArtifactVersionResponseError = getArtifactVersionResponseDefault & {
+  headers: Headers;
+};
+
+export type getArtifactVersionResponse =
+  | getArtifactVersionResponseSuccess
+  | getArtifactVersionResponseError;
+
+export const getGetArtifactVersionUrl = (artifact: string, version: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/artifacts/${encodeURIComponent(String(artifact))}/versions/${encodeURIComponent(String(version))}`;
+};
+
+/**
+ * @summary Get an artifact version
+ */
+export const getArtifactVersion = async (
+  artifact: string,
+  version: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getArtifactVersionResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetArtifactVersionUrl(artifact, version), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getArtifactVersionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getArtifactVersionResponse;
 };
 
 export type listMemoriesResponse200 = {
