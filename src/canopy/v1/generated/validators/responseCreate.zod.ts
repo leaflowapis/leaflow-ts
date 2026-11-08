@@ -4,17 +4,26 @@
  * Leaflow Canopy API
  * Canopy model inference, API keys, model catalogue, service enablement and recorded usage.
  *
- * Project inference is served on this host in each provider's own protocol:
+ * Project inference is served on this host at each protocol's own endpoints:
  *
  * - OpenAI: `/v1/chat/completions`, `/v1/responses` and `/v1/embeddings`; use
  *   `https://canopy.leaflow.cloud/v1` as the OpenAI SDK base URL.
  * - Anthropic: `/v1/messages`; use `https://canopy.leaflow.cloud` as the Anthropic SDK base URL.
  * - Gemini: `/v1beta/models/{model}:generateContent` and `:streamGenerateContent`.
  *
- * Canopy does not convert between protocols. A request is accepted only for a model whose
- * `supported_endpoints` lists the endpoint it was sent to, and it is forwarded unchanged except for
- * the model name and the credentials. Reasoning settings such as `reasoning_effort` are passed
- * through as written; a model's `capabilities` lists the values its upstream accepts.
+ * Every chat model accepts all four chat protocols: Chat Completions, Responses, Messages and Gemini
+ * generateContent. A request is forwarded unchanged, apart from the model name and the credentials, when a
+ * provider of the model speaks the protocol it was sent in; otherwise it is translated into a protocol a
+ * provider speaks, and the response is translated back. Content that cannot be translated, such as a tool
+ * that runs on another provider's servers or a reference to a file stored with another provider, is refused
+ * with 400 rather than dropped. Reasoning settings such as `reasoning_effort` are passed through as written;
+ * a model's `capabilities` lists the values it accepts.
+ *
+ * Responses is stateless: `store` must be false, and a response cannot be retrieved after it is returned.
+ * Send the output items of a response back unchanged, in their order, as input to the next request.
+ *
+ * What a model does follows from its `input_modalities`, `output_modalities` and the media blocks of its
+ * `capabilities`. Embeddings, images, audio and videos are accepted for a model whose providers serve them.
  *
  * Management operations use `/api/v1`. The management model catalogue names how each model is billed in Billing;
  * `/v1/models` returns the OpenAI model format with Canopy capabilities and parameter limits.
@@ -48,15 +57,23 @@ export const ResponseCreate = zod
     model: zod.string().optional(),
     input: zod.unknown().optional(),
     instructions: zod.string().nullish(),
-    store: zod.boolean().default(responseCreateStoreDefault),
+    store: zod
+      .boolean()
+      .default(responseCreateStoreDefault)
+      .describe("Must be false. True is refused with 400 `RESPONSES_STORE_UNSUPPORTED`."),
     stream: zod.boolean().default(responseCreateStreamDefault),
-    previous_response_id: zod.string().nullish(),
+    previous_response_id: zod
+      .string()
+      .nullish()
+      .describe(
+        "Continues a response created earlier on the same WebSocket connection. Over HTTP no response can be continued, and a request carrying it is refused with 404 `RESPONSE_NOT_FOUND`.",
+      ),
     reasoning: zod.record(zod.string(), zod.unknown()).optional(),
     tools: zod.array(zod.record(zod.string(), zod.unknown())).optional(),
     max_output_tokens: zod.int().min(1).optional(),
   })
   .describe(
-    "Native Responses request. model may be omitted when continuing a project-owned stored response. store defaults to false. Only caller-executed function and custom tools are supported. background, conversation and WebSocket-only fields are rejected over HTTP.",
+    "Native Responses request. Only caller-executed function and custom tools are supported. background, conversation and WebSocket-only fields are rejected over HTTP.",
   );
 
 export type ResponseCreate = zod.input<typeof ResponseCreate>;
