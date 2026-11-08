@@ -20,10 +20,11 @@
  * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
- * parts, then complete the upload and send its attachment id in a message.
+ * parts, then complete the upload and send its file id in a message.
  *
- * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
- * the conversations that already use it; downloading keeps working.
+ * Files the person attached are listed by search-files. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working. Files the assistant hands over
+ * are artifacts: they appear on the tool call that created them and are listed by list-artifacts.
  * OpenAPI spec version: 2.0.0
  */
 export interface FieldViolation {
@@ -355,7 +356,7 @@ export type MessagePartData = { [key: string]: unknown } | null;
  * One piece of a message. `type` says which field carries it:
  *
  * - `text` — the words, in `text`
- * - `file` — an attachment uploaded earlier, by id in `attachmentId`
+ * - `file` — a file uploaded earlier, by id in `fileId`
  * - `data-<name>` — context from the client, in `data`. The name is shown to the assistant so it
  *   can tell one block from another.
  */
@@ -368,10 +369,10 @@ export interface MessagePart {
   /** @nullable */
   text?: string | null;
   /**
-   * The attachment must have been uploaded and not yet sent with another message.
+   * The file must have been uploaded and not yet sent with another message.
    * @nullable
    */
-  attachmentId?: string | null;
+  fileId?: string | null;
   /** @nullable */
   data?: MessagePartData;
 }
@@ -809,6 +810,62 @@ export const PartResourceType = {
   file: "file",
 } as const;
 
+/**
+ * How the assistant reads the file.
+ *
+ * - `image` — read directly, and only by models that accept image input
+ * - `text` — placed inline in the message when small enough, otherwise read on demand
+ * - `binary` — never read directly; the assistant downloads it onto a host to work with it
+ *
+ * Only an `image` can be shown in place; everything else is offered for download.
+ */
+export type FileResourceType = (typeof FileResourceType)[keyof typeof FileResourceType];
+
+export const FileResourceType = {
+  image: "image",
+  text: "text",
+  binary: "binary",
+} as const;
+
+/**
+ * A stored file, wherever it appears.
+ */
+export interface FileResource {
+  id: string;
+  filename: string;
+  /** The IANA media type detected at intake, not the Content-Type the client sent. */
+  mediaType: string;
+  /**
+   * How the assistant reads the file.
+   *
+   * - `image` — read directly, and only by models that accept image input
+   * - `text` — placed inline in the message when small enough, otherwise read on demand
+   * - `binary` — never read directly; the assistant downloads it onto a host to work with it
+   *
+   * Only an `image` can be shown in place; everything else is offered for download.
+   */
+  type: FileResourceType;
+  byteSize: number;
+  /**
+   * Null unless type is image. Lets a client hold the space before the image loads.
+   * @nullable
+   */
+  width: number | null;
+  /**
+   * Null unless type is image.
+   * @nullable
+   */
+  height: number | null;
+  /**
+   * When this upload is cleared if no message ever references it. Null once a message, a tool
+   * call or an artifact uses it; such a file is kept as long as what uses it is.
+   * @nullable
+   */
+  draftExpiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface PartResource {
   /**
    * Addresses this part in the realtime stream: text arrives as `append` frames pointing at
@@ -821,41 +878,8 @@ export interface PartResource {
    * @nullable
    */
   text: string | null;
-  /**
-   * For `file` parts. Points at one of the item's `attachments`.
-   * @nullable
-   */
-  attachmentId: string | null;
-}
-
-/**
- * A client renders an image in place and everything else as a file to download.
- */
-export type AttachmentResourceType =
-  (typeof AttachmentResourceType)[keyof typeof AttachmentResourceType];
-
-export const AttachmentResourceType = {
-  image: "image",
-  text: "text",
-  binary: "binary",
-} as const;
-
-export interface AttachmentResource {
-  id: string;
-  /** A client renders an image in place and everything else as a file to download. */
-  type: AttachmentResourceType;
-  filename: string;
-  byteSize: number;
-  /**
-   * Null unless type is image. Lets a client hold the space before the image loads.
-   * @nullable
-   */
-  width: number | null;
-  /**
-   * Null unless type is image.
-   * @nullable
-   */
-  height: number | null;
+  /** For `file` parts. A file the person attached. */
+  file: FileResource | null;
 }
 
 export type ClientContextPartData = { [key: string]: unknown };
@@ -963,6 +987,35 @@ export interface QuestionResource {
   choices: ChoiceResource[];
 }
 
+export interface ArtifactVersionResource {
+  id: string;
+  artifactId: string;
+  /** The artifact's current title. */
+  title: string;
+  /**
+   * The position among the artifact's versions, from 1.
+   * @minimum 1
+   */
+  version: number;
+  file: FileResource;
+  /**
+   * The conversation whose tool call created this version. Null for a version added through the API.
+   * @nullable
+   */
+  threadId: string | null;
+  /**
+   * The turn whose tool call created this version. Null for a version added through the API.
+   * @nullable
+   */
+  turnId: string | null;
+  /**
+   * The tool call that created this version. Null for a version added through the API.
+   * @nullable
+   */
+  itemId: string | null;
+  createdAt: string;
+}
+
 /**
  * The answers given so far, by question id. Null for other calls.
  * @nullable
@@ -1021,6 +1074,17 @@ export interface ToolCallResource {
    * @nullable
    */
   autoAnswerMs: number | null;
+  /**
+   * Files the call returned to the assistant as part of its result, such as a screenshot it
+   * looks at. They are working material rather than something handed to the person.
+   */
+  contentFiles: FileResource[];
+  /**
+   * The artifact versions this call handed to the person, such as a QR code to scan or an
+   * exported report. Show them where the call appears; the latest version of each artifact is
+   * also what the turn handed over.
+   */
+  artifacts: ArtifactVersionResource[];
 }
 
 /**
@@ -1059,11 +1123,10 @@ export interface ThreadItemResource {
   durationMs: number | null;
   /**
    * The content, in the order it was written. Text arrives as `append` frames on the realtime
-   * stream. An attachment belongs where it was written, so render parts in order. Empty for
-   * tool calls; their outcome is in `toolCall.detail` and `toolCall.presentation`.
+   * stream. A file the person attached belongs where it was written, so render parts in order.
+   * Empty for tool calls; their outcome is in `toolCall`.
    */
   parts: PartResource[];
-  attachments: AttachmentResource[];
   /**
    * The `data-*` blocks the client attached to a user message. They are not part of what the
    * person wrote; render the message from `parts` and leave these out of the bubble.
@@ -1197,6 +1260,201 @@ export interface ToolResultRequestBody {
    * @maxLength 500
    */
   nextCursor?: string;
+}
+
+/**
+ * Counts over everything the criteria match, ignoring `ids` and the cursor.
+ */
+export interface FileCountsResource {
+  total: number;
+  totalBytes: number;
+}
+
+export interface FileListResponseBody {
+  files: FileResource[];
+  /**
+   * Null on the last page.
+   * @nullable
+   */
+  nextCursor: string | null;
+  /** Null unless `include` asked for it. */
+  counts: FileCountsResource | null;
+}
+
+/**
+ * How the assistant reads the file.
+ */
+export type SearchFilesRequestBodyType =
+  (typeof SearchFilesRequestBodyType)[keyof typeof SearchFilesRequestBodyType];
+
+export const SearchFilesRequestBodyType = {
+  image: "image",
+  text: "text",
+  binary: "binary",
+} as const;
+
+export type SearchFilesRequestBodyIncludeItem =
+  (typeof SearchFilesRequestBodyIncludeItem)[keyof typeof SearchFilesRequestBodyIncludeItem];
+
+export const SearchFilesRequestBodyIncludeItem = {
+  counts: "counts",
+} as const;
+
+export interface SearchFilesRequestBody {
+  /**
+   * Read these files. Cannot be combined with cursor.
+   * @minItems 1
+   * @maxItems 200
+   */
+  ids?: string[];
+  /**
+   * Matches filenames, case-insensitively.
+   * @maxLength 100
+   */
+  q?: string;
+  /** How the assistant reads the file. */
+  type?: SearchFilesRequestBodyType;
+  /** True for uploads no message references, false for the rest. */
+  draft?: boolean;
+  /** @maxLength 1024 */
+  cursor?: string;
+  /**
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /** Optional parts of the response. `counts` adds `counts`. */
+  include?: SearchFilesRequestBodyIncludeItem[];
+}
+
+export interface UpdateFileRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  filename: string;
+}
+
+export interface UploadConfigurationResource {
+  enabled: boolean;
+  policyId: string;
+  maxFileBytes: number;
+  maxImageBytes: number;
+  partSizeBytes: number;
+  expirySeconds: number;
+}
+
+export interface UploadPartResource {
+  number: number;
+  byteSize: number;
+  etag: string;
+}
+
+export interface UploadResource {
+  id: string;
+  filename: string;
+  byteSize: number;
+  partSizeBytes: number;
+  policyId: string;
+  expiresAt: string;
+  status: string;
+  /**
+   * The file the upload became. Null until the upload is complete.
+   * @nullable
+   */
+  fileId: string | null;
+  parts: UploadPartResource[];
+}
+
+export interface UploadListResponseBody {
+  uploads: UploadResource[];
+}
+
+export interface CreateUploadRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  requestId: string;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  filename: string;
+  byteSize: number;
+  policyId: string;
+  maxFileBytes: number;
+  partSizeBytes: number;
+}
+
+export interface UpdateUploadRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  filename: string;
+}
+
+export interface CompleteUploadRequestBody {
+  policyId: string;
+}
+
+export interface ArtifactResource {
+  id: string;
+  title: string;
+  latestVersion: ArtifactVersionResource;
+  /** @minimum 1 */
+  versionCount: number;
+  createdAt: string;
+  /** When the title last changed or the latest version was added. */
+  updatedAt: string;
+}
+
+export interface ArtifactListResponseBody {
+  artifacts: ArtifactResource[];
+  /**
+   * Null on the last page.
+   * @nullable
+   */
+  nextCursor: string | null;
+}
+
+export interface ArtifactVersionListResponseBody {
+  versions: ArtifactVersionResource[];
+  /**
+   * Null on the last page.
+   * @nullable
+   */
+  nextCursor: string | null;
+}
+
+export interface CreateArtifactRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  title: string;
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  fileId: string;
+}
+
+export interface UpdateArtifactRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  title: string;
+}
+
+export interface CreateArtifactVersionRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  fileId: string;
 }
 
 /**
@@ -1667,226 +1925,6 @@ export interface UpdateSettingsRequestBody {
    */
   defaultModelId?: string | null;
   defaultReasoningEffort?: ReasoningEffort | null;
-}
-
-/**
- * Counts over everything the criteria match, ignoring `ids` and the cursor.
- */
-export interface AttachmentCountsResource {
-  total: number;
-  totalBytes: number;
-}
-
-/**
- * How the assistant will see this file.
- */
-export type AttachmentFileResourceType =
-  (typeof AttachmentFileResourceType)[keyof typeof AttachmentFileResourceType];
-
-export const AttachmentFileResourceType = {
-  image: "image",
-  text: "text",
-  binary: "binary",
-} as const;
-
-export interface AttachmentFileResource {
-  byteSize: number;
-  createdAt: string;
-  /**
-   * When this draft is cleared if no message ever references it. Null once a message uses it —
-   * a file that belongs to a conversation is kept as long as the conversation is.
-   * @nullable
-   */
-  draftExpiresAt: string | null;
-  filename: string;
-  /**
-   * Null unless type is image.
-   * @nullable
-   */
-  height: number | null;
-  id: string;
-  /** Detected at intake, not the Content-Type the client sent. */
-  mime: string;
-  /** How the assistant will see this file. */
-  type: AttachmentFileResourceType;
-  updatedAt: string;
-  /**
-   * Null unless type is image.
-   * @nullable
-   */
-  width: number | null;
-}
-
-export interface AttachmentListResponseBody {
-  attachments: AttachmentFileResource[];
-  /**
-   * Null on the last page.
-   * @nullable
-   */
-  nextCursor: string | null;
-  /** Null unless `include` asked for it. */
-  counts: AttachmentCountsResource | null;
-}
-
-/**
- * How the assistant sees the file.
- */
-export type SearchAttachmentsRequestBodyType =
-  (typeof SearchAttachmentsRequestBodyType)[keyof typeof SearchAttachmentsRequestBodyType];
-
-export const SearchAttachmentsRequestBodyType = {
-  image: "image",
-  text: "text",
-  binary: "binary",
-} as const;
-
-export type SearchAttachmentsRequestBodyIncludeItem =
-  (typeof SearchAttachmentsRequestBodyIncludeItem)[keyof typeof SearchAttachmentsRequestBodyIncludeItem];
-
-export const SearchAttachmentsRequestBodyIncludeItem = {
-  counts: "counts",
-} as const;
-
-export interface SearchAttachmentsRequestBody {
-  /**
-   * Read these attachments. Cannot be combined with cursor.
-   * @minItems 1
-   * @maxItems 200
-   */
-  ids?: string[];
-  /**
-   * Matches filenames, case-insensitively.
-   * @maxLength 100
-   */
-  q?: string;
-  /** How the assistant sees the file. */
-  type?: SearchAttachmentsRequestBodyType;
-  /** True for uploads no message references, false for the rest. */
-  draft?: boolean;
-  /** @maxLength 1024 */
-  cursor?: string;
-  /**
-   * @minimum 1
-   * @maximum 200
-   */
-  limit?: number;
-  /** Optional parts of the response. `counts` adds `counts`. */
-  include?: SearchAttachmentsRequestBodyIncludeItem[];
-}
-
-export interface UpdateAttachmentRequestBody {
-  /**
-   * @minLength 1
-   * @maxLength 255
-   */
-  filename: string;
-}
-
-/**
- * How the assistant will see this file.
- *
- * - `image` — read directly, and only by models that accept image input
- * - `text` — placed inline in the message when small enough, otherwise read on demand
- * - `binary` — never read directly; the assistant downloads it onto a cloud instance to work with it
- */
-export type UploadedResourceType = (typeof UploadedResourceType)[keyof typeof UploadedResourceType];
-
-export const UploadedResourceType = {
-  image: "image",
-  text: "text",
-  binary: "binary",
-} as const;
-
-export interface UploadedResource {
-  /** Size of what was stored. For an image that has been resized, this is the resized size, not what was uploaded. */
-  byteSize: number;
-  /**
-   * When this upload gets cleared if no message ever references it. Sending a message with this id makes it permanent and this stops applying — a file that belongs to a conversation is kept as long as the conversation is.
-   *
-   * It is here so the editor can say so before it happens. An attachment chip that quietly stops working a week later reads as a bug, and the person who hits it has no way to tell that what they are seeing is a draft being collected.
-   */
-  draftExpiresAt: string;
-  filename: string;
-  /**
-   * Null unless type is image.
-   * @nullable
-   */
-  height: number | null;
-  id: string;
-  /**
-   * How the assistant will see this file.
-   *
-   * - `image` — read directly, and only by models that accept image input
-   * - `text` — placed inline in the message when small enough, otherwise read on demand
-   * - `binary` — never read directly; the assistant downloads it onto a cloud instance to work with it
-   */
-  type: UploadedResourceType;
-  /**
-   * Null unless type is image.
-   * @nullable
-   */
-  width: number | null;
-}
-
-export interface UploadConfigurationResource {
-  enabled: boolean;
-  policyId: string;
-  maxFileBytes: number;
-  maxImageBytes: number;
-  partSizeBytes: number;
-  expirySeconds: number;
-}
-
-export interface UploadPartResource {
-  number: number;
-  byteSize: number;
-  etag: string;
-}
-
-export interface UploadResource {
-  id: string;
-  filename: string;
-  byteSize: number;
-  partSizeBytes: number;
-  policyId: string;
-  expiresAt: string;
-  status: string;
-  /** @nullable */
-  attachmentId: string | null;
-  parts: UploadPartResource[];
-}
-
-export interface UploadListResponseBody {
-  uploads: UploadResource[];
-}
-
-export interface CreateUploadRequestBody {
-  /**
-   * @minLength 1
-   * @maxLength 64
-   */
-  requestId: string;
-  /**
-   * @minLength 1
-   * @maxLength 255
-   */
-  filename: string;
-  byteSize: number;
-  policyId: string;
-  maxFileBytes: number;
-  partSizeBytes: number;
-}
-
-export interface UpdateUploadRequestBody {
-  /**
-   * @minLength 1
-   * @maxLength 255
-   */
-  filename: string;
-}
-
-export interface CompleteUploadRequestBody {
-  policyId: string;
 }
 
 export interface MemoryResource {
@@ -2454,7 +2492,7 @@ export type ListTaskRunsParams = {
   limit?: number;
 };
 
-export type UploadAttachmentParams = {
+export type UploadFileParams = {
   /**
    * The name to show and to give the assistant. Images do not need one; anything else does, because the name is most of what says what the file is. Falls back to a generated name.
    * @maxLength 255
@@ -2471,6 +2509,41 @@ export type PutUploadPartHeaders = {
    * @minimum 1
    */
   "X-Part-Size": number;
+};
+
+export type ListArtifactsParams = {
+  /**
+   * Only artifacts with a version created in this conversation.
+   * @maxLength 64
+   */
+  thread?: string;
+  /**
+   * The next_cursor returned by the previous page. Omit it for the first page.
+   * @minLength 1
+   * @maxLength 1024
+   */
+  cursor?: string;
+  /**
+   * Items returned in this page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+};
+
+export type ListArtifactVersionsParams = {
+  /**
+   * The next_cursor returned by the previous page. Omit it for the first page.
+   * @minLength 1
+   * @maxLength 1024
+   */
+  cursor?: string;
+  /**
+   * Items returned in this page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
 };
 
 export type ListBindingsParams = {

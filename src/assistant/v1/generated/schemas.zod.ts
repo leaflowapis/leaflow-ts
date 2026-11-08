@@ -20,10 +20,11 @@
  * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
- * parts, then complete the upload and send its attachment id in a message.
+ * parts, then complete the upload and send its file id in a message.
  *
- * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
- * the conversations that already use it; downloading keeps working.
+ * Files the person attached are listed by search-files. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working. Files the assistant hands over
+ * are artifacts: they appear on the tool call that created them and are listed by list-artifacts.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
@@ -31,6 +32,10 @@ import * as zod from "zod";
 import { AnswerQuestionRequestBody } from "./validators/answerQuestionRequestBody.zod.js";
 
 import { CompleteUploadRequestBody } from "./validators/completeUploadRequestBody.zod.js";
+
+import { CreateArtifactRequestBody } from "./validators/createArtifactRequestBody.zod.js";
+
+import { CreateArtifactVersionRequestBody } from "./validators/createArtifactVersionRequestBody.zod.js";
 
 import { CreateChannelRequestBody } from "./validators/createChannelRequestBody.zod.js";
 
@@ -62,9 +67,11 @@ import { SkillRequestBody } from "./validators/skillRequestBody.zod.js";
 
 import { ToolResultRequestBody } from "./validators/toolResultRequestBody.zod.js";
 
-import { UpdateAttachmentRequestBody } from "./validators/updateAttachmentRequestBody.zod.js";
+import { UpdateArtifactRequestBody } from "./validators/updateArtifactRequestBody.zod.js";
 
 import { UpdateChannelRequestBody } from "./validators/updateChannelRequestBody.zod.js";
+
+import { UpdateFileRequestBody } from "./validators/updateFileRequestBody.zod.js";
 
 import { UpdateFolderRequestBody } from "./validators/updateFolderRequestBody.zod.js";
 
@@ -696,19 +703,19 @@ export const GetTaskRunParams = zod.strictObject({
 export const UpdateSettingsBody = UpdateSettingsRequestBody;
 
 /**
- * The body is the file bytes themselves, not multipart, one file per request. The type is determined from the content, not from Content-Type or from the name. Put the returned id in attachmentIds when sending a message.
+ * The body is the file bytes themselves, not multipart, one file per request. The type is determined from the content, not from Content-Type or from the name. Put the returned id in a `file` part when sending a message.
  *
  * An upload that no message ever references is a draft, and drafts are collected — `draftExpiresAt` in the response says when this one goes. Sending a message with the id makes it permanent.
  *
  * The returned `type` says how the assistant will see it. An `image` is read directly, and only by models that accept image input. A small `text` file is placed inline in the message. A large `text` file, and anything `binary`, arrives as a reference the assistant reads on demand — for a binary that usually means downloading it onto one of the project's cloud instances.
  * @summary Upload a file
  */
-export const uploadAttachmentQueryFilenameMax = 255;
+export const uploadFileQueryFilenameMax = 255;
 
-export const UploadAttachmentQueryParams = zod.strictObject({
+export const UploadFileQueryParams = zod.strictObject({
   filename: zod
     .string()
-    .max(uploadAttachmentQueryFilenameMax)
+    .max(uploadFileQueryFilenameMax)
     .optional()
     .describe(
       "The name to show and to give the assistant. Images do not need one; anything else does, because the name is most of what says what the file is. Falls back to a generated name.",
@@ -716,47 +723,46 @@ export const UploadAttachmentQueryParams = zod.strictObject({
 });
 
 /**
- * Metadata for one attachment. The bytes are at /api/v1/attachments/{attachment}:download.
+ * Metadata for one file. The bytes are at /api/v1/files/{file}:download.
  *
- * Returns 404 when the attachment does not exist, does not belong to the current user, or was
- * removed from the library. Removed files stay readable through their conversations but are no
- * longer described here.
+ * Returns 404 when the file does not exist, does not belong to the current user, or was removed
+ * from the library. Removed files stay readable through their conversations but are no longer
+ * described here.
  * @summary Get a file
  */
-export const GetAttachmentParams = zod.strictObject({
-  attachment: zod.string(),
+export const GetFileParams = zod.strictObject({
+  file: zod.string(),
 });
 
 /**
- * Changes the name shown in the library and given to the assistant. The bytes and the attachment
- * id do not change; conversations that already use it see the new name from their next request
- * on.
+ * Changes the name shown in the library and given to the assistant. The bytes and the file id do
+ * not change; conversations that already use it see the new name from their next request on.
  * @summary Rename a file
  */
-export const UpdateAttachmentParams = zod.strictObject({
-  attachment: zod.string(),
+export const UpdateFileParams = zod.strictObject({
+  file: zod.string(),
 });
 
-export const UpdateAttachmentBody = UpdateAttachmentRequestBody;
+export const UpdateFileBody = UpdateFileRequestBody;
 
 /**
- * Hides the file from the library. Conversations that already use it keep it: the attachment
- * stays readable by id and keeps rendering in their history. Its bytes are released when the
- * project is deleted. A draft is cleared for good when its expiry passes. Idempotent.
+ * Hides the file from the library. Conversations that already use it keep it: the file stays
+ * readable by id and keeps rendering in their history. Its bytes are released when the project
+ * is deleted. A draft is cleared for good when its expiry passes. Idempotent.
  * @summary Remove a file from the library
  */
-export const DeleteAttachmentParams = zod.strictObject({
-  attachment: zod.string(),
+export const DeleteFileParams = zod.strictObject({
+  file: zod.string(),
 });
 
 /**
- * Returns the original bytes for an attachment id, including one removed from the library. The response carries long-lived cache headers because the content never changes. Returns 404 when the attachment does not exist or does not belong to the current user.
+ * Returns the original bytes of a file, including one removed from the library, a file a tool produced and an artifact version. The response carries long-lived cache headers because the content never changes. Returns 404 when the file does not exist or does not belong to the current user.
  *
- * Only an attachment whose `type` is `image` comes back with its own image type and is usable as the address of an `<img>`. Everything else is served as `application/octet-stream` with `Content-Disposition: attachment`, deliberately: an uploaded file is arbitrary bytes under a name its uploader chose, and serving it back inline would run it on this origin.
+ * Only a file whose `type` is `image` comes back with its own image type and is usable as the address of an `<img>`. Everything else is served as `application/octet-stream` with `Content-Disposition: attachment`, deliberately: a file is arbitrary bytes under a name chosen elsewhere, and serving it back inline would run it on this origin.
  * @summary Download a file
  */
-export const DownloadAttachmentParams = zod.strictObject({
-  attachment: zod.string(),
+export const DownloadFileParams = zod.strictObject({
+  file: zod.string(),
 });
 
 /**
@@ -819,6 +825,136 @@ export const PutUploadPartQueryParams = zod.strictObject({
 
 export const PutUploadPartHeader = zod.strictObject({
   "X-Part-Size": zod.int().min(1),
+});
+
+/**
+ * The caller's artifacts in this project, most recently updated first. An artifact is a file the
+ * assistant handed over, kept under one title across its versions: a later version replaces what
+ * the person sees, and earlier versions stay readable.
+ *
+ * With `thread`, only artifacts that have a version created in that conversation are listed.
+ * @summary List artifacts
+ */
+export const listArtifactsQueryThreadMax = 64;
+
+export const listArtifactsQueryCursorMax = 1024;
+
+export const listArtifactsQueryLimitDefault = 50;
+export const listArtifactsQueryLimitMax = 200;
+
+export const ListArtifactsQueryParams = zod.strictObject({
+  thread: zod
+    .string()
+    .max(listArtifactsQueryThreadMax)
+    .optional()
+    .describe("Only artifacts with a version created in this conversation."),
+  cursor: zod
+    .string()
+    .min(1)
+    .max(listArtifactsQueryCursorMax)
+    .optional()
+    .describe("The next_cursor returned by the previous page. Omit it for the first page."),
+  limit: zod
+    .int()
+    .min(1)
+    .max(listArtifactsQueryLimitMax)
+    .default(listArtifactsQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
+});
+
+/**
+ * Makes a file the first version of a new artifact. The file must belong to the caller in this
+ * project. Fails with 404 and code FILE_NOT_FOUND when it does not.
+ * @summary Create an artifact
+ */
+export const CreateArtifactBody = CreateArtifactRequestBody;
+
+/**
+ * @summary Get an artifact
+ */
+export const getArtifactPathArtifactMax = 64;
+
+export const GetArtifactParams = zod.strictObject({
+  artifact: zod.string().max(getArtifactPathArtifactMax).describe("An artifact id."),
+});
+
+/**
+ * Changes the title shown for every version. The versions and their files do not change.
+ * @summary Rename an artifact
+ */
+export const updateArtifactPathArtifactMax = 64;
+
+export const UpdateArtifactParams = zod.strictObject({
+  artifact: zod.string().max(updateArtifactPathArtifactMax).describe("An artifact id."),
+});
+
+export const UpdateArtifactBody = UpdateArtifactRequestBody;
+
+/**
+ * Removes the artifact and its versions from lists, and the assistant can no longer add versions
+ * to it. Conversations that showed a version keep showing it, and its file stays downloadable.
+ * Idempotent.
+ * @summary Delete an artifact
+ */
+export const deleteArtifactPathArtifactMax = 64;
+
+export const DeleteArtifactParams = zod.strictObject({
+  artifact: zod.string().max(deleteArtifactPathArtifactMax).describe("An artifact id."),
+});
+
+/**
+ * The versions of an artifact, newest first.
+ * @summary List artifact versions
+ */
+export const listArtifactVersionsPathArtifactMax = 64;
+
+export const ListArtifactVersionsParams = zod.strictObject({
+  artifact: zod.string().max(listArtifactVersionsPathArtifactMax).describe("An artifact id."),
+});
+
+export const listArtifactVersionsQueryCursorMax = 1024;
+
+export const listArtifactVersionsQueryLimitDefault = 50;
+export const listArtifactVersionsQueryLimitMax = 200;
+
+export const ListArtifactVersionsQueryParams = zod.strictObject({
+  cursor: zod
+    .string()
+    .min(1)
+    .max(listArtifactVersionsQueryCursorMax)
+    .optional()
+    .describe("The next_cursor returned by the previous page. Omit it for the first page."),
+  limit: zod
+    .int()
+    .min(1)
+    .max(listArtifactVersionsQueryLimitMax)
+    .default(listArtifactVersionsQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
+});
+
+/**
+ * Makes a file the newest version of the artifact. The file must belong to the caller in this
+ * project. Fails with 404 and code FILE_NOT_FOUND when it does not.
+ * @summary Add a version
+ */
+export const createArtifactVersionPathArtifactMax = 64;
+
+export const CreateArtifactVersionParams = zod.strictObject({
+  artifact: zod.string().max(createArtifactVersionPathArtifactMax).describe("An artifact id."),
+});
+
+export const CreateArtifactVersionBody = CreateArtifactVersionRequestBody;
+
+/**
+ * @summary Get an artifact version
+ */
+export const getArtifactVersionPathArtifactMax = 64;
+
+export const getArtifactVersionPathVersionMax = 64;
+
+export const GetArtifactVersionParams = zod.strictObject({
+  artifact: zod.string().max(getArtifactVersionPathArtifactMax).describe("An artifact id."),
+  version: zod.string().max(getArtifactVersionPathVersionMax).describe("An artifact version id."),
 });
 
 /**

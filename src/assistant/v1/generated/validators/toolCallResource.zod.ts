@@ -20,13 +20,16 @@
  * outlines the person's messages for navigating a long conversation.
  *
  * Upload large files with /api/v1/uploads: read /api/v1/upload-configuration first, send exact-sized
- * parts, then complete the upload and send its attachment id in a message.
+ * parts, then complete the upload and send its file id in a message.
  *
- * Files uploaded that way are listed by search-attachments. Renaming or removing one does not change
- * the conversations that already use it; downloading keeps working.
+ * Files the person attached are listed by search-files. Renaming or removing one does not change
+ * the conversations that already use it; downloading keeps working. Files the assistant hands over
+ * are artifacts: they appear on the tool call that created them and are listed by list-artifacts.
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { ArtifactVersionResource } from "./artifactVersionResource.zod.js";
+import { FileResource } from "./fileResource.zod.js";
 import { PresentationResource } from "./presentationResource.zod.js";
 import { QuestionResource } from "./questionResource.zod.js";
 
@@ -91,6 +94,16 @@ export const ToolCallResource = zod.strictObject({
     .nullable()
     .describe(
       "How long an `ask` call waits before it continues with its default answers. Null when it waits indefinitely.",
+    ),
+  contentFiles: zod
+    .array(FileResource)
+    .describe(
+      "Files the call returned to the assistant as part of its result, such as a screenshot it\nlooks at. They are working material rather than something handed to the person.",
+    ),
+  artifacts: zod
+    .array(ArtifactVersionResource)
+    .describe(
+      "The artifact versions this call handed to the person, such as a QR code to scan or an\nexported report. Show them where the call appears; the latest version of each artifact is\nalso what the turn handed over.",
     ),
 });
 
