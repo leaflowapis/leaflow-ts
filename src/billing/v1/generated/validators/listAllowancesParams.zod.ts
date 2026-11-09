@@ -7,7 +7,7 @@
  */
 import * as zod from "zod";
 import { AllowanceStatus } from "./allowanceStatus.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const listAllowancesParamsPageDefault = 1;
 export const listAllowancesParamsPageMax = 2147483647;
@@ -29,7 +29,7 @@ export const ListAllowancesParams = zod.strictObject({
   billing_account_id: zod.int().optional(),
   meter_id: zod.uuid().optional(),
   status: zod.array(AllowanceStatus).min(1).max(listAllowancesParamsStatusMax).optional(),
-  product_id: ProductID.optional(),
+  product_id: ProductId.optional(),
   project_ids: zod.array(zod.uuid()).min(1).max(listAllowancesParamsProjectIdsMax).optional(),
 });
 

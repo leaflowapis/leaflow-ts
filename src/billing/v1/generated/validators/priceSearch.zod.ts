@@ -7,7 +7,7 @@
  */
 import * as zod from "zod";
 import { PriceType } from "./priceType.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const priceSearchCurrencyMin = 3;
@@ -42,7 +42,7 @@ export const PriceSearch = zod
       .max(priceSearchPlanIdsMax)
       .optional()
       .describe("Only prices of these plans."),
-    product_id: ProductID.optional(),
+    product_id: ProductId.optional(),
     type: PriceType.optional().describe("Narrows to one price type."),
     usage_type: UsageType.optional().describe("Narrows to one usage type."),
     dimensions: zod

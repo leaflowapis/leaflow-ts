@@ -7,7 +7,7 @@
  */
 import * as zod from "zod";
 import { ActiveResourceStatus } from "./activeResourceStatus.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const listActiveResourcesParamsPageDefault = 1;
 export const listActiveResourcesParamsPageMax = 2147483647;
@@ -34,7 +34,7 @@ export const ListActiveResourcesParams = zod.strictObject({
   billing_account_id: zod.int().optional(),
   project_ids: zod.array(zod.uuid()).min(1).max(listActiveResourcesParamsProjectIdsMax).optional(),
   meter_id: zod.uuid().optional(),
-  product_id: ProductID.optional(),
+  product_id: ProductId.optional(),
   status: zod.array(ActiveResourceStatus).min(1).max(listActiveResourcesParamsStatusMax).optional(),
 });
 

@@ -7,7 +7,7 @@
  */
 import * as zod from "zod";
 import { PriceType } from "./priceType.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const listPricesParamsPageDefault = 1;
@@ -27,7 +27,7 @@ export const ListPricesParams = zod.strictObject({
     .max(listPricesParamsPageSizeMax)
     .default(listPricesParamsPageSizeDefault),
   currency: zod.string().min(listPricesParamsCurrencyMin).max(listPricesParamsCurrencyMax),
-  product_id: ProductID.optional(),
+  product_id: ProductId.optional(),
   type: PriceType.optional(),
   usage_type: UsageType.optional(),
 });

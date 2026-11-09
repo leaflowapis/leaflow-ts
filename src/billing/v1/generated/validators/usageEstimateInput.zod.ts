@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const usageEstimateInputPlanLookupKeyMax = 128;
 
@@ -18,7 +18,7 @@ export const usageEstimateInputQuantityRegExp = new RegExp("^[0-9]{1,28}([.][0-9
 
 export const UsageEstimateInput = zod
   .strictObject({
-    product_id: ProductID.optional(),
+    product_id: ProductId.optional(),
     plan_id: zod.uuid().optional(),
     plan_lookup_key: zod.string().min(1).max(usageEstimateInputPlanLookupKeyMax).optional(),
     price_id: zod.uuid().optional(),

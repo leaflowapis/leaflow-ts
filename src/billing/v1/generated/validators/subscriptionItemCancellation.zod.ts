@@ -8,17 +8,15 @@
 import * as zod from "zod";
 import { CancellationMode } from "./cancellationMode.zod.js";
 
-export const SubscriptionCancellation = zod
+export const SubscriptionItemCancellation = zod
   .strictObject({
     reason: zod.string().optional(),
     cancellation_id: zod
       .uuid()
       .optional()
-      .describe(
-        "The cancellation this item belongs to, with the other subscriptions released together.",
-      ),
+      .describe("The cancellation this entry belongs to, with the other items released together."),
     id: zod.uuid(),
-    subscription_id: zod.uuid(),
+    subscription_item_id: zod.uuid(),
     status: zod.enum(["requested", "scheduled", "releasing", "failed", "completed", "canceled"]),
     mode: CancellationMode,
     requested_at: zod.iso.datetime({ offset: true }),
@@ -32,8 +30,8 @@ export const SubscriptionCancellation = zod
     failure_reason: zod.string().optional(),
   })
   .describe(
-    "The latest cancellation including the subscription, with this subscription's item: `id` is the item and `cancellation_id` the cancellation. scheduled_at is the intended time and effective_at the confirmed end of service.",
+    "The latest cancellation including the subscription item, with this item's entry: `id` is the entry and `cancellation_id` the cancellation. scheduled_at is the intended time and effective_at the confirmed end of service.",
   );
 
-export type SubscriptionCancellation = zod.input<typeof SubscriptionCancellation>;
-export type SubscriptionCancellationOutput = zod.output<typeof SubscriptionCancellation>;
+export type SubscriptionItemCancellation = zod.input<typeof SubscriptionItemCancellation>;
+export type SubscriptionItemCancellationOutput = zod.output<typeof SubscriptionItemCancellation>;

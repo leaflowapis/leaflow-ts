@@ -16,7 +16,7 @@
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
  * - **Custom methods.** An action that is not one of the standard methods (list, get, create, update, delete) is a custom method, `POST` on the resource's path followed by `:` and the verb, as in `POST /api/v2/instances/{id}:reboot` (AIP-136). A state is changed by its custom method, never by writing the state: `:start` and `:stop`, `:rescue` and `:unrescue`, `:associate` and `:disassociate`.
- * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
+ * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only descriptive fields, all optional and at least one given, and answers 200. A change that starts an operation or a purchase, such as a resize, is its own method (`:resize`, `:retype`, `:changeBandwidth`).
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. Its `access_state` is `pending` until the order is accepted and delivery settles it, then `enabled`; a subscription that lapses suspends or reclaims the resource it pays for. Deleting a resource that subscriptions pay for cancels the subscriptions of its `release_set` in Billing, and the deletion answers with that cancellation.
  * - **Availability zones.** A volume and an instance must reside in the same availability zone to be attached. An instance type and a volume type each belong to one availability zone, as on GCP, so a purchase names the type and the type names the zone; the volumes bought with an instance have to be of types of the instance type's zone.
  * - **IPv6 is routed, not translated.** A virtual private cloud with IPv6 holds a /56 and each of its subnets a /64 of it, as on Alibaba Cloud, Tencent Cloud and Azure; IPv6 and its security groups require no EIP or NAT gateway. EIP and NATGateway are IPv4 products; IPv6 EIP, NAT66 and IPv6 port forwarding are not supported.
@@ -33,16 +33,18 @@
  * OpenAPI spec version: 2.0.0
  */
 import type {
-  AssociateElasticIPRequestBody,
+  AssociateElasticIpRequestBody,
   AttachNetworkInterfaceRequestBody,
   AttachVolumeRequestBody,
-  AvailabilityZoneID,
+  AvailabilityZoneId,
   AvailabilityZoneListResponseBody,
   AvailabilityZoneResource,
+  ChangeElasticIpBandwidthRequestBody,
+  ChangeElasticIpChargeTypeRequestBody,
   ConflictResponse,
   ConsoleResponseBody,
-  CreateElasticIPRequestBody,
-  CreateElasticIPResponseBody,
+  CreateElasticIpRequestBody,
+  CreateElasticIpResponseBody,
   CreateInstanceRequestBody,
   CreateInstanceResponseBody,
   CreateLaunchTemplateRequestBody,
@@ -63,8 +65,8 @@ import type {
   CreateVolumeResponseBody,
   CreateVolumeSnapshotRequestBody,
   CreateVolumeSnapshotResponseBody,
-  DeleteElasticIPResponseBody,
   DeleteElasticIpParams,
+  DeleteElasticIpResponseBody,
   DeleteInstanceParams,
   DeleteInstanceResponseBody,
   DeletePrivateImageParams,
@@ -75,28 +77,29 @@ import type {
   DeleteVolumeResponseBody,
   DeleteVolumeSnapshotParams,
   DeleteVolumeSnapshotResponseBody,
-  ElasticIP,
-  ElasticIPAssociation,
-  ElasticIPID,
-  ElasticIPLine,
-  ElasticIPLineID,
-  ElasticIPLineListResponseBody,
-  ElasticIPListResponseBody,
+  ElasticIp,
+  ElasticIpAssociation,
+  ElasticIpChangeResponseBody,
+  ElasticIpId,
+  ElasticIpLine,
+  ElasticIpLineId,
+  ElasticIpLineListResponseBody,
+  ElasticIpListResponseBody,
   Error,
   FreeSubnetCidr,
   GetVirtualPrivateCloudFreeSubnetCidrParams,
-  ImageID,
+  ImageId,
   Instance,
   InstanceFamily,
-  InstanceFamilyID,
+  InstanceFamilyId,
   InstanceFamilyListResponseBody,
-  InstanceID,
+  InstanceId,
   InstanceListResponseBody,
   InstanceType,
-  InstanceTypeID,
+  InstanceTypeId,
   InstanceTypeListResponseBody,
   LaunchTemplate,
-  LaunchTemplateID,
+  LaunchTemplateId,
   LaunchTemplateListResponseBody,
   LaunchTemplateVersion,
   LaunchTemplateVersionListResponseBody,
@@ -128,12 +131,12 @@ import type {
   ListVolumeTypesParams,
   ListVolumesParams,
   NetworkInterface,
-  NetworkInterfaceAddressID,
+  NetworkInterfaceAddressId,
   NetworkInterfaceAttachmentList,
-  NetworkInterfaceID,
+  NetworkInterfaceId,
   NetworkInterfaceListResponseBody,
   NewLaunchTemplateVersion,
-  OperationLogID,
+  OperationLogId,
   OperationLogListResponseBody,
   OperationLogResource,
   PasswordChoice,
@@ -147,27 +150,29 @@ import type {
   RebootInstanceRequestBody,
   RebuildInstanceRequestBody,
   RebuildInstanceResponseBody,
-  RegionID,
+  RegionId,
   RegionListResponseBody,
   RegionResource,
+  ReplaceNetworkInterfaceSecurityGroupsRequestBody,
   RescueInstanceResponseBody,
   ResetInstancePasswordResponseBody,
+  ResizeInstanceRequestBody,
+  ResizeInstanceResponseBody,
+  ResizeVolumeRequestBody,
+  RetypeVolumeRequestBody,
   RevertVolumeRequestBody,
   RunInstanceCommandRequestBody,
   RunInstanceCommandResponseBody,
   SecurityGroup,
-  SecurityGroupID,
-  SecurityGroupIDOrWildcard,
+  SecurityGroupId,
+  SecurityGroupIdOrWildcard,
   SecurityGroupListResponseBody,
   SecurityGroupRule,
-  SecurityGroupRuleID,
+  SecurityGroupRuleId,
   SecurityGroupRuleListResponseBody,
-  SubnetID,
+  SubnetId,
   TrafficUsageListResponseBody,
-  UpdateElasticIPRequestBody,
-  UpdateElasticIPResponseBody,
   UpdateInstanceRequestBody,
-  UpdateInstanceResponseBody,
   UpdateLaunchTemplateRequestBody,
   UpdateNetworkInterfaceRequestBody,
   UpdatePrivateImageRequestBody,
@@ -176,31 +181,31 @@ import type {
   UpdateVirtualPrivateCloudSubnetRequestBody,
   UpdateVolumeBackupRequestBody,
   UpdateVolumeRequestBody,
-  UpdateVolumeResponseBody,
   UpdateVolumeSnapshotRequestBody,
   VirtualPrivateCloud,
-  VirtualPrivateCloudID,
-  VirtualPrivateCloudIDOrWildcard,
+  VirtualPrivateCloudId,
+  VirtualPrivateCloudIdOrWildcard,
   VirtualPrivateCloudListResponseBody,
-  VirtualPrivateCloudPeeringID,
+  VirtualPrivateCloudPeeringId,
   VirtualPrivateCloudPeeringListResponseBody,
   VirtualPrivateCloudPeeringResource,
-  VirtualPrivateCloudRouteID,
+  VirtualPrivateCloudRouteId,
   VirtualPrivateCloudRouteListResponseBody,
   VirtualPrivateCloudRouteResource,
   VirtualPrivateCloudSubnet,
   VirtualPrivateCloudSubnetListResponseBody,
   VolumeAttachmentList,
-  VolumeBackupID,
+  VolumeBackupId,
   VolumeBackupListResponseBody,
   VolumeBackupResource,
-  VolumeID,
+  VolumeChangeResponseBody,
+  VolumeId,
   VolumeListResponseBody,
   VolumeResource,
-  VolumeSnapshotID,
+  VolumeSnapshotId,
   VolumeSnapshotListResponseBody,
   VolumeSnapshotResource,
-  VolumeTypeID,
+  VolumeTypeId,
   VolumeTypeListResponseBody,
   VolumeTypeResource,
 } from "./models.js";
@@ -325,7 +330,7 @@ export type getAvailabilityZoneResponse =
   | getAvailabilityZoneResponseSuccess
   | getAvailabilityZoneResponseError;
 
-export const getGetAvailabilityZoneUrl = (availabilityZoneId: AvailabilityZoneID) => {
+export const getGetAvailabilityZoneUrl = (availabilityZoneId: AvailabilityZoneId) => {
   return `https://compute.leaflow.cloud/api/v2/availability-zones/${encodeURIComponent(String(availabilityZoneId))}`;
 };
 
@@ -334,7 +339,7 @@ export const getGetAvailabilityZoneUrl = (availabilityZoneId: AvailabilityZoneID
  * @summary Retrieve an availability zone
  */
 export const getAvailabilityZone = async (
-  availabilityZoneId: AvailabilityZoneID,
+  availabilityZoneId: AvailabilityZoneId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getAvailabilityZoneResponse> => {
@@ -350,7 +355,7 @@ export const getAvailabilityZone = async (
 };
 
 export type listElasticIpLinesResponse200 = {
-  data: ElasticIPLineListResponseBody;
+  data: ElasticIpLineListResponseBody;
   status: 200;
 };
 
@@ -407,7 +412,7 @@ export const listElasticIpLines = async (
 };
 
 export type getElasticIpLineResponse200 = {
-  data: ElasticIPLine;
+  data: ElasticIpLine;
   status: 200;
 };
 
@@ -427,7 +432,7 @@ export type getElasticIpLineResponse =
   | getElasticIpLineResponseSuccess
   | getElasticIpLineResponseError;
 
-export const getGetElasticIpLineUrl = (elasticIpLineId: ElasticIPLineID) => {
+export const getGetElasticIpLineUrl = (elasticIpLineId: ElasticIpLineId) => {
   return `https://compute.leaflow.cloud/api/v2/elastic-ip-lines/${encodeURIComponent(String(elasticIpLineId))}`;
 };
 
@@ -436,7 +441,7 @@ export const getGetElasticIpLineUrl = (elasticIpLineId: ElasticIPLineID) => {
  * @summary Get an elastic IP line
  */
 export const getElasticIpLine = async (
-  elasticIpLineId: ElasticIPLineID,
+  elasticIpLineId: ElasticIpLineId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getElasticIpLineResponse> => {
@@ -452,7 +457,7 @@ export const getElasticIpLine = async (
 };
 
 export type listElasticIpsResponse200 = {
-  data: ElasticIPListResponseBody;
+  data: ElasticIpListResponseBody;
   status: 200;
 };
 
@@ -506,7 +511,7 @@ export const listElasticIps = async (
 };
 
 export type createElasticIpResponse202 = {
-  data: CreateElasticIPResponseBody;
+  data: CreateElasticIpResponseBody;
   status: 202;
 };
 
@@ -547,11 +552,15 @@ export const getCreateElasticIpUrl = () => {
  *
  * Allocation does not select or create a virtual private cloud. A later association selects an assigned network-interface address; Compute then establishes the required network connectivity.
  *
+ * An elastic IP bought on its own has a Billing subscription of its own, with two items: the address, always pay-as-you-go and charged while the address is not associated with anything, and the network, on the chosen terms.
+ *
+ * **Buying for an instance.** With `instance_id`, the elastic IP is associated with the primary network interface of that instance of the project once created, and its two items join the instance's Billing subscription: a prepaid network item is charged up to the instance's term end, the rest of the current period in proportion to the time left, and from then on renews, renews automatically and expires with the instance. `billing` may be omitted to take the instance's terms; given, its usage type and period must be the instance's (422 `ELASTIC_IP_BILLING_TERMS_MISMATCH`). An instance that cannot take another elastic IP, or whose type allows less bandwidth than `bandwidth_mbps`, is refused before anything is ordered, as associating would be.
+ *
  * The elastic IP is `pending` from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
  * @summary Allocate an elastic IP
  */
 export const createElasticIp = async (
-  createElasticIPRequestBody: CreateElasticIPRequestBody,
+  createElasticIpRequestBody: CreateElasticIpRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<createElasticIpResponse> => {
@@ -578,7 +587,7 @@ export const createElasticIp = async (
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(createElasticIPRequestBody),
+    body: JSON.stringify(createElasticIpRequestBody),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -588,7 +597,7 @@ export const createElasticIp = async (
 };
 
 export type getElasticIpResponse200 = {
-  data: ElasticIP;
+  data: ElasticIp;
   status: 200;
 };
 
@@ -606,7 +615,7 @@ export type getElasticIpResponseError = getElasticIpResponseDefault & {
 
 export type getElasticIpResponse = getElasticIpResponseSuccess | getElasticIpResponseError;
 
-export const getGetElasticIpUrl = (elasticIpId: ElasticIPID) => {
+export const getGetElasticIpUrl = (elasticIpId: ElasticIpId) => {
   return `https://compute.leaflow.cloud/api/v2/elastic-ips/${encodeURIComponent(String(elasticIpId))}`;
 };
 
@@ -614,7 +623,7 @@ export const getGetElasticIpUrl = (elasticIpId: ElasticIPID) => {
  * @summary Retrieve an elastic IP
  */
 export const getElasticIp = async (
-  elasticIpId: ElasticIPID,
+  elasticIpId: ElasticIpId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getElasticIpResponse> => {
@@ -629,100 +638,8 @@ export const getElasticIp = async (
   return { data, status: res.status, headers: res.headers } as getElasticIpResponse;
 };
 
-export type updateElasticIpResponse200 = {
-  data: UpdateElasticIPResponseBody;
-  status: 200;
-};
-
-export type updateElasticIpResponse202 = {
-  data: UpdateElasticIPResponseBody;
-  status: 202;
-};
-
-export type updateElasticIpResponse409 = {
-  data: ConflictResponse;
-  status: 409;
-};
-
-export type updateElasticIpResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 202 | 409>;
-};
-
-export type updateElasticIpResponseSuccess = (
-  | updateElasticIpResponse200
-  | updateElasticIpResponse202
-) & {
-  headers: Headers;
-};
-export type updateElasticIpResponseError = (
-  | updateElasticIpResponse409
-  | updateElasticIpResponseDefault
-) & {
-  headers: Headers;
-};
-
-export type updateElasticIpResponse = updateElasticIpResponseSuccess | updateElasticIpResponseError;
-
-export const getUpdateElasticIpUrl = (elasticIpId: ElasticIPID) => {
-  return `https://compute.leaflow.cloud/api/v2/elastic-ips/${encodeURIComponent(String(elasticIpId))}`;
-};
-
-/**
- * Changes the bandwidth of this elastic IP, or what its pay-as-you-go network subscription charges for. `bandwidth_mbps` and `internet_charge_type` are operational fields: each starts a change and cannot be combined with any other field in the same request. Such a request is refused with 422 `UPDATE_FIELDS_COMBINED`, because a change that committed beside another that was then refused would leave the request half applied. An elastic IP has no descriptive field today, so 200 is reserved for the fields that may be added to it and every accepted update answers 202. `checkout` and `proration_date` belong to the purchase of the `bandwidth_mbps` change and are accepted only together with it.
- *
- * No separate bandwidth resource is created, and the limit applies to inbound and outbound traffic alike. The new value may be any whole number of Mbps within the line's bandwidth range, otherwise the request is refused with `ELASTIC_IP_BANDWIDTH_RANGE`. How the change is paid follows the elastic IP's network subscription:
- *
- * - **Prepaid**: the change goes through a Checkout Session that changes the network subscription, priced for the rest of its period. It starts once Billing accepts the order; if checkout is not completed, the order is not accepted or the change fails, `bandwidth_mbps` keeps its value and Billing shows the outcome.
- * - **Pay-as-you-go**: there is no checkout. The change starts at once, `checkout_session_id` and `order_id` are null, and the new limit is metered from the instant it is applied; if it fails, the old limit stays in effect and metered. `checkout` and `proration_date` are refused with `ELASTIC_IP_CHECKOUT_UNUSED`.
- *
- * A change of `internet_charge_type` needs no checkout and is `updating_internet_charge_type` until it is applied; see the field.
- *
- * The elastic IP is `updating_bandwidth` until the change is applied or ends, so other operations and a second change are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The current limit stays in effect until the change is applied.
- *
- * While the address is associated with an instance, the limit must not exceed the `max_bandwidth_mbps` of that instance's type; a higher limit is refused with `INSTANCE_BANDWIDTH_CEILING`. The limit of an address that is not associated is checked when the address is associated with an instance.
- * @summary Update an elastic IP
- */
-export const updateElasticIp = async (
-  elasticIpId: ElasticIPID,
-  updateElasticIPRequestBody: UpdateElasticIPRequestBody,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<updateElasticIpResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getUpdateElasticIpUrl(elasticIpId), {
-    ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(updateElasticIPRequestBody),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: updateElasticIpResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as updateElasticIpResponse;
-};
-
 export type deleteElasticIpResponse202 = {
-  data: DeleteElasticIPResponseBody;
+  data: DeleteElasticIpResponseBody;
   status: 202;
 };
 
@@ -748,7 +665,7 @@ export type deleteElasticIpResponseError = (
 
 export type deleteElasticIpResponse = deleteElasticIpResponseSuccess | deleteElasticIpResponseError;
 
-export const getDeleteElasticIpUrl = (elasticIpId: ElasticIPID, params?: DeleteElasticIpParams) => {
+export const getDeleteElasticIpUrl = (elasticIpId: ElasticIpId, params?: DeleteElasticIpParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -769,11 +686,11 @@ export const getDeleteElasticIpUrl = (elasticIpId: ElasticIPID, params?: DeleteE
  *
  * Refused with `COMPUTE_PURCHASE_PENDING` while the purchase that created it still awaits checkout or payment; `meta.checkout_session_id` names its Checkout Session and `meta.order_id` its order once checkout created one. Expire the session or cancel the order in Billing instead.
  *
- * While subscriptions pay for the elastic IP (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed subscription being refunded under its terms, and `period_end` keeps the elastic IP working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
+ * While subscription items pay for the elastic IP (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed item being refunded under its terms, and `period_end` keeps the elastic IP working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
  * @summary Release an elastic IP
  */
 export const deleteElasticIp = async (
-  elasticIpId: ElasticIPID,
+  elasticIpId: ElasticIpId,
   params?: DeleteElasticIpParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -787,6 +704,165 @@ export const deleteElasticIp = async (
 
   const data: deleteElasticIpResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as deleteElasticIpResponse;
+};
+
+export type changeElasticIpBandwidthResponse202 = {
+  data: ElasticIpChangeResponseBody;
+  status: 202;
+};
+
+export type changeElasticIpBandwidthResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type changeElasticIpBandwidthResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 202 | 409>;
+};
+
+export type changeElasticIpBandwidthResponseSuccess = changeElasticIpBandwidthResponse202 & {
+  headers: Headers;
+};
+export type changeElasticIpBandwidthResponseError = (
+  | changeElasticIpBandwidthResponse409
+  | changeElasticIpBandwidthResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type changeElasticIpBandwidthResponse =
+  | changeElasticIpBandwidthResponseSuccess
+  | changeElasticIpBandwidthResponseError;
+
+export const getChangeElasticIpBandwidthUrl = (elasticIpId: ElasticIpId) => {
+  return `https://compute.leaflow.cloud/api/v2/elastic-ips/${encodeURIComponent(String(elasticIpId))}:changeBandwidth`;
+};
+
+/**
+ * Changes the bandwidth ceiling of this elastic IP. No separate bandwidth resource is created, and the limit applies to inbound and outbound traffic alike. The new value may be any whole number of Mbps within the line's bandwidth range, otherwise the request is refused with `ELASTIC_IP_BANDWIDTH_RANGE`. How the change is paid follows the elastic IP's network item:
+ *
+ * - **Prepaid**: the change goes through a Checkout Session that changes the network item, priced for the rest of its period. It starts once Billing accepts the order; if checkout is not completed, the order is not accepted or the change fails, `bandwidth_mbps` keeps its value and Billing shows the outcome.
+ * - **Pay-as-you-go**: there is no checkout. The change starts at once, `checkout_session_id` and `order_id` are null, and the new limit is metered from the instant it is applied; if it fails, the old limit stays in effect and metered. `checkout` and `proration_date` are refused with `ELASTIC_IP_CHECKOUT_UNUSED`.
+ *
+ * The elastic IP is `updating_bandwidth` until the change is applied or ends, so other operations and a second change are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The current limit stays in effect until the change is applied.
+ *
+ * While the address is associated with an instance, the limit must not exceed the `max_bandwidth_mbps` of that instance's type; a higher limit is refused with `INSTANCE_BANDWIDTH_CEILING`. The limit of an address that is not associated is checked when the address is associated with an instance.
+ * @summary Change the bandwidth of an elastic IP
+ */
+export const changeElasticIpBandwidth = async (
+  elasticIpId: ElasticIpId,
+  changeElasticIpBandwidthRequestBody: ChangeElasticIpBandwidthRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<changeElasticIpBandwidthResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getChangeElasticIpBandwidthUrl(elasticIpId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(changeElasticIpBandwidthRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: changeElasticIpBandwidthResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as changeElasticIpBandwidthResponse;
+};
+
+export type changeElasticIpChargeTypeResponse202 = {
+  data: ElasticIp;
+  status: 202;
+};
+
+export type changeElasticIpChargeTypeResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type changeElasticIpChargeTypeResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 202 | 409>;
+};
+
+export type changeElasticIpChargeTypeResponseSuccess = changeElasticIpChargeTypeResponse202 & {
+  headers: Headers;
+};
+export type changeElasticIpChargeTypeResponseError = (
+  | changeElasticIpChargeTypeResponse409
+  | changeElasticIpChargeTypeResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type changeElasticIpChargeTypeResponse =
+  | changeElasticIpChargeTypeResponseSuccess
+  | changeElasticIpChargeTypeResponseError;
+
+export const getChangeElasticIpChargeTypeUrl = (elasticIpId: ElasticIpId) => {
+  return `https://compute.leaflow.cloud/api/v2/elastic-ips/${encodeURIComponent(String(elasticIpId))}:changeChargeType`;
+};
+
+/**
+ * Moves a pay-as-you-go elastic IP between charging for its bandwidth and charging for its traffic, within the same network item and without checkout. A prepaid network item has paid for its bandwidth and is refused with `ELASTIC_IP_CHARGE_TYPE_PREPAID`; `traffic` on a line whose `traffic_sale_status` is `off_sale` is refused with `ELASTIC_IP_TRAFFIC_UNAVAILABLE`, the type already in effect with `ELASTIC_IP_CHARGE_TYPE_UNCHANGED`, and a type the currency of the network item does not offer on the line with HTTP 403 `ELASTIC_IP_CHARGE_TYPE_NOT_OFFERED`: prices are set per currency, and a currency without one there does not sell that type.
+ *
+ * The change takes effect at the instant it is applied: bandwidth stops being metered then and traffic starts being, or the other way round. Traffic is counted in windows, and a window is charged the way the elastic IP was charged for most of it, so a report that arrives late is still charged as it was at the time and a window the change falls in is never charged both ways. `bandwidth_mbps` stays the ceiling either way. The elastic IP is `updating_internet_charge_type` until the change is applied.
+ * @summary Change what an elastic IP is charged for
+ */
+export const changeElasticIpChargeType = async (
+  elasticIpId: ElasticIpId,
+  changeElasticIpChargeTypeRequestBody: ChangeElasticIpChargeTypeRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<changeElasticIpChargeTypeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getChangeElasticIpChargeTypeUrl(elasticIpId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(changeElasticIpChargeTypeRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: changeElasticIpChargeTypeResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as changeElasticIpChargeTypeResponse;
 };
 
 export type listElasticIpTrafficUsageResponse200 = {
@@ -811,7 +887,7 @@ export type listElasticIpTrafficUsageResponse =
   | listElasticIpTrafficUsageResponseError;
 
 export const getListElasticIpTrafficUsageUrl = (
-  elasticIpId: ElasticIPID,
+  elasticIpId: ElasticIpId,
   params: ListElasticIpTrafficUsageParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -836,7 +912,7 @@ export const getListElasticIpTrafficUsageUrl = (
  * @summary List the traffic an elastic IP sent
  */
 export const listElasticIpTrafficUsage = async (
-  elasticIpId: ElasticIPID,
+  elasticIpId: ElasticIpId,
   params: ListElasticIpTrafficUsageParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -853,7 +929,7 @@ export const listElasticIpTrafficUsage = async (
 };
 
 export type getElasticIpAssociationResponse200 = {
-  data: ElasticIPAssociation;
+  data: ElasticIpAssociation;
   status: 200;
 };
 
@@ -873,7 +949,7 @@ export type getElasticIpAssociationResponse =
   | getElasticIpAssociationResponseSuccess
   | getElasticIpAssociationResponseError;
 
-export const getGetElasticIpAssociationUrl = (elasticIpId: ElasticIPID) => {
+export const getGetElasticIpAssociationUrl = (elasticIpId: ElasticIpId) => {
   return `https://compute.leaflow.cloud/api/v2/elastic-ips/${encodeURIComponent(String(elasticIpId))}/association`;
 };
 
@@ -884,7 +960,7 @@ export const getGetElasticIpAssociationUrl = (elasticIpId: ElasticIPID) => {
  * @summary Retrieve the association of an elastic IP
  */
 export const getElasticIpAssociation = async (
-  elasticIpId: ElasticIPID,
+  elasticIpId: ElasticIpId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getElasticIpAssociationResponse> => {
@@ -900,7 +976,7 @@ export const getElasticIpAssociation = async (
 };
 
 export type associateElasticIpResponse202 = {
-  data: ElasticIP;
+  data: ElasticIp;
   status: 202;
 };
 
@@ -928,7 +1004,7 @@ export type associateElasticIpResponse =
   | associateElasticIpResponseSuccess
   | associateElasticIpResponseError;
 
-export const getAssociateElasticIpUrl = (elasticIpId: ElasticIPID) => {
+export const getAssociateElasticIpUrl = (elasticIpId: ElasticIpId) => {
   return `https://compute.leaflow.cloud/api/v2/elastic-ips/${encodeURIComponent(String(elasticIpId))}:associate`;
 };
 
@@ -941,8 +1017,8 @@ export const getAssociateElasticIpUrl = (elasticIpId: ElasticIPID) => {
  * @summary Associate an elastic IP with a target
  */
 export const associateElasticIp = async (
-  elasticIpId: ElasticIPID,
-  associateElasticIPRequestBody: AssociateElasticIPRequestBody,
+  elasticIpId: ElasticIpId,
+  associateElasticIpRequestBody: AssociateElasticIpRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<associateElasticIpResponse> => {
@@ -969,7 +1045,7 @@ export const associateElasticIp = async (
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(associateElasticIPRequestBody),
+    body: JSON.stringify(associateElasticIpRequestBody),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -979,7 +1055,7 @@ export const associateElasticIp = async (
 };
 
 export type disassociateElasticIpResponse202 = {
-  data: ElasticIP;
+  data: ElasticIp;
   status: 202;
 };
 
@@ -1007,7 +1083,7 @@ export type disassociateElasticIpResponse =
   | disassociateElasticIpResponseSuccess
   | disassociateElasticIpResponseError;
 
-export const getDisassociateElasticIpUrl = (elasticIpId: ElasticIPID) => {
+export const getDisassociateElasticIpUrl = (elasticIpId: ElasticIpId) => {
   return `https://compute.leaflow.cloud/api/v2/elastic-ips/${encodeURIComponent(String(elasticIpId))}:disassociate`;
 };
 
@@ -1016,7 +1092,7 @@ export const getDisassociateElasticIpUrl = (elasticIpId: ElasticIPID) => {
  * @summary Remove the association of an elastic IP
  */
 export const disassociateElasticIp = async (
-  elasticIpId: ElasticIPID,
+  elasticIpId: ElasticIpId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<disassociateElasticIpResponse> => {
@@ -1109,7 +1185,7 @@ export type getInstanceFamilyResponse =
   | getInstanceFamilyResponseSuccess
   | getInstanceFamilyResponseError;
 
-export const getGetInstanceFamilyUrl = (instanceFamilyId: InstanceFamilyID) => {
+export const getGetInstanceFamilyUrl = (instanceFamilyId: InstanceFamilyId) => {
   return `https://compute.leaflow.cloud/api/v2/instance-families/${encodeURIComponent(String(instanceFamilyId))}`;
 };
 
@@ -1118,7 +1194,7 @@ export const getGetInstanceFamilyUrl = (instanceFamilyId: InstanceFamilyID) => {
  * @summary Get an instance family
  */
 export const getInstanceFamily = async (
-  instanceFamilyId: InstanceFamilyID,
+  instanceFamilyId: InstanceFamilyId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getInstanceFamilyResponse> => {
@@ -1209,7 +1285,7 @@ export type getInstanceTypeResponseError = getInstanceTypeResponseDefault & {
 
 export type getInstanceTypeResponse = getInstanceTypeResponseSuccess | getInstanceTypeResponseError;
 
-export const getGetInstanceTypeUrl = (instanceTypeId: InstanceTypeID) => {
+export const getGetInstanceTypeUrl = (instanceTypeId: InstanceTypeId) => {
   return `https://compute.leaflow.cloud/api/v2/instance-types/${encodeURIComponent(String(instanceTypeId))}`;
 };
 
@@ -1218,7 +1294,7 @@ export const getGetInstanceTypeUrl = (instanceTypeId: InstanceTypeID) => {
  * @summary Get an instance type
  */
 export const getInstanceType = async (
-  instanceTypeId: InstanceTypeID,
+  instanceTypeId: InstanceTypeId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getInstanceTypeResponse> => {
@@ -1326,7 +1402,7 @@ export const getCreateInstanceUrl = () => {
  *
  * The instances are created in the availability zone of their instance type, and the volumes bought with them have to be of volume types of that zone (422 `VOLUME_TYPE_OTHER_AVAILABILITY_ZONE`). The types have to have room for all of them, checked before anything is ordered: refused with 409 `INSTANCE_TYPE_SOLD_OUT` or `VOLUME_TYPE_SOLD_OUT` when a type takes no new orders for now, `INSTANCE_TYPE_CAPACITY_REACHED` or `VOLUME_TYPE_CAPACITY_REACHED` when what is sold of it is used up, `INSTANCE_TYPE_NO_HOST_ROOM` when no host of the zone can take the machine, `VOLUME_TYPE_NO_POOL_ROOM` when the storage of the zone cannot take the boot volume, and `ELASTIC_IP_LINE_EXHAUSTED` when the line of the new elastic IPs has fewer addresses left than instances. Two orders placed at the same moment can both pass; an instance that finds a type full when its order is accepted is not created and is refunded, ending `failed` with `provisioning_failed`.
  *
- * Choose an image or existing volume through boot_volume, and exactly one of network_interface_id or subnet_id. Existing network interfaces, boot volumes or elastic IPs require count=1. They are not held while the instance is pending; if one is no longer usable when the order is accepted, the instance ends `failed` with `provisioning_failed`. Image boots require boot_volume; existing volumes retain their own subscription. Instances, volumes and public IPs keep their own subscription items on the same order.
+ * Choose an image or existing volume through boot_volume, and exactly one of network_interface_id or subnet_id. Existing network interfaces, boot volumes or elastic IPs require count=1. They are not held while the instance is pending; if one is no longer usable when the order is accepted, the instance ends `failed` with `provisioning_failed`. Image boots require boot_volume; existing volumes retain their own subscription. Each instance gets its own Billing subscription, with the boot volume, data volumes and elastic IP bought with it as items of it: they renew, renew automatically and expire with the machine as a whole, while each can still be changed or released alone. `checkout.auto_renew` turns automatic renewal on for each machine.
  *
  * Instances of one request succeed or fail individually. Each instance, with its boot volume, network interface and elastic IP, is created or fails as a whole. Instances that were created are kept; each failed instance ends `failed` with `provisioning_failed`, its part of the order is refunded, and the order then ends `partially_completed`. An instance is delivered whole or not at all: when the customer cancels any of its order items before the order is accepted, it is not created, its remaining items are canceled and refunded, and it ends `failed` with `order_canceled`. Each instance is named after this request with a number appended.
  *
@@ -1391,7 +1467,7 @@ export type getInstanceResponseError = getInstanceResponseDefault & {
 
 export type getInstanceResponse = getInstanceResponseSuccess | getInstanceResponseError;
 
-export const getGetInstanceUrl = (instanceId: InstanceID) => {
+export const getGetInstanceUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}`;
 };
 
@@ -1400,7 +1476,7 @@ export const getGetInstanceUrl = (instanceId: InstanceID) => {
  * @summary Retrieve an instance
  */
 export const getInstance = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getInstanceResponse> => {
@@ -1416,62 +1492,38 @@ export const getInstance = async (
 };
 
 export type updateInstanceResponse200 = {
-  data: UpdateInstanceResponseBody;
+  data: Instance;
   status: 200;
-};
-
-export type updateInstanceResponse202 = {
-  data: UpdateInstanceResponseBody;
-  status: 202;
-};
-
-export type updateInstanceResponse409 = {
-  data: ConflictResponse;
-  status: 409;
 };
 
 export type updateInstanceResponseDefault = {
   data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 202 | 409>;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type updateInstanceResponseSuccess = (
-  | updateInstanceResponse200
-  | updateInstanceResponse202
-) & {
+export type updateInstanceResponseSuccess = updateInstanceResponse200 & {
   headers: Headers;
 };
-export type updateInstanceResponseError = (
-  | updateInstanceResponse409
-  | updateInstanceResponseDefault
-) & {
+export type updateInstanceResponseError = updateInstanceResponseDefault & {
   headers: Headers;
 };
 
 export type updateInstanceResponse = updateInstanceResponseSuccess | updateInstanceResponseError;
 
-export const getUpdateInstanceUrl = (instanceId: InstanceID) => {
+export const getUpdateInstanceUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}`;
 };
 
 /**
- * Changes the descriptive fields (`name`, `labels`, `notes`) or the operational field `instance_type_id`. All fields are optional and at least one is required. Starting and stopping are the `:start` and `:stop` methods.
- *
- * `instance_type_id` starts a workflow and cannot be combined with any other field in the same request. Such a request is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied. `checkout` and `proration_date` belong to the purchase of the `instance_type_id` change and are accepted only together with it.
- *
- * **Descriptive fields** are not operations and are accepted at any time, whatever the instance is doing. The request returns 200 with `checkout_session_id` and `order_id` null.
+ * Changes the descriptive fields `name`, `labels` and `description`; all are optional and at least one is required. They are not operations and are accepted at any time, whatever the instance is doing. Changing the instance type is the `:resize` method; starting and stopping are `:start` and `:stop`.
  *
  * - `name` changes the display name only. The hostname inside the instance is unchanged; it equals the instance id.
  * - `labels` records what this instance is for, as key-value pairs. Nothing on the platform reads them. **The whole set is replaced**: whatever is absent from the request is removed, and an empty object clears them all. Do not put credentials here. Labels are visible to platform operators.
- * - `notes` is a free-text note about this instance: what it runs, and what to be careful about before touching it. **The whole note is replaced**; send an empty string to clear it. Do not put credentials here. The note is visible to platform operators.
- *
- * **`instance_type_id`** changes the instance's type **cold**: the instance has to be stopped, and is refused with 409 `INSTANCE_RESIZE_REQUIRES_STOP` otherwise. Its operating system is not booted for the change, and it is still stopped once the change is applied; start it when you are ready. An instance stopped by the legacy stop, which released its host, is refused with 409 `INSTANCE_SHELVED`; start it once and stop it again. A target type that cannot hold what the instance already uses is refused before anything is ordered: fewer network interfaces than are attached with 409 `INSTANCE_RESIZE_NETWORK_INTERFACES_EXCEED`, fewer elastic IPs than are associated with 409 `INSTANCE_RESIZE_ELASTIC_IPS_EXCEED`, and less purchasable bandwidth than an associated elastic IP has with 409 `INSTANCE_BANDWIDTH_CEILING` naming it in `meta.elastic_ip_id`. The request returns 202 with the instance and the Checkout Session for the change, including for metered terms. The instance keeps its usage type and period, priced with the target type's matching option; a target type without that option is refused with 409 `BILLING_OPTION_UNAVAILABLE`. The resize starts once Billing accepts the order. Do not submit the change again after paying. After an uncertain response, look the Checkout Session up in Billing before submitting again.
- *
- * The instance is `resizing` until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. It keeps its current type until the resize is applied; the new type takes effect, and is billed from then on, when `instance_type_id` shows it. If checkout is not completed, the order is not accepted or the resize fails, the instance keeps its current type and Billing shows the outcome. A completed resize is final and cannot be reverted; to return to the previous type, submit another resize.
+ * - `description` is a free-text note about this instance: what it runs, and what to be careful about before touching it. **The whole note is replaced**; send an empty string to clear it. Do not put credentials here. The note is visible to platform operators.
  * @summary Update an instance
  */
 export const updateInstance = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   updateInstanceRequestBody: UpdateInstanceRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -1535,7 +1587,7 @@ export type deleteInstanceResponseError = (
 
 export type deleteInstanceResponse = deleteInstanceResponseSuccess | deleteInstanceResponseError;
 
-export const getDeleteInstanceUrl = (instanceId: InstanceID, params?: DeleteInstanceParams) => {
+export const getDeleteInstanceUrl = (instanceId: InstanceId, params?: DeleteInstanceParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -1558,11 +1610,11 @@ export const getDeleteInstanceUrl = (instanceId: InstanceID, params?: DeleteInst
  *
  * Refused with `COMPUTE_PURCHASE_PENDING` while the purchase that created it still awaits checkout or payment; `meta.checkout_session_id` names its Checkout Session and `meta.order_id` its order once checkout created one. Expire the session or cancel the order in Billing instead.
  *
- * While subscriptions pay for the instance (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed subscription being refunded under its terms, and `period_end` keeps the instance working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
+ * While subscription items pay for the instance (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed item being refunded under its terms, and `period_end` keeps the instance working until `scheduled_at` and releases it then. Volumes and elastic IPs kept after the release keep their items, and the subscription continues with them. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
  * @summary Release an instance
  */
 export const deleteInstance = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   params?: DeleteInstanceParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -1576,6 +1628,81 @@ export const deleteInstance = async (
 
   const data: deleteInstanceResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as deleteInstanceResponse;
+};
+
+export type resizeInstanceResponse202 = {
+  data: ResizeInstanceResponseBody;
+  status: 202;
+};
+
+export type resizeInstanceResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type resizeInstanceResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 202 | 409>;
+};
+
+export type resizeInstanceResponseSuccess = resizeInstanceResponse202 & {
+  headers: Headers;
+};
+export type resizeInstanceResponseError = (
+  | resizeInstanceResponse409
+  | resizeInstanceResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type resizeInstanceResponse = resizeInstanceResponseSuccess | resizeInstanceResponseError;
+
+export const getResizeInstanceUrl = (instanceId: InstanceId) => {
+  return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:resize`;
+};
+
+/**
+ * Changes the instance's type **cold**, through a change of its subscription item purchased in Billing: the instance has to be stopped, and is refused with 409 `INSTANCE_RESIZE_REQUIRES_STOP` otherwise. Its operating system is not booted for the change, and it is still stopped once the change is applied; start it when you are ready. An instance stopped by the legacy stop, which released its host, is refused with 409 `INSTANCE_SHELVED`; start it once and stop it again. A target type that cannot hold what the instance already uses is refused before anything is ordered: fewer network interfaces than are attached with 409 `INSTANCE_RESIZE_NETWORK_INTERFACES_EXCEED`, fewer elastic IPs than are associated with 409 `INSTANCE_RESIZE_ELASTIC_IPS_EXCEED`, and less purchasable bandwidth than an associated elastic IP has with 409 `INSTANCE_BANDWIDTH_CEILING` naming it in `meta.elastic_ip_id`. The request returns 202 with the instance and the Checkout Session for the change, including for metered terms. The instance keeps its usage type and period, priced with the target type's matching option; a target type without that option is refused with 409 `BILLING_OPTION_UNAVAILABLE`. The resize starts once Billing accepts the order. Do not submit the change again after paying. After an uncertain response, look the Checkout Session up in Billing before submitting again.
+ *
+ * The instance is `resizing` until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. It keeps its current type until the resize is applied; the new type takes effect, and is billed from then on, when `instance_type_id` shows it. If checkout is not completed, the order is not accepted or the resize fails, the instance keeps its current type and Billing shows the outcome. A completed resize is final and cannot be reverted; to return to the previous type, submit another resize.
+ * @summary Resize an instance
+ */
+export const resizeInstance = async (
+  instanceId: InstanceId,
+  resizeInstanceRequestBody: ResizeInstanceRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<resizeInstanceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getResizeInstanceUrl(instanceId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(resizeInstanceRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resizeInstanceResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as resizeInstanceResponse;
 };
 
 export type startInstanceResponse202 = {
@@ -1605,7 +1732,7 @@ export type startInstanceResponseError = (
 
 export type startInstanceResponse = startInstanceResponseSuccess | startInstanceResponseError;
 
-export const getStartInstanceUrl = (instanceId: InstanceID) => {
+export const getStartInstanceUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:start`;
 };
 
@@ -1616,7 +1743,7 @@ export const getStartInstanceUrl = (instanceId: InstanceID) => {
  * @summary Start an instance
  */
 export const startInstance = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<startInstanceResponse> => {
@@ -1655,18 +1782,18 @@ export type stopInstanceResponseError = (stopInstanceResponse409 | stopInstanceR
 
 export type stopInstanceResponse = stopInstanceResponseSuccess | stopInstanceResponseError;
 
-export const getStopInstanceUrl = (instanceId: InstanceID) => {
+export const getStopInstanceUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:stop`;
 };
 
 /**
  * Shuts the instance down **on its host**, as Alibaba Cloud's ordinary stop does: it keeps its volumes, network interfaces, addresses and quota, and the vCPU and memory of its host stay reserved for it, so it starts again without asking for room. **A metered instance keeps being charged for compute while stopped**; its volumes and elastic IPs are charged as always. An instance stopped by a suspension, for non-payment or by the platform, is not charged for compute while the suspension lasts. It is `stopping` until it is stopped. Stopping a stopped instance changes nothing.
  *
- * Changing `instance_type_id` is done on a stopped instance and only then. A stopped instance can also be rebuilt and have network interfaces and volumes attached and detached; rescuing it needs it running.
+ * Resizing is done on a stopped instance and only then. A stopped instance can also be rebuilt and have network interfaces and volumes attached and detached; rescuing it needs it running.
  * @summary Stop an instance
  */
 export const stopInstance = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<stopInstanceResponse> => {
@@ -1702,7 +1829,7 @@ export type runInstanceCommandResponse =
   | runInstanceCommandResponseSuccess
   | runInstanceCommandResponseError;
 
-export const getRunInstanceCommandUrl = (instanceId: InstanceID) => {
+export const getRunInstanceCommandUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:runCommand`;
 };
 
@@ -1727,7 +1854,7 @@ export const getRunInstanceCommandUrl = (instanceId: InstanceID) => {
  * @summary Run a command on an instance
  */
 export const runInstanceCommand = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   runInstanceCommandRequestBody: RunInstanceCommandRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -1764,51 +1891,51 @@ export const runInstanceCommand = async (
   return { data, status: res.status, headers: res.headers } as runInstanceCommandResponse;
 };
 
-export type getInstanceConsoleResponse200 = {
+export type createInstanceConsoleUrlResponse200 = {
   data: ConsoleResponseBody;
   status: 200;
 };
 
-export type getInstanceConsoleResponseDefault = {
+export type createInstanceConsoleUrlResponseDefault = {
   data: Error;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type getInstanceConsoleResponseSuccess = getInstanceConsoleResponse200 & {
+export type createInstanceConsoleUrlResponseSuccess = createInstanceConsoleUrlResponse200 & {
   headers: Headers;
 };
-export type getInstanceConsoleResponseError = getInstanceConsoleResponseDefault & {
+export type createInstanceConsoleUrlResponseError = createInstanceConsoleUrlResponseDefault & {
   headers: Headers;
 };
 
-export type getInstanceConsoleResponse =
-  | getInstanceConsoleResponseSuccess
-  | getInstanceConsoleResponseError;
+export type createInstanceConsoleUrlResponse =
+  | createInstanceConsoleUrlResponseSuccess
+  | createInstanceConsoleUrlResponseError;
 
-export const getGetInstanceConsoleUrl = (instanceId: InstanceID) => {
-  return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}/console`;
+export const getCreateInstanceConsoleUrlUrl = (instanceId: InstanceId) => {
+  return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:createConsoleUrl`;
 };
 
 /**
- * The instance's VNC console, operated from a browser through a noVNC client. It does not require the instance to be reachable over the network, which makes it usable when a network misconfiguration prevents login.
+ * Issues an address for the instance's VNC console, operated from a browser through a noVNC client. It does not require the instance to be reachable over the network, which makes it usable when a network misconfiguration prevents login.
  *
- * The returned address is single-use and expires within minutes. Every request issues a new address, so request one before each use and do not cache the response.
- * @summary Retrieve a VNC console
+ * The address is single-use and expires within minutes. Every request issues a new address, so request one before each use and do not cache the response.
+ * @summary Create a VNC console address
  */
-export const getInstanceConsole = async (
-  instanceId: InstanceID,
+export const createInstanceConsoleUrl = async (
+  instanceId: InstanceId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<getInstanceConsoleResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetInstanceConsoleUrl(instanceId), {
+): Promise<createInstanceConsoleUrlResponse> => {
+  const res = await (fetchFn ?? fetch)(getCreateInstanceConsoleUrlUrl(instanceId), {
     ...options,
-    method: "GET",
+    method: "POST",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getInstanceConsoleResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as getInstanceConsoleResponse;
+  const data: createInstanceConsoleUrlResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as createInstanceConsoleUrlResponse;
 };
 
 export type resetInstancePasswordResponse200 = {
@@ -1840,7 +1967,7 @@ export type resetInstancePasswordResponse =
   | resetInstancePasswordResponseSuccess
   | resetInstancePasswordResponseError;
 
-export const getResetInstancePasswordUrl = (instanceId: InstanceID) => {
+export const getResetInstancePasswordUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:resetPassword`;
 };
 
@@ -1853,7 +1980,7 @@ export const getResetInstancePasswordUrl = (instanceId: InstanceID) => {
  * @summary Reset the login password
  */
 export const resetInstancePassword = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   passwordChoice: PasswordChoice,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -1917,7 +2044,7 @@ export type rebootInstanceResponseError = (
 
 export type rebootInstanceResponse = rebootInstanceResponseSuccess | rebootInstanceResponseError;
 
-export const getRebootInstanceUrl = (instanceId: InstanceID) => {
+export const getRebootInstanceUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:reboot`;
 };
 
@@ -1934,7 +2061,7 @@ export const getRebootInstanceUrl = (instanceId: InstanceID) => {
  * @summary Reboot an instance
  */
 export const rebootInstance = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   rebootInstanceRequestBody: RebootInstanceRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -1998,7 +2125,7 @@ export type rebuildInstanceResponseError = (
 
 export type rebuildInstanceResponse = rebuildInstanceResponseSuccess | rebuildInstanceResponseError;
 
-export const getRebuildInstanceUrl = (instanceId: InstanceID) => {
+export const getRebuildInstanceUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:rebuild`;
 };
 
@@ -2013,7 +2140,7 @@ export const getRebuildInstanceUrl = (instanceId: InstanceID) => {
  * @summary Rebuild an instance
  */
 export const rebuildInstance = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   rebuildInstanceRequestBody: RebuildInstanceRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -2072,7 +2199,7 @@ export type listInstanceVolumesResponse =
   | listInstanceVolumesResponseError;
 
 export const getListInstanceVolumesUrl = (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   params?: ListInstanceVolumesParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -2094,7 +2221,7 @@ export const getListInstanceVolumesUrl = (
  * @summary List the volumes attached to an instance
  */
 export const listInstanceVolumes = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   params?: ListInstanceVolumesParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -2139,7 +2266,7 @@ export type attachInstanceVolumeResponse =
   | attachInstanceVolumeResponseSuccess
   | attachInstanceVolumeResponseError;
 
-export const getAttachInstanceVolumeUrl = (instanceId: InstanceID) => {
+export const getAttachInstanceVolumeUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}/volumes`;
 };
 
@@ -2148,7 +2275,7 @@ export const getAttachInstanceVolumeUrl = (instanceId: InstanceID) => {
  * @summary Attach a volume
  */
 export const attachInstanceVolume = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   attachVolumeRequestBody: AttachVolumeRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -2214,7 +2341,7 @@ export type detachInstanceVolumeResponse =
   | detachInstanceVolumeResponseSuccess
   | detachInstanceVolumeResponseError;
 
-export const getDetachInstanceVolumeUrl = (instanceId: InstanceID, volumeId: VolumeID) => {
+export const getDetachInstanceVolumeUrl = (instanceId: InstanceId, volumeId: VolumeId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}/volumes/${encodeURIComponent(String(volumeId))}`;
 };
 
@@ -2227,8 +2354,8 @@ export const getDetachInstanceVolumeUrl = (instanceId: InstanceID, volumeId: Vol
  * @summary Detach a volume
  */
 export const detachInstanceVolume = async (
-  instanceId: InstanceID,
-  volumeId: VolumeID,
+  instanceId: InstanceId,
+  volumeId: VolumeId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<detachInstanceVolumeResponse> => {
@@ -2267,7 +2394,7 @@ export type listInstanceNetworkInterfacesResponse =
   | listInstanceNetworkInterfacesResponseError;
 
 export const getListInstanceNetworkInterfacesUrl = (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   params?: ListInstanceNetworkInterfacesParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -2289,7 +2416,7 @@ export const getListInstanceNetworkInterfacesUrl = (
  * @summary List the network interfaces of an instance
  */
 export const listInstanceNetworkInterfaces = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   params?: ListInstanceNetworkInterfacesParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -2339,7 +2466,7 @@ export type attachInstanceNetworkInterfaceResponse =
   | attachInstanceNetworkInterfaceResponseSuccess
   | attachInstanceNetworkInterfaceResponseError;
 
-export const getAttachInstanceNetworkInterfaceUrl = (instanceId: InstanceID) => {
+export const getAttachInstanceNetworkInterfaceUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}/network-interfaces`;
 };
 
@@ -2348,7 +2475,7 @@ export const getAttachInstanceNetworkInterfaceUrl = (instanceId: InstanceID) => 
  * @summary Attach a network interface
  */
 export const attachInstanceNetworkInterface = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   attachNetworkInterfaceRequestBody: AttachNetworkInterfaceRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -2420,8 +2547,8 @@ export type detachInstanceNetworkInterfaceResponse =
   | detachInstanceNetworkInterfaceResponseError;
 
 export const getDetachInstanceNetworkInterfaceUrl = (
-  instanceId: InstanceID,
-  networkInterfaceId: NetworkInterfaceID,
+  instanceId: InstanceId,
+  networkInterfaceId: NetworkInterfaceId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}/network-interfaces/${encodeURIComponent(String(networkInterfaceId))}`;
 };
@@ -2433,8 +2560,8 @@ export const getDetachInstanceNetworkInterfaceUrl = (
  * @summary Detach a network interface
  */
 export const detachInstanceNetworkInterface = async (
-  instanceId: InstanceID,
-  networkInterfaceId: NetworkInterfaceID,
+  instanceId: InstanceId,
+  networkInterfaceId: NetworkInterfaceId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<detachInstanceNetworkInterfaceResponse> => {
@@ -2483,7 +2610,7 @@ export type rescueInstanceResponseError = (
 
 export type rescueInstanceResponse = rescueInstanceResponseSuccess | rescueInstanceResponseError;
 
-export const getRescueInstanceUrl = (instanceId: InstanceID) => {
+export const getRescueInstanceUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:rescue`;
 };
 
@@ -2500,7 +2627,7 @@ export const getRescueInstanceUrl = (instanceId: InstanceID) => {
  * @summary Put an instance into rescue mode
  */
 export const rescueInstance = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<rescueInstanceResponse> => {
@@ -2544,7 +2671,7 @@ export type unrescueInstanceResponse =
   | unrescueInstanceResponseSuccess
   | unrescueInstanceResponseError;
 
-export const getUnrescueInstanceUrl = (instanceId: InstanceID) => {
+export const getUnrescueInstanceUrl = (instanceId: InstanceId) => {
   return `https://compute.leaflow.cloud/api/v2/instances/${encodeURIComponent(String(instanceId))}:unrescue`;
 };
 
@@ -2553,7 +2680,7 @@ export const getUnrescueInstanceUrl = (instanceId: InstanceID) => {
  * @summary Take an instance out of rescue mode
  */
 export const unrescueInstance = async (
-  instanceId: InstanceID,
+  instanceId: InstanceId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<unrescueInstanceResponse> => {
@@ -2715,7 +2842,7 @@ export type getLaunchTemplateResponse =
   | getLaunchTemplateResponseSuccess
   | getLaunchTemplateResponseError;
 
-export const getGetLaunchTemplateUrl = (launchTemplateId: LaunchTemplateID) => {
+export const getGetLaunchTemplateUrl = (launchTemplateId: LaunchTemplateId) => {
   return `https://compute.leaflow.cloud/api/v2/launch-templates/${encodeURIComponent(String(launchTemplateId))}`;
 };
 
@@ -2723,7 +2850,7 @@ export const getGetLaunchTemplateUrl = (launchTemplateId: LaunchTemplateID) => {
  * @summary Get a launch template
  */
 export const getLaunchTemplate = async (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getLaunchTemplateResponse> => {
@@ -2759,7 +2886,7 @@ export type updateLaunchTemplateResponse =
   | updateLaunchTemplateResponseSuccess
   | updateLaunchTemplateResponseError;
 
-export const getUpdateLaunchTemplateUrl = (launchTemplateId: LaunchTemplateID) => {
+export const getUpdateLaunchTemplateUrl = (launchTemplateId: LaunchTemplateId) => {
   return `https://compute.leaflow.cloud/api/v2/launch-templates/${encodeURIComponent(String(launchTemplateId))}`;
 };
 
@@ -2768,7 +2895,7 @@ export const getUpdateLaunchTemplateUrl = (launchTemplateId: LaunchTemplateID) =
  * @summary Update a launch template
  */
 export const updateLaunchTemplate = async (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   updateLaunchTemplateRequestBody: UpdateLaunchTemplateRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -2826,7 +2953,7 @@ export type deleteLaunchTemplateResponse =
   | deleteLaunchTemplateResponseSuccess
   | deleteLaunchTemplateResponseError;
 
-export const getDeleteLaunchTemplateUrl = (launchTemplateId: LaunchTemplateID) => {
+export const getDeleteLaunchTemplateUrl = (launchTemplateId: LaunchTemplateId) => {
   return `https://compute.leaflow.cloud/api/v2/launch-templates/${encodeURIComponent(String(launchTemplateId))}`;
 };
 
@@ -2835,7 +2962,7 @@ export const getDeleteLaunchTemplateUrl = (launchTemplateId: LaunchTemplateID) =
  * @summary Delete a launch template
  */
 export const deleteLaunchTemplate = async (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteLaunchTemplateResponse> => {
@@ -2872,7 +2999,7 @@ export type listLaunchTemplateVersionsResponse =
   | listLaunchTemplateVersionsResponseError;
 
 export const getListLaunchTemplateVersionsUrl = (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   params?: ListLaunchTemplateVersionsParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -2895,7 +3022,7 @@ export const getListLaunchTemplateVersionsUrl = (
  * @summary List the versions of a launch template
  */
 export const listLaunchTemplateVersions = async (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   params?: ListLaunchTemplateVersionsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -2933,7 +3060,7 @@ export type createLaunchTemplateVersionResponse =
   | createLaunchTemplateVersionResponseSuccess
   | createLaunchTemplateVersionResponseError;
 
-export const getCreateLaunchTemplateVersionUrl = (launchTemplateId: LaunchTemplateID) => {
+export const getCreateLaunchTemplateVersionUrl = (launchTemplateId: LaunchTemplateId) => {
   return `https://compute.leaflow.cloud/api/v2/launch-templates/${encodeURIComponent(String(launchTemplateId))}/versions`;
 };
 
@@ -2942,7 +3069,7 @@ export const getCreateLaunchTemplateVersionUrl = (launchTemplateId: LaunchTempla
  * @summary Create a launch template version
  */
 export const createLaunchTemplateVersion = async (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   newLaunchTemplateVersion: NewLaunchTemplateVersion,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -3001,7 +3128,7 @@ export type getLaunchTemplateVersionResponse =
   | getLaunchTemplateVersionResponseError;
 
 export const getGetLaunchTemplateVersionUrl = (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   versionNumber: number,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/launch-templates/${encodeURIComponent(String(launchTemplateId))}/versions/${encodeURIComponent(String(versionNumber))}`;
@@ -3011,7 +3138,7 @@ export const getGetLaunchTemplateVersionUrl = (
  * @summary Get a launch template version
  */
 export const getLaunchTemplateVersion = async (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   versionNumber: number,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -3053,7 +3180,7 @@ export type deleteLaunchTemplateVersionResponse =
   | deleteLaunchTemplateVersionResponseError;
 
 export const getDeleteLaunchTemplateVersionUrl = (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   versionNumber: number,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/launch-templates/${encodeURIComponent(String(launchTemplateId))}/versions/${encodeURIComponent(String(versionNumber))}`;
@@ -3064,7 +3191,7 @@ export const getDeleteLaunchTemplateVersionUrl = (
  * @summary Delete a launch template version
  */
 export const deleteLaunchTemplateVersion = async (
-  launchTemplateId: LaunchTemplateID,
+  launchTemplateId: LaunchTemplateId,
   versionNumber: number,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -3226,7 +3353,7 @@ export type getNetworkInterfaceResponse =
   | getNetworkInterfaceResponseSuccess
   | getNetworkInterfaceResponseError;
 
-export const getGetNetworkInterfaceUrl = (networkInterfaceId: NetworkInterfaceID) => {
+export const getGetNetworkInterfaceUrl = (networkInterfaceId: NetworkInterfaceId) => {
   return `https://compute.leaflow.cloud/api/v2/network-interfaces/${encodeURIComponent(String(networkInterfaceId))}`;
 };
 
@@ -3235,7 +3362,7 @@ export const getGetNetworkInterfaceUrl = (networkInterfaceId: NetworkInterfaceID
  * @summary Retrieve a network interface
  */
 export const getNetworkInterface = async (
-  networkInterfaceId: NetworkInterfaceID,
+  networkInterfaceId: NetworkInterfaceId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getNetworkInterfaceResponse> => {
@@ -3255,20 +3382,12 @@ export type updateNetworkInterfaceResponse200 = {
   status: 200;
 };
 
-export type updateNetworkInterfaceResponse202 = {
-  data: NetworkInterface;
-  status: 202;
-};
-
 export type updateNetworkInterfaceResponseDefault = {
   data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 202>;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type updateNetworkInterfaceResponseSuccess = (
-  | updateNetworkInterfaceResponse200
-  | updateNetworkInterfaceResponse202
-) & {
+export type updateNetworkInterfaceResponseSuccess = updateNetworkInterfaceResponse200 & {
   headers: Headers;
 };
 export type updateNetworkInterfaceResponseError = updateNetworkInterfaceResponseDefault & {
@@ -3279,21 +3398,18 @@ export type updateNetworkInterfaceResponse =
   | updateNetworkInterfaceResponseSuccess
   | updateNetworkInterfaceResponseError;
 
-export const getUpdateNetworkInterfaceUrl = (networkInterfaceId: NetworkInterfaceID) => {
+export const getUpdateNetworkInterfaceUrl = (networkInterfaceId: NetworkInterfaceId) => {
   return `https://compute.leaflow.cloud/api/v2/network-interfaces/${encodeURIComponent(String(networkInterfaceId))}`;
 };
 
 /**
- * Changes the name, or replaces the security groups. The two are never combined (422 `UPDATE_FIELDS_COMBINED`).
- *
- * - `name` is not an operation, is accepted at any time and answers 200.
- * - `security_group_ids` is the complete new set, one to five groups of the network interface's virtual private cloud; groups left out are removed. It applies to traffic of the running instance as soon as it is in place, and answers 202 with the network interface `updating_security_groups` until then.
+ * Changes the name. It is not an operation and is accepted at any time. Replacing the security groups is `:replaceSecurityGroups`.
  *
  * Secondary IPv4 addresses are added and removed under `/network-interfaces/{networkInterfaceId}/addresses`.
  * @summary Update a network interface
  */
 export const updateNetworkInterface = async (
-  networkInterfaceId: NetworkInterfaceID,
+  networkInterfaceId: NetworkInterfaceId,
   updateNetworkInterfaceRequestBody: UpdateNetworkInterfaceRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -3359,7 +3475,7 @@ export type deleteNetworkInterfaceResponse =
   | deleteNetworkInterfaceResponseSuccess
   | deleteNetworkInterfaceResponseError;
 
-export const getDeleteNetworkInterfaceUrl = (networkInterfaceId: NetworkInterfaceID) => {
+export const getDeleteNetworkInterfaceUrl = (networkInterfaceId: NetworkInterfaceId) => {
   return `https://compute.leaflow.cloud/api/v2/network-interfaces/${encodeURIComponent(String(networkInterfaceId))}`;
 };
 
@@ -3368,7 +3484,7 @@ export const getDeleteNetworkInterfaceUrl = (networkInterfaceId: NetworkInterfac
  * @summary Delete a network interface
  */
 export const deleteNetworkInterface = async (
-  networkInterfaceId: NetworkInterfaceID,
+  networkInterfaceId: NetworkInterfaceId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteNetworkInterfaceResponse> => {
@@ -3381,6 +3497,91 @@ export const deleteNetworkInterface = async (
 
   const data: deleteNetworkInterfaceResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as deleteNetworkInterfaceResponse;
+};
+
+export type replaceNetworkInterfaceSecurityGroupsResponse202 = {
+  data: NetworkInterface;
+  status: 202;
+};
+
+export type replaceNetworkInterfaceSecurityGroupsResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type replaceNetworkInterfaceSecurityGroupsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 202 | 409>;
+};
+
+export type replaceNetworkInterfaceSecurityGroupsResponseSuccess =
+  replaceNetworkInterfaceSecurityGroupsResponse202 & {
+    headers: Headers;
+  };
+export type replaceNetworkInterfaceSecurityGroupsResponseError = (
+  | replaceNetworkInterfaceSecurityGroupsResponse409
+  | replaceNetworkInterfaceSecurityGroupsResponseDefault
+) & {
+  headers: Headers;
+};
+
+export type replaceNetworkInterfaceSecurityGroupsResponse =
+  | replaceNetworkInterfaceSecurityGroupsResponseSuccess
+  | replaceNetworkInterfaceSecurityGroupsResponseError;
+
+export const getReplaceNetworkInterfaceSecurityGroupsUrl = (
+  networkInterfaceId: NetworkInterfaceId,
+) => {
+  return `https://compute.leaflow.cloud/api/v2/network-interfaces/${encodeURIComponent(String(networkInterfaceId))}:replaceSecurityGroups`;
+};
+
+/**
+ * `security_group_ids` is the complete new set, one to five groups of the network interface's virtual private cloud; groups left out are removed. It applies to traffic of the running instance as soon as it is in place, and the network interface is `updating_security_groups` until then.
+ * @summary Replace the security groups of a network interface
+ */
+export const replaceNetworkInterfaceSecurityGroups = async (
+  networkInterfaceId: NetworkInterfaceId,
+  replaceNetworkInterfaceSecurityGroupsRequestBody: ReplaceNetworkInterfaceSecurityGroupsRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<replaceNetworkInterfaceSecurityGroupsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getReplaceNetworkInterfaceSecurityGroupsUrl(networkInterfaceId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+      body: JSON.stringify(replaceNetworkInterfaceSecurityGroupsRequestBody),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: replaceNetworkInterfaceSecurityGroupsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as replaceNetworkInterfaceSecurityGroupsResponse;
 };
 
 export type createNetworkInterfaceAddressResponse202 = {
@@ -3406,7 +3607,7 @@ export type createNetworkInterfaceAddressResponse =
   | createNetworkInterfaceAddressResponseSuccess
   | createNetworkInterfaceAddressResponseError;
 
-export const getCreateNetworkInterfaceAddressUrl = (networkInterfaceId: NetworkInterfaceID) => {
+export const getCreateNetworkInterfaceAddressUrl = (networkInterfaceId: NetworkInterfaceId) => {
   return `https://compute.leaflow.cloud/api/v2/network-interfaces/${encodeURIComponent(String(networkInterfaceId))}/addresses`;
 };
 
@@ -3419,7 +3620,7 @@ export const getCreateNetworkInterfaceAddressUrl = (networkInterfaceId: NetworkI
  * @summary Add a secondary IPv4 address
  */
 export const createNetworkInterfaceAddress = async (
-  networkInterfaceId: NetworkInterfaceID,
+  networkInterfaceId: NetworkInterfaceId,
   createNetworkInterfaceAddressRequestBody: CreateNetworkInterfaceAddressRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -3484,8 +3685,8 @@ export type deleteNetworkInterfaceAddressResponse =
   | deleteNetworkInterfaceAddressResponseError;
 
 export const getDeleteNetworkInterfaceAddressUrl = (
-  networkInterfaceId: NetworkInterfaceID,
-  addressId: NetworkInterfaceAddressID,
+  networkInterfaceId: NetworkInterfaceId,
+  addressId: NetworkInterfaceAddressId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/network-interfaces/${encodeURIComponent(String(networkInterfaceId))}/addresses/${encodeURIComponent(String(addressId))}`;
 };
@@ -3495,8 +3696,8 @@ export const getDeleteNetworkInterfaceAddressUrl = (
  * @summary Remove a secondary IPv4 address
  */
 export const deleteNetworkInterfaceAddress = async (
-  networkInterfaceId: NetworkInterfaceID,
-  addressId: NetworkInterfaceAddressID,
+  networkInterfaceId: NetworkInterfaceId,
+  addressId: NetworkInterfaceAddressId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteNetworkInterfaceAddressResponse> => {
@@ -3598,7 +3799,7 @@ export type getOperationLogResponseError = getOperationLogResponseDefault & {
 
 export type getOperationLogResponse = getOperationLogResponseSuccess | getOperationLogResponseError;
 
-export const getGetOperationLogUrl = (operationLogId: OperationLogID) => {
+export const getGetOperationLogUrl = (operationLogId: OperationLogId) => {
   return `https://compute.leaflow.cloud/api/v2/operation-logs/${encodeURIComponent(String(operationLogId))}`;
 };
 
@@ -3607,7 +3808,7 @@ export const getGetOperationLogUrl = (operationLogId: OperationLogID) => {
  * @summary Retrieve an operation log entry
  */
 export const getOperationLog = async (
-  operationLogId: OperationLogID,
+  operationLogId: OperationLogId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getOperationLogResponse> => {
@@ -3780,7 +3981,7 @@ export type getPrivateImageResponseError = getPrivateImageResponseDefault & {
 
 export type getPrivateImageResponse = getPrivateImageResponseSuccess | getPrivateImageResponseError;
 
-export const getGetPrivateImageUrl = (privateImageId: ImageID) => {
+export const getGetPrivateImageUrl = (privateImageId: ImageId) => {
   return `https://compute.leaflow.cloud/api/v2/private-images/${encodeURIComponent(String(privateImageId))}`;
 };
 
@@ -3789,7 +3990,7 @@ export const getGetPrivateImageUrl = (privateImageId: ImageID) => {
  * @summary Retrieve a private image
  */
 export const getPrivateImage = async (
-  privateImageId: ImageID,
+  privateImageId: ImageId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getPrivateImageResponse> => {
@@ -3825,7 +4026,7 @@ export type updatePrivateImageResponse =
   | updatePrivateImageResponseSuccess
   | updatePrivateImageResponseError;
 
-export const getUpdatePrivateImageUrl = (privateImageId: ImageID) => {
+export const getUpdatePrivateImageUrl = (privateImageId: ImageId) => {
   return `https://compute.leaflow.cloud/api/v2/private-images/${encodeURIComponent(String(privateImageId))}`;
 };
 
@@ -3834,7 +4035,7 @@ export const getUpdatePrivateImageUrl = (privateImageId: ImageID) => {
  * @summary Update a private image
  */
 export const updatePrivateImage = async (
-  privateImageId: ImageID,
+  privateImageId: ImageId,
   updatePrivateImageRequestBody: UpdatePrivateImageRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -3901,7 +4102,7 @@ export type deletePrivateImageResponse =
   | deletePrivateImageResponseError;
 
 export const getDeletePrivateImageUrl = (
-  privateImageId: ImageID,
+  privateImageId: ImageId,
   params?: DeletePrivateImageParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -3930,11 +4131,11 @@ export const getDeletePrivateImageUrl = (
  *
  * A resource whose purchase still awaits checkout or payment is refused with `COMPUTE_PURCHASE_PENDING`; `meta.checkout_session_id` names its Checkout Session and `meta.order_id` its order once checkout created one. Expire the session or cancel the order in Billing instead. A subscribed resource is released through its subscription cancellation. Cleanup must be confirmed before metering is stopped; unknown cleanup is not proof of release.
  *
- * While subscriptions pay for the private image (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed subscription being refunded under its terms, and `period_end` keeps the private image working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
+ * While subscription items pay for the private image (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed item being refunded under its terms, and `period_end` keeps the private image working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
  * @summary Delete a private image
  */
 export const deletePrivateImage = async (
-  privateImageId: ImageID,
+  privateImageId: ImageId,
   params?: DeletePrivateImageParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -4030,7 +4231,7 @@ export type getPublicImageResponseError = getPublicImageResponseDefault & {
 
 export type getPublicImageResponse = getPublicImageResponseSuccess | getPublicImageResponseError;
 
-export const getGetPublicImageUrl = (publicImageId: ImageID) => {
+export const getGetPublicImageUrl = (publicImageId: ImageId) => {
   return `https://compute.leaflow.cloud/api/v2/public-images/${encodeURIComponent(String(publicImageId))}`;
 };
 
@@ -4039,7 +4240,7 @@ export const getGetPublicImageUrl = (publicImageId: ImageID) => {
  * @summary Retrieve a public image
  */
 export const getPublicImage = async (
-  publicImageId: ImageID,
+  publicImageId: ImageId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getPublicImageResponse> => {
@@ -4073,7 +4274,7 @@ export type listQuotasResponseError = listQuotasResponseDefault & {
 
 export type listQuotasResponse = listQuotasResponseSuccess | listQuotasResponseError;
 
-export const getListQuotasUrl = (regionId: RegionID, params?: ListQuotasParams) => {
+export const getListQuotasUrl = (regionId: RegionId, params?: ListQuotasParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -4094,7 +4295,7 @@ export const getListQuotasUrl = (regionId: RegionID, params?: ListQuotasParams) 
  * @summary List project quotas in a region
  */
 export const listQuotas = async (
-  regionId: RegionID,
+  regionId: RegionId,
   params?: ListQuotasParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -4129,7 +4330,7 @@ export type getQuotaResponseError = getQuotaResponseDefault & {
 
 export type getQuotaResponse = getQuotaResponseSuccess | getQuotaResponseError;
 
-export const getGetQuotaUrl = (regionId: RegionID, resource: QuotaResourceType) => {
+export const getGetQuotaUrl = (regionId: RegionId, resource: QuotaResourceType) => {
   return `https://compute.leaflow.cloud/api/v2/regions/${encodeURIComponent(String(regionId))}/quotas/${encodeURIComponent(String(resource))}`;
 };
 
@@ -4138,7 +4339,7 @@ export const getGetQuotaUrl = (regionId: RegionID, resource: QuotaResourceType) 
  * @summary Get a project quota in a region
  */
 export const getQuota = async (
-  regionId: RegionID,
+  regionId: RegionId,
   resource: QuotaResourceType,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -4227,7 +4428,7 @@ export type getRegionResponseError = getRegionResponseDefault & {
 
 export type getRegionResponse = getRegionResponseSuccess | getRegionResponseError;
 
-export const getGetRegionUrl = (regionId: RegionID) => {
+export const getGetRegionUrl = (regionId: RegionId) => {
   return `https://compute.leaflow.cloud/api/v2/regions/${encodeURIComponent(String(regionId))}`;
 };
 
@@ -4236,7 +4437,7 @@ export const getGetRegionUrl = (regionId: RegionID) => {
  * @summary Retrieve a region
  */
 export const getRegion = async (
-  regionId: RegionID,
+  regionId: RegionId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getRegionResponse> => {
@@ -4273,7 +4474,7 @@ export type listSecurityGroupRulesResponse =
   | listSecurityGroupRulesResponseError;
 
 export const getListSecurityGroupRulesUrl = (
-  securityGroupId: SecurityGroupIDOrWildcard,
+  securityGroupId: SecurityGroupIdOrWildcard,
   params?: ListSecurityGroupRulesParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -4296,7 +4497,7 @@ export const getListSecurityGroupRulesUrl = (
  * @summary List security group rules
  */
 export const listSecurityGroupRules = async (
-  securityGroupId: SecurityGroupIDOrWildcard,
+  securityGroupId: SecurityGroupIdOrWildcard,
   params?: ListSecurityGroupRulesParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -4333,7 +4534,7 @@ export type createSecurityGroupRuleResponse =
   | createSecurityGroupRuleResponseSuccess
   | createSecurityGroupRuleResponseError;
 
-export const getCreateSecurityGroupRuleUrl = (securityGroupId: SecurityGroupID) => {
+export const getCreateSecurityGroupRuleUrl = (securityGroupId: SecurityGroupId) => {
   return `https://compute.leaflow.cloud/api/v2/security-groups/${encodeURIComponent(String(securityGroupId))}/rules`;
 };
 
@@ -4342,7 +4543,7 @@ export const getCreateSecurityGroupRuleUrl = (securityGroupId: SecurityGroupID) 
  * @summary Create a security group rule
  */
 export const createSecurityGroupRule = async (
-  securityGroupId: SecurityGroupID,
+  securityGroupId: SecurityGroupId,
   createSecurityGroupRuleRequestBody: CreateSecurityGroupRuleRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -4401,8 +4602,8 @@ export type getSecurityGroupRuleResponse =
   | getSecurityGroupRuleResponseError;
 
 export const getGetSecurityGroupRuleUrl = (
-  securityGroupId: SecurityGroupID,
-  securityGroupRuleId: SecurityGroupRuleID,
+  securityGroupId: SecurityGroupId,
+  securityGroupRuleId: SecurityGroupRuleId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/security-groups/${encodeURIComponent(String(securityGroupId))}/rules/${encodeURIComponent(String(securityGroupRuleId))}`;
 };
@@ -4411,8 +4612,8 @@ export const getGetSecurityGroupRuleUrl = (
  * @summary Get a security group rule
  */
 export const getSecurityGroupRule = async (
-  securityGroupId: SecurityGroupID,
-  securityGroupRuleId: SecurityGroupRuleID,
+  securityGroupId: SecurityGroupId,
+  securityGroupRuleId: SecurityGroupRuleId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getSecurityGroupRuleResponse> => {
@@ -4452,8 +4653,8 @@ export type deleteSecurityGroupRuleResponse =
   | deleteSecurityGroupRuleResponseError;
 
 export const getDeleteSecurityGroupRuleUrl = (
-  securityGroupId: SecurityGroupID,
-  securityGroupRuleId: SecurityGroupRuleID,
+  securityGroupId: SecurityGroupId,
+  securityGroupRuleId: SecurityGroupRuleId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/security-groups/${encodeURIComponent(String(securityGroupId))}/rules/${encodeURIComponent(String(securityGroupRuleId))}`;
 };
@@ -4462,8 +4663,8 @@ export const getDeleteSecurityGroupRuleUrl = (
  * @summary Delete a security group rule
  */
 export const deleteSecurityGroupRule = async (
-  securityGroupId: SecurityGroupID,
-  securityGroupRuleId: SecurityGroupRuleID,
+  securityGroupId: SecurityGroupId,
+  securityGroupRuleId: SecurityGroupRuleId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteSecurityGroupRuleResponse> => {
@@ -4624,7 +4825,7 @@ export type getSecurityGroupResponse =
   | getSecurityGroupResponseSuccess
   | getSecurityGroupResponseError;
 
-export const getGetSecurityGroupUrl = (securityGroupId: SecurityGroupID) => {
+export const getGetSecurityGroupUrl = (securityGroupId: SecurityGroupId) => {
   return `https://compute.leaflow.cloud/api/v2/security-groups/${encodeURIComponent(String(securityGroupId))}`;
 };
 
@@ -4632,7 +4833,7 @@ export const getGetSecurityGroupUrl = (securityGroupId: SecurityGroupID) => {
  * @summary Get a security group
  */
 export const getSecurityGroup = async (
-  securityGroupId: SecurityGroupID,
+  securityGroupId: SecurityGroupId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getSecurityGroupResponse> => {
@@ -4668,7 +4869,7 @@ export type updateSecurityGroupResponse =
   | updateSecurityGroupResponseSuccess
   | updateSecurityGroupResponseError;
 
-export const getUpdateSecurityGroupUrl = (securityGroupId: SecurityGroupID) => {
+export const getUpdateSecurityGroupUrl = (securityGroupId: SecurityGroupId) => {
   return `https://compute.leaflow.cloud/api/v2/security-groups/${encodeURIComponent(String(securityGroupId))}`;
 };
 
@@ -4677,7 +4878,7 @@ export const getUpdateSecurityGroupUrl = (securityGroupId: SecurityGroupID) => {
  * @summary Update a security group
  */
 export const updateSecurityGroup = async (
-  securityGroupId: SecurityGroupID,
+  securityGroupId: SecurityGroupId,
   updateSecurityGroupRequestBody: UpdateSecurityGroupRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -4735,7 +4936,7 @@ export type deleteSecurityGroupResponse =
   | deleteSecurityGroupResponseSuccess
   | deleteSecurityGroupResponseError;
 
-export const getDeleteSecurityGroupUrl = (securityGroupId: SecurityGroupID) => {
+export const getDeleteSecurityGroupUrl = (securityGroupId: SecurityGroupId) => {
   return `https://compute.leaflow.cloud/api/v2/security-groups/${encodeURIComponent(String(securityGroupId))}`;
 };
 
@@ -4744,7 +4945,7 @@ export const getDeleteSecurityGroupUrl = (securityGroupId: SecurityGroupID) => {
  * @summary Delete a security group
  */
 export const deleteSecurityGroup = async (
-  securityGroupId: SecurityGroupID,
+  securityGroupId: SecurityGroupId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteSecurityGroupResponse> => {
@@ -4919,7 +5120,7 @@ export type getVirtualPrivateCloudPeeringResponse =
   | getVirtualPrivateCloudPeeringResponseError;
 
 export const getGetVirtualPrivateCloudPeeringUrl = (
-  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringID,
+  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-cloud-peerings/${encodeURIComponent(String(virtualPrivateCloudPeeringId))}`;
 };
@@ -4928,7 +5129,7 @@ export const getGetVirtualPrivateCloudPeeringUrl = (
  * @summary Get peering
  */
 export const getVirtualPrivateCloudPeering = async (
-  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringID,
+  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getVirtualPrivateCloudPeeringResponse> => {
@@ -4981,7 +5182,7 @@ export type deleteVirtualPrivateCloudPeeringResponse =
   | deleteVirtualPrivateCloudPeeringResponseError;
 
 export const getDeleteVirtualPrivateCloudPeeringUrl = (
-  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringID,
+  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-cloud-peerings/${encodeURIComponent(String(virtualPrivateCloudPeeringId))}`;
 };
@@ -4990,7 +5191,7 @@ export const getDeleteVirtualPrivateCloudPeeringUrl = (
  * @summary Delete peering
  */
 export const deleteVirtualPrivateCloudPeering = async (
-  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringID,
+  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteVirtualPrivateCloudPeeringResponse> => {
@@ -5043,7 +5244,7 @@ export type acceptVirtualPrivateCloudPeeringResponse =
   | acceptVirtualPrivateCloudPeeringResponseError;
 
 export const getAcceptVirtualPrivateCloudPeeringUrl = (
-  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringID,
+  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-cloud-peerings/${encodeURIComponent(String(virtualPrivateCloudPeeringId))}:accept`;
 };
@@ -5053,7 +5254,7 @@ export const getAcceptVirtualPrivateCloudPeeringUrl = (
  * @summary Accept a peering
  */
 export const acceptVirtualPrivateCloudPeering = async (
-  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringID,
+  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<acceptVirtualPrivateCloudPeeringResponse> => {
@@ -5106,7 +5307,7 @@ export type rejectVirtualPrivateCloudPeeringResponse =
   | rejectVirtualPrivateCloudPeeringResponseError;
 
 export const getRejectVirtualPrivateCloudPeeringUrl = (
-  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringID,
+  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-cloud-peerings/${encodeURIComponent(String(virtualPrivateCloudPeeringId))}:reject`;
 };
@@ -5116,7 +5317,7 @@ export const getRejectVirtualPrivateCloudPeeringUrl = (
  * @summary Reject a peering
  */
 export const rejectVirtualPrivateCloudPeering = async (
-  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringID,
+  virtualPrivateCloudPeeringId: VirtualPrivateCloudPeeringId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<rejectVirtualPrivateCloudPeeringResponse> => {
@@ -5162,7 +5363,7 @@ export type listVirtualPrivateCloudRoutesResponse =
   | listVirtualPrivateCloudRoutesResponseError;
 
 export const getListVirtualPrivateCloudRoutesUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudIDOrWildcard,
+  virtualPrivateCloudId: VirtualPrivateCloudIdOrWildcard,
   params?: ListVirtualPrivateCloudRoutesParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -5185,7 +5386,7 @@ export const getListVirtualPrivateCloudRoutesUrl = (
  * @summary List routes
  */
 export const listVirtualPrivateCloudRoutes = async (
-  virtualPrivateCloudId: VirtualPrivateCloudIDOrWildcard,
+  virtualPrivateCloudId: VirtualPrivateCloudIdOrWildcard,
   params?: ListVirtualPrivateCloudRoutesParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -5232,7 +5433,7 @@ export type createVirtualPrivateCloudRouteResponse =
   | createVirtualPrivateCloudRouteResponseError;
 
 export const getCreateVirtualPrivateCloudRouteUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}/routes`;
 };
@@ -5242,7 +5443,7 @@ export const getCreateVirtualPrivateCloudRouteUrl = (
  * @summary Create a static route
  */
 export const createVirtualPrivateCloudRoute = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
   createVirtualPrivateCloudRouteRequestBody: CreateVirtualPrivateCloudRouteRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -5309,8 +5510,8 @@ export type getVirtualPrivateCloudRouteResponse =
   | getVirtualPrivateCloudRouteResponseError;
 
 export const getGetVirtualPrivateCloudRouteUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  virtualPrivateCloudRouteId: VirtualPrivateCloudRouteID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  virtualPrivateCloudRouteId: VirtualPrivateCloudRouteId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}/routes/${encodeURIComponent(String(virtualPrivateCloudRouteId))}`;
 };
@@ -5319,8 +5520,8 @@ export const getGetVirtualPrivateCloudRouteUrl = (
  * @summary Get a route
  */
 export const getVirtualPrivateCloudRoute = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  virtualPrivateCloudRouteId: VirtualPrivateCloudRouteID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  virtualPrivateCloudRouteId: VirtualPrivateCloudRouteId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getVirtualPrivateCloudRouteResponse> => {
@@ -5362,8 +5563,8 @@ export type deleteVirtualPrivateCloudRouteResponse =
   | deleteVirtualPrivateCloudRouteResponseError;
 
 export const getDeleteVirtualPrivateCloudRouteUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  virtualPrivateCloudRouteId: VirtualPrivateCloudRouteID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  virtualPrivateCloudRouteId: VirtualPrivateCloudRouteId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}/routes/${encodeURIComponent(String(virtualPrivateCloudRouteId))}`;
 };
@@ -5373,8 +5574,8 @@ export const getDeleteVirtualPrivateCloudRouteUrl = (
  * @summary Delete a static route
  */
 export const deleteVirtualPrivateCloudRoute = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  virtualPrivateCloudRouteId: VirtualPrivateCloudRouteID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  virtualPrivateCloudRouteId: VirtualPrivateCloudRouteId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteVirtualPrivateCloudRouteResponse> => {
@@ -5420,7 +5621,7 @@ export type listVirtualPrivateCloudSubnetsResponse =
   | listVirtualPrivateCloudSubnetsResponseError;
 
 export const getListVirtualPrivateCloudSubnetsUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudIDOrWildcard,
+  virtualPrivateCloudId: VirtualPrivateCloudIdOrWildcard,
   params?: ListVirtualPrivateCloudSubnetsParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -5443,7 +5644,7 @@ export const getListVirtualPrivateCloudSubnetsUrl = (
  * @summary List subnets
  */
 export const listVirtualPrivateCloudSubnets = async (
-  virtualPrivateCloudId: VirtualPrivateCloudIDOrWildcard,
+  virtualPrivateCloudId: VirtualPrivateCloudIdOrWildcard,
   params?: ListVirtualPrivateCloudSubnetsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -5490,7 +5691,7 @@ export type createVirtualPrivateCloudSubnetResponse =
   | createVirtualPrivateCloudSubnetResponseError;
 
 export const getCreateVirtualPrivateCloudSubnetUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}/subnets`;
 };
@@ -5500,7 +5701,7 @@ export const getCreateVirtualPrivateCloudSubnetUrl = (
  * @summary Create a subnet
  */
 export const createVirtualPrivateCloudSubnet = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
   createVirtualPrivateCloudSubnetRequestBody: CreateVirtualPrivateCloudSubnetRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -5568,8 +5769,8 @@ export type getVirtualPrivateCloudSubnetResponse =
   | getVirtualPrivateCloudSubnetResponseError;
 
 export const getGetVirtualPrivateCloudSubnetUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  subnetId: SubnetID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  subnetId: SubnetId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}/subnets/${encodeURIComponent(String(subnetId))}`;
 };
@@ -5578,8 +5779,8 @@ export const getGetVirtualPrivateCloudSubnetUrl = (
  * @summary Get a subnet
  */
 export const getVirtualPrivateCloudSubnet = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  subnetId: SubnetID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  subnetId: SubnetId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getVirtualPrivateCloudSubnetResponse> => {
@@ -5621,8 +5822,8 @@ export type updateVirtualPrivateCloudSubnetResponse =
   | updateVirtualPrivateCloudSubnetResponseError;
 
 export const getUpdateVirtualPrivateCloudSubnetUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  subnetId: SubnetID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  subnetId: SubnetId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}/subnets/${encodeURIComponent(String(subnetId))}`;
 };
@@ -5632,8 +5833,8 @@ export const getUpdateVirtualPrivateCloudSubnetUrl = (
  * @summary Update a subnet
  */
 export const updateVirtualPrivateCloudSubnet = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  subnetId: SubnetID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  subnetId: SubnetId,
   updateVirtualPrivateCloudSubnetRequestBody: UpdateVirtualPrivateCloudSubnetRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -5701,8 +5902,8 @@ export type deleteVirtualPrivateCloudSubnetResponse =
   | deleteVirtualPrivateCloudSubnetResponseError;
 
 export const getDeleteVirtualPrivateCloudSubnetUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  subnetId: SubnetID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  subnetId: SubnetId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}/subnets/${encodeURIComponent(String(subnetId))}`;
 };
@@ -5712,8 +5913,8 @@ export const getDeleteVirtualPrivateCloudSubnetUrl = (
  * @summary Delete a subnet
  */
 export const deleteVirtualPrivateCloudSubnet = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
-  subnetId: SubnetID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
+  subnetId: SubnetId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteVirtualPrivateCloudSubnetResponse> => {
@@ -5878,7 +6079,7 @@ export type getVirtualPrivateCloudResponse =
   | getVirtualPrivateCloudResponseSuccess
   | getVirtualPrivateCloudResponseError;
 
-export const getGetVirtualPrivateCloudUrl = (virtualPrivateCloudId: VirtualPrivateCloudID) => {
+export const getGetVirtualPrivateCloudUrl = (virtualPrivateCloudId: VirtualPrivateCloudId) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}`;
 };
 
@@ -5886,7 +6087,7 @@ export const getGetVirtualPrivateCloudUrl = (virtualPrivateCloudId: VirtualPriva
  * @summary Retrieve a virtual private cloud
  */
 export const getVirtualPrivateCloud = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getVirtualPrivateCloudResponse> => {
@@ -5922,7 +6123,7 @@ export type updateVirtualPrivateCloudResponse =
   | updateVirtualPrivateCloudResponseSuccess
   | updateVirtualPrivateCloudResponseError;
 
-export const getUpdateVirtualPrivateCloudUrl = (virtualPrivateCloudId: VirtualPrivateCloudID) => {
+export const getUpdateVirtualPrivateCloudUrl = (virtualPrivateCloudId: VirtualPrivateCloudId) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}`;
 };
 
@@ -5931,7 +6132,7 @@ export const getUpdateVirtualPrivateCloudUrl = (virtualPrivateCloudId: VirtualPr
  * @summary Update a virtual private cloud
  */
 export const updateVirtualPrivateCloud = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
   updateVirtualPrivateCloudRequestBody: UpdateVirtualPrivateCloudRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -5997,7 +6198,7 @@ export type deleteVirtualPrivateCloudResponse =
   | deleteVirtualPrivateCloudResponseSuccess
   | deleteVirtualPrivateCloudResponseError;
 
-export const getDeleteVirtualPrivateCloudUrl = (virtualPrivateCloudId: VirtualPrivateCloudID) => {
+export const getDeleteVirtualPrivateCloudUrl = (virtualPrivateCloudId: VirtualPrivateCloudId) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}`;
 };
 
@@ -6006,7 +6207,7 @@ export const getDeleteVirtualPrivateCloudUrl = (virtualPrivateCloudId: VirtualPr
  * @summary Release a virtual private cloud
  */
 export const deleteVirtualPrivateCloud = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteVirtualPrivateCloudResponse> => {
@@ -6052,7 +6253,7 @@ export type enableVirtualPrivateCloudIpv6Response =
   | enableVirtualPrivateCloudIpv6ResponseError;
 
 export const getEnableVirtualPrivateCloudIpv6Url = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}:enableIpv6`;
 };
@@ -6064,7 +6265,7 @@ export const getEnableVirtualPrivateCloudIpv6Url = (
  * @summary Enable IPv6 on a virtual private cloud
  */
 export const enableVirtualPrivateCloudIpv6 = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<enableVirtualPrivateCloudIpv6Response> => {
@@ -6114,7 +6315,7 @@ export type disableVirtualPrivateCloudIpv6Response =
   | disableVirtualPrivateCloudIpv6ResponseError;
 
 export const getDisableVirtualPrivateCloudIpv6Url = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
 ) => {
   return `https://compute.leaflow.cloud/api/v2/virtual-private-clouds/${encodeURIComponent(String(virtualPrivateCloudId))}:disableIpv6`;
 };
@@ -6124,7 +6325,7 @@ export const getDisableVirtualPrivateCloudIpv6Url = (
  * @summary Disable IPv6 on a virtual private cloud
  */
 export const disableVirtualPrivateCloudIpv6 = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<disableVirtualPrivateCloudIpv6Response> => {
@@ -6170,7 +6371,7 @@ export type getVirtualPrivateCloudFreeSubnetCidrResponse =
   | getVirtualPrivateCloudFreeSubnetCidrResponseError;
 
 export const getGetVirtualPrivateCloudFreeSubnetCidrUrl = (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
   params?: GetVirtualPrivateCloudFreeSubnetCidrParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -6193,7 +6394,7 @@ export const getGetVirtualPrivateCloudFreeSubnetCidrUrl = (
  * @summary Get a free subnet CIDR
  */
 export const getVirtualPrivateCloudFreeSubnetCidr = async (
-  virtualPrivateCloudId: VirtualPrivateCloudID,
+  virtualPrivateCloudId: VirtualPrivateCloudId,
   params?: GetVirtualPrivateCloudFreeSubnetCidrParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -6369,7 +6570,7 @@ export type getVolumeBackupResponseError = getVolumeBackupResponseDefault & {
 
 export type getVolumeBackupResponse = getVolumeBackupResponseSuccess | getVolumeBackupResponseError;
 
-export const getGetVolumeBackupUrl = (volumeBackupId: VolumeBackupID) => {
+export const getGetVolumeBackupUrl = (volumeBackupId: VolumeBackupId) => {
   return `https://compute.leaflow.cloud/api/v2/volume-backups/${encodeURIComponent(String(volumeBackupId))}`;
 };
 
@@ -6378,7 +6579,7 @@ export const getGetVolumeBackupUrl = (volumeBackupId: VolumeBackupID) => {
  * @summary Retrieve a volume backup
  */
 export const getVolumeBackup = async (
-  volumeBackupId: VolumeBackupID,
+  volumeBackupId: VolumeBackupId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getVolumeBackupResponse> => {
@@ -6414,7 +6615,7 @@ export type updateVolumeBackupResponse =
   | updateVolumeBackupResponseSuccess
   | updateVolumeBackupResponseError;
 
-export const getUpdateVolumeBackupUrl = (volumeBackupId: VolumeBackupID) => {
+export const getUpdateVolumeBackupUrl = (volumeBackupId: VolumeBackupId) => {
   return `https://compute.leaflow.cloud/api/v2/volume-backups/${encodeURIComponent(String(volumeBackupId))}`;
 };
 
@@ -6423,7 +6624,7 @@ export const getUpdateVolumeBackupUrl = (volumeBackupId: VolumeBackupID) => {
  * @summary Update a volume backup
  */
 export const updateVolumeBackup = async (
-  volumeBackupId: VolumeBackupID,
+  volumeBackupId: VolumeBackupId,
   updateVolumeBackupRequestBody: UpdateVolumeBackupRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -6490,7 +6691,7 @@ export type deleteVolumeBackupResponse =
   | deleteVolumeBackupResponseError;
 
 export const getDeleteVolumeBackupUrl = (
-  volumeBackupId: VolumeBackupID,
+  volumeBackupId: VolumeBackupId,
   params?: DeleteVolumeBackupParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -6515,11 +6716,11 @@ export const getDeleteVolumeBackupUrl = (
  *
  * A resource whose purchase still awaits checkout or payment is refused with `COMPUTE_PURCHASE_PENDING`; `meta.checkout_session_id` names its Checkout Session and `meta.order_id` its order once checkout created one. Expire the session or cancel the order in Billing instead. A subscribed resource is released through its subscription cancellation. Cleanup must be confirmed before metering is stopped; unknown cleanup is not proof of release.
  *
- * While subscriptions pay for the volume backup (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed subscription being refunded under its terms, and `period_end` keeps the volume backup working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
+ * While subscription items pay for the volume backup (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed item being refunded under its terms, and `period_end` keeps the volume backup working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
  * @summary Delete a volume backup
  */
 export const deleteVolumeBackup = async (
-  volumeBackupId: VolumeBackupID,
+  volumeBackupId: VolumeBackupId,
   params?: DeleteVolumeBackupParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -6690,7 +6891,7 @@ export type getVolumeSnapshotResponse =
   | getVolumeSnapshotResponseSuccess
   | getVolumeSnapshotResponseError;
 
-export const getGetVolumeSnapshotUrl = (volumeSnapshotId: VolumeSnapshotID) => {
+export const getGetVolumeSnapshotUrl = (volumeSnapshotId: VolumeSnapshotId) => {
   return `https://compute.leaflow.cloud/api/v2/volume-snapshots/${encodeURIComponent(String(volumeSnapshotId))}`;
 };
 
@@ -6698,7 +6899,7 @@ export const getGetVolumeSnapshotUrl = (volumeSnapshotId: VolumeSnapshotID) => {
  * @summary Retrieve a snapshot
  */
 export const getVolumeSnapshot = async (
-  volumeSnapshotId: VolumeSnapshotID,
+  volumeSnapshotId: VolumeSnapshotId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getVolumeSnapshotResponse> => {
@@ -6734,7 +6935,7 @@ export type updateVolumeSnapshotResponse =
   | updateVolumeSnapshotResponseSuccess
   | updateVolumeSnapshotResponseError;
 
-export const getUpdateVolumeSnapshotUrl = (volumeSnapshotId: VolumeSnapshotID) => {
+export const getUpdateVolumeSnapshotUrl = (volumeSnapshotId: VolumeSnapshotId) => {
   return `https://compute.leaflow.cloud/api/v2/volume-snapshots/${encodeURIComponent(String(volumeSnapshotId))}`;
 };
 
@@ -6743,7 +6944,7 @@ export const getUpdateVolumeSnapshotUrl = (volumeSnapshotId: VolumeSnapshotID) =
  * @summary Update a snapshot
  */
 export const updateVolumeSnapshot = async (
-  volumeSnapshotId: VolumeSnapshotID,
+  volumeSnapshotId: VolumeSnapshotId,
   updateVolumeSnapshotRequestBody: UpdateVolumeSnapshotRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -6810,7 +7011,7 @@ export type deleteVolumeSnapshotResponse =
   | deleteVolumeSnapshotResponseError;
 
 export const getDeleteVolumeSnapshotUrl = (
-  volumeSnapshotId: VolumeSnapshotID,
+  volumeSnapshotId: VolumeSnapshotId,
   params?: DeleteVolumeSnapshotParams,
 ) => {
   const normalizedParams = new URLSearchParams();
@@ -6833,11 +7034,11 @@ export const getDeleteVolumeSnapshotUrl = (
  *
  * A resource whose purchase still awaits checkout or payment is refused with `COMPUTE_PURCHASE_PENDING`; `meta.checkout_session_id` names its Checkout Session and `meta.order_id` its order once checkout created one. Expire the session or cancel the order in Billing instead. A subscribed resource is released through its subscription cancellation. Cleanup must be confirmed before metering is stopped; unknown cleanup is not proof of release.
  *
- * While subscriptions pay for the snapshot (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed subscription being refunded under its terms, and `period_end` keeps the snapshot working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
+ * While subscription items pay for the snapshot (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed item being refunded under its terms, and `period_end` keeps the snapshot working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
  * @summary Delete a snapshot
  */
 export const deleteVolumeSnapshot = async (
-  volumeSnapshotId: VolumeSnapshotID,
+  volumeSnapshotId: VolumeSnapshotId,
   params?: DeleteVolumeSnapshotParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -6927,7 +7128,7 @@ export type getVolumeTypeResponseError = getVolumeTypeResponseDefault & {
 
 export type getVolumeTypeResponse = getVolumeTypeResponseSuccess | getVolumeTypeResponseError;
 
-export const getGetVolumeTypeUrl = (volumeTypeId: VolumeTypeID) => {
+export const getGetVolumeTypeUrl = (volumeTypeId: VolumeTypeId) => {
   return `https://compute.leaflow.cloud/api/v2/volume-types/${encodeURIComponent(String(volumeTypeId))}`;
 };
 
@@ -6936,7 +7137,7 @@ export const getGetVolumeTypeUrl = (volumeTypeId: VolumeTypeID) => {
  * @summary Get a volume type
  */
 export const getVolumeType = async (
-  volumeTypeId: VolumeTypeID,
+  volumeTypeId: VolumeTypeId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getVolumeTypeResponse> => {
@@ -7046,7 +7247,9 @@ export const getCreateVolumeUrl = () => {
  *
  * A volume type that is off sale is rejected with `VOLUME_TYPE_OFF_SALE`, even though its identifier still resolves. Types that are off sale do not appear in the volume type listing; volumes already bought on one keep working and can still be resized.
  *
- * A volume bought on its own is licensed: `billing.usage_type` `metered` is refused with `VOLUME_USAGE_TYPE_UNAVAILABLE`. A volume created with an instance follows the machine's terms instead and may be metered.
+ * A volume bought on its own is licensed, with a Billing subscription of its own: `billing.usage_type` `metered` is refused with `VOLUME_USAGE_TYPE_UNAVAILABLE`. A volume created with an instance follows the machine's terms instead and may be metered.
+ *
+ * **Buying for an instance.** With `instance_id`, the volume is attached to that instance of the project once created, and becomes an item of the instance's Billing subscription: it is charged up to the instance's term end, the rest of the current period in proportion to the time left, and from then on renews, renews automatically and expires with the instance. Its volume type has to be of the instance's availability zone (422 `VOLUME_TYPE_OTHER_AVAILABILITY_ZONE`). `billing` may be omitted to take the instance's terms; given, its usage type and period must be the instance's (422 `VOLUME_BILLING_TERMS_MISMATCH`), while its termination policy may differ. An instance with no room for another volume is refused before anything is ordered, as attaching would be.
  *
  * The volume is `pending` from the moment its Checkout Session is created until it is delivered or its checkout or order ends. Every other operation on it is refused with `COMPUTE_RESOURCE_BUSY` meanwhile, and its deletion with `COMPUTE_PURCHASE_PENDING` while its purchase awaits checkout or payment.
  * @summary Create a volume
@@ -7107,7 +7310,7 @@ export type getVolumeResponseError = getVolumeResponseDefault & {
 
 export type getVolumeResponse = getVolumeResponseSuccess | getVolumeResponseError;
 
-export const getGetVolumeUrl = (volumeId: VolumeID) => {
+export const getGetVolumeUrl = (volumeId: VolumeId) => {
   return `https://compute.leaflow.cloud/api/v2/volumes/${encodeURIComponent(String(volumeId))}`;
 };
 
@@ -7116,7 +7319,7 @@ export const getGetVolumeUrl = (volumeId: VolumeID) => {
  * @summary Retrieve a volume
  */
 export const getVolume = async (
-  volumeId: VolumeID,
+  volumeId: VolumeId,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getVolumeResponse> => {
@@ -7132,54 +7335,34 @@ export const getVolume = async (
 };
 
 export type updateVolumeResponse200 = {
-  data: UpdateVolumeResponseBody;
+  data: VolumeResource;
   status: 200;
-};
-
-export type updateVolumeResponse202 = {
-  data: UpdateVolumeResponseBody;
-  status: 202;
-};
-
-export type updateVolumeResponse409 = {
-  data: ConflictResponse;
-  status: 409;
 };
 
 export type updateVolumeResponseDefault = {
   data: Error;
-  status: Exclude<HTTPStatusCodes, 200 | 202 | 409>;
+  status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type updateVolumeResponseSuccess = (updateVolumeResponse200 | updateVolumeResponse202) & {
+export type updateVolumeResponseSuccess = updateVolumeResponse200 & {
   headers: Headers;
 };
-export type updateVolumeResponseError = (updateVolumeResponse409 | updateVolumeResponseDefault) & {
+export type updateVolumeResponseError = updateVolumeResponseDefault & {
   headers: Headers;
 };
 
 export type updateVolumeResponse = updateVolumeResponseSuccess | updateVolumeResponseError;
 
-export const getUpdateVolumeUrl = (volumeId: VolumeID) => {
+export const getUpdateVolumeUrl = (volumeId: VolumeId) => {
   return `https://compute.leaflow.cloud/api/v2/volumes/${encodeURIComponent(String(volumeId))}`;
 };
 
 /**
- * Changes the name, the capacity or the volume type. The availability zone is immutable.
- *
- * `size_gib` and `volume_type_id` are operational fields: each starts a change and cannot be combined with any other field in the same request, including the other one. Such a request is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied. `checkout` and `proration_date` belong to the purchase of the change and are accepted only together with one of them.
- *
- * **Renaming** is not an operation and is accepted at any time. It returns 200 with `checkout_session_id` and `order_id` null.
- *
- * **Resizing** accepts only an increase; a smaller `size_gib` is refused with `VOLUME_CANNOT_SHRINK` (422), since a file system cannot be shrunk from outside the instance. It returns 202 with the volume and the Checkout Session for the resize, which keeps the volume's usage type and period. The volume is `resizing` until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The volume keeps its current size until the resize is applied; once `size_gib` shows the new size, extend the file system inside the instance. If checkout is not completed, the order is not accepted or the resize fails, the volume keeps its size and Billing shows the outcome.
- *
- * **Changing the type** moves the volume to another volume type at the same capacity, priced as that type, and returns 202 with the volume and the Checkout Session for the change, which keeps the volume's usage type and period. The volume has to be detached (409 `VOLUME_RETYPE_ATTACHED`), so a boot volume cannot change its type. The target has to be on sale (`VOLUME_TYPE_OFF_SALE`), in the volume's region (422 `VOLUME_RETYPE_OTHER_REGION`), of the volume's availability zone (422 `VOLUME_TYPE_OTHER_AVAILABILITY_ZONE`) with room for the volume (409 `VOLUME_TYPE_SOLD_OUT`, `VOLUME_TYPE_CAPACITY_REACHED`, `VOLUME_TYPE_NO_POOL_ROOM`), admit the volume's capacity (422 `VOLUME_SIZE_OUT_OF_RANGE`, `VOLUME_SIZE_NOT_ON_STEP`) and differ from the current one (422 `VOLUME_RETYPE_SAME_TYPE`). The volume is `retyping` until the change is applied, its Checkout Session expires or its order is canceled. A target on the same storage backend takes effect at once; one on another backend copies the volume's data there first, which takes longer the larger the volume is. The volume keeps its type until `volume_type_id` shows the new one, and its `performance` follows from then on; a change that did not take effect leaves the volume as it was and is refunded.
- *
- * An attached volume, including a boot volume, can be resized. The capacity is usable at once, and the volume's `performance` shows what its type gives the new size. **That performance applies from the volume's next attachment, or the next start of its stopped instance**: the storage reads a volume's limits only while connecting it. Until then the attachment's `performance` shows what is in effect.
+ * Changes the name. It is not an operation and is accepted at any time. Growing the volume is `:resize` and moving it to another type is `:retype`.
  * @summary Update a volume
  */
 export const updateVolume = async (
-  volumeId: VolumeID,
+  volumeId: VolumeId,
   updateVolumeRequestBody: UpdateVolumeRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -7240,7 +7423,7 @@ export type deleteVolumeResponseError = (deleteVolumeResponse409 | deleteVolumeR
 
 export type deleteVolumeResponse = deleteVolumeResponseSuccess | deleteVolumeResponseError;
 
-export const getDeleteVolumeUrl = (volumeId: VolumeID, params?: DeleteVolumeParams) => {
+export const getDeleteVolumeUrl = (volumeId: VolumeId, params?: DeleteVolumeParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -7261,11 +7444,11 @@ export const getDeleteVolumeUrl = (volumeId: VolumeID, params?: DeleteVolumePara
  *
  * Refused with `COMPUTE_PURCHASE_PENDING` while the purchase that created it still awaits checkout or payment; `meta.checkout_session_id` names its Checkout Session and `meta.order_id` its order once checkout created one. Expire the session or cancel the order in Billing instead.
  *
- * While subscriptions pay for the volume (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed subscription being refunded under its terms, and `period_end` keeps the volume working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
+ * While subscription items pay for the volume (those in its `release_set`), deleting it cancels them rather than being refused: Compute creates one Billing cancellation for the whole set and answers with it in `cancellation`. `cancellation_mode` chooses when: `immediate` cancels the set now, a licensed item being refunded under its terms, and `period_end` keeps the volume working until `scheduled_at` and releases it then. Asking again while that cancellation is pending answers with it again, whatever mode is asked for.
  * @summary Delete a volume
  */
 export const deleteVolume = async (
-  volumeId: VolumeID,
+  volumeId: VolumeId,
   params?: DeleteVolumeParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
@@ -7279,6 +7462,148 @@ export const deleteVolume = async (
 
   const data: deleteVolumeResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as deleteVolumeResponse;
+};
+
+export type resizeVolumeResponse202 = {
+  data: VolumeChangeResponseBody;
+  status: 202;
+};
+
+export type resizeVolumeResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type resizeVolumeResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 202 | 409>;
+};
+
+export type resizeVolumeResponseSuccess = resizeVolumeResponse202 & {
+  headers: Headers;
+};
+export type resizeVolumeResponseError = (resizeVolumeResponse409 | resizeVolumeResponseDefault) & {
+  headers: Headers;
+};
+
+export type resizeVolumeResponse = resizeVolumeResponseSuccess | resizeVolumeResponseError;
+
+export const getResizeVolumeUrl = (volumeId: VolumeId) => {
+  return `https://compute.leaflow.cloud/api/v2/volumes/${encodeURIComponent(String(volumeId))}:resize`;
+};
+
+/**
+ * Grows the volume through a change of its subscription item purchased in Billing. Only an increase is accepted; a smaller `size_gib` is refused with `VOLUME_CANNOT_SHRINK` (422), since a file system cannot be shrunk from outside the instance. It returns 202 with the volume and the Checkout Session for the resize, which keeps the volume's usage type and period. The volume is `resizing` until the resize is applied, its Checkout Session expires or its order is canceled, so other operations and a second resize are refused with `COMPUTE_RESOURCE_BUSY` meanwhile. The volume keeps its current size until the resize is applied; once `size_gib` shows the new size, extend the file system inside the instance. If checkout is not completed, the order is not accepted or the resize fails, the volume keeps its size and Billing shows the outcome.
+ *
+ * An attached volume, including a boot volume, can be resized. The capacity is usable at once, and the volume's `performance` shows what its type gives the new size. **That performance applies from the volume's next attachment, or the next start of its stopped instance**: the storage reads a volume's limits only while connecting it. Until then the attachment's `performance` shows what is in effect.
+ * @summary Resize a volume
+ */
+export const resizeVolume = async (
+  volumeId: VolumeId,
+  resizeVolumeRequestBody: ResizeVolumeRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<resizeVolumeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getResizeVolumeUrl(volumeId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(resizeVolumeRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resizeVolumeResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as resizeVolumeResponse;
+};
+
+export type retypeVolumeResponse202 = {
+  data: VolumeChangeResponseBody;
+  status: 202;
+};
+
+export type retypeVolumeResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type retypeVolumeResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 202 | 409>;
+};
+
+export type retypeVolumeResponseSuccess = retypeVolumeResponse202 & {
+  headers: Headers;
+};
+export type retypeVolumeResponseError = (retypeVolumeResponse409 | retypeVolumeResponseDefault) & {
+  headers: Headers;
+};
+
+export type retypeVolumeResponse = retypeVolumeResponseSuccess | retypeVolumeResponseError;
+
+export const getRetypeVolumeUrl = (volumeId: VolumeId) => {
+  return `https://compute.leaflow.cloud/api/v2/volumes/${encodeURIComponent(String(volumeId))}:retype`;
+};
+
+/**
+ * Moves the volume to another volume type at the same capacity, priced as that type, through a change of its subscription item purchased in Billing, and returns 202 with the volume and the Checkout Session for the change, which keeps the volume's usage type and period. The volume has to be detached (409 `VOLUME_RETYPE_ATTACHED`), so a boot volume cannot change its type. The target has to be on sale (`VOLUME_TYPE_OFF_SALE`), in the volume's region (422 `VOLUME_RETYPE_OTHER_REGION`), of the volume's availability zone (422 `VOLUME_TYPE_OTHER_AVAILABILITY_ZONE`) with room for the volume (409 `VOLUME_TYPE_SOLD_OUT`, `VOLUME_TYPE_CAPACITY_REACHED`, `VOLUME_TYPE_NO_POOL_ROOM`), admit the volume's capacity (422 `VOLUME_SIZE_OUT_OF_RANGE`, `VOLUME_SIZE_NOT_ON_STEP`) and differ from the current one (422 `VOLUME_RETYPE_SAME_TYPE`). The volume is `retyping` until the change is applied, its Checkout Session expires or its order is canceled. A target on the same storage backend takes effect at once; one on another backend copies the volume's data there first, which takes longer the larger the volume is. The volume keeps its type until `volume_type_id` shows the new one, and its `performance` follows from then on; a change that did not take effect leaves the volume as it was and is refunded.
+ * @summary Change the type of a volume
+ */
+export const retypeVolume = async (
+  volumeId: VolumeId,
+  retypeVolumeRequestBody: RetypeVolumeRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<retypeVolumeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getRetypeVolumeUrl(volumeId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(retypeVolumeRequestBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: retypeVolumeResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as retypeVolumeResponse;
 };
 
 export type revertVolumeResponse202 = {
@@ -7305,7 +7630,7 @@ export type revertVolumeResponseError = (revertVolumeResponse409 | revertVolumeR
 
 export type revertVolumeResponse = revertVolumeResponseSuccess | revertVolumeResponseError;
 
-export const getRevertVolumeUrl = (volumeId: VolumeID) => {
+export const getRevertVolumeUrl = (volumeId: VolumeId) => {
   return `https://compute.leaflow.cloud/api/v2/volumes/${encodeURIComponent(String(volumeId))}:revert`;
 };
 
@@ -7318,7 +7643,7 @@ export const getRevertVolumeUrl = (volumeId: VolumeID) => {
  * @summary Revert a volume to a snapshot
  */
 export const revertVolume = async (
-  volumeId: VolumeID,
+  volumeId: VolumeId,
   revertVolumeRequestBody: RevertVolumeRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,

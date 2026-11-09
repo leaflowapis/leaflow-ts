@@ -7,6 +7,9 @@
  */
 import * as zod from "zod";
 import { CancellationPolicy } from "./cancellationPolicy.zod.js";
+import { CheckoutSessionSubscriptionInput } from "./checkoutSessionSubscriptionInput.zod.js";
+
+export const checkoutSessionCreateSubscriptionsMax = 20;
 
 export const checkoutSessionCreatePeriodsDefault = 1;
 
@@ -17,7 +20,11 @@ export const CheckoutSessionCreate = zod
       .describe(
         "Chosen by the caller. Creating it again conflicts; read the session after an unknown outcome.",
       ),
-    subscription_id: zod.uuid(),
+    subscriptions: zod
+      .array(CheckoutSessionSubscriptionInput)
+      .min(1)
+      .max(checkoutSessionCreateSubscriptionsMax)
+      .describe("Each subscription at most once."),
     periods: zod
       .int()
       .min(1)
@@ -27,7 +34,9 @@ export const CheckoutSessionCreate = zod
     interval: zod.enum(["day", "month", "year"]).optional().describe("As in renewing."),
     cancellation_policy: CancellationPolicy.optional().describe("As in renewing."),
   })
-  .describe("The subscription to renew, and its periods and price chosen as in renewing.");
+  .describe(
+    "The subscriptions to renew together, and the periods and price chosen as in renewing, applied to each.",
+  );
 
 export type CheckoutSessionCreate = zod.input<typeof CheckoutSessionCreate>;
 export type CheckoutSessionCreateOutput = zod.output<typeof CheckoutSessionCreate>;

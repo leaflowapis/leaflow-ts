@@ -7,7 +7,7 @@
  */
 import * as zod from "zod";
 import { FeatureGrantStatus } from "./featureGrantStatus.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const listFeatureGrantsParamsPageDefault = 1;
 export const listFeatureGrantsParamsPageMax = 2147483647;
@@ -29,7 +29,7 @@ export const ListFeatureGrantsParams = zod.strictObject({
     .max(listFeatureGrantsParamsPageSizeMax)
     .default(listFeatureGrantsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
-  product_id: ProductID.optional(),
+  product_id: ProductId.optional(),
   status: zod.array(FeatureGrantStatus).min(1).max(listFeatureGrantsParamsStatusMax).optional(),
 });
 

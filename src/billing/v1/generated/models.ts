@@ -57,19 +57,19 @@ export const QuoteRenewalInterval = {
 } as const;
 
 /**
- * Price renewing a licensed subscription. Give `price_id`, or `interval` with
- * `interval_count`, to renew for another term at the price currently sold for it. Naming
- * the current term, or giving neither, renews at the agreed amount. A term sold at several
- * prices that differ in cancellation policy is refused with 409
- * `BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` or `price_id` is given.
+ * Price renewing a whole subscription: every continuing licensed item. Give `interval` with
+ * `interval_count` to renew for another term at the price each item currently sells it for, with
+ * its own cancellation policy or the only price of that term. Naming the current term, or giving
+ * neither, renews every item at its agreed amount. A term an item does not sell is refused with
+ * 409 `BILLING_RENEWAL_PRICE_UNAVAILABLE` and `meta.subscription_item_id`; prices the rule cannot
+ * choose between, with 409 `BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` is given.
  */
 export interface QuoteRenewal {
   subscription_id: string;
-  price_id?: string;
   interval?: QuoteRenewalInterval;
   /** @minimum 1 */
   interval_count?: number;
-  /** With `interval` and `interval_count`, chooses among prices of that term that differ in cancellation policy. */
+  /** With `interval` and `interval_count`, renews every item at its price of that term with this cancellation policy. */
   cancellation_policy?: CancellationPolicy;
   /**
    * How many consecutive periods to renew for.
@@ -102,18 +102,31 @@ export const QuoteRenewalResultInterval = {
 export type Money = string;
 
 /**
- * What renewing would charge. Renewing the same subscription for the same term and periods charges exactly `total` unless prices or the account's discounts change first.
+ * One item of a quoted renewal.
+ */
+export interface QuoteRenewalItem {
+  subscription_item_id: string;
+  plan_id: string;
+  plan_name: string;
+  /** The price the item is charged under. */
+  price_id: string;
+  /** The price of the periods for this item before the account's discounts. */
+  amount: Money;
+}
+
+/**
+ * What renewing one subscription would charge as part of the quoted renewal order.
  */
 export interface QuoteRenewalResult {
   /** Which renewal of the request this answers. */
   index: number;
   subscription_id: string;
-  /** The price the renewal is charged under. */
-  price_id: string;
+  /** Each item the renewal covers, with the price it is charged under. */
+  items: QuoteRenewalItem[];
   interval: QuoteRenewalResultInterval;
   interval_count: number;
   periods: number;
-  /** The price of the periods before the account's discounts, with any discount the subscription carries already reflected; includes tax only where the price does. */
+  /** The price of the periods for every item before the account's discounts, with any discount the items carry already reflected; includes tax only where the price does. */
   amount: Money;
   /** The reduction from a discount the account holds. */
   discount_amount: Money;
@@ -151,7 +164,7 @@ export type QuoteItemDimensions = { [key: string]: string };
  * @maxLength 64
  * @pattern ^[a-z][a-z0-9]*(-[a-z0-9]+)*$
  */
-export type ProductID = string;
+export type ProductId = string;
 
 /**
  * `one_time` charges once when bought. `recurring` charges again for every period, or for usage as it is settled.
@@ -180,7 +193,7 @@ export const UsageType = {
 export interface QuoteDowngradeRefund {
   /** Returned to the original payment sources, tax paid on it included. */
   refundable_amount: Money;
-  /** Before tax, the part of the excess that the subscription's refund terms do not return. */
+  /** Before tax, the part of the excess that the item's refund terms do not return. */
   forfeited_amount: Money;
 }
 
@@ -196,11 +209,16 @@ export interface QuoteItem {
    */
   index: number;
   /**
-   * The subscription changed; null for a new purchase.
+   * The subscription the line belongs to when it changes an item or is added to an existing subscription; null when it opens a new one.
    * @nullable
    */
   subscription_id: string | null;
-  product_id: ProductID;
+  /**
+   * The subscription item changed; null for a new line.
+   * @nullable
+   */
+  subscription_item_id: string | null;
+  product_id: ProductId;
   plan_id: string;
   /** The selected price, also when the request identified it indirectly. */
   price_id: string;
@@ -339,12 +357,19 @@ export interface Quote {
   total: Money;
   currency: string;
   /**
-   * Immediate changes only; null otherwise. The instant the change is priced from; pass it when confirming the Checkout Session so it is priced from the same instant.
+   * Immediate changes and items added to an existing subscription only; null otherwise. The instant they are priced from; pass it when confirming the Checkout Session so it is priced from the same instant.
    * @nullable
    */
   proration_date: string | null;
   /** `complete`: tax is calculated for the billing account's invoice contact, or for `address` without an account. `requires_location_inputs`: a quote without an account or `address`, which leaves out tax that would be added; tax already contained in a price is included. */
   tax_status: QuoteTaxStatus;
+}
+
+/**
+ * One subscription item to end, each at most once.
+ */
+export interface CancellationItemInput {
+  subscription_item_id: string;
 }
 
 /**
@@ -362,20 +387,20 @@ export const CancellationMode = {
 } as const;
 
 /**
- * What ending these subscriptions together would return, for one mode; preview `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).
+ * What ending these items together would return, for one mode; preview `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when an item is already being canceled (`meta.cancellation_id`), its subscription is being reclaimed (`meta.reason` `reclaim_requested`) or the item has a paid change waiting to switch (`meta.order_id`).
  */
 export interface CancellationPreviewRequest {
   /**
-   * A billing account you own that currently pays for every subscription.
+   * A billing account you own that currently pays for every item.
    * @minimum 1
    */
   billing_account_id: number;
   /**
-   * The subscriptions to end together, all of one service, including every subscription released with a resource.
+   * The items to end together, all of one service, including every item released with a resource.
    * @minItems 1
    * @maxItems 50
    */
-  subscription_ids: string[];
+  items: CancellationItemInput[];
   mode: CancellationMode;
 }
 
@@ -396,9 +421,11 @@ export interface NamedIdentity {
 }
 
 /**
- * One subscription of the previewed cancellation.
+ * One subscription item of the previewed cancellation.
  */
 export interface CancellationPreviewItem {
+  subscription_item_id: string;
+  /** The subscription the item belongs to. */
   subscription_id: string;
   plan_id: string;
   plan_name: string;
@@ -406,7 +433,7 @@ export interface CancellationPreviewItem {
   project?: NamedIdentity | null;
   type: PriceType;
   usage_type: UsageType;
-  /** Whether automatic renewal is on now. Creating the cancellation turns it off; withdrawing it turns it back on for a metered subscription but not for a licensed one. */
+  /** Whether the item's subscription renews automatically now. Creating a cancellation of every continuing item of the subscription turns it off; withdrawing it turns it back on for a subscription with only metered items but not for one with licensed items. */
   auto_renew: boolean;
   unused_amount: Money;
   short_rate_surcharge_amount: Money;
@@ -418,7 +445,7 @@ export interface CancellationPreviewItem {
 }
 
 /**
- * What the cancellation would return, per subscription and in total, as of now. Give `proration_date` and
+ * What the cancellation would return, per item and in total, as of now. Give `proration_date` and
  * `refundable_amount` when creating the cancellation.
  *
  * - `unused_amount`: before tax, the amount paid for the current periods in proportion to the time remaining.
@@ -431,11 +458,11 @@ export interface CancellationPreviewItem {
  * - `tax_amount`: the tax included in `refundable_amount`.
  * - `forfeited_amount`: before tax, the part of `unused_amount` the refund terms do not return.
  *
- * Metered and one-time subscriptions show zero; their usage until release is charged as usual.
+ * Metered and one-time items show zero; their usage until release is charged as usual.
  */
 export interface CancellationPreview {
   mode: CancellationMode;
-  /** For `period_end`, when release begins, the end of the paid terms. */
+  /** For `period_end`, when release begins, the end of the subscriptions' current terms. */
   scheduled_at?: string;
   /** For `immediate`, the second the refund is computed as of. Give it when creating the cancellation. */
   proration_date?: string;
@@ -456,7 +483,7 @@ export interface CancellationCreate {
    * @minItems 1
    * @maxItems 50
    */
-  subscription_ids: string[];
+  items: CancellationItemInput[];
   mode: CancellationMode;
   /** For `immediate`, the preview's `proration_date`: a whole second, not in the future and at most ten minutes old; the refund is computed as of it. Now when omitted. */
   proration_date?: string;
@@ -504,18 +531,21 @@ export const CancellationItemStatus = {
 } as const;
 
 /**
- * One subscription of the cancellation.
+ * One subscription item of the cancellation.
  */
 export interface CancellationItem {
-  /** The subscription's cancellation item, the same as `Subscription.cancellation.id`. */
+  /** The item's entry in the cancellation, the same as `SubscriptionItem.cancellation.id`. */
   id: string;
+  subscription_item_id: string;
+  /** The subscription the item belongs to. */
   subscription_id: string;
   plan_id: string;
   plan_name: string;
   type: PriceType;
   /**
-   * Creating the cancellation turned automatic renewal off; withdrawing it turns renewal back on
-   * for a `metered` subscription and leaves it off for a `licensed` one.
+   * When the cancellation covers every continuing item of a subscription, creating it turned the
+   * subscription's automatic renewal off; withdrawing it turns renewal back on for a subscription with
+   * only `metered` items and leaves it off for one with `licensed` items.
    */
   usage_type: UsageType;
   status: CancellationItemStatus;
@@ -533,15 +563,15 @@ export interface CancellationItem {
 }
 
 /**
- * One cancellation of a set of subscriptions of one service, released together at one time.
+ * One cancellation of a set of subscription items of one service, released together at one time.
  *
  * - `requested`: `immediate`, release has not begun.
  * - `scheduled`: `period_end`, waiting for `scheduled_at`.
  * - `releasing`: release has begun; it can no longer be withdrawn.
- * - `completed`: every subscription has ended and its refund has been made.
- * - `canceled`: withdrawn before release began; the subscriptions continue.
+ * - `completed`: every item has ended and its refund has been made.
+ * - `canceled`: withdrawn before release began; the items continue.
  * - `failed`: the service could not carry it out, for the reason in `failure_code`; the
- *   subscriptions continue and can be canceled again.
+ *   items continue and can be canceled again.
  */
 export interface Cancellation {
   id: string;
@@ -552,7 +582,7 @@ export interface Cancellation {
   proration_date?: string;
   /** Who requested it; `project_deletion` means the project was deleted. */
   origin: CancellationOrigin;
-  /** The billing account paying for these subscriptions when the cancellation was created: the purchasing account of an account-level purchase, or the project's linked account. */
+  /** The billing account paying for these items when the cancellation was created: the purchasing account of an account-level purchase, or the project's linked account. */
   billing_account_id: number;
   currency: string;
   /** The refund confirmed when the cancellation was created. Absent when the platform created it. */
@@ -582,10 +612,10 @@ export interface CancellationList {
   pagination: OffsetPagination;
 }
 
-export type SubscriptionCancellationStatus =
-  (typeof SubscriptionCancellationStatus)[keyof typeof SubscriptionCancellationStatus];
+export type SubscriptionItemCancellationStatus =
+  (typeof SubscriptionItemCancellationStatus)[keyof typeof SubscriptionItemCancellationStatus];
 
-export const SubscriptionCancellationStatus = {
+export const SubscriptionItemCancellationStatus = {
   requested: "requested",
   scheduled: "scheduled",
   releasing: "releasing",
@@ -595,15 +625,15 @@ export const SubscriptionCancellationStatus = {
 } as const;
 
 /**
- * The latest cancellation including the subscription, with this subscription's item: `id` is the item and `cancellation_id` the cancellation. scheduled_at is the intended time and effective_at the confirmed end of service.
+ * The latest cancellation including the subscription item, with this item's entry: `id` is the entry and `cancellation_id` the cancellation. scheduled_at is the intended time and effective_at the confirmed end of service.
  */
-export interface SubscriptionCancellation {
+export interface SubscriptionItemCancellation {
   reason?: string;
-  /** The cancellation this item belongs to, with the other subscriptions released together. */
+  /** The cancellation this entry belongs to, with the other items released together. */
   cancellation_id?: string;
   id: string;
-  subscription_id: string;
-  status: SubscriptionCancellationStatus;
+  subscription_item_id: string;
+  status: SubscriptionItemCancellationStatus;
   mode: CancellationMode;
   requested_at: string;
   scheduled_at?: string;
@@ -678,7 +708,7 @@ export interface Error {
 }
 
 export interface Product {
-  id: ProductID;
+  id: ProductId;
   name: string;
   description?: string;
 }
@@ -1444,7 +1474,7 @@ export interface InvoiceList {
 export type InvoiceItemDimensions = { [key: string]: string };
 
 /**
- * The value of one paid period moved to the new configuration of a subscription.
+ * The value of one paid period moved to the new configuration of a subscription item.
  */
 export interface InvoiceItemProration {
   /** The earlier invoice line that paid for the period. */
@@ -1506,7 +1536,7 @@ export interface InvoiceItem {
   /** For a usage line, the values of its meter's presentation dimensions, such as the model and token kind. Empty for other lines. */
   dimensions?: InvoiceItemDimensions;
   /**
-   * Present on a line that changes a subscription immediately, one entry for each paid period it
+   * Present on a line that changes a subscription item immediately, one entry for each paid period it
    * covers. `amount` is the sum of `remaining_amount` minus `credited_amount` over the entries.
    */
   prorations?: InvoiceItemProration[];
@@ -1662,7 +1692,7 @@ export const RefundStatus = {
  * - `order_canceled`: the order was canceled after part of it was paid.
  * - `change_canceled`: a scheduled change was withdrawn after part of it was paid.
  * - `change_expired`: a scheduled change could not take effect in time.
- * - `subscription_canceled`: the unused value of a canceled subscription, under its refund terms.
+ * - `subscription_canceled`: the unused value of a canceled subscription item, under its refund terms.
  * - `future_period_canceled`: a renewal that had not started was withdrawn.
  * - `downgrade_difference`: after a downgrade, the remaining paid value, valued under each paid period's refund
  *   policy and as `prorated` where that policy is `none`, minus the new configuration's value for the remaining
@@ -1737,6 +1767,9 @@ export interface RefundList {
 export type UsageChargeDimensions = { [key: string]: string };
 
 export interface UsageCharge {
+  /** The subscription item the usage belongs to. */
+  subscription_item_id: string;
+  /** The subscription the item belongs to. */
   subscription_id: string;
   id: string;
   project_id?: string;
@@ -1782,6 +1815,24 @@ export interface UsageChargeList {
   pagination: OffsetPagination;
 }
 
+/**
+ * `pending`: the order has not been accepted. `provisioning`: the owning service accepted the order and is delivering. `active`: delivery was confirmed; payment alone does not make a subscription active. `trialing`: in a free trial, in service and not charged until `trial_end`. `suspended`: service is stopped while a lien restricts its use. `canceled`: cancellation of every item completed, or an undelivered purchase was canceled or failed. `terminated`: an operator or the owning service ended it immediately.
+ */
+export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus];
+
+export const SubscriptionStatus = {
+  pending: "pending",
+  provisioning: "provisioning",
+  active: "active",
+  trialing: "trialing",
+  suspended: "suspended",
+  canceled: "canceled",
+  terminated: "terminated",
+} as const;
+
+/**
+ * The renewal term of its licensed items, `interval_count` intervals long; `none` when every item is metered.
+ */
 export type SubscriptionInterval = (typeof SubscriptionInterval)[keyof typeof SubscriptionInterval];
 
 export const SubscriptionInterval = {
@@ -1790,6 +1841,35 @@ export const SubscriptionInterval = {
   month: "month",
   year: "year",
 } as const;
+
+/**
+ * What happens when the trial ends while automatic renewal is off. With it on, the first paid period is charged to the account's funds or saved payment method, and this applies only when that charge fails. `cancel`: the subscription ends and its resources are released. `pause`: service stops, and renewing before the retention period ends restores it, with the first paid period starting at payment. `create_invoice`: as `pause`, and an invoice for the first paid period is issued to pay.
+ */
+export type TrialEndBehaviorMissingPaymentMethod =
+  (typeof TrialEndBehaviorMissingPaymentMethod)[keyof typeof TrialEndBehaviorMissingPaymentMethod];
+
+export const TrialEndBehaviorMissingPaymentMethod = {
+  cancel: "cancel",
+  pause: "pause",
+  create_invoice: "create_invoice",
+} as const;
+
+export interface TrialEndBehavior {
+  /** What happens when the trial ends while automatic renewal is off. With it on, the first paid period is charged to the account's funds or saved payment method, and this applies only when that charge fails. `cancel`: the subscription ends and its resources are released. `pause`: service stops, and renewing before the retention period ends restores it, with the first paid period starting at payment. `create_invoice`: as `pause`, and an invoice for the first paid period is issued to pay. */
+  missing_payment_method: TrialEndBehaviorMissingPaymentMethod;
+  /**
+   * How long a subscription stopped at the end of its trial keeps its resources before they are reclaimed; null for the platform's retention period.
+   * @nullable
+   */
+  retention_seconds: number | null;
+}
+
+/**
+ * How a free trial ends, as Stripe's trial_settings.
+ */
+export interface TrialSettings {
+  end_behavior: TrialEndBehavior;
+}
 
 /**
  * An operation prevented on the subscription. `billing.subscriptions.use` stops the service. `renew` prevents renewal and paying a renewal order. `modify` prevents placing a change order. `cancel` prevents cancellation. `terminate` prevents immediate termination.
@@ -1829,7 +1909,7 @@ export const ScheduledChangeInterval = {
 } as const;
 
 /**
- * The next accepted period-end change of the subscription: the target terms, applied at effective_at.
+ * The next accepted period-end change of the item: the target terms, applied at effective_at.
  */
 export interface ScheduledChange {
   order_id: string;
@@ -1849,51 +1929,28 @@ export interface ScheduledChange {
 }
 
 /**
- * `pending`: the order has not been accepted. `provisioning`: the owning service accepted the order and is delivering. `active`: delivery was confirmed; payment alone does not make a subscription active. `suspended`: service is stopped while a lien restricts its use. `canceled`: cancellation completed, or an undelivered purchase was canceled or failed. `terminated`: an operator or the owning service ended it immediately.
- */
-export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus];
-
-export const SubscriptionStatus = {
-  pending: "pending",
-  provisioning: "provisioning",
-  active: "active",
-  suspended: "suspended",
-  canceled: "canceled",
-  terminated: "terminated",
-} as const;
-
-/**
  * The dimension values of what was bought, such as region and instance type. Empty when the purchase gave none.
  */
-export type SubscriptionDimensions = { [key: string]: string };
+export type SubscriptionItemDimensions = { [key: string]: string };
 
 /**
- * A purchase that is billed, renewed and changed on its own, separate from the owning service's resource. A new
- * recurring purchase creates a pending subscription for each order line; its ID is returned on the order item
- * and stays the same through checkout, delivery, renewals and changes. A one-time purchase may create none.
- *
- * Pending and provisioning subscriptions grant no service. A subscription becomes provisioning when the owning
- * service accepts the order, and active when the service confirms delivery, which sets started_at; payment
- * changes neither. Licensed service periods start at delivery, and metered usage is charged as the service
- * reports it. Canceling or failing an undelivered purchase cancels its subscriptions without starting a period.
- * Renewals use recurring_amount and the agreed interval; paid periods keep their value.
- *
- * A shared capacity limit, such as a regional snapshot quota, has one subscription for the purchased quantity
- * rather than one per item.
+ * One priced part of a subscription, as a Stripe subscription item, such as the instance, a volume or the bandwidth of an elastic IP. It renews with its subscription and can be changed or canceled alone.
  */
-export interface Subscription {
-  /** Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them. */
-  renewal_discounts_enabled?: boolean;
-  currency: string;
+export interface SubscriptionItem {
+  id: string;
+  subscription_id: string;
+  plan_id: string;
+  plan_name: string;
+  price_id: string;
   type: PriceType;
   usage_type: UsageType;
   /** The dimension values of what was bought, such as region and instance type. Empty when the purchase gave none. */
-  dimensions: SubscriptionDimensions;
-  interval: SubscriptionInterval;
-  /** @minimum 1 */
-  interval_count?: number;
-  /** The whole licensed subscription's renewal amount, after continuing discounts and before tax. A pending subscription shows base terms until paying the order fixes any new discount. Absent for metered and one-time subscriptions. */
+  dimensions: SubscriptionItemDimensions;
+  quantity: string;
+  /** This item's renewal amount, after continuing discounts and before tax. A pending item shows base terms until paying the order fixes any new discount. Absent for metered and one-time items. */
   recurring_amount?: string;
+  /** Whether new account discounts may apply to this item in future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them. */
+  renewal_discounts_enabled?: boolean;
   cancellation_policy?: CancellationPolicy;
   refund_policy?: RefundPolicy;
   /** Refund policy `short_rate` only, as on the price bought. */
@@ -1902,28 +1959,47 @@ export interface Subscription {
   short_rate_threshold_seconds?: number;
   /** Licensed recurring only, the `monthly_list_amount` that a renewal at the agreed amount keeps; see the order item. */
   monthly_list_amount?: string;
-  order_item_id?: string;
   coupon_id?: string;
   coupon?: ObjectIdentity;
   /** @minimum 0 */
   discounted_renewals_remaining?: number;
-  /** The operations currently prevented on the subscription, sorted; it is suspended while this contains `billing.subscriptions.use`. */
-  restrictions?: SubscriptionRestriction[];
-  billing_cycle_anchor?: string;
-  cancellation?: SubscriptionCancellation;
-  /** The accepted period-end change scheduled for this subscription; null when there is none. */
+  /** The order item that created it. */
+  order_item_id?: string;
+  cancellation?: SubscriptionItemCancellation;
+  /** The accepted period-end change scheduled for this item; null when there is none. */
   scheduled_change?: ScheduledChange | null;
+  created_at?: string;
   /**
-   * The saved payment method automatic renewal charges after balance and credits, before the account's default payment method. Set when a purchase, renewal or change is paid with a saved payment method. Used only while it belongs to the account paying the renewal.
+   * When the item's service started. Null until its delivery is confirmed.
    * @nullable
    */
-  default_payment_method_id?: string | null;
-  created_at?: string;
+  started_at?: string | null;
+  /**
+   * When the item ended, alone or with its subscription.
+   * @nullable
+   */
+  ended_at?: string | null;
+}
+
+/**
+ * A billing relationship that renews as a whole, as a Stripe subscription: one term, one renewal date, one
+ * automatic renewal setting and one service state for all of its items. The owning service decides which order
+ * lines form one subscription, such as a machine and the volumes and elastic IP bought with it; a resource bought
+ * on its own has its own. A purchase creates pending subscriptions and items whose IDs are returned on the order
+ * items and stay the same through checkout, delivery, renewals and changes.
+ *
+ * Pending and provisioning subscriptions grant no service. A subscription becomes provisioning when the owning
+ * service accepts the order, and active, or trialing during a free trial, when the service confirms delivery,
+ * which sets started_at; payment changes neither. Renewing buys further periods for every continuing licensed
+ * item at once; items cannot be renewed on their own, but each can be changed or canceled alone.
+ */
+export interface Subscription {
   id: string;
   /** The billing account that made the purchase. Renewals of a project subscription are charged to the project's current billing account. */
   billing_account_id: number;
   account: AccountIdentity;
-  product_id: ProductID;
+  product_id: ProductId;
+  product: Product;
   /**
    * The project it is for. Absent for an account-level purchase, such as a membership.
    * @nullable
@@ -1931,29 +2007,52 @@ export interface Subscription {
   project_id?: string | null;
   /** The project and its current name. Absent for an account-level purchase or when the project cannot be read; `project_id` still identifies it. */
   project?: NamedIdentity | null;
-  product: Product;
-  plan_id: string;
-  plan_name: string;
-  price_id: string;
-  quantity: string;
+  currency: string;
+  status: SubscriptionStatus;
+  /** The renewal term of its licensed items, `interval_count` intervals long; `none` when every item is metered. */
+  interval: SubscriptionInterval;
+  /** @minimum 1 */
+  interval_count?: number;
   /**
-   * When a licensed subscription renews or expires: the end of the last period bought, moved by renewing in advance. Null until the subscription becomes active, even when its purchase has been paid, and for metered subscriptions.
+   * When the subscription renews or expires: the end of the free trial or of the last period bought for its licensed items, moved by renewing in advance. Null until the subscription becomes active, even when its purchase has been paid, and when every item is metered.
    * @nullable
    */
   current_term_end?: string | null;
   /**
-   * Start of the service period in effect now. Null when none is, including for metered subscriptions.
+   * Start of the service period in effect now. Null when none is, including when every item is metered.
    * @nullable
    */
   current_period_start?: string | null;
   /**
-   * End of the service period in effect now; renewing in advance moves `current_term_end`, not this. Null when no period is in effect, including for metered subscriptions.
+   * End of the service period in effect now; renewing in advance moves `current_term_end`, not this. Null when no period is in effect, including when every item is metered.
    * @nullable
    */
   current_period_end?: string | null;
-  /** Whether a licensed subscription renews automatically. A metered subscription continues until it is canceled; for it this is true until a cancellation is requested, and cannot be set. */
+  billing_cycle_anchor?: string;
+  /** Whether the subscription renews automatically, or converts to paid when its free trial ends. Without licensed items it continues until it is canceled; then this is true until a cancellation is requested, and cannot be set. */
   auto_renew: boolean;
-  status: SubscriptionStatus;
+  /**
+   * Start of the free trial; null without one.
+   * @nullable
+   */
+  trial_start?: string | null;
+  /**
+   * End of the free trial; null without one. It is `current_term_end` until the first paid period is bought.
+   * @nullable
+   */
+  trial_end?: string | null;
+  /** How the free trial ends; null without one. */
+  trial_settings?: TrialSettings | null;
+  /** The operations currently prevented on the subscription, sorted; it is suspended while this contains `billing.subscriptions.use`. */
+  restrictions?: SubscriptionRestriction[];
+  /**
+   * The saved payment method automatic renewal charges after balance and credits, before the account's default payment method. Set when a purchase, renewal or change is paid with a saved payment method. Used only while it belongs to the account paying the renewal.
+   * @nullable
+   */
+  default_payment_method_id?: string | null;
+  /** Every item, ended ones included, oldest first. */
+  items: SubscriptionItem[];
+  created_at?: string;
   /**
    * When service started. Null until a new subscription becomes active, also after payment.
    * @nullable
@@ -1968,34 +2067,52 @@ export interface SubscriptionList {
   pagination: OffsetPagination;
 }
 
-export type RenewalPriceInterval = (typeof RenewalPriceInterval)[keyof typeof RenewalPriceInterval];
+export type RenewalOptionInterval =
+  (typeof RenewalOptionInterval)[keyof typeof RenewalOptionInterval];
 
-export const RenewalPriceInterval = {
+export const RenewalOptionInterval = {
   day: "day",
   month: "month",
   year: "year",
 } as const;
 
-export interface RenewalPrice {
+/**
+ * What one item renews at under a renewal option.
+ */
+export interface RenewalOptionItem {
+  subscription_item_id: string;
+  /**
+   * The price the item renews at; null on the current option, which keeps the agreed amount.
+   * @nullable
+   */
+  price_id: string | null;
+  /** One period of this item, before tax and discounts. */
+  amount: Money;
   cancellation_policy?: CancellationPolicy;
   refund_policy?: RefundPolicy;
   /** Refund policy `short_rate` only. */
   short_rate_multiplier?: string;
   /** Refund policy `short_rate` only. */
   short_rate_threshold_seconds?: number;
-  price_id: string;
-  /** How many periods one renewal covers. */
-  interval_count: number;
-  interval: RenewalPriceInterval;
-  /** What renewing for this term costs, for the quantity held. */
-  amount?: Money;
-  currency?: string;
-  /** The term the subscription renews at now; renewing for it keeps the agreed price. */
-  current: boolean;
 }
 
-export interface RenewalPriceList {
-  items: RenewalPrice[];
+/**
+ * One term the whole subscription can renew for. Every continuing licensed item renews at it; items with an open cancellation end with the current term and are left out.
+ */
+export interface RenewalOption {
+  interval: RenewalOptionInterval;
+  /** How many intervals one renewal covers. */
+  interval_count: number;
+  /** The term the subscription renews at now; renewing for it keeps every item's agreed price. */
+  current: boolean;
+  /** One period for every item, before tax and discounts. */
+  amount: Money;
+  currency: string;
+  items: RenewalOptionItem[];
+}
+
+export interface RenewalOptionList {
+  items: RenewalOption[];
   pagination: OffsetPagination;
 }
 
@@ -2014,7 +2131,7 @@ export interface RenewRequest {
   /** The order ID, chosen by the caller. Creating it again conflicts; read the order after an unknown outcome. */
   order_id: string;
   /**
-   * How many further periods to buy, each at the price the subscription already renews at. To buy a longer term at its own price, give `interval` and `interval_count` instead.
+   * How many further periods to buy for every renewed item, each at the price it already renews at. To buy a longer term at its own price, give `interval` and `interval_count` instead.
    * @minimum 1
    */
   periods?: number;
@@ -2022,19 +2139,21 @@ export interface RenewRequest {
    * Renew for a term of this length instead, at the price currently sold for it. Give
    * `interval` with it.
    *
-   * Leaving both out renews at the price this item already bills at, which a later price
+   * Leaving both out renews every item at the price it already bills at, which a later price
    * change does not affect. Naming a term that differs from the current one is a fresh
-   * choice, so it is bought at today's price. Naming the current term changes nothing. A
-   * term sold at several prices that differ in cancellation policy is refused with 409
+   * choice, so every item is bought at today's price for that term, with its own cancellation
+   * policy or, without one, the only price of that term. Naming the current term changes
+   * nothing. A term an item does not sell is refused with 409 `BILLING_RENEWAL_PRICE_UNAVAILABLE`
+   * and `meta.subscription_item_id`; prices the rule cannot choose between, with 409
    * `BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` is given.
    *
-   * List the terms on offer with the renewal prices operation.
+   * List the terms on offer with the renewal options operation.
    * @minimum 1
    */
   interval_count?: number;
   /** The unit interval_count counts in. */
   interval?: RenewRequestInterval;
-  /** With `interval` and `interval_count`, chooses among prices of that term that differ in cancellation policy. */
+  /** With `interval` and `interval_count`, renews every item at its price of that term with this cancellation policy. */
   cancellation_policy?: CancellationPolicy;
   payment_method_id?: string;
   /** Whether to pay from the balance, with or without `payment_method_id`. */
@@ -2044,8 +2163,11 @@ export interface RenewRequest {
   return_url?: string;
 }
 
-export interface AutoRenewSet {
-  auto_renew: boolean;
+/**
+ * The settings to change; settings left out keep their values.
+ */
+export interface SubscriptionUpdate {
+  auto_renew?: boolean;
 }
 
 /**
@@ -2061,7 +2183,7 @@ export const CheckoutSessionStatus = {
 } as const;
 
 /**
- * `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms.
+ * `new` buys, `renew` extends subscriptions, `modify` changes subscription items' configuration or billing terms.
  */
 export type CheckoutSessionType = (typeof CheckoutSessionType)[keyof typeof CheckoutSessionType];
 
@@ -2122,6 +2244,32 @@ export interface CheckoutOptions {
    * @maxLength 2048
    */
   return_url?: string;
+  /**
+   * Turns on automatic renewal of every subscription with licensed items that the purchase opens. Off
+   * when omitted. It must be the customer's own choice.
+   */
+  auto_renew?: boolean;
+}
+
+/**
+ * One subscription of the session.
+ */
+export interface CheckoutSessionSubscription {
+  /**
+   * The existing subscription renewed or changed, or that new items are added to. Null for a subscription the purchase opens.
+   * @nullable
+   */
+  subscription_id: string | null;
+  /**
+   * The free trial a subscription the purchase opens gets; null without one.
+   * @nullable
+   */
+  trial_period_days: number | null;
+  /**
+   * The end of the free trial a subscription the purchase opens gets; null without one or when given in days.
+   * @nullable
+   */
+  trial_end: string | null;
 }
 
 /**
@@ -2129,7 +2277,7 @@ export interface CheckoutOptions {
  */
 export interface CheckoutSession {
   id: string;
-  product_id: ProductID;
+  product_id: ProductId;
   billing_account_id: number;
   account: AccountIdentity;
   /**
@@ -2139,7 +2287,7 @@ export interface CheckoutSession {
   project_id: string | null;
   /** The project and its current name. Null for an account-level purchase or when the project cannot be read; `project_id` still identifies it. */
   project: NamedIdentity | null;
-  /** `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms. */
+  /** `new` buys, `renew` extends subscriptions, `modify` changes subscription items' configuration or billing terms. */
   type: CheckoutSessionType;
   /** When a change takes effect, as on the order it creates; `none` for anything that is not a change. */
   change_effective: CheckoutSessionChangeEffective;
@@ -2159,6 +2307,8 @@ export interface CheckoutSession {
    * @nullable
    */
   order_id: string | null;
+  /** The subscriptions the session buys, renews or changes, in order; each item names its entry in `subscription_index`. */
+  subscriptions: CheckoutSessionSubscription[];
 }
 
 export interface CheckoutSessionList {
@@ -2188,10 +2338,15 @@ export interface CheckoutSessionItem {
   /** The dimension values of what is bought, such as region and instance type. */
   dimensions: CheckoutSessionItemDimensions;
   /**
-   * The subscription changed or renewed. Null for a new purchase.
+   * The item's subscription, as its index in the session's `subscriptions`.
+   * @minimum 0
+   */
+  subscription_index: number;
+  /**
+   * The subscription item changed or renewed. Null for an item the purchase adds.
    * @nullable
    */
-  subscription_id: string | null;
+  subscription_item_id: string | null;
   /**
    * Renewals only; null otherwise. How many consecutive periods are renewed.
    * @minimum 1
@@ -2218,12 +2373,24 @@ export const CheckoutSessionCreateInterval = {
 } as const;
 
 /**
- * The subscription to renew, and its periods and price chosen as in renewing.
+ * One subscription to renew.
+ */
+export interface CheckoutSessionSubscriptionInput {
+  subscription_id: string;
+}
+
+/**
+ * The subscriptions to renew together, and the periods and price chosen as in renewing, applied to each.
  */
 export interface CheckoutSessionCreate {
   /** Chosen by the caller. Creating it again conflicts; read the session after an unknown outcome. */
   checkout_session_id: string;
-  subscription_id: string;
+  /**
+   * Each subscription at most once.
+   * @minItems 1
+   * @maxItems 20
+   */
+  subscriptions: CheckoutSessionSubscriptionInput[];
   /**
    * As in renewing.
    * @minimum 1
@@ -2303,7 +2470,7 @@ export interface PaidWith {
 }
 
 /**
- * `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms.
+ * `new` buys, `renew` extends subscriptions, `modify` changes subscription items' configuration or billing terms.
  */
 export type OrderType = (typeof OrderType)[keyof typeof OrderType];
 
@@ -2314,7 +2481,7 @@ export const OrderType = {
 } as const;
 
 /**
- * When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced when the order is created and starts when the current paid period ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual.
+ * When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced when the order is created and starts when the current paid period ends; if the invoice is unpaid by then, the order is canceled and the item renews or ends with its subscription as usual.
  */
 export type OrderChangeEffective = (typeof OrderChangeEffective)[keyof typeof OrderChangeEffective];
 
@@ -2334,7 +2501,7 @@ export const OrderItemInterval = {
 } as const;
 
 /**
- * `pending`: waiting to be set up. `completed`: set up, as confirmed by the service. `failed`: not set up; its amount was refunded to the original payment sources. `canceled`: withdrawn without delivery; any collected amount is returned. A completed item ends when its subscription is canceled.
+ * `pending`: waiting to be set up. `completed`: set up, as confirmed by the service. `failed`: not set up; its amount was refunded to the original payment sources. `canceled`: withdrawn without delivery; any collected amount is returned. A completed item ends when its subscription item is canceled.
  */
 export type OrderItemStatus = (typeof OrderItemStatus)[keyof typeof OrderItemStatus];
 
@@ -2353,7 +2520,7 @@ export type OrderItemConfiguration = { [key: string]: unknown };
 export type OrderItemDimensions = { [key: string]: string };
 
 /**
- * The purchase terms frozen at placement. Monetary fields come from the order's invoice lines and are zero without an immediate charge, such as for a metered purchase. Later catalog changes do not reprice the line. A new service purchase has its pending subscription from placement.
+ * The purchase terms frozen at placement. Monetary fields come from the order's invoice lines and are zero without an immediate charge, such as for a metered purchase. Later catalog changes do not reprice the line. A new service purchase has its pending subscription and subscription item from placement.
  */
 export interface OrderItem {
   /** Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them. */
@@ -2363,8 +2530,10 @@ export interface OrderItem {
   /** @minimum 0 */
   position?: number;
   configuration?: OrderItemConfiguration;
-  /** The Billing subscription: the new pending subscription of a recurring purchase, or the existing one renewed or changed, which keeps its ID. Absent for a purchase without a subscription. */
+  /** The Billing subscription the line belongs to: a new pending one, the existing one an added item joins, or the one renewed or changed, which keeps its ID. Absent for a purchase without a subscription. */
   subscription_id?: string;
+  /** The subscription item the line created, renewed or changed, which keeps its ID. Absent for a purchase without a subscription. */
+  subscription_item_id?: string;
   interval: OrderItemInterval;
   /** @minimum 1 */
   interval_count?: number;
@@ -2398,7 +2567,7 @@ export interface OrderItem {
   id: string;
   order_id?: string;
   price_id: string;
-  product_id?: ProductID;
+  product_id?: ProductId;
   product?: Product;
   /** Which plan was bought. */
   plan_id: string;
@@ -2462,10 +2631,10 @@ export interface Order {
   /** The billing account the order was placed with, unchanged when the project is later linked to another account. While it is suspended or closed, the order cannot be accepted, and a period-end change is called off when the current period ends; such requests fail with `BILLING_ACCOUNT_UNAVAILABLE`. */
   billing_account_id?: number;
   currency: string;
-  /** `new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms. */
+  /** `new` buys, `renew` extends subscriptions, `modify` changes subscription items' configuration or billing terms. */
   type: OrderType;
   status: OrderStatus;
-  /** When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced when the order is created and starts when the current paid period ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual. */
+  /** When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced when the order is created and starts when the current paid period ends; if the invoice is unpaid by then, the order is canceled and the item renews or ends with its subscription as usual. */
   change_effective?: OrderChangeEffective;
   /**
    * Acceptance deadline; a pending order expires after it.
@@ -2600,6 +2769,9 @@ export const AllowanceStatus = {
 export interface Allowance {
   /** Optional issuance key, unique within this billing account. */
   idempotency_key?: string;
+  /** The subscription item whose purchase includes the allowance; absent for an allowance not included in a purchase. */
+  subscription_item_id?: string;
+  /** The subscription that item belongs to. */
   subscription_id?: string;
   id: string;
   billing_account_id?: number;
@@ -2673,7 +2845,7 @@ export interface Entitlement {
   name?: string;
   enabled: boolean;
   /**
-   * When the providing subscription ends. Absent for a metered subscription.
+   * When the providing subscription item ends with its current term. Absent for a metered item.
    * @nullable
    */
   expires_at?: string | null;
@@ -2701,7 +2873,7 @@ export interface Plan {
   product: Product;
   features: PlanFeature[];
   id: string;
-  product_id: ProductID;
+  product_id: ProductId;
   name: string;
   description?: string;
 }
@@ -2818,7 +2990,7 @@ export interface Price {
   short_rate_multiplier?: string;
   /** Refund policy `short_rate` only, how long after the period start `short_rate_multiplier` applies. */
   short_rate_threshold_seconds?: number;
-  product_id?: ProductID;
+  product_id?: ProductId;
   id: string;
   plan_id: string;
   currency: string;
@@ -2879,7 +3051,7 @@ export interface QuoteItemInput {
    */
   plan_lookup_key?: string;
   price_id?: string;
-  product_id?: ProductID;
+  product_id?: ProductId;
   plan_id?: string;
   /** Narrows the selection when a plan offers more than one price type. */
   price_type?: PriceType;
@@ -2894,6 +3066,8 @@ export interface QuoteItemInput {
   quantity: string;
   /** The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused with `BILLING_PRICE_UNAVAILABLE` rather than priced at zero. Prices are set per currency, and a currency may not offer some combinations at all, for example in a region it does not sell to. */
   dimensions?: QuoteItemInputDimensions;
+  /** Price the line as a new item added to this existing subscription, as the owning service adds it when buying for a resource the subscription pays for. Needs `billing_account_id`, which must currently pay for the subscription. A licensed line is priced up to the subscription's `current_term_end`, the rest of the current period in proportion to the time left from `proration_date`, and must have the subscription's interval and interval count; a metered line has no immediate charge; added to a trialing subscription, the line is free until the trial ends. */
+  subscription_id?: string;
 }
 
 /**
@@ -2946,7 +3120,9 @@ export interface ActiveResource {
   ended_at?: string;
   suspended_at?: string;
   state_changed_at?: string;
-  /** The metered subscription charged for this metering record. */
+  /** The metered subscription item charged for this metering record. */
+  subscription_item_id: string;
+  /** The subscription the item belongs to. */
   subscription_id: string;
   resource_id: string;
   product: Product;
@@ -2989,7 +3165,7 @@ export type UsageEstimateInputDimensions = { [key: string]: string };
  * Future usage of one metered price. Give the price, or the plan to use its metered price in the currency, and the meter that measures the usage; give each resource's ID or lookup key, never both, and product_id with lookup keys.
  */
 export interface UsageEstimateInput {
-  product_id?: ProductID;
+  product_id?: ProductId;
   plan_id?: string;
   /**
    * @minLength 1
@@ -3087,15 +3263,15 @@ export const QuoteChangeInputInterval = {
 } as const;
 
 /**
- * The dimension values after the change, given in full; omit to keep the subscription's.
+ * The dimension values after the change, given in full; omit to keep the item's.
  */
 export type QuoteChangeInputDimensions = { [key: string]: string };
 
 /**
- * The new terms of one subscription. Identify the price, or the plan to select one from, as for a proposed item. Without a price or billing terms, the plan's price with the subscription's price type, usage type, interval, interval count and cancellation policy is selected. Omitted dimensions keep the subscription's.
+ * The new terms of one subscription item. Identify the price, or the plan to select one from, as for a proposed item. Without a price or billing terms, the plan's price with the item's price type, usage type, interval, interval count and cancellation policy is selected. Omitted dimensions keep the item's.
  */
 export interface QuoteChangeInput {
-  subscription_id: string;
+  subscription_item_id: string;
   /**
    * @minLength 1
    * @maxLength 128
@@ -3107,11 +3283,11 @@ export interface QuoteChangeInput {
    */
   plan_lookup_key?: string;
   price_id?: string;
-  product_id?: ProductID;
+  product_id?: ProductId;
   plan_id?: string;
-  /** Selects the price type instead of keeping the subscription's. */
+  /** Selects the price type instead of keeping the item's. */
   price_type?: PriceType;
-  /** Selects the usage type instead of keeping the subscription's. */
+  /** Selects the usage type instead of keeping the item's. */
   usage_type?: UsageType;
   interval?: QuoteChangeInputInterval;
   /** @minimum 1 */
@@ -3123,7 +3299,7 @@ export interface QuoteChangeInput {
    * @pattern ^(?:(?:[1-9][0-9]{0,27}|0(?:[1-9][0-9]{0,26}|0(?:[1-9][0-9]{0,25}|0(?:[1-9][0-9]{0,24}|0(?:[1-9][0-9]{0,23}|0(?:[1-9][0-9]{0,22}|0(?:[1-9][0-9]{0,21}|0(?:[1-9][0-9]{0,20}|0(?:[1-9][0-9]{0,19}|0(?:[1-9][0-9]{0,18}|0(?:[1-9][0-9]{0,17}|0(?:[1-9][0-9]{0,16}|0(?:[1-9][0-9]{0,15}|0(?:[1-9][0-9]{0,14}|0(?:[1-9][0-9]{0,13}|0(?:[1-9][0-9]{0,12}|0(?:[1-9][0-9]{0,11}|0(?:[1-9][0-9]{0,10}|0(?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9])))))))))))))))))))))))))))([.][0-9]{1,10})?|0{1,28}[.](?:[1-9][0-9]{0,9}|0(?:[1-9][0-9]{0,8}|0(?:[1-9][0-9]{0,7}|0(?:[1-9][0-9]{0,6}|0(?:[1-9][0-9]{0,5}|0(?:[1-9][0-9]{0,4}|0(?:[1-9][0-9]{0,3}|0(?:[1-9][0-9]{0,2}|0(?:[1-9][0-9]{0,1}|0[1-9]))))))))))$
    */
   quantity: string;
-  /** The dimension values after the change, given in full; omit to keep the subscription's. */
+  /** The dimension values after the change, given in full; omit to keep the item's. */
   dimensions?: QuoteChangeInputDimensions;
 }
 
@@ -3142,7 +3318,7 @@ export interface QuoteAddress {
 }
 
 /**
- * Quote proposed items, changes or renewals: exactly one of them. Give exactly one of `billing_account_id` and `currency`; changes and renewals need the account. Promotion codes apply to proposed items and changes. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.
+ * Quote proposed items, changes or renewals: exactly one of them. Give exactly one of `billing_account_id` and `currency`; changes, renewals and items added to an existing subscription need the account. Promotion codes apply to proposed items and changes. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.
  */
 export interface QuoteRequest {
   /**
@@ -3163,13 +3339,13 @@ export interface QuoteRequest {
    */
   items?: QuoteItemInput[];
   /**
-   * Preview renewing these subscriptions, each at most once; each entry is a separate renewal order. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account or a member of the subscription's project. To apply a promotion code, create a renewal Checkout Session and quote it.
+   * Preview renewing these subscriptions together in one renewal order, as a renewal Checkout Session does, each at most once; `total` is that order's. Each must currently be paid by `billing_account_id`, be yours to read as the owner of that account or a member of the subscription's project, and all must belong to the same project and service. To apply a promotion code, create a renewal Checkout Session and quote it.
    * @minItems 1
    * @maxItems 100
    */
   renewals?: QuoteRenewal[];
   /**
-   * Preview changing these subscriptions in one order, each at most once. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account or a member of the subscription's project; all must belong to the same project, or all to no project.
+   * Preview changing these subscription items in one order, each at most once. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account or a member of the subscription's project; all must belong to the same project, or all to no project.
    * @minItems 1
    * @maxItems 100
    */
@@ -3492,7 +3668,7 @@ export interface PriceSearch {
    * @maxItems 200
    */
   plan_ids?: string[];
-  product_id?: ProductID;
+  product_id?: ProductId;
   /** Narrows to one price type. */
   type?: PriceType;
   /** Narrows to one usage type. */
@@ -4109,7 +4285,7 @@ export type ListUsageChargesParams = {
    * Only this account; all of yours when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
-  product_id?: ProductID;
+  product_id?: ProductId;
   resource_id?: string;
   /**
    * Only the charges summed into this usage invoice line.
@@ -4132,6 +4308,12 @@ export type ListUsageChargesParams = {
 
 export type ListSubscriptionsParams = {
   expiring_before?: string;
+  /**
+   * Only these subscriptions, such as those of the resources shown on one page. Comma-separated.
+   * @minItems 1
+   * @maxItems 200
+   */
+  subscription_ids?: string[];
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -4157,7 +4339,7 @@ export type ListSubscriptionsParams = {
   /**
    * Only subscriptions in these statuses; omit for every status. Comma-separated, for example `status=active,suspended`.
    * @minItems 1
-   * @maxItems 6
+   * @maxItems 7
    */
   status?: SubscriptionStatus[];
 };
@@ -4180,9 +4362,13 @@ export type ListCancellationsParams = {
    */
   billing_account_id?: AccountIdQueryParameter;
   /**
-   * Only cancellations that include this subscription.
+   * Only cancellations that include an item of this subscription.
    */
   subscription_id?: string;
+  /**
+   * Only cancellations that include this subscription item.
+   */
+  subscription_item_id?: string;
   /**
    * Only cancellations in these statuses; omit for every status. `open` means requested, scheduled or releasing. Comma-separated, for example `status=open,failed`.
    * @minItems 1
@@ -4210,7 +4396,7 @@ export const ListCancellationsStatusItem = {
   failed: "failed",
 } as const;
 
-export type ListRenewalPricesParams = {
+export type ListRenewalOptionsParams = {
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -4252,7 +4438,7 @@ export type ListAllowancesParams = {
    * @maxItems 4
    */
   status?: AllowanceStatus[];
-  product_id?: ProductID;
+  product_id?: ProductId;
   /**
    * Only records of these projects. Omit for all projects and account-level records of your billing accounts. Where an operation is open to project members, each project must be assigned to a billing account you own or have you as a member, and a member sees the records of the project that the owner of its current billing account sees.
    * @minItems 1
@@ -4398,7 +4584,7 @@ export type ListEntitlementsParams = {
    * @maxItems 100
    */
   project_ids?: ProjectIdsQueryParameter;
-  product_id?: ProductID;
+  product_id?: ProductId;
 };
 
 export type ListFeatureGrantsParams = {
@@ -4418,7 +4604,7 @@ export type ListFeatureGrantsParams = {
    * Only this account; all of yours when omitted.
    */
   billing_account_id?: AccountIdQueryParameter;
-  product_id?: ProductID;
+  product_id?: ProductId;
   /**
    * Only feature grants in these statuses; omit for every status. Comma-separated, for example `status=scheduled,active`.
    * @minItems 1
@@ -4446,7 +4632,7 @@ export type ListPricesParams = {
    * @maxLength 3
    */
   currency: string;
-  product_id?: ProductID;
+  product_id?: ProductId;
   /**
    * Narrows to one price type.
    */
@@ -4508,7 +4694,7 @@ export type GetPriceHeaders = {
 };
 
 export type ListPlansParams = {
-  product_id: ProductID;
+  product_id: ProductId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -4586,7 +4772,7 @@ export type ListActiveResourcesParams = {
    */
   project_ids?: ProjectIdsQueryParameter;
   meter_id?: string;
-  product_id?: ProductID;
+  product_id?: ProductId;
   /**
    * Only metering in these statuses; omit for every status. Comma-separated, for example `status=active,suspended`.
    * @minItems 1
@@ -4608,7 +4794,7 @@ export type ListSpendParams = {
   /**
    * Filter by the fixed platform service ID.
    */
-  product_id?: ProductID;
+  product_id?: ProductId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1

@@ -23,7 +23,7 @@ export const InvoiceItemProration = zod
       "Before tax, the unused value of the earlier line for the period, credited against `remaining_amount`.",
     ),
   })
-  .describe("The value of one paid period moved to the new configuration of a subscription.");
+  .describe("The value of one paid period moved to the new configuration of a subscription item.");
 
 export type InvoiceItemProration = zod.input<typeof InvoiceItemProration>;
 export type InvoiceItemProrationOutput = zod.output<typeof InvoiceItemProration>;

@@ -8,7 +8,7 @@
 import * as zod from "zod";
 import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { PriceType } from "./priceType.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const quoteItemInputPriceLookupKeyMax = 128;
@@ -24,7 +24,7 @@ export const QuoteItemInput = zod
     price_lookup_key: zod.string().min(1).max(quoteItemInputPriceLookupKeyMax).optional(),
     plan_lookup_key: zod.string().min(1).max(quoteItemInputPlanLookupKeyMax).optional(),
     price_id: zod.uuid().optional(),
-    product_id: ProductID.optional(),
+    product_id: ProductId.optional(),
     plan_id: zod.uuid().optional(),
     price_type: PriceType.optional().describe(
       "Narrows the selection when a plan offers more than one price type.",
@@ -43,6 +43,12 @@ export const QuoteItemInput = zod
       .optional()
       .describe(
         "The dimension values of what is bought, such as region and instance type. Required whenever the price uses a rate card; prices with their own amounts ignore them. Every key the meter declares must be given. A combination no rate covers is refused with `BILLING_PRICE_UNAVAILABLE` rather than priced at zero. Prices are set per currency, and a currency may not offer some combinations at all, for example in a region it does not sell to.",
+      ),
+    subscription_id: zod
+      .uuid()
+      .optional()
+      .describe(
+        "Price the line as a new item added to this existing subscription, as the owning service adds it when buying for a resource the subscription pays for. Needs `billing_account_id`, which must currently pay for the subscription. A licensed line is priced up to the subscription's `current_term_end`, the rest of the current period in proportion to the time left from `proration_date`, and must have the subscription's interval and interval count; a metered line has no immediate charge; added to a trialing subscription, the line is free until the trial ends.",
       ),
   })
   .describe(

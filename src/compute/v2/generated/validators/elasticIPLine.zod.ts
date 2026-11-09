@@ -16,7 +16,7 @@
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
  * - **Custom methods.** An action that is not one of the standard methods (list, get, create, update, delete) is a custom method, `POST` on the resource's path followed by `:` and the verb, as in `POST /api/v2/instances/{id}:reboot` (AIP-136). A state is changed by its custom method, never by writing the state: `:start` and `:stop`, `:rescue` and `:unrescue`, `:associate` and `:disassociate`.
- * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
+ * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only descriptive fields, all optional and at least one given, and answers 200. A change that starts an operation or a purchase, such as a resize, is its own method (`:resize`, `:retype`, `:changeBandwidth`).
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. Its `access_state` is `pending` until the order is accepted and delivery settles it, then `enabled`; a subscription that lapses suspends or reclaims the resource it pays for. Deleting a resource that subscriptions pay for cancels the subscriptions of its `release_set` in Billing, and the deletion answers with that cancellation.
  * - **Availability zones.** A volume and an instance must reside in the same availability zone to be attached. An instance type and a volume type each belong to one availability zone, as on GCP, so a purchase names the type and the type names the zone; the volumes bought with an instance have to be of types of the instance type's zone.
  * - **IPv6 is routed, not translated.** A virtual private cloud with IPv6 holds a /56 and each of its subnets a /64 of it, as on Alibaba Cloud, Tencent Cloud and Azure; IPv6 and its security groups require no EIP or NAT gateway. EIP and NATGateway are IPv4 products; IPv6 EIP, NAT66 and IPv6 port forwarding are not supported.
@@ -34,20 +34,20 @@
  */
 import * as zod from "zod";
 import { BillingComponent } from "./billingComponent.zod.js";
-import { ElasticIPLineID } from "./elasticIPLineID.zod.js";
-import { RegionID } from "./regionID.zod.js";
+import { ElasticIpLineId } from "./elasticIpLineId.zod.js";
+import { RegionId } from "./regionId.zod.js";
 
-export const elasticIPLineNameMax = 128;
+export const elasticIpLineNameMax = 128;
 
-export const elasticIPLineDescriptionMin = 0;
-export const elasticIPLineDescriptionMax = 255;
+export const elasticIpLineDescriptionMin = 0;
+export const elasticIpLineDescriptionMax = 255;
 
-export const ElasticIPLine = zod
+export const ElasticIpLine = zod
   .strictObject({
-    id: ElasticIPLineID,
-    region_id: RegionID,
-    name: zod.string().min(1).max(elasticIPLineNameMax),
-    description: zod.string().min(elasticIPLineDescriptionMin).max(elasticIPLineDescriptionMax),
+    id: ElasticIpLineId,
+    region_id: RegionId,
+    name: zod.string().min(1).max(elasticIpLineNameMax),
+    description: zod.string().min(elasticIpLineDescriptionMin).max(elasticIpLineDescriptionMax),
     address_billing: BillingComponent.describe(
       "The address line every elastic IP of this line has. It is always metered, and meters the address while no network interface holds it.",
     ),
@@ -76,8 +76,8 @@ export const ElasticIPLine = zod
     updated_at: zod.iso.datetime({ offset: true }),
   })
   .describe(
-    "The network an elastic IP is bought on: the bandwidth that can be chosen, and the two Billing Plans every elastic IP of the line is paid under in one order. The address subscription is always used and meters the address while it is held idle, associated with nothing; the network subscription pays the bandwidth, prepaid or used while associated, or the traffic sent. Contains no supply ranges, gateways or backend execution state.",
+    "The network an elastic IP is bought on: the bandwidth that can be chosen, and the two Billing Plans every elastic IP of the line is paid under in one order. The address item is always used and meters the address while it is held idle, associated with nothing; the network item pays the bandwidth, prepaid or used while associated, or the traffic sent. Contains no supply ranges, gateways or backend execution state.",
   );
 
-export type ElasticIPLine = zod.input<typeof ElasticIPLine>;
-export type ElasticIPLineOutput = zod.output<typeof ElasticIPLine>;
+export type ElasticIpLine = zod.input<typeof ElasticIpLine>;
+export type ElasticIpLineOutput = zod.output<typeof ElasticIpLine>;

@@ -9,13 +9,14 @@ import * as zod from "zod";
 import { AccountIdentity } from "./accountIdentity.zod.js";
 import { CheckoutOptions } from "./checkoutOptions.zod.js";
 import { CheckoutSessionStatus } from "./checkoutSessionStatus.zod.js";
+import { CheckoutSessionSubscription } from "./checkoutSessionSubscription.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const CheckoutSession = zod
   .strictObject({
     id: zod.uuid(),
-    product_id: ProductID,
+    product_id: ProductId,
     billing_account_id: zod.int(),
     account: AccountIdentity,
     project_id: zod
@@ -32,7 +33,7 @@ export const CheckoutSession = zod
     type: zod
       .enum(["new", "renew", "modify"])
       .describe(
-        "`new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms.",
+        "`new` buys, `renew` extends subscriptions, `modify` changes subscription items' configuration or billing terms.",
       ),
     change_effective: zod
       .enum(["none", "immediate", "period_end"])
@@ -56,6 +57,11 @@ export const CheckoutSession = zod
       .uuid()
       .nullable()
       .describe("The order created when the session completed. Null otherwise."),
+    subscriptions: zod
+      .array(CheckoutSessionSubscription)
+      .describe(
+        "The subscriptions the session buys, renews or changes, in order; each item names its entry in `subscription_index`.",
+      ),
   })
   .describe(
     "A purchase waiting for you to complete checkout. Completing it applies the discount and creates the order with its invoice issued; the order carries the session's ID.",

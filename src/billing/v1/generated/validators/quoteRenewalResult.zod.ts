@@ -7,17 +7,20 @@
  */
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
+import { QuoteRenewalItem } from "./quoteRenewalItem.zod.js";
 
 export const QuoteRenewalResult = zod
   .strictObject({
     index: zod.int().describe("Which renewal of the request this answers."),
     subscription_id: zod.uuid(),
-    price_id: zod.uuid().describe("The price the renewal is charged under."),
+    items: zod
+      .array(QuoteRenewalItem)
+      .describe("Each item the renewal covers, with the price it is charged under."),
     interval: zod.enum(["day", "month", "year"]),
     interval_count: zod.int(),
     periods: zod.int(),
     amount: Money.describe(
-      "The price of the periods before the account's discounts, with any discount the subscription carries already reflected; includes tax only where the price does.",
+      "The price of the periods for every item before the account's discounts, with any discount the items carry already reflected; includes tax only where the price does.",
     ),
     discount_amount: Money.describe("The reduction from a discount the account holds."),
     tax_amount: Money.describe("Tax on the discounted amount."),
@@ -26,9 +29,7 @@ export const QuoteRenewalResult = zod
       "What renewing would charge: `amount` less `discount_amount`, plus `tax_amount`, less\n`tax_included_amount`.",
     ),
   })
-  .describe(
-    "What renewing would charge. Renewing the same subscription for the same term and periods charges exactly `total` unless prices or the account's discounts change first.",
-  );
+  .describe("What renewing one subscription would charge as part of the quoted renewal order.");
 
 export type QuoteRenewalResult = zod.input<typeof QuoteRenewalResult>;
 export type QuoteRenewalResultOutput = zod.output<typeof QuoteRenewalResult>;

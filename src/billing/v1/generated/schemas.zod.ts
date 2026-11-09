@@ -11,8 +11,6 @@ import { ActiveResourceStatus } from "./validators/activeResourceStatus.zod.js";
 
 import { AllowanceStatus } from "./validators/allowanceStatus.zod.js";
 
-import { AutoRenewSet } from "./validators/autoRenewSet.zod.js";
-
 import { BillingAccountCreate } from "./validators/billingAccountCreate.zod.js";
 
 import { BillingAccountStatus } from "./validators/billingAccountStatus.zod.js";
@@ -62,6 +60,8 @@ import { SetProjectAssignmentRequest } from "./validators/setProjectAssignmentRe
 import { StatementStatus } from "./validators/statementStatus.zod.js";
 
 import { SubscriptionStatus } from "./validators/subscriptionStatus.zod.js";
+
+import { SubscriptionUpdate } from "./validators/subscriptionUpdate.zod.js";
 
 import { TopUpCreate } from "./validators/topUpCreate.zod.js";
 
@@ -1030,9 +1030,11 @@ export const ListUsageChargesQueryParams = zod.strictObject({
 });
 
 /**
- * Subscriptions paid by your billing accounts; members of a project list its subscriptions with `project_ids`. Deleted subscriptions are not listed.
+ * Subscriptions paid by your billing accounts; members of a project list its subscriptions with `project_ids`. Each subscription includes its items. Deleted subscriptions are not listed.
  * @summary List subscriptions
  */
+export const listSubscriptionsQuerySubscriptionIdsMax = 200;
+
 export const listSubscriptionsQueryPageDefault = 1;
 export const listSubscriptionsQueryPageMax = 2147483647;
 
@@ -1041,10 +1043,18 @@ export const listSubscriptionsQueryPageSizeMax = 200;
 
 export const listSubscriptionsQueryProjectIdsMax = 100;
 
-export const listSubscriptionsQueryStatusMax = 6;
+export const listSubscriptionsQueryStatusMax = 7;
 
 export const ListSubscriptionsQueryParams = zod.strictObject({
   expiring_before: zod.iso.datetime({ offset: true }).optional(),
+  subscription_ids: zod
+    .array(zod.uuid())
+    .min(1)
+    .max(listSubscriptionsQuerySubscriptionIdsMax)
+    .optional()
+    .describe(
+      "Only these subscriptions, such as those of the resources shown on one page. Comma-separated.",
+    ),
   page: zod
     .int()
     .min(1)
@@ -1080,7 +1090,7 @@ export const ListSubscriptionsQueryParams = zod.strictObject({
 });
 
 /**
- * A subscription paid by your billing account or of a project you are a member of. Deleted subscriptions are reported as not found.
+ * A subscription paid by your billing account or of a project you are a member of, with its items. Deleted subscriptions are reported as not found.
  * @summary Get subscription
  */
 export const GetSubscriptionParams = zod.strictObject({
@@ -1088,7 +1098,26 @@ export const GetSubscriptionParams = zod.strictObject({
 });
 
 /**
- * Hides a canceled or terminated subscription from your subscription list and detail by setting deleted_at; its status, ended_at and history are kept. Only the owner of the subscription's current billing account can delete it. A subscription that has not ended is refused with 409 `BILLING_SUBSCRIPTION_NOT_ENDED` and `status`. Repeating it keeps the original deleted_at. It sends no cleanup command and creates no refund.
+ * Changes the subscription's settings given in the request; settings left out keep their values. `auto_renew`
+ * turns automatic renewal on or off for the whole subscription, or, on a trialing subscription, whether the trial
+ * converts to paid. Turning it off does not shorten current_term_end and still allows manual renewal.
+ *
+ * `auto_renew` is refused with 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_INACTIVE` for a pending or provisioning
+ * subscription, 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_FIXED` for a subscription with only metered items, which
+ * continues until it is canceled, and 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` with `meta.cancellation_id`
+ * while a cancellation of the whole subscription is open: creating it turned renewal off, and withdrawing it does
+ * not turn renewal back on. Open to the owner of the subscription's current billing account and to members of its
+ * project with the project permission `billing:finance.manage`.
+ * @summary Update subscription
+ */
+export const UpdateSubscriptionParams = zod.strictObject({
+  subscriptionId: zod.uuid(),
+});
+
+export const UpdateSubscriptionBody = SubscriptionUpdate;
+
+/**
+ * Hides a canceled or terminated subscription from your subscription list and detail by setting deleted_at; its status, ended_at, items and history are kept. Only the owner of the subscription's current billing account can delete it. A subscription that has not ended is refused with 409 `BILLING_SUBSCRIPTION_NOT_ENDED` and `status`. Repeating it keeps the original deleted_at. It sends no cleanup command and creates no refund.
  * @summary Delete subscription
  */
 export const DeleteSubscriptionParams = zod.strictObject({
@@ -1096,16 +1125,16 @@ export const DeleteSubscriptionParams = zod.strictObject({
 });
 
 /**
- * Requests cancellation on the purchase's agreed terms, with the same rules as creating a cancellation. Give the
- * `proration_date` and `refundable_amount` of preview-cancellation for this subscription. Open to the owner of the
- * subscription's current billing account and to members of its project with the project permission
- * `billing:finance.manage`.
+ * Requests cancellation of every continuing item of the subscription on their agreed terms, with the same rules
+ * as creating a cancellation. Give the `proration_date` and `refundable_amount` of preview-cancellation for these
+ * items. Open to the owner of the subscription's current billing account and to members of its project with the
+ * project permission `billing:finance.manage`.
  *
  * Immediate cancellation asks the owning service to release the resources now; period-end cancellation keeps the
- * subscription active or suspended until the paid term ends. The subscription becomes canceled when the service
- * confirms the release; follow the returned cancellation. Subscriptions released together must be canceled
- * together through create-cancellation, and pending or provisioning purchases through their order. Repeating the
- * request while the cancellation is open returns it.
+ * subscription in service until its current term ends. The subscription becomes canceled when the service
+ * confirms the release; follow the returned cancellation. To cancel some items, or items released together across
+ * subscriptions, use create-cancellation; pending or provisioning purchases are canceled through their order.
+ * Repeating the request while the cancellation is open returns it.
  * @summary Cancel subscription
  */
 export const CancelSubscriptionParams = zod.strictObject({
@@ -1115,7 +1144,7 @@ export const CancelSubscriptionParams = zod.strictObject({
 export const CancelSubscriptionBody = CancelSubscriptionRequest;
 
 /**
- * Newest first; members of a project list its cancellations with `project_ids`. Filter by `subscription_id` and `status=open` to find a subscription's cancellation in progress.
+ * Newest first; members of a project list its cancellations with `project_ids`. Filter by `subscription_item_id` and `status=open` to find an item's cancellation in progress, or by `subscription_id` for every item of a subscription.
  * @summary List cancellations
  */
 export const listCancellationsQueryPageDefault = 1;
@@ -1148,7 +1177,11 @@ export const ListCancellationsQueryParams = zod.strictObject({
   subscription_id: zod
     .uuid()
     .optional()
-    .describe("Only cancellations that include this subscription."),
+    .describe("Only cancellations that include an item of this subscription."),
+  subscription_item_id: zod
+    .uuid()
+    .optional()
+    .describe("Only cancellations that include this subscription item."),
   status: zod
     .array(
       zod.enum(["open", "requested", "scheduled", "releasing", "completed", "canceled", "failed"]),
@@ -1170,44 +1203,46 @@ export const ListCancellationsQueryParams = zod.strictObject({
 });
 
 /**
- * Ends subscriptions of one service together. Deleting a resource is an `immediate` cancellation of every
- * subscription released with it, such as a server with its disks or an address with its bandwidth. Open to the
- * owner of the subscriptions' current billing account and to members of their project with the project
- * permission `billing:finance.manage`.
+ * Ends subscription items of one service together, from one subscription or several. Deleting a resource is an
+ * `immediate` cancellation of every item released with it, such as a server with its disks or an address with
+ * its bandwidth. Open to the owner of the items' current billing account and to members of their project with
+ * the project permission `billing:finance.manage`.
  *
- * The owning service releases the resources at once for `immediate`, or at `scheduled_at`, the end of the paid
- * term, for `period_end`. When release is confirmed, the unused value is returned to the original payment
- * sources under each subscription's refund terms. For `immediate` the refund is computed as of `proration_date`
- * and is not reduced by service used during release. Metered usage is charged until release.
+ * The owning service releases the resources at once for `immediate`, or at `scheduled_at`, the end of the
+ * subscription's current term, for `period_end`; until then the items are left out of renewals. When release is
+ * confirmed, the unused value is returned to the original payment sources under each item's refund terms. For
+ * `immediate` the refund is computed as of `proration_date` and is not reduced by service used during release.
+ * Metered usage is charged until release. A subscription whose continuing items all end is canceled.
  *
- * `mode` must be allowed for every subscription. Metered and one-time subscriptions end only `immediate`. A
- * licensed subscription ends `period_end` while its paid term lasts, and `immediate` unless its terms allow only
- * the end of the paid term and that term has not ended. For `period_end` all paid terms must end at the same
+ * `mode` must be allowed for every item. Metered and one-time items end only `immediate`. A licensed item ends
+ * `period_end` while its subscription's paid term lasts, and `immediate` unless its terms allow only the end of
+ * the paid term and that term has not ended. For `period_end` the paid terms of all items must end at the same
  * time.
  *
  * Refused with:
  *
- * - 400 `BILLING_CANCELLATION_INVALID` when `subscription_ids` or `proration_date` is invalid (`meta.field`), or
- *   the subscriptions do not share one service, project, account and currency;
- * - 409 `BILLING_CANCELLATION_CONFLICT` when a subscription has not started or has ended;
+ * - 400 `BILLING_CANCELLATION_INVALID` when `items` or `proration_date` is invalid (`meta.field`), or the items
+ *   do not share one service, project, account and currency;
+ * - 409 `BILLING_CANCELLATION_CONFLICT` when an item has not started or has ended;
  * - 422 `BILLING_CANCELLATION_MODE_FIXED` when `mode` is not allowed, and `BILLING_CANCELLATION_TERMS_UNSET`
- *   when a licensed subscription has no cancellation terms, both with `meta.subscription_id`;
+ *   when a licensed item has no cancellation terms, both with `meta.subscription_item_id`;
  * - 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when, for `period_end`, the paid terms end at different times;
- * - 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled
- *   (`meta.cancellation_id`) or reclaimed (`meta.reason` `reclaim_requested`), or has a paid change waiting to
- *   switch (`meta.order_id`);
- * - 409 `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online renewal payment for one of them is in progress;
+ * - 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when an item is already being canceled
+ *   (`meta.cancellation_id`), its subscription is being reclaimed (`meta.reason` `reclaim_requested`), or the
+ *   item has a paid change waiting to switch (`meta.order_id`);
+ * - 409 `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online renewal payment for one of their subscriptions is in
+ *   progress;
  * - 409 `BILLING_CANCELLATION_REFUND_CHANGED` when the refund no longer equals `expected_refundable_amount`.
  *
- * Repeating the request for the same subscriptions, mode and amount while the cancellation is open returns it
- * with 200. Unpaid renewal orders are canceled with it, and automatic renewal is turned off for every
- * subscription.
- * @summary Cancel subscriptions
+ * Repeating the request for the same items, mode and amount while the cancellation is open returns it with 200.
+ * When it covers every continuing item of a subscription, unpaid renewal orders of that subscription are
+ * canceled with it and its automatic renewal is turned off.
+ * @summary Cancel subscription items
  */
 export const CreateCancellationBody = CancellationCreate;
 
 /**
- * A cancellation paid by your billing account or of a project you are a member of, with its schedule, expected refundable amount and the outcome for each subscription, including partial success.
+ * A cancellation paid by your billing account or of a project you are a member of, with its schedule, expected refundable amount and the outcome for each item, including partial success.
  * @summary Get a cancellation
  */
 export const GetCancellationParams = zod.strictObject({
@@ -1215,50 +1250,53 @@ export const GetCancellationParams = zod.strictObject({
 });
 
 /**
- * Withdraws the whole cancellation, which stays with status `canceled`, while no resource has begun to be released; afterwards it is refused with 409 `BILLING_CANCELLATION_CONFLICT`. The subscriptions continue, but automatic renewal, turned off when the cancellation was created, stays off until it is turned on again. Withdrawing a withdrawn cancellation returns it unchanged. Open to the owner of the subscriptions' current billing account and to members of their project with the project permission `billing:finance.manage`.
+ * Withdraws the whole cancellation, which stays with status `canceled`, while no resource has begun to be released; afterwards it is refused with 409 `BILLING_CANCELLATION_CONFLICT`. The items continue and renew with their subscriptions again; a subscription's automatic renewal, turned off when the cancellation covered all of its continuing items, stays off until it is turned on again. Withdrawing a withdrawn cancellation returns it unchanged. Open to the owner of the items' current billing account and to members of their project with the project permission `billing:finance.manage`.
  * @summary Withdraw a cancellation
  */
-export const WithdrawCancellationParams = zod.strictObject({
+export const DeleteCancellationParams = zod.strictObject({
   cancellationId: zod.uuid(),
 });
 
 /**
- * Lists the current renewal agreement and available intervals. The current option preserves recurring_amount; other options use current prices. Amounts cover the whole subscription quantity and exclude tax. Open to the owner of the subscription's current billing account and to members of its project.
- * @summary List the terms this item can be renewed for
+ * The current agreement first, then each other term every continuing licensed item sells in the subscription's currency. The current option keeps each item's recurring_amount; other options use current prices, each item taking the price of that term with its own cancellation policy, or the only price of that term. Amounts exclude tax and discounts. Open to the owner of the subscription's current billing account and to members of its project.
+ * @summary List the terms the subscription can be renewed for
  */
-export const ListRenewalPricesParams = zod.strictObject({
+export const ListRenewalOptionsParams = zod.strictObject({
   subscriptionId: zod.uuid(),
 });
 
-export const listRenewalPricesQueryPageDefault = 1;
-export const listRenewalPricesQueryPageMax = 2147483647;
+export const listRenewalOptionsQueryPageDefault = 1;
+export const listRenewalOptionsQueryPageMax = 2147483647;
 
-export const listRenewalPricesQueryPageSizeDefault = 50;
-export const listRenewalPricesQueryPageSizeMax = 200;
+export const listRenewalOptionsQueryPageSizeDefault = 50;
+export const listRenewalOptionsQueryPageSizeMax = 200;
 
-export const ListRenewalPricesQueryParams = zod.strictObject({
+export const ListRenewalOptionsQueryParams = zod.strictObject({
   page: zod
     .int()
     .min(1)
-    .max(listRenewalPricesQueryPageMax)
-    .default(listRenewalPricesQueryPageDefault)
+    .max(listRenewalOptionsQueryPageMax)
+    .default(listRenewalOptionsQueryPageDefault)
     .describe("1-based page number. Defaults to 1."),
   page_size: zod
     .int()
     .min(1)
-    .max(listRenewalPricesQueryPageSizeMax)
-    .default(listRenewalPricesQueryPageSizeDefault)
+    .max(listRenewalOptionsQueryPageSizeMax)
+    .default(listRenewalOptionsQueryPageSizeDefault)
     .describe("Items per page. Defaults to 50; at most 200."),
 });
 
 /**
- * Buys licensed periods from current_term_end at the agreed recurring amount and pays for them at once. A
- * different interval selects the price currently sold for it and fixes new terms on the order, applied after
- * fulfillment. Paid periods keep their value.
+ * Buys further periods for the whole subscription from current_term_end and pays for them at once: every
+ * continuing licensed item renews, at its agreed recurring amount or, with a different interval, at the price each
+ * item currently sells that term for, and the new terms are fixed on the order. Items with an open cancellation end
+ * with the current term and are left out. Paid periods keep their value. A trialing subscription converts to paid
+ * this way; renewed after its trial expired, its first paid period starts at payment.
  *
  * Without `payment_method_id`, the renewal is paid from credit grants and balance as `use_credits` and
  * `use_balance` allow; when they cannot cover it, the request fails with `BILLING_INSUFFICIENT_FUNDS` and no
- * order is left. To apply a promotion code or pay later, create a renewal Checkout Session.
+ * order is left. To apply a promotion code, pay later, or renew several subscriptions in one order, create a
+ * renewal Checkout Session.
  *
  * Open to the owner of the subscription's current billing account and to members of its project with the
  * project permission `billing:finance.manage`. Only the owner can pay with `payment_method_id`.
@@ -1271,16 +1309,6 @@ export const RenewSubscriptionParams = zod.strictObject({
 });
 
 export const RenewSubscriptionBody = RenewRequest;
-
-/**
- * Turns automatic renewal of an active or suspended licensed subscription on or off. Turning it off does not shorten current_term_end and still allows manual renewal. Refused with 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_INACTIVE` for a pending or provisioning subscription, 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_FIXED` for a metered subscription, which continues until it is canceled, and 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` with `meta.cancellation_id` while a cancellation is open: creating it turned renewal off, and withdrawing it does not turn renewal back on. Open to the owner of the subscription's current billing account and to members of its project with the project permission `billing:finance.manage`.
- * @summary Set auto renew
- */
-export const SetAutoRenewParams = zod.strictObject({
-  subscriptionId: zod.uuid(),
-});
-
-export const SetAutoRenewBody = AutoRenewSet;
 
 /**
  * Remaining usage quantities, such as bytes, seconds or tokens; members of a project list its allowances with `project_ids`. Applicable allowances are consumed before usage is charged: lower priority values first, then earlier expiry, then earlier issuance. Unused quantity expires without refund or carry-over. Promotional allowances apply to usage paid by their holding account; included allowances apply only to their subscription, also after its project moves to another billing account.
@@ -1392,13 +1420,14 @@ export const ListCheckoutSessionsQueryParams = zod.strictObject({
 });
 
 /**
- * Opens a Checkout Session renewing a licensed subscription, with periods and price chosen as in
- * renewing. Nothing is charged until you complete it, when a promotion code can be applied; it then renews from
- * the subscription's current_term_end at that time. To renew at once from credit grants, balance or a payment
- * method, renew the subscription instead. Purchases and changes of a service's resources are created through
- * that service.
+ * Opens a Checkout Session renewing one or more subscriptions in one order, such as a machine and the separately
+ * bought volumes and elastic IPs attached to it, with periods and price chosen as in renewing. Every subscription
+ * must be paid by the same billing account and belong to the same project and service. Nothing is charged until
+ * you complete it, when a promotion code can be applied; each subscription then renews from its current_term_end
+ * at that time. To renew one subscription at once from credit grants, balance or a payment method, renew the
+ * subscription instead. Purchases and changes of a service's resources are created through that service.
  *
- * Open to the owner of the subscription's current billing account and to members of its project with the
+ * Open to the owner of the subscriptions' current billing account and to members of their project with the
  * project permission `billing:finance.manage`. Keep `checkout_session_id` and read the session after an
  * unknown outcome; creating it again conflicts.
  * @summary Create a renewal Checkout Session
@@ -1582,7 +1611,7 @@ export const PreviewOrderRefundQueryParams = zod.strictObject({
  * payment waiting for the payer is canceled with the order; one the gateway is processing is refused with
  * `BILLING_PAYMENT_PENDING` and `meta.transaction_id`. Repeating the cancellation does not refund twice.
  *
- * An accepted order is canceled by its owning service, and delivered items through subscription cancellation.
+ * An accepted order is canceled by its owning service, and delivered items through cancellation of their subscription items.
  * Refunds are previewed with `preview-order-refund`. Open to the owner of the order's billing account and to members of its project.
  * @summary Cancel order
  */

@@ -12,7 +12,8 @@ import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { Product } from "./product.zod.js";
 
 export const UsageCharge = zod.strictObject({
-  subscription_id: zod.uuid(),
+  subscription_item_id: zod.uuid().describe("The subscription item the usage belongs to."),
+  subscription_id: zod.uuid().describe("The subscription the item belongs to."),
   id: zod.uuid(),
   project_id: zod.uuid().optional(),
   project: zod

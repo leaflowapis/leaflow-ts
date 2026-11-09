@@ -16,7 +16,7 @@
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
  * - **Custom methods.** An action that is not one of the standard methods (list, get, create, update, delete) is a custom method, `POST` on the resource's path followed by `:` and the verb, as in `POST /api/v2/instances/{id}:reboot` (AIP-136). A state is changed by its custom method, never by writing the state: `:start` and `:stop`, `:rescue` and `:unrescue`, `:associate` and `:disassociate`.
- * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
+ * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only descriptive fields, all optional and at least one given, and answers 200. A change that starts an operation or a purchase, such as a resize, is its own method (`:resize`, `:retype`, `:changeBandwidth`).
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. Its `access_state` is `pending` until the order is accepted and delivery settles it, then `enabled`; a subscription that lapses suspends or reclaims the resource it pays for. Deleting a resource that subscriptions pay for cancels the subscriptions of its `release_set` in Billing, and the deletion answers with that cancellation.
  * - **Availability zones.** A volume and an instance must reside in the same availability zone to be attached. An instance type and a volume type each belong to one availability zone, as on GCP, so a purchase names the type and the type names the zone; the volumes bought with an instance have to be of types of the instance type's zone.
  * - **IPv6 is routed, not translated.** A virtual private cloud with IPv6 holds a /56 and each of its subnets a /64 of it, as on Alibaba Cloud, Tencent Cloud and Azure; IPv6 and its security groups require no EIP or NAT gateway. EIP and NATGateway are IPv4 products; IPv6 EIP, NAT66 and IPv6 port forwarding are not supported.
@@ -33,18 +33,18 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { AvailabilityZoneID } from "./availabilityZoneID.zod.js";
-import { ImageID } from "./imageID.zod.js";
-import { InstanceID } from "./instanceID.zod.js";
+import { AvailabilityZoneId } from "./availabilityZoneId.zod.js";
+import { ImageId } from "./imageId.zod.js";
+import { InstanceId } from "./instanceId.zod.js";
 import { InstanceRestriction } from "./instanceRestriction.zod.js";
-import { InstanceTypeID } from "./instanceTypeID.zod.js";
+import { InstanceTypeId } from "./instanceTypeId.zod.js";
 import { LatestOperation } from "./latestOperation.zod.js";
-import { LaunchTemplateID } from "./launchTemplateID.zod.js";
-import { RegionID } from "./regionID.zod.js";
+import { LaunchTemplateId } from "./launchTemplateId.zod.js";
+import { RegionId } from "./regionId.zod.js";
 import { ReleaseSetItem } from "./releaseSetItem.zod.js";
-import { SubnetID } from "./subnetID.zod.js";
-import { VirtualPrivateCloudID } from "./virtualPrivateCloudID.zod.js";
-import { VolumeID } from "./volumeID.zod.js";
+import { SubnetId } from "./subnetId.zod.js";
+import { VirtualPrivateCloudId } from "./virtualPrivateCloudId.zod.js";
+import { VolumeId } from "./volumeId.zod.js";
 
 export const instanceLabelsMaxOne = 63;
 
@@ -53,12 +53,12 @@ export const instanceLoginUsernameMax = 32;
 export const instanceDescriptionMax = 4096;
 
 export const Instance = zod.strictObject({
-  availability_zone_id: AvailabilityZoneID,
+  availability_zone_id: AvailabilityZoneId,
   created_at: zod.iso.datetime({ offset: true }),
   hostname: zod.string().describe("Hostname inside the instance; equals the instance id"),
-  id: InstanceID,
+  id: InstanceId,
   image_id: zod
-    .union([ImageID, zod.null()])
+    .union([ImageId, zod.null()])
     .describe(
       "Non-empty when the instance was created from an image, public or private. `image_type` says which collection holds it",
     ),
@@ -68,7 +68,7 @@ export const Instance = zod.strictObject({
     .describe(
       "Which collection `image_id` belongs to. `public` means `/public-images`, `private` means `/private-images`. Null when the instance boots from a volume and therefore has no image",
     ),
-  instance_type_id: InstanceTypeID,
+  instance_type_id: InstanceTypeId,
   ipv6_address: zod
     .string()
     .nullable()
@@ -90,14 +90,14 @@ export const Instance = zod.strictObject({
     .max(instanceDescriptionMax)
     .describe("A free-text note about this instance. Empty when never set"),
   private_ip: zod.string().nullable().describe("Private address of the instance"),
-  virtual_private_cloud_id: zod.union([VirtualPrivateCloudID, zod.null()]),
+  virtual_private_cloud_id: zod.union([VirtualPrivateCloudId, zod.null()]),
   elastic_ip_addresses: zod
     .array(zod.string())
     .nullable()
     .describe(
       "Elastic IPv4 addresses associated with the primary network interface; an empty array when none are associated",
     ),
-  region_id: RegionID,
+  region_id: RegionId,
   status: zod
     .enum([
       "pending",
@@ -131,7 +131,7 @@ export const Instance = zod.strictObject({
     .describe(
       "`pending` until the instance is created: before the order is accepted no instance exists and addresses are null. Then `running`. `failed` means the instance was not created; `failure_reason` states why. The other values are the state of the instance in the cloud. A value naming an operation in progress (`starting`, `stopping`, `rebooting`, `rebuilding`, `rescuing`, `unrescuing`, `resizing`, `resetting_password`, `attaching_volume`, `detaching_volume`, `attaching_network_interface`, `detaching_network_interface`, `associating_elastic_ip`, `disassociating_elastic_ip`, `capturing_image`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the instance refuses another operation until it ends.",
     ),
-  subnet_id: zod.union([SubnetID, zod.null()]),
+  subnet_id: zod.union([SubnetId, zod.null()]),
   updated_at: zod.iso.datetime({ offset: true }),
   restrictions: zod.array(InstanceRestriction),
   failure_reason: zod
@@ -159,12 +159,18 @@ export const Instance = zod.strictObject({
     .uuid()
     .nullable()
     .describe(
-      "The Billing subscription associated with this resource. It may still be pending; its\npresence does not imply delivery or metering. Null when no subscription is associated.",
+      "The Billing subscription the instance renews under, with the volumes and elastic IP bought with it or for it.\nRead it in Billing for the term end, automatic renewal and renewal. It may still be pending; its presence\ndoes not imply delivery or metering. Null when no subscription is associated.",
+    ),
+  subscription_item_id: zod
+    .uuid()
+    .nullable()
+    .describe(
+      "The instance's own item of that subscription. Null when no subscription is associated.",
     ),
   release_set: zod
     .array(ReleaseSetItem)
     .describe(
-      "Subscriptions required to release this instance and volumes deleted with it, each with the resource it pays for, so that each line of a cancellation can name what it releases. Billing determines cancellation terms. An empty set does not establish refund eligibility.",
+      "Subscription items required to release this instance and volumes deleted with it, each with the resource it pays for, so that each line of a cancellation can name what it releases. Billing determines cancellation terms. An empty set does not establish refund eligibility.",
     ),
   access_state: zod
     .union([
@@ -176,12 +182,12 @@ export const Instance = zod.strictObject({
     ])
     .nullable(),
   source_volume_id: zod
-    .union([VolumeID, zod.null()])
+    .union([VolumeId, zod.null()])
     .describe(
       "Non-empty when the instance was created from a volume you already had, instead of from an image",
     ),
   launch_template_id: zod
-    .union([LaunchTemplateID, zod.null()])
+    .union([LaunchTemplateId, zod.null()])
     .describe(
       "The launch template the instance was created from; null when none was named. Changing or deleting the template afterwards changes nothing about the instance.",
     ),

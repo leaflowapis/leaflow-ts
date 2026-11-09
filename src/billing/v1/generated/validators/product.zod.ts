@@ -6,10 +6,10 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const Product = zod.strictObject({
-  id: ProductID,
+  id: ProductId,
   name: zod.string(),
   description: zod.string().optional(),
 });

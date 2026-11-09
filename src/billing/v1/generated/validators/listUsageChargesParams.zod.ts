@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const listUsageChargesParamsPageDefault = 1;
 export const listUsageChargesParamsPageMax = 2147483647;
@@ -28,7 +28,7 @@ export const ListUsageChargesParams = zod.strictObject({
     .max(listUsageChargesParamsPageSizeMax)
     .default(listUsageChargesParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
-  product_id: ProductID.optional(),
+  product_id: ProductId.optional(),
   resource_id: zod.string().optional(),
   invoice_item_id: zod.uuid().optional(),
   from: zod.iso.datetime({ offset: true }).optional(),

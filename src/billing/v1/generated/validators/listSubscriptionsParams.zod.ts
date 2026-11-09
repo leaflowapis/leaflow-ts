@@ -8,6 +8,8 @@
 import * as zod from "zod";
 import { SubscriptionStatus } from "./subscriptionStatus.zod.js";
 
+export const listSubscriptionsParamsSubscriptionIdsMax = 200;
+
 export const listSubscriptionsParamsPageDefault = 1;
 export const listSubscriptionsParamsPageMax = 2147483647;
 
@@ -16,10 +18,15 @@ export const listSubscriptionsParamsPageSizeMax = 200;
 
 export const listSubscriptionsParamsProjectIdsMax = 100;
 
-export const listSubscriptionsParamsStatusMax = 6;
+export const listSubscriptionsParamsStatusMax = 7;
 
 export const ListSubscriptionsParams = zod.strictObject({
   expiring_before: zod.iso.datetime({ offset: true }).optional(),
+  subscription_ids: zod
+    .array(zod.uuid())
+    .min(1)
+    .max(listSubscriptionsParamsSubscriptionIdsMax)
+    .optional(),
   page: zod
     .int()
     .min(1)

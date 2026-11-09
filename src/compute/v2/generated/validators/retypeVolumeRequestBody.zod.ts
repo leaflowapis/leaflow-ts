@@ -16,7 +16,7 @@
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
  * - **Custom methods.** An action that is not one of the standard methods (list, get, create, update, delete) is a custom method, `POST` on the resource's path followed by `:` and the verb, as in `POST /api/v2/instances/{id}:reboot` (AIP-136). A state is changed by its custom method, never by writing the state: `:start` and `:stop`, `:rescue` and `:unrescue`, `:associate` and `:disassociate`.
- * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
+ * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only descriptive fields, all optional and at least one given, and answers 200. A change that starts an operation or a purchase, such as a resize, is its own method (`:resize`, `:retype`, `:changeBandwidth`).
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. Its `access_state` is `pending` until the order is accepted and delivery settles it, then `enabled`; a subscription that lapses suspends or reclaims the resource it pays for. Deleting a resource that subscriptions pay for cancels the subscriptions of its `release_set` in Billing, and the deletion answers with that cancellation.
  * - **Availability zones.** A volume and an instance must reside in the same availability zone to be attached. An instance type and a volume type each belong to one availability zone, as on GCP, so a purchase names the type and the type names the zone; the volumes bought with an instance have to be of types of the instance type's zone.
  * - **IPv6 is routed, not translated.** A virtual private cloud with IPv6 holds a /56 and each of its subnets a /64 of it, as on Alibaba Cloud, Tencent Cloud and Azure; IPv6 and its security groups require no EIP or NAT gateway. EIP and NATGateway are IPv4 products; IPv6 EIP, NAT66 and IPv6 port forwarding are not supported.
@@ -34,25 +34,18 @@
  */
 import * as zod from "zod";
 import { CheckoutOptions } from "./checkoutOptions.zod.js";
-import { InternetChargeType } from "./internetChargeType.zod.js";
+import { VolumeTypeId } from "./volumeTypeId.zod.js";
 
-export const UpdateElasticIPRequestBody = zod
-  .strictObject({
-    internet_charge_type: InternetChargeType.optional().describe(
-      "Moves a pay-as-you-go elastic IP between charging for its bandwidth and charging for its traffic, within the same network subscription and without checkout. A prepaid network subscription has paid for its bandwidth and is refused with `ELASTIC_IP_CHARGE_TYPE_PREPAID`; `traffic` on a line whose `traffic_sale_status` is `off_sale` is refused with `ELASTIC_IP_TRAFFIC_UNAVAILABLE`, the type already in effect with `ELASTIC_IP_CHARGE_TYPE_UNCHANGED`, and a type the currency of the network subscription does not offer on the line with HTTP 403 `ELASTIC_IP_CHARGE_TYPE_NOT_OFFERED`: prices are set per currency, and a currency without one there does not sell that type.\n\nThe change takes effect at the instant it is applied: bandwidth stops being metered then and traffic starts being, or the other way round. Traffic is counted in windows, and a window is charged the way the elastic IP was charged for most of it, so a report that arrives late is still charged as it was at the time and a window the change falls in is never charged both ways. `bandwidth_mbps` stays the ceiling either way.",
+export const RetypeVolumeRequestBody = zod.strictObject({
+  volume_type_id: VolumeTypeId,
+  proration_date: zod.iso
+    .datetime({ offset: true })
+    .optional()
+    .describe(
+      "The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`.",
     ),
-    bandwidth_mbps: zod.int().min(1).optional().describe("Applied to both directions"),
-    proration_date: zod.iso
-      .datetime({ offset: true })
-      .optional()
-      .describe(
-        "The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only with `bandwidth_mbps` on a prepaid network subscription, and only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`.",
-      ),
-    checkout: CheckoutOptions.optional(),
-  })
-  .describe(
-    "The mutable fields of the elastic IP identified by the path, all optional, at least one required. `bandwidth_mbps`\nand `internet_charge_type` are operational fields and cannot be combined with any other field; such a request is\nrefused with 422 `UPDATE_FIELDS_COMBINED`. This is a configuration change of that resource, not an independent\nbandwidth resource. Checkout is handled by Billing.",
-  );
+  checkout: CheckoutOptions.optional(),
+});
 
-export type UpdateElasticIPRequestBody = zod.input<typeof UpdateElasticIPRequestBody>;
-export type UpdateElasticIPRequestBodyOutput = zod.output<typeof UpdateElasticIPRequestBody>;
+export type RetypeVolumeRequestBody = zod.input<typeof RetypeVolumeRequestBody>;
+export type RetypeVolumeRequestBodyOutput = zod.output<typeof RetypeVolumeRequestBody>;

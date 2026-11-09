@@ -16,9 +16,10 @@ export const ActiveResource = zod
     ended_at: zod.iso.datetime({ offset: true }).optional(),
     suspended_at: zod.iso.datetime({ offset: true }).optional(),
     state_changed_at: zod.iso.datetime({ offset: true }).optional(),
-    subscription_id: zod
+    subscription_item_id: zod
       .uuid()
-      .describe("The metered subscription charged for this metering record."),
+      .describe("The metered subscription item charged for this metering record."),
+    subscription_id: zod.uuid().describe("The subscription the item belongs to."),
     resource_id: zod.string(),
     product: Product,
     resource_type: zod

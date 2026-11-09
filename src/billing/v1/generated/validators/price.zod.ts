@@ -12,7 +12,7 @@ import { Money } from "./money.zod.js";
 import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 import { Rate } from "./rate.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
 import { Tier } from "./tier.zod.js";
@@ -53,7 +53,7 @@ export const Price = zod.strictObject({
     .describe(
       "Refund policy `short_rate` only, how long after the period start `short_rate_multiplier` applies.",
     ),
-  product_id: ProductID.optional(),
+  product_id: ProductId.optional(),
   id: zod.uuid(),
   plan_id: zod.uuid(),
   currency: zod.string(),

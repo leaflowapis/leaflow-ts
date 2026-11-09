@@ -7,16 +7,16 @@
  */
 import * as zod from "zod";
 
-export const ProductIDMax = 64;
+export const ProductIdMax = 64;
 
-export const ProductIDRegExp = new RegExp("^[a-z][a-z0-9]*(-[a-z0-9]+)*$");
+export const ProductIdRegExp = new RegExp("^[a-z][a-z0-9]*(-[a-z0-9]+)*$");
 
-export const ProductID = zod
+export const ProductId = zod
   .string()
   .min(1)
-  .max(ProductIDMax)
-  .regex(ProductIDRegExp)
+  .max(ProductIdMax)
+  .regex(ProductIdRegExp)
   .describe("The platform service's fixed identifier, such as compute, canopy or assistant.");
 
-export type ProductID = zod.input<typeof ProductID>;
-export type ProductIDOutput = zod.output<typeof ProductID>;
+export type ProductId = zod.input<typeof ProductId>;
+export type ProductIdOutput = zod.output<typeof ProductId>;

@@ -429,6 +429,11 @@ export interface CheckoutOptions {
    * @maxLength 2048
    */
   return_url?: string;
+  /**
+   * Turns on automatic renewal of every subscription with licensed items that the purchase opens. Off
+   * when omitted. It must be the customer's own choice.
+   */
+  auto_renew?: boolean;
 }
 
 export interface MembershipCreate {

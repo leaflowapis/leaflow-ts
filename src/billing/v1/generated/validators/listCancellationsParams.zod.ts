@@ -30,6 +30,7 @@ export const ListCancellationsParams = zod.strictObject({
     .default(listCancellationsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
   subscription_id: zod.uuid().optional(),
+  subscription_item_id: zod.uuid().optional(),
   status: zod
     .array(
       zod.enum(["open", "requested", "scheduled", "releasing", "completed", "canceled", "failed"]),

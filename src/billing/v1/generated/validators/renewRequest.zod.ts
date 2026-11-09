@@ -24,21 +24,21 @@ export const RenewRequest = zod.strictObject({
     .min(1)
     .default(renewRequestPeriodsDefault)
     .describe(
-      "How many further periods to buy, each at the price the subscription already renews at. To buy a longer term at its own price, give `interval` and `interval_count` instead.",
+      "How many further periods to buy for every renewed item, each at the price it already renews at. To buy a longer term at its own price, give `interval` and `interval_count` instead.",
     ),
   interval_count: zod
     .int()
     .min(1)
     .optional()
     .describe(
-      "Renew for a term of this length instead, at the price currently sold for it. Give\n`interval` with it.\n\nLeaving both out renews at the price this item already bills at, which a later price\nchange does not affect. Naming a term that differs from the current one is a fresh\nchoice, so it is bought at today's price. Naming the current term changes nothing. A\nterm sold at several prices that differ in cancellation policy is refused with 409\n`BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` is given.\n\nList the terms on offer with the renewal prices operation.",
+      "Renew for a term of this length instead, at the price currently sold for it. Give\n`interval` with it.\n\nLeaving both out renews every item at the price it already bills at, which a later price\nchange does not affect. Naming a term that differs from the current one is a fresh\nchoice, so every item is bought at today's price for that term, with its own cancellation\npolicy or, without one, the only price of that term. Naming the current term changes\nnothing. A term an item does not sell is refused with 409 `BILLING_RENEWAL_PRICE_UNAVAILABLE`\nand `meta.subscription_item_id`; prices the rule cannot choose between, with 409\n`BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` is given.\n\nList the terms on offer with the renewal options operation.",
     ),
   interval: zod
     .enum(["day", "month", "year"])
     .optional()
     .describe("The unit interval_count counts in."),
   cancellation_policy: CancellationPolicy.optional().describe(
-    "With `interval` and `interval_count`, chooses among prices of that term that differ in cancellation policy.",
+    "With `interval` and `interval_count`, renews every item at its price of that term with this cancellation policy.",
   ),
   payment_method_id: zod.uuid().optional(),
   use_balance: zod

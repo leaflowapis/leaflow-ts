@@ -8,7 +8,7 @@
 import * as zod from "zod";
 import { Money } from "./money.zod.js";
 import { PriceType } from "./priceType.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 import { QuoteDowngradeRefund } from "./quoteDowngradeRefund.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
@@ -27,8 +27,14 @@ export const QuoteItem = zod
     subscription_id: zod
       .uuid()
       .nullable()
-      .describe("The subscription changed; null for a new purchase."),
-    product_id: ProductID,
+      .describe(
+        "The subscription the line belongs to when it changes an item or is added to an existing subscription; null when it opens a new one.",
+      ),
+    subscription_item_id: zod
+      .uuid()
+      .nullable()
+      .describe("The subscription item changed; null for a new line."),
+    product_id: ProductId,
     plan_id: zod.uuid(),
     price_id: zod
       .uuid()
