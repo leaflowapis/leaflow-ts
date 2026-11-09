@@ -15,7 +15,13 @@ export const Allowance = zod.strictObject({
     .string()
     .optional()
     .describe("Optional issuance key, unique within this billing account."),
-  subscription_id: zod.uuid().optional(),
+  subscription_item_id: zod
+    .uuid()
+    .optional()
+    .describe(
+      "The subscription item whose purchase includes the allowance; absent for an allowance not included in a purchase.",
+    ),
+  subscription_id: zod.uuid().optional().describe("The subscription that item belongs to."),
   id: zod.uuid(),
   billing_account_id: zod.int().optional(),
   product: Product,

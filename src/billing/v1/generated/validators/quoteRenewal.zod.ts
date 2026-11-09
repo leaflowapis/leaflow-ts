@@ -14,11 +14,10 @@ export const quoteRenewalPeriodsMax = 100;
 export const QuoteRenewal = zod
   .strictObject({
     subscription_id: zod.uuid(),
-    price_id: zod.uuid().optional(),
     interval: zod.enum(["day", "month", "year"]).optional(),
     interval_count: zod.int().min(1).optional(),
     cancellation_policy: CancellationPolicy.optional().describe(
-      "With `interval` and `interval_count`, chooses among prices of that term that differ in cancellation policy.",
+      "With `interval` and `interval_count`, renews every item at its price of that term with this cancellation policy.",
     ),
     periods: zod
       .int()
@@ -28,7 +27,7 @@ export const QuoteRenewal = zod
       .describe("How many consecutive periods to renew for."),
   })
   .describe(
-    "Price renewing a licensed subscription. Give `price_id`, or `interval` with\n`interval_count`, to renew for another term at the price currently sold for it. Naming\nthe current term, or giving neither, renews at the agreed amount. A term sold at several\nprices that differ in cancellation policy is refused with 409\n`BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` or `price_id` is given.",
+    "Price renewing a whole subscription: every continuing licensed item. Give `interval` with\n`interval_count` to renew for another term at the price each item currently sells it for, with\nits own cancellation policy or the only price of that term. Naming the current term, or giving\nneither, renews every item at its agreed amount. A term an item does not sell is refused with\n409 `BILLING_RENEWAL_PRICE_UNAVAILABLE` and `meta.subscription_item_id`; prices the rule cannot\nchoose between, with 409 `BILLING_RENEWAL_OPTION_AMBIGUOUS` unless `cancellation_policy` is given.",
   );
 
 export type QuoteRenewal = zod.input<typeof QuoteRenewal>;

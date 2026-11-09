@@ -8,7 +8,7 @@
 import * as zod from "zod";
 import { PlanFeature } from "./planFeature.zod.js";
 import { Product } from "./product.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const Plan = zod.strictObject({
   active: zod
@@ -18,7 +18,7 @@ export const Plan = zod.strictObject({
   product: Product,
   features: zod.array(PlanFeature),
   id: zod.uuid(),
-  product_id: ProductID,
+  product_id: ProductId,
   name: zod.string(),
   description: zod.string().optional(),
 });

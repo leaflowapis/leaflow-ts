@@ -11,7 +11,7 @@ import { Money } from "./money.zod.js";
 import { OrderItemStatus } from "./orderItemStatus.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 import { RefundPolicy } from "./refundPolicy.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
@@ -35,7 +35,13 @@ export const OrderItem = zod
       .uuid()
       .optional()
       .describe(
-        "The Billing subscription: the new pending subscription of a recurring purchase, or the existing one renewed or changed, which keeps its ID. Absent for a purchase without a subscription.",
+        "The Billing subscription the line belongs to: a new pending one, the existing one an added item joins, or the one renewed or changed, which keeps its ID. Absent for a purchase without a subscription.",
+      ),
+    subscription_item_id: zod
+      .uuid()
+      .optional()
+      .describe(
+        "The subscription item the line created, renewed or changed, which keeps its ID. Absent for a purchase without a subscription.",
       ),
     interval: zod.enum(["none", "day", "month", "year"]),
     interval_count: zod.int().min(1).optional(),
@@ -77,7 +83,7 @@ export const OrderItem = zod
     id: zod.uuid(),
     order_id: zod.uuid().optional(),
     price_id: zod.uuid(),
-    product_id: ProductID.optional(),
+    product_id: ProductId.optional(),
     product: Product.optional(),
     plan_id: zod.uuid().describe("Which plan was bought."),
     plan_name: zod.string().describe("The name when bought."),
@@ -106,7 +112,7 @@ export const OrderItem = zod
     status: OrderItemStatus,
   })
   .describe(
-    "The purchase terms frozen at placement. Monetary fields come from the order's invoice lines and are zero without an immediate charge, such as for a metered purchase. Later catalog changes do not reprice the line. A new service purchase has its pending subscription from placement.",
+    "The purchase terms frozen at placement. Monetary fields come from the order's invoice lines and are zero without an immediate charge, such as for a metered purchase. Later catalog changes do not reprice the line. A new service purchase has its pending subscription and subscription item from placement.",
   );
 
 export type OrderItem = zod.input<typeof OrderItem>;

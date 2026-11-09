@@ -16,7 +16,7 @@
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
  * - **Custom methods.** An action that is not one of the standard methods (list, get, create, update, delete) is a custom method, `POST` on the resource's path followed by `:` and the verb, as in `POST /api/v2/instances/{id}:reboot` (AIP-136). A state is changed by its custom method, never by writing the state: `:start` and `:stop`, `:rescue` and `:unrescue`, `:associate` and `:disassociate`.
- * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
+ * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only descriptive fields, all optional and at least one given, and answers 200. A change that starts an operation or a purchase, such as a resize, is its own method (`:resize`, `:retype`, `:changeBandwidth`).
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. Its `access_state` is `pending` until the order is accepted and delivery settles it, then `enabled`; a subscription that lapses suspends or reclaims the resource it pays for. Deleting a resource that subscriptions pay for cancels the subscriptions of its `release_set` in Billing, and the deletion answers with that cancellation.
  * - **Availability zones.** A volume and an instance must reside in the same availability zone to be attached. An instance type and a volume type each belong to one availability zone, as on GCP, so a purchase names the type and the type names the zone; the volumes bought with an instance have to be of types of the instance type's zone.
  * - **IPv6 is routed, not translated.** A virtual private cloud with IPv6 holds a /56 and each of its subnets a /64 of it, as on Alibaba Cloud, Tencent Cloud and Azure; IPv6 and its security groups require no EIP or NAT gateway. EIP and NATGateway are IPv4 products; IPv6 EIP, NAT66 and IPv6 port forwarding are not supported.
@@ -38,7 +38,7 @@
  * @maxLength 31
  * @pattern ^zone_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type AvailabilityZoneID = string;
+export type AvailabilityZoneId = string;
 
 /**
  * Compute Region TypeID. UUID text is not accepted.
@@ -46,15 +46,15 @@ export type AvailabilityZoneID = string;
  * @maxLength 33
  * @pattern ^region_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type RegionID = string;
+export type RegionId = string;
 
 export interface AvailabilityZoneResource {
   /** Display name for this zone, shown to tenants (Hong Kong A). The stable handle is code. */
   name: string;
   /** The zone's code within its region (hk-1-a). Stable and human-written; addressing is by id. */
   code: string;
-  id: AvailabilityZoneID;
-  region_id: RegionID;
+  id: AvailabilityZoneId;
+  region_id: RegionId;
 }
 
 /**
@@ -174,6 +174,11 @@ export interface CheckoutOptions {
    * @maxLength 2048
    */
   return_url?: string;
+  /**
+   * Turns on automatic renewal of every subscription with licensed items that the purchase opens. Off
+   * when omitted. It must be the customer's own choice.
+   */
+  auto_renew?: boolean;
 }
 
 /**
@@ -252,13 +257,13 @@ export const CancellationMode = {
 } as const;
 
 /**
- * A Billing cancellation that Compute created to release a resource and the subscriptions in its release set. Billing owns it; read its progress and any refund there by `id`.
+ * A Billing cancellation that Compute created to release a resource and the subscription items in its release set. Billing owns it; read its progress and any refund there by `id`.
  */
 export interface BillingCancellation {
   id: string;
   mode: CancellationMode;
   /**
-   * When the subscriptions end and the resources are released; null while Billing has not fixed it.
+   * When the items end and the resources are released; null while Billing has not fixed it.
    * @nullable
    */
   scheduled_at: string | null;
@@ -267,10 +272,10 @@ export interface BillingCancellation {
 /**
  * `on_sale` is offered for new elastic IPs; `off_sale` takes none, while the elastic IPs already on it keep working.
  */
-export type ElasticIPLineSaleStatus =
-  (typeof ElasticIPLineSaleStatus)[keyof typeof ElasticIPLineSaleStatus];
+export type ElasticIpLineSaleStatus =
+  (typeof ElasticIpLineSaleStatus)[keyof typeof ElasticIpLineSaleStatus];
 
-export const ElasticIPLineSaleStatus = {
+export const ElasticIpLineSaleStatus = {
   on_sale: "on_sale",
   off_sale: "off_sale",
 } as const;
@@ -278,28 +283,28 @@ export const ElasticIPLineSaleStatus = {
 /**
  * Whether an elastic IP of this line can be bought with `internet_charge_type` `traffic`, billed by the bytes it sends. `off_sale` refuses that with `ELASTIC_IP_TRAFFIC_UNAVAILABLE`.
  */
-export type ElasticIPLineTrafficSaleStatus =
-  (typeof ElasticIPLineTrafficSaleStatus)[keyof typeof ElasticIPLineTrafficSaleStatus];
+export type ElasticIpLineTrafficSaleStatus =
+  (typeof ElasticIpLineTrafficSaleStatus)[keyof typeof ElasticIpLineTrafficSaleStatus];
 
-export const ElasticIPLineTrafficSaleStatus = {
+export const ElasticIpLineTrafficSaleStatus = {
   on_sale: "on_sale",
   off_sale: "off_sale",
 } as const;
 
 /**
- * Compute ElasticIPLine TypeID. UUID text is not accepted.
+ * Compute ElasticIpLine TypeID. UUID text is not accepted.
  * @minLength 34
  * @maxLength 34
  * @pattern ^eipline_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type ElasticIPLineID = string;
+export type ElasticIpLineId = string;
 
 /**
- * The network an elastic IP is bought on: the bandwidth that can be chosen, and the two Billing Plans every elastic IP of the line is paid under in one order. The address subscription is always used and meters the address while it is held idle, associated with nothing; the network subscription pays the bandwidth, prepaid or used while associated, or the traffic sent. Contains no supply ranges, gateways or backend execution state.
+ * The network an elastic IP is bought on: the bandwidth that can be chosen, and the two Billing Plans every elastic IP of the line is paid under in one order. The address item is always used and meters the address while it is held idle, associated with nothing; the network item pays the bandwidth, prepaid or used while associated, or the traffic sent. Contains no supply ranges, gateways or backend execution state.
  */
-export interface ElasticIPLine {
-  id: ElasticIPLineID;
-  region_id: RegionID;
+export interface ElasticIpLine {
+  id: ElasticIpLineId;
+  region_id: RegionId;
   /**
    * @minLength 1
    * @maxLength 128
@@ -319,20 +324,20 @@ export interface ElasticIPLine {
   /** The most bandwidth an elastic IP of this line can be bought with, in Mbps, at most 1000. An elastic IP associated with an instance is also held to the instance type's `max_bandwidth_mbps`. */
   max_bandwidth_mbps: number;
   /** `on_sale` is offered for new elastic IPs; `off_sale` takes none, while the elastic IPs already on it keep working. */
-  sale_status: ElasticIPLineSaleStatus;
+  sale_status: ElasticIpLineSaleStatus;
   /** Whether an elastic IP of this line can be bought with `internet_charge_type` `traffic`, billed by the bytes it sends. `off_sale` refuses that with `ELASTIC_IP_TRAFFIC_UNAVAILABLE`. */
-  traffic_sale_status: ElasticIPLineTrafficSaleStatus;
+  traffic_sale_status: ElasticIpLineTrafficSaleStatus;
   created_at: string;
   updated_at: string;
 }
 
-export interface ElasticIPLineListResponseBody {
-  items: ElasticIPLine[];
+export interface ElasticIpLineListResponseBody {
+  items: ElasticIpLine[];
   pagination: OffsetPagination;
 }
 
 /**
- * What the network subscription of an elastic IP charges for. `bandwidth` charges for the bandwidth ceiling, prepaid for a period or by the Mbit/s-second while the address is associated. `traffic` charges for the bytes the address sends upstream, pay-as-you-go only, while the bandwidth is only a ceiling; it is refused with `ELASTIC_IP_TRAFFIC_UNAVAILABLE` on a line whose `traffic_sale_status` is `off_sale`. Inbound traffic is never charged. Prices are set per currency, so a pay-as-you-go purchase whose account currency has no rate on the line for the chosen type is refused before any order with HTTP 403 `ELASTIC_IP_CHARGE_TYPE_NOT_OFFERED`, whether the elastic IP is bought alone or with an instance. A pay-as-you-go elastic IP can move between the two with `update-elastic-ip`.
+ * What the network item of an elastic IP charges for. `bandwidth` charges for the bandwidth ceiling, prepaid for a period or by the Mbit/s-second while the address is associated. `traffic` charges for the bytes the address sends upstream, pay-as-you-go only, while the bandwidth is only a ceiling; it is refused with `ELASTIC_IP_TRAFFIC_UNAVAILABLE` on a line whose `traffic_sale_status` is `off_sale`. Inbound traffic is never charged. Prices are set per currency, so a pay-as-you-go purchase whose account currency has no rate on the line for the chosen type is refused before any order with HTTP 403 `ELASTIC_IP_CHARGE_TYPE_NOT_OFFERED`, whether the elastic IP is bought alone or with an instance. A pay-as-you-go elastic IP can move between the two with `update-elastic-ip`.
  */
 export type InternetChargeType = (typeof InternetChargeType)[keyof typeof InternetChargeType];
 
@@ -346,7 +351,7 @@ export const InternetChargeType = {
  * @maxLength 15
  * @pattern ^(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$
  */
-export type IPv4HostAddress = string;
+export type Ipv4HostAddress = string;
 
 /**
  * The public eip resource identifier. Only this fixed TypeID prefix is accepted; UUID text is not an alternative representation.
@@ -354,14 +359,14 @@ export type IPv4HostAddress = string;
  * @maxLength 34
  * @pattern ^eip_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type ElasticIPID = string;
+export type ElasticIpId = string;
 
 /**
  * `pending` until the address is created, with no address allocated before the order is accepted; then `available`. `failed` means no address was allocated; `failure_reason` states why. A value naming an operation in progress (`associating`, `disassociating`, `updating_bandwidth`, `updating_internet_charge_type`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the elastic IP refuses another operation until it ends.
  */
-export type ElasticIPStatus = (typeof ElasticIPStatus)[keyof typeof ElasticIPStatus];
+export type ElasticIpStatus = (typeof ElasticIpStatus)[keyof typeof ElasticIpStatus];
 
-export const ElasticIPStatus = {
+export const ElasticIpStatus = {
   pending: "pending",
   available: "available",
   deleted: "deleted",
@@ -389,14 +394,14 @@ export const InstanceReleaseResourceType = {
  * @maxLength 30
  * @pattern ^ins_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type InstanceID = string;
+export type InstanceId = string;
 
 /**
  * A resource a release set releases.
  */
 export interface InstanceReleaseResource {
   type: InstanceReleaseResourceType;
-  id: InstanceID;
+  id: InstanceId;
   /** The current display name of the selected resource. */
   name: string;
 }
@@ -414,31 +419,31 @@ export const VolumeReleaseResourceType = {
  * @maxLength 30
  * @pattern ^vol_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type VolumeID = string;
+export type VolumeId = string;
 
 /**
  * A resource a release set releases.
  */
 export interface VolumeReleaseResource {
   type: VolumeReleaseResourceType;
-  id: VolumeID;
+  id: VolumeId;
   /** The current display name of the selected resource. */
   name: string;
 }
 
-export type ElasticIPReleaseResourceType =
-  (typeof ElasticIPReleaseResourceType)[keyof typeof ElasticIPReleaseResourceType];
+export type ElasticIpReleaseResourceType =
+  (typeof ElasticIpReleaseResourceType)[keyof typeof ElasticIpReleaseResourceType];
 
-export const ElasticIPReleaseResourceType = {
+export const ElasticIpReleaseResourceType = {
   elastic_ip: "elastic_ip",
 } as const;
 
 /**
  * A resource a release set releases.
  */
-export interface ElasticIPReleaseResource {
-  type: ElasticIPReleaseResourceType;
-  id: ElasticIPID;
+export interface ElasticIpReleaseResource {
+  type: ElasticIpReleaseResourceType;
+  id: ElasticIpId;
   /** The current display name of the selected resource. */
   name: string;
 }
@@ -456,14 +461,14 @@ export const VolumeSnapshotReleaseResourceType = {
  * @maxLength 38
  * @pattern ^volsnapshot_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type VolumeSnapshotID = string;
+export type VolumeSnapshotId = string;
 
 /**
  * A resource a release set releases.
  */
 export interface VolumeSnapshotReleaseResource {
   type: VolumeSnapshotReleaseResourceType;
-  id: VolumeSnapshotID;
+  id: VolumeSnapshotId;
   /** The current display name of the selected resource. */
   name: string;
 }
@@ -481,14 +486,14 @@ export const VolumeBackupReleaseResourceType = {
  * @maxLength 36
  * @pattern ^volbackup_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type VolumeBackupID = string;
+export type VolumeBackupId = string;
 
 /**
  * A resource a release set releases.
  */
 export interface VolumeBackupReleaseResource {
   type: VolumeBackupReleaseResourceType;
-  id: VolumeBackupID;
+  id: VolumeBackupId;
   /** The current display name of the selected resource. */
   name: string;
 }
@@ -506,14 +511,14 @@ export const PrivateImageReleaseResourceType = {
  * @maxLength 32
  * @pattern ^image_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type ImageID = string;
+export type ImageId = string;
 
 /**
  * A resource a release set releases.
  */
 export interface PrivateImageReleaseResource {
   type: PrivateImageReleaseResourceType;
-  id: ImageID;
+  id: ImageId;
   /** The current display name of the selected resource. */
   name: string;
 }
@@ -524,15 +529,17 @@ export interface PrivateImageReleaseResource {
 export type ReleaseResource =
   | InstanceReleaseResource
   | VolumeReleaseResource
-  | ElasticIPReleaseResource
+  | ElasticIpReleaseResource
   | VolumeSnapshotReleaseResource
   | VolumeBackupReleaseResource
   | PrivateImageReleaseResource;
 
 /**
- * One subscription of a release set and the resource it pays for.
+ * One subscription item of a release set and the resource it pays for.
  */
 export interface ReleaseSetItem {
+  subscription_item_id: string;
+  /** The subscription the item belongs to. */
   subscription_id: string;
   resource: ReleaseResource;
 }
@@ -540,11 +547,11 @@ export interface ReleaseSetItem {
 /**
  * @nullable
  */
-export type ElasticIPAccessState =
-  | (typeof ElasticIPAccessState)[keyof typeof ElasticIPAccessState]
+export type ElasticIpAccessState =
+  | (typeof ElasticIpAccessState)[keyof typeof ElasticIpAccessState]
   | null;
 
-export const ElasticIPAccessState = {
+export const ElasticIpAccessState = {
   pending: "pending",
   enabled: "enabled",
   suspended: "suspended",
@@ -555,11 +562,11 @@ export const ElasticIPAccessState = {
  * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this elastic IP is refunded.
  * @nullable
  */
-export type ElasticIPFailureReason =
-  | (typeof ElasticIPFailureReason)[keyof typeof ElasticIPFailureReason]
+export type ElasticIpFailureReason =
+  | (typeof ElasticIpFailureReason)[keyof typeof ElasticIpFailureReason]
   | null;
 
-export const ElasticIPFailureReason = {
+export const ElasticIpFailureReason = {
   order_declined: "order_declined",
   order_canceled: "order_canceled",
   order_expired: "order_expired",
@@ -568,12 +575,12 @@ export const ElasticIPFailureReason = {
 } as const;
 
 /**
- * Compute ElasticIPAssociation TypeID. UUID text is not accepted.
+ * Compute ElasticIpAssociation TypeID. UUID text is not accepted.
  * @minLength 41
  * @maxLength 41
  * @pattern ^eipassociation_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type ElasticIPAssociationID = string;
+export type ElasticIpAssociationId = string;
 
 /**
  * Compute NetworkInterfaceAddress TypeID. UUID text is not accepted.
@@ -581,23 +588,23 @@ export type ElasticIPAssociationID = string;
  * @maxLength 37
  * @pattern ^eniaddress_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type NetworkInterfaceAddressID = string;
+export type NetworkInterfaceAddressId = string;
 
-export type ElasticIPAssociationState =
-  (typeof ElasticIPAssociationState)[keyof typeof ElasticIPAssociationState];
+export type ElasticIpAssociationState =
+  (typeof ElasticIpAssociationState)[keyof typeof ElasticIpAssociationState];
 
-export const ElasticIPAssociationState = {
+export const ElasticIpAssociationState = {
   associated: "associated",
   released: "released",
 } as const;
 
-export interface ElasticIPAssociation {
-  id: ElasticIPAssociationID;
-  elastic_ip_id: ElasticIPID;
-  network_interface_address_id: NetworkInterfaceAddressID;
-  public_address: IPv4HostAddress;
-  private_address: IPv4HostAddress;
-  state: ElasticIPAssociationState;
+export interface ElasticIpAssociation {
+  id: ElasticIpAssociationId;
+  elastic_ip_id: ElasticIpId;
+  network_interface_address_id: NetworkInterfaceAddressId;
+  public_address: Ipv4HostAddress;
+  private_address: Ipv4HostAddress;
+  state: ElasticIpAssociationState;
   /** @nullable */
   associated_at: string | null;
   /** @nullable */
@@ -630,15 +637,15 @@ export interface LatestOperation {
 
 /**
  * One public IP resource, including its bandwidth configuration. Bandwidth has no separate Compute resource ID.
- * Two subscriptions of one order pay for it: the address subscription, always pay-as-you-go, charges for the
- * address while it is not associated with anything, and the network subscription, on the terms chosen at
- * purchase, charges for the bandwidth or the traffic. Changing bandwidth updates this same resource, not another
- * allocation.
+ * Two items of one Billing subscription pay for it: the address item, always pay-as-you-go, charges for the
+ * address while it is not associated with anything, and the network item, on the terms chosen at purchase,
+ * charges for the bandwidth or the traffic. The subscription is the elastic IP's own, or the instance's when it
+ * was bought with or for one. Changing bandwidth updates this same resource, not another allocation.
  */
-export interface ElasticIP {
+export interface ElasticIp {
   internet_charge_type: InternetChargeType;
   /** The held IPv4 address; null before actual claim. Holding identity is not exposed. */
-  address: IPv4HostAddress | null;
+  address: Ipv4HostAddress | null;
   /**
    * The actual address holding start time; null before actual claim.
    * @nullable
@@ -652,11 +659,11 @@ export interface ElasticIP {
   /** @nullable */
   bandwidth_mbps: number | null;
   created_at: string;
-  id: ElasticIPID;
-  line_id: ElasticIPLineID;
-  region_id: RegionID;
+  id: ElasticIpId;
+  line_id: ElasticIpLineId;
+  region_id: RegionId;
   /** `pending` until the address is created, with no address allocated before the order is accepted; then `available`. `failed` means no address was allocated; `failure_reason` states why. A value naming an operation in progress (`associating`, `disassociating`, `updating_bandwidth`, `updating_internet_charge_type`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the elastic IP refuses another operation until it ends. */
-  status: ElasticIPStatus;
+  status: ElasticIpStatus;
   /**
    * The Billing Checkout Session that bought this resource; `order_id` and the order items stay null until its checkout completes. Null when the resource was not bought through one.
    * @nullable
@@ -670,40 +677,45 @@ export interface ElasticIP {
    */
   address_order_item_id: string | null;
   /**
-   * The Billing subscription of the address. It may still be pending; its presence does not imply delivery or metering.
+   * The Billing subscription the elastic IP renews under. Read it in Billing for the term end, automatic renewal and renewal. It may still be pending; its presence does not imply delivery or metering.
    * @nullable
    */
-  address_subscription_id: string | null;
+  subscription_id: string | null;
+  /**
+   * The subscription item of the address, always pay-as-you-go.
+   * @nullable
+   */
+  address_subscription_item_id: string | null;
   /**
    * The Billing order item of the bandwidth or traffic.
    * @nullable
    */
   internet_order_item_id: string | null;
   /**
-   * The Billing subscription of the bandwidth or traffic. It may still be pending; its presence does not imply delivery or metering.
+   * The subscription item of the bandwidth or traffic.
    * @nullable
    */
-  internet_subscription_id: string | null;
-  /** The subscriptions a cancellation through Billing has to cover to release this elastic IP, both the address's and the network's, each with the resource it pays for, so that each line of a cancellation can name what it releases. A subscription that has ended is not listed, and the set is empty when no subscription pays for the elastic IP. */
+  internet_subscription_item_id: string | null;
+  /** The subscription items a cancellation through Billing has to cover to release this elastic IP, both the address's and the network's, each with the resource it pays for, so that each line of a cancellation can name what it releases. An item that has ended is not listed, and the set is empty when no item pays for the elastic IP. */
   release_set: ReleaseSetItem[];
   /** @nullable */
-  access_state: ElasticIPAccessState;
+  access_state: ElasticIpAccessState;
   /**
    * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this elastic IP is refunded.
    * @nullable
    */
-  failure_reason: ElasticIPFailureReason;
-  association: ElasticIPAssociation | null;
+  failure_reason: ElasticIpFailureReason;
+  association: ElasticIpAssociation | null;
   /** The most recent operation started on the elastic IP; null when none has been recorded. */
   latest_operation: LatestOperation | null;
 }
 
 /**
- * The elastic IP as it is when the deletion is accepted, and the Billing cancellation that releases it when subscriptions pay for it.
+ * The elastic IP as it is when the deletion is accepted, and the Billing cancellation that releases it when subscription items pay for it.
  */
-export interface DeleteElasticIPResponseBody {
-  elastic_ip: ElasticIP;
-  /** The cancellation Compute created for the elastic IP's subscriptions; null when none pays for it. */
+export interface DeleteElasticIpResponseBody {
+  elastic_ip: ElasticIp;
+  /** The cancellation Compute created for the elastic IP's subscription items; null when none pays for it. */
   cancellation: null | BillingCancellation;
 }
 
@@ -724,15 +736,15 @@ export interface TrafficUsageListResponseBody {
   pagination: OffsetPagination;
 }
 
-export interface ElasticIPListResponseBody {
+export interface ElasticIpListResponseBody {
   /** @nullable */
-  items: ElasticIP[] | null;
+  items: ElasticIp[] | null;
   pagination: OffsetPagination;
 }
 
-export interface CreateElasticIPRequestBody {
+export interface CreateElasticIpRequestBody {
   internet_charge_type?: InternetChargeType;
-  address?: IPv4HostAddress;
+  address?: Ipv4HostAddress;
   /**
    * The bandwidth ceiling of this address, in Mbit/s, applied to both directions.
    *
@@ -742,57 +754,50 @@ export interface CreateElasticIPRequestBody {
    *
    * Any whole number of Mbps within the line's `min_bandwidth_mbps` and `max_bandwidth_mbps`, otherwise the
    * request is refused with `ELASTIC_IP_BANDWIDTH_RANGE`. Changing it
-   * later updates the same elastic IP through `update-elastic-ip`, not an independent bandwidth resource.
+   * later updates the same elastic IP through `change-elastic-ip-bandwidth`, not an independent bandwidth resource.
    * @minimum 1
    * @maximum 1000
    */
   bandwidth_mbps: number;
-  line_id: ElasticIPLineID;
-  billing: BillingChoice;
+  line_id: ElasticIpLineId;
+  billing?: BillingChoice;
+  checkout?: CheckoutOptions;
+  instance_id?: InstanceId;
+}
+
+export interface ChangeElasticIpBandwidthRequestBody {
+  /**
+   * The new ceiling in Mbit/s, applied to both directions.
+   * @minimum 1
+   */
+  bandwidth_mbps: number;
+  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only on a prepaid network item, and only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  proration_date?: string;
   checkout?: CheckoutOptions;
 }
 
-/**
- * The mutable fields of the elastic IP identified by the path, all optional, at least one required. `bandwidth_mbps`
- * and `internet_charge_type` are operational fields and cannot be combined with any other field; such a request is
- * refused with 422 `UPDATE_FIELDS_COMBINED`. This is a configuration change of that resource, not an independent
- * bandwidth resource. Checkout is handled by Billing.
- */
-export interface UpdateElasticIPRequestBody {
-  /**
-   * Moves a pay-as-you-go elastic IP between charging for its bandwidth and charging for its traffic, within the same network subscription and without checkout. A prepaid network subscription has paid for its bandwidth and is refused with `ELASTIC_IP_CHARGE_TYPE_PREPAID`; `traffic` on a line whose `traffic_sale_status` is `off_sale` is refused with `ELASTIC_IP_TRAFFIC_UNAVAILABLE`, the type already in effect with `ELASTIC_IP_CHARGE_TYPE_UNCHANGED`, and a type the currency of the network subscription does not offer on the line with HTTP 403 `ELASTIC_IP_CHARGE_TYPE_NOT_OFFERED`: prices are set per currency, and a currency without one there does not sell that type.
-   *
-   * The change takes effect at the instant it is applied: bandwidth stops being metered then and traffic starts being, or the other way round. Traffic is counted in windows, and a window is charged the way the elastic IP was charged for most of it, so a report that arrives late is still charged as it was at the time and a window the change falls in is never charged both ways. `bandwidth_mbps` stays the ceiling either way.
-   */
-  internet_charge_type?: InternetChargeType;
-  /**
-   * Applied to both directions
-   * @minimum 1
-   */
-  bandwidth_mbps?: number;
-  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only with `bandwidth_mbps` on a prepaid network subscription, and only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
-  proration_date?: string;
-  checkout?: CheckoutOptions;
+export interface ChangeElasticIpChargeTypeRequestBody {
+  internet_charge_type: InternetChargeType;
 }
 
 /**
  * An instance; the elastic IP points at the primary private IPv4 address of its primary network interface.
  */
 export interface InstanceAssociationTarget {
-  instance_id: InstanceID;
+  instance_id: InstanceId;
 }
 
 /**
  * One private address of a network interface. One interface may hold several private addresses, each with its own elastic IP.
  */
 export interface NetworkInterfaceAddressAssociationTarget {
-  network_interface_address_id: NetworkInterfaceAddressID;
+  network_interface_address_id: NetworkInterfaceAddressId;
 }
 
 /**
  * The target an elastic IP points at. Exactly one of the two forms.
  */
-export type AssociateElasticIPRequestBody =
+export type AssociateElasticIpRequestBody =
   | InstanceAssociationTarget
   | NetworkInterfaceAddressAssociationTarget;
 
@@ -800,8 +805,8 @@ export type AssociateElasticIPRequestBody =
  * The new elastic IP, `pending` until its order is accepted, and its Checkout Session. `address` is null until
  * the address is allocated.
  */
-export interface CreateElasticIPResponseBody {
-  elastic_ip: ElasticIP;
+export interface CreateElasticIpResponseBody {
+  elastic_ip: ElasticIp;
   /** The Billing Checkout Session of this purchase. With deferred checkout, the customer completes it in Billing. */
   checkout_session_id: string;
   /**
@@ -812,17 +817,17 @@ export interface CreateElasticIPResponseBody {
 }
 
 /**
- * The elastic IP and, when the update placed a Billing order, the Checkout Session for it. After a bandwidth change the elastic IP is still at its current bandwidth until the change is applied. Returned with 200 when only descriptive fields changed and with 202 when an operation started.
+ * The elastic IP and, for a prepaid network item, the Checkout Session for its bandwidth change. The elastic IP is still at its current bandwidth until the change is applied.
  */
-export interface UpdateElasticIPResponseBody {
-  elastic_ip: ElasticIP;
+export interface ElasticIpChangeResponseBody {
+  elastic_ip: ElasticIp;
   /**
-   * The Billing Checkout Session of the purchase; null when the update placed no order. With deferred checkout, the customer completes it in Billing.
+   * The Billing Checkout Session of the purchase; null for a pay-as-you-go network item, which changes without checkout. With deferred checkout, the customer completes it in Billing.
    * @nullable
    */
   checkout_session_id: string | null;
   /**
-   * The order created when checkout completes, at once for automatic checkout; null until then and when the update placed no order.
+   * The order created when checkout completes, at once for automatic checkout; null until then and without checkout.
    * @nullable
    */
   order_id: string | null;
@@ -834,7 +839,7 @@ export interface UpdateElasticIPResponseBody {
  * @maxLength 30
  * @pattern ^eni_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type NetworkInterfaceID = string;
+export type NetworkInterfaceId = string;
 
 /**
  * The public lt resource identifier. Only this fixed TypeID prefix is accepted; UUID text is not an alternative representation.
@@ -842,7 +847,7 @@ export type NetworkInterfaceID = string;
  * @maxLength 29
  * @pattern ^lt_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type LaunchTemplateID = string;
+export type LaunchTemplateId = string;
 
 /**
  * The public vpc resource identifier. Only this fixed TypeID prefix is accepted; UUID text is not an alternative representation.
@@ -850,13 +855,13 @@ export type LaunchTemplateID = string;
  * @maxLength 30
  * @pattern ^vpc_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type VirtualPrivateCloudID = string;
+export type VirtualPrivateCloudId = string;
 
 /**
  * A virtual private cloud identifier, or `-` to read across every virtual private cloud of the project (AIP-159).
  * @pattern ^(?:-|vpc_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25})$
  */
-export type VirtualPrivateCloudIDOrWildcard = string;
+export type VirtualPrivateCloudIdOrWildcard = string;
 
 /**
  * Compute InstanceType TypeID. UUID text is not accepted.
@@ -864,7 +869,7 @@ export type VirtualPrivateCloudIDOrWildcard = string;
  * @maxLength 34
  * @pattern ^instype_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type InstanceTypeID = string;
+export type InstanceTypeId = string;
 
 /**
  * Compute InstanceFamily TypeID. UUID text is not accepted.
@@ -872,7 +877,7 @@ export type InstanceTypeID = string;
  * @maxLength 36
  * @pattern ^insfamily_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type InstanceFamilyID = string;
+export type InstanceFamilyId = string;
 
 /**
  * Compute VolumeType TypeID. UUID text is not accepted.
@@ -880,7 +885,7 @@ export type InstanceFamilyID = string;
  * @maxLength 34
  * @pattern ^voltype_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type VolumeTypeID = string;
+export type VolumeTypeId = string;
 
 /**
  * Compute InstanceVolume TypeID. UUID text is not accepted.
@@ -888,7 +893,7 @@ export type VolumeTypeID = string;
  * @maxLength 33
  * @pattern ^insvol_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type InstanceVolumeID = string;
+export type InstanceVolumeId = string;
 
 /**
  * Compute SecurityGroup TypeID. UUID text is not accepted.
@@ -896,13 +901,13 @@ export type InstanceVolumeID = string;
  * @maxLength 29
  * @pattern ^sg_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type SecurityGroupID = string;
+export type SecurityGroupId = string;
 
 /**
  * A security group identifier, or `-` to read across every security group of the project (AIP-159).
  * @pattern ^(?:-|sg_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25})$
  */
-export type SecurityGroupIDOrWildcard = string;
+export type SecurityGroupIdOrWildcard = string;
 
 /**
  * Compute Subnet TypeID. UUID text is not accepted.
@@ -910,7 +915,7 @@ export type SecurityGroupIDOrWildcard = string;
  * @maxLength 33
  * @pattern ^subnet_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type SubnetID = string;
+export type SubnetId = string;
 
 /**
  * Compute InstanceNetworkInterface TypeID. UUID text is not accepted.
@@ -918,7 +923,7 @@ export type SubnetID = string;
  * @maxLength 33
  * @pattern ^inseni_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type InstanceNetworkInterfaceID = string;
+export type InstanceNetworkInterfaceId = string;
 
 /**
  * Compute OperationLog TypeID. UUID text is not accepted.
@@ -926,7 +931,7 @@ export type InstanceNetworkInterfaceID = string;
  * @maxLength 39
  * @pattern ^operationlog_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type OperationLogID = string;
+export type OperationLogId = string;
 
 /**
  * Compute VirtualPrivateCloudPeering TypeID. UUID text is not accepted.
@@ -934,7 +939,7 @@ export type OperationLogID = string;
  * @maxLength 37
  * @pattern ^vpcpeering_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type VirtualPrivateCloudPeeringID = string;
+export type VirtualPrivateCloudPeeringId = string;
 
 /**
  * Compute VirtualPrivateCloudRoute TypeID. UUID text is not accepted.
@@ -942,7 +947,7 @@ export type VirtualPrivateCloudPeeringID = string;
  * @maxLength 35
  * @pattern ^vpcroute_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type VirtualPrivateCloudRouteID = string;
+export type VirtualPrivateCloudRouteId = string;
 
 /**
  * Compute SecurityGroupRule TypeID. UUID text is not accepted.
@@ -950,7 +955,7 @@ export type VirtualPrivateCloudRouteID = string;
  * @maxLength 33
  * @pattern ^sgrule_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
-export type SecurityGroupRuleID = string;
+export type SecurityGroupRuleId = string;
 
 /**
  * Who makes the CPU the family runs on.
@@ -987,8 +992,8 @@ export const InstanceFamilyCategory = {
 } as const;
 
 export interface InstanceFamily {
-  id: InstanceFamilyID;
-  region_id: RegionID;
+  id: InstanceFamilyId;
+  region_id: RegionId;
   /** The family's name, such as `g7`. */
   name: string;
   category: InstanceFamilyCategory;
@@ -1019,11 +1024,11 @@ export const InstanceTypeSaleStatus = {
 } as const;
 
 export interface InstanceType {
-  availability_zone_id: AvailabilityZoneID;
+  availability_zone_id: AvailabilityZoneId;
   /** `sold_out` takes no new orders for now while the type stays listed; the instances already of it keep working. */
   sale_status: InstanceTypeSaleStatus;
-  id: InstanceTypeID;
-  instance_family_id: InstanceFamilyID;
+  id: InstanceTypeId;
+  instance_family_id: InstanceFamilyId;
   /**
    * The machine's network rate, in Mbps. **Each** network interface of the machine is limited to it in both directions — per interface rather than shared, so a machine with two interfaces has this rate on each of them; `max_network_interfaces` says how many it may have. Zero is no limit.
    *
@@ -1034,7 +1039,7 @@ export interface InstanceType {
   max_network_interfaces: number;
   name: string;
   memory_mib: number;
-  region_id: RegionID;
+  region_id: RegionId;
   vcpus: number;
   /** The line an instance of this type is. The boot volume and data volumes bought with it are lines of their volume types, and a new elastic IP the two lines of its elastic IP line. */
   billing: BillingComponent;
@@ -1093,11 +1098,11 @@ export const InstanceStatus = {
 
 /**
  * Why it is held. `operator_suspended` is a suspension by the platform. `billing_suspended` is the instance's
- * own subscription suspended for non-payment, and `billing_reclaimed` that subscription ending,
- * after which the instance is released. `boot_volume_suspended` and `boot_volume_reclaimed` are the same
- * for the subscription of the volume the instance boots from: that volume is billed apart, and the
- * instance cannot run without it, so renewing the volume's subscription lifts the hold, and a reclaimed
- * boot volume is released together with its instance.
+ * subscription suspended because its term ended without renewal or the account is in arrears, and
+ * `billing_reclaimed` that subscription ending, after which the instance is released. `boot_volume_suspended`
+ * and `boot_volume_reclaimed` are the same for the subscription of a volume the instance boots from that was
+ * bought on its own: the instance cannot run without it, so renewing that subscription lifts the hold, and a
+ * reclaimed boot volume is released together with its instance.
  */
 export type InstanceRestrictionReason =
   (typeof InstanceRestrictionReason)[keyof typeof InstanceRestrictionReason];
@@ -1119,11 +1124,11 @@ export const InstanceRestrictionReason = {
 export interface InstanceRestriction {
   /**
    * Why it is held. `operator_suspended` is a suspension by the platform. `billing_suspended` is the instance's
-   * own subscription suspended for non-payment, and `billing_reclaimed` that subscription ending,
-   * after which the instance is released. `boot_volume_suspended` and `boot_volume_reclaimed` are the same
-   * for the subscription of the volume the instance boots from: that volume is billed apart, and the
-   * instance cannot run without it, so renewing the volume's subscription lifts the hold, and a reclaimed
-   * boot volume is released together with its instance.
+   * subscription suspended because its term ended without renewal or the account is in arrears, and
+   * `billing_reclaimed` that subscription ending, after which the instance is released. `boot_volume_suspended`
+   * and `boot_volume_reclaimed` are the same for the subscription of a volume the instance boots from that was
+   * bought on its own: the instance cannot run without it, so renewing that subscription lifts the hold, and a
+   * reclaimed boot volume is released together with its instance.
    */
   reason: InstanceRestrictionReason;
   /**
@@ -1132,7 +1137,7 @@ export interface InstanceRestriction {
    */
   subscription_id: string | null;
   /** The volume the instance boots from, for `boot_volume_suspended` and `boot_volume_reclaimed`; null otherwise. */
-  volume_id: VolumeID | null;
+  volume_id: VolumeId | null;
   /**
    * When the hold began; null when that instant was not recorded.
    * @nullable
@@ -1176,19 +1181,19 @@ export const InstanceAccessState = {
 export type InstanceLabels = { [key: string]: string };
 
 export interface Instance {
-  availability_zone_id: AvailabilityZoneID;
+  availability_zone_id: AvailabilityZoneId;
   created_at: string;
   /** Hostname inside the instance; equals the instance id */
   hostname: string;
-  id: InstanceID;
+  id: InstanceId;
   /** Non-empty when the instance was created from an image, public or private. `image_type` says which collection holds it */
-  image_id: ImageID | null;
+  image_id: ImageId | null;
   /**
    * Which collection `image_id` belongs to. `public` means `/public-images`, `private` means `/private-images`. Null when the instance boots from a volume and therefore has no image
    * @nullable
    */
   image_type: InstanceImageType;
-  instance_type_id: InstanceTypeID;
+  instance_type_id: InstanceTypeId;
   /**
    * IPv6 address of the primary network interface. Assigned automatically once IPv6 is enabled on the virtual private cloud
    * @nullable
@@ -1212,16 +1217,16 @@ export interface Instance {
    * @nullable
    */
   private_ip: string | null;
-  virtual_private_cloud_id: VirtualPrivateCloudID | null;
+  virtual_private_cloud_id: VirtualPrivateCloudId | null;
   /**
    * Elastic IPv4 addresses associated with the primary network interface; an empty array when none are associated
    * @nullable
    */
   elastic_ip_addresses: string[] | null;
-  region_id: RegionID;
+  region_id: RegionId;
   /** `pending` until the instance is created: before the order is accepted no instance exists and addresses are null. Then `running`. `failed` means the instance was not created; `failure_reason` states why. The other values are the state of the instance in the cloud. A value naming an operation in progress (`starting`, `stopping`, `rebooting`, `rebuilding`, `rescuing`, `unrescuing`, `resizing`, `resetting_password`, `attaching_volume`, `detaching_volume`, `attaching_network_interface`, `detaching_network_interface`, `associating_elastic_ip`, `disassociating_elastic_ip`, `capturing_image`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the instance refuses another operation until it ends. */
   status: InstanceStatus;
-  subnet_id: SubnetID | null;
+  subnet_id: SubnetId | null;
   updated_at: string;
   restrictions: InstanceRestriction[];
   /**
@@ -1242,19 +1247,25 @@ export interface Instance {
    */
   order_item_id: string | null;
   /**
-   * The Billing subscription associated with this resource. It may still be pending; its
-   * presence does not imply delivery or metering. Null when no subscription is associated.
+   * The Billing subscription the instance renews under, with the volumes and elastic IP bought with it or for it.
+   * Read it in Billing for the term end, automatic renewal and renewal. It may still be pending; its presence
+   * does not imply delivery or metering. Null when no subscription is associated.
    * @nullable
    */
   subscription_id: string | null;
-  /** Subscriptions required to release this instance and volumes deleted with it, each with the resource it pays for, so that each line of a cancellation can name what it releases. Billing determines cancellation terms. An empty set does not establish refund eligibility. */
+  /**
+   * The instance's own item of that subscription. Null when no subscription is associated.
+   * @nullable
+   */
+  subscription_item_id: string | null;
+  /** Subscription items required to release this instance and volumes deleted with it, each with the resource it pays for, so that each line of a cancellation can name what it releases. Billing determines cancellation terms. An empty set does not establish refund eligibility. */
   release_set: ReleaseSetItem[];
   /** @nullable */
   access_state: InstanceAccessState;
   /** Non-empty when the instance was created from a volume you already had, instead of from an image */
-  source_volume_id: VolumeID | null;
+  source_volume_id: VolumeId | null;
   /** The launch template the instance was created from; null when none was named. Changing or deleting the template afterwards changes nothing about the instance. */
-  launch_template_id: LaunchTemplateID | null;
+  launch_template_id: LaunchTemplateId | null;
   /**
    * The version of that launch template it was created from; null when none was named.
    * @nullable
@@ -1274,11 +1285,11 @@ export interface Instance {
 }
 
 /**
- * The instance as it is when the deletion is accepted, and the Billing cancellation that releases it when subscriptions pay for it.
+ * The instance as it is when the deletion is accepted, and the Billing cancellation that releases it when subscription items pay for it.
  */
 export interface DeleteInstanceResponseBody {
   instance: Instance;
-  /** The cancellation Compute created for the instance's subscriptions; null when none pays for it. */
+  /** The cancellation Compute created for the instance's subscription items; null when none pays for it. */
   cancellation: null | BillingCancellation;
 }
 
@@ -1296,7 +1307,7 @@ export type CreateInstanceRequestBodyLabels = { [key: string]: string };
  * The launch template a creation starts from.
  */
 export interface LaunchTemplateReference {
-  launch_template_id: LaunchTemplateID;
+  launch_template_id: LaunchTemplateId;
   /**
    * A live version of it; the template's `default_version` when omitted.
    * @minimum 1
@@ -1308,7 +1319,7 @@ export interface LaunchTemplateReference {
  * The compute capacity requested for each instance in this order.
  */
 export interface NewCompute {
-  instance_type_id?: InstanceTypeID;
+  instance_type_id?: InstanceTypeId;
   billing: BillingChoice;
 }
 
@@ -1334,8 +1345,8 @@ export const NewBootVolumeOnInstanceRelease = {
  */
 export interface NewBootVolume {
   type: NewBootVolumeType;
-  image_id: ImageID;
-  volume_type_id: VolumeTypeID;
+  image_id: ImageId;
+  volume_type_id: VolumeTypeId;
   /** @minimum 1 */
   size_gib: number;
   /** What releasing the instance does to this volume. `delete` deletes it with the instance; `detach` keeps it, still billed on its own terms, for you to attach elsewhere or delete. */
@@ -1352,7 +1363,7 @@ export const ExistingBootVolumeType = {
 
 export interface ExistingBootVolume {
   type: ExistingBootVolumeType;
-  volume_id: VolumeID;
+  volume_id: VolumeId;
   /**
    * The existing account used to log in to this volume's operating system.
    * @minLength 1
@@ -1381,7 +1392,7 @@ export const NewDataVolumeOnInstanceRelease = {
  * An empty data volume created in the instance's availability zone. Its terms follow the rule shared by every component of the purchase, so a pay-as-you-go instance gets pay-as-you-go data volumes, which stay pay-as-you-go once detached.
  */
 export interface NewDataVolume {
-  volume_type_id: VolumeTypeID;
+  volume_type_id: VolumeTypeId;
   /**
    * Within the volume type's `min_size_gib` and `max_size_gib` and a multiple of its `size_step_gib`.
    * @minimum 1
@@ -1401,13 +1412,13 @@ export const NewPrimaryNetworkInterfaceType = {
 
 export interface NewPrimaryNetworkInterface {
   type: NewPrimaryNetworkInterfaceType;
-  subnet_id: SubnetID;
+  subnet_id: SubnetId;
   /**
    * The security groups of the interface, of the subnet's virtual private cloud. The default security group is not applied automatically.
    * @minItems 1
    * @maxItems 5
    */
-  security_group_ids: SecurityGroupID[];
+  security_group_ids: SecurityGroupId[];
 }
 
 export type ExistingPrimaryNetworkInterfaceType =
@@ -1419,7 +1430,7 @@ export const ExistingPrimaryNetworkInterfaceType = {
 
 export interface ExistingPrimaryNetworkInterface {
   type: ExistingPrimaryNetworkInterfaceType;
-  network_interface_id: NetworkInterfaceID;
+  network_interface_id: NetworkInterfaceId;
 }
 
 /**
@@ -1427,18 +1438,18 @@ export interface ExistingPrimaryNetworkInterface {
  */
 export type PrimaryNetworkInterface = NewPrimaryNetworkInterface | ExistingPrimaryNetworkInterface;
 
-export type NewElasticIPType = (typeof NewElasticIPType)[keyof typeof NewElasticIPType];
+export type NewElasticIpType = (typeof NewElasticIpType)[keyof typeof NewElasticIpType];
 
-export const NewElasticIPType = {
+export const NewElasticIpType = {
   new: "new",
 } as const;
 
 /**
  * One IPv4 elastic IP created with this bandwidth configuration in the instance's order.
  */
-export interface NewElasticIP {
-  type: NewElasticIPType;
-  line_id: ElasticIPLineID;
+export interface NewElasticIp {
+  type: NewElasticIpType;
+  line_id: ElasticIpLineId;
   /**
    * Any whole number of Mbps within the line's `min_bandwidth_mbps` and `max_bandwidth_mbps`, otherwise refused with `ELASTIC_IP_BANDWIDTH_RANGE`.
    * @minimum 1
@@ -1449,22 +1460,22 @@ export interface NewElasticIP {
   billing?: BillingChoice;
 }
 
-export type ExistingElasticIPType =
-  (typeof ExistingElasticIPType)[keyof typeof ExistingElasticIPType];
+export type ExistingElasticIpType =
+  (typeof ExistingElasticIpType)[keyof typeof ExistingElasticIpType];
 
-export const ExistingElasticIPType = {
+export const ExistingElasticIpType = {
   existing: "existing",
 } as const;
 
-export interface ExistingElasticIP {
-  type: ExistingElasticIPType;
-  elastic_ip_id: ElasticIPID;
+export interface ExistingElasticIp {
+  type: ExistingElasticIpType;
+  elastic_ip_id: ElasticIpId;
 }
 
 /**
  * `new` buys an elastic IP in the instance's order; `existing` associates one you already hold. One address is associated with one interface, so either creates only one instance.
  */
-export type InstanceElasticIP = NewElasticIP | ExistingElasticIP;
+export type InstanceElasticIp = NewElasticIp | ExistingElasticIp;
 
 export type GeneratedPasswordType =
   (typeof GeneratedPasswordType)[keyof typeof GeneratedPasswordType];
@@ -1527,7 +1538,7 @@ export interface CreateInstanceRequestBody {
    */
   data_volumes?: NewDataVolume[];
   network_interface?: PrimaryNetworkInterface;
-  elastic_ip?: InstanceElasticIP;
+  elastic_ip?: InstanceElasticIp;
   password?: PasswordChoice;
   /** Your own classification of each instance, as key-value pairs. A key may not contain a colon, whitespace or control characters */
   labels?: CreateInstanceRequestBodyLabels;
@@ -1551,9 +1562,7 @@ export interface CreateInstanceRequestBody {
 export type UpdateInstanceRequestBodyLabels = { [key: string]: string };
 
 /**
- * The mutable fields of an instance, all optional, at least one required. `instance_type_id` is an operational
- * field: it starts a workflow and cannot be combined with any other field; such a request is refused with 422
- * `UPDATE_FIELDS_COMBINED`.
+ * The descriptive fields of an instance, all optional, at least one required.
  */
 export interface UpdateInstanceRequestBody {
   /**
@@ -1568,10 +1577,6 @@ export interface UpdateInstanceRequestBody {
    * @maxLength 4096
    */
   description?: string;
-  instance_type_id?: InstanceTypeID;
-  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only with `instance_type_id`, and only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
-  proration_date?: string;
-  checkout?: CheckoutOptions;
 }
 
 export interface RebootInstanceRequestBody {
@@ -1622,7 +1627,7 @@ export interface ResetInstancePasswordResponseBody {
 }
 
 export interface RebuildInstanceRequestBody {
-  image_id: ImageID;
+  image_id: ImageId;
   password?: PasswordChoice;
   /** Whether the rebuilt instance joins Leaflow Fleet. If omitted, the instance's current value is retained. Because a rebuild replaces the operating system, the instance enrolls as a new Fleet machine and the previous machine is removed from Fleet. Setting the value to `true` for an image that does not support Fleet is rejected with 422 `INSTANCE_FLEET_UNSUPPORTED`. */
   join_fleet?: boolean;
@@ -1637,20 +1642,23 @@ export interface RebuildInstanceResponseBody {
   password: string | null;
 }
 
+export interface ResizeInstanceRequestBody {
+  instance_type_id: InstanceTypeId;
+  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  proration_date?: string;
+  checkout?: CheckoutOptions;
+}
+
 /**
- * The instance and, when the update placed a Billing order, the Checkout Session for it. After a resize the
- * instance is still on its current type, keeps its ID, and its current subscription remains in force until
- * the resize is applied. Returned with 200 when only descriptive fields changed and with 202 when an operation started.
+ * The instance and the Checkout Session for the resize. The instance is still on its current type, keeps its
+ * ID, and its subscription item keeps its current terms until the resize is applied.
  */
-export interface UpdateInstanceResponseBody {
+export interface ResizeInstanceResponseBody {
   instance: Instance;
+  /** The Billing Checkout Session of the purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
   /**
-   * The Billing Checkout Session of the purchase; null when the update placed no order. With deferred checkout, the customer completes it in Billing.
-   * @nullable
-   */
-  checkout_session_id: string | null;
-  /**
-   * The order created when checkout completes, at once for automatic checkout; null until then and when the update placed no order.
+   * The order created when checkout completes, at once for automatic checkout; null until then.
    * @nullable
    */
   order_id: string | null;
@@ -1688,8 +1696,8 @@ export interface RescueInstanceResponseBody {
 }
 
 export interface LaunchTemplate {
-  id: LaunchTemplateID;
-  region_id: RegionID;
+  id: LaunchTemplateId;
+  region_id: RegionId;
   name: string;
   description: string;
   /** The version a creation naming no version uses. */
@@ -1717,8 +1725,8 @@ export const LaunchTemplateBootVolumeOnInstanceRelease = {
  * A boot volume created from an image for each instance.
  */
 export interface LaunchTemplateBootVolume {
-  image_id: ImageID;
-  volume_type_id: VolumeTypeID;
+  image_id: ImageId;
+  volume_type_id: VolumeTypeId;
   /** @minimum 1 */
   size_gib: number;
   on_instance_release?: LaunchTemplateBootVolumeOnInstanceRelease;
@@ -1736,7 +1744,7 @@ export const LaunchTemplateDataVolumeOnInstanceRelease = {
  * An empty data volume created with each instance.
  */
 export interface LaunchTemplateDataVolume {
-  volume_type_id: VolumeTypeID;
+  volume_type_id: VolumeTypeId;
   /** @minimum 1 */
   size_gib: number;
   on_instance_release?: LaunchTemplateDataVolumeOnInstanceRelease;
@@ -1746,19 +1754,19 @@ export interface LaunchTemplateDataVolume {
  * A new primary network interface for each instance. An interface you already hold serves one instance, so a template cannot name one.
  */
 export interface LaunchTemplateNetworkInterface {
-  subnet_id: SubnetID;
+  subnet_id: SubnetId;
   /**
    * @minItems 1
    * @maxItems 5
    */
-  security_group_ids: SecurityGroupID[];
+  security_group_ids: SecurityGroupId[];
 }
 
 /**
  * A new elastic IP bought with each instance. An address you already hold serves one instance, so a template cannot name one.
  */
-export interface LaunchTemplateElasticIP {
-  line_id: ElasticIPLineID;
+export interface LaunchTemplateElasticIp {
+  line_id: ElasticIpLineId;
   /**
    * @minimum 1
    * @maximum 1000
@@ -1778,12 +1786,12 @@ export type NewLaunchTemplateVersionLabels = { [key: string]: string };
 export interface NewLaunchTemplateVersion {
   /** @maxLength 1024 */
   version_description?: string;
-  instance_type_id?: InstanceTypeID;
+  instance_type_id?: InstanceTypeId;
   boot_volume?: LaunchTemplateBootVolume;
   /** @maxItems 16 */
   data_volumes?: LaunchTemplateDataVolume[];
   network_interface?: LaunchTemplateNetworkInterface;
-  elastic_ip?: LaunchTemplateElasticIP;
+  elastic_ip?: LaunchTemplateElasticIp;
   /** A key may not contain a colon, whitespace or control characters. */
   labels?: NewLaunchTemplateVersionLabels;
   /** @maxLength 4096 */
@@ -1793,7 +1801,7 @@ export interface NewLaunchTemplateVersion {
 }
 
 export interface CreateLaunchTemplateRequestBody {
-  region_id: RegionID;
+  region_id: RegionId;
   /**
    * @minLength 1
    * @maxLength 128
@@ -1811,14 +1819,14 @@ export interface CreateLaunchTemplateRequestBody {
 export type LaunchTemplateVersionLabels = { [key: string]: string } | null;
 
 export interface LaunchTemplateVersion {
-  launch_template_id: LaunchTemplateID;
+  launch_template_id: LaunchTemplateId;
   version_number: number;
   version_description: string;
-  instance_type_id: InstanceTypeID | null;
+  instance_type_id: InstanceTypeId | null;
   boot_volume: LaunchTemplateBootVolume | null;
   data_volumes: LaunchTemplateDataVolume[];
   network_interface: LaunchTemplateNetworkInterface | null;
-  elastic_ip: LaunchTemplateElasticIP | null;
+  elastic_ip: LaunchTemplateElasticIp | null;
   /**
    * Null when the version describes no labels.
    * @nullable
@@ -1905,8 +1913,8 @@ export const NetworkInterfaceAddressState = {
 } as const;
 
 export interface NetworkInterfaceAddress {
-  id: NetworkInterfaceAddressID;
-  subnet_id: SubnetID;
+  id: NetworkInterfaceAddressId;
+  subnet_id: SubnetId;
   /**
    * @minLength 1
    * @maxLength 64
@@ -1950,9 +1958,9 @@ export const NetworkInterfaceAttachmentState = {
 } as const;
 
 export interface NetworkInterfaceAttachment {
-  id: InstanceNetworkInterfaceID;
-  instance_id: InstanceID;
-  network_interface_id: NetworkInterfaceID;
+  id: InstanceNetworkInterfaceId;
+  instance_id: InstanceId;
+  network_interface_id: NetworkInterfaceId;
   role: NetworkInterfaceAttachmentRole;
   /** What releasing the instance does to this interface. `delete` deletes it together with the instance; `detach` detaches it and leaves it to you. The primary interface created with the instance is `delete`; an interface you created yourself is `detach`. */
   on_instance_release: NetworkInterfaceAttachmentOnInstanceRelease;
@@ -1966,18 +1974,18 @@ export interface NetworkInterfaceAttachment {
 }
 
 export interface NetworkInterface {
-  id: NetworkInterfaceID;
+  id: NetworkInterfaceId;
   /** @nullable */
   mac_address: string | null;
   name: string;
-  virtual_private_cloud_id: VirtualPrivateCloudID;
+  virtual_private_cloud_id: VirtualPrivateCloudId;
   /**
    * Elastic IPv4 addresses associated with this network interface; an empty array when none are associated
    * @nullable
    */
   elastic_ip_addresses: string[] | null;
   /** The security groups the network interface holds. */
-  security_group_ids: SecurityGroupID[];
+  security_group_ids: SecurityGroupId[];
   addresses?: NetworkInterfaceAddress[];
   attachment: NetworkInterfaceAttachment | null;
   /** `pending` until the interface is created, then `available`. `error` means its creation failed or the cloud reports it broken; delete it and create another. A value naming an operation in progress (`attaching`, `detaching`, `associating_elastic_ip`, `updating_security_groups`, `adding_address`, `removing_address`, `deleting`) is shown while that operation runs; the interface refuses another operation until it ends. */
@@ -1993,7 +2001,7 @@ export interface NetworkInterfaceListResponseBody {
 }
 
 export interface AttachNetworkInterfaceRequestBody {
-  network_interface_id: NetworkInterfaceID;
+  network_interface_id: NetworkInterfaceId;
 }
 
 export interface CreateNetworkInterfaceRequestBody {
@@ -2004,8 +2012,8 @@ export interface CreateNetworkInterfaceRequestBody {
    * @minItems 1
    * @nullable
    */
-  security_group_ids: SecurityGroupID[] | null;
-  subnet_id: SubnetID;
+  security_group_ids: SecurityGroupId[] | null;
+  subnet_id: SubnetId;
   /**
    * The private address to assign. Allocated automatically when omitted
    * @maxLength 64
@@ -2014,17 +2022,20 @@ export interface CreateNetworkInterfaceRequestBody {
 }
 
 /**
- * The mutable fields of a network interface, all optional, at least one required.
+ * The descriptive fields of a network interface, all optional, at least one required.
  */
 export interface UpdateNetworkInterfaceRequestBody {
   /** @maxLength 128 */
   name?: string;
+}
+
+export interface ReplaceNetworkInterfaceSecurityGroupsRequestBody {
   /**
    * The complete new set of security groups, of the network interface's virtual private cloud.
    * @minItems 1
    * @maxItems 5
    */
-  security_group_ids?: SecurityGroupID[];
+  security_group_ids: SecurityGroupId[];
 }
 
 export interface CreateNetworkInterfaceAddressRequestBody {
@@ -2091,10 +2102,10 @@ export interface OperationLogResource {
    * @nullable
    */
   failure: string | null;
-  id: OperationLogID;
+  id: OperationLogId;
   /** Path and query parameters of the request. Fields such as passwords are redacted */
   payload: OperationLogResourcePayload;
-  region_id: RegionID | null;
+  region_id: RegionId | null;
   /** Empty for create operations: the id of the new resource is in the response, not in the request path */
   subject_id: string;
   subject_type: string;
@@ -2144,8 +2155,8 @@ export const PrivateImageResourceFailureReason = {
  * An image this project captured from one of its instances, used to install instances of this project. Its storage is billed only to this project. Reclaimed for non-payment while instances installed from it remain, it is kept, unusable and no longer charged, and deleted once the last of them is released.
  */
 export interface PrivateImageResource {
-  id: ImageID;
-  region_id: RegionID;
+  id: ImageId;
+  region_id: RegionId;
   name: string;
   os_family: string;
   os_version: string;
@@ -2177,7 +2188,7 @@ export interface PrivateImageResource {
    * @nullable
    */
   billing_position: string | null;
-  source_instance_id: InstanceID;
+  source_instance_id: InstanceId;
   created_at: string;
   /**
    * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this image is refunded.
@@ -2200,22 +2211,27 @@ export interface PrivateImageResource {
    */
   readonly order_item_id: string | null;
   /**
-   * The subscription for this resource; its presence alone does not imply delivery.
+   * The Billing subscription of this resource; its presence alone does not imply delivery.
    * @nullable
    */
   readonly subscription_id: string | null;
-  /** The subscription that pays for this private image, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription pays for it, and once it is released. */
+  /**
+   * The resource's item of that subscription.
+   * @nullable
+   */
+  readonly subscription_item_id: string | null;
+  /** The subscription item that pays for this private image, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription item pays for it, and once it is released. */
   release_set: ReleaseSetItem[];
   /** The most recent operation started on the image; null when none has been recorded. */
   latest_operation: LatestOperation | null;
 }
 
 /**
- * The private image as it is when the deletion is accepted, and the Billing cancellation that releases it when subscriptions pay for it.
+ * The private image as it is when the deletion is accepted, and the Billing cancellation that releases it when subscription items pay for it.
  */
 export interface DeletePrivateImageResponseBody {
   private_image: PrivateImageResource;
-  /** The cancellation Compute created for the private image's subscriptions; null when none pays for it. */
+  /** The cancellation Compute created for the private image's subscription items; null when none pays for it. */
   cancellation: null | BillingCancellation;
 }
 
@@ -2228,7 +2244,7 @@ export interface PrivateImageListResponseBody {
  * Creation configuration for this resource. Compute project quotas and Billing authorization are checked independently.
  */
 export interface CreatePrivateImageRequestBody {
-  instance_id: InstanceID;
+  instance_id: InstanceId;
   /**
    * @minLength 1
    * @maxLength 128
@@ -2274,8 +2290,8 @@ export const PublicImageResourceSaleStatus = {
  * A platform image offered to every project to install an instance. It carries no ownership and no billing; its storage is the platform's.
  */
 export interface PublicImageResource {
-  id: ImageID;
-  region_id: RegionID;
+  id: ImageId;
+  region_id: RegionId;
   name: string;
   os_family: string;
   os_version: string;
@@ -2340,7 +2356,7 @@ export const QuotaSource = {
  */
 export interface ProjectQuota {
   readonly project_id: string;
-  region_id: RegionID;
+  region_id: RegionId;
   resource: QuotaResourceType;
   /** @minimum 0 */
   readonly limit: number;
@@ -2359,7 +2375,7 @@ export interface RegionResource {
   name: string;
   /** The region's code, the way the outside world names this place (hk-1). Stable and human-written; addressing is by id. */
   code: string;
-  id: RegionID;
+  id: RegionId;
   /** The line every snapshot in this region is, metered on the size it stores. */
   volume_snapshot_billing: BillingComponent;
   /** The line every volume backup in this region is, metered on the size it stores. */
@@ -2391,8 +2407,8 @@ export const SecurityGroupRuleIpVersion = {
 } as const;
 
 export interface SecurityGroupRule {
-  id: SecurityGroupRuleID;
-  security_group_id: SecurityGroupID;
+  id: SecurityGroupRuleId;
+  security_group_id: SecurityGroupId;
   direction: SecurityGroupRuleDirection;
   ip_version: SecurityGroupRuleIpVersion;
   /**
@@ -2454,8 +2470,8 @@ export interface CreateSecurityGroupRuleRequestBody {
 }
 
 export interface SecurityGroup {
-  id: SecurityGroupID;
-  virtual_private_cloud_id: VirtualPrivateCloudID;
+  id: SecurityGroupId;
+  virtual_private_cloud_id: VirtualPrivateCloudId;
   name: string;
   description: string;
   /** The default security group goes with its virtual private cloud and cannot be deleted on its own. */
@@ -2470,7 +2486,7 @@ export interface SecurityGroupListResponseBody {
 }
 
 export interface CreateSecurityGroupRequestBody {
-  virtual_private_cloud_id: VirtualPrivateCloudID;
+  virtual_private_cloud_id: VirtualPrivateCloudId;
   /**
    * @minLength 1
    * @maxLength 128
@@ -2518,13 +2534,13 @@ export const VirtualPrivateCloudPeeringResourceStatus = {
 } as const;
 
 export interface VirtualPrivateCloudPeeringResource {
-  id: VirtualPrivateCloudPeeringID;
+  id: VirtualPrivateCloudPeeringId;
   name: string;
-  region_id: RegionID;
+  region_id: RegionId;
   requester_project_id: string;
   accepter_project_id: string;
-  requester_virtual_private_cloud_id: VirtualPrivateCloudID;
-  accepter_virtual_private_cloud_id: VirtualPrivateCloudID;
+  requester_virtual_private_cloud_id: VirtualPrivateCloudId;
+  accepter_virtual_private_cloud_id: VirtualPrivateCloudId;
   /** The accepter project's decision. `pending` until it decides; `accept-virtual-private-cloud-peering` and `reject-virtual-private-cloud-peering` make it `accepted` or `rejected`. A rejected peering is `deleted`. */
   acceptance: VirtualPrivateCloudPeeringResourceAcceptance;
   /** `pending` until the connectivity exists: while acceptance is pending, and after it is accepted while the link is built (`provisioning`). Then `active`. `failed` means the link could not be built; `failure_reason` states why. `deleted` once deleted or rejected. `deleting` runs until the link and its peer routes are gone. */
@@ -2550,9 +2566,9 @@ export interface CreateVirtualPrivateCloudPeeringRequestBody {
    * @maxLength 128
    */
   name: string;
-  requester_virtual_private_cloud_id: VirtualPrivateCloudID;
+  requester_virtual_private_cloud_id: VirtualPrivateCloudId;
   accepter_project_id: string;
-  accepter_virtual_private_cloud_id: VirtualPrivateCloudID;
+  accepter_virtual_private_cloud_id: VirtualPrivateCloudId;
 }
 
 /**
@@ -2567,8 +2583,8 @@ export const VirtualPrivateCloudRouteType = {
 } as const;
 
 export interface VirtualPrivateCloudRouteResource {
-  id: VirtualPrivateCloudRouteID;
-  virtual_private_cloud_id: VirtualPrivateCloudID;
+  id: VirtualPrivateCloudRouteId;
+  virtual_private_cloud_id: VirtualPrivateCloudId;
   type: VirtualPrivateCloudRouteType;
   destination_cidr: string;
   /**
@@ -2577,7 +2593,7 @@ export interface VirtualPrivateCloudRouteResource {
    */
   next_hop_address: string | null;
   /** The peering that wrote the route, null for a tenant route. */
-  virtual_private_cloud_peering_id: VirtualPrivateCloudPeeringID | null;
+  virtual_private_cloud_peering_id: VirtualPrivateCloudPeeringId | null;
   description: string;
   created_at: string;
 }
@@ -2605,8 +2621,8 @@ export interface CreateVirtualPrivateCloudRouteRequestBody {
 }
 
 export interface VirtualPrivateCloudSubnet {
-  id: SubnetID;
-  virtual_private_cloud_id: VirtualPrivateCloudID;
+  id: SubnetId;
+  virtual_private_cloud_id: VirtualPrivateCloudId;
   name: string;
   /** The subnet's IPv4 range. */
   ipv4_cidr: string;
@@ -2672,8 +2688,8 @@ export const VirtualPrivateCloudStatus = {
 } as const;
 
 export interface VirtualPrivateCloud {
-  id: VirtualPrivateCloudID;
-  region_id: RegionID;
+  id: VirtualPrivateCloudId;
+  region_id: RegionId;
   name: string;
   ipv4_cidr: string;
   /**
@@ -2695,7 +2711,7 @@ export interface VirtualPrivateCloudListResponseBody {
 }
 
 export interface CreateVirtualPrivateCloudRequestBody {
-  region_id: RegionID;
+  region_id: RegionId;
   /**
    * @minLength 1
    * @maxLength 128
@@ -2763,17 +2779,17 @@ export const VolumeBackupResourceFailureReason = {
  */
 export interface VolumeBackupResource {
   created_at: string;
-  id: VolumeBackupID;
+  id: VolumeBackupId;
   name: string;
-  region_id: RegionID;
+  region_id: RegionId;
   /** Capacity of the source volume when the backup was created. A restored volume cannot be smaller than this */
   size_gib: number;
   /** The capacity metered for this backup, in GiB: the size of the source volume when the backup was taken. Usage is this capacity multiplied by the time the backup is retained. */
   capacity_gib: number;
-  source_volume_id: VolumeID;
+  source_volume_id: VolumeId;
   /** `pending` from the purchase until the backup is taken, then `available`. `failed` means the backup was not created. A value naming an operation in progress (`restoring`, `deleting`) is shown while that operation runs; the backup refuses another operation until it ends. */
   status: VolumeBackupResourceStatus;
-  source_availability_zone_id: AvailabilityZoneID;
+  source_availability_zone_id: AvailabilityZoneId;
   /**
    * Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this backup is refunded.
    * @nullable
@@ -2795,22 +2811,27 @@ export interface VolumeBackupResource {
    */
   readonly order_item_id: string | null;
   /**
-   * The subscription for this resource; its presence alone does not imply delivery.
+   * The Billing subscription of this resource; its presence alone does not imply delivery.
    * @nullable
    */
   readonly subscription_id: string | null;
-  /** The subscription that pays for this volume backup, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription pays for it, and once it is released. */
+  /**
+   * The resource's item of that subscription.
+   * @nullable
+   */
+  readonly subscription_item_id: string | null;
+  /** The subscription item that pays for this volume backup, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription item pays for it, and once it is released. */
   release_set: ReleaseSetItem[];
   /** The most recent operation started on the backup; null when none has been recorded. */
   latest_operation: LatestOperation | null;
 }
 
 /**
- * The volume backup as it is when the deletion is accepted, and the Billing cancellation that releases it when subscriptions pay for it.
+ * The volume backup as it is when the deletion is accepted, and the Billing cancellation that releases it when subscription items pay for it.
  */
 export interface DeleteVolumeBackupResponseBody {
   volume_backup: VolumeBackupResource;
-  /** The cancellation Compute created for the volume backup's subscriptions; null when none pays for it. */
+  /** The cancellation Compute created for the volume backup's subscription items; null when none pays for it. */
   cancellation: null | BillingCancellation;
 }
 
@@ -2821,7 +2842,7 @@ export interface VolumeBackupListResponseBody {
 }
 
 export interface CreateVolumeBackupRequestBody {
-  volume_id: VolumeID;
+  volume_id: VolumeId;
   /**
    * @minLength 1
    * @maxLength 128
@@ -2891,12 +2912,12 @@ export const VolumeSnapshotResourceFailureReason = {
  * A snapshot of a volume. Compute project quotas constrain its count; retained storage is metered independently of that quota.
  */
 export interface VolumeSnapshotResource {
-  availability_zone_id: AvailabilityZoneID;
+  availability_zone_id: AvailabilityZoneId;
   created_at: string;
-  volume_id: VolumeID;
-  id: VolumeSnapshotID;
+  volume_id: VolumeId;
+  id: VolumeSnapshotId;
   name: string;
-  region_id: RegionID;
+  region_id: RegionId;
   /** Capacity of the source volume when the snapshot was created. A volume restored from it cannot be smaller */
   size_gib: number;
   /** `pending` once a quota slot is reserved and until the snapshot is taken; then `available`. `failed` means the snapshot was not created; its slot is released once no snapshot data remains. `error` means the cloud reports the snapshot broken. A value naming an operation in progress (`restoring`, `deleting`) is shown while that operation runs; the snapshot refuses another operation until it ends. */
@@ -2922,22 +2943,27 @@ export interface VolumeSnapshotResource {
    */
   readonly order_item_id: string | null;
   /**
-   * The subscription for this resource; its presence alone does not imply delivery.
+   * The Billing subscription of this resource; its presence alone does not imply delivery.
    * @nullable
    */
   readonly subscription_id: string | null;
-  /** The subscription that pays for this snapshot, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription pays for it, and once it is released. */
+  /**
+   * The resource's item of that subscription.
+   * @nullable
+   */
+  readonly subscription_item_id: string | null;
+  /** The subscription item that pays for this snapshot, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription item pays for it, and once it is released. */
   release_set: ReleaseSetItem[];
   /** The most recent operation started on the snapshot; null when none has been recorded. */
   latest_operation: LatestOperation | null;
 }
 
 /**
- * The snapshot as it is when the deletion is accepted, and the Billing cancellation that releases it when subscriptions pay for it.
+ * The snapshot as it is when the deletion is accepted, and the Billing cancellation that releases it when subscription items pay for it.
  */
 export interface DeleteVolumeSnapshotResponseBody {
   volume_snapshot: VolumeSnapshotResource;
-  /** The cancellation Compute created for the snapshot's subscriptions; null when none pays for it. */
+  /** The cancellation Compute created for the snapshot's subscription items; null when none pays for it. */
   cancellation: null | BillingCancellation;
 }
 
@@ -2951,7 +2977,7 @@ export interface VolumeSnapshotListResponseBody {
  * Creation configuration for this resource. Compute project quotas and Billing authorization are checked independently.
  */
 export interface CreateVolumeSnapshotRequestBody {
-  volume_id: VolumeID;
+  volume_id: VolumeId;
   /**
    * @minLength 1
    * @maxLength 128
@@ -3026,15 +3052,15 @@ export interface VolumeTypePerformance {
 }
 
 export interface VolumeTypeResource {
-  availability_zone_id: AvailabilityZoneID;
+  availability_zone_id: AvailabilityZoneId;
   /** `sold_out` takes no new orders for now while the type stays listed; the volumes already of it keep working. */
   sale_status: VolumeTypeResourceSaleStatus;
-  id: VolumeTypeID;
+  id: VolumeTypeId;
   max_size_gib: number;
   medium: VolumeTypeResourceMedium;
   min_size_gib: number;
   name: string;
-  region_id: RegionID;
+  region_id: RegionId;
   size_step_gib: number;
   performance: VolumeTypePerformance;
   /** The line a volume of this type is, whether bought on its own or as the boot volume or a data volume of an instance. A volume bought on its own is licensed only. */
@@ -3134,9 +3160,9 @@ export const VolumeAttachmentState = {
 } as const;
 
 export interface VolumeAttachment {
-  id: InstanceVolumeID;
-  instance_id: InstanceID;
-  volume_id: VolumeID;
+  id: InstanceVolumeId;
+  instance_id: InstanceId;
+  volume_id: VolumeId;
   role: VolumeAttachmentRole;
   /** What releasing the instance does to this volume. `delete` deletes it together with the instance; `detach` detaches it and leaves it to you. A volume you attached, or booted the instance from, is `detach`; a volume bought with the instance follows the choice made when it was bought. */
   on_instance_release: VolumeAttachmentOnInstanceRelease;
@@ -3154,12 +3180,12 @@ export interface VolumeAttachment {
 }
 
 export interface VolumeResource {
-  availability_zone_id: AvailabilityZoneID;
+  availability_zone_id: AvailabilityZoneId;
   created_at: string;
-  volume_type_id: VolumeTypeID;
-  id: VolumeID;
+  volume_type_id: VolumeTypeId;
+  id: VolumeId;
   name: string;
-  region_id: RegionID;
+  region_id: RegionId;
   size_gib: number;
   performance: VolumePerformance;
   /** `pending` until the volume is created, with no storage allocated before the order is accepted; then `available`, or `in_use` once attached. `failed` means the volume was not created; `failure_reason` states why. `error` means the cloud reports the volume broken. A value naming an operation in progress (`resizing`, `retyping`, `reverting`, `attaching`, `detaching`, `suspending`, `resuming`, `deleting`) is shown while that operation runs; the volume refuses another operation until it ends. */
@@ -3177,12 +3203,18 @@ export interface VolumeResource {
    */
   order_item_id: string | null;
   /**
-   * The Billing subscription associated with this resource. It may still be pending; its
+   * The Billing subscription the resource renews under: its own, or the instance's when it was bought with or
+   * for one. Read it in Billing for the term end, automatic renewal and renewal. It may still be pending; its
    * presence does not imply delivery or metering. Null when no subscription is associated.
    * @nullable
    */
   subscription_id: string | null;
-  /** The subscriptions a cancellation through Billing has to cover to release this volume: its own, each with the resource it pays for, so that each line of a cancellation can name what it releases. Snapshots have no individual subscriptions. A boot volume is released only with its instance, so for a boot volume the set is that of the instance. Subscriptions that have ended are not listed, and the set is empty when no subscription pays for any of them. */
+  /**
+   * The resource's item of that subscription. Null when no subscription is associated.
+   * @nullable
+   */
+  subscription_item_id: string | null;
+  /** The subscription items a cancellation through Billing has to cover to release this volume: its own, each with the resource it pays for, so that each line of a cancellation can name what it releases. Snapshots have no individual items. A boot volume is released only with its instance, so for a boot volume the set is that of the instance. Items that have ended are not listed, and the set is empty when no item pays for any of them. */
   release_set: ReleaseSetItem[];
   /** @nullable */
   access_state: VolumeResourceAccessState;
@@ -3197,11 +3229,11 @@ export interface VolumeResource {
 }
 
 /**
- * The volume as it is when the deletion is accepted, and the Billing cancellation that releases it when subscriptions pay for it.
+ * The volume as it is when the deletion is accepted, and the Billing cancellation that releases it when subscription items pay for it.
  */
 export interface DeleteVolumeResponseBody {
   volume: VolumeResource;
-  /** The cancellation Compute created for the volume's subscriptions; null when none pays for it. */
+  /** The cancellation Compute created for the volume's subscription items; null when none pays for it. */
   cancellation: null | BillingCancellation;
 }
 
@@ -3212,7 +3244,7 @@ export interface VolumeListResponseBody {
 }
 
 export interface CreateVolumeRequestBody {
-  volume_type_id: VolumeTypeID;
+  volume_type_id: VolumeTypeId;
   /**
    * @minLength 1
    * @maxLength 128
@@ -3223,14 +3255,15 @@ export interface CreateVolumeRequestBody {
    * @minimum 1
    */
   size_gib?: number;
-  volume_snapshot_id?: VolumeSnapshotID;
-  volume_backup_id?: VolumeBackupID;
-  billing: BillingChoice;
+  volume_snapshot_id?: VolumeSnapshotId;
+  volume_backup_id?: VolumeBackupId;
+  billing?: BillingChoice;
   checkout?: CheckoutOptions;
+  instance_id?: InstanceId;
 }
 
 /**
- * The mutable fields of a volume, all optional, at least one required. `size_gib` and `volume_type_id` are operational fields and cannot be combined with each other or with `name`; such a request is refused with 422 `UPDATE_FIELDS_COMBINED`.
+ * The descriptive fields of a volume, all optional, at least one required.
  */
 export interface UpdateVolumeRequestBody {
   /**
@@ -3238,23 +3271,14 @@ export interface UpdateVolumeRequestBody {
    * @maxLength 128
    */
   name?: string;
-  /**
-   * The new capacity. Must be larger than the current capacity
-   * @minimum 1
-   */
-  size_gib?: number;
-  volume_type_id?: VolumeTypeID;
-  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only with `size_gib` or `volume_type_id`, and only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
-  proration_date?: string;
-  checkout?: CheckoutOptions;
 }
 
 export interface RevertVolumeRequestBody {
-  volume_snapshot_id: VolumeSnapshotID;
+  volume_snapshot_id: VolumeSnapshotId;
 }
 
 export interface AttachVolumeRequestBody {
-  volume_id: VolumeID;
+  volume_id: VolumeId;
 }
 
 /**
@@ -3273,20 +3297,35 @@ export interface CreateVolumeResponseBody {
 }
 
 /**
- * The volume and, when the update placed a Billing order, the Checkout Session for it. After a resize the volume is still at its current size until the change is applied. Returned with 200 when only descriptive fields changed and with 202 when an operation started.
+ * The volume and the Checkout Session for its resize or type change. The volume keeps its current size and type until the change is applied.
  */
-export interface UpdateVolumeResponseBody {
+export interface VolumeChangeResponseBody {
   volume: VolumeResource;
+  /** The Billing Checkout Session of the purchase. With deferred checkout, the customer completes it in Billing. */
+  checkout_session_id: string;
   /**
-   * The Billing Checkout Session of the purchase; null when the update placed no order. With deferred checkout, the customer completes it in Billing.
-   * @nullable
-   */
-  checkout_session_id: string | null;
-  /**
-   * The order created when checkout completes, at once for automatic checkout; null until then and when the update placed no order.
+   * The order created when checkout completes, at once for automatic checkout; null until then.
    * @nullable
    */
   order_id: string | null;
+}
+
+export interface ResizeVolumeRequestBody {
+  /**
+   * The new capacity. Must be larger than the current capacity
+   * @minimum 1
+   */
+  size_gib: number;
+  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  proration_date?: string;
+  checkout?: CheckoutOptions;
+}
+
+export interface RetypeVolumeRequestBody {
+  volume_type_id: VolumeTypeId;
+  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  proration_date?: string;
+  checkout?: CheckoutOptions;
 }
 
 export interface VolumeAttachmentList {
@@ -3380,7 +3419,7 @@ export type ListAvailabilityZonesParams = {
   /**
    * Return only the zones of this region
    */
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3396,7 +3435,7 @@ export type ListAvailabilityZonesParams = {
 };
 
 export type ListElasticIpLinesParams = {
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * Search text matched against line names and descriptions; combined with the other filters using AND.
    * @minLength 1
@@ -3470,7 +3509,7 @@ export const ListElasticIpTrafficUsageInterval = {
 } as const;
 
 export type ListInstanceFamiliesParams = {
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3486,15 +3525,15 @@ export type ListInstanceFamiliesParams = {
 };
 
 export type ListInstanceTypesParams = {
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * Return only the types of this instance family.
    */
-  instance_family_id?: InstanceFamilyID;
+  instance_family_id?: InstanceFamilyId;
   /**
    * Return only the types of this availability zone, sold out or not.
    */
-  availability_zone_id?: AvailabilityZoneID;
+  availability_zone_id?: AvailabilityZoneId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3574,7 +3613,7 @@ export type ListLaunchTemplatesParams = {
   /**
    * Only launch templates of this region.
    */
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3643,7 +3682,7 @@ export type ListPrivateImagesParams = {
   /**
    * Return only the images of this region
    */
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3673,7 +3712,7 @@ export type ListPublicImagesParams = {
   /**
    * Return only the images of this region
    */
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3737,11 +3776,11 @@ export type ListSecurityGroupsParams = {
   /**
    * Only security groups in this region.
    */
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * Only security groups of this virtual private cloud.
    */
-  virtual_private_cloud_id?: VirtualPrivateCloudID;
+  virtual_private_cloud_id?: VirtualPrivateCloudId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3805,7 +3844,7 @@ export type ListVirtualPrivateCloudsParams = {
   /**
    * Returns every region when omitted
    */
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3832,7 +3871,7 @@ export type ListVolumeBackupsParams = {
   /**
    * Return only the backups of this volume
    */
-  volume_id?: VolumeID;
+  volume_id?: VolumeId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3862,7 +3901,7 @@ export type ListVolumeSnapshotsParams = {
   /**
    * Return only the snapshots of this volume
    */
-  volume_id?: VolumeID;
+  volume_id?: VolumeId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3889,11 +3928,11 @@ export type DeleteVolumeSnapshotParams = {
 };
 
 export type ListVolumeTypesParams = {
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * Return only the types of this availability zone, sold out or not.
    */
-  availability_zone_id?: AvailabilityZoneID;
+  availability_zone_id?: AvailabilityZoneId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -3909,11 +3948,11 @@ export type ListVolumeTypesParams = {
 };
 
 export type ListVolumesParams = {
-  region_id?: RegionID;
+  region_id?: RegionId;
   /**
    * Supplied together with `region_id` to filter attachable volumes
    */
-  availability_zone_id?: AvailabilityZoneID;
+  availability_zone_id?: AvailabilityZoneId;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1

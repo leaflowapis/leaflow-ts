@@ -15,14 +15,15 @@ export const CancellationItem = zod
     id: zod
       .uuid()
       .describe(
-        "The subscription's cancellation item, the same as `Subscription.cancellation.id`.",
+        "The item's entry in the cancellation, the same as `SubscriptionItem.cancellation.id`.",
       ),
-    subscription_id: zod.uuid(),
+    subscription_item_id: zod.uuid(),
+    subscription_id: zod.uuid().describe("The subscription the item belongs to."),
     plan_id: zod.uuid(),
     plan_name: zod.string(),
     type: PriceType,
     usage_type: UsageType.describe(
-      "Creating the cancellation turned automatic renewal off; withdrawing it turns renewal back on\nfor a `metered` subscription and leaves it off for a `licensed` one.",
+      "When the cancellation covers every continuing item of a subscription, creating it turned the\nsubscription's automatic renewal off; withdrawing it turns renewal back on for a subscription with\nonly `metered` items and leaves it off for one with `licensed` items.",
     ),
     status: zod.enum(["requested", "scheduled", "releasing", "completed", "canceled", "failed"]),
     failure_code: zod
@@ -46,7 +47,7 @@ export const CancellationItem = zod
       "Present with `completed`. The part returned to the payment method it was paid with.",
     ),
   })
-  .describe("One subscription of the cancellation.");
+  .describe("One subscription item of the cancellation.");
 
 export type CancellationItem = zod.input<typeof CancellationItem>;
 export type CancellationItemOutput = zod.output<typeof CancellationItem>;

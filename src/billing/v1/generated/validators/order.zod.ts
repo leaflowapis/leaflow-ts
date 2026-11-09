@@ -51,14 +51,14 @@ export const Order = zod
     type: zod
       .enum(["new", "renew", "modify"])
       .describe(
-        "`new` buys, `renew` extends a licensed subscription, `modify` changes a subscription's configuration or billing terms.",
+        "`new` buys, `renew` extends subscriptions, `modify` changes subscription items' configuration or billing terms.",
       ),
     status: OrderStatus,
     change_effective: zod
       .enum(["none", "immediate", "period_end"])
       .optional()
       .describe(
-        "When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced when the order is created and starts when the current paid period ends; if the invoice is unpaid by then, the order is canceled and the subscription renews or ends as usual.",
+        "When a plan change takes effect; `none` for anything that is not a change. A `period_end` order stays pending until the first period at the new price is paid. That period is invoiced when the order is created and starts when the current paid period ends; if the invoice is unpaid by then, the order is canceled and the item renews or ends with its subscription as usual.",
       ),
     expires_at: zod.iso
       .datetime({ offset: true })

@@ -13,6 +13,8 @@ export const checkoutOptionsModeDefault = `automatic`;
 export const checkoutOptionsExpectedAmountTwoRegExp = new RegExp("^[0-9]{1,15}([.][0-9]{1,10})?$");
 export const checkoutOptionsReturnUrlMax = 2048;
 
+export const checkoutOptionsAutoRenewDefault = false;
+
 export const CheckoutOptions = zod
   .strictObject({
     mode: CheckoutMode.default(checkoutOptionsModeDefault),
@@ -27,6 +29,12 @@ export const CheckoutOptions = zod
       .optional()
       .describe(
         "Where the client goes after the customer finishes a deferred checkout. Any absolute URI with a\nscheme, including mobile and desktop application schemes. Billing stores it without checking the\ntarget; each client validates its own.",
+      ),
+    auto_renew: zod
+      .boolean()
+      .default(checkoutOptionsAutoRenewDefault)
+      .describe(
+        "Turns on automatic renewal of every subscription with licensed items that the purchase opens. Off\nwhen omitted. It must be the customer's own choice.",
       ),
   })
   .describe(

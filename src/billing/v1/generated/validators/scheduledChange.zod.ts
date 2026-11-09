@@ -25,7 +25,7 @@ export const ScheduledChange = zod
     interval_count: zod.int().min(1),
   })
   .describe(
-    "The next accepted period-end change of the subscription: the target terms, applied at effective_at.",
+    "The next accepted period-end change of the item: the target terms, applied at effective_at.",
   );
 
 export type ScheduledChange = zod.input<typeof ScheduledChange>;

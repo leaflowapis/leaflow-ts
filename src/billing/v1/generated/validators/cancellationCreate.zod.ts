@@ -6,10 +6,11 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CancellationItemInput } from "./cancellationItemInput.zod.js";
 import { CancellationMode } from "./cancellationMode.zod.js";
 import { Money } from "./money.zod.js";
 
-export const cancellationCreateSubscriptionIdsMax = 50;
+export const cancellationCreateItemsMax = 50;
 
 export const cancellationCreateExpectedRefundableAmountTwoRegExp = new RegExp(
   "^[0-9]{1,15}([.][0-9]{1,10})?$",
@@ -17,10 +18,10 @@ export const cancellationCreateExpectedRefundableAmountTwoRegExp = new RegExp(
 export const cancellationCreateReasonMax = 1024;
 
 export const CancellationCreate = zod.strictObject({
-  subscription_ids: zod
-    .array(zod.uuid())
+  items: zod
+    .array(CancellationItemInput)
     .min(1)
-    .max(cancellationCreateSubscriptionIdsMax)
+    .max(cancellationCreateItemsMax)
     .describe("As in the preview."),
   mode: CancellationMode,
   proration_date: zod.iso

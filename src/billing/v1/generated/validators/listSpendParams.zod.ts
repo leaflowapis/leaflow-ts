@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const listSpendParamsGroupByDefault = `product`;
 export const listSpendParamsPageDefault = 1;
@@ -23,7 +23,7 @@ export const ListSpendParams = zod.strictObject({
   group_by: zod
     .enum(["product", "plan", "resource", "meter"])
     .default(listSpendParamsGroupByDefault),
-  product_id: ProductID.optional(),
+  product_id: ProductId.optional(),
   page: zod.int().min(1).max(listSpendParamsPageMax).default(listSpendParamsPageDefault),
   page_size: zod
     .int()

@@ -33,7 +33,7 @@ export const Quote = zod
       .datetime({ offset: true })
       .nullable()
       .describe(
-        "Immediate changes only; null otherwise. The instant the change is priced from; pass it when confirming the Checkout Session so it is priced from the same instant.",
+        "Immediate changes and items added to an existing subscription only; null otherwise. The instant they are priced from; pass it when confirming the Checkout Session so it is priced from the same instant.",
       ),
     tax_status: zod
       .enum(["complete", "requires_location_inputs"])

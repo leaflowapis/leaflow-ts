@@ -16,7 +16,7 @@
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
  * - **Custom methods.** An action that is not one of the standard methods (list, get, create, update, delete) is a custom method, `POST` on the resource's path followed by `:` and the verb, as in `POST /api/v2/instances/{id}:reboot` (AIP-136). A state is changed by its custom method, never by writing the state: `:start` and `:stop`, `:rescue` and `:unrescue`, `:associate` and `:disassociate`.
- * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
+ * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only descriptive fields, all optional and at least one given, and answers 200. A change that starts an operation or a purchase, such as a resize, is its own method (`:resize`, `:retype`, `:changeBandwidth`).
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. Its `access_state` is `pending` until the order is accepted and delivery settles it, then `enabled`; a subscription that lapses suspends or reclaims the resource it pays for. Deleting a resource that subscriptions pay for cancels the subscriptions of its `release_set` in Billing, and the deletion answers with that cancellation.
  * - **Availability zones.** A volume and an instance must reside in the same availability zone to be attached. An instance type and a volume type each belong to one availability zone, as on GCP, so a purchase names the type and the type names the zone; the volumes bought with an instance have to be of types of the instance type's zone.
  * - **IPv6 is routed, not translated.** A virtual private cloud with IPv6 holds a /56 and each of its subnets a /64 of it, as on Alibaba Cloud, Tencent Cloud and Azure; IPv6 and its security groups require no EIP or NAT gateway. EIP and NATGateway are IPv4 products; IPv6 EIP, NAT66 and IPv6 port forwarding are not supported.
@@ -33,20 +33,20 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { ElasticIPAssociation } from "./elasticIPAssociation.zod.js";
-import { ElasticIPID } from "./elasticIPID.zod.js";
-import { ElasticIPLineID } from "./elasticIPLineID.zod.js";
+import { ElasticIpAssociation } from "./elasticIpAssociation.zod.js";
+import { ElasticIpId } from "./elasticIpId.zod.js";
+import { ElasticIpLineId } from "./elasticIpLineId.zod.js";
 import { InternetChargeType } from "./internetChargeType.zod.js";
-import { IPv4HostAddress } from "./iPv4HostAddress.zod.js";
+import { Ipv4HostAddress } from "./ipv4HostAddress.zod.js";
 import { LatestOperation } from "./latestOperation.zod.js";
-import { RegionID } from "./regionID.zod.js";
+import { RegionId } from "./regionId.zod.js";
 import { ReleaseSetItem } from "./releaseSetItem.zod.js";
 
-export const ElasticIP = zod
+export const ElasticIp = zod
   .strictObject({
     internet_charge_type: InternetChargeType,
     address: zod
-      .union([IPv4HostAddress, zod.null()])
+      .union([Ipv4HostAddress, zod.null()])
       .describe(
         "The held IPv4 address; null before actual claim. Holding identity is not exposed.",
       ),
@@ -60,9 +60,9 @@ export const ElasticIP = zod
       .describe("The confirmed holding release time; null while held or before actual claim."),
     bandwidth_mbps: zod.int().nullable(),
     created_at: zod.iso.datetime({ offset: true }),
-    id: ElasticIPID,
-    line_id: ElasticIPLineID,
-    region_id: RegionID,
+    id: ElasticIpId,
+    line_id: ElasticIpLineId,
+    region_id: RegionId,
     status: zod
       .enum([
         "pending",
@@ -92,26 +92,28 @@ export const ElasticIP = zod
       .uuid()
       .nullable()
       .describe("The Billing order item of the address, always pay-as-you-go."),
-    address_subscription_id: zod
+    subscription_id: zod
       .uuid()
       .nullable()
       .describe(
-        "The Billing subscription of the address. It may still be pending; its presence does not imply delivery or metering.",
+        "The Billing subscription the elastic IP renews under. Read it in Billing for the term end, automatic renewal and renewal. It may still be pending; its presence does not imply delivery or metering.",
       ),
+    address_subscription_item_id: zod
+      .uuid()
+      .nullable()
+      .describe("The subscription item of the address, always pay-as-you-go."),
     internet_order_item_id: zod
       .uuid()
       .nullable()
       .describe("The Billing order item of the bandwidth or traffic."),
-    internet_subscription_id: zod
+    internet_subscription_item_id: zod
       .uuid()
       .nullable()
-      .describe(
-        "The Billing subscription of the bandwidth or traffic. It may still be pending; its presence does not imply delivery or metering.",
-      ),
+      .describe("The subscription item of the bandwidth or traffic."),
     release_set: zod
       .array(ReleaseSetItem)
       .describe(
-        "The subscriptions a cancellation through Billing has to cover to release this elastic IP, both the address's and the network's, each with the resource it pays for, so that each line of a cancellation can name what it releases. A subscription that has ended is not listed, and the set is empty when no subscription pays for the elastic IP.",
+        "The subscription items a cancellation through Billing has to cover to release this elastic IP, both the address's and the network's, each with the resource it pays for, so that each line of a cancellation can name what it releases. An item that has ended is not listed, and the set is empty when no item pays for the elastic IP.",
       ),
     access_state: zod
       .union([
@@ -135,7 +137,7 @@ export const ElasticIP = zod
       .describe(
         "Why creation failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired. `provisioning_failed` means creation failed after the order was accepted, and the charge for this elastic IP is refunded.",
       ),
-    association: zod.union([ElasticIPAssociation, zod.null()]),
+    association: zod.union([ElasticIpAssociation, zod.null()]),
     latest_operation: zod
       .union([LatestOperation, zod.null()])
       .describe(
@@ -143,8 +145,8 @@ export const ElasticIP = zod
       ),
   })
   .describe(
-    "One public IP resource, including its bandwidth configuration. Bandwidth has no separate Compute resource ID.\nTwo subscriptions of one order pay for it: the address subscription, always pay-as-you-go, charges for the\naddress while it is not associated with anything, and the network subscription, on the terms chosen at\npurchase, charges for the bandwidth or the traffic. Changing bandwidth updates this same resource, not another\nallocation.",
+    "One public IP resource, including its bandwidth configuration. Bandwidth has no separate Compute resource ID.\nTwo items of one Billing subscription pay for it: the address item, always pay-as-you-go, charges for the\naddress while it is not associated with anything, and the network item, on the terms chosen at purchase,\ncharges for the bandwidth or the traffic. The subscription is the elastic IP's own, or the instance's when it\nwas bought with or for one. Changing bandwidth updates this same resource, not another allocation.",
   );
 
-export type ElasticIP = zod.input<typeof ElasticIP>;
-export type ElasticIPOutput = zod.output<typeof ElasticIP>;
+export type ElasticIp = zod.input<typeof ElasticIp>;
+export type ElasticIpOutput = zod.output<typeof ElasticIp>;

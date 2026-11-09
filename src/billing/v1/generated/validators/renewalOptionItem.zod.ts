@@ -6,25 +6,26 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CancellationPolicy } from "./cancellationPolicy.zod.js";
+import { Money } from "./money.zod.js";
+import { RefundPolicy } from "./refundPolicy.zod.js";
 
-export const listRenewalPricesParamsPageDefault = 1;
-export const listRenewalPricesParamsPageMax = 2147483647;
+export const RenewalOptionItem = zod
+  .strictObject({
+    subscription_item_id: zod.uuid(),
+    price_id: zod
+      .uuid()
+      .nullable()
+      .describe(
+        "The price the item renews at; null on the current option, which keeps the agreed amount.",
+      ),
+    amount: Money.describe("One period of this item, before tax and discounts."),
+    cancellation_policy: CancellationPolicy.optional(),
+    refund_policy: RefundPolicy.optional(),
+    short_rate_multiplier: zod.string().optional().describe("Refund policy `short_rate` only."),
+    short_rate_threshold_seconds: zod.int().optional().describe("Refund policy `short_rate` only."),
+  })
+  .describe("What one item renews at under a renewal option.");
 
-export const listRenewalPricesParamsPageSizeDefault = 50;
-export const listRenewalPricesParamsPageSizeMax = 200;
-
-export const ListRenewalPricesParams = zod.strictObject({
-  page: zod
-    .int()
-    .min(1)
-    .max(listRenewalPricesParamsPageMax)
-    .default(listRenewalPricesParamsPageDefault),
-  page_size: zod
-    .int()
-    .min(1)
-    .max(listRenewalPricesParamsPageSizeMax)
-    .default(listRenewalPricesParamsPageSizeDefault),
-});
-
-export type ListRenewalPricesParams = zod.input<typeof ListRenewalPricesParams>;
-export type ListRenewalPricesParamsOutput = zod.output<typeof ListRenewalPricesParams>;
+export type RenewalOptionItem = zod.input<typeof RenewalOptionItem>;
+export type RenewalOptionItemOutput = zod.output<typeof RenewalOptionItem>;

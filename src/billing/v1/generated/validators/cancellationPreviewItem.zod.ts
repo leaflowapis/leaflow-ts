@@ -13,7 +13,8 @@ import { UsageType } from "./usageType.zod.js";
 
 export const CancellationPreviewItem = zod
   .strictObject({
-    subscription_id: zod.uuid(),
+    subscription_item_id: zod.uuid(),
+    subscription_id: zod.uuid().describe("The subscription the item belongs to."),
     plan_id: zod.uuid(),
     plan_name: zod.string(),
     project: zod
@@ -27,7 +28,7 @@ export const CancellationPreviewItem = zod
     auto_renew: zod
       .boolean()
       .describe(
-        "Whether automatic renewal is on now. Creating the cancellation turns it off; withdrawing it turns it back on for a metered subscription but not for a licensed one.",
+        "Whether the item's subscription renews automatically now. Creating a cancellation of every continuing item of the subscription turns it off; withdrawing it turns it back on for a subscription with only metered items but not for one with licensed items.",
       ),
     unused_amount: Money,
     short_rate_surcharge_amount: Money,
@@ -37,7 +38,7 @@ export const CancellationPreviewItem = zod
     tax_amount: Money,
     forfeited_amount: Money,
   })
-  .describe("One subscription of the previewed cancellation.");
+  .describe("One subscription item of the previewed cancellation.");
 
 export type CancellationPreviewItem = zod.input<typeof CancellationPreviewItem>;
 export type CancellationPreviewItemOutput = zod.output<typeof CancellationPreviewItem>;

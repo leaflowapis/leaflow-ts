@@ -14,7 +14,7 @@ export const QuoteDowngradeRefund = zod
       "Returned to the original payment sources, tax paid on it included.",
     ),
     forfeited_amount: Money.describe(
-      "Before tax, the part of the excess that the subscription's refund terms do not return.",
+      "Before tax, the part of the excess that the item's refund terms do not return.",
     ),
   })
   .describe(

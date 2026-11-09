@@ -66,7 +66,7 @@ export const InvoiceItem = zod.strictObject({
     .array(InvoiceItemProration)
     .optional()
     .describe(
-      "Present on a line that changes a subscription immediately, one entry for each paid period it\ncovers. `amount` is the sum of `remaining_amount` minus `credited_amount` over the entries.",
+      "Present on a line that changes a subscription item immediately, one entry for each paid period it\ncovers. `amount` is the sum of `remaining_amount` minus `credited_amount` over the entries.",
     ),
 });
 

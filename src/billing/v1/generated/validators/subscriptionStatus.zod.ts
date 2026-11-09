@@ -8,9 +8,9 @@
 import * as zod from "zod";
 
 export const SubscriptionStatus = zod
-  .enum(["pending", "provisioning", "active", "suspended", "canceled", "terminated"])
+  .enum(["pending", "provisioning", "active", "trialing", "suspended", "canceled", "terminated"])
   .describe(
-    "`pending`: the order has not been accepted. `provisioning`: the owning service accepted the order and is delivering. `active`: delivery was confirmed; payment alone does not make a subscription active. `suspended`: service is stopped while a lien restricts its use. `canceled`: cancellation completed, or an undelivered purchase was canceled or failed. `terminated`: an operator or the owning service ended it immediately.",
+    "`pending`: the order has not been accepted. `provisioning`: the owning service accepted the order and is delivering. `active`: delivery was confirmed; payment alone does not make a subscription active. `trialing`: in a free trial, in service and not charged until `trial_end`. `suspended`: service is stopped while a lien restricts its use. `canceled`: cancellation of every item completed, or an undelivered purchase was canceled or failed. `terminated`: an operator or the owning service ended it immediately.",
   );
 
 export type SubscriptionStatus = zod.input<typeof SubscriptionStatus>;

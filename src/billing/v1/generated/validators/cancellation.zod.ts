@@ -26,7 +26,7 @@ export const Cancellation = zod
     billing_account_id: zod
       .int()
       .describe(
-        "The billing account paying for these subscriptions when the cancellation was created: the purchasing account of an account-level purchase, or the project's linked account.",
+        "The billing account paying for these items when the cancellation was created: the purchasing account of an account-level purchase, or the project's linked account.",
       ),
     currency: zod.string(),
     expected_refundable_amount: Money.optional().describe(
@@ -44,7 +44,7 @@ export const Cancellation = zod
     items: zod.array(CancellationItem),
   })
   .describe(
-    "One cancellation of a set of subscriptions of one service, released together at one time.\n\n- `requested`: `immediate`, release has not begun.\n- `scheduled`: `period_end`, waiting for `scheduled_at`.\n- `releasing`: release has begun; it can no longer be withdrawn.\n- `completed`: every subscription has ended and its refund has been made.\n- `canceled`: withdrawn before release began; the subscriptions continue.\n- `failed`: the service could not carry it out, for the reason in `failure_code`; the\n  subscriptions continue and can be canceled again.",
+    "One cancellation of a set of subscription items of one service, released together at one time.\n\n- `requested`: `immediate`, release has not begun.\n- `scheduled`: `period_end`, waiting for `scheduled_at`.\n- `releasing`: release has begun; it can no longer be withdrawn.\n- `completed`: every item has ended and its refund has been made.\n- `canceled`: withdrawn before release began; the items continue.\n- `failed`: the service could not carry it out, for the reason in `failure_code`; the\n  items continue and can be canceled again.",
   );
 
 export type Cancellation = zod.input<typeof Cancellation>;

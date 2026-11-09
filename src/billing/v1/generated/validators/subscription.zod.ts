@@ -7,89 +7,16 @@
  */
 import * as zod from "zod";
 import { AccountIdentity } from "./accountIdentity.zod.js";
-import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { NamedIdentity } from "./namedIdentity.zod.js";
-import { ObjectIdentity } from "./objectIdentity.zod.js";
-import { PriceType } from "./priceType.zod.js";
 import { Product } from "./product.zod.js";
-import { ProductID } from "./productID.zod.js";
-import { RefundPolicy } from "./refundPolicy.zod.js";
-import { ScheduledChange } from "./scheduledChange.zod.js";
-import { SubscriptionCancellation } from "./subscriptionCancellation.zod.js";
+import { ProductId } from "./productId.zod.js";
+import { SubscriptionItem } from "./subscriptionItem.zod.js";
 import { SubscriptionRestriction } from "./subscriptionRestriction.zod.js";
 import { SubscriptionStatus } from "./subscriptionStatus.zod.js";
-import { UsageType } from "./usageType.zod.js";
-
-export const subscriptionDiscountedRenewalsRemainingMin = 0;
+import { TrialSettings } from "./trialSettings.zod.js";
 
 export const Subscription = zod
   .strictObject({
-    renewal_discounts_enabled: zod
-      .boolean()
-      .optional()
-      .describe(
-        "Whether new account discounts may apply to future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them.",
-      ),
-    currency: zod.string(),
-    type: PriceType,
-    usage_type: UsageType,
-    dimensions: zod
-      .record(zod.string(), zod.string())
-      .describe(
-        "The dimension values of what was bought, such as region and instance type. Empty when the purchase gave none.",
-      ),
-    interval: zod.enum(["none", "day", "month", "year"]),
-    interval_count: zod.int().min(1).optional(),
-    recurring_amount: zod
-      .string()
-      .optional()
-      .describe(
-        "The whole licensed subscription's renewal amount, after continuing discounts and before tax. A pending subscription shows base terms until paying the order fixes any new discount. Absent for metered and one-time subscriptions.",
-      ),
-    cancellation_policy: CancellationPolicy.optional(),
-    refund_policy: RefundPolicy.optional(),
-    short_rate_multiplier: zod
-      .string()
-      .optional()
-      .describe("Refund policy `short_rate` only, as on the price bought."),
-    short_rate_threshold_seconds: zod
-      .int()
-      .optional()
-      .describe("Refund policy `short_rate` only, as on the price bought."),
-    monthly_list_amount: zod
-      .string()
-      .optional()
-      .describe(
-        "Licensed recurring only, the `monthly_list_amount` that a renewal at the agreed amount keeps; see the order item.",
-      ),
-    order_item_id: zod.uuid().optional(),
-    coupon_id: zod.uuid().optional(),
-    coupon: ObjectIdentity.optional(),
-    discounted_renewals_remaining: zod
-      .int()
-      .min(subscriptionDiscountedRenewalsRemainingMin)
-      .optional(),
-    restrictions: zod
-      .array(SubscriptionRestriction)
-      .optional()
-      .describe(
-        "The operations currently prevented on the subscription, sorted; it is suspended while this contains `billing.subscriptions.use`.",
-      ),
-    billing_cycle_anchor: zod.iso.datetime({ offset: true }).optional(),
-    cancellation: SubscriptionCancellation.optional(),
-    scheduled_change: zod
-      .union([ScheduledChange, zod.null()])
-      .optional()
-      .describe(
-        "The accepted period-end change scheduled for this subscription; null when there is none.",
-      ),
-    default_payment_method_id: zod
-      .uuid()
-      .nullish()
-      .describe(
-        "The saved payment method automatic renewal charges after balance and credits, before the account's default payment method. Set when a purchase, renewal or change is paid with a saved payment method. Used only while it belongs to the account paying the renewal.",
-      ),
-    created_at: zod.iso.datetime({ offset: true }).optional(),
     id: zod.uuid(),
     billing_account_id: zod
       .int()
@@ -97,7 +24,8 @@ export const Subscription = zod
         "The billing account that made the purchase. Renewals of a project subscription are charged to the project's current billing account.",
       ),
     account: AccountIdentity,
-    product_id: ProductID,
+    product_id: ProductId,
+    product: Product,
     project_id: zod
       .uuid()
       .nullish()
@@ -110,35 +38,66 @@ export const Subscription = zod
       .describe(
         "The project and its current name. Absent for an account-level purchase or when the project cannot be read; `project_id` still identifies it.",
       ),
-    product: Product,
-    plan_id: zod.uuid(),
-    plan_name: zod.string(),
-    price_id: zod.uuid(),
-    quantity: zod.string(),
+    currency: zod.string(),
+    status: SubscriptionStatus,
+    interval: zod
+      .enum(["none", "day", "month", "year"])
+      .describe(
+        "The renewal term of its licensed items, `interval_count` intervals long; `none` when every item is metered.",
+      ),
+    interval_count: zod.int().min(1).optional(),
     current_term_end: zod.iso
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "When a licensed subscription renews or expires: the end of the last period bought, moved by renewing in advance. Null until the subscription becomes active, even when its purchase has been paid, and for metered subscriptions.",
+        "When the subscription renews or expires: the end of the free trial or of the last period bought for its licensed items, moved by renewing in advance. Null until the subscription becomes active, even when its purchase has been paid, and when every item is metered.",
       ),
     current_period_start: zod.iso
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "Start of the service period in effect now. Null when none is, including for metered subscriptions.",
+        "Start of the service period in effect now. Null when none is, including when every item is metered.",
       ),
     current_period_end: zod.iso
       .datetime({ offset: true })
       .nullish()
       .describe(
-        "End of the service period in effect now; renewing in advance moves `current_term_end`, not this. Null when no period is in effect, including for metered subscriptions.",
+        "End of the service period in effect now; renewing in advance moves `current_term_end`, not this. Null when no period is in effect, including when every item is metered.",
       ),
+    billing_cycle_anchor: zod.iso.datetime({ offset: true }).optional(),
     auto_renew: zod
       .boolean()
       .describe(
-        "Whether a licensed subscription renews automatically. A metered subscription continues until it is canceled; for it this is true until a cancellation is requested, and cannot be set.",
+        "Whether the subscription renews automatically, or converts to paid when its free trial ends. Without licensed items it continues until it is canceled; then this is true until a cancellation is requested, and cannot be set.",
       ),
-    status: SubscriptionStatus,
+    trial_start: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe("Start of the free trial; null without one."),
+    trial_end: zod.iso
+      .datetime({ offset: true })
+      .nullish()
+      .describe(
+        "End of the free trial; null without one. It is `current_term_end` until the first paid period is bought.",
+      ),
+    trial_settings: zod
+      .union([TrialSettings, zod.null()])
+      .optional()
+      .describe("How the free trial ends; null without one."),
+    restrictions: zod
+      .array(SubscriptionRestriction)
+      .optional()
+      .describe(
+        "The operations currently prevented on the subscription, sorted; it is suspended while this contains `billing.subscriptions.use`.",
+      ),
+    default_payment_method_id: zod
+      .uuid()
+      .nullish()
+      .describe(
+        "The saved payment method automatic renewal charges after balance and credits, before the account's default payment method. Set when a purchase, renewal or change is paid with a saved payment method. Used only while it belongs to the account paying the renewal.",
+      ),
+    items: zod.array(SubscriptionItem).describe("Every item, ended ones included, oldest first."),
+    created_at: zod.iso.datetime({ offset: true }).optional(),
     started_at: zod.iso
       .datetime({ offset: true })
       .nullish()
@@ -148,7 +107,7 @@ export const Subscription = zod
     ended_at: zod.iso.datetime({ offset: true }).nullish(),
   })
   .describe(
-    "A purchase that is billed, renewed and changed on its own, separate from the owning service's resource. A new\nrecurring purchase creates a pending subscription for each order line; its ID is returned on the order item\nand stays the same through checkout, delivery, renewals and changes. A one-time purchase may create none.\n\nPending and provisioning subscriptions grant no service. A subscription becomes provisioning when the owning\nservice accepts the order, and active when the service confirms delivery, which sets started_at; payment\nchanges neither. Licensed service periods start at delivery, and metered usage is charged as the service\nreports it. Canceling or failing an undelivered purchase cancels its subscriptions without starting a period.\nRenewals use recurring_amount and the agreed interval; paid periods keep their value.\n\nA shared capacity limit, such as a regional snapshot quota, has one subscription for the purchased quantity\nrather than one per item.",
+    "A billing relationship that renews as a whole, as a Stripe subscription: one term, one renewal date, one\nautomatic renewal setting and one service state for all of its items. The owning service decides which order\nlines form one subscription, such as a machine and the volumes and elastic IP bought with it; a resource bought\non its own has its own. A purchase creates pending subscriptions and items whose IDs are returned on the order\nitems and stay the same through checkout, delivery, renewals and changes.\n\nPending and provisioning subscriptions grant no service. A subscription becomes provisioning when the owning\nservice accepts the order, and active, or trialing during a free trial, when the service confirms delivery,\nwhich sets started_at; payment changes neither. Renewing buys further periods for every continuing licensed\nitem at once; items cannot be renewed on their own, but each can be changed or canceled alone.",
   );
 
 export type Subscription = zod.input<typeof Subscription>;

@@ -6,27 +6,28 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { CancellationItemInput } from "./cancellationItemInput.zod.js";
 import { CancellationMode } from "./cancellationMode.zod.js";
 
-export const cancellationPreviewRequestSubscriptionIdsMax = 50;
+export const cancellationPreviewRequestItemsMax = 50;
 
 export const CancellationPreviewRequest = zod
   .strictObject({
     billing_account_id: zod
       .int()
       .min(1)
-      .describe("A billing account you own that currently pays for every subscription."),
-    subscription_ids: zod
-      .array(zod.uuid())
+      .describe("A billing account you own that currently pays for every item."),
+    items: zod
+      .array(CancellationItemInput)
       .min(1)
-      .max(cancellationPreviewRequestSubscriptionIdsMax)
+      .max(cancellationPreviewRequestItemsMax)
       .describe(
-        "The subscriptions to end together, all of one service, including every subscription released with a resource.",
+        "The items to end together, all of one service, including every item released with a resource.",
       ),
     mode: CancellationMode,
   })
   .describe(
-    "What ending these subscriptions together would return, for one mode; preview `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled (`meta.cancellation_id`), is being reclaimed (`meta.reason` `reclaim_requested`) or has a paid change waiting to switch (`meta.order_id`).",
+    "What ending these items together would return, for one mode; preview `immediate` and `period_end` separately to compare. Refused with 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when an item is already being canceled (`meta.cancellation_id`), its subscription is being reclaimed (`meta.reason` `reclaim_requested`) or the item has a paid change waiting to switch (`meta.order_id`).",
   );
 
 export type CancellationPreviewRequest = zod.input<typeof CancellationPreviewRequest>;

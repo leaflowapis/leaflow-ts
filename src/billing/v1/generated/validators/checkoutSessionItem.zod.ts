@@ -9,6 +9,8 @@ import * as zod from "zod";
 
 export const checkoutSessionItemPositionMin = 0;
 
+export const checkoutSessionItemSubscriptionIndexMin = 0;
+
 export const CheckoutSessionItem = zod
   .strictObject({
     position: zod.int().min(checkoutSessionItemPositionMin),
@@ -24,10 +26,14 @@ export const CheckoutSessionItem = zod
     dimensions: zod
       .record(zod.string(), zod.string())
       .describe("The dimension values of what is bought, such as region and instance type."),
-    subscription_id: zod
+    subscription_index: zod
+      .int()
+      .min(checkoutSessionItemSubscriptionIndexMin)
+      .describe("The item's subscription, as its index in the session's `subscriptions`."),
+    subscription_item_id: zod
       .uuid()
       .nullable()
-      .describe("The subscription changed or renewed. Null for a new purchase."),
+      .describe("The subscription item changed or renewed. Null for an item the purchase adds."),
     periods: zod
       .int()
       .min(1)

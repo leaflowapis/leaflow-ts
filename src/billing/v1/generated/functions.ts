@@ -10,7 +10,6 @@ import type {
   AccountDeletionReadiness,
   ActiveResourceList,
   AllowanceList,
-  AutoRenewSet,
   BillingAccount,
   BillingAccountCreate,
   BillingAccountList,
@@ -80,7 +79,7 @@ import type {
   ListProductsParams,
   ListProjectAssignmentsParams,
   ListRefundsParams,
-  ListRenewalPricesParams,
+  ListRenewalOptionsParams,
   ListSpendParams,
   ListStatementsParams,
   ListSubscriptionsParams,
@@ -113,7 +112,7 @@ import type {
   PriceList,
   PriceSearch,
   Product,
-  ProductID,
+  ProductId,
   ProductList,
   ProjectAssignment,
   ProjectAssignmentList,
@@ -121,7 +120,7 @@ import type {
   QuoteRequest,
   RefundList,
   RenewRequest,
-  RenewalPriceList,
+  RenewalOptionList,
   SetProjectAssignmentRequest,
   SpendRowList,
   Statement,
@@ -129,6 +128,7 @@ import type {
   StatementSummary,
   Subscription,
   SubscriptionList,
+  SubscriptionUpdate,
   TopUp,
   TopUpCreate,
   TopUpList,
@@ -2871,7 +2871,7 @@ export const getListSubscriptionsUrl = (params?: ListSubscriptionsParams) => {
 };
 
 /**
- * Subscriptions paid by your billing accounts; members of a project list its subscriptions with `project_ids`. Deleted subscriptions are not listed.
+ * Subscriptions paid by your billing accounts; members of a project list its subscriptions with `project_ids`. Each subscription includes its items. Deleted subscriptions are not listed.
  * @summary List subscriptions
  */
 export const listSubscriptions = async (
@@ -2914,7 +2914,7 @@ export const getGetSubscriptionUrl = (subscriptionId: string) => {
 };
 
 /**
- * A subscription paid by your billing account or of a project you are a member of. Deleted subscriptions are reported as not found.
+ * A subscription paid by your billing account or of a project you are a member of, with its items. Deleted subscriptions are reported as not found.
  * @summary Get subscription
  */
 export const getSubscription = async (
@@ -2931,6 +2931,82 @@ export const getSubscription = async (
 
   const data: getSubscriptionResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as getSubscriptionResponse;
+};
+
+export type updateSubscriptionResponse200 = {
+  data: Subscription;
+  status: 200;
+};
+
+export type updateSubscriptionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updateSubscriptionResponseSuccess = updateSubscriptionResponse200 & {
+  headers: Headers;
+};
+export type updateSubscriptionResponseError = updateSubscriptionResponseDefault & {
+  headers: Headers;
+};
+
+export type updateSubscriptionResponse =
+  | updateSubscriptionResponseSuccess
+  | updateSubscriptionResponseError;
+
+export const getUpdateSubscriptionUrl = (subscriptionId: string) => {
+  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}`;
+};
+
+/**
+ * Changes the subscription's settings given in the request; settings left out keep their values. `auto_renew`
+ * turns automatic renewal on or off for the whole subscription, or, on a trialing subscription, whether the trial
+ * converts to paid. Turning it off does not shorten current_term_end and still allows manual renewal.
+ *
+ * `auto_renew` is refused with 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_INACTIVE` for a pending or provisioning
+ * subscription, 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_FIXED` for a subscription with only metered items, which
+ * continues until it is canceled, and 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` with `meta.cancellation_id`
+ * while a cancellation of the whole subscription is open: creating it turned renewal off, and withdrawing it does
+ * not turn renewal back on. Open to the owner of the subscription's current billing account and to members of its
+ * project with the project permission `billing:finance.manage`.
+ * @summary Update subscription
+ */
+export const updateSubscription = async (
+  subscriptionId: string,
+  subscriptionUpdate: SubscriptionUpdate,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateSubscriptionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateSubscriptionUrl(subscriptionId), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(subscriptionUpdate),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateSubscriptionResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as updateSubscriptionResponse;
 };
 
 export type deleteSubscriptionResponse204 = {
@@ -2959,7 +3035,7 @@ export const getDeleteSubscriptionUrl = (subscriptionId: string) => {
 };
 
 /**
- * Hides a canceled or terminated subscription from your subscription list and detail by setting deleted_at; its status, ended_at and history are kept. Only the owner of the subscription's current billing account can delete it. A subscription that has not ended is refused with 409 `BILLING_SUBSCRIPTION_NOT_ENDED` and `status`. Repeating it keeps the original deleted_at. It sends no cleanup command and creates no refund.
+ * Hides a canceled or terminated subscription from your subscription list and detail by setting deleted_at; its status, ended_at, items and history are kept. Only the owner of the subscription's current billing account can delete it. A subscription that has not ended is refused with 409 `BILLING_SUBSCRIPTION_NOT_ENDED` and `status`. Repeating it keeps the original deleted_at. It sends no cleanup command and creates no refund.
  * @summary Delete subscription
  */
 export const deleteSubscription = async (
@@ -3004,16 +3080,16 @@ export const getCancelSubscriptionUrl = (subscriptionId: string) => {
 };
 
 /**
- * Requests cancellation on the purchase's agreed terms, with the same rules as creating a cancellation. Give the
- * `proration_date` and `refundable_amount` of preview-cancellation for this subscription. Open to the owner of the
- * subscription's current billing account and to members of its project with the project permission
- * `billing:finance.manage`.
+ * Requests cancellation of every continuing item of the subscription on their agreed terms, with the same rules
+ * as creating a cancellation. Give the `proration_date` and `refundable_amount` of preview-cancellation for these
+ * items. Open to the owner of the subscription's current billing account and to members of its project with the
+ * project permission `billing:finance.manage`.
  *
  * Immediate cancellation asks the owning service to release the resources now; period-end cancellation keeps the
- * subscription active or suspended until the paid term ends. The subscription becomes canceled when the service
- * confirms the release; follow the returned cancellation. Subscriptions released together must be canceled
- * together through create-cancellation, and pending or provisioning purchases through their order. Repeating the
- * request while the cancellation is open returns it.
+ * subscription in service until its current term ends. The subscription becomes canceled when the service
+ * confirms the release; follow the returned cancellation. To cancel some items, or items released together across
+ * subscriptions, use create-cancellation; pending or provisioning purchases are canceled through their order.
+ * Repeating the request while the cancellation is open returns it.
  * @summary Cancel subscription
  */
 export const cancelSubscription = async (
@@ -3237,7 +3313,7 @@ export const getListCancellationsUrl = (params?: ListCancellationsParams) => {
 };
 
 /**
- * Newest first; members of a project list its cancellations with `project_ids`. Filter by `subscription_id` and `status=open` to find a subscription's cancellation in progress.
+ * Newest first; members of a project list its cancellations with `project_ids`. Filter by `subscription_item_id` and `status=open` to find an item's cancellation in progress, or by `subscription_id` for every item of a subscription.
  * @summary List cancellations
  */
 export const listCancellations = async (
@@ -3290,39 +3366,41 @@ export const getCreateCancellationUrl = () => {
 };
 
 /**
- * Ends subscriptions of one service together. Deleting a resource is an `immediate` cancellation of every
- * subscription released with it, such as a server with its disks or an address with its bandwidth. Open to the
- * owner of the subscriptions' current billing account and to members of their project with the project
- * permission `billing:finance.manage`.
+ * Ends subscription items of one service together, from one subscription or several. Deleting a resource is an
+ * `immediate` cancellation of every item released with it, such as a server with its disks or an address with
+ * its bandwidth. Open to the owner of the items' current billing account and to members of their project with
+ * the project permission `billing:finance.manage`.
  *
- * The owning service releases the resources at once for `immediate`, or at `scheduled_at`, the end of the paid
- * term, for `period_end`. When release is confirmed, the unused value is returned to the original payment
- * sources under each subscription's refund terms. For `immediate` the refund is computed as of `proration_date`
- * and is not reduced by service used during release. Metered usage is charged until release.
+ * The owning service releases the resources at once for `immediate`, or at `scheduled_at`, the end of the
+ * subscription's current term, for `period_end`; until then the items are left out of renewals. When release is
+ * confirmed, the unused value is returned to the original payment sources under each item's refund terms. For
+ * `immediate` the refund is computed as of `proration_date` and is not reduced by service used during release.
+ * Metered usage is charged until release. A subscription whose continuing items all end is canceled.
  *
- * `mode` must be allowed for every subscription. Metered and one-time subscriptions end only `immediate`. A
- * licensed subscription ends `period_end` while its paid term lasts, and `immediate` unless its terms allow only
- * the end of the paid term and that term has not ended. For `period_end` all paid terms must end at the same
+ * `mode` must be allowed for every item. Metered and one-time items end only `immediate`. A licensed item ends
+ * `period_end` while its subscription's paid term lasts, and `immediate` unless its terms allow only the end of
+ * the paid term and that term has not ended. For `period_end` the paid terms of all items must end at the same
  * time.
  *
  * Refused with:
  *
- * - 400 `BILLING_CANCELLATION_INVALID` when `subscription_ids` or `proration_date` is invalid (`meta.field`), or
- *   the subscriptions do not share one service, project, account and currency;
- * - 409 `BILLING_CANCELLATION_CONFLICT` when a subscription has not started or has ended;
+ * - 400 `BILLING_CANCELLATION_INVALID` when `items` or `proration_date` is invalid (`meta.field`), or the items
+ *   do not share one service, project, account and currency;
+ * - 409 `BILLING_CANCELLATION_CONFLICT` when an item has not started or has ended;
  * - 422 `BILLING_CANCELLATION_MODE_FIXED` when `mode` is not allowed, and `BILLING_CANCELLATION_TERMS_UNSET`
- *   when a licensed subscription has no cancellation terms, both with `meta.subscription_id`;
+ *   when a licensed item has no cancellation terms, both with `meta.subscription_item_id`;
  * - 409 `BILLING_CANCELLATION_SCHEDULES_DIFFER` when, for `period_end`, the paid terms end at different times;
- * - 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when a subscription is already being canceled
- *   (`meta.cancellation_id`) or reclaimed (`meta.reason` `reclaim_requested`), or has a paid change waiting to
- *   switch (`meta.order_id`);
- * - 409 `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online renewal payment for one of them is in progress;
+ * - 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` when an item is already being canceled
+ *   (`meta.cancellation_id`), its subscription is being reclaimed (`meta.reason` `reclaim_requested`), or the
+ *   item has a paid change waiting to switch (`meta.order_id`);
+ * - 409 `BILLING_ORDER_PAYMENT_IN_FLIGHT` while an online renewal payment for one of their subscriptions is in
+ *   progress;
  * - 409 `BILLING_CANCELLATION_REFUND_CHANGED` when the refund no longer equals `expected_refundable_amount`.
  *
- * Repeating the request for the same subscriptions, mode and amount while the cancellation is open returns it
- * with 200. Unpaid renewal orders are canceled with it, and automatic renewal is turned off for every
- * subscription.
- * @summary Cancel subscriptions
+ * Repeating the request for the same items, mode and amount while the cancellation is open returns it with 200.
+ * When it covers every continuing item of a subscription, unpaid renewal orders of that subscription are
+ * canceled with it and its automatic renewal is turned off.
+ * @summary Cancel subscription items
  */
 export const createCancellation = async (
   cancellationCreate: CancellationCreate,
@@ -3387,7 +3465,7 @@ export const getPreviewCancellationUrl = () => {
 };
 
 /**
- * What creating the cancellation now would return, per subscription and in total. Nothing is canceled, ended or refunded. Open to the owner of the subscriptions' current billing account and to members of their project; refused for the same states as creating it.
+ * What creating the cancellation now would return, per item and in total. Nothing is canceled, ended or refunded. Open to the owner of the items' current billing account and to members of their project; refused for the same states as creating it.
  * @summary Preview a cancellation
  */
 export const previewCancellation = async (
@@ -3451,7 +3529,7 @@ export const getGetCancellationUrl = (cancellationId: string) => {
 };
 
 /**
- * A cancellation paid by your billing account or of a project you are a member of, with its schedule, expected refundable amount and the outcome for each subscription, including partial success.
+ * A cancellation paid by your billing account or of a project you are a member of, with its schedule, expected refundable amount and the outcome for each item, including partial success.
  * @summary Get a cancellation
  */
 export const getCancellation = async (
@@ -3470,75 +3548,75 @@ export const getCancellation = async (
   return { data, status: res.status, headers: res.headers } as getCancellationResponse;
 };
 
-export type withdrawCancellationResponse200 = {
+export type deleteCancellationResponse200 = {
   data: Cancellation;
   status: 200;
 };
 
-export type withdrawCancellationResponseDefault = {
+export type deleteCancellationResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type withdrawCancellationResponseSuccess = withdrawCancellationResponse200 & {
+export type deleteCancellationResponseSuccess = deleteCancellationResponse200 & {
   headers: Headers;
 };
-export type withdrawCancellationResponseError = withdrawCancellationResponseDefault & {
+export type deleteCancellationResponseError = deleteCancellationResponseDefault & {
   headers: Headers;
 };
 
-export type withdrawCancellationResponse =
-  | withdrawCancellationResponseSuccess
-  | withdrawCancellationResponseError;
+export type deleteCancellationResponse =
+  | deleteCancellationResponseSuccess
+  | deleteCancellationResponseError;
 
-export const getWithdrawCancellationUrl = (cancellationId: string) => {
+export const getDeleteCancellationUrl = (cancellationId: string) => {
   return `https://billing.leaflow.cloud/api/v1/cancellations/${encodeURIComponent(String(cancellationId))}`;
 };
 
 /**
- * Withdraws the whole cancellation, which stays with status `canceled`, while no resource has begun to be released; afterwards it is refused with 409 `BILLING_CANCELLATION_CONFLICT`. The subscriptions continue, but automatic renewal, turned off when the cancellation was created, stays off until it is turned on again. Withdrawing a withdrawn cancellation returns it unchanged. Open to the owner of the subscriptions' current billing account and to members of their project with the project permission `billing:finance.manage`.
+ * Withdraws the whole cancellation, which stays with status `canceled`, while no resource has begun to be released; afterwards it is refused with 409 `BILLING_CANCELLATION_CONFLICT`. The items continue and renew with their subscriptions again; a subscription's automatic renewal, turned off when the cancellation covered all of its continuing items, stays off until it is turned on again. Withdrawing a withdrawn cancellation returns it unchanged. Open to the owner of the items' current billing account and to members of their project with the project permission `billing:finance.manage`.
  * @summary Withdraw a cancellation
  */
-export const withdrawCancellation = async (
+export const deleteCancellation = async (
   cancellationId: string,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<withdrawCancellationResponse> => {
-  const res = await (fetchFn ?? fetch)(getWithdrawCancellationUrl(cancellationId), {
+): Promise<deleteCancellationResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteCancellationUrl(cancellationId), {
     ...options,
     method: "DELETE",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: withdrawCancellationResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as withdrawCancellationResponse;
+  const data: deleteCancellationResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as deleteCancellationResponse;
 };
 
-export type listRenewalPricesResponse200 = {
-  data: RenewalPriceList;
+export type listRenewalOptionsResponse200 = {
+  data: RenewalOptionList;
   status: 200;
 };
 
-export type listRenewalPricesResponseDefault = {
+export type listRenewalOptionsResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type listRenewalPricesResponseSuccess = listRenewalPricesResponse200 & {
+export type listRenewalOptionsResponseSuccess = listRenewalOptionsResponse200 & {
   headers: Headers;
 };
-export type listRenewalPricesResponseError = listRenewalPricesResponseDefault & {
+export type listRenewalOptionsResponseError = listRenewalOptionsResponseDefault & {
   headers: Headers;
 };
 
-export type listRenewalPricesResponse =
-  | listRenewalPricesResponseSuccess
-  | listRenewalPricesResponseError;
+export type listRenewalOptionsResponse =
+  | listRenewalOptionsResponseSuccess
+  | listRenewalOptionsResponseError;
 
-export const getListRenewalPricesUrl = (
+export const getListRenewalOptionsUrl = (
   subscriptionId: string,
-  params?: ListRenewalPricesParams,
+  params?: ListRenewalOptionsParams,
 ) => {
   const normalizedParams = new URLSearchParams();
 
@@ -3551,29 +3629,29 @@ export const getListRenewalPricesUrl = (
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/renewal-prices?${stringifiedParams}`
-    : `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/renewal-prices`;
+    ? `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/renewal-options?${stringifiedParams}`
+    : `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/renewal-options`;
 };
 
 /**
- * Lists the current renewal agreement and available intervals. The current option preserves recurring_amount; other options use current prices. Amounts cover the whole subscription quantity and exclude tax. Open to the owner of the subscription's current billing account and to members of its project.
- * @summary List the terms this item can be renewed for
+ * The current agreement first, then each other term every continuing licensed item sells in the subscription's currency. The current option keeps each item's recurring_amount; other options use current prices, each item taking the price of that term with its own cancellation policy, or the only price of that term. Amounts exclude tax and discounts. Open to the owner of the subscription's current billing account and to members of its project.
+ * @summary List the terms the subscription can be renewed for
  */
-export const listRenewalPrices = async (
+export const listRenewalOptions = async (
   subscriptionId: string,
-  params?: ListRenewalPricesParams,
+  params?: ListRenewalOptionsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<listRenewalPricesResponse> => {
-  const res = await (fetchFn ?? fetch)(getListRenewalPricesUrl(subscriptionId, params), {
+): Promise<listRenewalOptionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListRenewalOptionsUrl(subscriptionId, params), {
     ...options,
     method: "GET",
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listRenewalPricesResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as listRenewalPricesResponse;
+  const data: listRenewalOptionsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listRenewalOptionsResponse;
 };
 
 export type renewSubscriptionResponse200 = {
@@ -3610,13 +3688,16 @@ export const getRenewSubscriptionUrl = (subscriptionId: string) => {
 };
 
 /**
- * Buys licensed periods from current_term_end at the agreed recurring amount and pays for them at once. A
- * different interval selects the price currently sold for it and fixes new terms on the order, applied after
- * fulfillment. Paid periods keep their value.
+ * Buys further periods for the whole subscription from current_term_end and pays for them at once: every
+ * continuing licensed item renews, at its agreed recurring amount or, with a different interval, at the price each
+ * item currently sells that term for, and the new terms are fixed on the order. Items with an open cancellation end
+ * with the current term and are left out. Paid periods keep their value. A trialing subscription converts to paid
+ * this way; renewed after its trial expired, its first paid period starts at payment.
  *
  * Without `payment_method_id`, the renewal is paid from credit grants and balance as `use_credits` and
  * `use_balance` allow; when they cannot cover it, the request fails with `BILLING_INSUFFICIENT_FUNDS` and no
- * order is left. To apply a promotion code or pay later, create a renewal Checkout Session.
+ * order is left. To apply a promotion code, pay later, or renew several subscriptions in one order, create a
+ * renewal Checkout Session.
  *
  * Open to the owner of the subscription's current billing account and to members of its project with the
  * project permission `billing:finance.manage`. Only the owner can pay with `payment_method_id`.
@@ -3660,71 +3741,6 @@ export const renewSubscription = async (
 
   const data: renewSubscriptionResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as renewSubscriptionResponse;
-};
-
-export type setAutoRenewResponse200 = {
-  data: Subscription;
-  status: 200;
-};
-
-export type setAutoRenewResponseDefault = {
-  data: ErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type setAutoRenewResponseSuccess = setAutoRenewResponse200 & {
-  headers: Headers;
-};
-export type setAutoRenewResponseError = setAutoRenewResponseDefault & {
-  headers: Headers;
-};
-
-export type setAutoRenewResponse = setAutoRenewResponseSuccess | setAutoRenewResponseError;
-
-export const getSetAutoRenewUrl = (subscriptionId: string) => {
-  return `https://billing.leaflow.cloud/api/v1/subscriptions/${encodeURIComponent(String(subscriptionId))}/auto-renew`;
-};
-
-/**
- * Turns automatic renewal of an active or suspended licensed subscription on or off. Turning it off does not shorten current_term_end and still allows manual renewal. Refused with 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_INACTIVE` for a pending or provisioning subscription, 409 `BILLING_SUBSCRIPTION_AUTO_RENEW_FIXED` for a metered subscription, which continues until it is canceled, and 409 `BILLING_SUBSCRIPTION_OPERATION_PENDING` with `meta.cancellation_id` while a cancellation is open: creating it turned renewal off, and withdrawing it does not turn renewal back on. Open to the owner of the subscription's current billing account and to members of its project with the project permission `billing:finance.manage`.
- * @summary Set auto renew
- */
-export const setAutoRenew = async (
-  subscriptionId: string,
-  autoRenewSet: AutoRenewSet,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<setAutoRenewResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit["headers"]>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  const res = await (fetchFn ?? fetch)(getSetAutoRenewUrl(subscriptionId), {
-    ...options,
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(autoRenewSet),
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: setAutoRenewResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as setAutoRenewResponse;
 };
 
 export type listAllowancesResponse200 = {
@@ -3873,13 +3889,14 @@ export const getCreateCheckoutSessionUrl = () => {
 };
 
 /**
- * Opens a Checkout Session renewing a licensed subscription, with periods and price chosen as in
- * renewing. Nothing is charged until you complete it, when a promotion code can be applied; it then renews from
- * the subscription's current_term_end at that time. To renew at once from credit grants, balance or a payment
- * method, renew the subscription instead. Purchases and changes of a service's resources are created through
- * that service.
+ * Opens a Checkout Session renewing one or more subscriptions in one order, such as a machine and the separately
+ * bought volumes and elastic IPs attached to it, with periods and price chosen as in renewing. Every subscription
+ * must be paid by the same billing account and belong to the same project and service. Nothing is charged until
+ * you complete it, when a promotion code can be applied; each subscription then renews from its current_term_end
+ * at that time. To renew one subscription at once from credit grants, balance or a payment method, renew the
+ * subscription instead. Purchases and changes of a service's resources are created through that service.
  *
- * Open to the owner of the subscription's current billing account and to members of its project with the
+ * Open to the owner of the subscriptions' current billing account and to members of their project with the
  * project permission `billing:finance.manage`. Keep `checkout_session_id` and read the session after an
  * unknown outcome; creating it again conflicts.
  * @summary Create a renewal Checkout Session
@@ -4430,7 +4447,7 @@ export const getCancelOrderUrl = (orderId: string) => {
  * payment waiting for the payer is canceled with the order; one the gateway is processing is refused with
  * `BILLING_PAYMENT_PENDING` and `meta.transaction_id`. Repeating the cancellation does not refund twice.
  *
- * An accepted order is canceled by its owning service, and delivered items through subscription cancellation.
+ * An accepted order is canceled by its owning service, and delivered items through cancellation of their subscription items.
  * Refunds are previewed with `preview-order-refund`. Open to the owner of the order's billing account and to members of its project.
  * @summary Cancel order
  */
@@ -4895,7 +4912,7 @@ export type getProductResponseError = (getProductResponse304 | getProductRespons
 
 export type getProductResponse = getProductResponseSuccess | getProductResponseError;
 
-export const getGetProductUrl = (productId: ProductID) => {
+export const getGetProductUrl = (productId: ProductId) => {
   return `https://billing.leaflow.cloud/api/v1/products/${encodeURIComponent(String(productId))}`;
 };
 
@@ -4904,7 +4921,7 @@ export const getGetProductUrl = (productId: ProductID) => {
  * @summary Get a service
  */
 export const getProduct = async (
-  productId: ProductID,
+  productId: ProductId,
   headers?: GetProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,

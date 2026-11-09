@@ -6,13 +6,19 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { OffsetPagination } from "./offsetPagination.zod.js";
-import { RenewalPrice } from "./renewalPrice.zod.js";
+import { Money } from "./money.zod.js";
 
-export const RenewalPriceList = zod.strictObject({
-  items: zod.array(RenewalPrice),
-  pagination: OffsetPagination,
-});
+export const QuoteRenewalItem = zod
+  .strictObject({
+    subscription_item_id: zod.uuid(),
+    plan_id: zod.uuid(),
+    plan_name: zod.string(),
+    price_id: zod.uuid().describe("The price the item is charged under."),
+    amount: Money.describe(
+      "The price of the periods for this item before the account's discounts.",
+    ),
+  })
+  .describe("One item of a quoted renewal.");
 
-export type RenewalPriceList = zod.input<typeof RenewalPriceList>;
-export type RenewalPriceListOutput = zod.output<typeof RenewalPriceList>;
+export type QuoteRenewalItem = zod.input<typeof QuoteRenewalItem>;
+export type QuoteRenewalItemOutput = zod.output<typeof QuoteRenewalItem>;

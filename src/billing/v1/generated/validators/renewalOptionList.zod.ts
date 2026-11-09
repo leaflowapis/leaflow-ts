@@ -6,10 +6,13 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
+import { OffsetPagination } from "./offsetPagination.zod.js";
+import { RenewalOption } from "./renewalOption.zod.js";
 
-export const AutoRenewSet = zod.strictObject({
-  auto_renew: zod.boolean(),
+export const RenewalOptionList = zod.strictObject({
+  items: zod.array(RenewalOption),
+  pagination: OffsetPagination,
 });
 
-export type AutoRenewSet = zod.input<typeof AutoRenewSet>;
-export type AutoRenewSetOutput = zod.output<typeof AutoRenewSet>;
+export type RenewalOptionList = zod.input<typeof RenewalOptionList>;
+export type RenewalOptionListOutput = zod.output<typeof RenewalOptionList>;

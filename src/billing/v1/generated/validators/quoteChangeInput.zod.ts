@@ -8,7 +8,7 @@
 import * as zod from "zod";
 import { CancellationPolicy } from "./cancellationPolicy.zod.js";
 import { PriceType } from "./priceType.zod.js";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 import { UsageType } from "./usageType.zod.js";
 
 export const quoteChangeInputPriceLookupKeyMax = 128;
@@ -21,17 +21,17 @@ export const quoteChangeInputQuantityRegExp = new RegExp(
 
 export const QuoteChangeInput = zod
   .strictObject({
-    subscription_id: zod.uuid(),
+    subscription_item_id: zod.uuid(),
     price_lookup_key: zod.string().min(1).max(quoteChangeInputPriceLookupKeyMax).optional(),
     plan_lookup_key: zod.string().min(1).max(quoteChangeInputPlanLookupKeyMax).optional(),
     price_id: zod.uuid().optional(),
-    product_id: ProductID.optional(),
+    product_id: ProductId.optional(),
     plan_id: zod.uuid().optional(),
     price_type: PriceType.optional().describe(
-      "Selects the price type instead of keeping the subscription's.",
+      "Selects the price type instead of keeping the item's.",
     ),
     usage_type: UsageType.optional().describe(
-      "Selects the usage type instead of keeping the subscription's.",
+      "Selects the usage type instead of keeping the item's.",
     ),
     interval: zod.enum(["none", "day", "month", "year"]).optional(),
     interval_count: zod.int().min(1).optional(),
@@ -45,12 +45,10 @@ export const QuoteChangeInput = zod
     dimensions: zod
       .record(zod.string(), zod.string())
       .optional()
-      .describe(
-        "The dimension values after the change, given in full; omit to keep the subscription's.",
-      ),
+      .describe("The dimension values after the change, given in full; omit to keep the item's."),
   })
   .describe(
-    "The new terms of one subscription. Identify the price, or the plan to select one from, as for a proposed item. Without a price or billing terms, the plan's price with the subscription's price type, usage type, interval, interval count and cancellation policy is selected. Omitted dimensions keep the subscription's.",
+    "The new terms of one subscription item. Identify the price, or the plan to select one from, as for a proposed item. Without a price or billing terms, the plan's price with the item's price type, usage type, interval, interval count and cancellation policy is selected. Omitted dimensions keep the item's.",
   );
 
 export type QuoteChangeInput = zod.input<typeof QuoteChangeInput>;

@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { ProductID } from "./productID.zod.js";
+import { ProductId } from "./productId.zod.js";
 
 export const listEntitlementsParamsPageDefault = 1;
 export const listEntitlementsParamsPageMax = 2147483647;
@@ -29,7 +29,7 @@ export const ListEntitlementsParams = zod.strictObject({
     .default(listEntitlementsParamsPageSizeDefault),
   billing_account_id: zod.int().optional(),
   project_ids: zod.array(zod.uuid()).min(1).max(listEntitlementsParamsProjectIdsMax).optional(),
-  product_id: ProductID.optional(),
+  product_id: ProductId.optional(),
 });
 
 export type ListEntitlementsParams = zod.input<typeof ListEntitlementsParams>;

@@ -16,7 +16,7 @@
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
  * - **Custom methods.** An action that is not one of the standard methods (list, get, create, update, delete) is a custom method, `POST` on the resource's path followed by `:` and the verb, as in `POST /api/v2/instances/{id}:reboot` (AIP-136). A state is changed by its custom method, never by writing the state: `:start` and `:stop`, `:rescue` and `:unrescue`, `:associate` and `:disassociate`.
- * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only mutable fields, all optional and at least one given, and answers 200 when only descriptive fields changed and 202 when an operation started. An operational field (`instance_type_id`, `size_gib`, `bandwidth_mbps`) cannot be combined with any other field in the same request: it is refused with 422 `UPDATE_FIELDS_COMBINED`, because a rename that committed beside a change that was then refused would leave the request half applied.
+ * - **Operations.** Requests such as `:start`, attaching or deleting return HTTP 202 with the resource as it is when the request is accepted. While an operation runs, the resource's `status` names it, as in `starting` or `deleting`; once it has finished the resource shows its new status and the result. A resource with an operation in progress refuses another operation with HTTP 409 `COMPUTE_RESOURCE_BUSY`; an operation involving two resources, such as attaching a volume, is refused when either has one. A purchased change, such as a resize, is an operation from the moment its Checkout Session is created until the change is applied, the session expires or its order is canceled. Renaming and replacing labels or notes are not operations and are accepted at any time. **Updating.** A `PATCH` carries only descriptive fields, all optional and at least one given, and answers 200. A change that starts an operation or a purchase, such as a resize, is its own method (`:resize`, `:retype`, `:changeBandwidth`).
  * - **Billing relationships.** A purchased resource records its `checkout_session_id` and, once checkout completes, its `order_id`, `order_item_id` and `subscription_id`. Its `access_state` is `pending` until the order is accepted and delivery settles it, then `enabled`; a subscription that lapses suspends or reclaims the resource it pays for. Deleting a resource that subscriptions pay for cancels the subscriptions of its `release_set` in Billing, and the deletion answers with that cancellation.
  * - **Availability zones.** A volume and an instance must reside in the same availability zone to be attached. An instance type and a volume type each belong to one availability zone, as on GCP, so a purchase names the type and the type names the zone; the volumes bought with an instance have to be of types of the instance type's zone.
  * - **IPv6 is routed, not translated.** A virtual private cloud with IPv6 holds a /56 and each of its subnets a /64 of it, as on Alibaba Cloud, Tencent Cloud and Azure; IPv6 and its security groups require no EIP or NAT gateway. EIP and NATGateway are IPv4 products; IPv6 EIP, NAT66 and IPv6 port forwarding are not supported.
@@ -33,18 +33,18 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { ImageID } from "./imageID.zod.js";
-import { InstanceID } from "./instanceID.zod.js";
+import { ImageId } from "./imageId.zod.js";
+import { InstanceId } from "./instanceId.zod.js";
 import { LatestOperation } from "./latestOperation.zod.js";
-import { RegionID } from "./regionID.zod.js";
+import { RegionId } from "./regionId.zod.js";
 import { ReleaseSetItem } from "./releaseSetItem.zod.js";
 
 export const privateImageResourceLoginUsernameMax = 32;
 
 export const PrivateImageResource = zod
   .strictObject({
-    id: ImageID,
-    region_id: RegionID,
+    id: ImageId,
+    region_id: RegionId,
     name: zod.string(),
     os_family: zod.string(),
     os_version: zod.string(),
@@ -104,7 +104,7 @@ export const PrivateImageResource = zod
       .describe(
         "The `position` the image's storage is reported under now, the price Billing gives that position in the region's `private_image_billing` being what it costs. A number from `1`, its place among this project's stored private images in the region counted from the oldest, which moves up whenever an older one is deleted; `legacy` for an image carried over from the previous version, which takes no position and whose storage is never charged. Null while the image is not stored, before its capture finishes and once it is deleted or failed.",
       ),
-    source_instance_id: InstanceID,
+    source_instance_id: InstanceId,
     created_at: zod.iso.datetime({ offset: true }),
     failure_reason: zod
       .union([
@@ -133,11 +133,17 @@ export const PrivateImageResource = zod
     subscription_id: zod
       .uuid()
       .nullable()
-      .describe("The subscription for this resource; its presence alone does not imply delivery."),
+      .describe(
+        "The Billing subscription of this resource; its presence alone does not imply delivery.",
+      ),
+    subscription_item_id: zod
+      .uuid()
+      .nullable()
+      .describe("The resource's item of that subscription."),
     release_set: zod
       .array(ReleaseSetItem)
       .describe(
-        "The subscription that pays for this private image, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription pays for it, and once it is released.",
+        "The subscription item that pays for this private image, with the resource it pays for, so that a cancellation through Billing can name what it releases. Empty when no subscription item pays for it, and once it is released.",
       ),
     latest_operation: zod
       .union([LatestOperation, zod.null()])

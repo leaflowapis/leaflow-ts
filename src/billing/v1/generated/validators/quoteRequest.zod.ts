@@ -49,7 +49,7 @@ export const QuoteRequest = zod
       .max(quoteRequestRenewalsMax)
       .optional()
       .describe(
-        "Preview renewing these subscriptions, each at most once; each entry is a separate renewal order. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account or a member of the subscription's project. To apply a promotion code, create a renewal Checkout Session and quote it.",
+        "Preview renewing these subscriptions together in one renewal order, as a renewal Checkout Session does, each at most once; `total` is that order's. Each must currently be paid by `billing_account_id`, be yours to read as the owner of that account or a member of the subscription's project, and all must belong to the same project and service. To apply a promotion code, create a renewal Checkout Session and quote it.",
       ),
     changes: zod
       .array(QuoteChangeInput)
@@ -57,7 +57,7 @@ export const QuoteRequest = zod
       .max(quoteRequestChangesMax)
       .optional()
       .describe(
-        "Preview changing these subscriptions in one order, each at most once. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account or a member of the subscription's project; all must belong to the same project, or all to no project.",
+        "Preview changing these subscription items in one order, each at most once. Each must currently be paid by `billing_account_id` and be yours to read, as the owner of that account or a member of the subscription's project; all must belong to the same project, or all to no project.",
       ),
     change_effective: zod
       .enum(["immediate", "period_end"])
@@ -71,7 +71,7 @@ export const QuoteRequest = zod
     promotion_code: zod.string().min(1).max(quoteRequestPromotionCodeMax).optional(),
   })
   .describe(
-    "Quote proposed items, changes or renewals: exactly one of them. Give exactly one of `billing_account_id` and `currency`; changes and renewals need the account. Promotion codes apply to proposed items and changes. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.",
+    "Quote proposed items, changes or renewals: exactly one of them. Give exactly one of `billing_account_id` and `currency`; changes, renewals and items added to an existing subscription need the account. Promotion codes apply to proposed items and changes. An invalid combination fails with `BILLING_PURCHASE_INVALID` and the field.",
   );
 
 export type QuoteRequest = zod.input<typeof QuoteRequest>;
