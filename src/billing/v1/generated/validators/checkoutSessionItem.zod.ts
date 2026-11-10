@@ -8,6 +8,7 @@
 import * as zod from "zod";
 import { CheckoutSessionItemDowngradeRefund } from "./checkoutSessionItemDowngradeRefund.zod.js";
 import { Money } from "./money.zod.js";
+import { ObjectIdentity } from "./objectIdentity.zod.js";
 import { PriceType } from "./priceType.zod.js";
 import { ProductId } from "./productId.zod.js";
 import { UsageType } from "./usageType.zod.js";
@@ -75,6 +76,11 @@ export const CheckoutSessionItem = zod
     discount_amount: zod
       .union([Money, zod.null()])
       .describe("Total reduction on this item, including any continuing renewal discount."),
+    coupon: zod
+      .union([ObjectIdentity, zod.null()])
+      .describe(
+        "The coupon behind `discount_amount`, so the discount can be named: the one this checkout applies, or on\na renewal the one continuing from the purchase that first used it. Null when the item has no coupon\ndiscount.",
+      ),
     tax_amount: zod
       .union([Money, zod.null()])
       .describe(
