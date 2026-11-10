@@ -28,7 +28,7 @@ export const PriceOption = zod
       .and(zod.string().regex(priceOptionAmountTwoRegExp))
       .optional()
       .describe(
-        "Historical display metadata only. New responses omit this field; use Billing for quotes.",
+        "Historical display metadata only. New responses omit this field; use Billing for prices.",
       ),
     period_months: zod.union([
       zod.literal(1),
@@ -40,7 +40,7 @@ export const PriceOption = zod
     ]),
   })
   .describe(
-    "A verified price option for one billing period. Its Billing price must currently be available, use period-end cancellation without an automatic refund, and match this provider plan and region. Archived snapshots, unknown periods and unverified prices are excluded. Selection does not bypass current permissions, Price validation or disabled purchase controls. Billing owns quotes and checkout amounts.",
+    "A verified price option for one billing period. Its Billing price must currently be available, use period-end cancellation without an automatic refund, and match this provider plan and region. Archived snapshots, unknown periods and unverified prices are excluded. Selection does not bypass current permissions, Price validation or disabled purchase controls. Billing owns prices and checkout amounts.",
   );
 
 export type PriceOption = zod.input<typeof PriceOption>;

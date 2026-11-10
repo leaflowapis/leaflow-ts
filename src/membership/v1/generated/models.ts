@@ -431,9 +431,18 @@ export interface CheckoutOptions {
   return_url?: string;
   /**
    * Turns on automatic renewal of every subscription with licensed items that the purchase opens. Off
-   * when omitted. It must be the customer's own choice.
+   * when omitted. It must be the customer's own choice. For a free trial, it converts the trial to paid
+   * when the trial ends.
    */
   auto_renew?: boolean;
+  /**
+   * A free trial grant of the paying billing account that the customer chose to use. The first new
+   * subscription of the purchase whose lines the grant's offer all covers, and that has a licensed line and
+   * no trial of its own, opens with the offer's free trial. Accepted only in automatic mode; with deferred it is refused with
+   * HTTP 400, and the grant is chosen when completing the checkout through Billing. Refused with
+   * BILLING_TRIAL_GRANT_INAPPLICABLE when no subscription qualifies or the grant cannot be used now.
+   */
+  trial_grant_id?: string;
 }
 
 export interface MembershipCreate {

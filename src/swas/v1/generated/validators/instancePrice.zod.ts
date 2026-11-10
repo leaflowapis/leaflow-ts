@@ -19,7 +19,7 @@ export const InstancePrice = zod.strictObject({
     .and(zod.string().regex(instancePriceAmountTwoRegExp))
     .optional()
     .describe(
-      "Historical display metadata only. Price-only purchases omit this field; use Billing for quotes.",
+      "Historical display metadata only. Price-only purchases omit this field; use Billing for prices.",
     ),
   period_months: zod.union([
     zod.literal(1),

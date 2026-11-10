@@ -82,7 +82,7 @@ export const ServiceResource = zod
       .uuid()
       .nullable()
       .describe(
-        "The Billing plan the service is sold under; null where the service is not sold. Price enabling it with Billing's quote, giving this plan with the `recurring` price type, the `metered` usage type and a quantity of 1; token usage is priced per model, at the rates Billing holds for each model's `billing`.",
+        "The Billing plan the service is sold under; null where the service is not sold. Price enabling it with Billing's `preview-checkout-session`, giving this plan with the `recurring` price type, the `metered` usage type and a quantity of 1; token usage is priced per model, at the rates Billing holds for each model's `billing`.",
       ),
     subscription_id: zod
       .uuid()

@@ -27,7 +27,7 @@ export const Price = zod.strictObject({
     .and(zod.string().regex(priceAmountTwoRegExp))
     .optional()
     .describe(
-      "Historical display metadata only. New responses omit this field; use Billing for quotes.",
+      "Historical display metadata only. New responses omit this field; use Billing for prices.",
     ),
   period_months: zod.union([
     zod.union([
