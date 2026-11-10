@@ -35,7 +35,7 @@ export interface PurchaseCreate {
    */
   provider_plan_id: string;
   /**
-   * Selects a price from the requested plan and current catalog revision. The server resolves its immutable Billing terms, billing period and ownership; the client does not set the billing period. SWAS validates the Price selection only. Billing owns quotes, checkout confirmation and payment.
+   * Selects a price from the requested plan and current catalog revision. The server resolves its immutable Billing terms, billing period and ownership; the client does not set the billing period. SWAS validates the Price selection only. Billing owns pricing, checkout confirmation and payment.
    * @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
    */
   billing_price_id: string;
@@ -72,7 +72,7 @@ export const PurchaseState = {
 } as const;
 
 /**
- * Durable purchase progress. The checkout_session_id identifies the Billing session for user quote, confirmation and payment. It is not ready while checkout creation is pending. SWAS does not quote or charge automatically. delivered and billing_settled describe different facts; acceptance is not delivery.
+ * Durable purchase progress. The checkout_session_id identifies the Billing session for user pricing, confirmation and payment. It is not ready while checkout creation is pending. SWAS does not price or charge automatically. delivered and billing_settled describe different facts; acceptance is not delivery.
  */
 export interface Purchase {
   /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
@@ -102,7 +102,7 @@ export interface Price {
   billing_price_id: string;
   currency: "USD";
   /**
-   * Historical display metadata only. New responses omit this field; use Billing for quotes.
+   * Historical display metadata only. New responses omit this field; use Billing for prices.
    * @deprecated
    */
   amount?: DecimalAmount;
@@ -122,7 +122,7 @@ export const PriceOptionPeriodMonths = {
 } as const;
 
 /**
- * A verified price option for one billing period. Its Billing price must currently be available, use period-end cancellation without an automatic refund, and match this provider plan and region. Archived snapshots, unknown periods and unverified prices are excluded. Selection does not bypass current permissions, Price validation or disabled purchase controls. Billing owns quotes and checkout amounts.
+ * A verified price option for one billing period. Its Billing price must currently be available, use period-end cancellation without an automatic refund, and match this provider plan and region. Archived snapshots, unknown periods and unverified prices are excluded. Selection does not bypass current permissions, Price validation or disabled purchase controls. Billing owns prices and checkout amounts.
  */
 export interface PriceOption {
   /** @pattern ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ */
@@ -131,7 +131,7 @@ export interface PriceOption {
   billing_price_id: string;
   currency: "USD";
   /**
-   * Historical display metadata only. New responses omit this field; use Billing for quotes.
+   * Historical display metadata only. New responses omit this field; use Billing for prices.
    * @deprecated
    */
   amount?: DecimalAmount;
@@ -252,7 +252,7 @@ export const InstancePricePeriodMonths = {
 export interface InstancePrice {
   currency: "USD";
   /**
-   * Historical display metadata only. Price-only purchases omit this field; use Billing for quotes.
+   * Historical display metadata only. Price-only purchases omit this field; use Billing for prices.
    * @deprecated
    */
   amount?: DecimalAmount;

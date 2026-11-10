@@ -34,7 +34,13 @@ export const CheckoutOptions = zod
       .boolean()
       .default(checkoutOptionsAutoRenewDefault)
       .describe(
-        "Turns on automatic renewal of every subscription with licensed items that the purchase opens. Off\nwhen omitted. It must be the customer's own choice.",
+        "Turns on automatic renewal of every subscription with licensed items that the purchase opens. Off\nwhen omitted. It must be the customer's own choice. For a free trial, it converts the trial to paid\nwhen the trial ends.",
+      ),
+    trial_grant_id: zod
+      .uuid()
+      .optional()
+      .describe(
+        "A free trial grant of the paying billing account that the customer chose to use. The first new\nsubscription of the purchase whose lines the grant's offer all covers, and that has a licensed line and\nno trial of its own, opens with the offer's free trial. Accepted only in automatic mode; with deferred it is refused with\nHTTP 400, and the grant is chosen when completing the checkout through Billing. Refused with\nBILLING_TRIAL_GRANT_INAPPLICABLE when no subscription qualifies or the grant cannot be used now.",
       ),
   })
   .describe(

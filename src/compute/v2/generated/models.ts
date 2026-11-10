@@ -11,7 +11,7 @@
  * ## Conventions
  *
  * - **Purchases.** A purchase that creates resources returns them together with the `checkout_session_id` of its Billing Checkout Session and, once checkout completes, its `order_id`. They are readable at once and start as `pending`: checkout may not be complete, the order has not been accepted, nothing exists in the cloud, no inventory such as an address is held, and fields known only after allocation, such as addresses, are null. Once Billing accepts the order, the resource is created: it stays `pending`, then reaches its usual status, such as `running` or `available`. When the Checkout Session expires, the order is declined, canceled or expires, or creation fails, the resource ends `failed` and `failure_reason` states why; the charge for a resource that failed after acceptance is refunded. A purchased change, such as a resize requested with `instance_type_id`, `size_gib` or `bandwidth_mbps` on the resource, returns the resource unchanged with the Checkout Session for the change, and applies once its order is accepted.
- * - **Commercial terms.** Compute catalogs describe technical specifications and, for each order line a purchase makes, how it is sold in Billing (a `BillingComponent`: its Plan, dimensions, what its quantity counts and what its meters read); prices, amounts and currency belong to Billing. A purchase chooses its terms with `billing`, and Billing selects the matching price. Read prices and their rates with Billing's `search-prices` from those components, quote a proposed purchase with `get-quote`, and a change of a resource by its `subscription_id`; Compute has no quote or price proxy endpoint and returns no amounts.
+ * - **Commercial terms.** Compute catalogs describe technical specifications and, for each order line a purchase makes, how it is sold in Billing (a `BillingComponent`: its Plan, dimensions, what its quantity counts and what its meters read); prices, amounts and currency belong to Billing. A purchase chooses its terms with `billing`, and Billing selects the matching price. Read prices and their rates with Billing's `search-prices` from those components, preview the checkout of a proposed purchase, or of a change of a resource by its `subscription_id`, with `preview-checkout-session`; Compute has no pricing or price proxy endpoint and returns no amounts.
  * - **Checkout.** `checkout` is passed to Billing unchanged. Omit it for automatic checkout, which completes checkout within the request and pays from eligible credit grants and balance; insufficient funds refuse the request with HTTP 422 `BILLING_INSUFFICIENT_FUNDS`, and nothing is created. With `checkout.mode` set to `deferred`, the resources are returned `pending` with an open Checkout Session and no order, even for a zero total; nothing is created until the customer completes checkout in Billing, where a promotion code can be applied, and the order is paid. Do not submit the purchase again after paying; after an uncertain response, look the Checkout Session up in Billing first.
  * - **Quotas.** A creation, purchase or resize that adds to what a project holds in a region is checked against the project's quota there before anything is ordered or created, and is refused with HTTP 409 `COMPUTE_PROJECT_QUOTA_EXCEEDED`, whose `meta` names the `resource`, its `limit`, the amount `used` and the amount `requested`. An instance purchase counts the volumes, the new primary network interface and the new elastic IP bought with each instance. Read the limits with `list-quotas`; a limit no operator set is the platform default.
  * - **Projects.** Resource ownership and project identifiers refer to IAM platform projects, not OpenStack tenants. Instances, images and networks share one infrastructure OpenStack project; the platform project remains the authorization and ownership boundary.
@@ -176,9 +176,18 @@ export interface CheckoutOptions {
   return_url?: string;
   /**
    * Turns on automatic renewal of every subscription with licensed items that the purchase opens. Off
-   * when omitted. It must be the customer's own choice.
+   * when omitted. It must be the customer's own choice. For a free trial, it converts the trial to paid
+   * when the trial ends.
    */
   auto_renew?: boolean;
+  /**
+   * A free trial grant of the paying billing account that the customer chose to use. The first new
+   * subscription of the purchase whose lines the grant's offer all covers, and that has a licensed line and
+   * no trial of its own, opens with the offer's free trial. Accepted only in automatic mode; with deferred it is refused with
+   * HTTP 400, and the grant is chosen when completing the checkout through Billing. Refused with
+   * BILLING_TRIAL_GRANT_INAPPLICABLE when no subscription qualifies or the grant cannot be used now.
+   */
+  trial_grant_id?: string;
 }
 
 /**
@@ -230,7 +239,7 @@ export interface BillingMeter {
 }
 
 /**
- * How one order line of a catalog item is sold in Billing. Read its prices with Billing's `search-prices` by `plan_id`, giving `dimensions` to narrow each price's `rates` to this line. Quote a purchase with Billing's `get-quote`, giving the line `plan_id`, `dimensions` unchanged, and the quantity `quantity` names for the usage type chosen; estimate a metered line with `estimate-usage`, giving each of `meters` the same dimensions and the quantity it names. Prices and amounts are Billing's alone.
+ * How one order line of a catalog item is sold in Billing. Read its prices with Billing's `search-prices` by `plan_id`, giving `dimensions` to narrow each price's `rates` to this line. Preview a purchase with Billing's `preview-checkout-session`, giving the line `plan_id`, `dimensions` unchanged, and the quantity `quantity` names for the usage type chosen; estimate a metered line with `estimate-usage`, giving each of `meters` the same dimensions and the quantity it names. Prices and amounts are Billing's alone.
  */
 export interface BillingComponent {
   /** The Billing Plan the line is sold under. */
@@ -771,7 +780,7 @@ export interface ChangeElasticIpBandwidthRequestBody {
    * @minimum 1
    */
   bandwidth_mbps: number;
-  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only on a prepaid network item, and only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of the Billing Checkout Session preview for this change, so that the order is priced from the same instant. Only on a prepaid network item, and only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
   checkout?: CheckoutOptions;
 }
@@ -1644,7 +1653,7 @@ export interface RebuildInstanceResponseBody {
 
 export interface ResizeInstanceRequestBody {
   instance_type_id: InstanceTypeId;
-  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of the Billing Checkout Session preview for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
   checkout?: CheckoutOptions;
 }
@@ -3316,14 +3325,14 @@ export interface ResizeVolumeRequestBody {
    * @minimum 1
    */
   size_gib: number;
-  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of the Billing Checkout Session preview for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
   checkout?: CheckoutOptions;
 }
 
 export interface RetypeVolumeRequestBody {
   volume_type_id: VolumeTypeId;
-  /** The `proration_date` of the Billing quote for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
+  /** The `proration_date` of the Billing Checkout Session preview for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
   checkout?: CheckoutOptions;
 }
