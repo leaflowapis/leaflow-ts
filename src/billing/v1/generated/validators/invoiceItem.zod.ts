@@ -14,7 +14,12 @@ export const InvoiceItem = zod.strictObject({
   taxable: zod.boolean().optional(),
   discount_amount: zod.string().optional().describe("Discount applied to this line before tax."),
   discount_id: zod.uuid().nullish().describe("The account discount applied to this line."),
-  coupon_id: zod.uuid().nullish().describe("The coupon applied to this line."),
+  coupon_id: zod
+    .uuid()
+    .nullish()
+    .describe(
+      "The coupon whose discount this line gets, including one continuing on a renewal from the purchase that first used it.",
+    ),
   tax_amount: zod
     .string()
     .optional()

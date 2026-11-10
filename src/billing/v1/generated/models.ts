@@ -1245,7 +1245,7 @@ export interface InvoiceItem {
    */
   discount_id?: string | null;
   /**
-   * The coupon applied to this line.
+   * The coupon whose discount this line gets, including one continuing on a renewal from the purchase that first used it.
    * @nullable
    */
   coupon_id?: string | null;
@@ -2278,6 +2278,12 @@ export interface CheckoutSessionItem {
   amount: Money | null;
   /** Total reduction on this item, including any continuing renewal discount. */
   discount_amount: Money | null;
+  /**
+   * The coupon behind `discount_amount`, so the discount can be named: the one this checkout applies, or on
+   * a renewal the one continuing from the purchase that first used it. Null when the item has no coupon
+   * discount.
+   */
+  coupon: ObjectIdentity | null;
   /** Tax on the discounted amount, including any tax already contained in that amount. */
   tax_amount: Money | null;
   /** The part of tax_amount already contained in amount minus discount_amount. */
