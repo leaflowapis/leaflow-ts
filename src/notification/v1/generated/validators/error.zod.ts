@@ -50,13 +50,6 @@
  * Delivery to outbound channels is limited per channel, and bursts of alerts about one server are
  * summarised rather than sent individually. Nothing is summarised in the inbox: it always holds
  * every notification. A notification that was summarised or suppressed is still readable here.
- *
- * ## One-time credentials
- *
- * Some notifications carry a reference to a credential rather than the credential itself — the
- * initial password of a newly created instance, for example. That credential is readable exactly
- * once, expires on its own, and is destroyed as soon as it has been read. Requesting it a second
- * time returns `CREDENTIAL_TICKET_CONSUMED`.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";

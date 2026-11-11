@@ -50,13 +50,6 @@
  * Delivery to outbound channels is limited per channel, and bursts of alerts about one server are
  * summarised rather than sent individually. Nothing is summarised in the inbox: it always holds
  * every notification. A notification that was summarised or suppressed is still readable here.
- *
- * ## One-time credentials
- *
- * Some notifications carry a reference to a credential rather than the credential itself — the
- * initial password of a newly created instance, for example. That credential is readable exactly
- * once, expires on its own, and is destroyed as soon as it has been read. Requesting it a second
- * time returns `CREDENTIAL_TICKET_CONSUMED`.
  * OpenAPI spec version: 1.0.0
  */
 export interface FieldViolation {
@@ -572,60 +565,6 @@ export interface UpdateChannelRequestBody {
    * @maxLength 128
    */
   name?: string;
-}
-
-/**
- * What the credential belongs to.
- */
-export type CredentialSubjectKind =
-  (typeof CredentialSubjectKind)[keyof typeof CredentialSubjectKind];
-
-export const CredentialSubjectKind = {
-  compute_instance: "compute_instance",
-} as const;
-
-/**
- * A one-time credential, described without being consumed.
- */
-export interface CredentialTicketResource {
-  /**
-   * True when the credential can still be revealed. False once it has been revealed, has
-   * expired, or was withdrawn — in all three cases it is already destroyed
-   */
-  available: boolean;
-  /** After this moment the credential is destroyed whether or not it was read */
-  expires_at: string;
-  id: string;
-  /**
-   * When it was revealed; null if it has not been
-   * @nullable
-   */
-  revealed_at: string | null;
-  /**
-   * When the service that issued it withdrew it; null if it did not
-   * @nullable
-   */
-  revoked_at: string | null;
-  /** The resource the credential belongs to */
-  subject_id: string;
-  subject_kind: CredentialSubjectKind;
-}
-
-/**
- * The credential itself. This shape is returned by exactly one operation, and that operation
- * succeeds at most once per ticket.
- */
-export interface RevealedCredentialResource {
-  revealed_at: string;
-  /** The credential. It is destroyed as this response is produced and cannot be obtained again */
-  secret: string;
-  subject_id: string;
-  subject_kind: CredentialSubjectKind;
-  /**
-   * The account the credential belongs to, where the resource has one; null otherwise
-   * @nullable
-   */
-  username: string | null;
 }
 
 /**
