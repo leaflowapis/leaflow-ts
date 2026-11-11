@@ -50,13 +50,6 @@
  * Delivery to outbound channels is limited per channel, and bursts of alerts about one server are
  * summarised rather than sent individually. Nothing is summarised in the inbox: it always holds
  * every notification. A notification that was summarised or suppressed is still readable here.
- *
- * ## One-time credentials
- *
- * Some notifications carry a reference to a credential rather than the credential itself — the
- * initial password of a newly created instance, for example. That credential is readable exactly
- * once, expires on its own, and is destroyed as soon as it has been read. Requesting it a second
- * time returns `CREDENTIAL_TICKET_CONSUMED`.
  * OpenAPI spec version: 1.0.0
  */
 import type {
@@ -67,7 +60,6 @@ import type {
   ConfirmEmailOverrideRequestBody,
   CountUnreadNotificationsParams,
   CreateChannelRequestBody,
-  CredentialTicketResource,
   DeleteTypePreferenceParams,
   EmailOverrideCodeResource,
   Error,
@@ -79,7 +71,6 @@ import type {
   NotificationResource,
   NotificationTypeListResponseBody,
   PreferencesResource,
-  RevealedCredentialResource,
   TypePreferenceListResponseBody,
   TypePreferenceResource,
   UnreadCountResource,
@@ -1570,111 +1561,4 @@ export const verifyUserChannel = async (
 
   const data: verifyUserChannelResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as verifyUserChannelResponse;
-};
-
-export type describeCredentialTicketResponse200 = {
-  data: CredentialTicketResource;
-  status: 200;
-};
-
-export type describeCredentialTicketResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type describeCredentialTicketResponseSuccess = describeCredentialTicketResponse200 & {
-  headers: Headers;
-};
-export type describeCredentialTicketResponseError = describeCredentialTicketResponseDefault & {
-  headers: Headers;
-};
-
-export type describeCredentialTicketResponse =
-  | describeCredentialTicketResponseSuccess
-  | describeCredentialTicketResponseError;
-
-export const getDescribeCredentialTicketUrl = (ticketId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(ticketId))}`;
-};
-
-/**
- * Reports whether the credential is still available without consuming it. It never contains
- * the credential itself.
- *
- * A ticket addressed to someone else returns `CREDENTIAL_TICKET_NOT_FOUND`, the same answer
- * as one that does not exist.
- * @summary Describe a one-time credential
- */
-export const describeCredentialTicket = async (
-  ticketId: string,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<describeCredentialTicketResponse> => {
-  const res = await (fetchFn ?? fetch)(getDescribeCredentialTicketUrl(ticketId), {
-    ...options,
-    method: "GET",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: describeCredentialTicketResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as describeCredentialTicketResponse;
-};
-
-export type revealCredentialResponse200 = {
-  data: RevealedCredentialResource;
-  status: 200;
-};
-
-export type revealCredentialResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type revealCredentialResponseSuccess = revealCredentialResponse200 & {
-  headers: Headers;
-};
-export type revealCredentialResponseError = revealCredentialResponseDefault & {
-  headers: Headers;
-};
-
-export type revealCredentialResponse =
-  | revealCredentialResponseSuccess
-  | revealCredentialResponseError;
-
-export const getRevealCredentialUrl = (ticketId: string) => {
-  return `https://notification.leaflow.cloud/api/v1/credentials/${encodeURIComponent(String(ticketId))}:reveal`;
-};
-
-/**
- * Returns the credential and destroys it in the same step. **This is the only operation that
- * ever returns it, and it succeeds only once.**
- *
- * Every subsequent request returns `CREDENTIAL_TICKET_CONSUMED`, including one issued
- * concurrently with the first: exactly one caller receives the credential.
- *
- * A ticket that has expired returns `CREDENTIAL_TICKET_EXPIRED`, and one withdrawn by the
- * service that created it returns `CREDENTIAL_TICKET_REVOKED`. In all three cases the
- * credential is already gone and cannot be recovered; obtain a new one from the service that
- * owns the resource.
- *
- * This operation is a POST rather than a GET because a GET would be followed by link
- * scanners in mail clients and by browser prefetching, either of which would consume the
- * credential before the recipient opened it.
- * @summary Reveal a one-time credential
- */
-export const revealCredential = async (
-  ticketId: string,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<revealCredentialResponse> => {
-  const res = await (fetchFn ?? fetch)(getRevealCredentialUrl(ticketId), {
-    ...options,
-    method: "POST",
-  });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: revealCredentialResponse["data"] = body ? JSON.parse(body) : {};
-  return { data, status: res.status, headers: res.headers } as revealCredentialResponse;
 };
