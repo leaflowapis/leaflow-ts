@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import * as zod from "zod";
-import { Applicability } from "./applicability.zod.js";
+import { TrialOfferItem } from "./trialOfferItem.zod.js";
 import { TrialSettings } from "./trialSettings.zod.js";
 
 export const trialOfferTrialPeriodDaysMax = 730;
@@ -18,12 +18,14 @@ export const TrialOffer = zod
     description: zod.string(),
     trial_period_days: zod.int().min(1).max(trialOfferTrialPeriodDaysMax),
     trial_settings: TrialSettings,
-    applies_to: Applicability.describe(
-      "The purchases it can be used for. Every line of the subscription must be covered.",
-    ),
+    items: zod
+      .array(TrialOfferItem)
+      .describe(
+        "The plans a subscription on the trial may hold. An offer without items applies to no purchase.",
+      ),
   })
   .describe(
-    "The terms of a free trial. The licensed items of the subscription it is used for are free for `trial_period_days`, while metered usage is charged as usual. When the trial ends it converts to paid if automatic renewal is on; otherwise `trial_settings` applies.",
+    "The terms of a free trial. The licensed items of the subscription it is used for are free for `trial_period_days`, while metered usage is charged as usual. The subscription holds only the listed plans and no more of each than its `max_quantity`, both when it is bought and while the trial lasts. When the trial ends it converts to paid if automatic renewal is on; otherwise `trial_settings` applies.",
   );
 
 export type TrialOffer = zod.input<typeof TrialOffer>;

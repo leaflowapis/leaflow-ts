@@ -30,7 +30,9 @@ export const Discount = zod
     name: zod.string().optional(),
     percent_off: zod.string().optional().describe("For a percentage discount, out of one hundred."),
     amount: Money.optional(),
-    max_discount: Money.optional().describe("Caps a percentage discount."),
+    max_discount: Money.optional().describe(
+      "The most one purchase is reduced by, for a percentage, price override or free-setup discount.",
+    ),
     currency: zod.string().optional(),
     applies_to: Applicability.describe(
       "What it may pay for. Absent means anything on the account, including setup fees and usage.",

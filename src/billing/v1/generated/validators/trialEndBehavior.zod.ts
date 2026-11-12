@@ -17,7 +17,7 @@ export const TrialEndBehavior = zod.strictObject({
     .int()
     .nullable()
     .describe(
-      "How long a subscription stopped at the end of its trial keeps its resources before they are reclaimed; null for the platform's retention period.",
+      "How long a subscription stopped at the end of its trial keeps its resources before they are reclaimed; null for the platform's retention period. Must be null with `cancel`, which releases the resources when the trial ends.",
     ),
 });
 

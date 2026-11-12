@@ -1603,7 +1603,7 @@ export interface TrialEndBehavior {
   /** What happens when the trial ends while automatic renewal is off. With it on, the first paid period is charged to the account's funds or saved payment method, and this applies only when that charge fails. `cancel`: the subscription ends and its resources are released. `pause`: service stops, and renewing before the retention period ends restores it, with the first paid period starting at payment. `create_invoice`: as `pause`, and an invoice for the first paid period is issued to pay. */
   missing_payment_method: TrialEndBehaviorMissingPaymentMethod;
   /**
-   * How long a subscription stopped at the end of its trial keeps its resources before they are reclaimed; null for the platform's retention period.
+   * How long a subscription stopped at the end of its trial keeps its resources before they are reclaimed; null for the platform's retention period. Must be null with `cancel`, which releases the resources when the trial ends.
    * @nullable
    */
   retention_seconds: number | null;
@@ -2013,8 +2013,8 @@ export interface CheckoutOptions {
   auto_renew?: boolean;
   /**
    * A free trial grant of the paying billing account that the customer chose to use. The first new
-   * subscription of the purchase whose lines the grant's offer all covers, and that has a licensed line and
-   * no trial of its own, opens with the offer's free trial. Accepted only in automatic mode; with deferred it is refused with
+   * subscription of the purchase whose lines are all of plans the grant's offer lists, within each plan's
+   * max_quantity, and that has a licensed line and no trial of its own, opens with the offer's free trial. Accepted only in automatic mode; with deferred it is refused with
    * HTTP 400, and the grant is chosen when completing the checkout through Billing. Refused with
    * BILLING_TRIAL_GRANT_INAPPLICABLE when no subscription qualifies or the grant cannot be used now.
    */
@@ -2088,7 +2088,17 @@ export interface CheckoutSessionDiscount {
 }
 
 /**
- * The terms of a free trial. The licensed items of the subscription it is used for are free for `trial_period_days`, while metered usage is charged as usual. When the trial ends it converts to paid if automatic renewal is on; otherwise `trial_settings` applies.
+ * A plan a subscription on the trial may hold, and how much of it.
+ */
+export interface TrialOfferItem {
+  /** The plan, which may since have been archived. */
+  plan: ObjectIdentity;
+  /** The most the subscription's licensed items of this plan may hold together, in the plan's quantity unit, such as gibibytes of storage or megabits per second of bandwidth. Metered items of the plan are charged as usual and do not count towards it. */
+  max_quantity: string;
+}
+
+/**
+ * The terms of a free trial. The licensed items of the subscription it is used for are free for `trial_period_days`, while metered usage is charged as usual. The subscription holds only the listed plans and no more of each than its `max_quantity`, both when it is bought and while the trial lasts. When the trial ends it converts to paid if automatic renewal is on; otherwise `trial_settings` applies.
  */
 export interface TrialOffer {
   id: string;
@@ -2100,8 +2110,8 @@ export interface TrialOffer {
    */
   trial_period_days: number;
   trial_settings: TrialSettings;
-  /** The purchases it can be used for. Every line of the subscription must be covered. */
-  applies_to: Applicability;
+  /** The plans a subscription on the trial may hold. An offer without items applies to no purchase. */
+  items: TrialOfferItem[];
 }
 
 /**
@@ -3033,7 +3043,7 @@ export interface Discount {
   /** For a percentage discount, out of one hundred. */
   percent_off?: string;
   amount?: Money;
-  /** Caps a percentage discount. */
+  /** The most one purchase is reduced by, for a percentage, price override or free-setup discount. */
   max_discount?: Money;
   currency?: string;
   /** What it may pay for. Absent means anything on the account, including setup fees and usage. */
