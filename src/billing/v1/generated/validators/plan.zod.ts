@@ -21,6 +21,12 @@ export const Plan = zod.strictObject({
   product_id: ProductId,
   name: zod.string(),
   description: zod.string().optional(),
+  unit_label: zod
+    .string()
+    .optional()
+    .describe(
+      "What a licensed quantity of the plan counts, as shown next to it, such as GiB or Mbps. Absent when the plan has none. Metered usage is measured in its meter's unit instead.",
+    ),
 });
 
 export type Plan = zod.input<typeof Plan>;

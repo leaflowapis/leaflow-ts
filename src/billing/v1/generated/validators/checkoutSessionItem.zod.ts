@@ -49,6 +49,12 @@ export const CheckoutSessionItem = zod
       .nullable()
       .describe("Periods per billing cycle of a recurring licensed price; null otherwise."),
     quantity: zod.string(),
+    unit_label: zod
+      .string()
+      .optional()
+      .describe(
+        "The plan's unit label, which a licensed line's quantity counts, such as GiB or Mbps. A completed session shows the label its order was placed with. Absent for a metered line and when the plan has none.",
+      ),
     dimensions: zod
       .record(zod.string(), zod.string())
       .describe("The dimension values of what is bought, such as region and instance type."),

@@ -19,6 +19,12 @@ export const ScheduledChange = zod
     plan_name: zod.string(),
     price_id: zod.uuid(),
     quantity: zod.string(),
+    unit_label: zod
+      .string()
+      .optional()
+      .describe(
+        "The plan's unit label when the change was placed, which a licensed quantity counts, such as GiB or Mbps. Absent for a metered item and when the plan had none.",
+      ),
     recurring_amount: zod.string().describe("The target licensed renewal amount before tax."),
     currency: zod.string(),
     interval: zod.enum(["day", "month", "year"]),

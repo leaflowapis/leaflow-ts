@@ -88,6 +88,12 @@ export const OrderItem = zod
     plan_id: zod.uuid().describe("Which plan was bought."),
     plan_name: zod.string().describe("The name when bought."),
     quantity: zod.string(),
+    unit_label: zod
+      .string()
+      .optional()
+      .describe(
+        "The plan's unit label when the line was placed, which a licensed line's quantity counts, such as GiB or Mbps. Absent for a metered line and when the plan had none.",
+      ),
     unit_amount: Money.optional().describe(
       "The unit amount of the price the line is charged under. Absent for a tiered price, and for an immediate change, which is charged as `gross_amount` describes.",
     ),

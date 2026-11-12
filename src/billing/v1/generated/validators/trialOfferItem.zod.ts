@@ -16,6 +16,12 @@ export const TrialOfferItem = zod
       .describe(
         "The most the subscription's licensed items of this plan may hold together, in the plan's quantity unit, such as gibibytes of storage or megabits per second of bandwidth. Metered items of the plan are charged as usual and do not count towards it.",
       ),
+    unit_label: zod
+      .string()
+      .optional()
+      .describe(
+        "The plan's unit label, which `max_quantity` counts, such as GiB or Mbps. Absent when the plan has none.",
+      ),
   })
   .describe("A plan a subscription on the trial may hold, and how much of it.");
 

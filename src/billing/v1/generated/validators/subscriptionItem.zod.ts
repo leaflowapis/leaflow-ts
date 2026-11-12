@@ -31,6 +31,12 @@ export const SubscriptionItem = zod
         "The dimension values of what was bought, such as region and instance type. Empty when the purchase gave none.",
       ),
     quantity: zod.string(),
+    unit_label: zod
+      .string()
+      .optional()
+      .describe(
+        "The plan's current unit label, which a licensed item's quantity counts, such as GiB or Mbps. Absent for a metered item and when the plan has none.",
+      ),
     recurring_amount: zod
       .string()
       .optional()

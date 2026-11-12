@@ -1261,6 +1261,7 @@ export interface InvoiceItem {
   resource_id?: string;
   /** The line's wording as recorded when the invoice was issued. */
   description: string;
+  /** What `quantity` counts: the plan's unit label for a licensed purchase line, such as GiB, or the meter's unit for a usage line. Empty when there is none. */
   unit?: string;
   quantity?: string;
   /** The part covered by an included allowance, and therefore not charged. */
@@ -1665,6 +1666,8 @@ export interface ScheduledChange {
   plan_name: string;
   price_id: string;
   quantity: string;
+  /** The plan's unit label when the change was placed, which a licensed quantity counts, such as GiB or Mbps. Absent for a metered item and when the plan had none. */
+  unit_label?: string;
   /** The target licensed renewal amount before tax. */
   recurring_amount: string;
   currency: string;
@@ -1692,6 +1695,8 @@ export interface SubscriptionItem {
   /** The dimension values of what was bought, such as region and instance type. Empty when the purchase gave none. */
   dimensions: SubscriptionItemDimensions;
   quantity: string;
+  /** The plan's current unit label, which a licensed item's quantity counts, such as GiB or Mbps. Absent for a metered item and when the plan has none. */
+  unit_label?: string;
   /** This item's renewal amount, after continuing discounts and before tax. A pending item shows base terms until paying the order fixes any new discount. Absent for metered and one-time items. */
   recurring_amount?: string;
   /** Whether new account discounts may apply to this item in future renewals. A fixed operator renewal agreement disables automatic discounts; catalog repricing or a newly selected purchase agreement enables them. */
@@ -2095,6 +2100,8 @@ export interface TrialOfferItem {
   plan: ObjectIdentity;
   /** The most the subscription's licensed items of this plan may hold together, in the plan's quantity unit, such as gibibytes of storage or megabits per second of bandwidth. Metered items of the plan are charged as usual and do not count towards it. */
   max_quantity: string;
+  /** The plan's unit label, which `max_quantity` counts, such as GiB or Mbps. Absent when the plan has none. */
+  unit_label?: string;
 }
 
 /**
@@ -2266,6 +2273,8 @@ export interface CheckoutSessionItem {
    */
   interval_count: number | null;
   quantity: string;
+  /** The plan's unit label, which a licensed line's quantity counts, such as GiB or Mbps. A completed session shows the label its order was placed with. Absent for a metered line and when the plan has none. */
+  unit_label?: string;
   /** The dimension values of what is bought, such as region and instance type. */
   dimensions: CheckoutSessionItemDimensions;
   /**
@@ -2901,6 +2910,8 @@ export interface OrderItem {
   /** The name when bought. */
   plan_name: string;
   quantity: string;
+  /** The plan's unit label when the line was placed, which a licensed line's quantity counts, such as GiB or Mbps. Absent for a metered line and when the plan had none. */
+  unit_label?: string;
   /** The unit amount of the price the line is charged under. Absent for a tiered price, and for an immediate change, which is charged as `gross_amount` describes. */
   unit_amount?: Money;
   /**
@@ -3208,6 +3219,8 @@ export interface Plan {
   product_id: ProductId;
   name: string;
   description?: string;
+  /** What a licensed quantity of the plan counts, as shown next to it, such as GiB or Mbps. Absent when the plan has none. Metered usage is measured in its meter's unit instead. */
+  unit_label?: string;
 }
 
 export interface PlanList {

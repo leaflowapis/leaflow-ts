@@ -38,7 +38,12 @@ export const InvoiceItem = zod.strictObject({
     ),
   resource_id: zod.string().optional(),
   description: zod.string().describe("The line's wording as recorded when the invoice was issued."),
-  unit: zod.string().optional(),
+  unit: zod
+    .string()
+    .optional()
+    .describe(
+      "What `quantity` counts: the plan's unit label for a licensed purchase line, such as GiB, or the meter's unit for a usage line. Empty when there is none.",
+    ),
   quantity: zod.string().optional(),
   deducted_quantity: zod
     .string()
