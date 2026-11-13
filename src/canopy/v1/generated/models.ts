@@ -413,6 +413,15 @@ export const APIKeyResourceStatus = {
   revoked: "revoked",
 } as const;
 
+/**
+ * Model names the key rewrites. A request naming a key of this map is served by the model it maps to, and is admitted, billed and recorded as that model; aliases are not followed in chains. At most 10 entries, each name and model at most 128 characters.
+ *
+ * The model must exist, and while `restrict_models` is true it must also be listed in `allowed_models`. A restricted model is callable only while the project holds a grant for it.
+ */
+export interface ModelAliases {
+  [key: string]: string;
+}
+
 export interface APIKeyResource {
   /** Carries no meaning while `restrict_models` is false */
   allowed_models: string[];
@@ -437,6 +446,7 @@ export interface APIKeyResource {
   prefix: string;
   /** While true, only the models listed in `allowed_models` are permitted */
   restrict_models: boolean;
+  model_aliases: ModelAliases;
   status: APIKeyResourceStatus;
   /** True indicates that the key was disabled because its project is suspended, and that the project has to be restored before the key can be used again */
   suspended: boolean;
@@ -472,6 +482,7 @@ export interface CreateAPIKeyRequestBody {
   name: string;
   /** While true, only the models listed in `allowed_models` are permitted */
   restrict_models?: boolean;
+  model_aliases?: ModelAliases;
 }
 
 export type IssuedAPIKeyResourceStatus =
@@ -507,6 +518,7 @@ export interface IssuedAPIKeyResource {
   prefix: string;
   /** While true, only the models listed in `allowed_models` are permitted */
   restrict_models: boolean;
+  model_aliases: ModelAliases;
   /** The complete key, **returned in this response only**. Store it immediately */
   secret: string;
   status: IssuedAPIKeyResourceStatus;
@@ -531,6 +543,7 @@ export interface UpdateAPIKeyRequestBody {
   name?: string | null;
   /** @nullable */
   restrict_models?: boolean | null;
+  model_aliases?: ModelAliases;
 }
 
 export type ModelResourceStatus = (typeof ModelResourceStatus)[keyof typeof ModelResourceStatus];
@@ -539,6 +552,19 @@ export const ModelResourceStatus = {
   available: "available",
   draining: "draining",
   retired: "retired",
+} as const;
+
+/**
+ * Who can call the model. Every model is listed to every project.
+ *
+ * - `public`: callable by every project.
+ * - `restricted`: callable only by projects holding a grant. A request from any other project fails with 403 `MODEL_ACCESS_REQUIRED`.
+ */
+export type ModelResourceAccess = (typeof ModelResourceAccess)[keyof typeof ModelResourceAccess];
+
+export const ModelResourceAccess = {
+  public: "public",
+  restricted: "restricted",
 } as const;
 
 /**
@@ -619,6 +645,17 @@ export interface ModelResource {
    */
   output_modalities: Modality[] | null;
   capabilities: ModelCapabilities;
+  /**
+   * Who can call the model. Every model is listed to every project.
+   *
+   * - `public`: callable by every project.
+   * - `restricted`: callable only by projects holding a grant. A request from any other project fails with 403 `MODEL_ACCESS_REQUIRED`.
+   */
+  access: ModelResourceAccess;
+  /** Whether the current project can call the model. Always true for a public model */
+  access_granted: boolean;
+  /** True when the model is served without upstream content moderation */
+  moderation_disabled: boolean;
 }
 
 /**

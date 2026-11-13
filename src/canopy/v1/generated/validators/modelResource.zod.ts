@@ -77,6 +77,17 @@ export const ModelResource = zod.strictObject({
     .nullable()
     .describe("Produced output modalities. Image input does not imply image generation."),
   capabilities: ModelCapabilities,
+  access: zod
+    .enum(["public", "restricted"])
+    .describe(
+      "Who can call the model. Every model is listed to every project.\n\n- `public`: callable by every project.\n- `restricted`: callable only by projects holding a grant. A request from any other project fails with 403 `MODEL_ACCESS_REQUIRED`.",
+    ),
+  access_granted: zod
+    .boolean()
+    .describe("Whether the current project can call the model. Always true for a public model"),
+  moderation_disabled: zod
+    .boolean()
+    .describe("True when the model is served without upstream content moderation"),
 });
 
 export type ModelResource = zod.input<typeof ModelResource>;

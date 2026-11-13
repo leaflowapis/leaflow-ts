@@ -48,6 +48,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { ModelAliases } from "./modelAliases.zod.js";
 
 export const createAPIKeyRequestBodyNameMax = 128;
 
@@ -69,6 +70,7 @@ export const CreateAPIKeyRequestBody = zod.strictObject({
     .boolean()
     .optional()
     .describe("While true, only the models listed in `allowed_models` are permitted"),
+  model_aliases: ModelAliases.optional(),
 });
 
 export type CreateAPIKeyRequestBody = zod.input<typeof CreateAPIKeyRequestBody>;

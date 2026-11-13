@@ -48,6 +48,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { ModelAliases } from "./modelAliases.zod.js";
 
 export const updateAPIKeyRequestBodyNameMax = 128;
 
@@ -60,6 +61,7 @@ export const UpdateAPIKeyRequestBody = zod.strictObject({
     .describe("Sets the expiry. To remove it, use `clear_expiry`"),
   name: zod.string().max(updateAPIKeyRequestBodyNameMax).nullish(),
   restrict_models: zod.boolean().nullish(),
+  model_aliases: ModelAliases.optional(),
 });
 
 export type UpdateAPIKeyRequestBody = zod.input<typeof UpdateAPIKeyRequestBody>;

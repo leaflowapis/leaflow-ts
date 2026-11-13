@@ -48,6 +48,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
+import { ModelAliases } from "./modelAliases.zod.js";
 
 export const APIKeyResource = zod.strictObject({
   allowed_models: zod
@@ -74,6 +75,7 @@ export const APIKeyResource = zod.strictObject({
   restrict_models: zod
     .boolean()
     .describe("While true, only the models listed in `allowed_models` are permitted"),
+  model_aliases: ModelAliases,
   status: zod.enum(["active", "disabled", "revoked"]),
   suspended: zod
     .boolean()
