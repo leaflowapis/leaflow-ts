@@ -59,11 +59,17 @@ export const SubscriptionItem = zod
       .int()
       .optional()
       .describe("Refund policy `short_rate` only, as on the price bought."),
-    monthly_list_amount: zod
+    list_amount: zod
       .string()
       .optional()
       .describe(
-        "Licensed recurring only, the `monthly_list_amount` that a renewal at the agreed amount keeps; see the order item.",
+        "Licensed recurring only, the frozen reference amount preserved by renewal at the agreed amount; see the order item.",
+      ),
+    list_interval: zod
+      .enum(["day", "month", "year"])
+      .optional()
+      .describe(
+        "Unit of the frozen list_amount. Present exactly when list_amount has a value; uses Billing's interval vocabulary. It is the reference price unit, not necessarily the purchased period unit.",
       ),
     coupon_id: zod.uuid().optional(),
     coupon: ObjectIdentity.optional(),

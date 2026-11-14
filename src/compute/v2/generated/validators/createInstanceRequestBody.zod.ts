@@ -97,7 +97,7 @@ export const CreateInstanceRequestBody = zod
     checkout: CheckoutOptions.optional(),
   })
   .describe(
-    "Every part a launch template can describe may come from `launch_template` instead: a part given here overrides the template's, and `data_volumes`, when given, replaces the template's list. After that the instance type, the boot volume and the network interface are required, each refused with 422 `INSTANCE_CREATE_INVALID` naming the field when neither gives it.\n\nEvery component bought with the instance (its boot volume, data volumes and elastic IP) shares the usage type and period of `compute.billing`; a component's own `billing` exists to choose a different termination policy, and when omitted it is `compute.billing`.",
+    "Every part a launch template can describe may come from `launch_template` instead: a part given here overrides the template's, and `data_volumes`, when given, replaces the template's list. After that the instance type, the boot volume and the network interface are required, each refused with 422 `INSTANCE_CREATE_INVALID` naming the field when neither gives it.\n\nEvery newly purchased component (compute capacity, boot volume, data volume and elastic IP network) requires its own `billing.price_id` from that component's Billing plan. Billing checks subscription compatibility; price IDs are never inherited between components.",
   );
 
 export type CreateInstanceRequestBody = zod.input<typeof CreateInstanceRequestBody>;

@@ -18,18 +18,9 @@ export const CancellationPolicy = {
 /**
  * `none` refunds nothing.
  *
- * `prorated` refunds the amount paid for the current period minus the value of the time used, never below zero
- * or above what remains unrefunded. Time used runs from the period start to the effective cancellation, by the
- * second. Each whole month from the period start is valued at the order item's `monthly_list_amount`, and the
- * remainder at that amount in proportion to the length of the month it falls in; without `monthly_list_amount`,
- * time used is valued at the amount paid in proportion to the length of the period. A renewal starts a new
- * period, and an immediate change starts one at the change. Discounts and setup fees are not refunded. Refunds
- * return to the original payment sources, with tax refunded in proportion.
+ * `prorated` refunds the amount paid for the current period minus the value of the time used, never below zero or above what remains unrefunded. Time used runs from the period start to effective cancellation, by the second. The order item freezes `list_amount` for one `list_interval`: each complete interval uses that amount, and the remainder is proportional to the actual length of its interval. Calendar intervals are anchored at the service period start in UTC. Without a frozen reference, time used is valued at the amount paid in proportion to the period length. A renewal starts a new period; an immediate change starts one at the change. Discounts and setup fees are not refunded. Refunds return to the original payment sources, with tax refunded in proportion.
  *
- * `short_rate` refunds as `prorated`, except that when the cancellation takes effect less than
- * `short_rate_threshold_seconds` after the period start, the value of the time used is multiplied by
- * `short_rate_multiplier`, up to `monthly_list_amount` for each month begun or, without `monthly_list_amount`,
- * up to the amount paid.
+ * `short_rate` applies the same calculation, but when cancellation takes effect less than `short_rate_threshold_seconds` after the period start, multiplies the used value by `short_rate_multiplier`, capped at `list_amount` for each reference interval begun, or at the amount paid when no reference was frozen.
  */
 export type RefundPolicy = (typeof RefundPolicy)[keyof typeof RefundPolicy];
 
@@ -1442,8 +1433,8 @@ export const RefundStatus = {
  * - `future_period_canceled`: a renewal that had not started was withdrawn.
  * - `downgrade_difference`: after a downgrade, the remaining paid value, valued under each paid period's refund
  *   policy and as `prorated` where that policy is `none`, minus the new configuration's value for the remaining
- *   time: each whole month at the change item's `monthly_list_amount` and the remainder in proportion to the
- *   length of the month it falls in, or without `monthly_list_amount`, the new period price in proportion to the
+ *   time: each complete `list_interval` at the change item's `list_amount` and the remainder in proportion to the
+ *   length of the reference interval it falls in, or without `list_amount`, the new period price in proportion to the
  *   remaining time.
  * - `usage_true_up`: usage priced over the whole month cost less than was charged.
  * - `payment_not_applied`: a payment arrived after its invoice could no longer be paid.
@@ -1632,6 +1623,18 @@ export const SubscriptionRestriction = {
 } as const;
 
 /**
+ * Unit of the frozen list_amount. Present exactly when list_amount has a value; uses Billing's interval vocabulary. It is the reference price unit, not necessarily the purchased period unit.
+ */
+export type SubscriptionItemListInterval =
+  (typeof SubscriptionItemListInterval)[keyof typeof SubscriptionItemListInterval];
+
+export const SubscriptionItemListInterval = {
+  day: "day",
+  month: "month",
+  year: "year",
+} as const;
+
+/**
  * Follows the items. `pending`: not yet accepted, paid or unpaid; its invoice shows whether payment is needed, and it can expire or be canceled. `accepted`: items are being set up. `completed`: every item was set up. `partially_completed`: some items were set up and the others failed or were canceled and refunded to their original payment sources. `failed`: no item was delivered and at least one failed; amounts collected for undelivered items are refunded. `canceled`: every item was withdrawn without delivery; collected amounts are returned to their original payment sources. No status by itself means the service was delivered.
  */
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
@@ -1707,8 +1710,10 @@ export interface SubscriptionItem {
   short_rate_multiplier?: string;
   /** Refund policy `short_rate` only, as on the price bought. */
   short_rate_threshold_seconds?: number;
-  /** Licensed recurring only, the `monthly_list_amount` that a renewal at the agreed amount keeps; see the order item. */
-  monthly_list_amount?: string;
+  /** Licensed recurring only, the frozen reference amount preserved by renewal at the agreed amount; see the order item. */
+  list_amount?: string;
+  /** Unit of the frozen list_amount. Present exactly when list_amount has a value; uses Billing's interval vocabulary. It is the reference price unit, not necessarily the purchased period unit. */
+  list_interval?: SubscriptionItemListInterval;
   coupon_id?: string;
   coupon?: ObjectIdentity;
   /** @minimum 0 */
@@ -2837,6 +2842,18 @@ export const OrderItemInterval = {
 } as const;
 
 /**
+ * Unit of the frozen list_amount. Present exactly when list_amount has a value; uses Billing's interval vocabulary. It is the reference price unit, not necessarily the purchased period unit.
+ */
+export type OrderItemListInterval =
+  (typeof OrderItemListInterval)[keyof typeof OrderItemListInterval];
+
+export const OrderItemListInterval = {
+  day: "day",
+  month: "month",
+  year: "year",
+} as const;
+
+/**
  * `pending`: waiting to be set up. `completed`: set up, as confirmed by the service. `failed`: not set up; its amount was refunded to the original payment sources. `canceled`: withdrawn without delivery; any collected amount is returned. A completed item ends when its subscription item is canceled.
  */
 export type OrderItemStatus = (typeof OrderItemStatus)[keyof typeof OrderItemStatus];
@@ -2876,10 +2893,12 @@ export interface OrderItem {
   cancellation_policy?: CancellationPolicy;
   refund_policy?: RefundPolicy;
   /**
-   * Recurring licensed items only: a month at list price for this item's quantity, before tax and discounts, which values time under a refund or a downgrade. It is the monthly amount of the shortest period the plan sells, not longer than the one bought, at the item's dimensions, fixed at purchase; a renewal at the agreed amount keeps the previous value. Null when time used is valued at the amount paid, as for a daily period.
+   * Recurring licensed items only: the reference list amount for one list_interval, for this item's quantity and dimensions, in the order currency before tax and discounts. For monthly or yearly purchases it is the monthly amount of the shortest eligible monthly or yearly price; for daily purchases it is the daily amount of the shortest eligible daily price. Eligible prices belong to the same plan, are sellable at purchase, and do not exceed the purchased period. The purchased price itself is a candidate. Frozen at purchase; renewal at the agreed amount preserves it. Absent or null when used time is valued proportionally at the amount paid.
    * @nullable
    */
-  monthly_list_amount?: string | null;
+  list_amount?: string | null;
+  /** Unit of the frozen list_amount. Present exactly when list_amount has a value; uses Billing's interval vocabulary. It is the reference price unit, not necessarily the purchased period unit. */
+  list_interval?: OrderItemListInterval;
   /**
    * Refund policy `short_rate` only, as on the price when bought.
    * @nullable

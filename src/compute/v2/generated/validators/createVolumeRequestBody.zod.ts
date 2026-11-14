@@ -54,7 +54,7 @@ export const CreateVolumeRequestBody = zod.strictObject({
     ),
   volume_snapshot_id: VolumeSnapshotId.optional(),
   volume_backup_id: VolumeBackupId.optional(),
-  billing: BillingChoice.optional(),
+  billing: BillingChoice,
   checkout: CheckoutOptions.optional(),
   instance_id: InstanceId.optional(),
 });

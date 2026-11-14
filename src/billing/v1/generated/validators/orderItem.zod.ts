@@ -47,11 +47,17 @@ export const OrderItem = zod
     interval_count: zod.int().min(1).optional(),
     cancellation_policy: CancellationPolicy.optional(),
     refund_policy: RefundPolicy.optional(),
-    monthly_list_amount: zod
+    list_amount: zod
       .string()
       .nullish()
       .describe(
-        "Recurring licensed items only: a month at list price for this item's quantity, before tax and discounts, which values time under a refund or a downgrade. It is the monthly amount of the shortest period the plan sells, not longer than the one bought, at the item's dimensions, fixed at purchase; a renewal at the agreed amount keeps the previous value. Null when time used is valued at the amount paid, as for a daily period.",
+        "Recurring licensed items only: the reference list amount for one list_interval, for this item's quantity and dimensions, in the order currency before tax and discounts. For monthly or yearly purchases it is the monthly amount of the shortest eligible monthly or yearly price; for daily purchases it is the daily amount of the shortest eligible daily price. Eligible prices belong to the same plan, are sellable at purchase, and do not exceed the purchased period. The purchased price itself is a candidate. Frozen at purchase; renewal at the agreed amount preserves it. Absent or null when used time is valued proportionally at the amount paid.",
+      ),
+    list_interval: zod
+      .enum(["day", "month", "year"])
+      .optional()
+      .describe(
+        "Unit of the frozen list_amount. Present exactly when list_amount has a value; uses Billing's interval vocabulary. It is the reference price unit, not necessarily the purchased period unit.",
       ),
     short_rate_multiplier: zod
       .string()

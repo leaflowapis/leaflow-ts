@@ -75,51 +75,12 @@ export interface AvailabilityZoneListResponseBody {
   pagination: OffsetPagination;
 }
 
-export type BillingPeriodUnit = (typeof BillingPeriodUnit)[keyof typeof BillingPeriodUnit];
-
-export const BillingPeriodUnit = {
-  month: "month",
-  year: "year",
-} as const;
-
-export interface BillingPeriod {
-  unit: BillingPeriodUnit;
-  /**
-   * @minimum 1
-   * @maximum 2147483647
-   */
-  count: number;
-}
-
 /**
- * `licensed` pays for a period in advance; `metered` bills usage until canceled.
- */
-export type BillingChoiceUsageType =
-  (typeof BillingChoiceUsageType)[keyof typeof BillingChoiceUsageType];
-
-export const BillingChoiceUsageType = {
-  licensed: "licensed",
-  metered: "metered",
-} as const;
-
-/**
- * Immediate ends service when cancellation takes effect, with refunds governed by the purchased terms. Period-end keeps service until the paid period ends.
- */
-export type TerminationPolicy = (typeof TerminationPolicy)[keyof typeof TerminationPolicy];
-
-export const TerminationPolicy = {
-  immediate: "immediate",
-  period_end: "period_end",
-} as const;
-
-/**
- * The commercial terms for one newly purchased component. Licensed requires period and termination_policy; metered refuses both. Components in one instance purchase must use the same usage type and period, while their termination policies may differ.
+ * The Billing price selected for this component's plan. Billing validates the price, currency, availability, cancellation terms and subscription period. Each newly purchased component selects its own price; a price cannot be inherited from a different component's plan.
  */
 export interface BillingChoice {
-  /** `licensed` pays for a period in advance; `metered` bills usage until canceled. */
-  usage_type: BillingChoiceUsageType;
-  period?: BillingPeriod;
-  termination_policy?: TerminationPolicy;
+  /** The ID of a recurring price returned by Billing for this component's plan. */
+  price_id: string;
 }
 
 /**
@@ -158,7 +119,7 @@ export type Money = string;
  * only to Billing. A service may retain a failed creation record when Billing refuses a purchase; no
  * infrastructure is created for that refusal.
  */
-export interface CheckoutOptions {
+export interface CheckoutOptions06b7f7b {
   mode?: CheckoutMode;
   /**
    * Expected invoice total after discounts and tax, before applying credit grants or balance.
@@ -189,6 +150,8 @@ export interface CheckoutOptions {
    */
   trial_grant_id?: string;
 }
+
+export type CheckoutOptions = CheckoutOptions06b7f7b;
 
 /**
  * The line's dimensions, the coordinates Billing prices it at; every meter of the line reads under the same ones, and under its own `resource_dimensions` as well. Pass them to Billing unchanged; they name nothing a client needs to read.
@@ -769,8 +732,8 @@ export interface CreateElasticIpRequestBody {
    */
   bandwidth_mbps: number;
   line_id: ElasticIpLineId;
-  billing?: BillingChoice;
-  checkout?: CheckoutOptions;
+  billing: BillingChoice;
+  checkout?: CheckoutOptions06b7f7b;
   instance_id?: InstanceId;
 }
 
@@ -782,7 +745,7 @@ export interface ChangeElasticIpBandwidthRequestBody {
   bandwidth_mbps: number;
   /** The `proration_date` of the Billing Checkout Session preview for this change, so that the order is priced from the same instant. Only on a prepaid network item, and only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
-  checkout?: CheckoutOptions;
+  checkout?: CheckoutOptions06b7f7b;
 }
 
 export interface ChangeElasticIpChargeTypeRequestBody {
@@ -1360,7 +1323,7 @@ export interface NewBootVolume {
   size_gib: number;
   /** What releasing the instance does to this volume. `delete` deletes it with the instance; `detach` keeps it, still billed on its own terms, for you to attach elsewhere or delete. */
   on_instance_release?: NewBootVolumeOnInstanceRelease;
-  billing?: BillingChoice;
+  billing: BillingChoice;
 }
 
 export type ExistingBootVolumeType =
@@ -1409,7 +1372,7 @@ export interface NewDataVolume {
   size_gib: number;
   /** What releasing the instance does to this volume. `delete` deletes it with the instance; `detach` keeps it, still billed on its own terms, for you to attach elsewhere or delete. */
   on_instance_release?: NewDataVolumeOnInstanceRelease;
-  billing?: BillingChoice;
+  billing: BillingChoice;
 }
 
 export type NewPrimaryNetworkInterfaceType =
@@ -1466,7 +1429,7 @@ export interface NewElasticIp {
    */
   bandwidth_mbps: number;
   internet_charge_type?: InternetChargeType;
-  billing?: BillingChoice;
+  billing: BillingChoice;
 }
 
 export type ExistingElasticIpType =
@@ -1524,7 +1487,7 @@ export type PasswordChoice = GeneratedPassword | SuppliedPassword;
 /**
  * Every part a launch template can describe may come from `launch_template` instead: a part given here overrides the template's, and `data_volumes`, when given, replaces the template's list. After that the instance type, the boot volume and the network interface are required, each refused with 422 `INSTANCE_CREATE_INVALID` naming the field when neither gives it.
  *
- * Every component bought with the instance (its boot volume, data volumes and elastic IP) shares the usage type and period of `compute.billing`; a component's own `billing` exists to choose a different termination policy, and when omitted it is `compute.billing`.
+ * Every newly purchased component (compute capacity, boot volume, data volume and elastic IP network) requires its own `billing.price_id` from that component's Billing plan. Billing checks subscription compatibility; price IDs are never inherited between components.
  */
 export interface CreateInstanceRequestBody {
   launch_template?: LaunchTemplateReference;
@@ -1562,7 +1525,7 @@ export interface CreateInstanceRequestBody {
    * Setting the value to `true` for an image that does not support Fleet, or when booting from an existing volume, is rejected with 422 `INSTANCE_FLEET_UNSUPPORTED` before an order is placed. If Fleet is unavailable when an instance is created, the instance is still created and its `fleet_machine_id` is null.
    */
   join_fleet?: boolean;
-  checkout?: CheckoutOptions;
+  checkout?: CheckoutOptions06b7f7b;
 }
 
 /**
@@ -1655,7 +1618,7 @@ export interface ResizeInstanceRequestBody {
   instance_type_id: InstanceTypeId;
   /** The `proration_date` of the Billing Checkout Session preview for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
-  checkout?: CheckoutOptions;
+  checkout?: CheckoutOptions06b7f7b;
 }
 
 /**
@@ -2259,7 +2222,7 @@ export interface CreatePrivateImageRequestBody {
    * @maxLength 128
    */
   name: string;
-  checkout?: CheckoutOptions;
+  checkout?: CheckoutOptions06b7f7b;
 }
 
 export interface UpdatePrivateImageRequestBody {
@@ -2857,7 +2820,7 @@ export interface CreateVolumeBackupRequestBody {
    * @maxLength 128
    */
   name: string;
-  checkout?: CheckoutOptions;
+  checkout?: CheckoutOptions06b7f7b;
 }
 
 /**
@@ -2992,7 +2955,7 @@ export interface CreateVolumeSnapshotRequestBody {
    * @maxLength 128
    */
   name: string;
-  checkout?: CheckoutOptions;
+  checkout?: CheckoutOptions06b7f7b;
 }
 
 /**
@@ -3266,8 +3229,8 @@ export interface CreateVolumeRequestBody {
   size_gib?: number;
   volume_snapshot_id?: VolumeSnapshotId;
   volume_backup_id?: VolumeBackupId;
-  billing?: BillingChoice;
-  checkout?: CheckoutOptions;
+  billing: BillingChoice;
+  checkout?: CheckoutOptions06b7f7b;
   instance_id?: InstanceId;
 }
 
@@ -3327,14 +3290,14 @@ export interface ResizeVolumeRequestBody {
   size_gib: number;
   /** The `proration_date` of the Billing Checkout Session preview for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
-  checkout?: CheckoutOptions;
+  checkout?: CheckoutOptions06b7f7b;
 }
 
 export interface RetypeVolumeRequestBody {
   volume_type_id: VolumeTypeId;
   /** The `proration_date` of the Billing Checkout Session preview for this change, so that the order is priced from the same instant. Only for automatic checkout; deferred checkout is priced when the customer completes it. Defaults to the time of the request; it must be a whole second, not in the future and at most 10 minutes old, otherwise the request is refused with `BILLING_CHANGE_INVALID`. */
   proration_date?: string;
-  checkout?: CheckoutOptions;
+  checkout?: CheckoutOptions06b7f7b;
 }
 
 export interface VolumeAttachmentList {

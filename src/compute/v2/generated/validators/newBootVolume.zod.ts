@@ -51,7 +51,7 @@ export const NewBootVolume = zod
       .describe(
         "What releasing the instance does to this volume. `delete` deletes it with the instance; `detach` keeps it, still billed on its own terms, for you to attach elsewhere or delete.",
       ),
-    billing: BillingChoice.optional(),
+    billing: BillingChoice,
   })
   .describe(
     "A boot volume created from an image and recorded in the instance order. Its commercial terms are explicit and its release policy does not override them.",

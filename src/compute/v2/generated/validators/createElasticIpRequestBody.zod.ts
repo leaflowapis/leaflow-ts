@@ -53,7 +53,7 @@ export const CreateElasticIpRequestBody = zod.strictObject({
       'The bandwidth ceiling of this address, in Mbit/s, applied to both directions.\n\nRequired, and there is no "unlimited": an address with no ceiling runs at line rate and is\ncharged nothing for the traffic, while the address itself bills normally — so the invoice\nlooks correct and nothing anywhere reports it.\n\nAny whole number of Mbps within the line\'s `min_bandwidth_mbps` and `max_bandwidth_mbps`, otherwise the\nrequest is refused with `ELASTIC_IP_BANDWIDTH_RANGE`. Changing it\nlater updates the same elastic IP through `change-elastic-ip-bandwidth`, not an independent bandwidth resource.',
     ),
   line_id: ElasticIpLineId,
-  billing: BillingChoice.optional(),
+  billing: BillingChoice,
   checkout: CheckoutOptions.optional(),
   instance_id: InstanceId.optional(),
 });

@@ -33,19 +33,15 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
-import { BillingPeriod } from "./billingPeriod.zod.js";
-import { TerminationPolicy } from "./terminationPolicy.zod.js";
 
 export const BillingChoice = zod
   .strictObject({
-    usage_type: zod
-      .enum(["licensed", "metered"])
-      .describe("`licensed` pays for a period in advance; `metered` bills usage until canceled."),
-    period: BillingPeriod.optional(),
-    termination_policy: TerminationPolicy.optional(),
+    price_id: zod
+      .uuid()
+      .describe("The ID of a recurring price returned by Billing for this component's plan."),
   })
   .describe(
-    "The commercial terms for one newly purchased component. Licensed requires period and termination_policy; metered refuses both. Components in one instance purchase must use the same usage type and period, while their termination policies may differ.",
+    "The Billing price selected for this component's plan. Billing validates the price, currency, availability, cancellation terms and subscription period. Each newly purchased component selects its own price; a price cannot be inherited from a different component's plan.",
   );
 
 export type BillingChoice = zod.input<typeof BillingChoice>;

@@ -53,7 +53,7 @@ export const NewDataVolume = zod
       .describe(
         "What releasing the instance does to this volume. `delete` deletes it with the instance; `detach` keeps it, still billed on its own terms, for you to attach elsewhere or delete.",
       ),
-    billing: BillingChoice.optional(),
+    billing: BillingChoice,
   })
   .describe(
     "An empty data volume created in the instance's availability zone. Its terms follow the rule shared by every component of the purchase, so a pay-as-you-go instance gets pay-as-you-go data volumes, which stay pay-as-you-go once detached.",

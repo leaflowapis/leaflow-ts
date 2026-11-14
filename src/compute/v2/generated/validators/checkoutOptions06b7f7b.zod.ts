@@ -33,12 +33,48 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { CheckoutMode } from "./checkoutMode.zod.js";
+import { Money } from "./money.zod.js";
 
-export const TerminationPolicy = zod
-  .enum(["immediate", "period_end"])
+export const checkoutOptions06b7f7bModeDefault = `automatic`;
+export const checkoutOptions06b7f7bExpectedAmountTwoRegExp = new RegExp(
+  "^[0-9]{1,15}([.][0-9]{1,10})?$",
+);
+export const checkoutOptions06b7f7bReturnUrlMax = 2048;
+
+export const checkoutOptions06b7f7bAutoRenewDefault = false;
+
+export const CheckoutOptions06b7f7b = zod
+  .strictObject({
+    mode: CheckoutMode.default(checkoutOptions06b7f7bModeDefault),
+    expected_amount: Money.and(zod.string().regex(checkoutOptions06b7f7bExpectedAmountTwoRegExp))
+      .optional()
+      .describe(
+        "Expected invoice total after discounts and tax, before applying credit grants or balance.\nA different total fails with BILLING_AMOUNT_CHANGED without charging or reserving a discount.\nAccepted only in automatic mode; with deferred it is refused with HTTP 400. For deferred\ncheckout, give the expected amount when completing it through Billing.",
+      ),
+    return_url: zod
+      .url()
+      .max(checkoutOptions06b7f7bReturnUrlMax)
+      .optional()
+      .describe(
+        "Where the client goes after the customer finishes a deferred checkout. Any absolute URI with a\nscheme, including mobile and desktop application schemes. Billing stores it without checking the\ntarget; each client validates its own.",
+      ),
+    auto_renew: zod
+      .boolean()
+      .default(checkoutOptions06b7f7bAutoRenewDefault)
+      .describe(
+        "Turns on automatic renewal of every subscription with licensed items that the purchase opens. Off\nwhen omitted. It must be the customer's own choice. For a free trial, it converts the trial to paid\nwhen the trial ends.",
+      ),
+    trial_grant_id: zod
+      .uuid()
+      .optional()
+      .describe(
+        "A free trial grant of the paying billing account that the customer chose to use. The first new\nsubscription of the purchase whose lines are all of plans the grant's offer lists, within each plan's\nmax_quantity, and that has a licensed line and no trial of its own, opens with the offer's free trial. Accepted only in automatic mode; with deferred it is refused with\nHTTP 400, and the grant is chosen when completing the checkout through Billing. Refused with\nBILLING_TRIAL_GRANT_INAPPLICABLE when no subscription qualifies or the grant cannot be used now.",
+      ),
+  })
   .describe(
-    "Immediate ends service when cancellation takes effect, with refunds governed by the purchased terms. Period-end keeps service until the paid period ends.",
+    "Shared checkout choices for a product purchase. The service may set them or forward its client's\nchoices unchanged; it does not need to read them, and Billing validates them. Omitting this object or\nmode selects automatic checkout. Each purchase creates its own Checkout Session. Promotion codes are supplied\nonly to Billing. A service may retain a failed creation record when Billing refuses a purchase; no\ninfrastructure is created for that refusal.",
   );
 
-export type TerminationPolicy = zod.input<typeof TerminationPolicy>;
-export type TerminationPolicyOutput = zod.output<typeof TerminationPolicy>;
+export type CheckoutOptions06b7f7b = zod.input<typeof CheckoutOptions06b7f7b>;
+export type CheckoutOptions06b7f7bOutput = zod.output<typeof CheckoutOptions06b7f7b>;

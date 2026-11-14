@@ -51,7 +51,7 @@ export const NewElasticIp = zod
         "Any whole number of Mbps within the line's `min_bandwidth_mbps` and `max_bandwidth_mbps`, otherwise refused with `ELASTIC_IP_BANDWIDTH_RANGE`.",
       ),
     internet_charge_type: InternetChargeType.optional(),
-    billing: BillingChoice.optional(),
+    billing: BillingChoice,
   })
   .describe(
     "One IPv4 elastic IP created with this bandwidth configuration in the instance's order.",
