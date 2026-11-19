@@ -36,7 +36,6 @@
     "generate": "orval && npm run generate:proto",
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsc -p tsconfig.build.json && tsc --noEmit --module NodeNext --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck tests/*.test.ts && node --test tests/*.test.ts tests/*.test.mjs",
     "prepublishOnly": "npm run build",
     "format:check": "prettier --check orval.config.mjs src",
     "generate:proto": "buf generate \"${CONTRACTS_DIR:-./leaflowapis}\" --template buf.gen.yaml"

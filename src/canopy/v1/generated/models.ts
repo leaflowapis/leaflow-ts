@@ -48,7 +48,7 @@
  * - **A usage query must carry a time range**, spanning no more than 31 days for individual request records (which are retained for 90 days), or 400 days for aggregated usage endpoints (which are retained for 400 days). `from` and `to` carry a timezone offset, which the server does not infer.
  * - **The request and response bodies do not appear in the ledger.** They are not recorded. Quote the request `id` when reporting a problem.
  * - **Usage may be estimated.** The upstream provider does not report usage on every request. Where it does not, `usage_source` is `estimated` and the figures are derived from the character classes of the payload, to within roughly fifteen per cent.
- * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
+ * - **The service is enabled before use.** A project enables the model platform once, through `create-enablement`; the forwarding endpoints refuse its requests until the enablement is `active`. Requests are then billed under the enablement's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
  * OpenAPI spec version: 1.0.0
  */
 export type ChatCompletionRequestMessagesItem = { [key: string]: unknown };
@@ -719,12 +719,12 @@ export interface ModelListResponseBody {
 }
 
 /**
- * `inactive` has never been enabled or its subscription has ended; `pending` awaits completion of its checkout and acceptance of its order; `active` accepts requests on the forwarding endpoints; `failed` means the enablement failed, as `failure_reason` states. An `inactive` or `failed` service can be enabled again.
+ * `inactive` has never been enabled or its subscription has ended; `pending` awaits completion of its checkout and acceptance of its order; `active` accepts requests on the forwarding endpoints; `failed` means the enablement failed, as `failure_reason` states. An `inactive` or `failed` enablement can be enabled again.
  */
-export type ServiceResourceStatus =
-  (typeof ServiceResourceStatus)[keyof typeof ServiceResourceStatus];
+export type EnablementResourceStatus =
+  (typeof EnablementResourceStatus)[keyof typeof EnablementResourceStatus];
 
-export const ServiceResourceStatus = {
+export const EnablementResourceStatus = {
   inactive: "inactive",
   pending: "pending",
   active: "active",
@@ -735,11 +735,11 @@ export const ServiceResourceStatus = {
  * Why the enablement failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired; `order_declined` means Billing did not accept the order, for example because the billing account is suspended; `order_canceled` means the order was withdrawn; `order_expired` means it was not paid in time.
  * @nullable
  */
-export type ServiceResourceFailureReason =
-  | (typeof ServiceResourceFailureReason)[keyof typeof ServiceResourceFailureReason]
+export type EnablementResourceFailureReason =
+  | (typeof EnablementResourceFailureReason)[keyof typeof EnablementResourceFailureReason]
   | null;
 
-export const ServiceResourceFailureReason = {
+export const EnablementResourceFailureReason = {
   checkout_expired: "checkout_expired",
   order_declined: "order_declined",
   order_canceled: "order_canceled",
@@ -747,16 +747,16 @@ export const ServiceResourceFailureReason = {
 } as const;
 
 /**
- * The model platform service of a project.
+ * The model platform enablement of a project.
  */
-export interface ServiceResource {
-  /** `inactive` has never been enabled or its subscription has ended; `pending` awaits completion of its checkout and acceptance of its order; `active` accepts requests on the forwarding endpoints; `failed` means the enablement failed, as `failure_reason` states. An `inactive` or `failed` service can be enabled again. */
-  status: ServiceResourceStatus;
+export interface EnablementResource {
+  /** `inactive` has never been enabled or its subscription has ended; `pending` awaits completion of its checkout and acceptance of its order; `active` accepts requests on the forwarding endpoints; `failed` means the enablement failed, as `failure_reason` states. An `inactive` or `failed` enablement can be enabled again. */
+  status: EnablementResourceStatus;
   /**
    * Why the enablement failed; null unless `status` is `failed`. `checkout_expired` means checkout was not completed before its Checkout Session expired; `order_declined` means Billing did not accept the order, for example because the billing account is suspended; `order_canceled` means the order was withdrawn; `order_expired` means it was not paid in time.
    * @nullable
    */
-  failure_reason: ServiceResourceFailureReason;
+  failure_reason: EnablementResourceFailureReason;
   /**
    * The Checkout Session of the latest enablement; null before any enablement.
    * @nullable
@@ -778,7 +778,7 @@ export interface ServiceResource {
    */
   subscription_id: string | null;
   /**
-   * When the service became active and billing began; null until then.
+   * When the enablement became active and billing began; null until then.
    * @nullable
    */
   activated_at: string | null;
@@ -857,15 +857,15 @@ export interface CheckoutOptions {
   trial_grant_id?: string;
 }
 
-export interface CreateServiceRequestBody {
+export interface CreateEnablementRequestBody {
   checkout?: CheckoutOptions;
 }
 
 /**
- * The service, `pending` until its order is accepted, and its Checkout Session.
+ * The enablement, `pending` until its order is accepted, and its Checkout Session.
  */
-export interface CreateServiceResponseBody {
-  service: ServiceResource;
+export interface CreateEnablementResponseBody {
+  enablement: EnablementResource;
   /** The Billing Checkout Session of this enablement. With deferred checkout, the customer completes it in Billing. */
   checkout_session_id: string;
   /**

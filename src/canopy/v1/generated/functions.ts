@@ -48,7 +48,7 @@
  * - **A usage query must carry a time range**, spanning no more than 31 days for individual request records (which are retained for 90 days), or 400 days for aggregated usage endpoints (which are retained for 400 days). `from` and `to` carry a timezone offset, which the server does not infer.
  * - **The request and response bodies do not appear in the ledger.** They are not recorded. Quote the request `id` when reporting a problem.
  * - **Usage may be estimated.** The upstream provider does not report usage on every request. Where it does not, `usage_source` is `estimated` and the figures are derived from the character classes of the payload, to within roughly fifteen per cent.
- * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
+ * - **The service is enabled before use.** A project enables the model platform once, through `create-enablement`; the forwarding endpoints refuse its requests until the enablement is `active`. Requests are then billed under the enablement's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
  * OpenAPI spec version: 1.0.0
  */
 import { decodeResponse } from "../../../response.js";
@@ -63,13 +63,14 @@ import type {
   ChatCompletionRequest,
   ConflictResponse,
   CreateAPIKeyRequestBody,
-  CreateServiceRequestBody,
-  CreateServiceResponseBody,
+  CreateEnablementRequestBody,
+  CreateEnablementResponseBody,
   CreateSystemOneHeaders,
   DecisionRequest,
   DecisionResponse,
   EmbeddingRequest,
   EmbeddingResponse,
+  EnablementResource,
   ErrorResponse,
   GetUsageSummaryParams,
   GetUsageTimelineParams,
@@ -99,7 +100,6 @@ import type {
   RequestResource,
   ResponseCreate,
   ResponseResource,
-  ServiceResource,
   SourceUsageListResponseBody,
   SourceUsageTimelineResponseBody,
   SpeechRequest,
@@ -2138,93 +2138,95 @@ export const getRequest = async (
   return { data, status: res.status, headers: res.headers } as getRequestResponse;
 };
 
-export type getServiceResponse200 = {
-  data: ServiceResource;
+export type getEnablementResponse200 = {
+  data: EnablementResource;
   status: 200;
 };
 
-export type getServiceResponseDefault = {
+export type getEnablementResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 200>;
 };
 
-export type getServiceResponseSuccess = getServiceResponse200 & {
+export type getEnablementResponseSuccess = getEnablementResponse200 & {
   headers: Headers;
 };
-export type getServiceResponseError = getServiceResponseDefault & {
+export type getEnablementResponseError = getEnablementResponseDefault & {
   headers: Headers;
 };
 
-export type getServiceResponse = getServiceResponseSuccess | getServiceResponseError;
+export type getEnablementResponse = getEnablementResponseSuccess | getEnablementResponseError;
 
-export const getGetServiceUrl = () => {
-  return `https://canopy.leaflow.cloud/api/v1/service`;
+export const getGetEnablementUrl = () => {
+  return `https://canopy.leaflow.cloud/api/v1/enablement`;
 };
 
 /**
- * The model platform service of the authenticated project. The forwarding endpoints accept its requests only while `status` is `active`; each request is then billed under `subscription_id`, per token, at the rates Billing holds for each model's `billing`.
+ * The model platform enablement of the authenticated project. The forwarding endpoints accept its requests only while `status` is `active`; each request is then billed under `subscription_id`, per token, at the rates Billing holds for each model's `billing`.
  *
- * When the project is deleted, its API keys are revoked and the subscription is canceled; the service then reads `inactive` with `ended_at` set.
- * @summary Get the model platform service
+ * When the project is deleted, its API keys are revoked and the subscription is canceled; the enablement then reads `inactive` with `ended_at` set.
+ * @summary Get the model platform enablement
  */
-export const getService = async (
+export const getEnablement = async (
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<getServiceResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetServiceUrl(), {
+): Promise<getEnablementResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetEnablementUrl(), {
     ...options,
     method: "GET",
   });
-  const data: getServiceResponse["data"] = (await decodeResponse(
+  const data: getEnablementResponse["data"] = (await decodeResponse(
     res,
     { "200": "json", default: "json" },
     {},
-  )) as getServiceResponse["data"];
-  return { data, status: res.status, headers: res.headers } as getServiceResponse;
+  )) as getEnablementResponse["data"];
+  return { data, status: res.status, headers: res.headers } as getEnablementResponse;
 };
 
-export type createServiceResponse202 = {
-  data: CreateServiceResponseBody;
+export type createEnablementResponse202 = {
+  data: CreateEnablementResponseBody;
   status: 202;
 };
 
-export type createServiceResponse409 = {
+export type createEnablementResponse409 = {
   data: ConflictResponse;
   status: 409;
 };
 
-export type createServiceResponseDefault = {
+export type createEnablementResponseDefault = {
   data: ErrorResponse;
   status: Exclude<HTTPStatusCodes, 202 | 409>;
 };
 
-export type createServiceResponseSuccess = createServiceResponse202 & {
+export type createEnablementResponseSuccess = createEnablementResponse202 & {
   headers: Headers;
 };
-export type createServiceResponseError = (
-  | createServiceResponse409
-  | createServiceResponseDefault
+export type createEnablementResponseError = (
+  | createEnablementResponse409
+  | createEnablementResponseDefault
 ) & {
   headers: Headers;
 };
 
-export type createServiceResponse = createServiceResponseSuccess | createServiceResponseError;
+export type createEnablementResponse =
+  | createEnablementResponseSuccess
+  | createEnablementResponseError;
 
-export const getCreateServiceUrl = () => {
-  return `https://canopy.leaflow.cloud/api/v1/service`;
+export const getCreateEnablementUrl = () => {
+  return `https://canopy.leaflow.cloud/api/v1/enablement`;
 };
 
 /**
- * Purchases the model platform service for this project. The service itself has no charge; requests are metered under it by the tokens they use. It takes no billing choice. Returns the service as `pending` with its Checkout Session; it becomes `active` once the order is accepted, which with automatic checkout and nothing to pay happens without further action.
+ * Purchases the model platform enablement for this project. The enablement itself has no charge; requests are metered under it by the tokens they use. It takes no billing choice. Returns the enablement as `pending` with its Checkout Session; it becomes `active` once the order is accepted, which with automatic checkout and nothing to pay happens without further action.
  *
- * Refused with 409 `SERVICE_ALREADY_ENABLED` while an enablement is pending or the service is active. A refusal of the order by Billing is returned with Billing's code, such as `BILLING_PRICE_UNAVAILABLE` when the service has no price in the currency of the project's billing account.
+ * Refused with 409 `SERVICE_ALREADY_ENABLED` while an enablement is pending or active. A refusal of the order by Billing is returned with Billing's code, such as `BILLING_PRICE_UNAVAILABLE` when the service has no price in the currency of the project's billing account.
  * @summary Enable the model platform service
  */
-export const createService = async (
-  createServiceRequestBody: CreateServiceRequestBody,
+export const createEnablement = async (
+  createEnablementRequestBody: CreateEnablementRequestBody,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
-): Promise<createServiceResponse> => {
+): Promise<createEnablementResponse> => {
   const getHeaders = (
     h?: NonNullable<RequestInit["headers"]>,
   ): Record<string, string | readonly string[]> => {
@@ -2244,18 +2246,18 @@ export const createService = async (
     }
     return headers;
   };
-  const res = await (fetchFn ?? fetch)(getCreateServiceUrl(), {
+  const res = await (fetchFn ?? fetch)(getCreateEnablementUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
-    body: JSON.stringify(createServiceRequestBody),
+    body: JSON.stringify(createEnablementRequestBody),
   });
-  const data: createServiceResponse["data"] = (await decodeResponse(
+  const data: createEnablementResponse["data"] = (await decodeResponse(
     res,
     { "202": "json", "409": "json", default: "json" },
     {},
-  )) as createServiceResponse["data"];
-  return { data, status: res.status, headers: res.headers } as createServiceResponse;
+  )) as createEnablementResponse["data"];
+  return { data, status: res.status, headers: res.headers } as createEnablementResponse;
 };
 
 export type listUsageByApiKeyResponse200 = {

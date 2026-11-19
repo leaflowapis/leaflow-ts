@@ -48,7 +48,7 @@
  * - **A usage query must carry a time range**, spanning no more than 31 days for individual request records (which are retained for 90 days), or 400 days for aggregated usage endpoints (which are retained for 400 days). `from` and `to` carry a timezone offset, which the server does not infer.
  * - **The request and response bodies do not appear in the ledger.** They are not recorded. Quote the request `id` when reporting a problem.
  * - **Usage may be estimated.** The upstream provider does not report usage on every request. Where it does not, `usage_source` is `estimated` and the figures are derived from the character classes of the payload, to within roughly fifteen per cent.
- * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
+ * - **The service is enabled before use.** A project enables the model platform once, through `create-enablement`; the forwarding endpoints refuse its requests until the enablement is `active`. Requests are then billed under the enablement's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";

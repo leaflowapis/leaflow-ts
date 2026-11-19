@@ -48,7 +48,7 @@
  * - **A usage query must carry a time range**, spanning no more than 31 days for individual request records (which are retained for 90 days), or 400 days for aggregated usage endpoints (which are retained for 400 days). `from` and `to` carry a timezone offset, which the server does not infer.
  * - **The request and response bodies do not appear in the ledger.** They are not recorded. Quote the request `id` when reporting a problem.
  * - **Usage may be estimated.** The upstream provider does not report usage on every request. Where it does not, `usage_source` is `estimated` and the figures are derived from the character classes of the payload, to within roughly fifteen per cent.
- * - **The service is enabled before use.** A project enables the model platform once, through `create-service`; the forwarding endpoints refuse its requests until the service is `active`. Requests are then billed under the service's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
+ * - **The service is enabled before use.** A project enables the model platform once, through `create-enablement`; the forwarding endpoints refuse its requests until the enablement is `active`. Requests are then billed under the enablement's subscription by the tokens they use, at the rates Billing holds for each model's `billing`.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -59,7 +59,7 @@ import { ChatCompletionRequest } from "./validators/chatCompletionRequest.zod.js
 
 import { CreateAPIKeyRequestBody } from "./validators/createAPIKeyRequestBody.zod.js";
 
-import { CreateServiceRequestBody } from "./validators/createServiceRequestBody.zod.js";
+import { CreateEnablementRequestBody } from "./validators/createEnablementRequestBody.zod.js";
 
 import { DecisionRequest } from "./validators/decisionRequest.zod.js";
 
@@ -437,12 +437,12 @@ export const GetRequestParams = zod.strictObject({
 });
 
 /**
- * Purchases the model platform service for this project. The service itself has no charge; requests are metered under it by the tokens they use. It takes no billing choice. Returns the service as `pending` with its Checkout Session; it becomes `active` once the order is accepted, which with automatic checkout and nothing to pay happens without further action.
+ * Purchases the model platform enablement for this project. The enablement itself has no charge; requests are metered under it by the tokens they use. It takes no billing choice. Returns the enablement as `pending` with its Checkout Session; it becomes `active` once the order is accepted, which with automatic checkout and nothing to pay happens without further action.
  *
- * Refused with 409 `SERVICE_ALREADY_ENABLED` while an enablement is pending or the service is active. A refusal of the order by Billing is returned with Billing's code, such as `BILLING_PRICE_UNAVAILABLE` when the service has no price in the currency of the project's billing account.
+ * Refused with 409 `SERVICE_ALREADY_ENABLED` while an enablement is pending or active. A refusal of the order by Billing is returned with Billing's code, such as `BILLING_PRICE_UNAVAILABLE` when the service has no price in the currency of the project's billing account.
  * @summary Enable the model platform service
  */
-export const CreateServiceBody = CreateServiceRequestBody;
+export const CreateEnablementBody = CreateEnablementRequestBody;
 
 /**
  * Answers which key is consuming the budget. A key that has been revoked still appears, since the usage it accrued beforehand is part of that answer.
