@@ -58,7 +58,7 @@ export const rateLimitResourceRpmLimitMax = 2147483647;
 
 export const rateLimitResourceRpmMin = 0;
 
-export const rateLimitResourceTpmMin = 0;
+export const rateLimitResourceTpsMin = 0;
 
 export const RateLimitResource = zod.strictObject({
   rpm_limit: zod
@@ -75,12 +75,12 @@ export const RateLimitResource = zod.strictObject({
     .describe(
       "Exact API-key arrivals passing the project rate limiter in the last 60 seconds, including pre-model rejections. Null when the live store is unavailable.",
     ),
-  tpm: zod
-    .int()
-    .min(rateLimitResourceTpmMin)
+  tps: zod
+    .number()
+    .min(rateLimitResourceTpsMin)
     .nullable()
     .describe(
-      "Normalized API-key token-usage deltas observed in the last 60 one-second buckets, including delayed streaming usage and estimates. Not a limit. Null when the live store is unavailable.",
+      "Output throughput in tokens per second across completed requests with reported output or reasoning tokens in the last 60 seconds (total output tokens divided by total end-to-end request duration). Observational only, not a limit. Returns 0 when no eligible output requests completed in the window, or null when the live store is unavailable.",
     ),
   window_seconds: zod.literal(60).describe("Length of the observation window in seconds."),
   observed_at: zod.iso

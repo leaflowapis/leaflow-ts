@@ -455,11 +455,11 @@ export interface RateLimitResource {
    */
   rpm: number | null;
   /**
-   * Normalized API-key token-usage deltas observed in the last 60 one-second buckets, including delayed streaming usage and estimates. Not a limit. Null when the live store is unavailable.
+   * Output throughput in tokens per second across completed requests with reported output or reasoning tokens in the last 60 seconds (total output tokens divided by total end-to-end request duration). Observational only, not a limit. Returns 0 when no eligible output requests completed in the window, or null when the live store is unavailable.
    * @minimum 0
    * @nullable
    */
-  tpm: number | null;
+  tps: number | null;
   /** Length of the observation window in seconds. */
   window_seconds: RateLimitResourceWindowSeconds;
   /** UTC RFC 3339 snapshot time, with one-second precision. */
