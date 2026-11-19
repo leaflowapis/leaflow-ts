@@ -1,0 +1,16 @@
+# The protobuf messages of the contract's buf module (the Fleet protocol), for clients that
+# speak it directly, such as a browser viewer. Messages only: these services are carried by the
+# protocol's own connections and rpc frames, never by gRPC or Connect.
+#
+# Files keep their proto paths under src/proto (leaflow/fleet/…, google/rpc/…), so imports
+# between generated files stay valid. Well-known types come from @bufbuild/protobuf/wkt and are not
+# generated. clean removes files of protos the contract no longer has.
+version: v2
+clean: true
+plugins:
+  - local: protoc-gen-es
+    out: src/proto
+    include_imports: true
+    opt:
+      - target=ts
+      - import_extension=js
