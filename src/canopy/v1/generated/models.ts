@@ -624,7 +624,7 @@ export const ModelResourceAccess = {
 } as const;
 
 /**
- * The billable quantity this entry prices. Token kinds are `input`, `output`, `cache_read`, `cache_write` and `reasoning`; media kinds are `images`, `audio_characters`, `audio_seconds` and `video_seconds`.
+ * The billable quantity this entry prices. Token kinds are `input`, `output`, `cache_read`, `cache_write`, `reasoning`, `audio_input`, `audio_output` and `audio_cache_read`; media kinds are `images`, `audio_characters`, `audio_seconds`, `video_seconds` and `rerank_units`.
  */
 export type ModelMeterKind = (typeof ModelMeterKind)[keyof typeof ModelMeterKind];
 
@@ -634,6 +634,9 @@ export const ModelMeterKind = {
   cache_read: "cache_read",
   cache_write: "cache_write",
   reasoning: "reasoning",
+  audio_input: "audio_input",
+  audio_output: "audio_output",
+  audio_cache_read: "audio_cache_read",
   images: "images",
   audio_characters: "audio_characters",
   audio_seconds: "audio_seconds",
@@ -647,7 +650,7 @@ export const ModelMeterKind = {
 export type ModelMeterDimensions = { [key: string]: string };
 
 export interface ModelMeter {
-  /** The billable quantity this entry prices. Token kinds are `input`, `output`, `cache_read`, `cache_write` and `reasoning`; media kinds are `images`, `audio_characters`, `audio_seconds` and `video_seconds`. */
+  /** The billable quantity this entry prices. Token kinds are `input`, `output`, `cache_read`, `cache_write`, `reasoning`, `audio_input`, `audio_output` and `audio_cache_read`; media kinds are `images`, `audio_characters`, `audio_seconds`, `video_seconds` and `rerank_units`. */
   kind: ModelMeterKind;
   meter_lookup_key: string;
   /** The unit the meter counts in, such as token, image, character or second. */
@@ -661,7 +664,7 @@ export interface ModelMeter {
 /**
  * How requests to a model are billed: under the service's subscription, on the Billing plan `plan_id`, one rate for each billable kind. Read the rates from Billing with `search-prices` for the plan, narrowing each price's `rates` with each meter's `dimensions`.
  *
- * Text is billed on the five token kinds. `input` excludes cached input, which is `cache_read`; `output` excludes reasoning the provider reports separately, which is `reasoning`. Media is billed on its own unit and never converted to tokens: `images` counts generated images, `audio_characters` counts the input characters of speech synthesis, `audio_seconds` counts the duration of a transcription, and `video_seconds` counts the duration of a generated video. A request is billed for each kind it used.
+ * Text is billed on the five token kinds. `input` excludes cached input, which is `cache_read`; `output` excludes reasoning the provider reports separately, which is `reasoning`. Realtime sessions also bill audio tokens on the `tokens` meter via `audio_input`, `audio_output`, and `audio_cache_read`. Media is billed on its own unit and never converted to tokens: `images` counts generated images, `audio_characters` counts the input characters of speech synthesis, `audio_seconds` counts the duration of a transcription, and `video_seconds` counts the duration of a generated video. A request is billed for each kind it used.
  *
  * Rates are set per currency, and a currency may not offer a model at all. A model is offered in the currency of the project's billing account when at least one of its billable kinds has a rate there; a kind without a rate in that currency is not charged. Requests to a model with no rate in that currency are refused with 403 `BILLING_MODEL_NOT_OFFERED`.
  */
@@ -1064,6 +1067,21 @@ export interface RequestResource {
    * @nullable
    */
   reasoning_tokens: number | null;
+  /**
+   * Uncached audio input tokens consumed in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_input_tokens?: number | null;
+  /**
+   * Audio output tokens synthesized in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_output_tokens?: number | null;
+  /**
+   * Cached audio input tokens served from upstream cache in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_cache_read_tokens?: number | null;
   retries: number;
   /**
    * Who made the request. `api_key` means one of the project's API keys and `project_token` a project access token on the OpenAI-compatible endpoints; any other value names the Leaflow service that made it on the project's behalf, such as `assistant`, and more services may appear. Null for requests recorded before sources were tracked
@@ -1122,6 +1140,21 @@ export interface APIKeyUsageResource {
    * @nullable
    */
   reasoning_tokens: number | null;
+  /**
+   * Uncached audio input tokens consumed in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_input_tokens?: number | null;
+  /**
+   * Audio output tokens synthesized in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_output_tokens?: number | null;
+  /**
+   * Cached audio input tokens served from upstream cache in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_cache_read_tokens?: number | null;
   /** Media quantities and their rate dimensions. Null when this range has no media usage. */
   media?: MediaUsage | null;
   requests: number;
@@ -1153,6 +1186,21 @@ export interface APIKeyUsageBucketResource {
   cache_write_tokens: number | null;
   /** @nullable */
   reasoning_tokens: number | null;
+  /**
+   * Uncached audio input tokens consumed in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_input_tokens?: number | null;
+  /**
+   * Audio output tokens synthesized in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_output_tokens?: number | null;
+  /**
+   * Cached audio input tokens served from upstream cache in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_cache_read_tokens?: number | null;
   media?: MediaUsage | null;
 }
 
@@ -1187,6 +1235,21 @@ export interface ModelUsageResource {
    * @nullable
    */
   reasoning_tokens: number | null;
+  /**
+   * Uncached audio input tokens consumed in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_input_tokens?: number | null;
+  /**
+   * Audio output tokens synthesized in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_output_tokens?: number | null;
+  /**
+   * Cached audio input tokens served from upstream cache in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_cache_read_tokens?: number | null;
   /** Media quantities and their rate dimensions. Null when this range has no media usage. */
   media?: MediaUsage | null;
   requests: number;
@@ -1233,6 +1296,21 @@ export interface SourceUsageResource {
    * @nullable
    */
   reasoning_tokens: number | null;
+  /**
+   * Uncached audio input tokens consumed in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_input_tokens?: number | null;
+  /**
+   * Audio output tokens synthesized in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_output_tokens?: number | null;
+  /**
+   * Cached audio input tokens served from upstream cache in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_cache_read_tokens?: number | null;
   /** Media quantities and their rate dimensions. Null when this range has no media usage. */
   media?: MediaUsage | null;
   requests: number;
@@ -1268,6 +1346,21 @@ export interface SourceUsageBucketResource {
   cache_write_tokens: number | null;
   /** @nullable */
   reasoning_tokens: number | null;
+  /**
+   * Uncached audio input tokens consumed in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_input_tokens?: number | null;
+  /**
+   * Audio output tokens synthesized in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_output_tokens?: number | null;
+  /**
+   * Cached audio input tokens served from upstream cache in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_cache_read_tokens?: number | null;
   media?: MediaUsage | null;
 }
 
@@ -1301,6 +1394,21 @@ export interface TotalsResource {
    * @nullable
    */
   reasoning_tokens: number | null;
+  /**
+   * Uncached audio input tokens consumed in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_input_tokens?: number | null;
+  /**
+   * Audio output tokens synthesized in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_output_tokens?: number | null;
+  /**
+   * Cached audio input tokens served from upstream cache in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_cache_read_tokens?: number | null;
   /** Media quantities and their rate dimensions. Null when this range has no media usage. */
   media?: MediaUsage | null;
   requests: number;
@@ -1339,6 +1447,21 @@ export interface UsageBucketResource {
    * @nullable
    */
   reasoning_tokens: number | null;
+  /**
+   * Uncached audio input tokens consumed in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_input_tokens?: number | null;
+  /**
+   * Audio output tokens synthesized in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_output_tokens?: number | null;
+  /**
+   * Cached audio input tokens served from upstream cache in realtime sessions. Omitted or null when unused.
+   * @nullable
+   */
+  audio_cache_read_tokens?: number | null;
   /** Media quantities and their rate dimensions. Null when this range has no media usage. */
   media?: MediaUsage | null;
   requests: number;

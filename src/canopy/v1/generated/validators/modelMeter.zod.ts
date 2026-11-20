@@ -61,6 +61,9 @@ export const ModelMeter = zod.strictObject({
       "cache_read",
       "cache_write",
       "reasoning",
+      "audio_input",
+      "audio_output",
+      "audio_cache_read",
       "images",
       "audio_characters",
       "audio_seconds",
@@ -68,7 +71,7 @@ export const ModelMeter = zod.strictObject({
       "rerank_units",
     ])
     .describe(
-      "The billable quantity this entry prices. Token kinds are `input`, `output`, `cache_read`, `cache_write` and `reasoning`; media kinds are `images`, `audio_characters`, `audio_seconds` and `video_seconds`.",
+      "The billable quantity this entry prices. Token kinds are `input`, `output`, `cache_read`, `cache_write`, `reasoning`, `audio_input`, `audio_output` and `audio_cache_read`; media kinds are `images`, `audio_characters`, `audio_seconds`, `video_seconds` and `rerank_units`.",
     ),
   meter_lookup_key: zod.string(),
   unit: zod

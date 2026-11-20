@@ -69,6 +69,22 @@ export const SourceUsageResource = zod.strictObject({
   input_tokens: zod.int().nullable().describe("Null when this range has no token usage."),
   output_tokens: zod.int().nullable().describe("Null when this range has no token usage."),
   reasoning_tokens: zod.int().nullable().describe("Null when this range has no token usage."),
+  audio_input_tokens: zod
+    .int()
+    .nullish()
+    .describe(
+      "Uncached audio input tokens consumed in realtime sessions. Omitted or null when unused.",
+    ),
+  audio_output_tokens: zod
+    .int()
+    .nullish()
+    .describe("Audio output tokens synthesized in realtime sessions. Omitted or null when unused."),
+  audio_cache_read_tokens: zod
+    .int()
+    .nullish()
+    .describe(
+      "Cached audio input tokens served from upstream cache in realtime sessions. Omitted or null when unused.",
+    ),
   media: zod
     .union([MediaUsage, zod.null()])
     .optional()
