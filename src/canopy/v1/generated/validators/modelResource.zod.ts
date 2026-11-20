@@ -81,6 +81,12 @@ export const ModelResource = zod.strictObject({
     .nullable()
     .describe("Produced output modalities. Image input does not imply image generation."),
   capabilities: ModelCapabilities,
+  supported_endpoints: zod
+    .array(zod.string())
+    .optional()
+    .describe(
+      "Inference endpoints reachable on Canopy for this model, derived from its provider mappings.",
+    ),
   access: zod
     .enum(["public", "restricted"])
     .describe(

@@ -81,6 +81,8 @@ import type {
   InferenceError,
   IssuedAPIKeyResource,
   ListApiKeysParams,
+  ListInferenceModelsParams,
+  ListModelsParams,
   ListRequestsParams,
   ListUsageByApiKeyParams,
   ListUsageByApiKeyTimelineParams,
@@ -1388,18 +1390,31 @@ export type listInferenceModelsResponse =
   | listInferenceModelsResponseSuccess
   | listInferenceModelsResponseError;
 
-export const getListInferenceModelsUrl = () => {
-  return `https://canopy.leaflow.cloud/v1/models`;
+export const getListInferenceModelsUrl = (params?: ListInferenceModelsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://canopy.leaflow.cloud/v1/models?${stringifiedParams}`
+    : `https://canopy.leaflow.cloud/v1/models`;
 };
 
 /**
  * @summary List callable models with capabilities and parameter limits
  */
 export const listInferenceModels = async (
+  params?: ListInferenceModelsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listInferenceModelsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListInferenceModelsUrl(), {
+  const res = await (fetchFn ?? fetch)(getListInferenceModelsUrl(params), {
     ...options,
     method: "GET",
   });
@@ -1903,8 +1918,20 @@ export type listModelsResponseError = listModelsResponseDefault & {
 
 export type listModelsResponse = listModelsResponseSuccess | listModelsResponseError;
 
-export const getListModelsUrl = () => {
-  return `https://canopy.leaflow.cloud/api/v1/models`;
+export const getListModelsUrl = (params?: ListModelsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://canopy.leaflow.cloud/api/v1/models?${stringifiedParams}`
+    : `https://canopy.leaflow.cloud/api/v1/models`;
 };
 
 /**
@@ -1918,10 +1945,11 @@ export const getListModelsUrl = () => {
  * @summary List the available models
  */
 export const listModels = async (
+  params?: ListModelsParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listModelsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListModelsUrl(), {
+  const res = await (fetchFn ?? fetch)(getListModelsUrl(params), {
     ...options,
     method: "GET",
   });

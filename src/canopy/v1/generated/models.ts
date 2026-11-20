@@ -602,6 +602,23 @@ export interface UpdateAPIKeyRequestBody {
   model_aliases?: ModelAliases;
 }
 
+/**
+ * High-level capability category derived from a model's reachable inference endpoints.
+ */
+export type ModelCategory = (typeof ModelCategory)[keyof typeof ModelCategory];
+
+export const ModelCategory = {
+  chat: "chat",
+  image: "image",
+  video: "video",
+  speech: "speech",
+  transcription: "transcription",
+  realtime: "realtime",
+  embedding: "embedding",
+  rerank: "rerank",
+  decision: "decision",
+} as const;
+
 export type ModelResourceStatus = (typeof ModelResourceStatus)[keyof typeof ModelResourceStatus];
 
 export const ModelResourceStatus = {
@@ -704,6 +721,8 @@ export interface ModelResource {
    */
   output_modalities: Modality[] | null;
   capabilities: ModelCapabilities;
+  /** Inference endpoints reachable on Canopy for this model, derived from its provider mappings. */
+  supported_endpoints?: string[];
   /**
    * Who can call the model. Every model is listed to every project.
    *
@@ -2118,6 +2137,27 @@ export const StreamGenerateContentAlt = {
   sse: "sse",
 } as const;
 
+export type ListInferenceModelsParams = {
+  /**
+   * Restricts the result to models serving the specified high-level category (`chat`, `image`, `video`, `speech`, `transcription`, `realtime`, `embedding`, `rerank`, `decision`).
+   */
+  category?: ModelCategory;
+  /**
+   * Restricts the result to models reachable on the specified inference endpoint path (for example `/v1/chat/completions` or `/v1/audio/speech`).
+   * @minLength 1
+   * @maxLength 128
+   */
+  endpoint?: string;
+  /**
+   * Restricts the result to models declaring the specified input modality.
+   */
+  input_modality?: Modality;
+  /**
+   * Restricts the result to models declaring the specified output modality.
+   */
+  output_modality?: Modality;
+};
+
 export type ListApiKeysParams = {
   /**
    * 1-based page number. Defaults to 1.
@@ -2144,6 +2184,27 @@ export const ListApiKeysStatus = {
   disabled: "disabled",
   revoked: "revoked",
 } as const;
+
+export type ListModelsParams = {
+  /**
+   * Restricts the result to models serving the specified high-level category (`chat`, `image`, `video`, `speech`, `transcription`, `realtime`, `embedding`, `rerank`, `decision`), derived from reachable inference endpoints.
+   */
+  category?: ModelCategory;
+  /**
+   * Restricts the result to models reachable on the specified inference endpoint path (for example `/v1/chat/completions`, `/v1/audio/speech`, or `/v1/realtime`).
+   * @minLength 1
+   * @maxLength 128
+   */
+  endpoint?: string;
+  /**
+   * Restricts the result to models declaring the specified input modality.
+   */
+  input_modality?: Modality;
+  /**
+   * Restricts the result to models declaring the specified output modality.
+   */
+  output_modality?: Modality;
+};
 
 export type LookupModelParams = {
   /**

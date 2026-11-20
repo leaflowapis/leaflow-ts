@@ -238,6 +238,46 @@ export const StreamGenerateContentQueryParams = zod.strictObject({
 export const StreamGenerateContentBody = NativeRequest;
 
 /**
+ * @summary List callable models with capabilities and parameter limits
+ */
+export const listInferenceModelsQueryEndpointMax = 128;
+
+export const ListInferenceModelsQueryParams = zod.strictObject({
+  category: zod
+    .enum([
+      "chat",
+      "image",
+      "video",
+      "speech",
+      "transcription",
+      "realtime",
+      "embedding",
+      "rerank",
+      "decision",
+    ])
+    .optional()
+    .describe(
+      "Restricts the result to models serving the specified high-level category (`chat`, `image`, `video`, `speech`, `transcription`, `realtime`, `embedding`, `rerank`, `decision`).",
+    ),
+  endpoint: zod
+    .string()
+    .min(1)
+    .max(listInferenceModelsQueryEndpointMax)
+    .optional()
+    .describe(
+      "Restricts the result to models reachable on the specified inference endpoint path (for example `/v1/chat/completions` or `/v1/audio/speech`).",
+    ),
+  input_modality: zod
+    .enum(["text", "image", "audio", "video", "file", "embedding"])
+    .optional()
+    .describe("Restricts the result to models declaring the specified input modality."),
+  output_modality: zod
+    .enum(["text", "image", "audio", "video", "file", "embedding"])
+    .optional()
+    .describe("Restricts the result to models declaring the specified output modality."),
+});
+
+/**
  * @summary Get a callable model with capabilities and parameter limits
  */
 export const GetInferenceModelParams = zod.strictObject({
@@ -333,6 +373,53 @@ export const EnableApiKeyParams = zod.strictObject({
  */
 export const RevokeApiKeyParams = zod.strictObject({
   keyId: zod.uuid(),
+});
+
+/**
+ * A model that has been retired does not appear here, while it remains readable individually.
+ *
+ * Restricted models are listed to every project. Calling one requires a grant for the project, and `access_granted` says whether the current project holds one.
+ *
+ * `context_length` and `max_output_tokens` are advisory. The server does not truncate on their basis, and the request body is forwarded upstream unchanged.
+ *
+ * Canopy returns no amounts: each model's `billing` names the Billing plan and the rate dimensions its token usage is priced at. Read the rates from the `rates` of the plan's prices in Billing's `search-prices`.
+ * @summary List the available models
+ */
+export const listModelsQueryEndpointMax = 128;
+
+export const ListModelsQueryParams = zod.strictObject({
+  category: zod
+    .enum([
+      "chat",
+      "image",
+      "video",
+      "speech",
+      "transcription",
+      "realtime",
+      "embedding",
+      "rerank",
+      "decision",
+    ])
+    .optional()
+    .describe(
+      "Restricts the result to models serving the specified high-level category (`chat`, `image`, `video`, `speech`, `transcription`, `realtime`, `embedding`, `rerank`, `decision`), derived from reachable inference endpoints.",
+    ),
+  endpoint: zod
+    .string()
+    .min(1)
+    .max(listModelsQueryEndpointMax)
+    .optional()
+    .describe(
+      "Restricts the result to models reachable on the specified inference endpoint path (for example `/v1/chat/completions`, `/v1/audio/speech`, or `/v1/realtime`).",
+    ),
+  input_modality: zod
+    .enum(["text", "image", "audio", "video", "file", "embedding"])
+    .optional()
+    .describe("Restricts the result to models declaring the specified input modality."),
+  output_modality: zod
+    .enum(["text", "image", "audio", "video", "file", "embedding"])
+    .optional()
+    .describe("Restricts the result to models declaring the specified output modality."),
 });
 
 /**
