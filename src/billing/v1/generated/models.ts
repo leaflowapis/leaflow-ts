@@ -3449,6 +3449,12 @@ export interface Price {
   interval_count?: number;
   interval: PriceInterval;
   setup_fee?: Money;
+  /**
+   * Metered prices only. Minimum available funds (balance plus applicable credits) required to open a
+   * metered-only subscription at this price. Absent uses the currency's minimum_top_up; `0` disables the
+   * requirement.
+   */
+  minimum_funds?: Money;
 }
 
 export interface PriceList {

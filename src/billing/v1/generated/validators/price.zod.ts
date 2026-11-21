@@ -92,6 +92,9 @@ export const Price = zod.strictObject({
     .describe("For recurring licensed prices, how many interval units one period covers."),
   interval: zod.enum(["none", "day", "month", "year"]),
   setup_fee: Money.optional(),
+  minimum_funds: Money.optional().describe(
+    "Metered prices only. Minimum available funds (balance plus applicable credits) required to open a\nmetered-only subscription at this price. Absent uses the currency's minimum_top_up; `0` disables the\nrequirement.",
+  ),
 });
 
 export type Price = zod.input<typeof Price>;
