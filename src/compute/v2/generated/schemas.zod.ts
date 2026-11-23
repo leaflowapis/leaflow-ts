@@ -107,6 +107,90 @@ import { UpdateVolumeRequestBody } from "./validators/updateVolumeRequestBody.zo
 import { UpdateVolumeSnapshotRequestBody } from "./validators/updateVolumeSnapshotRequestBody.zod.js";
 
 /**
+ * Lists DDoS attack and blackhole incidents recorded for public addresses held by this project, newest first. Filters are combined with AND. Results are paginated.
+ * @summary List attack incidents
+ */
+export const listAttackIncidentsQueryRegionIdMin = 33;
+export const listAttackIncidentsQueryRegionIdMax = 33;
+
+export const listAttackIncidentsQueryRegionIdRegExp = new RegExp(
+  "^region_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$",
+);
+export const listAttackIncidentsQueryElasticIpIdMin = 30;
+export const listAttackIncidentsQueryElasticIpIdMax = 30;
+
+export const listAttackIncidentsQueryElasticIpIdRegExp = new RegExp(
+  "^eip_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$",
+);
+export const listAttackIncidentsQueryTargetAddressMax = 64;
+
+export const listAttackIncidentsQueryPageDefault = 1;
+export const listAttackIncidentsQueryPageMax = 2147483647;
+
+export const listAttackIncidentsQueryPageSizeDefault = 50;
+export const listAttackIncidentsQueryPageSizeMax = 200;
+
+export const ListAttackIncidentsQueryParams = zod.strictObject({
+  region_id: zod
+    .string()
+    .min(listAttackIncidentsQueryRegionIdMin)
+    .max(listAttackIncidentsQueryRegionIdMax)
+    .regex(listAttackIncidentsQueryRegionIdRegExp)
+    .optional()
+    .describe("Compute Region TypeID. UUID text is not accepted."),
+  elastic_ip_id: zod
+    .string()
+    .min(listAttackIncidentsQueryElasticIpIdMin)
+    .max(listAttackIncidentsQueryElasticIpIdMax)
+    .regex(listAttackIncidentsQueryElasticIpIdRegExp)
+    .optional()
+    .describe(
+      "The public eip resource identifier. Only this fixed TypeID prefix is accepted; UUID text is not an alternative representation.",
+    ),
+  target_address: zod
+    .string()
+    .min(1)
+    .max(listAttackIncidentsQueryTargetAddressMax)
+    .optional()
+    .describe("An IPv4/IPv6 host address or CIDR to match exactly."),
+  status: zod.enum(["active", "ended"]).optional(),
+  mitigation_action: zod.enum(["none", "scrubbing", "rate_limit", "blackhole"]).optional(),
+  started_from: zod.iso.datetime({ offset: true }).optional(),
+  started_to: zod.iso.datetime({ offset: true }).optional(),
+  page: zod
+    .int()
+    .min(1)
+    .max(listAttackIncidentsQueryPageMax)
+    .default(listAttackIncidentsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listAttackIncidentsQueryPageSizeMax)
+    .default(listAttackIncidentsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
+
+/**
+ * @summary Get an attack incident
+ */
+export const getAttackIncidentPathAttackIncidentIdMin = 41;
+export const getAttackIncidentPathAttackIncidentIdMax = 41;
+
+export const getAttackIncidentPathAttackIncidentIdRegExp = new RegExp(
+  "^attackincident_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$",
+);
+
+export const GetAttackIncidentParams = zod.strictObject({
+  attackIncidentId: zod
+    .string()
+    .min(getAttackIncidentPathAttackIncidentIdMin)
+    .max(getAttackIncidentPathAttackIncidentIdMax)
+    .regex(getAttackIncidentPathAttackIncidentIdRegExp)
+    .describe("Compute AttackIncident TypeID. UUID text is not accepted."),
+});
+
+/**
  * A volume and an instance must reside in the same availability zone to be attached. Confirm the zone before creating either. Without `region_id`, the zones of every region are listed.
  * @summary List availability zones
  */
@@ -388,6 +472,53 @@ export const ChangeElasticIpChargeTypeParams = zod.strictObject({
 });
 
 export const ChangeElasticIpChargeTypeBody = ChangeElasticIpChargeTypeRequestBody;
+
+/**
+ * Lists DDoS attack and blackhole incidents recorded for this elastic IP while held by this project, newest first. Results are paginated.
+ * @summary List attack incidents for an elastic IP
+ */
+export const listElasticIpAttackIncidentsPathElasticIpIdMin = 30;
+export const listElasticIpAttackIncidentsPathElasticIpIdMax = 30;
+
+export const listElasticIpAttackIncidentsPathElasticIpIdRegExp = new RegExp(
+  "^eip_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$",
+);
+
+export const ListElasticIpAttackIncidentsParams = zod.strictObject({
+  elasticIpId: zod
+    .string()
+    .min(listElasticIpAttackIncidentsPathElasticIpIdMin)
+    .max(listElasticIpAttackIncidentsPathElasticIpIdMax)
+    .regex(listElasticIpAttackIncidentsPathElasticIpIdRegExp)
+    .describe(
+      "The public eip resource identifier. Only this fixed TypeID prefix is accepted; UUID text is not an alternative representation.",
+    ),
+});
+
+export const listElasticIpAttackIncidentsQueryPageDefault = 1;
+export const listElasticIpAttackIncidentsQueryPageMax = 2147483647;
+
+export const listElasticIpAttackIncidentsQueryPageSizeDefault = 50;
+export const listElasticIpAttackIncidentsQueryPageSizeMax = 200;
+
+export const ListElasticIpAttackIncidentsQueryParams = zod.strictObject({
+  status: zod.enum(["active", "ended"]).optional(),
+  mitigation_action: zod.enum(["none", "scrubbing", "rate_limit", "blackhole"]).optional(),
+  started_from: zod.iso.datetime({ offset: true }).optional(),
+  started_to: zod.iso.datetime({ offset: true }).optional(),
+  page: zod
+    .int()
+    .min(1)
+    .max(listElasticIpAttackIncidentsQueryPageMax)
+    .default(listElasticIpAttackIncidentsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listElasticIpAttackIncidentsQueryPageSizeMax)
+    .default(listElasticIpAttackIncidentsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+});
 
 /**
  * The bytes and packets the elastic IP's address sent to the internet while the elastic IP held it, summed by hour or by day in UTC over `[start_time, end_time)`. Only intervals with traffic are listed. Inbound traffic is not measured.

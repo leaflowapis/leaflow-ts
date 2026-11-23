@@ -21,6 +21,7 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { ActiveAttackSummary } from "./activeAttackSummary.zod.js";
 import { ElasticIpAssociation } from "./elasticIpAssociation.zod.js";
 import { ElasticIpId } from "./elasticIpId.zod.js";
 import { InternetChargeType } from "./internetChargeType.zod.js";
@@ -128,6 +129,11 @@ export const ElasticIp = zod
       .union([LatestOperation, zod.null()])
       .describe(
         "The most recent operation started on the elastic IP; null when none has been recorded.",
+      ),
+    active_attack: zod
+      .union([ActiveAttackSummary, zod.null()])
+      .describe(
+        "The active attack or blackhole mitigation affecting this address; null when no attack is active.",
       ),
   })
   .describe(

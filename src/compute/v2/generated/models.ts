@@ -600,6 +600,47 @@ export interface LatestOperation {
 }
 
 /**
+ * Compute AttackIncident TypeID. UUID text is not accepted.
+ * @minLength 41
+ * @maxLength 41
+ * @pattern ^attackincident_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
+ */
+export type AttackIncidentId = string;
+
+export type AttackMitigationAction =
+  (typeof AttackMitigationAction)[keyof typeof AttackMitigationAction];
+
+export const AttackMitigationAction = {
+  none: "none",
+  scrubbing: "scrubbing",
+  rate_limit: "rate_limit",
+  blackhole: "blackhole",
+} as const;
+
+/**
+ * The active attack or blackhole mitigation currently affecting this elastic IP.
+ */
+export interface ActiveAttackSummary {
+  incident_id: AttackIncidentId;
+  mitigation_action: AttackMitigationAction;
+  started_at: string;
+  /** @nullable */
+  blackholed_at: string | null;
+  /** @nullable */
+  expected_end_at: string | null;
+  /**
+   * @minimum 0
+   * @nullable
+   */
+  peak_attack_bps: number | null;
+  /**
+   * @minimum 0
+   * @nullable
+   */
+  peak_attack_pps: number | null;
+}
+
+/**
  * A public IPv4 address with its bandwidth. Two items of one Billing subscription pay for it: the address item, always pay-as-you-go, charges for the
  * address while it is not associated with anything, and the network item, on the terms chosen at purchase,
  * charges for the bandwidth or the traffic. The subscription is the elastic IP's own, or the instance's when it
@@ -671,6 +712,8 @@ export interface ElasticIp {
   association: ElasticIpAssociation | null;
   /** The most recent operation started on the elastic IP; null when none has been recorded. */
   latest_operation: LatestOperation | null;
+  /** The active attack or blackhole mitigation affecting this address; null when no attack is active. */
+  active_attack: ActiveAttackSummary | null;
 }
 
 /**
@@ -918,6 +961,97 @@ export type VirtualPrivateCloudRouteId = string;
  * @pattern ^sgrule_[0-7][0123456789abcdefghjkmnpqrstvwxyz]{25}$
  */
 export type SecurityGroupRuleId = string;
+
+export type AttackDirection = (typeof AttackDirection)[keyof typeof AttackDirection];
+
+export const AttackDirection = {
+  inbound: "inbound",
+  outbound: "outbound",
+} as const;
+
+export type AttackIncidentStatus = (typeof AttackIncidentStatus)[keyof typeof AttackIncidentStatus];
+
+export const AttackIncidentStatus = {
+  active: "active",
+  ended: "ended",
+} as const;
+
+export type AttackEndSource = (typeof AttackEndSource)[keyof typeof AttackEndSource];
+
+export const AttackEndSource = {
+  reported: "reported",
+  auto_expired: "auto_expired",
+  timed_out: "timed_out",
+  operator: "operator",
+} as const;
+
+/**
+ * @nullable
+ */
+export type AttackIncidentEndSource =
+  | (typeof AttackIncidentEndSource)[keyof typeof AttackIncidentEndSource]
+  | null;
+
+export const AttackIncidentEndSource = {
+  reported: "reported",
+  auto_expired: "auto_expired",
+  timed_out: "timed_out",
+  operator: "operator",
+} as const;
+
+/**
+ * One DDoS attack or blackhole incident recorded for an address held by this project.
+ */
+export interface AttackIncident {
+  id: AttackIncidentId;
+  region_id: RegionId;
+  elastic_ip_id: ElasticIpId | null;
+  virtual_private_cloud_id: VirtualPrivateCloudId | null;
+  /** Target IP address or CIDR. */
+  target_address: string;
+  direction: AttackDirection;
+  status: AttackIncidentStatus;
+  mitigation_action: AttackMitigationAction;
+  /** @nullable */
+  end_source: AttackIncidentEndSource;
+  started_at: string;
+  last_event_at: string;
+  /** @nullable */
+  blackholed_at: string | null;
+  /** @nullable */
+  expected_end_at: string | null;
+  /** @nullable */
+  ended_at: string | null;
+  /**
+   * @minimum 0
+   * @nullable
+   */
+  peak_attack_bps: number | null;
+  /**
+   * @minimum 0
+   * @nullable
+   */
+  peak_attack_pps: number | null;
+  /**
+   * @minimum 0
+   * @nullable
+   */
+  threshold_bps: number | null;
+  /**
+   * @minimum 0
+   * @nullable
+   */
+  threshold_pps: number | null;
+  attack_types: string[];
+  target_ports: number[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AttackIncidentListResponseBody {
+  items: AttackIncident[];
+  pagination: OffsetPagination;
+}
 
 /**
  * Who makes the CPU the family runs on.
@@ -3535,6 +3669,33 @@ export type ConflictResponse = Error;
 
 export type CancellationModeParameter = CancellationMode;
 
+export type ListAttackIncidentsParams = {
+  region_id?: RegionId;
+  elastic_ip_id?: ElasticIpId;
+  /**
+   * An IPv4/IPv6 host address or CIDR to match exactly.
+   * @minLength 1
+   * @maxLength 64
+   */
+  target_address?: string;
+  status?: AttackIncidentStatus;
+  mitigation_action?: AttackMitigationAction;
+  started_from?: string;
+  started_to?: string;
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+};
+
 export type ListAvailabilityZonesParams = {
   /**
    * Return only the zones of this region
@@ -3601,6 +3762,25 @@ export type DeleteElasticIpParams = {
    * BILLING_CANCELLATION_MODE_FIXED.
    */
   cancellation_mode?: CancellationModeParameter;
+};
+
+export type ListElasticIpAttackIncidentsParams = {
+  status?: AttackIncidentStatus;
+  mitigation_action?: AttackMitigationAction;
+  started_from?: string;
+  started_to?: string;
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
 };
 
 export type ListElasticIpTrafficUsageParams = {

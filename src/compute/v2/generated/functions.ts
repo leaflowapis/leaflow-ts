@@ -28,6 +28,9 @@ import type {
   AssociateIpv6CidrBlockResponseBody,
   AttachNetworkInterfaceRequestBody,
   AttachVolumeRequestBody,
+  AttackIncident,
+  AttackIncidentId,
+  AttackIncidentListResponseBody,
   AvailabilityZoneId,
   AvailabilityZoneListResponseBody,
   AvailabilityZoneResource,
@@ -96,7 +99,9 @@ import type {
   LaunchTemplateListResponseBody,
   LaunchTemplateVersion,
   LaunchTemplateVersionListResponseBody,
+  ListAttackIncidentsParams,
   ListAvailabilityZonesParams,
+  ListElasticIpAttackIncidentsParams,
   ListElasticIpTrafficUsageParams,
   ListElasticIpsParams,
   ListInstanceFamiliesParams,
@@ -245,6 +250,109 @@ export type HTTPStatusCodes =
   | HTTPStatusCode3xx
   | HTTPStatusCode4xx
   | HTTPStatusCode5xx;
+
+export type listAttackIncidentsResponse200 = {
+  data: AttackIncidentListResponseBody;
+  status: 200;
+};
+
+export type listAttackIncidentsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listAttackIncidentsResponseSuccess = listAttackIncidentsResponse200 & {
+  headers: Headers;
+};
+export type listAttackIncidentsResponseError = listAttackIncidentsResponseDefault & {
+  headers: Headers;
+};
+
+export type listAttackIncidentsResponse =
+  | listAttackIncidentsResponseSuccess
+  | listAttackIncidentsResponseError;
+
+export const getListAttackIncidentsUrl = (params?: ListAttackIncidentsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://compute.leaflow.cloud/api/v2/attack-incidents?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v2/attack-incidents`;
+};
+
+/**
+ * Lists DDoS attack and blackhole incidents recorded for public addresses held by this project, newest first. Filters are combined with AND. Results are paginated.
+ * @summary List attack incidents
+ */
+export const listAttackIncidents = async (
+  params?: ListAttackIncidentsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAttackIncidentsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAttackIncidentsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+  const data: listAttackIncidentsResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listAttackIncidentsResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listAttackIncidentsResponse;
+};
+
+export type getAttackIncidentResponse200 = {
+  data: AttackIncident;
+  status: 200;
+};
+
+export type getAttackIncidentResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getAttackIncidentResponseSuccess = getAttackIncidentResponse200 & {
+  headers: Headers;
+};
+export type getAttackIncidentResponseError = getAttackIncidentResponseDefault & {
+  headers: Headers;
+};
+
+export type getAttackIncidentResponse =
+  | getAttackIncidentResponseSuccess
+  | getAttackIncidentResponseError;
+
+export const getGetAttackIncidentUrl = (attackIncidentId: AttackIncidentId) => {
+  return `https://compute.leaflow.cloud/api/v2/attack-incidents/${encodeURIComponent(String(attackIncidentId))}`;
+};
+
+/**
+ * @summary Get an attack incident
+ */
+export const getAttackIncident = async (
+  attackIncidentId: AttackIncidentId,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAttackIncidentResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetAttackIncidentUrl(attackIncidentId), {
+    ...options,
+    method: "GET",
+  });
+  const data: getAttackIncidentResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as getAttackIncidentResponse["data"];
+  return { data, status: res.status, headers: res.headers } as getAttackIncidentResponse;
+};
 
 export type listAvailabilityZonesResponse200 = {
   data: AvailabilityZoneListResponseBody;
@@ -865,6 +973,70 @@ export const changeElasticIpChargeType = async (
     {},
   )) as changeElasticIpChargeTypeResponse["data"];
   return { data, status: res.status, headers: res.headers } as changeElasticIpChargeTypeResponse;
+};
+
+export type listElasticIpAttackIncidentsResponse200 = {
+  data: AttackIncidentListResponseBody;
+  status: 200;
+};
+
+export type listElasticIpAttackIncidentsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listElasticIpAttackIncidentsResponseSuccess =
+  listElasticIpAttackIncidentsResponse200 & {
+    headers: Headers;
+  };
+export type listElasticIpAttackIncidentsResponseError =
+  listElasticIpAttackIncidentsResponseDefault & {
+    headers: Headers;
+  };
+
+export type listElasticIpAttackIncidentsResponse =
+  | listElasticIpAttackIncidentsResponseSuccess
+  | listElasticIpAttackIncidentsResponseError;
+
+export const getListElasticIpAttackIncidentsUrl = (
+  elasticIpId: ElasticIpId,
+  params?: ListElasticIpAttackIncidentsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://compute.leaflow.cloud/api/v2/elastic-ips/${encodeURIComponent(String(elasticIpId))}/attack-incidents?${stringifiedParams}`
+    : `https://compute.leaflow.cloud/api/v2/elastic-ips/${encodeURIComponent(String(elasticIpId))}/attack-incidents`;
+};
+
+/**
+ * Lists DDoS attack and blackhole incidents recorded for this elastic IP while held by this project, newest first. Results are paginated.
+ * @summary List attack incidents for an elastic IP
+ */
+export const listElasticIpAttackIncidents = async (
+  elasticIpId: ElasticIpId,
+  params?: ListElasticIpAttackIncidentsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listElasticIpAttackIncidentsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListElasticIpAttackIncidentsUrl(elasticIpId, params), {
+    ...options,
+    method: "GET",
+  });
+  const data: listElasticIpAttackIncidentsResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listElasticIpAttackIncidentsResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listElasticIpAttackIncidentsResponse;
 };
 
 export type listElasticIpTrafficUsageResponse200 = {
