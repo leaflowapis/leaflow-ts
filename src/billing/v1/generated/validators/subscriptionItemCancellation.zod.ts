@@ -21,7 +21,12 @@ export const SubscriptionItemCancellation = zod
     status: zod.enum(["requested", "scheduled", "releasing", "failed", "completed", "canceled"]),
     mode: CancellationMode,
     requested_at: zod.iso.datetime({ offset: true }),
-    scheduled_at: zod.iso.datetime({ offset: true }).optional(),
+    scheduled_at: zod.iso
+      .datetime({ offset: true })
+      .optional()
+      .describe(
+        "The release time fixed when this cancellation was created. Later changes to subscription terms do not move it.",
+      ),
     effective_at: zod.iso.datetime({ offset: true }).optional(),
     completed_at: zod.iso.datetime({ offset: true }).optional(),
     release_started_at: zod.iso.datetime({ offset: true }).optional(),

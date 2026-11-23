@@ -18,7 +18,7 @@ export const CancellationPreview = zod
       .datetime({ offset: true })
       .optional()
       .describe(
-        "For `period_end`, when release begins, the end of the subscriptions' current terms.",
+        "For `period_end`, the release time if created now, resolved from the current terms. Creating the cancellation fixes its release time; later term changes do not move it.",
       ),
     proration_date: zod.iso
       .datetime({ offset: true })

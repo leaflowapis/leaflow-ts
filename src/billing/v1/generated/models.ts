@@ -201,7 +201,7 @@ export interface CancellationPreviewItem {
  */
 export interface CancellationPreview {
   mode: CancellationMode;
-  /** For `period_end`, when release begins, the end of the subscriptions' current terms. */
+  /** For `period_end`, the release time if created now, resolved from the current terms. Creating the cancellation fixes its release time; later term changes do not move it. */
   scheduled_at?: string;
   /** For `immediate`, the second the refund is computed as of. Give it when creating the cancellation. */
   proration_date?: string;
@@ -328,6 +328,7 @@ export interface Cancellation {
   id: string;
   status: CancellationStatus;
   mode: CancellationMode;
+  /** The release time fixed when this cancellation was created. Later changes to subscription terms do not move it. */
   scheduled_at?: string;
   /** For `immediate`, the second the refund is computed as of. */
   proration_date?: string;
@@ -388,6 +389,7 @@ export interface SubscriptionItemCancellation {
   status: SubscriptionItemCancellationStatus;
   mode: CancellationMode;
   requested_at: string;
+  /** The release time fixed when this cancellation was created. Later changes to subscription terms do not move it. */
   scheduled_at?: string;
   effective_at?: string;
   completed_at?: string;
