@@ -24,6 +24,12 @@ import { CreateRoleRequestBody } from "./validators/createRoleRequestBody.zod.js
 
 import { CreateSSHKeyRequestBody } from "./validators/createSSHKeyRequestBody.zod.js";
 
+import { CreateServiceAccountKeyRequestBody } from "./validators/createServiceAccountKeyRequestBody.zod.js";
+
+import { CreateServiceAccountRequestBody } from "./validators/createServiceAccountRequestBody.zod.js";
+
+import { CreateServiceAccountSSHKeyRequestBody } from "./validators/createServiceAccountSSHKeyRequestBody.zod.js";
+
 import { IssueInvitationRequestBody } from "./validators/issueInvitationRequestBody.zod.js";
 
 import { RenameSSHKeyRequestBody } from "./validators/renameSSHKeyRequestBody.zod.js";
@@ -39,6 +45,8 @@ import { UpdateApplicationRequestBody } from "./validators/updateApplicationRequ
 import { UpdateProjectRequestBody } from "./validators/updateProjectRequestBody.zod.js";
 
 import { UpdateRoleRequestBody } from "./validators/updateRoleRequestBody.zod.js";
+
+import { UpdateServiceAccountRequestBody } from "./validators/updateServiceAccountRequestBody.zod.js";
 
 /**
  * The slug is not affected; it is set through `PUT /api/v1/project/slug`.
@@ -140,6 +148,12 @@ export const ListMembersQueryParams = zod.strictObject({
     .max(listMembersQueryKeywordMax)
     .optional()
     .describe("Matches against user id, email address or name"),
+  service_account: zod
+    .boolean()
+    .optional()
+    .describe(
+      "When true, returns only service accounts; when false, excludes service accounts; omitted returns all members",
+    ),
 });
 
 /**
@@ -406,4 +420,207 @@ export const DeleteApplicationParams = zod.strictObject({
  */
 export const RotateApplicationSecretParams = zod.strictObject({
   applicationId: zod.uuid(),
+});
+
+/**
+ * Suspended service accounts are included. Deleted service accounts are omitted unless `include_deleted` is true. Visible to any project member.
+ * @summary List the service accounts of this project
+ */
+export const listServiceAccountsQueryLimitDefault = 50;
+export const listServiceAccountsQueryLimitMax = 200;
+
+export const listServiceAccountsQueryOffsetDefault = 0;
+export const listServiceAccountsQueryOffsetMin = 0;
+export const listServiceAccountsQueryOffsetMax = 10000;
+
+export const listServiceAccountsQueryKeywordMax = 255;
+
+export const listServiceAccountsQueryIncludeDeletedDefault = false;
+
+export const ListServiceAccountsQueryParams = zod.strictObject({
+  limit: zod
+    .int()
+    .min(1)
+    .max(listServiceAccountsQueryLimitMax)
+    .default(listServiceAccountsQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
+  offset: zod
+    .int()
+    .min(listServiceAccountsQueryOffsetMin)
+    .max(listServiceAccountsQueryOffsetMax)
+    .default(listServiceAccountsQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
+  keyword: zod
+    .string()
+    .max(listServiceAccountsQueryKeywordMax)
+    .optional()
+    .describe("Matches against service account id, name, email or description"),
+  include_deleted: zod
+    .boolean()
+    .default(listServiceAccountsQueryIncludeDeletedDefault)
+    .describe("Include service accounts that have been deleted"),
+});
+
+/**
+ * Creates a project-owned service account and joins it to the current project as a member. Its `id` is also its member `user_id`; manage roles and direct permissions through `/api/v1/members/{userId}/roles` and `/api/v1/members/{userId}/permissions`.
+ *
+ * Requires `iam:service_accounts.manage`. When initial `roles` are supplied, `iam:members.manage` is also required, and granting `ADMIN` requires the caller to be a project owner or administrator.
+ * @summary Create a service account
+ */
+export const CreateServiceAccountBody = CreateServiceAccountRequestBody;
+
+/**
+ * A deleted service account remains readable with `status` `DELETED`. Visible to any project member.
+ * @summary Get a service account
+ */
+export const GetServiceAccountParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+});
+
+/**
+ * Updates the display name, description or optional email address of an active or suspended service account. Requires `iam:service_accounts.manage`.
+ * @summary Update a service account
+ */
+export const UpdateServiceAccountParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+});
+
+export const UpdateServiceAccountBody = UpdateServiceAccountRequestBody;
+
+/**
+ * Immediately retires the service account's membership, revokes all signing keys and SSH keys, clears its profile fields and records its deletion timestamp. Deleted service accounts cannot be restored, and their names may be reused.
+ *
+ * Requires `iam:service_accounts.manage`. Repeating the call on an already deleted service account returns it unchanged.
+ * @summary Delete a service account
+ */
+export const DeleteServiceAccountParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+});
+
+/**
+ * Suspends the service account, preventing token exchanges and project writes while preserving its identity and resources for later reuse. Requires `iam:service_accounts.manage`.
+ * @summary Disable a service account
+ */
+export const DisableServiceAccountParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+});
+
+/**
+ * Returns a suspended service account to `ACTIVE`. Requires `iam:service_accounts.manage`.
+ * @summary Enable a service account
+ */
+export const EnableServiceAccountParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+});
+
+/**
+ * Never returns private keys. Revoked keys are omitted unless `include_revoked` is true. Visible to any project member.
+ * @summary List the signing keys of a service account
+ */
+export const ListServiceAccountKeysParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+});
+
+export const listServiceAccountKeysQueryLimitDefault = 50;
+export const listServiceAccountKeysQueryLimitMax = 200;
+
+export const listServiceAccountKeysQueryOffsetDefault = 0;
+export const listServiceAccountKeysQueryOffsetMin = 0;
+export const listServiceAccountKeysQueryOffsetMax = 10000;
+
+export const listServiceAccountKeysQueryIncludeRevokedDefault = false;
+
+export const ListServiceAccountKeysQueryParams = zod.strictObject({
+  limit: zod
+    .int()
+    .min(1)
+    .max(listServiceAccountKeysQueryLimitMax)
+    .default(listServiceAccountKeysQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
+  offset: zod
+    .int()
+    .min(listServiceAccountKeysQueryOffsetMin)
+    .max(listServiceAccountKeysQueryOffsetMax)
+    .default(listServiceAccountKeysQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
+  include_revoked: zod
+    .boolean()
+    .default(listServiceAccountKeysQueryIncludeRevokedDefault)
+    .describe("Include revoked keys"),
+});
+
+/**
+ * Adds an Ed25519 signing key for RFC 7523 token exchange. A service account may hold at most 5 active unexpired keys at a time.
+ *
+ * With `origin` `GENERATED`, the platform generates an Ed25519 key pair, stores only the public key, and returns the private key once inside `credentials`. With `origin` `UPLOADED`, `public_key` carries a PKIX PEM Ed25519 public key and `credentials` is omitted.
+ *
+ * Requires `iam:service_accounts.manage`.
+ * @summary Create or upload a signing key for a service account
+ */
+export const CreateServiceAccountKeyParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+});
+
+export const CreateServiceAccountKeyBody = CreateServiceAccountKeyRequestBody;
+
+/**
+ * Marks the key `REVOKED` and retains the row for audit. Repeating the call returns the revoked key. Requires `iam:service_accounts.manage`.
+ * @summary Revoke a signing key of a service account
+ */
+export const RevokeServiceAccountKeyParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+  keyId: zod.uuid(),
+});
+
+/**
+ * Most recent first. Visible to any project member.
+ * @summary List the SSH keys of a service account
+ */
+export const ListServiceAccountSshKeysParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+});
+
+export const listServiceAccountSshKeysQueryLimitDefault = 50;
+export const listServiceAccountSshKeysQueryLimitMax = 200;
+
+export const listServiceAccountSshKeysQueryOffsetDefault = 0;
+export const listServiceAccountSshKeysQueryOffsetMin = 0;
+export const listServiceAccountSshKeysQueryOffsetMax = 10000;
+
+export const ListServiceAccountSshKeysQueryParams = zod.strictObject({
+  limit: zod
+    .int()
+    .min(1)
+    .max(listServiceAccountSshKeysQueryLimitMax)
+    .default(listServiceAccountSshKeysQueryLimitDefault)
+    .describe("Items returned in this page. Defaults to 50; at most 200."),
+  offset: zod
+    .int()
+    .min(listServiceAccountSshKeysQueryOffsetMin)
+    .max(listServiceAccountSshKeysQueryOffsetMax)
+    .default(listServiceAccountSshKeysQueryOffsetDefault)
+    .describe("Items to skip. Defaults to 0; at most 10000."),
+  status: zod
+    .enum(["ACTIVE", "REVOKED"])
+    .optional()
+    .describe("Both kinds are returned while this is absent"),
+});
+
+/**
+ * Registers an OpenSSH public key on the service account. Requires `iam:service_accounts.manage`.
+ * @summary Add an SSH key to a service account
+ */
+export const CreateServiceAccountSshKeyParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+});
+
+export const CreateServiceAccountSshKeyBody = CreateServiceAccountSSHKeyRequestBody;
+
+/**
+ * Marks the key `REVOKED` and retains the row for audit. Requires `iam:service_accounts.manage`.
+ * @summary Revoke an SSH key of a service account
+ */
+export const RevokeServiceAccountSshKeyParams = zod.strictObject({
+  serviceAccountId: zod.uuid(),
+  keyId: zod.uuid(),
 });

@@ -289,6 +289,8 @@ export interface ResolvedMemberResource {
   last_name: string;
   /** True when this person is no longer a member of the project. */
   left: boolean;
+  /** True when this member is a project-owned service account rather than a personal account. */
+  service_account: boolean;
   user_id: string;
 }
 
@@ -344,6 +346,8 @@ export interface MemberResource {
    * @nullable
    */
   permissions: MemberPermissionResource[] | null;
+  /** True when this member is a project-owned service account */
+  service_account: boolean;
   user_id: string;
 }
 
@@ -628,6 +632,209 @@ export interface LengthAwarePageApplicationResource {
   total: number;
 }
 
+export type ServiceAccountResourceStatus =
+  (typeof ServiceAccountResourceStatus)[keyof typeof ServiceAccountResourceStatus];
+
+export const ServiceAccountResourceStatus = {
+  ACTIVE: "ACTIVE",
+  SUSPENDED: "SUSPENDED",
+  BANNED: "BANNED",
+  DELETED: "DELETED",
+} as const;
+
+export interface ServiceAccountResource {
+  /** Platform user id of this service account */
+  id: string;
+  project_id: string;
+  name: string;
+  description: string;
+  /** Optional email address; empty when not configured */
+  email: string;
+  status: ServiceAccountResourceStatus;
+  /** Role codes currently assigned to this service account in the project */
+  roles: string[];
+  /** @nullable */
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  /** @nullable */
+  deleted_at: string | null;
+}
+
+export interface LengthAwarePageServiceAccountResource {
+  items: ServiceAccountResource[];
+  limit: number;
+  offset: number;
+  total: number;
+}
+
+export interface CreateServiceAccountRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name: string;
+  /** @maxLength 500 */
+  description?: string;
+  /**
+   * Optional email address; omit or leave empty unless using an allowed domain
+   * @maxLength 320
+   */
+  email?: string;
+  /** Optional initial role codes to assign at creation; `OWNER` is not accepted */
+  roles?: string[];
+}
+
+export interface UpdateServiceAccountRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name?: string;
+  /** @maxLength 500 */
+  description?: string;
+  /**
+   * Optional email address; pass an empty string to clear it
+   * @maxLength 320
+   */
+  email?: string;
+}
+
+export type ServiceAccountKeyResourceOrigin =
+  (typeof ServiceAccountKeyResourceOrigin)[keyof typeof ServiceAccountKeyResourceOrigin];
+
+export const ServiceAccountKeyResourceOrigin = {
+  GENERATED: "GENERATED",
+  UPLOADED: "UPLOADED",
+} as const;
+
+export type ServiceAccountKeyResourceStatus =
+  (typeof ServiceAccountKeyResourceStatus)[keyof typeof ServiceAccountKeyResourceStatus];
+
+export const ServiceAccountKeyResourceStatus = {
+  ACTIVE: "ACTIVE",
+  REVOKED: "REVOKED",
+} as const;
+
+export interface ServiceAccountKeyResource {
+  /** Key identifier, also used as the JWT `kid` header */
+  id: string;
+  service_account_id: string;
+  name: string;
+  origin: ServiceAccountKeyResourceOrigin;
+  /** Ed25519 public key in PKIX PEM format */
+  public_key: string;
+  /** SHA-256 fingerprint of the public key (`SHA256:...`) */
+  fingerprint: string;
+  status: ServiceAccountKeyResourceStatus;
+  /** @nullable */
+  expires_at: string | null;
+  /** @nullable */
+  last_used_at: string | null;
+  /** @nullable */
+  created_by: string | null;
+  created_at: string;
+  /** @nullable */
+  revoked_at: string | null;
+  /** @nullable */
+  revoked_by: string | null;
+}
+
+export interface LengthAwarePageServiceAccountKeyResource {
+  items: ServiceAccountKeyResource[];
+  limit: number;
+  offset: number;
+  total: number;
+}
+
+export type CreateServiceAccountKeyRequestBodyOrigin =
+  (typeof CreateServiceAccountKeyRequestBodyOrigin)[keyof typeof CreateServiceAccountKeyRequestBodyOrigin];
+
+export const CreateServiceAccountKeyRequestBodyOrigin = {
+  GENERATED: "GENERATED",
+  UPLOADED: "UPLOADED",
+} as const;
+
+export interface CreateServiceAccountKeyRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name: string;
+  origin: CreateServiceAccountKeyRequestBodyOrigin;
+  /**
+   * Required for `UPLOADED` keys; must be a PKIX PEM Ed25519 public key. Must be omitted for `GENERATED` keys
+   * @maxLength 2048
+   */
+  public_key?: string;
+  /** Optional expiry timestamp; cannot be extended after creation */
+  expires_at?: string;
+}
+
+/**
+ * One-time credentials document returned only when creating a `GENERATED` key
+ */
+export interface ServiceAccountCredentialsResource {
+  type: string;
+  project_id: string;
+  service_account_id: string;
+  name: string;
+  email: string;
+  key_id: string;
+  algorithm: string;
+  /** PKCS#8 PEM Ed25519 private key, returned once and never stored */
+  private_key: string;
+  /** Token exchange endpoint URL and expected JWT `aud` claim */
+  token_uri: string;
+}
+
+export interface CreateServiceAccountKeyResponseBody {
+  key: ServiceAccountKeyResource;
+  credentials?: ServiceAccountCredentialsResource;
+}
+
+export type ServiceAccountSSHKeyResourceStatus =
+  (typeof ServiceAccountSSHKeyResourceStatus)[keyof typeof ServiceAccountSSHKeyResourceStatus];
+
+export const ServiceAccountSSHKeyResourceStatus = {
+  ACTIVE: "ACTIVE",
+  REVOKED: "REVOKED",
+} as const;
+
+export interface ServiceAccountSSHKeyResource {
+  id: string;
+  name: string;
+  /** The key in OpenSSH format, without the comment it was added with */
+  public_key: string;
+  /** The SHA-256 fingerprint, as `ssh-keygen -l` prints it */
+  fingerprint: string;
+  /** The algorithm, such as `ssh-ed25519` */
+  key_type: string;
+  status: ServiceAccountSSHKeyResourceStatus;
+  created_at: string;
+}
+
+export interface LengthAwarePageServiceAccountSSHKeyResource {
+  items: ServiceAccountSSHKeyResource[];
+  limit: number;
+  offset: number;
+  total: number;
+}
+
+export interface CreateServiceAccountSSHKeyRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name: string;
+  /**
+   * The public key in OpenSSH format. A certificate is refused
+   * @minLength 1
+   * @maxLength 16384
+   */
+  public_key: string;
+}
+
 /**
  * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
  */
@@ -683,6 +890,10 @@ export type ListMembersParams = {
    * @maxLength 255
    */
   keyword?: string;
+  /**
+   * When true, returns only service accounts; when false, excludes service accounts; omitted returns all members
+   */
+  service_account?: boolean;
 };
 
 export type ListSshKeysParams = {
@@ -734,3 +945,73 @@ export type ListApplicationsParams = {
    */
   include_archived?: boolean;
 };
+
+export type ListServiceAccountsParams = {
+  /**
+   * Items returned in this page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * Items to skip. Defaults to 0; at most 10000.
+   * @minimum 0
+   * @maximum 10000
+   */
+  offset?: number;
+  /**
+   * Matches against service account id, name, email or description
+   * @maxLength 255
+   */
+  keyword?: string;
+  /**
+   * Include service accounts that have been deleted
+   */
+  include_deleted?: boolean;
+};
+
+export type ListServiceAccountKeysParams = {
+  /**
+   * Items returned in this page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * Items to skip. Defaults to 0; at most 10000.
+   * @minimum 0
+   * @maximum 10000
+   */
+  offset?: number;
+  /**
+   * Include revoked keys
+   */
+  include_revoked?: boolean;
+};
+
+export type ListServiceAccountSshKeysParams = {
+  /**
+   * Items returned in this page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  limit?: number;
+  /**
+   * Items to skip. Defaults to 0; at most 10000.
+   * @minimum 0
+   * @maximum 10000
+   */
+  offset?: number;
+  /**
+   * Both kinds are returned while this is absent
+   */
+  status?: ListServiceAccountSshKeysStatus;
+};
+
+export type ListServiceAccountSshKeysStatus =
+  (typeof ListServiceAccountSshKeysStatus)[keyof typeof ListServiceAccountSshKeysStatus];
+
+export const ListServiceAccountSshKeysStatus = {
+  ACTIVE: "ACTIVE",
+  REVOKED: "REVOKED",
+} as const;

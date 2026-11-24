@@ -23,6 +23,10 @@ import type {
   CreateMemberPermissionRequestBody,
   CreateRoleRequestBody,
   CreateSSHKeyRequestBody,
+  CreateServiceAccountKeyRequestBody,
+  CreateServiceAccountKeyResponseBody,
+  CreateServiceAccountRequestBody,
+  CreateServiceAccountSSHKeyRequestBody,
   Error,
   IssueInvitationRequestBody,
   IssuedInvitationResponseBody,
@@ -30,9 +34,15 @@ import type {
   LengthAwarePageInvitationResource,
   LengthAwarePageMemberResource,
   LengthAwarePageSSHKeyResource,
+  LengthAwarePageServiceAccountKeyResource,
+  LengthAwarePageServiceAccountResource,
+  LengthAwarePageServiceAccountSSHKeyResource,
   ListApplicationsParams,
   ListInvitationsParams,
   ListMembersParams,
+  ListServiceAccountKeysParams,
+  ListServiceAccountSshKeysParams,
+  ListServiceAccountsParams,
   ListSshKeysParams,
   MemberPermissionListResponseBody,
   MemberPermissionResource,
@@ -47,12 +57,16 @@ import type {
   RoleResource,
   RotateApplicationSecretResponseBody,
   SSHKeyResource,
+  ServiceAccountKeyResource,
+  ServiceAccountResource,
+  ServiceAccountSSHKeyResource,
   SetMemberRolesRequestBody,
   SetProjectSlugRequestBody,
   TransferOwnershipRequestBody,
   UpdateApplicationRequestBody,
   UpdateProjectRequestBody,
   UpdateRoleRequestBody,
+  UpdateServiceAccountRequestBody,
 } from "./models.js";
 
 export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
@@ -1968,4 +1982,743 @@ export const rotateApplicationSecret = async (
     {},
   )) as rotateApplicationSecretResponse["data"];
   return { data, status: res.status, headers: res.headers } as rotateApplicationSecretResponse;
+};
+
+export type listServiceAccountsResponse200 = {
+  data: LengthAwarePageServiceAccountResource;
+  status: 200;
+};
+
+export type listServiceAccountsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listServiceAccountsResponseSuccess = listServiceAccountsResponse200 & {
+  headers: Headers;
+};
+export type listServiceAccountsResponseError = listServiceAccountsResponseDefault & {
+  headers: Headers;
+};
+
+export type listServiceAccountsResponse =
+  | listServiceAccountsResponseSuccess
+  | listServiceAccountsResponseError;
+
+export const getListServiceAccountsUrl = (params?: ListServiceAccountsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://iam.leaflow.cloud/api/v1/service-accounts?${stringifiedParams}`
+    : `https://iam.leaflow.cloud/api/v1/service-accounts`;
+};
+
+/**
+ * Suspended service accounts are included. Deleted service accounts are omitted unless `include_deleted` is true. Visible to any project member.
+ * @summary List the service accounts of this project
+ */
+export const listServiceAccounts = async (
+  params?: ListServiceAccountsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listServiceAccountsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListServiceAccountsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+  const data: listServiceAccountsResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listServiceAccountsResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listServiceAccountsResponse;
+};
+
+export type createServiceAccountResponse201 = {
+  data: ServiceAccountResource;
+  status: 201;
+};
+
+export type createServiceAccountResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createServiceAccountResponseSuccess = createServiceAccountResponse201 & {
+  headers: Headers;
+};
+export type createServiceAccountResponseError = createServiceAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type createServiceAccountResponse =
+  | createServiceAccountResponseSuccess
+  | createServiceAccountResponseError;
+
+export const getCreateServiceAccountUrl = () => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts`;
+};
+
+/**
+ * Creates a project-owned service account and joins it to the current project as a member. Its `id` is also its member `user_id`; manage roles and direct permissions through `/api/v1/members/{userId}/roles` and `/api/v1/members/{userId}/permissions`.
+ *
+ * Requires `iam:service_accounts.manage`. When initial `roles` are supplied, `iam:members.manage` is also required, and granting `ADMIN` requires the caller to be a project owner or administrator.
+ * @summary Create a service account
+ */
+export const createServiceAccount = async (
+  createServiceAccountRequestBody: CreateServiceAccountRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createServiceAccountResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateServiceAccountUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createServiceAccountRequestBody),
+  });
+  const data: createServiceAccountResponse["data"] = (await decodeResponse(
+    res,
+    { "201": "json", default: "json" },
+    {},
+  )) as createServiceAccountResponse["data"];
+  return { data, status: res.status, headers: res.headers } as createServiceAccountResponse;
+};
+
+export type getServiceAccountResponse200 = {
+  data: ServiceAccountResource;
+  status: 200;
+};
+
+export type getServiceAccountResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getServiceAccountResponseSuccess = getServiceAccountResponse200 & {
+  headers: Headers;
+};
+export type getServiceAccountResponseError = getServiceAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type getServiceAccountResponse =
+  | getServiceAccountResponseSuccess
+  | getServiceAccountResponseError;
+
+export const getGetServiceAccountUrl = (serviceAccountId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}`;
+};
+
+/**
+ * A deleted service account remains readable with `status` `DELETED`. Visible to any project member.
+ * @summary Get a service account
+ */
+export const getServiceAccount = async (
+  serviceAccountId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getServiceAccountResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetServiceAccountUrl(serviceAccountId), {
+    ...options,
+    method: "GET",
+  });
+  const data: getServiceAccountResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as getServiceAccountResponse["data"];
+  return { data, status: res.status, headers: res.headers } as getServiceAccountResponse;
+};
+
+export type updateServiceAccountResponse200 = {
+  data: ServiceAccountResource;
+  status: 200;
+};
+
+export type updateServiceAccountResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updateServiceAccountResponseSuccess = updateServiceAccountResponse200 & {
+  headers: Headers;
+};
+export type updateServiceAccountResponseError = updateServiceAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type updateServiceAccountResponse =
+  | updateServiceAccountResponseSuccess
+  | updateServiceAccountResponseError;
+
+export const getUpdateServiceAccountUrl = (serviceAccountId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}`;
+};
+
+/**
+ * Updates the display name, description or optional email address of an active or suspended service account. Requires `iam:service_accounts.manage`.
+ * @summary Update a service account
+ */
+export const updateServiceAccount = async (
+  serviceAccountId: string,
+  updateServiceAccountRequestBody: UpdateServiceAccountRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateServiceAccountResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateServiceAccountUrl(serviceAccountId), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateServiceAccountRequestBody),
+  });
+  const data: updateServiceAccountResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as updateServiceAccountResponse["data"];
+  return { data, status: res.status, headers: res.headers } as updateServiceAccountResponse;
+};
+
+export type deleteServiceAccountResponse200 = {
+  data: ServiceAccountResource;
+  status: 200;
+};
+
+export type deleteServiceAccountResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type deleteServiceAccountResponseSuccess = deleteServiceAccountResponse200 & {
+  headers: Headers;
+};
+export type deleteServiceAccountResponseError = deleteServiceAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteServiceAccountResponse =
+  | deleteServiceAccountResponseSuccess
+  | deleteServiceAccountResponseError;
+
+export const getDeleteServiceAccountUrl = (serviceAccountId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}`;
+};
+
+/**
+ * Immediately retires the service account's membership, revokes all signing keys and SSH keys, clears its profile fields and records its deletion timestamp. Deleted service accounts cannot be restored, and their names may be reused.
+ *
+ * Requires `iam:service_accounts.manage`. Repeating the call on an already deleted service account returns it unchanged.
+ * @summary Delete a service account
+ */
+export const deleteServiceAccount = async (
+  serviceAccountId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteServiceAccountResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteServiceAccountUrl(serviceAccountId), {
+    ...options,
+    method: "DELETE",
+  });
+  const data: deleteServiceAccountResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as deleteServiceAccountResponse["data"];
+  return { data, status: res.status, headers: res.headers } as deleteServiceAccountResponse;
+};
+
+export type disableServiceAccountResponse200 = {
+  data: ServiceAccountResource;
+  status: 200;
+};
+
+export type disableServiceAccountResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type disableServiceAccountResponseSuccess = disableServiceAccountResponse200 & {
+  headers: Headers;
+};
+export type disableServiceAccountResponseError = disableServiceAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type disableServiceAccountResponse =
+  | disableServiceAccountResponseSuccess
+  | disableServiceAccountResponseError;
+
+export const getDisableServiceAccountUrl = (serviceAccountId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}:disable`;
+};
+
+/**
+ * Suspends the service account, preventing token exchanges and project writes while preserving its identity and resources for later reuse. Requires `iam:service_accounts.manage`.
+ * @summary Disable a service account
+ */
+export const disableServiceAccount = async (
+  serviceAccountId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<disableServiceAccountResponse> => {
+  const res = await (fetchFn ?? fetch)(getDisableServiceAccountUrl(serviceAccountId), {
+    ...options,
+    method: "POST",
+  });
+  const data: disableServiceAccountResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as disableServiceAccountResponse["data"];
+  return { data, status: res.status, headers: res.headers } as disableServiceAccountResponse;
+};
+
+export type enableServiceAccountResponse200 = {
+  data: ServiceAccountResource;
+  status: 200;
+};
+
+export type enableServiceAccountResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type enableServiceAccountResponseSuccess = enableServiceAccountResponse200 & {
+  headers: Headers;
+};
+export type enableServiceAccountResponseError = enableServiceAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type enableServiceAccountResponse =
+  | enableServiceAccountResponseSuccess
+  | enableServiceAccountResponseError;
+
+export const getEnableServiceAccountUrl = (serviceAccountId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}:enable`;
+};
+
+/**
+ * Returns a suspended service account to `ACTIVE`. Requires `iam:service_accounts.manage`.
+ * @summary Enable a service account
+ */
+export const enableServiceAccount = async (
+  serviceAccountId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<enableServiceAccountResponse> => {
+  const res = await (fetchFn ?? fetch)(getEnableServiceAccountUrl(serviceAccountId), {
+    ...options,
+    method: "POST",
+  });
+  const data: enableServiceAccountResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as enableServiceAccountResponse["data"];
+  return { data, status: res.status, headers: res.headers } as enableServiceAccountResponse;
+};
+
+export type listServiceAccountKeysResponse200 = {
+  data: LengthAwarePageServiceAccountKeyResource;
+  status: 200;
+};
+
+export type listServiceAccountKeysResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listServiceAccountKeysResponseSuccess = listServiceAccountKeysResponse200 & {
+  headers: Headers;
+};
+export type listServiceAccountKeysResponseError = listServiceAccountKeysResponseDefault & {
+  headers: Headers;
+};
+
+export type listServiceAccountKeysResponse =
+  | listServiceAccountKeysResponseSuccess
+  | listServiceAccountKeysResponseError;
+
+export const getListServiceAccountKeysUrl = (
+  serviceAccountId: string,
+  params?: ListServiceAccountKeysParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}/keys?${stringifiedParams}`
+    : `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}/keys`;
+};
+
+/**
+ * Never returns private keys. Revoked keys are omitted unless `include_revoked` is true. Visible to any project member.
+ * @summary List the signing keys of a service account
+ */
+export const listServiceAccountKeys = async (
+  serviceAccountId: string,
+  params?: ListServiceAccountKeysParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listServiceAccountKeysResponse> => {
+  const res = await (fetchFn ?? fetch)(getListServiceAccountKeysUrl(serviceAccountId, params), {
+    ...options,
+    method: "GET",
+  });
+  const data: listServiceAccountKeysResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listServiceAccountKeysResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listServiceAccountKeysResponse;
+};
+
+export type createServiceAccountKeyResponse201 = {
+  data: CreateServiceAccountKeyResponseBody;
+  status: 201;
+};
+
+export type createServiceAccountKeyResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createServiceAccountKeyResponseSuccess = createServiceAccountKeyResponse201 & {
+  headers: Headers;
+};
+export type createServiceAccountKeyResponseError = createServiceAccountKeyResponseDefault & {
+  headers: Headers;
+};
+
+export type createServiceAccountKeyResponse =
+  | createServiceAccountKeyResponseSuccess
+  | createServiceAccountKeyResponseError;
+
+export const getCreateServiceAccountKeyUrl = (serviceAccountId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}/keys`;
+};
+
+/**
+ * Adds an Ed25519 signing key for RFC 7523 token exchange. A service account may hold at most 5 active unexpired keys at a time.
+ *
+ * With `origin` `GENERATED`, the platform generates an Ed25519 key pair, stores only the public key, and returns the private key once inside `credentials`. With `origin` `UPLOADED`, `public_key` carries a PKIX PEM Ed25519 public key and `credentials` is omitted.
+ *
+ * Requires `iam:service_accounts.manage`.
+ * @summary Create or upload a signing key for a service account
+ */
+export const createServiceAccountKey = async (
+  serviceAccountId: string,
+  createServiceAccountKeyRequestBody: CreateServiceAccountKeyRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createServiceAccountKeyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateServiceAccountKeyUrl(serviceAccountId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createServiceAccountKeyRequestBody),
+  });
+  const data: createServiceAccountKeyResponse["data"] = (await decodeResponse(
+    res,
+    { "201": "json", default: "json" },
+    {},
+  )) as createServiceAccountKeyResponse["data"];
+  return { data, status: res.status, headers: res.headers } as createServiceAccountKeyResponse;
+};
+
+export type revokeServiceAccountKeyResponse200 = {
+  data: ServiceAccountKeyResource;
+  status: 200;
+};
+
+export type revokeServiceAccountKeyResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type revokeServiceAccountKeyResponseSuccess = revokeServiceAccountKeyResponse200 & {
+  headers: Headers;
+};
+export type revokeServiceAccountKeyResponseError = revokeServiceAccountKeyResponseDefault & {
+  headers: Headers;
+};
+
+export type revokeServiceAccountKeyResponse =
+  | revokeServiceAccountKeyResponseSuccess
+  | revokeServiceAccountKeyResponseError;
+
+export const getRevokeServiceAccountKeyUrl = (serviceAccountId: string, keyId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}/keys/${encodeURIComponent(String(keyId))}`;
+};
+
+/**
+ * Marks the key `REVOKED` and retains the row for audit. Repeating the call returns the revoked key. Requires `iam:service_accounts.manage`.
+ * @summary Revoke a signing key of a service account
+ */
+export const revokeServiceAccountKey = async (
+  serviceAccountId: string,
+  keyId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<revokeServiceAccountKeyResponse> => {
+  const res = await (fetchFn ?? fetch)(getRevokeServiceAccountKeyUrl(serviceAccountId, keyId), {
+    ...options,
+    method: "DELETE",
+  });
+  const data: revokeServiceAccountKeyResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as revokeServiceAccountKeyResponse["data"];
+  return { data, status: res.status, headers: res.headers } as revokeServiceAccountKeyResponse;
+};
+
+export type listServiceAccountSshKeysResponse200 = {
+  data: LengthAwarePageServiceAccountSSHKeyResource;
+  status: 200;
+};
+
+export type listServiceAccountSshKeysResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listServiceAccountSshKeysResponseSuccess = listServiceAccountSshKeysResponse200 & {
+  headers: Headers;
+};
+export type listServiceAccountSshKeysResponseError = listServiceAccountSshKeysResponseDefault & {
+  headers: Headers;
+};
+
+export type listServiceAccountSshKeysResponse =
+  | listServiceAccountSshKeysResponseSuccess
+  | listServiceAccountSshKeysResponseError;
+
+export const getListServiceAccountSshKeysUrl = (
+  serviceAccountId: string,
+  params?: ListServiceAccountSshKeysParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}/ssh-keys?${stringifiedParams}`
+    : `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}/ssh-keys`;
+};
+
+/**
+ * Most recent first. Visible to any project member.
+ * @summary List the SSH keys of a service account
+ */
+export const listServiceAccountSshKeys = async (
+  serviceAccountId: string,
+  params?: ListServiceAccountSshKeysParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listServiceAccountSshKeysResponse> => {
+  const res = await (fetchFn ?? fetch)(getListServiceAccountSshKeysUrl(serviceAccountId, params), {
+    ...options,
+    method: "GET",
+  });
+  const data: listServiceAccountSshKeysResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listServiceAccountSshKeysResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listServiceAccountSshKeysResponse;
+};
+
+export type createServiceAccountSshKeyResponse201 = {
+  data: ServiceAccountSSHKeyResource;
+  status: 201;
+};
+
+export type createServiceAccountSshKeyResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createServiceAccountSshKeyResponseSuccess = createServiceAccountSshKeyResponse201 & {
+  headers: Headers;
+};
+export type createServiceAccountSshKeyResponseError = createServiceAccountSshKeyResponseDefault & {
+  headers: Headers;
+};
+
+export type createServiceAccountSshKeyResponse =
+  | createServiceAccountSshKeyResponseSuccess
+  | createServiceAccountSshKeyResponseError;
+
+export const getCreateServiceAccountSshKeyUrl = (serviceAccountId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}/ssh-keys`;
+};
+
+/**
+ * Registers an OpenSSH public key on the service account. Requires `iam:service_accounts.manage`.
+ * @summary Add an SSH key to a service account
+ */
+export const createServiceAccountSshKey = async (
+  serviceAccountId: string,
+  createServiceAccountSSHKeyRequestBody: CreateServiceAccountSSHKeyRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createServiceAccountSshKeyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateServiceAccountSshKeyUrl(serviceAccountId), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createServiceAccountSSHKeyRequestBody),
+  });
+  const data: createServiceAccountSshKeyResponse["data"] = (await decodeResponse(
+    res,
+    { "201": "json", default: "json" },
+    {},
+  )) as createServiceAccountSshKeyResponse["data"];
+  return { data, status: res.status, headers: res.headers } as createServiceAccountSshKeyResponse;
+};
+
+export type revokeServiceAccountSshKeyResponse200 = {
+  data: ServiceAccountSSHKeyResource;
+  status: 200;
+};
+
+export type revokeServiceAccountSshKeyResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type revokeServiceAccountSshKeyResponseSuccess = revokeServiceAccountSshKeyResponse200 & {
+  headers: Headers;
+};
+export type revokeServiceAccountSshKeyResponseError = revokeServiceAccountSshKeyResponseDefault & {
+  headers: Headers;
+};
+
+export type revokeServiceAccountSshKeyResponse =
+  | revokeServiceAccountSshKeyResponseSuccess
+  | revokeServiceAccountSshKeyResponseError;
+
+export const getRevokeServiceAccountSshKeyUrl = (serviceAccountId: string, keyId: string) => {
+  return `https://iam.leaflow.cloud/api/v1/service-accounts/${encodeURIComponent(String(serviceAccountId))}/ssh-keys/${encodeURIComponent(String(keyId))}`;
+};
+
+/**
+ * Marks the key `REVOKED` and retains the row for audit. Requires `iam:service_accounts.manage`.
+ * @summary Revoke an SSH key of a service account
+ */
+export const revokeServiceAccountSshKey = async (
+  serviceAccountId: string,
+  keyId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<revokeServiceAccountSshKeyResponse> => {
+  const res = await (fetchFn ?? fetch)(getRevokeServiceAccountSshKeyUrl(serviceAccountId, keyId), {
+    ...options,
+    method: "DELETE",
+  });
+  const data: revokeServiceAccountSshKeyResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as revokeServiceAccountSshKeyResponse["data"];
+  return { data, status: res.status, headers: res.headers } as revokeServiceAccountSshKeyResponse;
 };

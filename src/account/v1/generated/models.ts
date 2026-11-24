@@ -770,6 +770,32 @@ export interface ScopedTokenResponseBody {
   token_type: string;
 }
 
+export interface ExchangeServiceAccountTokenRequestBody {
+  /**
+   * Must be `urn:ietf:params:oauth:grant-type:jwt-bearer`
+   * @minLength 1
+   * @maxLength 128
+   */
+  grant_type: string;
+  /**
+   * Compact EdDSA JWS signed with an active key of the service account
+   * @minLength 1
+   * @maxLength 8192
+   */
+  assertion: string;
+}
+
+export interface OAuthTokenResponseBody {
+  /** The scoped token, to be sent as `Authorization: Bearer` */
+  access_token: string;
+  /** Always `Bearer` */
+  token_type: string;
+  /** Seconds remaining before expiry */
+  expires_in: number;
+  /** When the token expires */
+  expires_at: string;
+}
+
 /**
  * Pagination metadata for keyset traversal. Pass next_cursor as cursor to read the following page; null means there is no following page.
  */

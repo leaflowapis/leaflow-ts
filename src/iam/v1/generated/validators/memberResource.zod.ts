@@ -32,6 +32,9 @@ export const MemberResource = zod.strictObject({
     .array(MemberPermissionResource)
     .nullable()
     .describe("The permissions granted to this person directly, apart from their roles"),
+  service_account: zod
+    .boolean()
+    .describe("True when this member is a project-owned service account"),
   user_id: zod.string(),
 });
 

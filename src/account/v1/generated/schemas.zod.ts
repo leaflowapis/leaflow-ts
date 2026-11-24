@@ -57,6 +57,8 @@ import { CreateProjectRequestBody } from "./validators/createProjectRequestBody.
 
 import { CreateSSHKeyRequestBody } from "./validators/createSSHKeyRequestBody.zod.js";
 
+import { ExchangeServiceAccountTokenRequestBody } from "./validators/exchangeServiceAccountTokenRequestBody.zod.js";
+
 import { RegisterRequestBody } from "./validators/registerRequestBody.zod.js";
 
 import { RenameSSHKeyRequestBody } from "./validators/renameSSHKeyRequestBody.zod.js";
@@ -415,3 +417,13 @@ export const GetProjectSlugAvailabilityParams = zod.strictObject({
 export const CreateScopedTokenParams = zod.strictObject({
   projectId: zod.uuid(),
 });
+
+/**
+ * No bearer token required. Authenticates a service account using an RFC 7523 JWT bearer assertion signed with an active Ed25519 key registered on that service account, and returns a standard scoped token for the owning project.
+ *
+ * Accepts either `application/json` or `application/x-www-form-urlencoded`. The assertion must be a compact `EdDSA` JWS whose `kid` header names an active, unexpired key of the service account, whose `iss` and `sub` equal the service account id, whose `aud` exactly matches this token endpoint URL, and whose lifetime (`exp - iat`) does not exceed 300 seconds.
+ *
+ * Any verification or account-state failure answers 401 `INVALID_GRANT`. Excess requests per key or service account answer 429.
+ * @summary Exchange a service account JWT assertion for a scoped token
+ */
+export const ExchangeServiceAccountTokenBody = ExchangeServiceAccountTokenRequestBody;

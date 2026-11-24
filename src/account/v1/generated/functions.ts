@@ -61,6 +61,7 @@ import type {
   CreateProjectRequestBody,
   CreateSSHKeyRequestBody,
   Error,
+  ExchangeServiceAccountTokenRequestBody,
   IdentityVerificationResource,
   InvitationPreviewResource,
   LengthAwarePageAuthorizedApplicationResource,
@@ -72,6 +73,7 @@ import type {
   ListProjectsParams,
   ListSshKeysParams,
   LocaleOptionsResource,
+  OAuthTokenResponseBody,
   PreviewInvitationByTokenParams,
   ProjectAccessList,
   ProjectAccessResource,
@@ -1962,4 +1964,76 @@ export const createScopedToken = async (
     {},
   )) as createScopedTokenResponse["data"];
   return { data, status: res.status, headers: res.headers } as createScopedTokenResponse;
+};
+
+export type exchangeServiceAccountTokenResponse200 = {
+  data: OAuthTokenResponseBody;
+  status: 200;
+};
+
+export type exchangeServiceAccountTokenResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type exchangeServiceAccountTokenResponseSuccess = exchangeServiceAccountTokenResponse200 & {
+  headers: Headers;
+};
+export type exchangeServiceAccountTokenResponseError =
+  exchangeServiceAccountTokenResponseDefault & {
+    headers: Headers;
+  };
+
+export type exchangeServiceAccountTokenResponse =
+  | exchangeServiceAccountTokenResponseSuccess
+  | exchangeServiceAccountTokenResponseError;
+
+export const getExchangeServiceAccountTokenUrl = () => {
+  return `https://account.leaflow.cloud/account/v1/oauth/token`;
+};
+
+/**
+ * No bearer token required. Authenticates a service account using an RFC 7523 JWT bearer assertion signed with an active Ed25519 key registered on that service account, and returns a standard scoped token for the owning project.
+ *
+ * Accepts either `application/json` or `application/x-www-form-urlencoded`. The assertion must be a compact `EdDSA` JWS whose `kid` header names an active, unexpired key of the service account, whose `iss` and `sub` equal the service account id, whose `aud` exactly matches this token endpoint URL, and whose lifetime (`exp - iat`) does not exceed 300 seconds.
+ *
+ * Any verification or account-state failure answers 401 `INVALID_GRANT`. Excess requests per key or service account answer 429.
+ * @summary Exchange a service account JWT assertion for a scoped token
+ */
+export const exchangeServiceAccountToken = async (
+  exchangeServiceAccountTokenRequestBody: ExchangeServiceAccountTokenRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<exchangeServiceAccountTokenResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getExchangeServiceAccountTokenUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangeServiceAccountTokenRequestBody),
+  });
+  const data: exchangeServiceAccountTokenResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as exchangeServiceAccountTokenResponse["data"];
+  return { data, status: res.status, headers: res.headers } as exchangeServiceAccountTokenResponse;
 };

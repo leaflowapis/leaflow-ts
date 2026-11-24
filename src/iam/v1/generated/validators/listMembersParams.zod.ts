@@ -35,6 +35,7 @@ export const ListMembersParams = zod.strictObject({
     .max(listMembersParamsKeywordMax)
     .optional()
     .describe("Matches against user id, email address or name"),
+  service_account: zod.boolean().optional(),
 });
 
 export type ListMembersParams = zod.input<typeof ListMembersParams>;

@@ -25,6 +25,11 @@ export const ResolvedMemberResource = zod
     first_name: zod.string(),
     last_name: zod.string(),
     left: zod.boolean().describe("True when this person is no longer a member of the project."),
+    service_account: zod
+      .boolean()
+      .describe(
+        "True when this member is a project-owned service account rather than a personal account.",
+      ),
     user_id: zod.string(),
   })
   .describe(
