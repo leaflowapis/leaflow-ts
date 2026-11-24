@@ -1,4 +1,4 @@
-import { globSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, globSync, readFileSync, writeFileSync } from "node:fs";
 import { posix } from "node:path";
 import { defineConfig, isVerb } from "orval";
 import { format } from "prettier";
@@ -173,6 +173,13 @@ export default defineConfig(
       const hooks = {
         afterAllFilesWrite: [
           async () => {
+            const entryPath = `./src/${module}/index.ts`;
+            if (!existsSync(entryPath)) {
+              writeFileSync(
+                entryPath,
+                'export * from "./generated/functions.js";\nexport * from "./generated/models.js";\nexport * as schemas from "./generated/schemas.zod.js";\n',
+              );
+            }
             if (module === "assistant/v1") {
               const path = `./src/${module}/generated/functions.ts`;
               const code = readFileSync(path, "utf8");
@@ -249,7 +256,7 @@ export default defineConfig(
                 path: `./src/${module}/generated/models.ts`,
                 mode: "single",
               },
-              clean: false,
+              clean: module === "okdata/v1",
               client: responseClient(module),
               headers: true,
               urlEncodeParameters: true,

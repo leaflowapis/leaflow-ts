@@ -10,6 +10,7 @@ export * as iam from "./iam/v1/index.js";
 export * as membership from "./membership/v1/index.js";
 export * as monitoring from "./monitoring/v1/index.js";
 export * as notification from "./notification/v1/index.js";
+export * as okdata from "./okdata/v1/index.js";
 export * as support from "./support/v1/index.js";
 export * as type from "./type/index.js";
 export * as swasLegacy from "./swas-legacy/v1/index.js";
