@@ -2096,6 +2096,7 @@ export const routes = [
     path: "/v1/models",
     operationId: "list-inference-models",
     securityScheme: "ScopedToken",
+    securityOptional: true,
     upstreamUrl: "https://canopy.leaflow.cloud",
   },
   {
@@ -2105,6 +2106,7 @@ export const routes = [
     path: "/v1/models/{model}",
     operationId: "get-inference-model",
     securityScheme: "ScopedToken",
+    securityOptional: true,
     upstreamUrl: "https://canopy.leaflow.cloud",
   },
   {
@@ -2186,6 +2188,7 @@ export const routes = [
     path: "/api/v1/models",
     operationId: "list-models",
     securityScheme: "ScopedToken",
+    securityOptional: true,
     upstreamUrl: "https://canopy.leaflow.cloud",
   },
   {
@@ -2195,6 +2198,7 @@ export const routes = [
     path: "/api/v1/models:lookup",
     operationId: "lookup-model",
     securityScheme: "ScopedToken",
+    securityOptional: true,
     upstreamUrl: "https://canopy.leaflow.cloud",
   },
   {
@@ -2204,6 +2208,7 @@ export const routes = [
     path: "/api/v1/models/{modelId}",
     operationId: "get-model",
     securityScheme: "ScopedToken",
+    securityOptional: true,
     upstreamUrl: "https://canopy.leaflow.cloud",
   },
   {

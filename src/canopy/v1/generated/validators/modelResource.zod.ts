@@ -34,12 +34,13 @@
  *
  * ## Authentication
  *
- * Every request carries a scoped token; see the `bearerAuth` security scheme.
+ * Most requests carry a scoped token; see the `bearerAuth` security scheme. Model catalogue endpoints (`/api/v1/models`, `/api/v1/models/{modelId}`, `/api/v1/models:lookup`, `/v1/models`, `/v1/models/{model}`) accept optional authentication so public sites can list available models without signing in.
  *
  * Management and project inference accept the same verified IAM scoped token. The token is the
  * sole billing project authority; `OpenAI-Project` and historical identity headers cannot
  * override it. These endpoints do not accept a Canopy API key. The separate API-key gateway
- * accepts Canopy API keys and serves the same endpoints.
+ * accepts Canopy API keys and serves the same endpoints (as well as keyless free inference for
+ * public models where free access is enabled).
  *
  * ## Conventions
  *
@@ -55,6 +56,7 @@ import * as zod from "zod";
 import { Modality } from "./modality.zod.js";
 import { ModelBilling } from "./modelBilling.zod.js";
 import { ModelCapabilities } from "./modelCapabilities.zod.js";
+import { ModelFreeAccess } from "./modelFreeAccess.zod.js";
 
 export const ModelResource = zod.strictObject({
   context_length: zod
@@ -90,14 +92,22 @@ export const ModelResource = zod.strictObject({
   access: zod
     .enum(["public", "restricted"])
     .describe(
-      "Who can call the model. Every model is listed to every project.\n\n- `public`: callable by every project.\n- `restricted`: callable only by projects holding a grant. A request from any other project fails with 403 `MODEL_ACCESS_REQUIRED`.",
+      "Who can call the model. Every model is listed to every caller.\n\n- `public`: callable by every project.\n- `restricted`: callable only by projects holding a grant. A request from any other project fails with 403 `MODEL_ACCESS_REQUIRED`.",
     ),
   access_granted: zod
     .boolean()
-    .describe("Whether the current project can call the model. Always true for a public model"),
+    .describe(
+      "Whether the caller can call the model. Always true for a public model; false for a restricted model when unauthenticated or when the project holds no grant.",
+    ),
   moderation_disabled: zod
     .boolean()
     .describe("True when the model is served without upstream content moderation"),
+  free_access: zod
+    .union([ModelFreeAccess, zod.null()])
+    .optional()
+    .describe(
+      "Public limits for keyless free inference when enabled on this model. Null when the model requires an API key or project token.",
+    ),
 });
 
 export type ModelResource = zod.input<typeof ModelResource>;

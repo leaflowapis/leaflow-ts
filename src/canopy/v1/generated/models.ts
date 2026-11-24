@@ -34,12 +34,13 @@
  *
  * ## Authentication
  *
- * Every request carries a scoped token; see the `bearerAuth` security scheme.
+ * Most requests carry a scoped token; see the `bearerAuth` security scheme. Model catalogue endpoints (`/api/v1/models`, `/api/v1/models/{modelId}`, `/api/v1/models:lookup`, `/v1/models`, `/v1/models/{model}`) accept optional authentication so public sites can list available models without signing in.
  *
  * Management and project inference accept the same verified IAM scoped token. The token is the
  * sole billing project authority; `OpenAI-Project` and historical identity headers cannot
  * override it. These endpoints do not accept a Canopy API key. The separate API-key gateway
- * accepts Canopy API keys and serves the same endpoints.
+ * accepts Canopy API keys and serves the same endpoints (as well as keyless free inference for
+ * public models where free access is enabled).
  *
  * ## Conventions
  *
@@ -299,6 +300,22 @@ export interface ModelCapabilities {
   parameters?: ModelParameter[] | null;
 }
 
+/**
+ * Public limits for keyless free inference on a model.
+ */
+export interface ModelFreeAccess {
+  /**
+   * Maximum input context tokens accepted for keyless free requests.
+   * @minimum 1
+   */
+  context_length: number;
+  /**
+   * Maximum keyless free requests per minute per client IP.
+   * @minimum 1
+   */
+  ip_rpm_limit: number;
+}
+
 export interface Model {
   id: string;
   object: "model";
@@ -323,6 +340,8 @@ export interface Model {
   capabilities: ModelCapabilities;
   /** Inference endpoints reachable on Canopy for this model, derived from its provider mappings. */
   supported_endpoints?: string[];
+  /** Public limits for keyless free inference when enabled on this model. Null when the model requires an API key or project token. */
+  free_access?: ModelFreeAccess | null;
   [key: string]: unknown;
 }
 
@@ -628,7 +647,7 @@ export const ModelResourceStatus = {
 } as const;
 
 /**
- * Who can call the model. Every model is listed to every project.
+ * Who can call the model. Every model is listed to every caller.
  *
  * - `public`: callable by every project.
  * - `restricted`: callable only by projects holding a grant. A request from any other project fails with 403 `MODEL_ACCESS_REQUIRED`.
@@ -724,16 +743,18 @@ export interface ModelResource {
   /** Inference endpoints reachable on Canopy for this model, derived from its provider mappings. */
   supported_endpoints?: string[];
   /**
-   * Who can call the model. Every model is listed to every project.
+   * Who can call the model. Every model is listed to every caller.
    *
    * - `public`: callable by every project.
    * - `restricted`: callable only by projects holding a grant. A request from any other project fails with 403 `MODEL_ACCESS_REQUIRED`.
    */
   access: ModelResourceAccess;
-  /** Whether the current project can call the model. Always true for a public model */
+  /** Whether the caller can call the model. Always true for a public model; false for a restricted model when unauthenticated or when the project holds no grant. */
   access_granted: boolean;
   /** True when the model is served without upstream content moderation */
   moderation_disabled: boolean;
+  /** Public limits for keyless free inference when enabled on this model. Null when the model requires an API key or project token. */
+  free_access?: ModelFreeAccess | null;
 }
 
 export interface ModelListResponseBody {

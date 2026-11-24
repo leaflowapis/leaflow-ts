@@ -34,12 +34,13 @@
  *
  * ## Authentication
  *
- * Every request carries a scoped token; see the `bearerAuth` security scheme.
+ * Most requests carry a scoped token; see the `bearerAuth` security scheme. Model catalogue endpoints (`/api/v1/models`, `/api/v1/models/{modelId}`, `/api/v1/models:lookup`, `/v1/models`, `/v1/models/{model}`) accept optional authentication so public sites can list available models without signing in.
  *
  * Management and project inference accept the same verified IAM scoped token. The token is the
  * sole billing project authority; `OpenAI-Project` and historical identity headers cannot
  * override it. These endpoints do not accept a Canopy API key. The separate API-key gateway
- * accepts Canopy API keys and serves the same endpoints.
+ * accepts Canopy API keys and serves the same endpoints (as well as keyless free inference for
+ * public models where free access is enabled).
  *
  * ## Conventions
  *
@@ -378,9 +379,11 @@ export const RevokeApiKeyParams = zod.strictObject({
 /**
  * A model that has been retired does not appear here, while it remains readable individually.
  *
- * Restricted models are listed to every project. Calling one requires a grant for the project, and `access_granted` says whether the current project holds one.
+ * Authentication is optional. Without a token, all non-retired models are listed with `access_granted` set to `true` for `public` models and `false` for `restricted` models. When a valid scoped token is sent, `access_granted` reflects the project's grants for restricted models; an invalid or expired token is still refused with 401.
  *
- * `context_length` and `max_output_tokens` are advisory. The server does not truncate on their basis, and the request body is forwarded upstream unchanged.
+ * Restricted models are listed to every caller. Calling one requires a grant for the project, and `access_granted` says whether the current project holds one.
+ *
+ * `context_length` and `max_output_tokens` are advisory for paid calls. When `free_access` is non-null, keyless free inference is enabled for the model within `free_access.context_length` input tokens and `free_access.ip_rpm_limit` requests per minute per IP.
  *
  * Canopy returns no amounts: each model's `billing` names the Billing plan and the rate dimensions its token usage is priced at. Read the rates from the `rates` of the plan's prices in Billing's `search-prices`.
  * @summary List the available models
@@ -423,7 +426,7 @@ export const ListModelsQueryParams = zod.strictObject({
 });
 
 /**
- * Reads a model by query parameter rather than URL path segment, safely supporting slash-prefixed model names such as `cyber/deepseek-v4.1-flash` as well as internal model identifiers. Retired models remain readable here.
+ * Reads a model by query parameter rather than URL path segment, safely supporting slash-prefixed model names such as `cyber/deepseek-v4.1-flash` as well as internal model identifiers. Retired models remain readable here. Authentication is optional; without a token, `access_granted` is `true` for `public` models and `false` for `restricted` models.
  * @summary Look up a model by name or ID
  */
 export const lookupModelQueryModelIdMax = 128;
@@ -437,7 +440,7 @@ export const LookupModelQueryParams = zod.strictObject({
 });
 
 /**
- * A model that has been retired remains readable here, while forwarding to it is refused with `MODEL_RETIRED`. That is distinct from a model that does not exist.
+ * A model that has been retired remains readable here, while forwarding to it is refused with `MODEL_RETIRED`. That is distinct from a model that does not exist. Authentication is optional; without a token, `access_granted` is `true` for `public` models and `false` for `restricted` models.
  * @summary Get a model
  */
 export const getModelPathModelIdMax = 128;

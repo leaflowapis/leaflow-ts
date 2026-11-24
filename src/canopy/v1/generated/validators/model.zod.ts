@@ -34,12 +34,13 @@
  *
  * ## Authentication
  *
- * Every request carries a scoped token; see the `bearerAuth` security scheme.
+ * Most requests carry a scoped token; see the `bearerAuth` security scheme. Model catalogue endpoints (`/api/v1/models`, `/api/v1/models/{modelId}`, `/api/v1/models:lookup`, `/v1/models`, `/v1/models/{model}`) accept optional authentication so public sites can list available models without signing in.
  *
  * Management and project inference accept the same verified IAM scoped token. The token is the
  * sole billing project authority; `OpenAI-Project` and historical identity headers cannot
  * override it. These endpoints do not accept a Canopy API key. The separate API-key gateway
- * accepts Canopy API keys and serves the same endpoints.
+ * accepts Canopy API keys and serves the same endpoints (as well as keyless free inference for
+ * public models where free access is enabled).
  *
  * ## Conventions
  *
@@ -54,6 +55,7 @@
 import * as zod from "zod";
 import { Modality } from "./modality.zod.js";
 import { ModelCapabilities } from "./modelCapabilities.zod.js";
+import { ModelFreeAccess } from "./modelFreeAccess.zod.js";
 
 export const Model = zod.strictObject({
   id: zod.string(),
@@ -81,6 +83,12 @@ export const Model = zod.strictObject({
     .optional()
     .describe(
       "Inference endpoints reachable on Canopy for this model, derived from its provider mappings.",
+    ),
+  free_access: zod
+    .union([ModelFreeAccess, zod.null()])
+    .optional()
+    .describe(
+      "Public limits for keyless free inference when enabled on this model. Null when the model requires an API key or project token.",
     ),
 });
 
