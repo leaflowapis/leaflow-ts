@@ -6,7 +6,7 @@
  *
  * Enable OKData once per project (`okdata:enablement.create`) before invoking metered queries (`okdata:query.invoke`). Project identity and billing ownership come solely from the verified IAM scoped token.
  *
- * Search and structured analytical queries use `QUERY` with JSON bodies. Resource reads use `GET` with path identifiers and query parameters; alternate identifiers use read-only `:lookup` operations. All data operations require an `Idempotency-Key` header (24-hour replay window) and use shared response models, optional `view` and `fields` projections, and cursor pagination where supported. Every page is a separate metered query. Retail prices and invoices are managed by Leaflow Billing.
+ * Search and structured analytical queries use `QUERY` with JSON bodies. Resource reads use `GET` with path identifiers and query parameters; alternate identifiers use read-only `:lookup` operations. All data operations accept an optional `Idempotency-Key` header (24-hour replay window for safe retries) and use shared response models, optional `view` and `fields` projections, and cursor pagination where supported. Every page is a separate metered query. Retail prices and invoices are managed by Leaflow Billing.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -323,8 +323,9 @@ export const GetAlibaba1688ProductHeader = zod.strictObject({
     .min(1)
     .max(getAlibaba1688ProductHeaderIdempotencyKeyMax)
     .regex(getAlibaba1688ProductHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -386,8 +387,9 @@ export const ListAlibaba1688ProductReviewsHeader = zod.strictObject({
     .min(1)
     .max(listAlibaba1688ProductReviewsHeaderIdempotencyKeyMax)
     .regex(listAlibaba1688ProductReviewsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -407,8 +409,9 @@ export const SearchAlibaba1688ProductsHeader = zod.strictObject({
     .min(1)
     .max(searchAlibaba1688ProductsHeaderIdempotencyKeyMax)
     .regex(searchAlibaba1688ProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -474,8 +477,9 @@ export const ListAlibaba1688ShopProductsHeader = zod.strictObject({
     .min(1)
     .max(listAlibaba1688ShopProductsHeaderIdempotencyKeyMax)
     .regex(listAlibaba1688ShopProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -534,8 +538,9 @@ export const GetAliexpressProductHeader = zod.strictObject({
     .min(1)
     .max(getAliexpressProductHeaderIdempotencyKeyMax)
     .regex(getAliexpressProductHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -597,8 +602,9 @@ export const ListAliexpressProductReviewsHeader = zod.strictObject({
     .min(1)
     .max(listAliexpressProductReviewsHeaderIdempotencyKeyMax)
     .regex(listAliexpressProductReviewsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -618,8 +624,9 @@ export const SearchAliexpressProductsHeader = zod.strictObject({
     .min(1)
     .max(searchAliexpressProductsHeaderIdempotencyKeyMax)
     .regex(searchAliexpressProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -691,8 +698,9 @@ export const ListAllTrendsHeader = zod.strictObject({
     .min(1)
     .max(listAllTrendsHeaderIdempotencyKeyMax)
     .regex(listAllTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -785,8 +793,9 @@ export const ListAmazonBestsellersHeader = zod.strictObject({
     .min(1)
     .max(listAmazonBestsellersHeaderIdempotencyKeyMax)
     .regex(listAmazonBestsellersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -866,8 +875,9 @@ export const GetAmazonProductHeader = zod.strictObject({
     .min(1)
     .max(getAmazonProductHeaderIdempotencyKeyMax)
     .regex(getAmazonProductHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -961,8 +971,9 @@ export const ListAmazonProductReviewsHeader = zod.strictObject({
     .min(1)
     .max(listAmazonProductReviewsHeaderIdempotencyKeyMax)
     .regex(listAmazonProductReviewsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -982,8 +993,9 @@ export const SearchAmazonProductsHeader = zod.strictObject({
     .min(1)
     .max(searchAmazonProductsHeaderIdempotencyKeyMax)
     .regex(searchAmazonProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1044,8 +1056,9 @@ export const GetAppStoreAppHeader = zod.strictObject({
     .min(1)
     .max(getAppStoreAppHeaderIdempotencyKeyMax)
     .regex(getAppStoreAppHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1101,8 +1114,9 @@ export const LookupAppStoreAppHeader = zod.strictObject({
     .min(1)
     .max(lookupAppStoreAppHeaderIdempotencyKeyMax)
     .regex(lookupAppStoreAppHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1173,8 +1187,9 @@ export const ListAppStoreAppReviewsHeader = zod.strictObject({
     .min(1)
     .max(listAppStoreAppReviewsHeaderIdempotencyKeyMax)
     .regex(listAppStoreAppReviewsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1242,8 +1257,9 @@ export const LookupAppStoreAppReviewsHeader = zod.strictObject({
     .min(1)
     .max(lookupAppStoreAppReviewsHeaderIdempotencyKeyMax)
     .regex(lookupAppStoreAppReviewsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1285,8 +1301,9 @@ export const ListBaiduTrendsHeader = zod.strictObject({
     .min(1)
     .max(listBaiduTrendsHeaderIdempotencyKeyMax)
     .regex(listBaiduTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1343,8 +1360,9 @@ export const ListBilibiliBackupUserVideosHeader = zod.strictObject({
     .min(1)
     .max(listBilibiliBackupUserVideosHeaderIdempotencyKeyMax)
     .regex(listBilibiliBackupUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1405,8 +1423,9 @@ export const ListBilibiliCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listBilibiliCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listBilibiliCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1458,8 +1477,9 @@ export const GetBilibiliLiveRoomHeader = zod.strictObject({
     .min(1)
     .max(getBilibiliLiveRoomHeaderIdempotencyKeyMax)
     .regex(getBilibiliLiveRoomHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1503,8 +1523,9 @@ export const LookupBilibiliLiveRoomHeader = zod.strictObject({
     .min(1)
     .max(lookupBilibiliLiveRoomHeaderIdempotencyKeyMax)
     .regex(lookupBilibiliLiveRoomHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1554,8 +1575,9 @@ export const GetBilibiliLiveUserHeader = zod.strictObject({
     .min(1)
     .max(getBilibiliLiveUserHeaderIdempotencyKeyMax)
     .regex(getBilibiliLiveUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1602,8 +1624,9 @@ export const ListBilibiliTrendsHeader = zod.strictObject({
     .min(1)
     .max(listBilibiliTrendsHeaderIdempotencyKeyMax)
     .regex(listBilibiliTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1653,8 +1676,9 @@ export const GetBilibiliUserHeader = zod.strictObject({
     .min(1)
     .max(getBilibiliUserHeaderIdempotencyKeyMax)
     .regex(getBilibiliUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1711,8 +1735,9 @@ export const ListBilibiliUserVideosHeader = zod.strictObject({
     .min(1)
     .max(listBilibiliUserVideosHeaderIdempotencyKeyMax)
     .regex(listBilibiliUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1771,8 +1796,9 @@ export const ListBilibiliVideoCommentsHeader = zod.strictObject({
     .min(1)
     .max(listBilibiliVideoCommentsHeaderIdempotencyKeyMax)
     .regex(listBilibiliVideoCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1819,8 +1845,9 @@ export const GetBilibiliVideoHeader = zod.strictObject({
     .min(1)
     .max(getBilibiliVideoHeaderIdempotencyKeyMax)
     .regex(getBilibiliVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1864,8 +1891,9 @@ export const LookupBilibiliVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupBilibiliVideoHeaderIdempotencyKeyMax)
     .regex(lookupBilibiliVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1915,8 +1943,9 @@ export const ListBilibiliTrendingVideosHeader = zod.strictObject({
     .min(1)
     .max(listBilibiliTrendingVideosHeaderIdempotencyKeyMax)
     .regex(listBilibiliTrendingVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1936,8 +1965,9 @@ export const SearchBilibiliVideosHeader = zod.strictObject({
     .min(1)
     .max(searchBilibiliVideosHeaderIdempotencyKeyMax)
     .regex(searchBilibiliVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -1991,8 +2021,9 @@ export const ListBlueskyPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(listBlueskyPostCommentsHeaderIdempotencyKeyMax)
     .regex(listBlueskyPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2036,8 +2067,9 @@ export const LookupBlueskyPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(lookupBlueskyPostCommentsHeaderIdempotencyKeyMax)
     .regex(lookupBlueskyPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2089,8 +2121,9 @@ export const GetBlueskyPostHeader = zod.strictObject({
     .min(1)
     .max(getBlueskyPostHeaderIdempotencyKeyMax)
     .regex(getBlueskyPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2134,8 +2167,9 @@ export const LookupBlueskyPostHeader = zod.strictObject({
     .min(1)
     .max(lookupBlueskyPostHeaderIdempotencyKeyMax)
     .regex(lookupBlueskyPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2187,8 +2221,9 @@ export const GetBlueskyUserHeader = zod.strictObject({
     .min(1)
     .max(getBlueskyUserHeaderIdempotencyKeyMax)
     .regex(getBlueskyUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2235,8 +2270,9 @@ export const LookupBlueskyUserHeader = zod.strictObject({
     .min(1)
     .max(lookupBlueskyUserHeaderIdempotencyKeyMax)
     .regex(lookupBlueskyUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2302,8 +2338,9 @@ export const ListBlueskyUserPostsHeader = zod.strictObject({
     .min(1)
     .max(listBlueskyUserPostsHeaderIdempotencyKeyMax)
     .regex(listBlueskyUserPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2364,8 +2401,9 @@ export const LookupBlueskyUserPostsHeader = zod.strictObject({
     .min(1)
     .max(lookupBlueskyUserPostsHeaderIdempotencyKeyMax)
     .regex(lookupBlueskyUserPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2385,8 +2423,9 @@ export const SearchBlueskyUsersHeader = zod.strictObject({
     .min(1)
     .max(searchBlueskyUsersHeaderIdempotencyKeyMax)
     .regex(searchBlueskyUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2447,8 +2486,9 @@ export const ListDouyinBackupUserVideosHeader = zod.strictObject({
     .min(1)
     .max(listDouyinBackupUserVideosHeaderIdempotencyKeyMax)
     .regex(listDouyinBackupUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2504,8 +2544,9 @@ export const LookupDouyinBackupUserVideosHeader = zod.strictObject({
     .min(1)
     .max(lookupDouyinBackupUserVideosHeaderIdempotencyKeyMax)
     .regex(lookupDouyinBackupUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2525,8 +2566,9 @@ export const SearchDouyinBackupVideosHeader = zod.strictObject({
     .min(1)
     .max(searchDouyinBackupVideosHeaderIdempotencyKeyMax)
     .regex(searchDouyinBackupVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2589,8 +2631,9 @@ export const ListDouyinCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listDouyinCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listDouyinCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2654,8 +2697,9 @@ export const ListDouyinHashtagVideosHeader = zod.strictObject({
     .min(1)
     .max(listDouyinHashtagVideosHeaderIdempotencyKeyMax)
     .regex(listDouyinHashtagVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2714,8 +2758,9 @@ export const GetDouyinIndexBrandHistoryHeader = zod.strictObject({
     .min(1)
     .max(getDouyinIndexBrandHistoryHeaderIdempotencyKeyMax)
     .regex(getDouyinIndexBrandHistoryHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2774,8 +2819,9 @@ export const GetDouyinIndexBrandMetricsHeader = zod.strictObject({
     .min(1)
     .max(getDouyinIndexBrandMetricsHeaderIdempotencyKeyMax)
     .regex(getDouyinIndexBrandMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2827,8 +2873,9 @@ export const GetDouyinIndexCreatorAudienceHeader = zod.strictObject({
     .min(1)
     .max(getDouyinIndexCreatorAudienceHeaderIdempotencyKeyMax)
     .regex(getDouyinIndexCreatorAudienceHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2880,8 +2927,9 @@ export const GetDouyinIndexCreatorMetricsHeader = zod.strictObject({
     .min(1)
     .max(getDouyinIndexCreatorMetricsHeaderIdempotencyKeyMax)
     .regex(getDouyinIndexCreatorMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -2943,8 +2991,9 @@ export const ListDouyinIndexCreatorVideosHeader = zod.strictObject({
     .min(1)
     .max(listDouyinIndexCreatorVideosHeaderIdempotencyKeyMax)
     .regex(listDouyinIndexCreatorVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3003,8 +3052,9 @@ export const GetDouyinIndexKeywordAudienceHeader = zod.strictObject({
     .min(1)
     .max(getDouyinIndexKeywordAudienceHeaderIdempotencyKeyMax)
     .regex(getDouyinIndexKeywordAudienceHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3024,8 +3074,9 @@ export const GetDouyinIndexKeywordsHistoryHeader = zod.strictObject({
     .min(1)
     .max(getDouyinIndexKeywordsHistoryHeaderIdempotencyKeyMax)
     .regex(getDouyinIndexKeywordsHistoryHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3080,8 +3131,9 @@ export const ListDouyinRelatedIndexKeywordsHeader = zod.strictObject({
     .min(1)
     .max(listDouyinRelatedIndexKeywordsHeaderIdempotencyKeyMax)
     .regex(listDouyinRelatedIndexKeywordsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3128,8 +3180,9 @@ export const ListDouyinIndexTrendsHeader = zod.strictObject({
     .min(1)
     .max(listDouyinIndexTrendsHeaderIdempotencyKeyMax)
     .regex(listDouyinIndexTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3149,8 +3202,9 @@ export const SearchDouyinIndexVideosHeader = zod.strictObject({
     .min(1)
     .max(searchDouyinIndexVideosHeaderIdempotencyKeyMax)
     .regex(searchDouyinIndexVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3199,8 +3253,9 @@ export const ListDouyinRelatedKeywordsHeader = zod.strictObject({
     .min(1)
     .max(listDouyinRelatedKeywordsHeaderIdempotencyKeyMax)
     .regex(listDouyinRelatedKeywordsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3252,8 +3307,9 @@ export const GetDouyinLiveRoomHeader = zod.strictObject({
     .min(1)
     .max(getDouyinLiveRoomHeaderIdempotencyKeyMax)
     .regex(getDouyinLiveRoomHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3297,8 +3353,9 @@ export const LookupDouyinLiveRoomHeader = zod.strictObject({
     .min(1)
     .max(lookupDouyinLiveRoomHeaderIdempotencyKeyMax)
     .regex(lookupDouyinLiveRoomHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3360,8 +3417,9 @@ export const GetDouyinLiveStreamerMetricsHeader = zod.strictObject({
     .min(1)
     .max(getDouyinLiveStreamerMetricsHeaderIdempotencyKeyMax)
     .regex(getDouyinLiveStreamerMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3433,8 +3491,9 @@ export const ListDouyinTrendingLiveStreamersHeader = zod.strictObject({
     .min(1)
     .max(listDouyinTrendingLiveStreamersHeaderIdempotencyKeyMax)
     .regex(listDouyinTrendingLiveStreamersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3486,8 +3545,9 @@ export const GetDouyinLiveUserHeader = zod.strictObject({
     .min(1)
     .max(getDouyinLiveUserHeaderIdempotencyKeyMax)
     .regex(getDouyinLiveUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3531,8 +3591,9 @@ export const LookupDouyinLiveUserHeader = zod.strictObject({
     .min(1)
     .max(lookupDouyinLiveUserHeaderIdempotencyKeyMax)
     .regex(lookupDouyinLiveUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3582,8 +3643,9 @@ export const ListDouyinTrendsHeader = zod.strictObject({
     .min(1)
     .max(listDouyinTrendsHeaderIdempotencyKeyMax)
     .regex(listDouyinTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3633,8 +3695,9 @@ export const GetDouyinUserHeader = zod.strictObject({
     .min(1)
     .max(getDouyinUserHeaderIdempotencyKeyMax)
     .regex(getDouyinUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3678,8 +3741,9 @@ export const LookupDouyinUserHeader = zod.strictObject({
     .min(1)
     .max(lookupDouyinUserHeaderIdempotencyKeyMax)
     .regex(lookupDouyinUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3732,8 +3796,9 @@ export const LookupDouyinUserHistoryHeader = zod.strictObject({
     .min(1)
     .max(lookupDouyinUserHistoryHeaderIdempotencyKeyMax)
     .regex(lookupDouyinUserHistoryHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3791,8 +3856,9 @@ export const BatchGetDouyinUsersHistoryHeader = zod.strictObject({
     .min(1)
     .max(batchGetDouyinUsersHistoryHeaderIdempotencyKeyMax)
     .regex(batchGetDouyinUsersHistoryHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3812,8 +3878,9 @@ export const SearchDouyinUsersHeader = zod.strictObject({
     .min(1)
     .max(searchDouyinUsersHeaderIdempotencyKeyMax)
     .regex(searchDouyinUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3872,8 +3939,9 @@ export const ListDouyinUserVideosHeader = zod.strictObject({
     .min(1)
     .max(listDouyinUserVideosHeaderIdempotencyKeyMax)
     .regex(listDouyinUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3932,8 +4000,9 @@ export const ListDouyinVideoCommentsHeader = zod.strictObject({
     .min(1)
     .max(listDouyinVideoCommentsHeaderIdempotencyKeyMax)
     .regex(listDouyinVideoCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -3980,8 +4049,9 @@ export const GetDouyinVideoHeader = zod.strictObject({
     .min(1)
     .max(getDouyinVideoHeaderIdempotencyKeyMax)
     .regex(getDouyinVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4025,8 +4095,9 @@ export const LookupDouyinVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupDouyinVideoHeaderIdempotencyKeyMax)
     .regex(lookupDouyinVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4076,8 +4147,9 @@ export const GetDouyinVideoMetricsHeader = zod.strictObject({
     .min(1)
     .max(getDouyinVideoMetricsHeaderIdempotencyKeyMax)
     .regex(getDouyinVideoMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4126,8 +4198,9 @@ export const LookupDouyinVideoMetricsHeader = zod.strictObject({
     .min(1)
     .max(lookupDouyinVideoMetricsHeaderIdempotencyKeyMax)
     .regex(lookupDouyinVideoMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4174,8 +4247,9 @@ export const ListDouyinRelatedVideosHeader = zod.strictObject({
     .min(1)
     .max(listDouyinRelatedVideosHeaderIdempotencyKeyMax)
     .regex(listDouyinRelatedVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4231,8 +4305,9 @@ export const ListDouyinTrendingVideosHeader = zod.strictObject({
     .min(1)
     .max(listDouyinTrendingVideosHeaderIdempotencyKeyMax)
     .regex(listDouyinTrendingVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4252,8 +4327,9 @@ export const SearchDouyinVideosHeader = zod.strictObject({
     .min(1)
     .max(searchDouyinVideosHeaderIdempotencyKeyMax)
     .regex(searchDouyinVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4300,8 +4376,9 @@ export const ListDouyinXingtuCampaignsHeader = zod.strictObject({
     .min(1)
     .max(listDouyinXingtuCampaignsHeaderIdempotencyKeyMax)
     .regex(listDouyinXingtuCampaignsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4353,8 +4430,9 @@ export const GetDouyinXingtuCreatorAudienceHeader = zod.strictObject({
     .min(1)
     .max(getDouyinXingtuCreatorAudienceHeaderIdempotencyKeyMax)
     .regex(getDouyinXingtuCreatorAudienceHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4406,8 +4484,9 @@ export const GetDouyinXingtuCreatorContentMixHeader = zod.strictObject({
     .min(1)
     .max(getDouyinXingtuCreatorContentMixHeaderIdempotencyKeyMax)
     .regex(getDouyinXingtuCreatorContentMixHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4459,8 +4538,9 @@ export const GetDouyinXingtuCreatorConversionHeader = zod.strictObject({
     .min(1)
     .max(getDouyinXingtuCreatorConversionHeaderIdempotencyKeyMax)
     .regex(getDouyinXingtuCreatorConversionHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4512,8 +4592,9 @@ export const GetDouyinXingtuCreatorHeader = zod.strictObject({
     .min(1)
     .max(getDouyinXingtuCreatorHeaderIdempotencyKeyMax)
     .regex(getDouyinXingtuCreatorHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4564,8 +4645,9 @@ export const BatchGetDouyinXingtuCreatorsHeader = zod.strictObject({
     .min(1)
     .max(batchGetDouyinXingtuCreatorsHeaderIdempotencyKeyMax)
     .regex(batchGetDouyinXingtuCreatorsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4617,8 +4699,9 @@ export const GetDouyinXingtuCreatorKeywordsHeader = zod.strictObject({
     .min(1)
     .max(getDouyinXingtuCreatorKeywordsHeaderIdempotencyKeyMax)
     .regex(getDouyinXingtuCreatorKeywordsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4675,8 +4758,9 @@ export const GetDouyinXingtuCreatorMetricsHeader = zod.strictObject({
     .min(1)
     .max(getDouyinXingtuCreatorMetricsHeaderIdempotencyKeyMax)
     .regex(getDouyinXingtuCreatorMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4728,8 +4812,9 @@ export const GetDouyinXingtuCreatorRatesHeader = zod.strictObject({
     .min(1)
     .max(getDouyinXingtuCreatorRatesHeaderIdempotencyKeyMax)
     .regex(getDouyinXingtuCreatorRatesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4781,8 +4866,9 @@ export const GetDouyinXingtuCreatorScoresHeader = zod.strictObject({
     .min(1)
     .max(getDouyinXingtuCreatorScoresHeaderIdempotencyKeyMax)
     .regex(getDouyinXingtuCreatorScoresHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4802,8 +4888,9 @@ export const SearchDouyinXingtuCreatorsHeader = zod.strictObject({
     .min(1)
     .max(searchDouyinXingtuCreatorsHeaderIdempotencyKeyMax)
     .regex(searchDouyinXingtuCreatorsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4864,8 +4951,9 @@ export const ListDouyinXingtuCreatorVideosHeader = zod.strictObject({
     .min(1)
     .max(listDouyinXingtuCreatorVideosHeaderIdempotencyKeyMax)
     .regex(listDouyinXingtuCreatorVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4915,8 +5003,9 @@ export const GetDouyinXingtuVideoHeader = zod.strictObject({
     .min(1)
     .max(getDouyinXingtuVideoHeaderIdempotencyKeyMax)
     .regex(getDouyinXingtuVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -4960,8 +5049,9 @@ export const LookupDouyinXingtuVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupDouyinXingtuVideoHeaderIdempotencyKeyMax)
     .regex(lookupDouyinXingtuVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5011,8 +5101,9 @@ export const GetDouyinShopProductHeader = zod.strictObject({
     .min(1)
     .max(getDouyinShopProductHeaderIdempotencyKeyMax)
     .regex(getDouyinShopProductHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5069,8 +5160,9 @@ export const ListDouyinShopProductReviewsHeader = zod.strictObject({
     .min(1)
     .max(listDouyinShopProductReviewsHeaderIdempotencyKeyMax)
     .regex(listDouyinShopProductReviewsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5090,8 +5182,9 @@ export const SearchDouyinShopProductsHeader = zod.strictObject({
     .min(1)
     .max(searchDouyinShopProductsHeaderIdempotencyKeyMax)
     .regex(searchDouyinShopProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5150,8 +5243,9 @@ export const ListDouyinShopShopProductsHeader = zod.strictObject({
     .min(1)
     .max(listDouyinShopShopProductsHeaderIdempotencyKeyMax)
     .regex(listDouyinShopShopProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5218,8 +5312,9 @@ export const ListGoogleAdvertiserAdsHeader = zod.strictObject({
     .min(1)
     .max(listGoogleAdvertiserAdsHeaderIdempotencyKeyMax)
     .regex(listGoogleAdvertiserAdsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5280,8 +5375,9 @@ export const LookupGoogleAdvertiserAdsHeader = zod.strictObject({
     .min(1)
     .max(lookupGoogleAdvertiserAdsHeaderIdempotencyKeyMax)
     .regex(lookupGoogleAdvertiserAdsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5301,8 +5397,9 @@ export const SearchGoogleAdvertisersHeader = zod.strictObject({
     .min(1)
     .max(searchGoogleAdvertisersHeaderIdempotencyKeyMax)
     .regex(searchGoogleAdvertisersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5359,8 +5456,9 @@ export const ListInstagramCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listInstagramCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listInstagramCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5414,8 +5512,9 @@ export const ListInstagramHashtagPostsHeader = zod.strictObject({
     .min(1)
     .max(listInstagramHashtagPostsHeaderIdempotencyKeyMax)
     .regex(listInstagramHashtagPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5472,8 +5571,9 @@ export const ListInstagramPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(listInstagramPostCommentsHeaderIdempotencyKeyMax)
     .regex(listInstagramPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5524,8 +5624,9 @@ export const LookupInstagramPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(lookupInstagramPostCommentsHeaderIdempotencyKeyMax)
     .regex(lookupInstagramPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5575,8 +5676,9 @@ export const GetInstagramPostHeader = zod.strictObject({
     .min(1)
     .max(getInstagramPostHeaderIdempotencyKeyMax)
     .regex(getInstagramPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5620,8 +5722,9 @@ export const LookupInstagramPostHeader = zod.strictObject({
     .min(1)
     .max(lookupInstagramPostHeaderIdempotencyKeyMax)
     .regex(lookupInstagramPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5671,8 +5774,9 @@ export const GetInstagramPostTranscriptHeader = zod.strictObject({
     .min(1)
     .max(getInstagramPostTranscriptHeaderIdempotencyKeyMax)
     .regex(getInstagramPostTranscriptHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5716,8 +5820,9 @@ export const LookupInstagramPostTranscriptHeader = zod.strictObject({
     .min(1)
     .max(lookupInstagramPostTranscriptHeaderIdempotencyKeyMax)
     .regex(lookupInstagramPostTranscriptHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5764,8 +5869,9 @@ export const GetInstagramUserHeader = zod.strictObject({
     .min(1)
     .max(getInstagramUserHeaderIdempotencyKeyMax)
     .regex(getInstagramUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5824,8 +5930,9 @@ export const ListInstagramUserPostsHeader = zod.strictObject({
     .min(1)
     .max(listInstagramUserPostsHeaderIdempotencyKeyMax)
     .regex(listInstagramUserPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5845,8 +5952,9 @@ export const SearchInstagramUsersHeader = zod.strictObject({
     .min(1)
     .max(searchInstagramUsersHeaderIdempotencyKeyMax)
     .regex(searchInstagramUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5906,8 +6014,9 @@ export const ListKuaishouCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listKuaishouCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listKuaishouCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -5949,8 +6058,9 @@ export const ListKuaishouTrendingLiveProductsHeader = zod.strictObject({
     .min(1)
     .max(listKuaishouTrendingLiveProductsHeaderIdempotencyKeyMax)
     .regex(listKuaishouTrendingLiveProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6012,8 +6122,9 @@ export const ListKuaishouTrendingLiveRoomsHeader = zod.strictObject({
     .min(1)
     .max(listKuaishouTrendingLiveRoomsHeaderIdempotencyKeyMax)
     .regex(listKuaishouTrendingLiveRoomsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6065,8 +6176,9 @@ export const GetKuaishouLiveUserHeader = zod.strictObject({
     .min(1)
     .max(getKuaishouLiveUserHeaderIdempotencyKeyMax)
     .regex(getKuaishouLiveUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6116,8 +6228,9 @@ export const ListKuaishouTrendsHeader = zod.strictObject({
     .min(1)
     .max(listKuaishouTrendsHeaderIdempotencyKeyMax)
     .regex(listKuaishouTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6169,8 +6282,9 @@ export const GetKuaishouUserHeader = zod.strictObject({
     .min(1)
     .max(getKuaishouUserHeaderIdempotencyKeyMax)
     .regex(getKuaishouUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6190,8 +6304,9 @@ export const SearchKuaishouUsersHeader = zod.strictObject({
     .min(1)
     .max(searchKuaishouUsersHeaderIdempotencyKeyMax)
     .regex(searchKuaishouUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6257,8 +6372,9 @@ export const ListKuaishouUserVideosHeader = zod.strictObject({
     .min(1)
     .max(listKuaishouUserVideosHeaderIdempotencyKeyMax)
     .regex(listKuaishouUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6315,8 +6431,9 @@ export const ListKuaishouVideoCommentsHeader = zod.strictObject({
     .min(1)
     .max(listKuaishouVideoCommentsHeaderIdempotencyKeyMax)
     .regex(listKuaishouVideoCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6367,8 +6484,9 @@ export const LookupKuaishouVideoCommentsHeader = zod.strictObject({
     .min(1)
     .max(lookupKuaishouVideoCommentsHeaderIdempotencyKeyMax)
     .regex(lookupKuaishouVideoCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6418,8 +6536,9 @@ export const GetKuaishouVideoHeader = zod.strictObject({
     .min(1)
     .max(getKuaishouVideoHeaderIdempotencyKeyMax)
     .regex(getKuaishouVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6463,8 +6582,9 @@ export const LookupKuaishouVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupKuaishouVideoHeaderIdempotencyKeyMax)
     .regex(lookupKuaishouVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6484,8 +6604,9 @@ export const SearchKuaishouVideosHeader = zod.strictObject({
     .min(1)
     .max(searchKuaishouVideosHeaderIdempotencyKeyMax)
     .regex(searchKuaishouVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6534,8 +6655,9 @@ export const GetMetaAdHeader = zod.strictObject({
     .min(1)
     .max(getMetaAdHeaderIdempotencyKeyMax)
     .regex(getMetaAdHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6579,8 +6701,9 @@ export const LookupMetaAdHeader = zod.strictObject({
     .min(1)
     .max(lookupMetaAdHeaderIdempotencyKeyMax)
     .regex(lookupMetaAdHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6600,8 +6723,9 @@ export const SearchMetaAdsHeader = zod.strictObject({
     .min(1)
     .max(searchMetaAdsHeaderIdempotencyKeyMax)
     .regex(searchMetaAdsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6680,8 +6804,9 @@ export const ListMetaAdvertiserAdsHeader = zod.strictObject({
     .min(1)
     .max(listMetaAdvertiserAdsHeaderIdempotencyKeyMax)
     .regex(listMetaAdvertiserAdsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6755,8 +6880,9 @@ export const LookupMetaAdvertiserAdsHeader = zod.strictObject({
     .min(1)
     .max(lookupMetaAdvertiserAdsHeaderIdempotencyKeyMax)
     .regex(lookupMetaAdvertiserAdsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6806,8 +6932,9 @@ export const ListRedditPopularPostsHeader = zod.strictObject({
     .min(1)
     .max(listRedditPopularPostsHeaderIdempotencyKeyMax)
     .regex(listRedditPopularPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6869,8 +6996,9 @@ export const ListRedditPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(listRedditPostCommentsHeaderIdempotencyKeyMax)
     .regex(listRedditPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6926,8 +7054,9 @@ export const LookupRedditPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(lookupRedditPostCommentsHeaderIdempotencyKeyMax)
     .regex(lookupRedditPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -6977,8 +7106,9 @@ export const GetRedditPostHeader = zod.strictObject({
     .min(1)
     .max(getRedditPostHeaderIdempotencyKeyMax)
     .regex(getRedditPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7022,8 +7152,9 @@ export const LookupRedditPostHeader = zod.strictObject({
     .min(1)
     .max(lookupRedditPostHeaderIdempotencyKeyMax)
     .regex(lookupRedditPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7043,8 +7174,9 @@ export const SearchRedditPostsHeader = zod.strictObject({
     .min(1)
     .max(searchRedditPostsHeaderIdempotencyKeyMax)
     .regex(searchRedditPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7096,8 +7228,9 @@ export const GetRedditPostTranscriptHeader = zod.strictObject({
     .min(1)
     .max(getRedditPostTranscriptHeaderIdempotencyKeyMax)
     .regex(getRedditPostTranscriptHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7141,8 +7274,9 @@ export const LookupRedditPostTranscriptHeader = zod.strictObject({
     .min(1)
     .max(lookupRedditPostTranscriptHeaderIdempotencyKeyMax)
     .regex(lookupRedditPostTranscriptHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7189,8 +7323,9 @@ export const GetRedditSubredditHeader = zod.strictObject({
     .min(1)
     .max(getRedditSubredditHeaderIdempotencyKeyMax)
     .regex(getRedditSubredditHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7255,8 +7390,9 @@ export const ListRedditSubredditPostsHeader = zod.strictObject({
     .min(1)
     .max(listRedditSubredditPostsHeaderIdempotencyKeyMax)
     .regex(listRedditSubredditPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7306,8 +7442,9 @@ export const ListRedditTrendsHeader = zod.strictObject({
     .min(1)
     .max(listRedditTrendsHeaderIdempotencyKeyMax)
     .regex(listRedditTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7354,8 +7491,9 @@ export const GetRedditUserHeader = zod.strictObject({
     .min(1)
     .max(getRedditUserHeaderIdempotencyKeyMax)
     .regex(getRedditUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7409,8 +7547,9 @@ export const ListRedditUserPostsHeader = zod.strictObject({
     .min(1)
     .max(listRedditUserPostsHeaderIdempotencyKeyMax)
     .regex(listRedditUserPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7464,8 +7603,9 @@ export const ListRedditUserSubredditsHeader = zod.strictObject({
     .min(1)
     .max(listRedditUserSubredditsHeaderIdempotencyKeyMax)
     .regex(listRedditUserSubredditsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7517,8 +7657,9 @@ export const GetTaobaoProductHeader = zod.strictObject({
     .min(1)
     .max(getTaobaoProductHeaderIdempotencyKeyMax)
     .regex(getTaobaoProductHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7582,8 +7723,9 @@ export const ListTaobaoProductReviewsHeader = zod.strictObject({
     .min(1)
     .max(listTaobaoProductReviewsHeaderIdempotencyKeyMax)
     .regex(listTaobaoProductReviewsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7603,8 +7745,9 @@ export const SearchTaobaoProductsHeader = zod.strictObject({
     .min(1)
     .max(searchTaobaoProductsHeaderIdempotencyKeyMax)
     .regex(searchTaobaoProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7676,8 +7819,9 @@ export const ListTaobaoShopProductsHeader = zod.strictObject({
     .min(1)
     .max(listTaobaoShopProductsHeaderIdempotencyKeyMax)
     .regex(listTaobaoShopProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7727,8 +7871,9 @@ export const GetTelegramChannelHeader = zod.strictObject({
     .min(1)
     .max(getTelegramChannelHeaderIdempotencyKeyMax)
     .regex(getTelegramChannelHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7785,8 +7930,9 @@ export const ListTelegramChannelMessagesHeader = zod.strictObject({
     .min(1)
     .max(listTelegramChannelMessagesHeaderIdempotencyKeyMax)
     .regex(listTelegramChannelMessagesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7844,8 +7990,9 @@ export const GetTelegramMessageHeader = zod.strictObject({
     .min(1)
     .max(getTelegramMessageHeaderIdempotencyKeyMax)
     .regex(getTelegramMessageHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7889,8 +8036,9 @@ export const LookupTelegramMessageHeader = zod.strictObject({
     .min(1)
     .max(lookupTelegramMessageHeaderIdempotencyKeyMax)
     .regex(lookupTelegramMessageHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7910,8 +8058,9 @@ export const SearchTiktokAdsHeader = zod.strictObject({
     .min(1)
     .max(searchTiktokAdsHeaderIdempotencyKeyMax)
     .regex(searchTiktokAdsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -7971,8 +8120,9 @@ export const ListTiktokCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listTiktokCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listTiktokCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8022,8 +8172,9 @@ export const GetTiktokCreativeCenterAdHeader = zod.strictObject({
     .min(1)
     .max(getTiktokCreativeCenterAdHeaderIdempotencyKeyMax)
     .regex(getTiktokCreativeCenterAdHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8043,8 +8194,9 @@ export const SearchTiktokCreativeCenterAdsHeader = zod.strictObject({
     .min(1)
     .max(searchTiktokCreativeCenterAdsHeaderIdempotencyKeyMax)
     .regex(searchTiktokCreativeCenterAdsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8100,8 +8252,9 @@ export const ListTiktokHashtagVideosHeader = zod.strictObject({
     .min(1)
     .max(listTiktokHashtagVideosHeaderIdempotencyKeyMax)
     .regex(listTiktokHashtagVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8162,8 +8315,9 @@ export const ListTiktokLiveRoomProductsHeader = zod.strictObject({
     .min(1)
     .max(listTiktokLiveRoomProductsHeaderIdempotencyKeyMax)
     .regex(listTiktokLiveRoomProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8205,8 +8359,9 @@ export const ListTiktokTrendingLiveStreamersHeader = zod.strictObject({
     .min(1)
     .max(listTiktokTrendingLiveStreamersHeaderIdempotencyKeyMax)
     .regex(listTiktokTrendingLiveStreamersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8253,8 +8408,9 @@ export const GetTiktokLiveUserHeader = zod.strictObject({
     .min(1)
     .max(getTiktokLiveUserHeaderIdempotencyKeyMax)
     .regex(getTiktokLiveUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8306,8 +8462,9 @@ export const GetTiktokShopProductHeader = zod.strictObject({
     .min(1)
     .max(getTiktokShopProductHeaderIdempotencyKeyMax)
     .regex(getTiktokShopProductHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8356,8 +8513,9 @@ export const LookupTiktokShopProductHeader = zod.strictObject({
     .min(1)
     .max(lookupTiktokShopProductHeaderIdempotencyKeyMax)
     .regex(lookupTiktokShopProductHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8416,8 +8574,9 @@ export const ListTiktokShopProductReviewsHeader = zod.strictObject({
     .min(1)
     .max(listTiktokShopProductReviewsHeaderIdempotencyKeyMax)
     .regex(listTiktokShopProductReviewsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8437,8 +8596,9 @@ export const SearchTiktokShopProductsHeader = zod.strictObject({
     .min(1)
     .max(searchTiktokShopProductsHeaderIdempotencyKeyMax)
     .regex(searchTiktokShopProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8497,8 +8657,9 @@ export const ListTiktokShopSellerProductsHeader = zod.strictObject({
     .min(1)
     .max(listTiktokShopSellerProductsHeaderIdempotencyKeyMax)
     .regex(listTiktokShopSellerProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8555,8 +8716,9 @@ export const ListTiktokUserFollowersHeader = zod.strictObject({
     .min(1)
     .max(listTiktokUserFollowersHeaderIdempotencyKeyMax)
     .regex(listTiktokUserFollowersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8612,8 +8774,9 @@ export const LookupTiktokUserFollowersHeader = zod.strictObject({
     .min(1)
     .max(lookupTiktokUserFollowersHeaderIdempotencyKeyMax)
     .regex(lookupTiktokUserFollowersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8660,8 +8823,9 @@ export const GetTiktokUserHeader = zod.strictObject({
     .min(1)
     .max(getTiktokUserHeaderIdempotencyKeyMax)
     .regex(getTiktokUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8681,8 +8845,9 @@ export const SearchTiktokUsersHeader = zod.strictObject({
     .min(1)
     .max(searchTiktokUsersHeaderIdempotencyKeyMax)
     .regex(searchTiktokUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8743,8 +8908,9 @@ export const ListTiktokUserVideosHeader = zod.strictObject({
     .min(1)
     .max(listTiktokUserVideosHeaderIdempotencyKeyMax)
     .regex(listTiktokUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8798,8 +8964,9 @@ export const ListTiktokVideoCommentsHeader = zod.strictObject({
     .min(1)
     .max(listTiktokVideoCommentsHeaderIdempotencyKeyMax)
     .regex(listTiktokVideoCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8846,8 +9013,9 @@ export const GetTiktokVideoHeader = zod.strictObject({
     .min(1)
     .max(getTiktokVideoHeaderIdempotencyKeyMax)
     .regex(getTiktokVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8891,8 +9059,9 @@ export const LookupTiktokVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupTiktokVideoHeaderIdempotencyKeyMax)
     .regex(lookupTiktokVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8912,8 +9081,9 @@ export const SearchTiktokVideosHeader = zod.strictObject({
     .min(1)
     .max(searchTiktokVideosHeaderIdempotencyKeyMax)
     .regex(searchTiktokVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -8969,8 +9139,9 @@ export const GetTiktokVideoTranscriptHeader = zod.strictObject({
     .min(1)
     .max(getTiktokVideoTranscriptHeaderIdempotencyKeyMax)
     .regex(getTiktokVideoTranscriptHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9021,8 +9192,9 @@ export const LookupTiktokVideoTranscriptHeader = zod.strictObject({
     .min(1)
     .max(lookupTiktokVideoTranscriptHeaderIdempotencyKeyMax)
     .regex(lookupTiktokVideoTranscriptHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9074,8 +9246,9 @@ export const GetToutiaoArticleHeader = zod.strictObject({
     .min(1)
     .max(getToutiaoArticleHeaderIdempotencyKeyMax)
     .regex(getToutiaoArticleHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9124,8 +9297,9 @@ export const LookupToutiaoArticleHeader = zod.strictObject({
     .min(1)
     .max(lookupToutiaoArticleHeaderIdempotencyKeyMax)
     .regex(lookupToutiaoArticleHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9184,8 +9358,9 @@ export const ListToutiaoPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(listToutiaoPostCommentsHeaderIdempotencyKeyMax)
     .regex(listToutiaoPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9241,8 +9416,9 @@ export const LookupToutiaoPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(lookupToutiaoPostCommentsHeaderIdempotencyKeyMax)
     .regex(lookupToutiaoPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9284,8 +9460,9 @@ export const ListToutiaoTrendsHeader = zod.strictObject({
     .min(1)
     .max(listToutiaoTrendsHeaderIdempotencyKeyMax)
     .regex(listToutiaoTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9337,8 +9514,9 @@ export const GetToutiaoUserHeader = zod.strictObject({
     .min(1)
     .max(getToutiaoUserHeaderIdempotencyKeyMax)
     .regex(getToutiaoUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9387,8 +9565,9 @@ export const LookupToutiaoUserHeader = zod.strictObject({
     .min(1)
     .max(lookupToutiaoUserHeaderIdempotencyKeyMax)
     .regex(lookupToutiaoUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9438,8 +9617,9 @@ export const GetToutiaoVideoHeader = zod.strictObject({
     .min(1)
     .max(getToutiaoVideoHeaderIdempotencyKeyMax)
     .regex(getToutiaoVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9488,8 +9668,9 @@ export const LookupToutiaoVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupToutiaoVideoHeaderIdempotencyKeyMax)
     .regex(lookupToutiaoVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9539,8 +9720,9 @@ export const GetTwitchLiveUserHeader = zod.strictObject({
     .min(1)
     .max(getTwitchLiveUserHeaderIdempotencyKeyMax)
     .regex(getTwitchLiveUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9560,8 +9742,9 @@ export const SearchWechatAccountsHeader = zod.strictObject({
     .min(1)
     .max(searchWechatAccountsHeaderIdempotencyKeyMax)
     .regex(searchWechatAccountsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9583,8 +9766,9 @@ export const SearchWechatBackupPostsHeader = zod.strictObject({
     .min(1)
     .max(searchWechatBackupPostsHeaderIdempotencyKeyMax)
     .regex(searchWechatBackupPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9633,8 +9817,9 @@ export const GetWechatIndexKeywordsHistoryHeader = zod.strictObject({
     .min(1)
     .max(getWechatIndexKeywordsHistoryHeaderIdempotencyKeyMax)
     .regex(getWechatIndexKeywordsHistoryHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9681,8 +9866,9 @@ export const ListWechatRelatedKeywordsHeader = zod.strictObject({
     .min(1)
     .max(listWechatRelatedKeywordsHeaderIdempotencyKeyMax)
     .regex(listWechatRelatedKeywordsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9702,8 +9888,9 @@ export const SearchWechatMiniprogramsHeader = zod.strictObject({
     .min(1)
     .max(searchWechatMiniprogramsHeaderIdempotencyKeyMax)
     .regex(searchWechatMiniprogramsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9725,8 +9912,9 @@ export const SearchWechatPostsHeader = zod.strictObject({
     .min(1)
     .max(searchWechatPostsHeaderIdempotencyKeyMax)
     .regex(searchWechatPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9780,8 +9968,9 @@ export const GetWechatChannelsBackupUserHeader = zod.strictObject({
     .min(1)
     .max(getWechatChannelsBackupUserHeaderIdempotencyKeyMax)
     .regex(getWechatChannelsBackupUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9840,8 +10029,9 @@ export const ListWechatChannelsBackupUserVideosHeader = zod.strictObject({
     .min(1)
     .max(listWechatChannelsBackupUserVideosHeaderIdempotencyKeyMax)
     .regex(listWechatChannelsBackupUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9861,8 +10051,9 @@ export const SearchWechatChannelsBackupVideosHeader = zod.strictObject({
     .min(1)
     .max(searchWechatChannelsBackupVideosHeaderIdempotencyKeyMax)
     .regex(searchWechatChannelsBackupVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9921,8 +10112,9 @@ export const ListWechatChannelsCollectionVideosHeader = zod.strictObject({
     .min(1)
     .max(listWechatChannelsCollectionVideosHeaderIdempotencyKeyMax)
     .regex(listWechatChannelsCollectionVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -9980,8 +10172,9 @@ export const ListWechatChannelsCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listWechatChannelsCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listWechatChannelsCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10040,8 +10233,9 @@ export const GetWechatChannelsLiveRoomHeader = zod.strictObject({
     .min(1)
     .max(getWechatChannelsLiveRoomHeaderIdempotencyKeyMax)
     .regex(getWechatChannelsLiveRoomHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10093,8 +10287,9 @@ export const GetWechatChannelsLiveUserHeader = zod.strictObject({
     .min(1)
     .max(getWechatChannelsLiveUserHeaderIdempotencyKeyMax)
     .regex(getWechatChannelsLiveUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10146,8 +10341,9 @@ export const ListWechatChannelsUserCollectionsHeader = zod.strictObject({
     .min(1)
     .max(listWechatChannelsUserCollectionsHeaderIdempotencyKeyMax)
     .regex(listWechatChannelsUserCollectionsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10199,8 +10395,9 @@ export const GetWechatChannelsUserHeader = zod.strictObject({
     .min(1)
     .max(getWechatChannelsUserHeaderIdempotencyKeyMax)
     .regex(getWechatChannelsUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10259,8 +10456,9 @@ export const ListWechatChannelsUserLiveReplaysHeader = zod.strictObject({
     .min(1)
     .max(listWechatChannelsUserLiveReplaysHeaderIdempotencyKeyMax)
     .regex(listWechatChannelsUserLiveReplaysHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10280,8 +10478,9 @@ export const SearchWechatChannelsUsersHeader = zod.strictObject({
     .min(1)
     .max(searchWechatChannelsUsersHeaderIdempotencyKeyMax)
     .regex(searchWechatChannelsUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10342,8 +10541,9 @@ export const ListWechatChannelsUserVideosHeader = zod.strictObject({
     .min(1)
     .max(listWechatChannelsUserVideosHeaderIdempotencyKeyMax)
     .regex(listWechatChannelsUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10400,8 +10600,9 @@ export const ListWechatChannelsVideoCommentsHeader = zod.strictObject({
     .min(1)
     .max(listWechatChannelsVideoCommentsHeaderIdempotencyKeyMax)
     .regex(listWechatChannelsVideoCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10451,8 +10652,9 @@ export const GetWechatChannelsVideoHeader = zod.strictObject({
     .min(1)
     .max(getWechatChannelsVideoHeaderIdempotencyKeyMax)
     .regex(getWechatChannelsVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10496,8 +10698,9 @@ export const LookupWechatChannelsVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupWechatChannelsVideoHeaderIdempotencyKeyMax)
     .regex(lookupWechatChannelsVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10547,8 +10750,9 @@ export const GetWechatChannelsVideoMetricsHeader = zod.strictObject({
     .min(1)
     .max(getWechatChannelsVideoMetricsHeaderIdempotencyKeyMax)
     .regex(getWechatChannelsVideoMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10568,8 +10772,9 @@ export const SearchWechatChannelsVideosHeader = zod.strictObject({
     .min(1)
     .max(searchWechatChannelsVideosHeaderIdempotencyKeyMax)
     .regex(searchWechatChannelsVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10601,8 +10806,9 @@ export const CreateWechatChannelsVideoShareLinkHeader = zod.strictObject({
     .min(1)
     .max(createWechatChannelsVideoShareLinkHeaderIdempotencyKeyMax)
     .regex(createWechatChannelsVideoShareLinkHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10666,8 +10872,9 @@ export const ListWechatMpAccountArticlesHeader = zod.strictObject({
     .min(1)
     .max(listWechatMpAccountArticlesHeaderIdempotencyKeyMax)
     .regex(listWechatMpAccountArticlesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10719,8 +10926,9 @@ export const GetWechatMpAccountHeader = zod.strictObject({
     .min(1)
     .max(getWechatMpAccountHeaderIdempotencyKeyMax)
     .regex(getWechatMpAccountHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10772,8 +10980,9 @@ export const GetWechatMpAccountOwnerHeader = zod.strictObject({
     .min(1)
     .max(getWechatMpAccountOwnerHeaderIdempotencyKeyMax)
     .regex(getWechatMpAccountOwnerHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10793,8 +11002,9 @@ export const SearchWechatMpAccountsHeader = zod.strictObject({
     .min(1)
     .max(searchWechatMpAccountsHeaderIdempotencyKeyMax)
     .regex(searchWechatMpAccountsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10852,8 +11062,9 @@ export const LookupWechatMpArticleCommentsHeader = zod.strictObject({
     .min(1)
     .max(lookupWechatMpArticleCommentsHeaderIdempotencyKeyMax)
     .regex(lookupWechatMpArticleCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10897,8 +11108,9 @@ export const LookupWechatMpArticleHeader = zod.strictObject({
     .min(1)
     .max(lookupWechatMpArticleHeaderIdempotencyKeyMax)
     .regex(lookupWechatMpArticleHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -10947,8 +11159,9 @@ export const LookupWechatMpArticleMetricsHeader = zod.strictObject({
     .min(1)
     .max(lookupWechatMpArticleMetricsHeaderIdempotencyKeyMax)
     .regex(lookupWechatMpArticleMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11004,8 +11217,9 @@ export const ListWechatMpCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listWechatMpCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listWechatMpCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11052,8 +11266,9 @@ export const ListWeiboBackupTrendsHeader = zod.strictObject({
     .min(1)
     .max(listWeiboBackupTrendsHeaderIdempotencyKeyMax)
     .regex(listWeiboBackupTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11110,8 +11325,9 @@ export const ListWeiboCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listWeiboCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listWeiboCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11165,8 +11381,9 @@ export const ListWeiboPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(listWeiboPostCommentsHeaderIdempotencyKeyMax)
     .regex(listWeiboPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11222,8 +11439,9 @@ export const LookupWeiboPostCommentsHeader = zod.strictObject({
     .min(1)
     .max(lookupWeiboPostCommentsHeaderIdempotencyKeyMax)
     .regex(lookupWeiboPostCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11270,8 +11488,9 @@ export const GetWeiboPostHeader = zod.strictObject({
     .min(1)
     .max(getWeiboPostHeaderIdempotencyKeyMax)
     .regex(getWeiboPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11320,8 +11539,9 @@ export const LookupWeiboPostHeader = zod.strictObject({
     .min(1)
     .max(lookupWeiboPostHeaderIdempotencyKeyMax)
     .regex(lookupWeiboPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11368,8 +11588,9 @@ export const ListWeiboPostLikersHeader = zod.strictObject({
     .min(1)
     .max(listWeiboPostLikersHeaderIdempotencyKeyMax)
     .regex(listWeiboPostLikersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11418,8 +11639,9 @@ export const LookupWeiboPostLikersHeader = zod.strictObject({
     .min(1)
     .max(lookupWeiboPostLikersHeaderIdempotencyKeyMax)
     .regex(lookupWeiboPostLikersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11439,8 +11661,9 @@ export const SearchWeiboPostsHeader = zod.strictObject({
     .min(1)
     .max(searchWeiboPostsHeaderIdempotencyKeyMax)
     .regex(searchWeiboPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11492,8 +11715,9 @@ export const ListWeiboTrendsHeader = zod.strictObject({
     .min(1)
     .max(listWeiboTrendsHeaderIdempotencyKeyMax)
     .regex(listWeiboTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11550,8 +11774,9 @@ export const ListWeiboUserFollowersHeader = zod.strictObject({
     .min(1)
     .max(listWeiboUserFollowersHeaderIdempotencyKeyMax)
     .regex(listWeiboUserFollowersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11601,8 +11826,9 @@ export const GetWeiboUserHeader = zod.strictObject({
     .min(1)
     .max(getWeiboUserHeaderIdempotencyKeyMax)
     .regex(getWeiboUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11659,8 +11885,9 @@ export const ListWeiboUserPostsHeader = zod.strictObject({
     .min(1)
     .max(listWeiboUserPostsHeaderIdempotencyKeyMax)
     .regex(listWeiboUserPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11680,8 +11907,9 @@ export const SearchWeiboUsersHeader = zod.strictObject({
     .min(1)
     .max(searchWeiboUsersHeaderIdempotencyKeyMax)
     .regex(searchWeiboUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11733,8 +11961,9 @@ export const GetXCommunityHeader = zod.strictObject({
     .min(1)
     .max(getXCommunityHeaderIdempotencyKeyMax)
     .regex(getXCommunityHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11791,8 +12020,9 @@ export const ListXCommunityMembersHeader = zod.strictObject({
     .min(1)
     .max(listXCommunityMembersHeaderIdempotencyKeyMax)
     .regex(listXCommunityMembersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11849,8 +12079,9 @@ export const ListXCommunityPostsHeader = zod.strictObject({
     .min(1)
     .max(listXCommunityPostsHeaderIdempotencyKeyMax)
     .regex(listXCommunityPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11897,8 +12128,9 @@ export const ListXListFollowersHeader = zod.strictObject({
     .min(1)
     .max(listXListFollowersHeaderIdempotencyKeyMax)
     .regex(listXListFollowersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -11952,8 +12184,9 @@ export const ListXListMembersHeader = zod.strictObject({
     .min(1)
     .max(listXListMembersHeaderIdempotencyKeyMax)
     .regex(listXListMembersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12007,8 +12240,9 @@ export const ListXListPostsHeader = zod.strictObject({
     .min(1)
     .max(listXListPostsHeaderIdempotencyKeyMax)
     .regex(listXListPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12055,8 +12289,9 @@ export const GetXPostArticleHeader = zod.strictObject({
     .min(1)
     .max(getXPostArticleHeaderIdempotencyKeyMax)
     .regex(getXPostArticleHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12103,8 +12338,9 @@ export const GetXPostHeader = zod.strictObject({
     .min(1)
     .max(getXPostHeaderIdempotencyKeyMax)
     .regex(getXPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12148,8 +12384,9 @@ export const LookupXPostHeader = zod.strictObject({
     .min(1)
     .max(lookupXPostHeaderIdempotencyKeyMax)
     .regex(lookupXPostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12208,8 +12445,9 @@ export const ListXPostQuotesHeader = zod.strictObject({
     .min(1)
     .max(listXPostQuotesHeaderIdempotencyKeyMax)
     .regex(listXPostQuotesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12263,8 +12501,9 @@ export const ListXPostRepliesHeader = zod.strictObject({
     .min(1)
     .max(listXPostRepliesHeaderIdempotencyKeyMax)
     .regex(listXPostRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12318,8 +12557,9 @@ export const ListXPostRetweetersHeader = zod.strictObject({
     .min(1)
     .max(listXPostRetweetersHeaderIdempotencyKeyMax)
     .regex(listXPostRetweetersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12339,8 +12579,9 @@ export const SearchXPostsHeader = zod.strictObject({
     .min(1)
     .max(searchXPostsHeaderIdempotencyKeyMax)
     .regex(searchXPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12396,8 +12637,9 @@ export const ListXThreadPostsHeader = zod.strictObject({
     .min(1)
     .max(listXThreadPostsHeaderIdempotencyKeyMax)
     .regex(listXThreadPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12448,8 +12690,9 @@ export const ListXTrendsHeader = zod.strictObject({
     .min(1)
     .max(listXTrendsHeaderIdempotencyKeyMax)
     .regex(listXTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12503,8 +12746,9 @@ export const ListXUserFollowersHeader = zod.strictObject({
     .min(1)
     .max(listXUserFollowersHeaderIdempotencyKeyMax)
     .regex(listXUserFollowersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12558,8 +12802,9 @@ export const ListXUserFollowingHeader = zod.strictObject({
     .min(1)
     .max(listXUserFollowingHeaderIdempotencyKeyMax)
     .regex(listXUserFollowingHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12609,8 +12854,9 @@ export const GetXUserHeader = zod.strictObject({
     .min(1)
     .max(getXUserHeaderIdempotencyKeyMax)
     .regex(getXUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12654,8 +12900,9 @@ export const LookupXUserHeader = zod.strictObject({
     .min(1)
     .max(lookupXUserHeaderIdempotencyKeyMax)
     .regex(lookupXUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12706,8 +12953,9 @@ export const BatchGetXUsersHeader = zod.strictObject({
     .min(1)
     .max(batchGetXUsersHeaderIdempotencyKeyMax)
     .regex(batchGetXUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12761,8 +13009,9 @@ export const ListXUserMentionsHeader = zod.strictObject({
     .min(1)
     .max(listXUserMentionsHeaderIdempotencyKeyMax)
     .regex(listXUserMentionsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12816,8 +13065,9 @@ export const ListXUserPostsHeader = zod.strictObject({
     .min(1)
     .max(listXUserPostsHeaderIdempotencyKeyMax)
     .regex(listXUserPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12837,8 +13087,9 @@ export const SearchXUsersHeader = zod.strictObject({
     .min(1)
     .max(searchXUsersHeaderIdempotencyKeyMax)
     .regex(searchXUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12890,8 +13141,9 @@ export const GetXianyuProductHeader = zod.strictObject({
     .min(1)
     .max(getXianyuProductHeaderIdempotencyKeyMax)
     .regex(getXianyuProductHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12911,8 +13163,9 @@ export const SearchXianyuProductsHeader = zod.strictObject({
     .min(1)
     .max(searchXianyuProductsHeaderIdempotencyKeyMax)
     .regex(searchXianyuProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12972,8 +13225,9 @@ export const ListXiaohongshuCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -12993,8 +13247,9 @@ export const SearchXiaohongshuImagesHeader = zod.strictObject({
     .min(1)
     .max(searchXiaohongshuImagesHeaderIdempotencyKeyMax)
     .regex(searchXiaohongshuImagesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13043,8 +13298,9 @@ export const ListXiaohongshuRelatedKeywordsHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuRelatedKeywordsHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuRelatedKeywordsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13098,8 +13354,9 @@ export const ListXiaohongshuNoteCommentsHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuNoteCommentsHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuNoteCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13146,8 +13403,9 @@ export const GetXiaohongshuNoteHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuNoteHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuNoteHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13191,8 +13449,9 @@ export const LookupXiaohongshuNoteHeader = zod.strictObject({
     .min(1)
     .max(lookupXiaohongshuNoteHeaderIdempotencyKeyMax)
     .regex(lookupXiaohongshuNoteHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13212,8 +13471,9 @@ export const SearchXiaohongshuNotesHeader = zod.strictObject({
     .min(1)
     .max(searchXiaohongshuNotesHeaderIdempotencyKeyMax)
     .regex(searchXiaohongshuNotesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13267,8 +13527,9 @@ export const GetXiaohongshuPgyCreatorAudienceHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuPgyCreatorAudienceHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuPgyCreatorAudienceHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13334,8 +13595,9 @@ export const GetXiaohongshuPgyCreatorCostsHistoryHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuPgyCreatorCostsHistoryHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuPgyCreatorCostsHistoryHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13396,8 +13658,9 @@ export const GetXiaohongshuPgyCreatorCostsMetricsHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuPgyCreatorCostsMetricsHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuPgyCreatorCostsMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13456,8 +13719,9 @@ export const GetXiaohongshuPgyCreatorFollowersHistoryHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuPgyCreatorFollowersHistoryHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuPgyCreatorFollowersHistoryHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13511,8 +13775,9 @@ export const GetXiaohongshuPgyCreatorFollowersMetricsHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuPgyCreatorFollowersMetricsHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuPgyCreatorFollowersMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13564,8 +13829,9 @@ export const GetXiaohongshuPgyCreatorHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuPgyCreatorHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuPgyCreatorHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13629,8 +13895,9 @@ export const GetXiaohongshuPgyCreatorMetricsHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuPgyCreatorMetricsHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuPgyCreatorMetricsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13727,8 +13994,9 @@ export const ListXiaohongshuPgyCreatorNotesHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuPgyCreatorNotesHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuPgyCreatorNotesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13787,8 +14055,9 @@ export const ListXiaohongshuRelatedPgyCreatorsHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuRelatedPgyCreatorsHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuRelatedPgyCreatorsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13808,8 +14077,9 @@ export const SearchXiaohongshuPgyCreatorsHeader = zod.strictObject({
     .min(1)
     .max(searchXiaohongshuPgyCreatorsHeaderIdempotencyKeyMax)
     .regex(searchXiaohongshuPgyCreatorsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13858,8 +14128,9 @@ export const GetXiaohongshuPgyKeywordsHistoryHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuPgyKeywordsHistoryHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuPgyKeywordsHistoryHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13906,8 +14177,9 @@ export const ListXiaohongshuRelatedPgyKeywordsHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuRelatedPgyKeywordsHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuRelatedPgyKeywordsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -13959,8 +14231,9 @@ export const GetXiaohongshuPgyNoteHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuPgyNoteHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuPgyNoteHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14041,8 +14314,9 @@ export const ListXiaohongshuTrendingPgyNotesHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuTrendingPgyNotesHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuTrendingPgyNotesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14092,8 +14366,9 @@ export const GetXiaohongshuShopProductHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuShopProductHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuShopProductHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14155,8 +14430,9 @@ export const ListXiaohongshuShopProductReviewsHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuShopProductReviewsHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuShopProductReviewsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14176,8 +14452,9 @@ export const SearchXiaohongshuShopProductsHeader = zod.strictObject({
     .min(1)
     .max(searchXiaohongshuShopProductsHeaderIdempotencyKeyMax)
     .regex(searchXiaohongshuShopProductsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14231,8 +14508,9 @@ export const GetXiaohongshuTopicHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuTopicHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuTopicHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14284,8 +14562,9 @@ export const ListXiaohongshuTopicNotesHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuTopicNotesHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuTopicNotesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14335,8 +14614,9 @@ export const ListXiaohongshuTrendsHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuTrendsHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14386,8 +14666,9 @@ export const GetXiaohongshuUserHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuUserHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14431,8 +14712,9 @@ export const LookupXiaohongshuUserHeader = zod.strictObject({
     .min(1)
     .max(lookupXiaohongshuUserHeaderIdempotencyKeyMax)
     .regex(lookupXiaohongshuUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14489,8 +14771,9 @@ export const ListXiaohongshuUserNotesHeader = zod.strictObject({
     .min(1)
     .max(listXiaohongshuUserNotesHeaderIdempotencyKeyMax)
     .regex(listXiaohongshuUserNotesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14510,8 +14793,9 @@ export const SearchXiaohongshuUsersHeader = zod.strictObject({
     .min(1)
     .max(searchXiaohongshuUsersHeaderIdempotencyKeyMax)
     .regex(searchXiaohongshuUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14560,8 +14844,9 @@ export const GetXiaohongshuVideoHeader = zod.strictObject({
     .min(1)
     .max(getXiaohongshuVideoHeaderIdempotencyKeyMax)
     .regex(getXiaohongshuVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14605,8 +14890,9 @@ export const LookupXiaohongshuVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupXiaohongshuVideoHeaderIdempotencyKeyMax)
     .regex(lookupXiaohongshuVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14658,8 +14944,9 @@ export const GetXiguaUserHeader = zod.strictObject({
     .min(1)
     .max(getXiguaUserHeaderIdempotencyKeyMax)
     .regex(getXiguaUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14706,8 +14993,9 @@ export const LookupXiguaUserHeader = zod.strictObject({
     .min(1)
     .max(lookupXiguaUserHeaderIdempotencyKeyMax)
     .regex(lookupXiguaUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14766,8 +15054,9 @@ export const ListXiguaUserVideosHeader = zod.strictObject({
     .min(1)
     .max(listXiguaUserVideosHeaderIdempotencyKeyMax)
     .regex(listXiguaUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14821,8 +15110,9 @@ export const LookupXiguaUserVideosHeader = zod.strictObject({
     .min(1)
     .max(lookupXiguaUserVideosHeaderIdempotencyKeyMax)
     .regex(lookupXiguaUserVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14881,8 +15171,9 @@ export const ListXiguaVideoCommentsHeader = zod.strictObject({
     .min(1)
     .max(listXiguaVideoCommentsHeaderIdempotencyKeyMax)
     .regex(listXiguaVideoCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14938,8 +15229,9 @@ export const LookupXiguaVideoCommentsHeader = zod.strictObject({
     .min(1)
     .max(lookupXiguaVideoCommentsHeaderIdempotencyKeyMax)
     .regex(lookupXiguaVideoCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -14991,8 +15283,9 @@ export const GetXiguaVideoHeader = zod.strictObject({
     .min(1)
     .max(getXiguaVideoHeaderIdempotencyKeyMax)
     .regex(getXiguaVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15041,8 +15334,9 @@ export const LookupXiguaVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupXiguaVideoHeaderIdempotencyKeyMax)
     .regex(lookupXiguaVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15062,8 +15356,9 @@ export const SearchXiguaVideosHeader = zod.strictObject({
     .min(1)
     .max(searchXiguaVideosHeaderIdempotencyKeyMax)
     .regex(searchXiguaVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15115,8 +15410,9 @@ export const GetYoutubeChannelHeader = zod.strictObject({
     .min(1)
     .max(getYoutubeChannelHeaderIdempotencyKeyMax)
     .regex(getYoutubeChannelHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15163,8 +15459,9 @@ export const LookupYoutubeChannelHeader = zod.strictObject({
     .min(1)
     .max(lookupYoutubeChannelHeaderIdempotencyKeyMax)
     .regex(lookupYoutubeChannelHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15221,8 +15518,9 @@ export const ListYoutubeChannelPostsHeader = zod.strictObject({
     .min(1)
     .max(listYoutubeChannelPostsHeaderIdempotencyKeyMax)
     .regex(listYoutubeChannelPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15276,8 +15574,9 @@ export const LookupYoutubeChannelPostsHeader = zod.strictObject({
     .min(1)
     .max(lookupYoutubeChannelPostsHeaderIdempotencyKeyMax)
     .regex(lookupYoutubeChannelPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15297,8 +15596,9 @@ export const SearchYoutubeChannelsHeader = zod.strictObject({
     .min(1)
     .max(searchYoutubeChannelsHeaderIdempotencyKeyMax)
     .regex(searchYoutubeChannelsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15367,8 +15667,9 @@ export const ListYoutubeChannelVideosHeader = zod.strictObject({
     .min(1)
     .max(listYoutubeChannelVideosHeaderIdempotencyKeyMax)
     .regex(listYoutubeChannelVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15432,8 +15733,9 @@ export const LookupYoutubeChannelVideosHeader = zod.strictObject({
     .min(1)
     .max(lookupYoutubeChannelVideosHeaderIdempotencyKeyMax)
     .regex(lookupYoutubeChannelVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15489,8 +15791,9 @@ export const LookupYoutubeCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(lookupYoutubeCommentRepliesHeaderIdempotencyKeyMax)
     .regex(lookupYoutubeCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15540,8 +15843,9 @@ export const GetYoutubePostHeader = zod.strictObject({
     .min(1)
     .max(getYoutubePostHeaderIdempotencyKeyMax)
     .regex(getYoutubePostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15585,8 +15889,9 @@ export const LookupYoutubePostHeader = zod.strictObject({
     .min(1)
     .max(lookupYoutubePostHeaderIdempotencyKeyMax)
     .regex(lookupYoutubePostHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15645,8 +15950,9 @@ export const ListYoutubeVideoCommentsHeader = zod.strictObject({
     .min(1)
     .max(listYoutubeVideoCommentsHeaderIdempotencyKeyMax)
     .regex(listYoutubeVideoCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15693,8 +15999,9 @@ export const GetYoutubeVideoHeader = zod.strictObject({
     .min(1)
     .max(getYoutubeVideoHeaderIdempotencyKeyMax)
     .regex(getYoutubeVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15738,8 +16045,9 @@ export const LookupYoutubeVideoHeader = zod.strictObject({
     .min(1)
     .max(lookupYoutubeVideoHeaderIdempotencyKeyMax)
     .regex(lookupYoutubeVideoHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15759,8 +16067,9 @@ export const SearchYoutubeVideosHeader = zod.strictObject({
     .min(1)
     .max(searchYoutubeVideosHeaderIdempotencyKeyMax)
     .regex(searchYoutubeVideosHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15814,8 +16123,9 @@ export const GetYoutubeVideoTranscriptHeader = zod.strictObject({
     .min(1)
     .max(getYoutubeVideoTranscriptHeaderIdempotencyKeyMax)
     .regex(getYoutubeVideoTranscriptHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15872,8 +16182,9 @@ export const ListZhihuAnswerCommentsHeader = zod.strictObject({
     .min(1)
     .max(listZhihuAnswerCommentsHeaderIdempotencyKeyMax)
     .regex(listZhihuAnswerCommentsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15923,8 +16234,9 @@ export const GetZhihuAnswerHeader = zod.strictObject({
     .min(1)
     .max(getZhihuAnswerHeaderIdempotencyKeyMax)
     .regex(getZhihuAnswerHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -15971,8 +16283,9 @@ export const LookupZhihuAnswerHeader = zod.strictObject({
     .min(1)
     .max(lookupZhihuAnswerHeaderIdempotencyKeyMax)
     .regex(lookupZhihuAnswerHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16022,8 +16335,9 @@ export const GetZhihuArticleHeader = zod.strictObject({
     .min(1)
     .max(getZhihuArticleHeaderIdempotencyKeyMax)
     .regex(getZhihuArticleHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16067,8 +16381,9 @@ export const LookupZhihuArticleHeader = zod.strictObject({
     .min(1)
     .max(lookupZhihuArticleHeaderIdempotencyKeyMax)
     .regex(lookupZhihuArticleHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16127,8 +16442,9 @@ export const ListZhihuColumnArticlesHeader = zod.strictObject({
     .min(1)
     .max(listZhihuColumnArticlesHeaderIdempotencyKeyMax)
     .regex(listZhihuColumnArticlesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16185,8 +16501,9 @@ export const ListZhihuCommentRepliesHeader = zod.strictObject({
     .min(1)
     .max(listZhihuCommentRepliesHeaderIdempotencyKeyMax)
     .regex(listZhihuCommentRepliesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16236,8 +16553,9 @@ export const GetZhihuPinHeader = zod.strictObject({
     .min(1)
     .max(getZhihuPinHeaderIdempotencyKeyMax)
     .regex(getZhihuPinHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16281,8 +16599,9 @@ export const LookupZhihuPinHeader = zod.strictObject({
     .min(1)
     .max(lookupZhihuPinHeaderIdempotencyKeyMax)
     .regex(lookupZhihuPinHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16302,8 +16621,9 @@ export const SearchZhihuPostsHeader = zod.strictObject({
     .min(1)
     .max(searchZhihuPostsHeaderIdempotencyKeyMax)
     .regex(searchZhihuPostsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16362,8 +16682,9 @@ export const ListZhihuQuestionAnswersHeader = zod.strictObject({
     .min(1)
     .max(listZhihuQuestionAnswersHeaderIdempotencyKeyMax)
     .regex(listZhihuQuestionAnswersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16417,8 +16738,9 @@ export const LookupZhihuQuestionAnswersHeader = zod.strictObject({
     .min(1)
     .max(lookupZhihuQuestionAnswersHeaderIdempotencyKeyMax)
     .regex(lookupZhihuQuestionAnswersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16468,8 +16790,9 @@ export const GetZhihuQuestionHeader = zod.strictObject({
     .min(1)
     .max(getZhihuQuestionHeaderIdempotencyKeyMax)
     .regex(getZhihuQuestionHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16516,8 +16839,9 @@ export const LookupZhihuQuestionHeader = zod.strictObject({
     .min(1)
     .max(lookupZhihuQuestionHeaderIdempotencyKeyMax)
     .regex(lookupZhihuQuestionHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16559,8 +16883,9 @@ export const ListZhihuTrendsHeader = zod.strictObject({
     .min(1)
     .max(listZhihuTrendsHeaderIdempotencyKeyMax)
     .regex(listZhihuTrendsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16617,8 +16942,9 @@ export const ListZhihuUserAnswersHeader = zod.strictObject({
     .min(1)
     .max(listZhihuUserAnswersHeaderIdempotencyKeyMax)
     .regex(listZhihuUserAnswersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16675,8 +17001,9 @@ export const ListZhihuUserArticlesHeader = zod.strictObject({
     .min(1)
     .max(listZhihuUserArticlesHeaderIdempotencyKeyMax)
     .regex(listZhihuUserArticlesHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16733,8 +17060,9 @@ export const ListZhihuUserFollowersHeader = zod.strictObject({
     .min(1)
     .max(listZhihuUserFollowersHeaderIdempotencyKeyMax)
     .regex(listZhihuUserFollowersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16784,8 +17112,9 @@ export const GetZhihuUserHeader = zod.strictObject({
     .min(1)
     .max(getZhihuUserHeaderIdempotencyKeyMax)
     .regex(getZhihuUserHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16842,8 +17171,9 @@ export const ListZhihuUserPinsHeader = zod.strictObject({
     .min(1)
     .max(listZhihuUserPinsHeaderIdempotencyKeyMax)
     .regex(listZhihuUserPinsHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 
@@ -16863,8 +17193,9 @@ export const SearchZhihuUsersHeader = zod.strictObject({
     .min(1)
     .max(searchZhihuUsersHeaderIdempotencyKeyMax)
     .regex(searchZhihuUsersHeaderIdempotencyKeyRegExp)
+    .optional()
     .describe(
-      "Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.\n\nRetry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
+      "Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).\n\nOmit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.\n\nAfter 24 hours, the same key starts a new metered query.",
     ),
 });
 

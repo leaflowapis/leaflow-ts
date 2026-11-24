@@ -6,7 +6,7 @@
  *
  * Enable OKData once per project (`okdata:enablement.create`) before invoking metered queries (`okdata:query.invoke`). Project identity and billing ownership come solely from the verified IAM scoped token.
  *
- * Search and structured analytical queries use `QUERY` with JSON bodies. Resource reads use `GET` with path identifiers and query parameters; alternate identifiers use read-only `:lookup` operations. All data operations require an `Idempotency-Key` header (24-hour replay window) and use shared response models, optional `view` and `fields` projections, and cursor pagination where supported. Every page is a separate metered query. Retail prices and invoices are managed by Leaflow Billing.
+ * Search and structured analytical queries use `QUERY` with JSON bodies. Resource reads use `GET` with path identifiers and query parameters; alternate identifiers use read-only `:lookup` operations. All data operations accept an optional `Idempotency-Key` header (24-hour replay window for safe retries) and use shared response models, optional `view` and `fields` projections, and cursor pagination where supported. Every page is a separate metered query. Retail prices and invoices are managed by Leaflow Billing.
  * OpenAPI spec version: 1.0.0
  */
 import { decodeResponse } from "../../../response.js";
@@ -1213,8 +1213,8 @@ export const getGetAlibaba1688ProductUrl = (
  */
 export const getAlibaba1688Product = async (
   productId: string,
-  headers: GetAlibaba1688ProductHeaders,
   params?: GetAlibaba1688ProductParams,
+  headers?: GetAlibaba1688ProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getAlibaba1688ProductResponse> => {
@@ -1309,8 +1309,8 @@ export const getListAlibaba1688ProductReviewsUrl = (
  */
 export const listAlibaba1688ProductReviews = async (
   productId: string,
-  headers: ListAlibaba1688ProductReviewsHeaders,
   params?: ListAlibaba1688ProductReviewsParams,
+  headers?: ListAlibaba1688ProductReviewsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listAlibaba1688ProductReviewsResponse> => {
@@ -1383,7 +1383,7 @@ export const getSearchAlibaba1688ProductsUrl = () => {
  */
 export const searchAlibaba1688Products = async (
   searchAlibaba1688ProductsRequest: SearchAlibaba1688ProductsRequest,
-  headers: SearchAlibaba1688ProductsHeaders,
+  headers?: SearchAlibaba1688ProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchAlibaba1688ProductsResponse> => {
@@ -1478,8 +1478,8 @@ export const getListAlibaba1688ShopProductsUrl = (
  */
 export const listAlibaba1688ShopProducts = async (
   shopId: string,
-  headers: ListAlibaba1688ShopProductsHeaders,
   params?: ListAlibaba1688ShopProductsParams,
+  headers?: ListAlibaba1688ShopProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listAlibaba1688ShopProductsResponse> => {
@@ -1572,8 +1572,8 @@ export const getGetAliexpressProductUrl = (
  */
 export const getAliexpressProduct = async (
   productId: string,
-  headers: GetAliexpressProductHeaders,
   params?: GetAliexpressProductParams,
+  headers?: GetAliexpressProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getAliexpressProductResponse> => {
@@ -1668,8 +1668,8 @@ export const getListAliexpressProductReviewsUrl = (
  */
 export const listAliexpressProductReviews = async (
   productId: string,
-  headers: ListAliexpressProductReviewsHeaders,
   params?: ListAliexpressProductReviewsParams,
+  headers?: ListAliexpressProductReviewsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listAliexpressProductReviewsResponse> => {
@@ -1738,7 +1738,7 @@ export const getSearchAliexpressProductsUrl = () => {
  */
 export const searchAliexpressProducts = async (
   searchAliexpressProductsRequest: SearchAliexpressProductsRequest,
-  headers: SearchAliexpressProductsHeaders,
+  headers?: SearchAliexpressProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchAliexpressProductsResponse> => {
@@ -1826,8 +1826,8 @@ export const getListAllTrendsUrl = (params?: ListAllTrendsParams) => {
  * @summary All hot lists in one call
  */
 export const listAllTrends = async (
-  headers: ListAllTrendsHeaders,
   params?: ListAllTrendsParams,
+  headers?: ListAllTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listAllTrendsResponse> => {
@@ -1917,7 +1917,7 @@ export const getListAmazonBestsellersUrl = (params: ListAmazonBestsellersParams)
  */
 export const listAmazonBestsellers = async (
   params: ListAmazonBestsellersParams,
-  headers: ListAmazonBestsellersHeaders,
+  headers?: ListAmazonBestsellersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listAmazonBestsellersResponse> => {
@@ -2007,8 +2007,8 @@ export const getGetAmazonProductUrl = (productId: string, params?: GetAmazonProd
  */
 export const getAmazonProduct = async (
   productId: string,
-  headers: GetAmazonProductHeaders,
   params?: GetAmazonProductParams,
+  headers?: GetAmazonProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getAmazonProductResponse> => {
@@ -2101,8 +2101,8 @@ export const getListAmazonProductReviewsUrl = (
  */
 export const listAmazonProductReviews = async (
   productId: string,
-  headers: ListAmazonProductReviewsHeaders,
   params?: ListAmazonProductReviewsParams,
+  headers?: ListAmazonProductReviewsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listAmazonProductReviewsResponse> => {
@@ -2171,7 +2171,7 @@ export const getSearchAmazonProductsUrl = () => {
  */
 export const searchAmazonProducts = async (
   searchAmazonProductsRequest: SearchAmazonProductsRequest,
-  headers: SearchAmazonProductsHeaders,
+  headers?: SearchAmazonProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchAmazonProductsResponse> => {
@@ -2260,8 +2260,8 @@ export const getGetAppStoreAppUrl = (appId: string, params?: GetAppStoreAppParam
  */
 export const getAppStoreApp = async (
   appId: string,
-  headers: GetAppStoreAppHeaders,
   params?: GetAppStoreAppParams,
+  headers?: GetAppStoreAppHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getAppStoreAppResponse> => {
@@ -2351,7 +2351,7 @@ export const getLookupAppStoreAppUrl = (params: LookupAppStoreAppParams) => {
  */
 export const lookupAppStoreApp = async (
   params: LookupAppStoreAppParams,
-  headers: LookupAppStoreAppHeaders,
+  headers?: LookupAppStoreAppHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupAppStoreAppResponse> => {
@@ -2444,8 +2444,8 @@ export const getListAppStoreAppReviewsUrl = (
  */
 export const listAppStoreAppReviews = async (
   appId: string,
-  headers: ListAppStoreAppReviewsHeaders,
   params?: ListAppStoreAppReviewsParams,
+  headers?: ListAppStoreAppReviewsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listAppStoreAppReviewsResponse> => {
@@ -2535,7 +2535,7 @@ export const getLookupAppStoreAppReviewsUrl = (params: LookupAppStoreAppReviewsP
  */
 export const lookupAppStoreAppReviews = async (
   params: LookupAppStoreAppReviewsParams,
-  headers: LookupAppStoreAppReviewsHeaders,
+  headers?: LookupAppStoreAppReviewsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupAppStoreAppReviewsResponse> => {
@@ -2622,8 +2622,8 @@ export const getListBaiduTrendsUrl = (params?: ListBaiduTrendsParams) => {
  * @summary Baidu hot search
  */
 export const listBaiduTrends = async (
-  headers: ListBaiduTrendsHeaders,
   params?: ListBaiduTrendsParams,
+  headers?: ListBaiduTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listBaiduTrendsResponse> => {
@@ -2718,8 +2718,8 @@ export const getListBilibiliBackupUserVideosUrl = (
  */
 export const listBilibiliBackupUserVideos = async (
   userId: string,
-  headers: ListBilibiliBackupUserVideosHeaders,
   params?: ListBilibiliBackupUserVideosParams,
+  headers?: ListBilibiliBackupUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listBilibiliBackupUserVideosResponse> => {
@@ -2814,8 +2814,8 @@ export const getListBilibiliCommentRepliesUrl = (
 export const listBilibiliCommentReplies = async (
   videoId: string,
   commentId: string,
-  headers: ListBilibiliCommentRepliesHeaders,
   params?: ListBilibiliCommentRepliesParams,
+  headers?: ListBilibiliCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listBilibiliCommentRepliesResponse> => {
@@ -2908,8 +2908,8 @@ export const getGetBilibiliLiveRoomUrl = (roomId: string, params?: GetBilibiliLi
  */
 export const getBilibiliLiveRoom = async (
   roomId: string,
-  headers: GetBilibiliLiveRoomHeaders,
   params?: GetBilibiliLiveRoomParams,
+  headers?: GetBilibiliLiveRoomHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getBilibiliLiveRoomResponse> => {
@@ -2999,7 +2999,7 @@ export const getLookupBilibiliLiveRoomUrl = (params: LookupBilibiliLiveRoomParam
  */
 export const lookupBilibiliLiveRoom = async (
   params: LookupBilibiliLiveRoomParams,
-  headers: LookupBilibiliLiveRoomHeaders,
+  headers?: LookupBilibiliLiveRoomHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupBilibiliLiveRoomResponse> => {
@@ -3089,8 +3089,8 @@ export const getGetBilibiliLiveUserUrl = (userId: string, params?: GetBilibiliLi
  */
 export const getBilibiliLiveUser = async (
   userId: string,
-  headers: GetBilibiliLiveUserHeaders,
   params?: GetBilibiliLiveUserParams,
+  headers?: GetBilibiliLiveUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getBilibiliLiveUserResponse> => {
@@ -3179,8 +3179,8 @@ export const getListBilibiliTrendsUrl = (params?: ListBilibiliTrendsParams) => {
  * @summary Bilibili hot searches
  */
 export const listBilibiliTrends = async (
-  headers: ListBilibiliTrendsHeaders,
   params?: ListBilibiliTrendsParams,
+  headers?: ListBilibiliTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listBilibiliTrendsResponse> => {
@@ -3268,8 +3268,8 @@ export const getGetBilibiliUserUrl = (userId: string, params?: GetBilibiliUserPa
  */
 export const getBilibiliUser = async (
   userId: string,
-  headers: GetBilibiliUserHeaders,
   params?: GetBilibiliUserParams,
+  headers?: GetBilibiliUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getBilibiliUserResponse> => {
@@ -3362,8 +3362,8 @@ export const getListBilibiliUserVideosUrl = (
  */
 export const listBilibiliUserVideos = async (
   userId: string,
-  headers: ListBilibiliUserVideosHeaders,
   params?: ListBilibiliUserVideosParams,
+  headers?: ListBilibiliUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listBilibiliUserVideosResponse> => {
@@ -3456,8 +3456,8 @@ export const getListBilibiliVideoCommentsUrl = (
  */
 export const listBilibiliVideoComments = async (
   videoId: string,
-  headers: ListBilibiliVideoCommentsHeaders,
   params?: ListBilibiliVideoCommentsParams,
+  headers?: ListBilibiliVideoCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listBilibiliVideoCommentsResponse> => {
@@ -3547,8 +3547,8 @@ export const getGetBilibiliVideoUrl = (videoId: string, params?: GetBilibiliVide
  */
 export const getBilibiliVideo = async (
   videoId: string,
-  headers: GetBilibiliVideoHeaders,
   params?: GetBilibiliVideoParams,
+  headers?: GetBilibiliVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getBilibiliVideoResponse> => {
@@ -3638,7 +3638,7 @@ export const getLookupBilibiliVideoUrl = (params: LookupBilibiliVideoParams) => 
  */
 export const lookupBilibiliVideo = async (
   params: LookupBilibiliVideoParams,
-  headers: LookupBilibiliVideoHeaders,
+  headers?: LookupBilibiliVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupBilibiliVideoResponse> => {
@@ -3707,7 +3707,7 @@ export const getSearchBilibiliVideosUrl = () => {
  */
 export const searchBilibiliVideos = async (
   searchBilibiliVideosRequest: SearchBilibiliVideosRequest,
-  headers: SearchBilibiliVideosHeaders,
+  headers?: SearchBilibiliVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchBilibiliVideosResponse> => {
@@ -3797,8 +3797,8 @@ export const getListBilibiliTrendingVideosUrl = (params?: ListBilibiliTrendingVi
  * @summary Bilibili popular videos
  */
 export const listBilibiliTrendingVideos = async (
-  headers: ListBilibiliTrendingVideosHeaders,
   params?: ListBilibiliTrendingVideosParams,
+  headers?: ListBilibiliTrendingVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listBilibiliTrendingVideosResponse> => {
@@ -3891,8 +3891,8 @@ export const getListBlueskyPostCommentsUrl = (
  */
 export const listBlueskyPostComments = async (
   postId: string,
-  headers: ListBlueskyPostCommentsHeaders,
   params?: ListBlueskyPostCommentsParams,
+  headers?: ListBlueskyPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listBlueskyPostCommentsResponse> => {
@@ -3982,7 +3982,7 @@ export const getLookupBlueskyPostCommentsUrl = (params: LookupBlueskyPostComment
  */
 export const lookupBlueskyPostComments = async (
   params: LookupBlueskyPostCommentsParams,
-  headers: LookupBlueskyPostCommentsHeaders,
+  headers?: LookupBlueskyPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupBlueskyPostCommentsResponse> => {
@@ -4070,8 +4070,8 @@ export const getGetBlueskyPostUrl = (postId: string, params?: GetBlueskyPostPara
  */
 export const getBlueskyPost = async (
   postId: string,
-  headers: GetBlueskyPostHeaders,
   params?: GetBlueskyPostParams,
+  headers?: GetBlueskyPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getBlueskyPostResponse> => {
@@ -4161,7 +4161,7 @@ export const getLookupBlueskyPostUrl = (params: LookupBlueskyPostParams) => {
  */
 export const lookupBlueskyPost = async (
   params: LookupBlueskyPostParams,
-  headers: LookupBlueskyPostHeaders,
+  headers?: LookupBlueskyPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupBlueskyPostResponse> => {
@@ -4249,8 +4249,8 @@ export const getGetBlueskyUserUrl = (userId: string, params?: GetBlueskyUserPara
  */
 export const getBlueskyUser = async (
   userId: string,
-  headers: GetBlueskyUserHeaders,
   params?: GetBlueskyUserParams,
+  headers?: GetBlueskyUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getBlueskyUserResponse> => {
@@ -4340,7 +4340,7 @@ export const getLookupBlueskyUserUrl = (params: LookupBlueskyUserParams) => {
  */
 export const lookupBlueskyUser = async (
   params: LookupBlueskyUserParams,
-  headers: LookupBlueskyUserHeaders,
+  headers?: LookupBlueskyUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupBlueskyUserResponse> => {
@@ -4430,8 +4430,8 @@ export const getListBlueskyUserPostsUrl = (userId: string, params?: ListBlueskyU
  */
 export const listBlueskyUserPosts = async (
   userId: string,
-  headers: ListBlueskyUserPostsHeaders,
   params?: ListBlueskyUserPostsParams,
+  headers?: ListBlueskyUserPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listBlueskyUserPostsResponse> => {
@@ -4521,7 +4521,7 @@ export const getLookupBlueskyUserPostsUrl = (params: LookupBlueskyUserPostsParam
  */
 export const lookupBlueskyUserPosts = async (
   params: LookupBlueskyUserPostsParams,
-  headers: LookupBlueskyUserPostsHeaders,
+  headers?: LookupBlueskyUserPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupBlueskyUserPostsResponse> => {
@@ -4590,7 +4590,7 @@ export const getSearchBlueskyUsersUrl = () => {
  */
 export const searchBlueskyUsers = async (
   searchBlueskyUsersRequest: SearchBlueskyUsersRequest,
-  headers: SearchBlueskyUsersHeaders,
+  headers?: SearchBlueskyUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchBlueskyUsersResponse> => {
@@ -4684,8 +4684,8 @@ export const getListDouyinBackupUserVideosUrl = (
  */
 export const listDouyinBackupUserVideos = async (
   userId: string,
-  headers: ListDouyinBackupUserVideosHeaders,
   params?: ListDouyinBackupUserVideosParams,
+  headers?: ListDouyinBackupUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinBackupUserVideosResponse> => {
@@ -4777,7 +4777,7 @@ export const getLookupDouyinBackupUserVideosUrl = (params: LookupDouyinBackupUse
  */
 export const lookupDouyinBackupUserVideos = async (
   params: LookupDouyinBackupUserVideosParams,
-  headers: LookupDouyinBackupUserVideosHeaders,
+  headers?: LookupDouyinBackupUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupDouyinBackupUserVideosResponse> => {
@@ -4846,7 +4846,7 @@ export const getSearchDouyinBackupVideosUrl = () => {
  */
 export const searchDouyinBackupVideos = async (
   searchDouyinBackupVideosRequest: SearchDouyinBackupVideosRequest,
-  headers: SearchDouyinBackupVideosHeaders,
+  headers?: SearchDouyinBackupVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchDouyinBackupVideosResponse> => {
@@ -4942,8 +4942,8 @@ export const getListDouyinCommentRepliesUrl = (
 export const listDouyinCommentReplies = async (
   videoId: string,
   commentId: string,
-  headers: ListDouyinCommentRepliesHeaders,
   params?: ListDouyinCommentRepliesParams,
+  headers?: ListDouyinCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinCommentRepliesResponse> => {
@@ -5036,8 +5036,8 @@ export const getListDouyinHashtagVideosUrl = (
  */
 export const listDouyinHashtagVideos = async (
   hashtagId: string,
-  headers: ListDouyinHashtagVideosHeaders,
   params?: ListDouyinHashtagVideosParams,
+  headers?: ListDouyinHashtagVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinHashtagVideosResponse> => {
@@ -5131,7 +5131,7 @@ export const getGetDouyinIndexBrandHistoryUrl = (
 export const getDouyinIndexBrandHistory = async (
   brand: string,
   params: GetDouyinIndexBrandHistoryParams,
-  headers: GetDouyinIndexBrandHistoryHeaders,
+  headers?: GetDouyinIndexBrandHistoryHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinIndexBrandHistoryResponse> => {
@@ -5225,7 +5225,7 @@ export const getGetDouyinIndexBrandMetricsUrl = (
 export const getDouyinIndexBrandMetrics = async (
   brand: string,
   params: GetDouyinIndexBrandMetricsParams,
-  headers: GetDouyinIndexBrandMetricsHeaders,
+  headers?: GetDouyinIndexBrandMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinIndexBrandMetricsResponse> => {
@@ -5320,8 +5320,8 @@ export const getGetDouyinIndexCreatorAudienceUrl = (
  */
 export const getDouyinIndexCreatorAudience = async (
   creatorId: string,
-  headers: GetDouyinIndexCreatorAudienceHeaders,
   params?: GetDouyinIndexCreatorAudienceParams,
+  headers?: GetDouyinIndexCreatorAudienceHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinIndexCreatorAudienceResponse> => {
@@ -5420,8 +5420,8 @@ export const getGetDouyinIndexCreatorMetricsUrl = (
  */
 export const getDouyinIndexCreatorMetrics = async (
   creatorId: string,
-  headers: GetDouyinIndexCreatorMetricsHeaders,
   params?: GetDouyinIndexCreatorMetricsParams,
+  headers?: GetDouyinIndexCreatorMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinIndexCreatorMetricsResponse> => {
@@ -5517,7 +5517,7 @@ export const getListDouyinIndexCreatorVideosUrl = (
 export const listDouyinIndexCreatorVideos = async (
   creatorId: string,
   params: ListDouyinIndexCreatorVideosParams,
-  headers: ListDouyinIndexCreatorVideosHeaders,
+  headers?: ListDouyinIndexCreatorVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinIndexCreatorVideosResponse> => {
@@ -5613,7 +5613,7 @@ export const getGetDouyinIndexKeywordAudienceUrl = (
 export const getDouyinIndexKeywordAudience = async (
   keyword: string,
   params: GetDouyinIndexKeywordAudienceParams,
-  headers: GetDouyinIndexKeywordAudienceHeaders,
+  headers?: GetDouyinIndexKeywordAudienceHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinIndexKeywordAudienceResponse> => {
@@ -5688,7 +5688,7 @@ export const getGetDouyinIndexKeywordsHistoryUrl = () => {
  */
 export const getDouyinIndexKeywordsHistory = async (
   getDouyinIndexKeywordsHistoryRequest: GetDouyinIndexKeywordsHistoryRequest,
-  headers: GetDouyinIndexKeywordsHistoryHeaders,
+  headers?: GetDouyinIndexKeywordsHistoryHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinIndexKeywordsHistoryResponse> => {
@@ -5789,7 +5789,7 @@ export const getListDouyinRelatedIndexKeywordsUrl = (
 export const listDouyinRelatedIndexKeywords = async (
   keyword: string,
   params: ListDouyinRelatedIndexKeywordsParams,
-  headers: ListDouyinRelatedIndexKeywordsHeaders,
+  headers?: ListDouyinRelatedIndexKeywordsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinRelatedIndexKeywordsResponse> => {
@@ -5882,8 +5882,8 @@ export const getListDouyinIndexTrendsUrl = (params?: ListDouyinIndexTrendsParams
  * @summary Douyin index: live hot topics
  */
 export const listDouyinIndexTrends = async (
-  headers: ListDouyinIndexTrendsHeaders,
   params?: ListDouyinIndexTrendsParams,
+  headers?: ListDouyinIndexTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinIndexTrendsResponse> => {
@@ -5952,7 +5952,7 @@ export const getSearchDouyinIndexVideosUrl = () => {
  */
 export const searchDouyinIndexVideos = async (
   searchDouyinIndexVideosRequest: SearchDouyinIndexVideosRequest,
-  headers: SearchDouyinIndexVideosHeaders,
+  headers?: SearchDouyinIndexVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchDouyinIndexVideosResponse> => {
@@ -6046,8 +6046,8 @@ export const getListDouyinRelatedKeywordsUrl = (
  */
 export const listDouyinRelatedKeywords = async (
   keyword: string,
-  headers: ListDouyinRelatedKeywordsHeaders,
   params?: ListDouyinRelatedKeywordsParams,
+  headers?: ListDouyinRelatedKeywordsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinRelatedKeywordsResponse> => {
@@ -6137,8 +6137,8 @@ export const getGetDouyinLiveRoomUrl = (roomId: string, params?: GetDouyinLiveRo
  */
 export const getDouyinLiveRoom = async (
   roomId: string,
-  headers: GetDouyinLiveRoomHeaders,
   params?: GetDouyinLiveRoomParams,
+  headers?: GetDouyinLiveRoomHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinLiveRoomResponse> => {
@@ -6228,7 +6228,7 @@ export const getLookupDouyinLiveRoomUrl = (params: LookupDouyinLiveRoomParams) =
  */
 export const lookupDouyinLiveRoom = async (
   params: LookupDouyinLiveRoomParams,
-  headers: LookupDouyinLiveRoomHeaders,
+  headers?: LookupDouyinLiveRoomHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupDouyinLiveRoomResponse> => {
@@ -6323,8 +6323,8 @@ export const getGetDouyinLiveStreamerMetricsUrl = (
  */
 export const getDouyinLiveStreamerMetrics = async (
   streamerId: string,
-  headers: GetDouyinLiveStreamerMetricsHeaders,
   params?: GetDouyinLiveStreamerMetricsParams,
+  headers?: GetDouyinLiveStreamerMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinLiveStreamerMetricsResponse> => {
@@ -6417,8 +6417,8 @@ export const getListDouyinTrendingLiveStreamersUrl = (
  * @summary Douyin live streamer boards
  */
 export const listDouyinTrendingLiveStreamers = async (
-  headers: ListDouyinTrendingLiveStreamersHeaders,
   params?: ListDouyinTrendingLiveStreamersParams,
+  headers?: ListDouyinTrendingLiveStreamersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinTrendingLiveStreamersResponse> => {
@@ -6512,8 +6512,8 @@ export const getGetDouyinLiveUserUrl = (userId: string, params?: GetDouyinLiveUs
  */
 export const getDouyinLiveUser = async (
   userId: string,
-  headers: GetDouyinLiveUserHeaders,
   params?: GetDouyinLiveUserParams,
+  headers?: GetDouyinLiveUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinLiveUserResponse> => {
@@ -6603,7 +6603,7 @@ export const getLookupDouyinLiveUserUrl = (params: LookupDouyinLiveUserParams) =
  */
 export const lookupDouyinLiveUser = async (
   params: LookupDouyinLiveUserParams,
-  headers: LookupDouyinLiveUserHeaders,
+  headers?: LookupDouyinLiveUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupDouyinLiveUserResponse> => {
@@ -6692,8 +6692,8 @@ export const getListDouyinTrendsUrl = (params?: ListDouyinTrendsParams) => {
  * @summary Douyin hot search board
  */
 export const listDouyinTrends = async (
-  headers: ListDouyinTrendsHeaders,
   params?: ListDouyinTrendsParams,
+  headers?: ListDouyinTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinTrendsResponse> => {
@@ -6781,8 +6781,8 @@ export const getGetDouyinUserUrl = (userId: string, params?: GetDouyinUserParams
  */
 export const getDouyinUser = async (
   userId: string,
-  headers: GetDouyinUserHeaders,
   params?: GetDouyinUserParams,
+  headers?: GetDouyinUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinUserResponse> => {
@@ -6872,7 +6872,7 @@ export const getLookupDouyinUserUrl = (params: LookupDouyinUserParams) => {
  */
 export const lookupDouyinUser = async (
   params: LookupDouyinUserParams,
-  headers: LookupDouyinUserHeaders,
+  headers?: LookupDouyinUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupDouyinUserResponse> => {
@@ -6962,7 +6962,7 @@ export const getLookupDouyinUserHistoryUrl = (params: LookupDouyinUserHistoryPar
  */
 export const lookupDouyinUserHistory = async (
   params: LookupDouyinUserHistoryParams,
-  headers: LookupDouyinUserHistoryHeaders,
+  headers?: LookupDouyinUserHistoryHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupDouyinUserHistoryResponse> => {
@@ -7052,7 +7052,7 @@ export const getBatchGetDouyinUsersHistoryUrl = (params: BatchGetDouyinUsersHist
  */
 export const batchGetDouyinUsersHistory = async (
   params: BatchGetDouyinUsersHistoryParams,
-  headers: BatchGetDouyinUsersHistoryHeaders,
+  headers?: BatchGetDouyinUsersHistoryHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<batchGetDouyinUsersHistoryResponse> => {
@@ -7121,7 +7121,7 @@ export const getSearchDouyinUsersUrl = () => {
  */
 export const searchDouyinUsers = async (
   searchDouyinUsersRequest: SearchDouyinUsersRequest,
-  headers: SearchDouyinUsersHeaders,
+  headers?: SearchDouyinUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchDouyinUsersResponse> => {
@@ -7212,8 +7212,8 @@ export const getListDouyinUserVideosUrl = (userId: string, params?: ListDouyinUs
  */
 export const listDouyinUserVideos = async (
   userId: string,
-  headers: ListDouyinUserVideosHeaders,
   params?: ListDouyinUserVideosParams,
+  headers?: ListDouyinUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinUserVideosResponse> => {
@@ -7306,8 +7306,8 @@ export const getListDouyinVideoCommentsUrl = (
  */
 export const listDouyinVideoComments = async (
   videoId: string,
-  headers: ListDouyinVideoCommentsHeaders,
   params?: ListDouyinVideoCommentsParams,
+  headers?: ListDouyinVideoCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinVideoCommentsResponse> => {
@@ -7395,8 +7395,8 @@ export const getGetDouyinVideoUrl = (videoId: string, params?: GetDouyinVideoPar
  */
 export const getDouyinVideo = async (
   videoId: string,
-  headers: GetDouyinVideoHeaders,
   params?: GetDouyinVideoParams,
+  headers?: GetDouyinVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinVideoResponse> => {
@@ -7486,7 +7486,7 @@ export const getLookupDouyinVideoUrl = (params: LookupDouyinVideoParams) => {
  */
 export const lookupDouyinVideo = async (
   params: LookupDouyinVideoParams,
-  headers: LookupDouyinVideoHeaders,
+  headers?: LookupDouyinVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupDouyinVideoResponse> => {
@@ -7579,8 +7579,8 @@ export const getGetDouyinVideoMetricsUrl = (
  */
 export const getDouyinVideoMetrics = async (
   videoId: string,
-  headers: GetDouyinVideoMetricsHeaders,
   params?: GetDouyinVideoMetricsParams,
+  headers?: GetDouyinVideoMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinVideoMetricsResponse> => {
@@ -7670,7 +7670,7 @@ export const getLookupDouyinVideoMetricsUrl = (params: LookupDouyinVideoMetricsP
  */
 export const lookupDouyinVideoMetrics = async (
   params: LookupDouyinVideoMetricsParams,
-  headers: LookupDouyinVideoMetricsHeaders,
+  headers?: LookupDouyinVideoMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupDouyinVideoMetricsResponse> => {
@@ -7763,8 +7763,8 @@ export const getListDouyinRelatedVideosUrl = (
  */
 export const listDouyinRelatedVideos = async (
   videoId: string,
-  headers: ListDouyinRelatedVideosHeaders,
   params?: ListDouyinRelatedVideosParams,
+  headers?: ListDouyinRelatedVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinRelatedVideosResponse> => {
@@ -7833,7 +7833,7 @@ export const getSearchDouyinVideosUrl = () => {
  */
 export const searchDouyinVideos = async (
   searchDouyinVideosRequest: SearchDouyinVideosRequest,
-  headers: SearchDouyinVideosHeaders,
+  headers?: SearchDouyinVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchDouyinVideosResponse> => {
@@ -7923,8 +7923,8 @@ export const getListDouyinTrendingVideosUrl = (params?: ListDouyinTrendingVideos
  * @summary Douyin video boards
  */
 export const listDouyinTrendingVideos = async (
-  headers: ListDouyinTrendingVideosHeaders,
   params?: ListDouyinTrendingVideosParams,
+  headers?: ListDouyinTrendingVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinTrendingVideosResponse> => {
@@ -8014,7 +8014,7 @@ export const getListDouyinXingtuCampaignsUrl = (params: ListDouyinXingtuCampaign
  */
 export const listDouyinXingtuCampaigns = async (
   params: ListDouyinXingtuCampaignsParams,
-  headers: ListDouyinXingtuCampaignsHeaders,
+  headers?: ListDouyinXingtuCampaignsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinXingtuCampaignsResponse> => {
@@ -8109,8 +8109,8 @@ export const getGetDouyinXingtuCreatorAudienceUrl = (
  */
 export const getDouyinXingtuCreatorAudience = async (
   creatorId: string,
-  headers: GetDouyinXingtuCreatorAudienceHeaders,
   params?: GetDouyinXingtuCreatorAudienceParams,
+  headers?: GetDouyinXingtuCreatorAudienceHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinXingtuCreatorAudienceResponse> => {
@@ -8209,8 +8209,8 @@ export const getGetDouyinXingtuCreatorContentMixUrl = (
  */
 export const getDouyinXingtuCreatorContentMix = async (
   creatorId: string,
-  headers: GetDouyinXingtuCreatorContentMixHeaders,
   params?: GetDouyinXingtuCreatorContentMixParams,
+  headers?: GetDouyinXingtuCreatorContentMixHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinXingtuCreatorContentMixResponse> => {
@@ -8309,8 +8309,8 @@ export const getGetDouyinXingtuCreatorConversionUrl = (
  */
 export const getDouyinXingtuCreatorConversion = async (
   creatorId: string,
-  headers: GetDouyinXingtuCreatorConversionHeaders,
   params?: GetDouyinXingtuCreatorConversionParams,
+  headers?: GetDouyinXingtuCreatorConversionHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinXingtuCreatorConversionResponse> => {
@@ -8407,8 +8407,8 @@ export const getGetDouyinXingtuCreatorUrl = (
  */
 export const getDouyinXingtuCreator = async (
   creatorId: string,
-  headers: GetDouyinXingtuCreatorHeaders,
   params?: GetDouyinXingtuCreatorParams,
+  headers?: GetDouyinXingtuCreatorHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinXingtuCreatorResponse> => {
@@ -8500,7 +8500,7 @@ export const getBatchGetDouyinXingtuCreatorsUrl = (params: BatchGetDouyinXingtuC
  */
 export const batchGetDouyinXingtuCreators = async (
   params: BatchGetDouyinXingtuCreatorsParams,
-  headers: BatchGetDouyinXingtuCreatorsHeaders,
+  headers?: BatchGetDouyinXingtuCreatorsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<batchGetDouyinXingtuCreatorsResponse> => {
@@ -8595,8 +8595,8 @@ export const getGetDouyinXingtuCreatorKeywordsUrl = (
  */
 export const getDouyinXingtuCreatorKeywords = async (
   creatorId: string,
-  headers: GetDouyinXingtuCreatorKeywordsHeaders,
   params?: GetDouyinXingtuCreatorKeywordsParams,
+  headers?: GetDouyinXingtuCreatorKeywordsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinXingtuCreatorKeywordsResponse> => {
@@ -8695,8 +8695,8 @@ export const getGetDouyinXingtuCreatorMetricsUrl = (
  */
 export const getDouyinXingtuCreatorMetrics = async (
   creatorId: string,
-  headers: GetDouyinXingtuCreatorMetricsHeaders,
   params?: GetDouyinXingtuCreatorMetricsParams,
+  headers?: GetDouyinXingtuCreatorMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinXingtuCreatorMetricsResponse> => {
@@ -8794,8 +8794,8 @@ export const getGetDouyinXingtuCreatorRatesUrl = (
  */
 export const getDouyinXingtuCreatorRates = async (
   creatorId: string,
-  headers: GetDouyinXingtuCreatorRatesHeaders,
   params?: GetDouyinXingtuCreatorRatesParams,
+  headers?: GetDouyinXingtuCreatorRatesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinXingtuCreatorRatesResponse> => {
@@ -8890,8 +8890,8 @@ export const getGetDouyinXingtuCreatorScoresUrl = (
  */
 export const getDouyinXingtuCreatorScores = async (
   creatorId: string,
-  headers: GetDouyinXingtuCreatorScoresHeaders,
   params?: GetDouyinXingtuCreatorScoresParams,
+  headers?: GetDouyinXingtuCreatorScoresHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinXingtuCreatorScoresResponse> => {
@@ -8960,7 +8960,7 @@ export const getSearchDouyinXingtuCreatorsUrl = () => {
  */
 export const searchDouyinXingtuCreators = async (
   searchDouyinXingtuCreatorsRequest: SearchDouyinXingtuCreatorsRequest,
-  headers: SearchDouyinXingtuCreatorsHeaders,
+  headers?: SearchDouyinXingtuCreatorsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchDouyinXingtuCreatorsResponse> => {
@@ -9056,8 +9056,8 @@ export const getListDouyinXingtuCreatorVideosUrl = (
  */
 export const listDouyinXingtuCreatorVideos = async (
   creatorId: string,
-  headers: ListDouyinXingtuCreatorVideosHeaders,
   params?: ListDouyinXingtuCreatorVideosParams,
+  headers?: ListDouyinXingtuCreatorVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinXingtuCreatorVideosResponse> => {
@@ -9154,8 +9154,8 @@ export const getGetDouyinXingtuVideoUrl = (
  */
 export const getDouyinXingtuVideo = async (
   videoId: string,
-  headers: GetDouyinXingtuVideoHeaders,
   params?: GetDouyinXingtuVideoParams,
+  headers?: GetDouyinXingtuVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinXingtuVideoResponse> => {
@@ -9245,7 +9245,7 @@ export const getLookupDouyinXingtuVideoUrl = (params: LookupDouyinXingtuVideoPar
  */
 export const lookupDouyinXingtuVideo = async (
   params: LookupDouyinXingtuVideoParams,
-  headers: LookupDouyinXingtuVideoHeaders,
+  headers?: LookupDouyinXingtuVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupDouyinXingtuVideoResponse> => {
@@ -9338,8 +9338,8 @@ export const getGetDouyinShopProductUrl = (
  */
 export const getDouyinShopProduct = async (
   productId: string,
-  headers: GetDouyinShopProductHeaders,
   params?: GetDouyinShopProductParams,
+  headers?: GetDouyinShopProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getDouyinShopProductResponse> => {
@@ -9434,8 +9434,8 @@ export const getListDouyinShopProductReviewsUrl = (
  */
 export const listDouyinShopProductReviews = async (
   productId: string,
-  headers: ListDouyinShopProductReviewsHeaders,
   params?: ListDouyinShopProductReviewsParams,
+  headers?: ListDouyinShopProductReviewsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinShopProductReviewsResponse> => {
@@ -9504,7 +9504,7 @@ export const getSearchDouyinShopProductsUrl = () => {
  */
 export const searchDouyinShopProducts = async (
   searchDouyinShopProductsRequest: SearchDouyinShopProductsRequest,
-  headers: SearchDouyinShopProductsHeaders,
+  headers?: SearchDouyinShopProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchDouyinShopProductsResponse> => {
@@ -9598,8 +9598,8 @@ export const getListDouyinShopShopProductsUrl = (
  */
 export const listDouyinShopShopProducts = async (
   shopId: string,
-  headers: ListDouyinShopShopProductsHeaders,
   params?: ListDouyinShopShopProductsParams,
+  headers?: ListDouyinShopShopProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listDouyinShopShopProductsResponse> => {
@@ -9692,8 +9692,8 @@ export const getListGoogleAdvertiserAdsUrl = (
  */
 export const listGoogleAdvertiserAds = async (
   advertiserId: string,
-  headers: ListGoogleAdvertiserAdsHeaders,
   params?: ListGoogleAdvertiserAdsParams,
+  headers?: ListGoogleAdvertiserAdsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listGoogleAdvertiserAdsResponse> => {
@@ -9783,7 +9783,7 @@ export const getLookupGoogleAdvertiserAdsUrl = (params: LookupGoogleAdvertiserAd
  */
 export const lookupGoogleAdvertiserAds = async (
   params: LookupGoogleAdvertiserAdsParams,
-  headers: LookupGoogleAdvertiserAdsHeaders,
+  headers?: LookupGoogleAdvertiserAdsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupGoogleAdvertiserAdsResponse> => {
@@ -9852,7 +9852,7 @@ export const getSearchGoogleAdvertisersUrl = () => {
  */
 export const searchGoogleAdvertisers = async (
   searchGoogleAdvertisersRequest: SearchGoogleAdvertisersRequest,
-  headers: SearchGoogleAdvertisersHeaders,
+  headers?: SearchGoogleAdvertisersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchGoogleAdvertisersResponse> => {
@@ -9949,8 +9949,8 @@ export const getListInstagramCommentRepliesUrl = (
 export const listInstagramCommentReplies = async (
   postId: string,
   commentId: string,
-  headers: ListInstagramCommentRepliesHeaders,
   params?: ListInstagramCommentRepliesParams,
+  headers?: ListInstagramCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listInstagramCommentRepliesResponse> => {
@@ -10046,8 +10046,8 @@ export const getListInstagramHashtagPostsUrl = (
  */
 export const listInstagramHashtagPosts = async (
   hashtagId: string,
-  headers: ListInstagramHashtagPostsHeaders,
   params?: ListInstagramHashtagPostsParams,
+  headers?: ListInstagramHashtagPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listInstagramHashtagPostsResponse> => {
@@ -10140,8 +10140,8 @@ export const getListInstagramPostCommentsUrl = (
  */
 export const listInstagramPostComments = async (
   postId: string,
-  headers: ListInstagramPostCommentsHeaders,
   params?: ListInstagramPostCommentsParams,
+  headers?: ListInstagramPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listInstagramPostCommentsResponse> => {
@@ -10232,7 +10232,7 @@ export const getLookupInstagramPostCommentsUrl = (params: LookupInstagramPostCom
  */
 export const lookupInstagramPostComments = async (
   params: LookupInstagramPostCommentsParams,
-  headers: LookupInstagramPostCommentsHeaders,
+  headers?: LookupInstagramPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupInstagramPostCommentsResponse> => {
@@ -10322,8 +10322,8 @@ export const getGetInstagramPostUrl = (postId: string, params?: GetInstagramPost
  */
 export const getInstagramPost = async (
   postId: string,
-  headers: GetInstagramPostHeaders,
   params?: GetInstagramPostParams,
+  headers?: GetInstagramPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getInstagramPostResponse> => {
@@ -10413,7 +10413,7 @@ export const getLookupInstagramPostUrl = (params: LookupInstagramPostParams) => 
  */
 export const lookupInstagramPost = async (
   params: LookupInstagramPostParams,
-  headers: LookupInstagramPostHeaders,
+  headers?: LookupInstagramPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupInstagramPostResponse> => {
@@ -10506,8 +10506,8 @@ export const getGetInstagramPostTranscriptUrl = (
  */
 export const getInstagramPostTranscript = async (
   postId: string,
-  headers: GetInstagramPostTranscriptHeaders,
   params?: GetInstagramPostTranscriptParams,
+  headers?: GetInstagramPostTranscriptHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getInstagramPostTranscriptResponse> => {
@@ -10601,7 +10601,7 @@ export const getLookupInstagramPostTranscriptUrl = (
  */
 export const lookupInstagramPostTranscript = async (
   params: LookupInstagramPostTranscriptParams,
-  headers: LookupInstagramPostTranscriptHeaders,
+  headers?: LookupInstagramPostTranscriptHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupInstagramPostTranscriptResponse> => {
@@ -10695,8 +10695,8 @@ export const getGetInstagramUserUrl = (username: string, params?: GetInstagramUs
  */
 export const getInstagramUser = async (
   username: string,
-  headers: GetInstagramUserHeaders,
   params?: GetInstagramUserParams,
+  headers?: GetInstagramUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getInstagramUserResponse> => {
@@ -10789,8 +10789,8 @@ export const getListInstagramUserPostsUrl = (
  */
 export const listInstagramUserPosts = async (
   username: string,
-  headers: ListInstagramUserPostsHeaders,
   params?: ListInstagramUserPostsParams,
+  headers?: ListInstagramUserPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listInstagramUserPostsResponse> => {
@@ -10859,7 +10859,7 @@ export const getSearchInstagramUsersUrl = () => {
  */
 export const searchInstagramUsers = async (
   searchInstagramUsersRequest: SearchInstagramUsersRequest,
-  headers: SearchInstagramUsersHeaders,
+  headers?: SearchInstagramUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchInstagramUsersResponse> => {
@@ -10955,8 +10955,8 @@ export const getListKuaishouCommentRepliesUrl = (
 export const listKuaishouCommentReplies = async (
   videoId: string,
   commentId: string,
-  headers: ListKuaishouCommentRepliesHeaders,
   params?: ListKuaishouCommentRepliesParams,
+  headers?: ListKuaishouCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listKuaishouCommentRepliesResponse> => {
@@ -11052,8 +11052,8 @@ export const getListKuaishouTrendingLiveProductsUrl = (
  * @summary Kuaishou shopping board: hot products
  */
 export const listKuaishouTrendingLiveProducts = async (
-  headers: ListKuaishouTrendingLiveProductsHeaders,
   params?: ListKuaishouTrendingLiveProductsParams,
+  headers?: ListKuaishouTrendingLiveProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listKuaishouTrendingLiveProductsResponse> => {
@@ -11150,8 +11150,8 @@ export const getListKuaishouTrendingLiveRoomsUrl = (
  * @summary Kuaishou live boards
  */
 export const listKuaishouTrendingLiveRooms = async (
-  headers: ListKuaishouTrendingLiveRoomsHeaders,
   params?: ListKuaishouTrendingLiveRoomsParams,
+  headers?: ListKuaishouTrendingLiveRoomsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listKuaishouTrendingLiveRoomsResponse> => {
@@ -11245,8 +11245,8 @@ export const getGetKuaishouLiveUserUrl = (userId: string, params?: GetKuaishouLi
  */
 export const getKuaishouLiveUser = async (
   userId: string,
-  headers: GetKuaishouLiveUserHeaders,
   params?: GetKuaishouLiveUserParams,
+  headers?: GetKuaishouLiveUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getKuaishouLiveUserResponse> => {
@@ -11335,8 +11335,8 @@ export const getListKuaishouTrendsUrl = (params?: ListKuaishouTrendsParams) => {
  * @summary Kuaishou hot list
  */
 export const listKuaishouTrends = async (
-  headers: ListKuaishouTrendsHeaders,
   params?: ListKuaishouTrendsParams,
+  headers?: ListKuaishouTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listKuaishouTrendsResponse> => {
@@ -11424,8 +11424,8 @@ export const getGetKuaishouUserUrl = (userId: string, params?: GetKuaishouUserPa
  */
 export const getKuaishouUser = async (
   userId: string,
-  headers: GetKuaishouUserHeaders,
   params?: GetKuaishouUserParams,
+  headers?: GetKuaishouUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getKuaishouUserResponse> => {
@@ -11494,7 +11494,7 @@ export const getSearchKuaishouUsersUrl = () => {
  */
 export const searchKuaishouUsers = async (
   searchKuaishouUsersRequest: SearchKuaishouUsersRequest,
-  headers: SearchKuaishouUsersHeaders,
+  headers?: SearchKuaishouUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchKuaishouUsersResponse> => {
@@ -11588,8 +11588,8 @@ export const getListKuaishouUserVideosUrl = (
  */
 export const listKuaishouUserVideos = async (
   userId: string,
-  headers: ListKuaishouUserVideosHeaders,
   params?: ListKuaishouUserVideosParams,
+  headers?: ListKuaishouUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listKuaishouUserVideosResponse> => {
@@ -11682,8 +11682,8 @@ export const getListKuaishouVideoCommentsUrl = (
  */
 export const listKuaishouVideoComments = async (
   videoId: string,
-  headers: ListKuaishouVideoCommentsHeaders,
   params?: ListKuaishouVideoCommentsParams,
+  headers?: ListKuaishouVideoCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listKuaishouVideoCommentsResponse> => {
@@ -11774,7 +11774,7 @@ export const getLookupKuaishouVideoCommentsUrl = (params: LookupKuaishouVideoCom
  */
 export const lookupKuaishouVideoComments = async (
   params: LookupKuaishouVideoCommentsParams,
-  headers: LookupKuaishouVideoCommentsHeaders,
+  headers?: LookupKuaishouVideoCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupKuaishouVideoCommentsResponse> => {
@@ -11864,8 +11864,8 @@ export const getGetKuaishouVideoUrl = (videoId: string, params?: GetKuaishouVide
  */
 export const getKuaishouVideo = async (
   videoId: string,
-  headers: GetKuaishouVideoHeaders,
   params?: GetKuaishouVideoParams,
+  headers?: GetKuaishouVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getKuaishouVideoResponse> => {
@@ -11955,7 +11955,7 @@ export const getLookupKuaishouVideoUrl = (params: LookupKuaishouVideoParams) => 
  */
 export const lookupKuaishouVideo = async (
   params: LookupKuaishouVideoParams,
-  headers: LookupKuaishouVideoHeaders,
+  headers?: LookupKuaishouVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupKuaishouVideoResponse> => {
@@ -12024,7 +12024,7 @@ export const getSearchKuaishouVideosUrl = () => {
  */
 export const searchKuaishouVideos = async (
   searchKuaishouVideosRequest: SearchKuaishouVideosRequest,
-  headers: SearchKuaishouVideosHeaders,
+  headers?: SearchKuaishouVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchKuaishouVideosResponse> => {
@@ -12113,8 +12113,8 @@ export const getGetMetaAdUrl = (adId: string, params?: GetMetaAdParams) => {
  */
 export const getMetaAd = async (
   adId: string,
-  headers: GetMetaAdHeaders,
   params?: GetMetaAdParams,
+  headers?: GetMetaAdHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getMetaAdResponse> => {
@@ -12202,7 +12202,7 @@ export const getLookupMetaAdUrl = (params: LookupMetaAdParams) => {
  */
 export const lookupMetaAd = async (
   params: LookupMetaAdParams,
-  headers: LookupMetaAdHeaders,
+  headers?: LookupMetaAdHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupMetaAdResponse> => {
@@ -12269,7 +12269,7 @@ export const getSearchMetaAdsUrl = () => {
  */
 export const searchMetaAds = async (
   searchMetaAdsRequest: SearchMetaAdsRequest,
-  headers: SearchMetaAdsHeaders,
+  headers?: SearchMetaAdsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchMetaAdsResponse> => {
@@ -12363,8 +12363,8 @@ export const getListMetaAdvertiserAdsUrl = (
  */
 export const listMetaAdvertiserAds = async (
   advertiserId: string,
-  headers: ListMetaAdvertiserAdsHeaders,
   params?: ListMetaAdvertiserAdsParams,
+  headers?: ListMetaAdvertiserAdsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listMetaAdvertiserAdsResponse> => {
@@ -12454,7 +12454,7 @@ export const getLookupMetaAdvertiserAdsUrl = (params: LookupMetaAdvertiserAdsPar
  */
 export const lookupMetaAdvertiserAds = async (
   params: LookupMetaAdvertiserAdsParams,
-  headers: LookupMetaAdvertiserAdsHeaders,
+  headers?: LookupMetaAdvertiserAdsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupMetaAdvertiserAdsResponse> => {
@@ -12543,8 +12543,8 @@ export const getListRedditPopularPostsUrl = (params?: ListRedditPopularPostsPara
  * @summary Reddit Popular feed
  */
 export const listRedditPopularPosts = async (
-  headers: ListRedditPopularPostsHeaders,
   params?: ListRedditPopularPostsParams,
+  headers?: ListRedditPopularPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listRedditPopularPostsResponse> => {
@@ -12637,8 +12637,8 @@ export const getListRedditPostCommentsUrl = (
  */
 export const listRedditPostComments = async (
   postId: string,
-  headers: ListRedditPostCommentsHeaders,
   params?: ListRedditPostCommentsParams,
+  headers?: ListRedditPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listRedditPostCommentsResponse> => {
@@ -12728,7 +12728,7 @@ export const getLookupRedditPostCommentsUrl = (params: LookupRedditPostCommentsP
  */
 export const lookupRedditPostComments = async (
   params: LookupRedditPostCommentsParams,
-  headers: LookupRedditPostCommentsHeaders,
+  headers?: LookupRedditPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupRedditPostCommentsResponse> => {
@@ -12816,8 +12816,8 @@ export const getGetRedditPostUrl = (postId: string, params?: GetRedditPostParams
  */
 export const getRedditPost = async (
   postId: string,
-  headers: GetRedditPostHeaders,
   params?: GetRedditPostParams,
+  headers?: GetRedditPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getRedditPostResponse> => {
@@ -12907,7 +12907,7 @@ export const getLookupRedditPostUrl = (params: LookupRedditPostParams) => {
  */
 export const lookupRedditPost = async (
   params: LookupRedditPostParams,
-  headers: LookupRedditPostHeaders,
+  headers?: LookupRedditPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupRedditPostResponse> => {
@@ -12976,7 +12976,7 @@ export const getSearchRedditPostsUrl = () => {
  */
 export const searchRedditPosts = async (
   searchRedditPostsRequest: SearchRedditPostsRequest,
-  headers: SearchRedditPostsHeaders,
+  headers?: SearchRedditPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchRedditPostsResponse> => {
@@ -13070,8 +13070,8 @@ export const getGetRedditPostTranscriptUrl = (
  */
 export const getRedditPostTranscript = async (
   postId: string,
-  headers: GetRedditPostTranscriptHeaders,
   params?: GetRedditPostTranscriptParams,
+  headers?: GetRedditPostTranscriptHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getRedditPostTranscriptResponse> => {
@@ -13161,7 +13161,7 @@ export const getLookupRedditPostTranscriptUrl = (params: LookupRedditPostTranscr
  */
 export const lookupRedditPostTranscript = async (
   params: LookupRedditPostTranscriptParams,
-  headers: LookupRedditPostTranscriptHeaders,
+  headers?: LookupRedditPostTranscriptHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupRedditPostTranscriptResponse> => {
@@ -13254,8 +13254,8 @@ export const getGetRedditSubredditUrl = (
  */
 export const getRedditSubreddit = async (
   subredditId: string,
-  headers: GetRedditSubredditHeaders,
   params?: GetRedditSubredditParams,
+  headers?: GetRedditSubredditHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getRedditSubredditResponse> => {
@@ -13348,8 +13348,8 @@ export const getListRedditSubredditPostsUrl = (
  */
 export const listRedditSubredditPosts = async (
   subredditId: string,
-  headers: ListRedditSubredditPostsHeaders,
   params?: ListRedditSubredditPostsParams,
+  headers?: ListRedditSubredditPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listRedditSubredditPostsResponse> => {
@@ -13438,8 +13438,8 @@ export const getListRedditTrendsUrl = (params?: ListRedditTrendsParams) => {
  * @summary Reddit trending searches
  */
 export const listRedditTrends = async (
-  headers: ListRedditTrendsHeaders,
   params?: ListRedditTrendsParams,
+  headers?: ListRedditTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listRedditTrendsResponse> => {
@@ -13527,8 +13527,8 @@ export const getGetRedditUserUrl = (username: string, params?: GetRedditUserPara
  */
 export const getRedditUser = async (
   username: string,
-  headers: GetRedditUserHeaders,
   params?: GetRedditUserParams,
+  headers?: GetRedditUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getRedditUserResponse> => {
@@ -13618,8 +13618,8 @@ export const getListRedditUserPostsUrl = (username: string, params?: ListRedditU
  */
 export const listRedditUserPosts = async (
   username: string,
-  headers: ListRedditUserPostsHeaders,
   params?: ListRedditUserPostsParams,
+  headers?: ListRedditUserPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listRedditUserPostsResponse> => {
@@ -13712,8 +13712,8 @@ export const getListRedditUserSubredditsUrl = (
  */
 export const listRedditUserSubreddits = async (
   username: string,
-  headers: ListRedditUserSubredditsHeaders,
   params?: ListRedditUserSubredditsParams,
+  headers?: ListRedditUserSubredditsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listRedditUserSubredditsResponse> => {
@@ -13803,8 +13803,8 @@ export const getGetTaobaoProductUrl = (productId: string, params?: GetTaobaoProd
  */
 export const getTaobaoProduct = async (
   productId: string,
-  headers: GetTaobaoProductHeaders,
   params?: GetTaobaoProductParams,
+  headers?: GetTaobaoProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTaobaoProductResponse> => {
@@ -13897,8 +13897,8 @@ export const getListTaobaoProductReviewsUrl = (
  */
 export const listTaobaoProductReviews = async (
   productId: string,
-  headers: ListTaobaoProductReviewsHeaders,
   params?: ListTaobaoProductReviewsParams,
+  headers?: ListTaobaoProductReviewsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTaobaoProductReviewsResponse> => {
@@ -13967,7 +13967,7 @@ export const getSearchTaobaoProductsUrl = () => {
  */
 export const searchTaobaoProducts = async (
   searchTaobaoProductsRequest: SearchTaobaoProductsRequest,
-  headers: SearchTaobaoProductsHeaders,
+  headers?: SearchTaobaoProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchTaobaoProductsResponse> => {
@@ -14062,7 +14062,7 @@ export const getListTaobaoShopProductsUrl = (
 export const listTaobaoShopProducts = async (
   shopId: string,
   params: ListTaobaoShopProductsParams,
-  headers: ListTaobaoShopProductsHeaders,
+  headers?: ListTaobaoShopProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTaobaoShopProductsResponse> => {
@@ -14152,8 +14152,8 @@ export const getGetTelegramChannelUrl = (username: string, params?: GetTelegramC
  */
 export const getTelegramChannel = async (
   username: string,
-  headers: GetTelegramChannelHeaders,
   params?: GetTelegramChannelParams,
+  headers?: GetTelegramChannelHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTelegramChannelResponse> => {
@@ -14247,8 +14247,8 @@ export const getListTelegramChannelMessagesUrl = (
  */
 export const listTelegramChannelMessages = async (
   username: string,
-  headers: ListTelegramChannelMessagesHeaders,
   params?: ListTelegramChannelMessagesParams,
+  headers?: ListTelegramChannelMessagesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTelegramChannelMessagesResponse> => {
@@ -14343,8 +14343,8 @@ export const getGetTelegramMessageUrl = (
 export const getTelegramMessage = async (
   username: string,
   messageId: string,
-  headers: GetTelegramMessageHeaders,
   params?: GetTelegramMessageParams,
+  headers?: GetTelegramMessageHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTelegramMessageResponse> => {
@@ -14434,7 +14434,7 @@ export const getLookupTelegramMessageUrl = (params: LookupTelegramMessageParams)
  */
 export const lookupTelegramMessage = async (
   params: LookupTelegramMessageParams,
-  headers: LookupTelegramMessageHeaders,
+  headers?: LookupTelegramMessageHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupTelegramMessageResponse> => {
@@ -14501,7 +14501,7 @@ export const getSearchTiktokAdsUrl = () => {
  */
 export const searchTiktokAds = async (
   searchTiktokAdsRequest: SearchTiktokAdsRequest,
-  headers: SearchTiktokAdsHeaders,
+  headers?: SearchTiktokAdsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchTiktokAdsResponse> => {
@@ -14597,8 +14597,8 @@ export const getListTiktokCommentRepliesUrl = (
 export const listTiktokCommentReplies = async (
   videoId: string,
   commentId: string,
-  headers: ListTiktokCommentRepliesHeaders,
   params?: ListTiktokCommentRepliesParams,
+  headers?: ListTiktokCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTiktokCommentRepliesResponse> => {
@@ -14691,8 +14691,8 @@ export const getGetTiktokCreativeCenterAdUrl = (
  */
 export const getTiktokCreativeCenterAd = async (
   adId: string,
-  headers: GetTiktokCreativeCenterAdHeaders,
   params?: GetTiktokCreativeCenterAdParams,
+  headers?: GetTiktokCreativeCenterAdHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTiktokCreativeCenterAdResponse> => {
@@ -14763,7 +14763,7 @@ export const getSearchTiktokCreativeCenterAdsUrl = () => {
  */
 export const searchTiktokCreativeCenterAds = async (
   searchTiktokCreativeCenterAdsRequest: SearchTiktokCreativeCenterAdsRequest,
-  headers: SearchTiktokCreativeCenterAdsHeaders,
+  headers?: SearchTiktokCreativeCenterAdsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchTiktokCreativeCenterAdsResponse> => {
@@ -14861,8 +14861,8 @@ export const getListTiktokHashtagVideosUrl = (
  */
 export const listTiktokHashtagVideos = async (
   hashtagId: string,
-  headers: ListTiktokHashtagVideosHeaders,
   params?: ListTiktokHashtagVideosParams,
+  headers?: ListTiktokHashtagVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTiktokHashtagVideosResponse> => {
@@ -14956,7 +14956,7 @@ export const getListTiktokLiveRoomProductsUrl = (
 export const listTiktokLiveRoomProducts = async (
   roomId: string,
   params: ListTiktokLiveRoomProductsParams,
-  headers: ListTiktokLiveRoomProductsHeaders,
+  headers?: ListTiktokLiveRoomProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTiktokLiveRoomProductsResponse> => {
@@ -15049,8 +15049,8 @@ export const getListTiktokTrendingLiveStreamersUrl = (
  * @summary TikTok LIVE shopping ranking
  */
 export const listTiktokTrendingLiveStreamers = async (
-  headers: ListTiktokTrendingLiveStreamersHeaders,
   params?: ListTiktokTrendingLiveStreamersParams,
+  headers?: ListTiktokTrendingLiveStreamersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTiktokTrendingLiveStreamersResponse> => {
@@ -15144,8 +15144,8 @@ export const getGetTiktokLiveUserUrl = (username: string, params?: GetTiktokLive
  */
 export const getTiktokLiveUser = async (
   username: string,
-  headers: GetTiktokLiveUserHeaders,
   params?: GetTiktokLiveUserParams,
+  headers?: GetTiktokLiveUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTiktokLiveUserResponse> => {
@@ -15238,8 +15238,8 @@ export const getGetTiktokShopProductUrl = (
  */
 export const getTiktokShopProduct = async (
   productId: string,
-  headers: GetTiktokShopProductHeaders,
   params?: GetTiktokShopProductParams,
+  headers?: GetTiktokShopProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTiktokShopProductResponse> => {
@@ -15329,7 +15329,7 @@ export const getLookupTiktokShopProductUrl = (params: LookupTiktokShopProductPar
  */
 export const lookupTiktokShopProduct = async (
   params: LookupTiktokShopProductParams,
-  headers: LookupTiktokShopProductHeaders,
+  headers?: LookupTiktokShopProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupTiktokShopProductResponse> => {
@@ -15424,8 +15424,8 @@ export const getListTiktokShopProductReviewsUrl = (
  */
 export const listTiktokShopProductReviews = async (
   productId: string,
-  headers: ListTiktokShopProductReviewsHeaders,
   params?: ListTiktokShopProductReviewsParams,
+  headers?: ListTiktokShopProductReviewsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTiktokShopProductReviewsResponse> => {
@@ -15494,7 +15494,7 @@ export const getSearchTiktokShopProductsUrl = () => {
  */
 export const searchTiktokShopProducts = async (
   searchTiktokShopProductsRequest: SearchTiktokShopProductsRequest,
-  headers: SearchTiktokShopProductsHeaders,
+  headers?: SearchTiktokShopProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchTiktokShopProductsResponse> => {
@@ -15590,8 +15590,8 @@ export const getListTiktokShopSellerProductsUrl = (
  */
 export const listTiktokShopSellerProducts = async (
   sellerId: string,
-  headers: ListTiktokShopSellerProductsHeaders,
   params?: ListTiktokShopSellerProductsParams,
+  headers?: ListTiktokShopSellerProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTiktokShopSellerProductsResponse> => {
@@ -15684,8 +15684,8 @@ export const getListTiktokUserFollowersUrl = (
  */
 export const listTiktokUserFollowers = async (
   username: string,
-  headers: ListTiktokUserFollowersHeaders,
   params?: ListTiktokUserFollowersParams,
+  headers?: ListTiktokUserFollowersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTiktokUserFollowersResponse> => {
@@ -15775,7 +15775,7 @@ export const getLookupTiktokUserFollowersUrl = (params: LookupTiktokUserFollower
  */
 export const lookupTiktokUserFollowers = async (
   params: LookupTiktokUserFollowersParams,
-  headers: LookupTiktokUserFollowersHeaders,
+  headers?: LookupTiktokUserFollowersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupTiktokUserFollowersResponse> => {
@@ -15863,8 +15863,8 @@ export const getGetTiktokUserUrl = (username: string, params?: GetTiktokUserPara
  */
 export const getTiktokUser = async (
   username: string,
-  headers: GetTiktokUserHeaders,
   params?: GetTiktokUserParams,
+  headers?: GetTiktokUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTiktokUserResponse> => {
@@ -15933,7 +15933,7 @@ export const getSearchTiktokUsersUrl = () => {
  */
 export const searchTiktokUsers = async (
   searchTiktokUsersRequest: SearchTiktokUsersRequest,
-  headers: SearchTiktokUsersHeaders,
+  headers?: SearchTiktokUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchTiktokUsersResponse> => {
@@ -16027,8 +16027,8 @@ export const getListTiktokUserVideosUrl = (
  */
 export const listTiktokUserVideos = async (
   username: string,
-  headers: ListTiktokUserVideosHeaders,
   params?: ListTiktokUserVideosParams,
+  headers?: ListTiktokUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTiktokUserVideosResponse> => {
@@ -16121,8 +16121,8 @@ export const getListTiktokVideoCommentsUrl = (
  */
 export const listTiktokVideoComments = async (
   videoId: string,
-  headers: ListTiktokVideoCommentsHeaders,
   params?: ListTiktokVideoCommentsParams,
+  headers?: ListTiktokVideoCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listTiktokVideoCommentsResponse> => {
@@ -16210,8 +16210,8 @@ export const getGetTiktokVideoUrl = (videoId: string, params?: GetTiktokVideoPar
  */
 export const getTiktokVideo = async (
   videoId: string,
-  headers: GetTiktokVideoHeaders,
   params?: GetTiktokVideoParams,
+  headers?: GetTiktokVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTiktokVideoResponse> => {
@@ -16301,7 +16301,7 @@ export const getLookupTiktokVideoUrl = (params: LookupTiktokVideoParams) => {
  */
 export const lookupTiktokVideo = async (
   params: LookupTiktokVideoParams,
-  headers: LookupTiktokVideoHeaders,
+  headers?: LookupTiktokVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupTiktokVideoResponse> => {
@@ -16370,7 +16370,7 @@ export const getSearchTiktokVideosUrl = () => {
  */
 export const searchTiktokVideos = async (
   searchTiktokVideosRequest: SearchTiktokVideosRequest,
-  headers: SearchTiktokVideosHeaders,
+  headers?: SearchTiktokVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchTiktokVideosResponse> => {
@@ -16464,8 +16464,8 @@ export const getGetTiktokVideoTranscriptUrl = (
  */
 export const getTiktokVideoTranscript = async (
   videoId: string,
-  headers: GetTiktokVideoTranscriptHeaders,
   params?: GetTiktokVideoTranscriptParams,
+  headers?: GetTiktokVideoTranscriptHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTiktokVideoTranscriptResponse> => {
@@ -16556,7 +16556,7 @@ export const getLookupTiktokVideoTranscriptUrl = (params: LookupTiktokVideoTrans
  */
 export const lookupTiktokVideoTranscript = async (
   params: LookupTiktokVideoTranscriptParams,
-  headers: LookupTiktokVideoTranscriptHeaders,
+  headers?: LookupTiktokVideoTranscriptHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupTiktokVideoTranscriptResponse> => {
@@ -16646,8 +16646,8 @@ export const getGetToutiaoArticleUrl = (articleId: string, params?: GetToutiaoAr
  */
 export const getToutiaoArticle = async (
   articleId: string,
-  headers: GetToutiaoArticleHeaders,
   params?: GetToutiaoArticleParams,
+  headers?: GetToutiaoArticleHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getToutiaoArticleResponse> => {
@@ -16737,7 +16737,7 @@ export const getLookupToutiaoArticleUrl = (params: LookupToutiaoArticleParams) =
  */
 export const lookupToutiaoArticle = async (
   params: LookupToutiaoArticleParams,
-  headers: LookupToutiaoArticleHeaders,
+  headers?: LookupToutiaoArticleHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupToutiaoArticleResponse> => {
@@ -16830,8 +16830,8 @@ export const getListToutiaoPostCommentsUrl = (
  */
 export const listToutiaoPostComments = async (
   postId: string,
-  headers: ListToutiaoPostCommentsHeaders,
   params?: ListToutiaoPostCommentsParams,
+  headers?: ListToutiaoPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listToutiaoPostCommentsResponse> => {
@@ -16921,7 +16921,7 @@ export const getLookupToutiaoPostCommentsUrl = (params: LookupToutiaoPostComment
  */
 export const lookupToutiaoPostComments = async (
   params: LookupToutiaoPostCommentsParams,
-  headers: LookupToutiaoPostCommentsHeaders,
+  headers?: LookupToutiaoPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupToutiaoPostCommentsResponse> => {
@@ -17010,8 +17010,8 @@ export const getListToutiaoTrendsUrl = (params?: ListToutiaoTrendsParams) => {
  * @summary Toutiao hot board
  */
 export const listToutiaoTrends = async (
-  headers: ListToutiaoTrendsHeaders,
   params?: ListToutiaoTrendsParams,
+  headers?: ListToutiaoTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listToutiaoTrendsResponse> => {
@@ -17099,8 +17099,8 @@ export const getGetToutiaoUserUrl = (userId: string, params?: GetToutiaoUserPara
  */
 export const getToutiaoUser = async (
   userId: string,
-  headers: GetToutiaoUserHeaders,
   params?: GetToutiaoUserParams,
+  headers?: GetToutiaoUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getToutiaoUserResponse> => {
@@ -17190,7 +17190,7 @@ export const getLookupToutiaoUserUrl = (params: LookupToutiaoUserParams) => {
  */
 export const lookupToutiaoUser = async (
   params: LookupToutiaoUserParams,
-  headers: LookupToutiaoUserHeaders,
+  headers?: LookupToutiaoUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupToutiaoUserResponse> => {
@@ -17278,8 +17278,8 @@ export const getGetToutiaoVideoUrl = (videoId: string, params?: GetToutiaoVideoP
  */
 export const getToutiaoVideo = async (
   videoId: string,
-  headers: GetToutiaoVideoHeaders,
   params?: GetToutiaoVideoParams,
+  headers?: GetToutiaoVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getToutiaoVideoResponse> => {
@@ -17369,7 +17369,7 @@ export const getLookupToutiaoVideoUrl = (params: LookupToutiaoVideoParams) => {
  */
 export const lookupToutiaoVideo = async (
   params: LookupToutiaoVideoParams,
-  headers: LookupToutiaoVideoHeaders,
+  headers?: LookupToutiaoVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupToutiaoVideoResponse> => {
@@ -17459,8 +17459,8 @@ export const getGetTwitchLiveUserUrl = (username: string, params?: GetTwitchLive
  */
 export const getTwitchLiveUser = async (
   username: string,
-  headers: GetTwitchLiveUserHeaders,
   params?: GetTwitchLiveUserParams,
+  headers?: GetTwitchLiveUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getTwitchLiveUserResponse> => {
@@ -17529,7 +17529,7 @@ export const getSearchWechatAccountsUrl = () => {
  */
 export const searchWechatAccounts = async (
   searchWechatAccountsRequest: SearchWechatAccountsRequest,
-  headers: SearchWechatAccountsHeaders,
+  headers?: SearchWechatAccountsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWechatAccountsResponse> => {
@@ -17599,7 +17599,7 @@ export const getSearchWechatBackupPostsUrl = () => {
  */
 export const searchWechatBackupPosts = async (
   searchWechatBackupPostsRequest: SearchWechatBackupPostsRequest,
-  headers: SearchWechatBackupPostsHeaders,
+  headers?: SearchWechatBackupPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWechatBackupPostsResponse> => {
@@ -17695,8 +17695,8 @@ export const getGetWechatIndexKeywordsHistoryUrl = (
  */
 export const getWechatIndexKeywordsHistory = async (
   keyword: string,
-  headers: GetWechatIndexKeywordsHistoryHeaders,
   params?: GetWechatIndexKeywordsHistoryParams,
+  headers?: GetWechatIndexKeywordsHistoryHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWechatIndexKeywordsHistoryResponse> => {
@@ -17793,8 +17793,8 @@ export const getListWechatRelatedKeywordsUrl = (
  */
 export const listWechatRelatedKeywords = async (
   keyword: string,
-  headers: ListWechatRelatedKeywordsHeaders,
   params?: ListWechatRelatedKeywordsParams,
+  headers?: ListWechatRelatedKeywordsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatRelatedKeywordsResponse> => {
@@ -17863,7 +17863,7 @@ export const getSearchWechatMiniprogramsUrl = () => {
  */
 export const searchWechatMiniprograms = async (
   searchWechatMiniprogramsRequest: SearchWechatMiniprogramsRequest,
-  headers: SearchWechatMiniprogramsHeaders,
+  headers?: SearchWechatMiniprogramsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWechatMiniprogramsResponse> => {
@@ -17933,7 +17933,7 @@ export const getSearchWechatPostsUrl = () => {
  */
 export const searchWechatPosts = async (
   searchWechatPostsRequest: SearchWechatPostsRequest,
-  headers: SearchWechatPostsHeaders,
+  headers?: SearchWechatPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWechatPostsResponse> => {
@@ -18028,8 +18028,8 @@ export const getGetWechatChannelsBackupUserUrl = (
  */
 export const getWechatChannelsBackupUser = async (
   userId: string,
-  headers: GetWechatChannelsBackupUserHeaders,
   params?: GetWechatChannelsBackupUserParams,
+  headers?: GetWechatChannelsBackupUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWechatChannelsBackupUserResponse> => {
@@ -18124,8 +18124,8 @@ export const getListWechatChannelsBackupUserVideosUrl = (
  */
 export const listWechatChannelsBackupUserVideos = async (
   userId: string,
-  headers: ListWechatChannelsBackupUserVideosHeaders,
   params?: ListWechatChannelsBackupUserVideosParams,
+  headers?: ListWechatChannelsBackupUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatChannelsBackupUserVideosResponse> => {
@@ -18200,7 +18200,7 @@ export const getSearchWechatChannelsBackupVideosUrl = () => {
  */
 export const searchWechatChannelsBackupVideos = async (
   searchWechatChannelsBackupVideosRequest: SearchWechatChannelsBackupVideosRequest,
-  headers: SearchWechatChannelsBackupVideosHeaders,
+  headers?: SearchWechatChannelsBackupVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWechatChannelsBackupVideosResponse> => {
@@ -18300,8 +18300,8 @@ export const getListWechatChannelsCollectionVideosUrl = (
  */
 export const listWechatChannelsCollectionVideos = async (
   collectionId: string,
-  headers: ListWechatChannelsCollectionVideosHeaders,
   params?: ListWechatChannelsCollectionVideosParams,
+  headers?: ListWechatChannelsCollectionVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatChannelsCollectionVideosResponse> => {
@@ -18405,8 +18405,8 @@ export const getListWechatChannelsCommentRepliesUrl = (
 export const listWechatChannelsCommentReplies = async (
   videoId: string,
   commentId: string,
-  headers: ListWechatChannelsCommentRepliesHeaders,
   params?: ListWechatChannelsCommentRepliesParams,
+  headers?: ListWechatChannelsCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatChannelsCommentRepliesResponse> => {
@@ -18506,8 +18506,8 @@ export const getGetWechatChannelsLiveRoomUrl = (
  */
 export const getWechatChannelsLiveRoom = async (
   roomId: string,
-  headers: GetWechatChannelsLiveRoomHeaders,
   params?: GetWechatChannelsLiveRoomParams,
+  headers?: GetWechatChannelsLiveRoomHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWechatChannelsLiveRoomResponse> => {
@@ -18600,8 +18600,8 @@ export const getGetWechatChannelsLiveUserUrl = (
  */
 export const getWechatChannelsLiveUser = async (
   userId: string,
-  headers: GetWechatChannelsLiveUserHeaders,
   params?: GetWechatChannelsLiveUserParams,
+  headers?: GetWechatChannelsLiveUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWechatChannelsLiveUserResponse> => {
@@ -18696,8 +18696,8 @@ export const getListWechatChannelsUserCollectionsUrl = (
  */
 export const listWechatChannelsUserCollections = async (
   userId: string,
-  headers: ListWechatChannelsUserCollectionsHeaders,
   params?: ListWechatChannelsUserCollectionsParams,
+  headers?: ListWechatChannelsUserCollectionsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatChannelsUserCollectionsResponse> => {
@@ -18794,8 +18794,8 @@ export const getGetWechatChannelsUserUrl = (
  */
 export const getWechatChannelsUser = async (
   userId: string,
-  headers: GetWechatChannelsUserHeaders,
   params?: GetWechatChannelsUserParams,
+  headers?: GetWechatChannelsUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWechatChannelsUserResponse> => {
@@ -18890,8 +18890,8 @@ export const getListWechatChannelsUserLiveReplaysUrl = (
  */
 export const listWechatChannelsUserLiveReplays = async (
   userId: string,
-  headers: ListWechatChannelsUserLiveReplaysHeaders,
   params?: ListWechatChannelsUserLiveReplaysParams,
+  headers?: ListWechatChannelsUserLiveReplaysHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatChannelsUserLiveReplaysResponse> => {
@@ -18964,7 +18964,7 @@ export const getSearchWechatChannelsUsersUrl = () => {
  */
 export const searchWechatChannelsUsers = async (
   searchWechatChannelsUsersRequest: SearchWechatChannelsUsersRequest,
-  headers: SearchWechatChannelsUsersHeaders,
+  headers?: SearchWechatChannelsUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWechatChannelsUsersResponse> => {
@@ -19060,8 +19060,8 @@ export const getListWechatChannelsUserVideosUrl = (
  */
 export const listWechatChannelsUserVideos = async (
   userId: string,
-  headers: ListWechatChannelsUserVideosHeaders,
   params?: ListWechatChannelsUserVideosParams,
+  headers?: ListWechatChannelsUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatChannelsUserVideosResponse> => {
@@ -19156,8 +19156,8 @@ export const getListWechatChannelsVideoCommentsUrl = (
  */
 export const listWechatChannelsVideoComments = async (
   videoId: string,
-  headers: ListWechatChannelsVideoCommentsHeaders,
   params?: ListWechatChannelsVideoCommentsParams,
+  headers?: ListWechatChannelsVideoCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatChannelsVideoCommentsResponse> => {
@@ -19254,8 +19254,8 @@ export const getGetWechatChannelsVideoUrl = (
  */
 export const getWechatChannelsVideo = async (
   videoId: string,
-  headers: GetWechatChannelsVideoHeaders,
   params?: GetWechatChannelsVideoParams,
+  headers?: GetWechatChannelsVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWechatChannelsVideoResponse> => {
@@ -19345,7 +19345,7 @@ export const getLookupWechatChannelsVideoUrl = (params: LookupWechatChannelsVide
  */
 export const lookupWechatChannelsVideo = async (
   params: LookupWechatChannelsVideoParams,
-  headers: LookupWechatChannelsVideoHeaders,
+  headers?: LookupWechatChannelsVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupWechatChannelsVideoResponse> => {
@@ -19440,8 +19440,8 @@ export const getGetWechatChannelsVideoMetricsUrl = (
  */
 export const getWechatChannelsVideoMetrics = async (
   videoId: string,
-  headers: GetWechatChannelsVideoMetricsHeaders,
   params?: GetWechatChannelsVideoMetricsParams,
+  headers?: GetWechatChannelsVideoMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWechatChannelsVideoMetricsResponse> => {
@@ -19514,7 +19514,7 @@ export const getSearchWechatChannelsVideosUrl = () => {
  */
 export const searchWechatChannelsVideos = async (
   searchWechatChannelsVideosRequest: SearchWechatChannelsVideosRequest,
-  headers: SearchWechatChannelsVideosHeaders,
+  headers?: SearchWechatChannelsVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWechatChannelsVideosResponse> => {
@@ -19587,7 +19587,7 @@ export const getCreateWechatChannelsVideoShareLinkUrl = (videoId: string) => {
 export const createWechatChannelsVideoShareLink = async (
   videoId: string,
   createWechatChannelsVideoShareLinkRequest: CreateWechatChannelsVideoShareLinkRequest,
-  headers: CreateWechatChannelsVideoShareLinkHeaders,
+  headers?: CreateWechatChannelsVideoShareLinkHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<createWechatChannelsVideoShareLinkResponse> => {
@@ -19686,8 +19686,8 @@ export const getListWechatMpAccountArticlesUrl = (
  */
 export const listWechatMpAccountArticles = async (
   accountId: string,
-  headers: ListWechatMpAccountArticlesHeaders,
   params?: ListWechatMpAccountArticlesParams,
+  headers?: ListWechatMpAccountArticlesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatMpAccountArticlesResponse> => {
@@ -19777,8 +19777,8 @@ export const getGetWechatMpAccountUrl = (accountId: string, params?: GetWechatMp
  */
 export const getWechatMpAccount = async (
   accountId: string,
-  headers: GetWechatMpAccountHeaders,
   params?: GetWechatMpAccountParams,
+  headers?: GetWechatMpAccountHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWechatMpAccountResponse> => {
@@ -19871,8 +19871,8 @@ export const getGetWechatMpAccountOwnerUrl = (
  */
 export const getWechatMpAccountOwner = async (
   accountId: string,
-  headers: GetWechatMpAccountOwnerHeaders,
   params?: GetWechatMpAccountOwnerParams,
+  headers?: GetWechatMpAccountOwnerHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWechatMpAccountOwnerResponse> => {
@@ -19941,7 +19941,7 @@ export const getSearchWechatMpAccountsUrl = () => {
  */
 export const searchWechatMpAccounts = async (
   searchWechatMpAccountsRequest: SearchWechatMpAccountsRequest,
-  headers: SearchWechatMpAccountsHeaders,
+  headers?: SearchWechatMpAccountsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWechatMpAccountsResponse> => {
@@ -20036,7 +20036,7 @@ export const getLookupWechatMpArticleCommentsUrl = (
  */
 export const lookupWechatMpArticleComments = async (
   params: LookupWechatMpArticleCommentsParams,
-  headers: LookupWechatMpArticleCommentsHeaders,
+  headers?: LookupWechatMpArticleCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupWechatMpArticleCommentsResponse> => {
@@ -20130,7 +20130,7 @@ export const getLookupWechatMpArticleUrl = (params: LookupWechatMpArticleParams)
  */
 export const lookupWechatMpArticle = async (
   params: LookupWechatMpArticleParams,
-  headers: LookupWechatMpArticleHeaders,
+  headers?: LookupWechatMpArticleHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupWechatMpArticleResponse> => {
@@ -20222,7 +20222,7 @@ export const getLookupWechatMpArticleMetricsUrl = (params: LookupWechatMpArticle
  */
 export const lookupWechatMpArticleMetrics = async (
   params: LookupWechatMpArticleMetricsParams,
-  headers: LookupWechatMpArticleMetricsHeaders,
+  headers?: LookupWechatMpArticleMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupWechatMpArticleMetricsResponse> => {
@@ -20316,7 +20316,7 @@ export const getListWechatMpCommentRepliesUrl = (
 export const listWechatMpCommentReplies = async (
   commentId: string,
   params: ListWechatMpCommentRepliesParams,
-  headers: ListWechatMpCommentRepliesHeaders,
+  headers?: ListWechatMpCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWechatMpCommentRepliesResponse> => {
@@ -20405,8 +20405,8 @@ export const getListWeiboBackupTrendsUrl = (params?: ListWeiboBackupTrendsParams
  * @summary Weibo hot search (backup)
  */
 export const listWeiboBackupTrends = async (
-  headers: ListWeiboBackupTrendsHeaders,
   params?: ListWeiboBackupTrendsParams,
+  headers?: ListWeiboBackupTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWeiboBackupTrendsResponse> => {
@@ -20499,8 +20499,8 @@ export const getListWeiboCommentRepliesUrl = (
  */
 export const listWeiboCommentReplies = async (
   commentId: string,
-  headers: ListWeiboCommentRepliesHeaders,
   params?: ListWeiboCommentRepliesParams,
+  headers?: ListWeiboCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWeiboCommentRepliesResponse> => {
@@ -20593,8 +20593,8 @@ export const getListWeiboPostCommentsUrl = (
  */
 export const listWeiboPostComments = async (
   postId: string,
-  headers: ListWeiboPostCommentsHeaders,
   params?: ListWeiboPostCommentsParams,
+  headers?: ListWeiboPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWeiboPostCommentsResponse> => {
@@ -20684,7 +20684,7 @@ export const getLookupWeiboPostCommentsUrl = (params: LookupWeiboPostCommentsPar
  */
 export const lookupWeiboPostComments = async (
   params: LookupWeiboPostCommentsParams,
-  headers: LookupWeiboPostCommentsHeaders,
+  headers?: LookupWeiboPostCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupWeiboPostCommentsResponse> => {
@@ -20772,8 +20772,8 @@ export const getGetWeiboPostUrl = (postId: string, params?: GetWeiboPostParams) 
  */
 export const getWeiboPost = async (
   postId: string,
-  headers: GetWeiboPostHeaders,
   params?: GetWeiboPostParams,
+  headers?: GetWeiboPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWeiboPostResponse> => {
@@ -20861,7 +20861,7 @@ export const getLookupWeiboPostUrl = (params: LookupWeiboPostParams) => {
  */
 export const lookupWeiboPost = async (
   params: LookupWeiboPostParams,
-  headers: LookupWeiboPostHeaders,
+  headers?: LookupWeiboPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupWeiboPostResponse> => {
@@ -20951,8 +20951,8 @@ export const getListWeiboPostLikersUrl = (postId: string, params?: ListWeiboPost
  */
 export const listWeiboPostLikers = async (
   postId: string,
-  headers: ListWeiboPostLikersHeaders,
   params?: ListWeiboPostLikersParams,
+  headers?: ListWeiboPostLikersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWeiboPostLikersResponse> => {
@@ -21042,7 +21042,7 @@ export const getLookupWeiboPostLikersUrl = (params: LookupWeiboPostLikersParams)
  */
 export const lookupWeiboPostLikers = async (
   params: LookupWeiboPostLikersParams,
-  headers: LookupWeiboPostLikersHeaders,
+  headers?: LookupWeiboPostLikersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupWeiboPostLikersResponse> => {
@@ -21111,7 +21111,7 @@ export const getSearchWeiboPostsUrl = () => {
  */
 export const searchWeiboPosts = async (
   searchWeiboPostsRequest: SearchWeiboPostsRequest,
-  headers: SearchWeiboPostsHeaders,
+  headers?: SearchWeiboPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWeiboPostsResponse> => {
@@ -21199,8 +21199,8 @@ export const getListWeiboTrendsUrl = (params?: ListWeiboTrendsParams) => {
  * @summary Weibo hot search
  */
 export const listWeiboTrends = async (
-  headers: ListWeiboTrendsHeaders,
   params?: ListWeiboTrendsParams,
+  headers?: ListWeiboTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWeiboTrendsResponse> => {
@@ -21293,8 +21293,8 @@ export const getListWeiboUserFollowersUrl = (
  */
 export const listWeiboUserFollowers = async (
   userId: string,
-  headers: ListWeiboUserFollowersHeaders,
   params?: ListWeiboUserFollowersParams,
+  headers?: ListWeiboUserFollowersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWeiboUserFollowersResponse> => {
@@ -21382,8 +21382,8 @@ export const getGetWeiboUserUrl = (userId: string, params?: GetWeiboUserParams) 
  */
 export const getWeiboUser = async (
   userId: string,
-  headers: GetWeiboUserHeaders,
   params?: GetWeiboUserParams,
+  headers?: GetWeiboUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getWeiboUserResponse> => {
@@ -21473,8 +21473,8 @@ export const getListWeiboUserPostsUrl = (userId: string, params?: ListWeiboUserP
  */
 export const listWeiboUserPosts = async (
   userId: string,
-  headers: ListWeiboUserPostsHeaders,
   params?: ListWeiboUserPostsParams,
+  headers?: ListWeiboUserPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listWeiboUserPostsResponse> => {
@@ -21543,7 +21543,7 @@ export const getSearchWeiboUsersUrl = () => {
  */
 export const searchWeiboUsers = async (
   searchWeiboUsersRequest: SearchWeiboUsersRequest,
-  headers: SearchWeiboUsersHeaders,
+  headers?: SearchWeiboUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchWeiboUsersResponse> => {
@@ -21632,8 +21632,8 @@ export const getGetXCommunityUrl = (communityId: string, params?: GetXCommunityP
  */
 export const getXCommunity = async (
   communityId: string,
-  headers: GetXCommunityHeaders,
   params?: GetXCommunityParams,
+  headers?: GetXCommunityHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXCommunityResponse> => {
@@ -21726,8 +21726,8 @@ export const getListXCommunityMembersUrl = (
  */
 export const listXCommunityMembers = async (
   communityId: string,
-  headers: ListXCommunityMembersHeaders,
   params?: ListXCommunityMembersParams,
+  headers?: ListXCommunityMembersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXCommunityMembersResponse> => {
@@ -21820,8 +21820,8 @@ export const getListXCommunityPostsUrl = (
  */
 export const listXCommunityPosts = async (
   communityId: string,
-  headers: ListXCommunityPostsHeaders,
   params?: ListXCommunityPostsParams,
+  headers?: ListXCommunityPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXCommunityPostsResponse> => {
@@ -21911,8 +21911,8 @@ export const getListXListFollowersUrl = (listId: string, params?: ListXListFollo
  */
 export const listXListFollowers = async (
   listId: string,
-  headers: ListXListFollowersHeaders,
   params?: ListXListFollowersParams,
+  headers?: ListXListFollowersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXListFollowersResponse> => {
@@ -22002,8 +22002,8 @@ export const getListXListMembersUrl = (listId: string, params?: ListXListMembers
  */
 export const listXListMembers = async (
   listId: string,
-  headers: ListXListMembersHeaders,
   params?: ListXListMembersParams,
+  headers?: ListXListMembersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXListMembersResponse> => {
@@ -22091,8 +22091,8 @@ export const getListXListPostsUrl = (listId: string, params?: ListXListPostsPara
  */
 export const listXListPosts = async (
   listId: string,
-  headers: ListXListPostsHeaders,
   params?: ListXListPostsParams,
+  headers?: ListXListPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXListPostsResponse> => {
@@ -22180,8 +22180,8 @@ export const getGetXPostArticleUrl = (postId: string, params?: GetXPostArticlePa
  */
 export const getXPostArticle = async (
   postId: string,
-  headers: GetXPostArticleHeaders,
   params?: GetXPostArticleParams,
+  headers?: GetXPostArticleHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXPostArticleResponse> => {
@@ -22269,8 +22269,8 @@ export const getGetXPostUrl = (postId: string, params?: GetXPostParams) => {
  */
 export const getXPost = async (
   postId: string,
-  headers: GetXPostHeaders,
   params?: GetXPostParams,
+  headers?: GetXPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXPostResponse> => {
@@ -22358,7 +22358,7 @@ export const getLookupXPostUrl = (params: LookupXPostParams) => {
  */
 export const lookupXPost = async (
   params: LookupXPostParams,
-  headers: LookupXPostHeaders,
+  headers?: LookupXPostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupXPostResponse> => {
@@ -22446,8 +22446,8 @@ export const getListXPostQuotesUrl = (postId: string, params?: ListXPostQuotesPa
  */
 export const listXPostQuotes = async (
   postId: string,
-  headers: ListXPostQuotesHeaders,
   params?: ListXPostQuotesParams,
+  headers?: ListXPostQuotesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXPostQuotesResponse> => {
@@ -22537,8 +22537,8 @@ export const getListXPostRepliesUrl = (postId: string, params?: ListXPostReplies
  */
 export const listXPostReplies = async (
   postId: string,
-  headers: ListXPostRepliesHeaders,
   params?: ListXPostRepliesParams,
+  headers?: ListXPostRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXPostRepliesResponse> => {
@@ -22628,8 +22628,8 @@ export const getListXPostRetweetersUrl = (postId: string, params?: ListXPostRetw
  */
 export const listXPostRetweeters = async (
   postId: string,
-  headers: ListXPostRetweetersHeaders,
   params?: ListXPostRetweetersParams,
+  headers?: ListXPostRetweetersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXPostRetweetersResponse> => {
@@ -22696,7 +22696,7 @@ export const getSearchXPostsUrl = () => {
  */
 export const searchXPosts = async (
   searchXPostsRequest: SearchXPostsRequest,
-  headers: SearchXPostsHeaders,
+  headers?: SearchXPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchXPostsResponse> => {
@@ -22787,8 +22787,8 @@ export const getListXThreadPostsUrl = (threadId: string, params?: ListXThreadPos
  */
 export const listXThreadPosts = async (
   threadId: string,
-  headers: ListXThreadPostsHeaders,
   params?: ListXThreadPostsParams,
+  headers?: ListXThreadPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXThreadPostsResponse> => {
@@ -22875,8 +22875,8 @@ export const getListXTrendsUrl = (params?: ListXTrendsParams) => {
  * @summary X trending topics
  */
 export const listXTrends = async (
-  headers: ListXTrendsHeaders,
   params?: ListXTrendsParams,
+  headers?: ListXTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXTrendsResponse> => {
@@ -22966,8 +22966,8 @@ export const getListXUserFollowersUrl = (username: string, params?: ListXUserFol
  */
 export const listXUserFollowers = async (
   username: string,
-  headers: ListXUserFollowersHeaders,
   params?: ListXUserFollowersParams,
+  headers?: ListXUserFollowersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXUserFollowersResponse> => {
@@ -23057,8 +23057,8 @@ export const getListXUserFollowingUrl = (username: string, params?: ListXUserFol
  */
 export const listXUserFollowing = async (
   username: string,
-  headers: ListXUserFollowingHeaders,
   params?: ListXUserFollowingParams,
+  headers?: ListXUserFollowingHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXUserFollowingResponse> => {
@@ -23146,8 +23146,8 @@ export const getGetXUserUrl = (username: string, params?: GetXUserParams) => {
  */
 export const getXUser = async (
   username: string,
-  headers: GetXUserHeaders,
   params?: GetXUserParams,
+  headers?: GetXUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXUserResponse> => {
@@ -23235,7 +23235,7 @@ export const getLookupXUserUrl = (params: LookupXUserParams) => {
  */
 export const lookupXUser = async (
   params: LookupXUserParams,
-  headers: LookupXUserHeaders,
+  headers?: LookupXUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupXUserResponse> => {
@@ -23323,7 +23323,7 @@ export const getBatchGetXUsersUrl = (params: BatchGetXUsersParams) => {
  */
 export const batchGetXUsers = async (
   params: BatchGetXUsersParams,
-  headers: BatchGetXUsersHeaders,
+  headers?: BatchGetXUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<batchGetXUsersResponse> => {
@@ -23413,8 +23413,8 @@ export const getListXUserMentionsUrl = (username: string, params?: ListXUserMent
  */
 export const listXUserMentions = async (
   username: string,
-  headers: ListXUserMentionsHeaders,
   params?: ListXUserMentionsParams,
+  headers?: ListXUserMentionsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXUserMentionsResponse> => {
@@ -23502,8 +23502,8 @@ export const getListXUserPostsUrl = (username: string, params?: ListXUserPostsPa
  */
 export const listXUserPosts = async (
   username: string,
-  headers: ListXUserPostsHeaders,
   params?: ListXUserPostsParams,
+  headers?: ListXUserPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXUserPostsResponse> => {
@@ -23570,7 +23570,7 @@ export const getSearchXUsersUrl = () => {
  */
 export const searchXUsers = async (
   searchXUsersRequest: SearchXUsersRequest,
-  headers: SearchXUsersHeaders,
+  headers?: SearchXUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchXUsersResponse> => {
@@ -23661,8 +23661,8 @@ export const getGetXianyuProductUrl = (productId: string, params?: GetXianyuProd
  */
 export const getXianyuProduct = async (
   productId: string,
-  headers: GetXianyuProductHeaders,
   params?: GetXianyuProductParams,
+  headers?: GetXianyuProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXianyuProductResponse> => {
@@ -23731,7 +23731,7 @@ export const getSearchXianyuProductsUrl = () => {
  */
 export const searchXianyuProducts = async (
   searchXianyuProductsRequest: SearchXianyuProductsRequest,
-  headers: SearchXianyuProductsHeaders,
+  headers?: SearchXianyuProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchXianyuProductsResponse> => {
@@ -23829,8 +23829,8 @@ export const getListXiaohongshuCommentRepliesUrl = (
 export const listXiaohongshuCommentReplies = async (
   noteId: string,
   commentId: string,
-  headers: ListXiaohongshuCommentRepliesHeaders,
   params?: ListXiaohongshuCommentRepliesParams,
+  headers?: ListXiaohongshuCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuCommentRepliesResponse> => {
@@ -23906,7 +23906,7 @@ export const getSearchXiaohongshuImagesUrl = () => {
  */
 export const searchXiaohongshuImages = async (
   searchXiaohongshuImagesRequest: SearchXiaohongshuImagesRequest,
-  headers: SearchXiaohongshuImagesHeaders,
+  headers?: SearchXiaohongshuImagesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchXiaohongshuImagesResponse> => {
@@ -24002,8 +24002,8 @@ export const getListXiaohongshuRelatedKeywordsUrl = (
  */
 export const listXiaohongshuRelatedKeywords = async (
   keyword: string,
-  headers: ListXiaohongshuRelatedKeywordsHeaders,
   params?: ListXiaohongshuRelatedKeywordsParams,
+  headers?: ListXiaohongshuRelatedKeywordsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuRelatedKeywordsResponse> => {
@@ -24101,8 +24101,8 @@ export const getListXiaohongshuNoteCommentsUrl = (
  */
 export const listXiaohongshuNoteComments = async (
   noteId: string,
-  headers: ListXiaohongshuNoteCommentsHeaders,
   params?: ListXiaohongshuNoteCommentsParams,
+  headers?: ListXiaohongshuNoteCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuNoteCommentsResponse> => {
@@ -24192,8 +24192,8 @@ export const getGetXiaohongshuNoteUrl = (noteId: string, params?: GetXiaohongshu
  */
 export const getXiaohongshuNote = async (
   noteId: string,
-  headers: GetXiaohongshuNoteHeaders,
   params?: GetXiaohongshuNoteParams,
+  headers?: GetXiaohongshuNoteHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuNoteResponse> => {
@@ -24283,7 +24283,7 @@ export const getLookupXiaohongshuNoteUrl = (params: LookupXiaohongshuNoteParams)
  */
 export const lookupXiaohongshuNote = async (
   params: LookupXiaohongshuNoteParams,
-  headers: LookupXiaohongshuNoteHeaders,
+  headers?: LookupXiaohongshuNoteHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupXiaohongshuNoteResponse> => {
@@ -24352,7 +24352,7 @@ export const getSearchXiaohongshuNotesUrl = () => {
  */
 export const searchXiaohongshuNotes = async (
   searchXiaohongshuNotesRequest: SearchXiaohongshuNotesRequest,
-  headers: SearchXiaohongshuNotesHeaders,
+  headers?: SearchXiaohongshuNotesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchXiaohongshuNotesResponse> => {
@@ -24448,8 +24448,8 @@ export const getGetXiaohongshuPgyCreatorAudienceUrl = (
  */
 export const getXiaohongshuPgyCreatorAudience = async (
   creatorId: string,
-  headers: GetXiaohongshuPgyCreatorAudienceHeaders,
   params?: GetXiaohongshuPgyCreatorAudienceParams,
+  headers?: GetXiaohongshuPgyCreatorAudienceHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuPgyCreatorAudienceResponse> => {
@@ -24548,8 +24548,8 @@ export const getGetXiaohongshuPgyCreatorCostsHistoryUrl = (
  */
 export const getXiaohongshuPgyCreatorCostsHistory = async (
   creatorId: string,
-  headers: GetXiaohongshuPgyCreatorCostsHistoryHeaders,
   params?: GetXiaohongshuPgyCreatorCostsHistoryParams,
+  headers?: GetXiaohongshuPgyCreatorCostsHistoryHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuPgyCreatorCostsHistoryResponse> => {
@@ -24651,8 +24651,8 @@ export const getGetXiaohongshuPgyCreatorCostsMetricsUrl = (
  */
 export const getXiaohongshuPgyCreatorCostsMetrics = async (
   creatorId: string,
-  headers: GetXiaohongshuPgyCreatorCostsMetricsHeaders,
   params?: GetXiaohongshuPgyCreatorCostsMetricsParams,
+  headers?: GetXiaohongshuPgyCreatorCostsMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuPgyCreatorCostsMetricsResponse> => {
@@ -24754,8 +24754,8 @@ export const getGetXiaohongshuPgyCreatorFollowersHistoryUrl = (
  */
 export const getXiaohongshuPgyCreatorFollowersHistory = async (
   creatorId: string,
-  headers: GetXiaohongshuPgyCreatorFollowersHistoryHeaders,
   params?: GetXiaohongshuPgyCreatorFollowersHistoryParams,
+  headers?: GetXiaohongshuPgyCreatorFollowersHistoryHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuPgyCreatorFollowersHistoryResponse> => {
@@ -24857,8 +24857,8 @@ export const getGetXiaohongshuPgyCreatorFollowersMetricsUrl = (
  */
 export const getXiaohongshuPgyCreatorFollowersMetrics = async (
   creatorId: string,
-  headers: GetXiaohongshuPgyCreatorFollowersMetricsHeaders,
   params?: GetXiaohongshuPgyCreatorFollowersMetricsParams,
+  headers?: GetXiaohongshuPgyCreatorFollowersMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuPgyCreatorFollowersMetricsResponse> => {
@@ -24958,8 +24958,8 @@ export const getGetXiaohongshuPgyCreatorUrl = (
  */
 export const getXiaohongshuPgyCreator = async (
   creatorId: string,
-  headers: GetXiaohongshuPgyCreatorHeaders,
   params?: GetXiaohongshuPgyCreatorParams,
+  headers?: GetXiaohongshuPgyCreatorHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuPgyCreatorResponse> => {
@@ -25054,8 +25054,8 @@ export const getGetXiaohongshuPgyCreatorMetricsUrl = (
  */
 export const getXiaohongshuPgyCreatorMetrics = async (
   creatorId: string,
-  headers: GetXiaohongshuPgyCreatorMetricsHeaders,
   params?: GetXiaohongshuPgyCreatorMetricsParams,
+  headers?: GetXiaohongshuPgyCreatorMetricsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuPgyCreatorMetricsResponse> => {
@@ -25154,8 +25154,8 @@ export const getListXiaohongshuPgyCreatorNotesUrl = (
  */
 export const listXiaohongshuPgyCreatorNotes = async (
   creatorId: string,
-  headers: ListXiaohongshuPgyCreatorNotesHeaders,
   params?: ListXiaohongshuPgyCreatorNotesParams,
+  headers?: ListXiaohongshuPgyCreatorNotesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuPgyCreatorNotesResponse> => {
@@ -25254,8 +25254,8 @@ export const getListXiaohongshuRelatedPgyCreatorsUrl = (
  */
 export const listXiaohongshuRelatedPgyCreators = async (
   creatorId: string,
-  headers: ListXiaohongshuRelatedPgyCreatorsHeaders,
   params?: ListXiaohongshuRelatedPgyCreatorsParams,
+  headers?: ListXiaohongshuRelatedPgyCreatorsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuRelatedPgyCreatorsResponse> => {
@@ -25330,7 +25330,7 @@ export const getSearchXiaohongshuPgyCreatorsUrl = () => {
  */
 export const searchXiaohongshuPgyCreators = async (
   searchXiaohongshuPgyCreatorsRequest: SearchXiaohongshuPgyCreatorsRequest,
-  headers: SearchXiaohongshuPgyCreatorsHeaders,
+  headers?: SearchXiaohongshuPgyCreatorsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchXiaohongshuPgyCreatorsResponse> => {
@@ -25426,8 +25426,8 @@ export const getGetXiaohongshuPgyKeywordsHistoryUrl = (
  */
 export const getXiaohongshuPgyKeywordsHistory = async (
   keyword: string,
-  headers: GetXiaohongshuPgyKeywordsHistoryHeaders,
   params?: GetXiaohongshuPgyKeywordsHistoryParams,
+  headers?: GetXiaohongshuPgyKeywordsHistoryHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuPgyKeywordsHistoryResponse> => {
@@ -25526,8 +25526,8 @@ export const getListXiaohongshuRelatedPgyKeywordsUrl = (
  */
 export const listXiaohongshuRelatedPgyKeywords = async (
   keyword: string,
-  headers: ListXiaohongshuRelatedPgyKeywordsHeaders,
   params?: ListXiaohongshuRelatedPgyKeywordsParams,
+  headers?: ListXiaohongshuRelatedPgyKeywordsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuRelatedPgyKeywordsResponse> => {
@@ -25624,8 +25624,8 @@ export const getGetXiaohongshuPgyNoteUrl = (
  */
 export const getXiaohongshuPgyNote = async (
   noteId: string,
-  headers: GetXiaohongshuPgyNoteHeaders,
   params?: GetXiaohongshuPgyNoteParams,
+  headers?: GetXiaohongshuPgyNoteHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuPgyNoteResponse> => {
@@ -25718,8 +25718,8 @@ export const getListXiaohongshuTrendingPgyNotesUrl = (
  * @summary Xiaohongshu PGY trending notes
  */
 export const listXiaohongshuTrendingPgyNotes = async (
-  headers: ListXiaohongshuTrendingPgyNotesHeaders,
   params?: ListXiaohongshuTrendingPgyNotesParams,
+  headers?: ListXiaohongshuTrendingPgyNotesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuTrendingPgyNotesResponse> => {
@@ -25816,8 +25816,8 @@ export const getGetXiaohongshuShopProductUrl = (
  */
 export const getXiaohongshuShopProduct = async (
   productId: string,
-  headers: GetXiaohongshuShopProductHeaders,
   params?: GetXiaohongshuShopProductParams,
+  headers?: GetXiaohongshuShopProductHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuShopProductResponse> => {
@@ -25912,8 +25912,8 @@ export const getListXiaohongshuShopProductReviewsUrl = (
  */
 export const listXiaohongshuShopProductReviews = async (
   productId: string,
-  headers: ListXiaohongshuShopProductReviewsHeaders,
   params?: ListXiaohongshuShopProductReviewsParams,
+  headers?: ListXiaohongshuShopProductReviewsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuShopProductReviewsResponse> => {
@@ -25988,7 +25988,7 @@ export const getSearchXiaohongshuShopProductsUrl = () => {
  */
 export const searchXiaohongshuShopProducts = async (
   searchXiaohongshuShopProductsRequest: SearchXiaohongshuShopProductsRequest,
-  headers: SearchXiaohongshuShopProductsHeaders,
+  headers?: SearchXiaohongshuShopProductsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchXiaohongshuShopProductsResponse> => {
@@ -26083,8 +26083,8 @@ export const getGetXiaohongshuTopicUrl = (topicId: string, params?: GetXiaohongs
  */
 export const getXiaohongshuTopic = async (
   topicId: string,
-  headers: GetXiaohongshuTopicHeaders,
   params?: GetXiaohongshuTopicParams,
+  headers?: GetXiaohongshuTopicHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuTopicResponse> => {
@@ -26177,8 +26177,8 @@ export const getListXiaohongshuTopicNotesUrl = (
  */
 export const listXiaohongshuTopicNotes = async (
   topicId: string,
-  headers: ListXiaohongshuTopicNotesHeaders,
   params?: ListXiaohongshuTopicNotesParams,
+  headers?: ListXiaohongshuTopicNotesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuTopicNotesResponse> => {
@@ -26267,8 +26267,8 @@ export const getListXiaohongshuTrendsUrl = (params?: ListXiaohongshuTrendsParams
  * @summary Xiaohongshu hot topics
  */
 export const listXiaohongshuTrends = async (
-  headers: ListXiaohongshuTrendsHeaders,
   params?: ListXiaohongshuTrendsParams,
+  headers?: ListXiaohongshuTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuTrendsResponse> => {
@@ -26358,8 +26358,8 @@ export const getGetXiaohongshuUserUrl = (userId: string, params?: GetXiaohongshu
  */
 export const getXiaohongshuUser = async (
   userId: string,
-  headers: GetXiaohongshuUserHeaders,
   params?: GetXiaohongshuUserParams,
+  headers?: GetXiaohongshuUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuUserResponse> => {
@@ -26449,7 +26449,7 @@ export const getLookupXiaohongshuUserUrl = (params: LookupXiaohongshuUserParams)
  */
 export const lookupXiaohongshuUser = async (
   params: LookupXiaohongshuUserParams,
-  headers: LookupXiaohongshuUserHeaders,
+  headers?: LookupXiaohongshuUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupXiaohongshuUserResponse> => {
@@ -26542,8 +26542,8 @@ export const getListXiaohongshuUserNotesUrl = (
  */
 export const listXiaohongshuUserNotes = async (
   userId: string,
-  headers: ListXiaohongshuUserNotesHeaders,
   params?: ListXiaohongshuUserNotesParams,
+  headers?: ListXiaohongshuUserNotesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiaohongshuUserNotesResponse> => {
@@ -26612,7 +26612,7 @@ export const getSearchXiaohongshuUsersUrl = () => {
  */
 export const searchXiaohongshuUsers = async (
   searchXiaohongshuUsersRequest: SearchXiaohongshuUsersRequest,
-  headers: SearchXiaohongshuUsersHeaders,
+  headers?: SearchXiaohongshuUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchXiaohongshuUsersResponse> => {
@@ -26703,8 +26703,8 @@ export const getGetXiaohongshuVideoUrl = (videoId: string, params?: GetXiaohongs
  */
 export const getXiaohongshuVideo = async (
   videoId: string,
-  headers: GetXiaohongshuVideoHeaders,
   params?: GetXiaohongshuVideoParams,
+  headers?: GetXiaohongshuVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiaohongshuVideoResponse> => {
@@ -26794,7 +26794,7 @@ export const getLookupXiaohongshuVideoUrl = (params: LookupXiaohongshuVideoParam
  */
 export const lookupXiaohongshuVideo = async (
   params: LookupXiaohongshuVideoParams,
-  headers: LookupXiaohongshuVideoHeaders,
+  headers?: LookupXiaohongshuVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupXiaohongshuVideoResponse> => {
@@ -26882,8 +26882,8 @@ export const getGetXiguaUserUrl = (userId: string, params?: GetXiguaUserParams) 
  */
 export const getXiguaUser = async (
   userId: string,
-  headers: GetXiguaUserHeaders,
   params?: GetXiguaUserParams,
+  headers?: GetXiguaUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiguaUserResponse> => {
@@ -26971,7 +26971,7 @@ export const getLookupXiguaUserUrl = (params: LookupXiguaUserParams) => {
  */
 export const lookupXiguaUser = async (
   params: LookupXiguaUserParams,
-  headers: LookupXiguaUserHeaders,
+  headers?: LookupXiguaUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupXiguaUserResponse> => {
@@ -27061,8 +27061,8 @@ export const getListXiguaUserVideosUrl = (userId: string, params?: ListXiguaUser
  */
 export const listXiguaUserVideos = async (
   userId: string,
-  headers: ListXiguaUserVideosHeaders,
   params?: ListXiguaUserVideosParams,
+  headers?: ListXiguaUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiguaUserVideosResponse> => {
@@ -27152,7 +27152,7 @@ export const getLookupXiguaUserVideosUrl = (params: LookupXiguaUserVideosParams)
  */
 export const lookupXiguaUserVideos = async (
   params: LookupXiguaUserVideosParams,
-  headers: LookupXiguaUserVideosHeaders,
+  headers?: LookupXiguaUserVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupXiguaUserVideosResponse> => {
@@ -27245,8 +27245,8 @@ export const getListXiguaVideoCommentsUrl = (
  */
 export const listXiguaVideoComments = async (
   videoId: string,
-  headers: ListXiguaVideoCommentsHeaders,
   params?: ListXiguaVideoCommentsParams,
+  headers?: ListXiguaVideoCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listXiguaVideoCommentsResponse> => {
@@ -27336,7 +27336,7 @@ export const getLookupXiguaVideoCommentsUrl = (params: LookupXiguaVideoCommentsP
  */
 export const lookupXiguaVideoComments = async (
   params: LookupXiguaVideoCommentsParams,
-  headers: LookupXiguaVideoCommentsHeaders,
+  headers?: LookupXiguaVideoCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupXiguaVideoCommentsResponse> => {
@@ -27424,8 +27424,8 @@ export const getGetXiguaVideoUrl = (videoId: string, params?: GetXiguaVideoParam
  */
 export const getXiguaVideo = async (
   videoId: string,
-  headers: GetXiguaVideoHeaders,
   params?: GetXiguaVideoParams,
+  headers?: GetXiguaVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getXiguaVideoResponse> => {
@@ -27515,7 +27515,7 @@ export const getLookupXiguaVideoUrl = (params: LookupXiguaVideoParams) => {
  */
 export const lookupXiguaVideo = async (
   params: LookupXiguaVideoParams,
-  headers: LookupXiguaVideoHeaders,
+  headers?: LookupXiguaVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupXiguaVideoResponse> => {
@@ -27584,7 +27584,7 @@ export const getSearchXiguaVideosUrl = () => {
  */
 export const searchXiguaVideos = async (
   searchXiguaVideosRequest: SearchXiguaVideosRequest,
-  headers: SearchXiguaVideosHeaders,
+  headers?: SearchXiguaVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchXiguaVideosResponse> => {
@@ -27675,8 +27675,8 @@ export const getGetYoutubeChannelUrl = (channelId: string, params?: GetYoutubeCh
  */
 export const getYoutubeChannel = async (
   channelId: string,
-  headers: GetYoutubeChannelHeaders,
   params?: GetYoutubeChannelParams,
+  headers?: GetYoutubeChannelHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getYoutubeChannelResponse> => {
@@ -27766,7 +27766,7 @@ export const getLookupYoutubeChannelUrl = (params: LookupYoutubeChannelParams) =
  */
 export const lookupYoutubeChannel = async (
   params: LookupYoutubeChannelParams,
-  headers: LookupYoutubeChannelHeaders,
+  headers?: LookupYoutubeChannelHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupYoutubeChannelResponse> => {
@@ -27859,8 +27859,8 @@ export const getListYoutubeChannelPostsUrl = (
  */
 export const listYoutubeChannelPosts = async (
   channelId: string,
-  headers: ListYoutubeChannelPostsHeaders,
   params?: ListYoutubeChannelPostsParams,
+  headers?: ListYoutubeChannelPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listYoutubeChannelPostsResponse> => {
@@ -27950,7 +27950,7 @@ export const getLookupYoutubeChannelPostsUrl = (params: LookupYoutubeChannelPost
  */
 export const lookupYoutubeChannelPosts = async (
   params: LookupYoutubeChannelPostsParams,
-  headers: LookupYoutubeChannelPostsHeaders,
+  headers?: LookupYoutubeChannelPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupYoutubeChannelPostsResponse> => {
@@ -28019,7 +28019,7 @@ export const getSearchYoutubeChannelsUrl = () => {
  */
 export const searchYoutubeChannels = async (
   searchYoutubeChannelsRequest: SearchYoutubeChannelsRequest,
-  headers: SearchYoutubeChannelsHeaders,
+  headers?: SearchYoutubeChannelsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchYoutubeChannelsResponse> => {
@@ -28113,8 +28113,8 @@ export const getListYoutubeChannelVideosUrl = (
  */
 export const listYoutubeChannelVideos = async (
   channelId: string,
-  headers: ListYoutubeChannelVideosHeaders,
   params?: ListYoutubeChannelVideosParams,
+  headers?: ListYoutubeChannelVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listYoutubeChannelVideosResponse> => {
@@ -28204,7 +28204,7 @@ export const getLookupYoutubeChannelVideosUrl = (params: LookupYoutubeChannelVid
  */
 export const lookupYoutubeChannelVideos = async (
   params: LookupYoutubeChannelVideosParams,
-  headers: LookupYoutubeChannelVideosHeaders,
+  headers?: LookupYoutubeChannelVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupYoutubeChannelVideosResponse> => {
@@ -28295,7 +28295,7 @@ export const getLookupYoutubeCommentRepliesUrl = (params: LookupYoutubeCommentRe
  */
 export const lookupYoutubeCommentReplies = async (
   params: LookupYoutubeCommentRepliesParams,
-  headers: LookupYoutubeCommentRepliesHeaders,
+  headers?: LookupYoutubeCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupYoutubeCommentRepliesResponse> => {
@@ -28383,8 +28383,8 @@ export const getGetYoutubePostUrl = (postId: string, params?: GetYoutubePostPara
  */
 export const getYoutubePost = async (
   postId: string,
-  headers: GetYoutubePostHeaders,
   params?: GetYoutubePostParams,
+  headers?: GetYoutubePostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getYoutubePostResponse> => {
@@ -28474,7 +28474,7 @@ export const getLookupYoutubePostUrl = (params: LookupYoutubePostParams) => {
  */
 export const lookupYoutubePost = async (
   params: LookupYoutubePostParams,
-  headers: LookupYoutubePostHeaders,
+  headers?: LookupYoutubePostHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupYoutubePostResponse> => {
@@ -28567,8 +28567,8 @@ export const getListYoutubeVideoCommentsUrl = (
  */
 export const listYoutubeVideoComments = async (
   videoId: string,
-  headers: ListYoutubeVideoCommentsHeaders,
   params?: ListYoutubeVideoCommentsParams,
+  headers?: ListYoutubeVideoCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listYoutubeVideoCommentsResponse> => {
@@ -28656,8 +28656,8 @@ export const getGetYoutubeVideoUrl = (videoId: string, params?: GetYoutubeVideoP
  */
 export const getYoutubeVideo = async (
   videoId: string,
-  headers: GetYoutubeVideoHeaders,
   params?: GetYoutubeVideoParams,
+  headers?: GetYoutubeVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getYoutubeVideoResponse> => {
@@ -28747,7 +28747,7 @@ export const getLookupYoutubeVideoUrl = (params: LookupYoutubeVideoParams) => {
  */
 export const lookupYoutubeVideo = async (
   params: LookupYoutubeVideoParams,
-  headers: LookupYoutubeVideoHeaders,
+  headers?: LookupYoutubeVideoHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupYoutubeVideoResponse> => {
@@ -28816,7 +28816,7 @@ export const getSearchYoutubeVideosUrl = () => {
  */
 export const searchYoutubeVideos = async (
   searchYoutubeVideosRequest: SearchYoutubeVideosRequest,
-  headers: SearchYoutubeVideosHeaders,
+  headers?: SearchYoutubeVideosHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchYoutubeVideosResponse> => {
@@ -28910,8 +28910,8 @@ export const getGetYoutubeVideoTranscriptUrl = (
  */
 export const getYoutubeVideoTranscript = async (
   videoId: string,
-  headers: GetYoutubeVideoTranscriptHeaders,
   params?: GetYoutubeVideoTranscriptParams,
+  headers?: GetYoutubeVideoTranscriptHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getYoutubeVideoTranscriptResponse> => {
@@ -29004,8 +29004,8 @@ export const getListZhihuAnswerCommentsUrl = (
  */
 export const listZhihuAnswerComments = async (
   answerId: string,
-  headers: ListZhihuAnswerCommentsHeaders,
   params?: ListZhihuAnswerCommentsParams,
+  headers?: ListZhihuAnswerCommentsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listZhihuAnswerCommentsResponse> => {
@@ -29093,8 +29093,8 @@ export const getGetZhihuAnswerUrl = (answerId: string, params?: GetZhihuAnswerPa
  */
 export const getZhihuAnswer = async (
   answerId: string,
-  headers: GetZhihuAnswerHeaders,
   params?: GetZhihuAnswerParams,
+  headers?: GetZhihuAnswerHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getZhihuAnswerResponse> => {
@@ -29184,7 +29184,7 @@ export const getLookupZhihuAnswerUrl = (params: LookupZhihuAnswerParams) => {
  */
 export const lookupZhihuAnswer = async (
   params: LookupZhihuAnswerParams,
-  headers: LookupZhihuAnswerHeaders,
+  headers?: LookupZhihuAnswerHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupZhihuAnswerResponse> => {
@@ -29272,8 +29272,8 @@ export const getGetZhihuArticleUrl = (articleId: string, params?: GetZhihuArticl
  */
 export const getZhihuArticle = async (
   articleId: string,
-  headers: GetZhihuArticleHeaders,
   params?: GetZhihuArticleParams,
+  headers?: GetZhihuArticleHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getZhihuArticleResponse> => {
@@ -29363,7 +29363,7 @@ export const getLookupZhihuArticleUrl = (params: LookupZhihuArticleParams) => {
  */
 export const lookupZhihuArticle = async (
   params: LookupZhihuArticleParams,
-  headers: LookupZhihuArticleHeaders,
+  headers?: LookupZhihuArticleHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupZhihuArticleResponse> => {
@@ -29456,8 +29456,8 @@ export const getListZhihuColumnArticlesUrl = (
  */
 export const listZhihuColumnArticles = async (
   columnId: string,
-  headers: ListZhihuColumnArticlesHeaders,
   params?: ListZhihuColumnArticlesParams,
+  headers?: ListZhihuColumnArticlesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listZhihuColumnArticlesResponse> => {
@@ -29550,8 +29550,8 @@ export const getListZhihuCommentRepliesUrl = (
  */
 export const listZhihuCommentReplies = async (
   commentId: string,
-  headers: ListZhihuCommentRepliesHeaders,
   params?: ListZhihuCommentRepliesParams,
+  headers?: ListZhihuCommentRepliesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listZhihuCommentRepliesResponse> => {
@@ -29639,8 +29639,8 @@ export const getGetZhihuPinUrl = (pinId: string, params?: GetZhihuPinParams) => 
  */
 export const getZhihuPin = async (
   pinId: string,
-  headers: GetZhihuPinHeaders,
   params?: GetZhihuPinParams,
+  headers?: GetZhihuPinHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getZhihuPinResponse> => {
@@ -29728,7 +29728,7 @@ export const getLookupZhihuPinUrl = (params: LookupZhihuPinParams) => {
  */
 export const lookupZhihuPin = async (
   params: LookupZhihuPinParams,
-  headers: LookupZhihuPinHeaders,
+  headers?: LookupZhihuPinHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupZhihuPinResponse> => {
@@ -29797,7 +29797,7 @@ export const getSearchZhihuPostsUrl = () => {
  */
 export const searchZhihuPosts = async (
   searchZhihuPostsRequest: SearchZhihuPostsRequest,
-  headers: SearchZhihuPostsHeaders,
+  headers?: SearchZhihuPostsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchZhihuPostsResponse> => {
@@ -29891,8 +29891,8 @@ export const getListZhihuQuestionAnswersUrl = (
  */
 export const listZhihuQuestionAnswers = async (
   questionId: string,
-  headers: ListZhihuQuestionAnswersHeaders,
   params?: ListZhihuQuestionAnswersParams,
+  headers?: ListZhihuQuestionAnswersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listZhihuQuestionAnswersResponse> => {
@@ -29982,7 +29982,7 @@ export const getLookupZhihuQuestionAnswersUrl = (params: LookupZhihuQuestionAnsw
  */
 export const lookupZhihuQuestionAnswers = async (
   params: LookupZhihuQuestionAnswersParams,
-  headers: LookupZhihuQuestionAnswersHeaders,
+  headers?: LookupZhihuQuestionAnswersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupZhihuQuestionAnswersResponse> => {
@@ -30072,8 +30072,8 @@ export const getGetZhihuQuestionUrl = (questionId: string, params?: GetZhihuQues
  */
 export const getZhihuQuestion = async (
   questionId: string,
-  headers: GetZhihuQuestionHeaders,
   params?: GetZhihuQuestionParams,
+  headers?: GetZhihuQuestionHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getZhihuQuestionResponse> => {
@@ -30163,7 +30163,7 @@ export const getLookupZhihuQuestionUrl = (params: LookupZhihuQuestionParams) => 
  */
 export const lookupZhihuQuestion = async (
   params: LookupZhihuQuestionParams,
-  headers: LookupZhihuQuestionHeaders,
+  headers?: LookupZhihuQuestionHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<lookupZhihuQuestionResponse> => {
@@ -30250,8 +30250,8 @@ export const getListZhihuTrendsUrl = (params?: ListZhihuTrendsParams) => {
  * @summary Zhihu hot list
  */
 export const listZhihuTrends = async (
-  headers: ListZhihuTrendsHeaders,
   params?: ListZhihuTrendsParams,
+  headers?: ListZhihuTrendsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listZhihuTrendsResponse> => {
@@ -30344,8 +30344,8 @@ export const getListZhihuUserAnswersUrl = (
  */
 export const listZhihuUserAnswers = async (
   username: string,
-  headers: ListZhihuUserAnswersHeaders,
   params?: ListZhihuUserAnswersParams,
+  headers?: ListZhihuUserAnswersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listZhihuUserAnswersResponse> => {
@@ -30438,8 +30438,8 @@ export const getListZhihuUserArticlesUrl = (
  */
 export const listZhihuUserArticles = async (
   username: string,
-  headers: ListZhihuUserArticlesHeaders,
   params?: ListZhihuUserArticlesParams,
+  headers?: ListZhihuUserArticlesHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listZhihuUserArticlesResponse> => {
@@ -30532,8 +30532,8 @@ export const getListZhihuUserFollowersUrl = (
  */
 export const listZhihuUserFollowers = async (
   username: string,
-  headers: ListZhihuUserFollowersHeaders,
   params?: ListZhihuUserFollowersParams,
+  headers?: ListZhihuUserFollowersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listZhihuUserFollowersResponse> => {
@@ -30621,8 +30621,8 @@ export const getGetZhihuUserUrl = (username: string, params?: GetZhihuUserParams
  */
 export const getZhihuUser = async (
   username: string,
-  headers: GetZhihuUserHeaders,
   params?: GetZhihuUserParams,
+  headers?: GetZhihuUserHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getZhihuUserResponse> => {
@@ -30712,8 +30712,8 @@ export const getListZhihuUserPinsUrl = (username: string, params?: ListZhihuUser
  */
 export const listZhihuUserPins = async (
   username: string,
-  headers: ListZhihuUserPinsHeaders,
   params?: ListZhihuUserPinsParams,
+  headers?: ListZhihuUserPinsHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listZhihuUserPinsResponse> => {
@@ -30782,7 +30782,7 @@ export const getSearchZhihuUsersUrl = () => {
  */
 export const searchZhihuUsers = async (
   searchZhihuUsersRequest: SearchZhihuUsersRequest,
-  headers: SearchZhihuUsersHeaders,
+  headers?: SearchZhihuUsersHeaders,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<searchZhihuUsersResponse> => {

@@ -6,7 +6,7 @@
  *
  * Enable OKData once per project (`okdata:enablement.create`) before invoking metered queries (`okdata:query.invoke`). Project identity and billing ownership come solely from the verified IAM scoped token.
  *
- * Search and structured analytical queries use `QUERY` with JSON bodies. Resource reads use `GET` with path identifiers and query parameters; alternate identifiers use read-only `:lookup` operations. All data operations require an `Idempotency-Key` header (24-hour replay window) and use shared response models, optional `view` and `fields` projections, and cursor pagination where supported. Every page is a separate metered query. Retail prices and invoices are managed by Leaflow Billing.
+ * Search and structured analytical queries use `QUERY` with JSON bodies. Resource reads use `GET` with path identifiers and query parameters; alternate identifiers use read-only `:lookup` operations. All data operations accept an optional `Idempotency-Key` header (24-hour replay window for safe retries) and use shared response models, optional `view` and `fields` projections, and cursor pagination where supported. Every page is a separate metered query. Retail prices and invoices are managed by Leaflow Billing.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -20,7 +20,8 @@ export const ListWeiboPostLikersHeaders = zod.strictObject({
     .string()
     .min(1)
     .max(listWeiboPostLikersHeadersIdempotencyKeyMax)
-    .regex(listWeiboPostLikersHeadersIdempotencyKeyRegExp),
+    .regex(listWeiboPostLikersHeadersIdempotencyKeyRegExp)
+    .optional(),
 });
 
 export type ListWeiboPostLikersHeaders = zod.input<typeof ListWeiboPostLikersHeaders>;

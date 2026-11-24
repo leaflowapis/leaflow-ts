@@ -6,7 +6,7 @@
  *
  * Enable OKData once per project (`okdata:enablement.create`) before invoking metered queries (`okdata:query.invoke`). Project identity and billing ownership come solely from the verified IAM scoped token.
  *
- * Search and structured analytical queries use `QUERY` with JSON bodies. Resource reads use `GET` with path identifiers and query parameters; alternate identifiers use read-only `:lookup` operations. All data operations require an `Idempotency-Key` header (24-hour replay window) and use shared response models, optional `view` and `fields` projections, and cursor pagination where supported. Every page is a separate metered query. Retail prices and invoices are managed by Leaflow Billing.
+ * Search and structured analytical queries use `QUERY` with JSON bodies. Resource reads use `GET` with path identifiers and query parameters; alternate identifiers use read-only `:lookup` operations. All data operations accept an optional `Idempotency-Key` header (24-hour replay window for safe retries) and use shared response models, optional `view` and `fields` projections, and cursor pagination where supported. Every page is a separate metered query. Retail prices and invoices are managed by Leaflow Billing.
  * OpenAPI spec version: 1.0.0
  */
 export interface FieldViolation {
@@ -5820,16 +5820,16 @@ export type GetAlibaba1688ProductParams = {
 
 export type GetAlibaba1688ProductHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListAlibaba1688ProductReviewsParams = {
@@ -5857,30 +5857,30 @@ export const ListAlibaba1688ProductReviewsSort = {
 
 export type ListAlibaba1688ProductReviewsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchAlibaba1688ProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListAlibaba1688ShopProductsParams = {
@@ -5912,16 +5912,16 @@ export const ListAlibaba1688ShopProductsSort = {
 
 export type ListAlibaba1688ShopProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetAliexpressProductParams = {
@@ -5936,16 +5936,16 @@ export type GetAliexpressProductParams = {
 
 export type GetAliexpressProductHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListAliexpressProductReviewsParams = {
@@ -5973,30 +5973,30 @@ export const ListAliexpressProductReviewsFilter = {
 
 export type ListAliexpressProductReviewsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchAliexpressProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListAllTrendsParams = {
@@ -6032,16 +6032,16 @@ export const ListAllTrendsPlatformsItem = {
 
 export type ListAllTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListAmazonBestsellersParams = {
@@ -6110,16 +6110,16 @@ export const ListAmazonBestsellersCountry = {
 
 export type ListAmazonBestsellersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetAmazonProductParams = {
@@ -6162,16 +6162,16 @@ export const GetAmazonProductCountry = {
 
 export type GetAmazonProductHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListAmazonProductReviewsParams = {
@@ -6232,30 +6232,30 @@ export const ListAmazonProductReviewsSort = {
 
 export type ListAmazonProductReviewsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchAmazonProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetAppStoreAppParams = {
@@ -6270,16 +6270,16 @@ export type GetAppStoreAppParams = {
 
 export type GetAppStoreAppHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupAppStoreAppParams = {
@@ -6299,16 +6299,16 @@ export type LookupAppStoreAppParams = {
 
 export type LookupAppStoreAppHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListAppStoreAppReviewsParams = {
@@ -6341,16 +6341,16 @@ export const ListAppStoreAppReviewsSort = {
 
 export type ListAppStoreAppReviewsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupAppStoreAppReviewsParams = {
@@ -6388,16 +6388,16 @@ export const LookupAppStoreAppReviewsSort = {
 
 export type LookupAppStoreAppReviewsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListBaiduTrendsParams = {
@@ -6407,16 +6407,16 @@ export type ListBaiduTrendsParams = {
 
 export type ListBaiduTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListBilibiliBackupUserVideosParams = {
@@ -6431,16 +6431,16 @@ export type ListBilibiliBackupUserVideosParams = {
 
 export type ListBilibiliBackupUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListBilibiliCommentRepliesParams = {
@@ -6455,16 +6455,16 @@ export type ListBilibiliCommentRepliesParams = {
 
 export type ListBilibiliCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetBilibiliLiveRoomParams = {
@@ -6474,16 +6474,16 @@ export type GetBilibiliLiveRoomParams = {
 
 export type GetBilibiliLiveRoomHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupBilibiliLiveRoomParams = {
@@ -6498,16 +6498,16 @@ export type LookupBilibiliLiveRoomParams = {
 
 export type LookupBilibiliLiveRoomHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetBilibiliLiveUserParams = {
@@ -6517,16 +6517,16 @@ export type GetBilibiliLiveUserParams = {
 
 export type GetBilibiliLiveUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListBilibiliTrendsParams = {
@@ -6548,16 +6548,16 @@ export const ListBilibiliTrendsBoard = {
 
 export type ListBilibiliTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetBilibiliUserParams = {
@@ -6567,16 +6567,16 @@ export type GetBilibiliUserParams = {
 
 export type GetBilibiliUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListBilibiliUserVideosParams = {
@@ -6591,16 +6591,16 @@ export type ListBilibiliUserVideosParams = {
 
 export type ListBilibiliUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListBilibiliVideoCommentsParams = {
@@ -6628,16 +6628,16 @@ export const ListBilibiliVideoCommentsSort = {
 
 export type ListBilibiliVideoCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetBilibiliVideoParams = {
@@ -6647,16 +6647,16 @@ export type GetBilibiliVideoParams = {
 
 export type GetBilibiliVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupBilibiliVideoParams = {
@@ -6671,30 +6671,30 @@ export type LookupBilibiliVideoParams = {
 
 export type LookupBilibiliVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchBilibiliVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListBilibiliTrendingVideosParams = {
@@ -6709,16 +6709,16 @@ export type ListBilibiliTrendingVideosParams = {
 
 export type ListBilibiliTrendingVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListBlueskyPostCommentsParams = {
@@ -6728,16 +6728,16 @@ export type ListBlueskyPostCommentsParams = {
 
 export type ListBlueskyPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupBlueskyPostCommentsParams = {
@@ -6752,16 +6752,16 @@ export type LookupBlueskyPostCommentsParams = {
 
 export type LookupBlueskyPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetBlueskyPostParams = {
@@ -6771,16 +6771,16 @@ export type GetBlueskyPostParams = {
 
 export type GetBlueskyPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupBlueskyPostParams = {
@@ -6795,16 +6795,16 @@ export type LookupBlueskyPostParams = {
 
 export type LookupBlueskyPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetBlueskyUserParams = {
@@ -6814,16 +6814,16 @@ export type GetBlueskyUserParams = {
 
 export type GetBlueskyUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupBlueskyUserParams = {
@@ -6838,16 +6838,16 @@ export type LookupBlueskyUserParams = {
 
 export type LookupBlueskyUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListBlueskyUserPostsParams = {
@@ -6876,16 +6876,16 @@ export const ListBlueskyUserPostsTab = {
 
 export type ListBlueskyUserPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupBlueskyUserPostsParams = {
@@ -6919,30 +6919,30 @@ export const LookupBlueskyUserPostsTab = {
 
 export type LookupBlueskyUserPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchBlueskyUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinBackupUserVideosParams = {
@@ -6957,16 +6957,16 @@ export type ListDouyinBackupUserVideosParams = {
 
 export type ListDouyinBackupUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupDouyinBackupUserVideosParams = {
@@ -6986,30 +6986,30 @@ export type LookupDouyinBackupUserVideosParams = {
 
 export type LookupDouyinBackupUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchDouyinBackupVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinCommentRepliesParams = {
@@ -7024,16 +7024,16 @@ export type ListDouyinCommentRepliesParams = {
 
 export type ListDouyinCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinHashtagVideosParams = {
@@ -7062,16 +7062,16 @@ export const ListDouyinHashtagVideosSort = {
 
 export type ListDouyinHashtagVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinIndexBrandHistoryParams = {
@@ -7091,16 +7091,16 @@ export type GetDouyinIndexBrandHistoryParams = {
 
 export type GetDouyinIndexBrandHistoryHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinIndexBrandMetricsParams = {
@@ -7120,16 +7120,16 @@ export type GetDouyinIndexBrandMetricsParams = {
 
 export type GetDouyinIndexBrandMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinIndexCreatorAudienceParams = {
@@ -7139,16 +7139,16 @@ export type GetDouyinIndexCreatorAudienceParams = {
 
 export type GetDouyinIndexCreatorAudienceHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinIndexCreatorMetricsParams = {
@@ -7158,16 +7158,16 @@ export type GetDouyinIndexCreatorMetricsParams = {
 
 export type GetDouyinIndexCreatorMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinIndexCreatorVideosParams = {
@@ -7187,16 +7187,16 @@ export type ListDouyinIndexCreatorVideosParams = {
 
 export type ListDouyinIndexCreatorVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinIndexKeywordAudienceParams = {
@@ -7216,30 +7216,30 @@ export type GetDouyinIndexKeywordAudienceParams = {
 
 export type GetDouyinIndexKeywordAudienceHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinIndexKeywordsHistoryHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinRelatedIndexKeywordsParams = {
@@ -7254,16 +7254,16 @@ export type ListDouyinRelatedIndexKeywordsParams = {
 
 export type ListDouyinRelatedIndexKeywordsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinIndexTrendsParams = {
@@ -7286,30 +7286,30 @@ export const ListDouyinIndexTrendsBoard = {
 
 export type ListDouyinIndexTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchDouyinIndexVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinRelatedKeywordsParams = {
@@ -7319,16 +7319,16 @@ export type ListDouyinRelatedKeywordsParams = {
 
 export type ListDouyinRelatedKeywordsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinLiveRoomParams = {
@@ -7338,16 +7338,16 @@ export type GetDouyinLiveRoomParams = {
 
 export type GetDouyinLiveRoomHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupDouyinLiveRoomParams = {
@@ -7362,16 +7362,16 @@ export type LookupDouyinLiveRoomParams = {
 
 export type LookupDouyinLiveRoomHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinLiveStreamerMetricsParams = {
@@ -7409,16 +7409,16 @@ export const GetDouyinLiveStreamerMetricsType = {
 
 export type GetDouyinLiveStreamerMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinTrendingLiveStreamersParams = {
@@ -7479,16 +7479,16 @@ export const ListDouyinTrendingLiveStreamersCategory = {
 
 export type ListDouyinTrendingLiveStreamersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinLiveUserParams = {
@@ -7498,16 +7498,16 @@ export type GetDouyinLiveUserParams = {
 
 export type GetDouyinLiveUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupDouyinLiveUserParams = {
@@ -7522,16 +7522,16 @@ export type LookupDouyinLiveUserParams = {
 
 export type LookupDouyinLiveUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinTrendsParams = {
@@ -7546,16 +7546,16 @@ export type ListDouyinTrendsParams = {
 
 export type ListDouyinTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinUserParams = {
@@ -7565,16 +7565,16 @@ export type GetDouyinUserParams = {
 
 export type GetDouyinUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupDouyinUserParams = {
@@ -7589,16 +7589,16 @@ export type LookupDouyinUserParams = {
 
 export type LookupDouyinUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupDouyinUserHistoryParams = {
@@ -7626,16 +7626,16 @@ export const LookupDouyinUserHistoryWindow = {
 
 export type LookupDouyinUserHistoryHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type BatchGetDouyinUsersHistoryParams = {
@@ -7665,30 +7665,30 @@ export const BatchGetDouyinUsersHistoryWindow = {
 
 export type BatchGetDouyinUsersHistoryHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchDouyinUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinUserVideosParams = {
@@ -7703,16 +7703,16 @@ export type ListDouyinUserVideosParams = {
 
 export type ListDouyinUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinVideoCommentsParams = {
@@ -7739,16 +7739,16 @@ export const ListDouyinVideoCommentsSort = {
 
 export type ListDouyinVideoCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinVideoParams = {
@@ -7758,16 +7758,16 @@ export type GetDouyinVideoParams = {
 
 export type GetDouyinVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupDouyinVideoParams = {
@@ -7782,16 +7782,16 @@ export type LookupDouyinVideoParams = {
 
 export type LookupDouyinVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinVideoMetricsParams = {
@@ -7801,16 +7801,16 @@ export type GetDouyinVideoMetricsParams = {
 
 export type GetDouyinVideoMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupDouyinVideoMetricsParams = {
@@ -7825,16 +7825,16 @@ export type LookupDouyinVideoMetricsParams = {
 
 export type LookupDouyinVideoMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinRelatedVideosParams = {
@@ -7844,30 +7844,30 @@ export type ListDouyinRelatedVideosParams = {
 
 export type ListDouyinRelatedVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchDouyinVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinTrendingVideosParams = {
@@ -7897,16 +7897,16 @@ export const ListDouyinTrendingVideosBoard = {
 
 export type ListDouyinTrendingVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinXingtuCampaignsParams = {
@@ -7926,16 +7926,16 @@ export type ListDouyinXingtuCampaignsParams = {
 
 export type ListDouyinXingtuCampaignsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinXingtuCreatorAudienceParams = {
@@ -7945,16 +7945,16 @@ export type GetDouyinXingtuCreatorAudienceParams = {
 
 export type GetDouyinXingtuCreatorAudienceHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinXingtuCreatorContentMixParams = {
@@ -7964,16 +7964,16 @@ export type GetDouyinXingtuCreatorContentMixParams = {
 
 export type GetDouyinXingtuCreatorContentMixHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinXingtuCreatorConversionParams = {
@@ -7983,16 +7983,16 @@ export type GetDouyinXingtuCreatorConversionParams = {
 
 export type GetDouyinXingtuCreatorConversionHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinXingtuCreatorParams = {
@@ -8002,16 +8002,16 @@ export type GetDouyinXingtuCreatorParams = {
 
 export type GetDouyinXingtuCreatorHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type BatchGetDouyinXingtuCreatorsParams = {
@@ -8029,16 +8029,16 @@ export type BatchGetDouyinXingtuCreatorsParams = {
 
 export type BatchGetDouyinXingtuCreatorsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinXingtuCreatorKeywordsParams = {
@@ -8048,16 +8048,16 @@ export type GetDouyinXingtuCreatorKeywordsParams = {
 
 export type GetDouyinXingtuCreatorKeywordsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinXingtuCreatorMetricsParams = {
@@ -8080,16 +8080,16 @@ export const GetDouyinXingtuCreatorMetricsWindow = {
 
 export type GetDouyinXingtuCreatorMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinXingtuCreatorRatesParams = {
@@ -8099,16 +8099,16 @@ export type GetDouyinXingtuCreatorRatesParams = {
 
 export type GetDouyinXingtuCreatorRatesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinXingtuCreatorScoresParams = {
@@ -8118,30 +8118,30 @@ export type GetDouyinXingtuCreatorScoresParams = {
 
 export type GetDouyinXingtuCreatorScoresHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchDouyinXingtuCreatorsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinXingtuCreatorVideosParams = {
@@ -8156,16 +8156,16 @@ export type ListDouyinXingtuCreatorVideosParams = {
 
 export type ListDouyinXingtuCreatorVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinXingtuVideoParams = {
@@ -8175,16 +8175,16 @@ export type GetDouyinXingtuVideoParams = {
 
 export type GetDouyinXingtuVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupDouyinXingtuVideoParams = {
@@ -8199,16 +8199,16 @@ export type LookupDouyinXingtuVideoParams = {
 
 export type LookupDouyinXingtuVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetDouyinShopProductParams = {
@@ -8218,16 +8218,16 @@ export type GetDouyinShopProductParams = {
 
 export type GetDouyinShopProductHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinShopProductReviewsParams = {
@@ -8242,30 +8242,30 @@ export type ListDouyinShopProductReviewsParams = {
 
 export type ListDouyinShopProductReviewsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchDouyinShopProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListDouyinShopShopProductsParams = {
@@ -8280,16 +8280,16 @@ export type ListDouyinShopShopProductsParams = {
 
 export type ListDouyinShopShopProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListGoogleAdvertiserAdsParams = {
@@ -8324,16 +8324,16 @@ export const ListGoogleAdvertiserAdsFormat = {
 
 export type ListGoogleAdvertiserAdsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupGoogleAdvertiserAdsParams = {
@@ -8373,30 +8373,30 @@ export const LookupGoogleAdvertiserAdsFormat = {
 
 export type LookupGoogleAdvertiserAdsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchGoogleAdvertisersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListInstagramCommentRepliesParams = {
@@ -8411,16 +8411,16 @@ export type ListInstagramCommentRepliesParams = {
 
 export type ListInstagramCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListInstagramHashtagPostsParams = {
@@ -8435,16 +8435,16 @@ export type ListInstagramHashtagPostsParams = {
 
 export type ListInstagramHashtagPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListInstagramPostCommentsParams = {
@@ -8459,16 +8459,16 @@ export type ListInstagramPostCommentsParams = {
 
 export type ListInstagramPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupInstagramPostCommentsParams = {
@@ -8488,16 +8488,16 @@ export type LookupInstagramPostCommentsParams = {
 
 export type LookupInstagramPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetInstagramPostParams = {
@@ -8507,16 +8507,16 @@ export type GetInstagramPostParams = {
 
 export type GetInstagramPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupInstagramPostParams = {
@@ -8531,16 +8531,16 @@ export type LookupInstagramPostParams = {
 
 export type LookupInstagramPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetInstagramPostTranscriptParams = {
@@ -8550,16 +8550,16 @@ export type GetInstagramPostTranscriptParams = {
 
 export type GetInstagramPostTranscriptHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupInstagramPostTranscriptParams = {
@@ -8574,16 +8574,16 @@ export type LookupInstagramPostTranscriptParams = {
 
 export type LookupInstagramPostTranscriptHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetInstagramUserParams = {
@@ -8593,16 +8593,16 @@ export type GetInstagramUserParams = {
 
 export type GetInstagramUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListInstagramUserPostsParams = {
@@ -8630,30 +8630,30 @@ export const ListInstagramUserPostsType = {
 
 export type ListInstagramUserPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchInstagramUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListKuaishouCommentRepliesParams = {
@@ -8668,16 +8668,16 @@ export type ListKuaishouCommentRepliesParams = {
 
 export type ListKuaishouCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListKuaishouTrendingLiveProductsParams = {
@@ -8687,16 +8687,16 @@ export type ListKuaishouTrendingLiveProductsParams = {
 
 export type ListKuaishouTrendingLiveProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListKuaishouTrendingLiveRoomsParams = {
@@ -8729,16 +8729,16 @@ export const ListKuaishouTrendingLiveRoomsBoard = {
 
 export type ListKuaishouTrendingLiveRoomsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetKuaishouLiveUserParams = {
@@ -8748,16 +8748,16 @@ export type GetKuaishouLiveUserParams = {
 
 export type GetKuaishouLiveUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListKuaishouTrendsParams = {
@@ -8772,16 +8772,16 @@ export type ListKuaishouTrendsParams = {
 
 export type ListKuaishouTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetKuaishouUserParams = {
@@ -8791,30 +8791,30 @@ export type GetKuaishouUserParams = {
 
 export type GetKuaishouUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchKuaishouUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListKuaishouUserVideosParams = {
@@ -8842,16 +8842,16 @@ export const ListKuaishouUserVideosSort = {
 
 export type ListKuaishouUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListKuaishouVideoCommentsParams = {
@@ -8866,16 +8866,16 @@ export type ListKuaishouVideoCommentsParams = {
 
 export type ListKuaishouVideoCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupKuaishouVideoCommentsParams = {
@@ -8895,16 +8895,16 @@ export type LookupKuaishouVideoCommentsParams = {
 
 export type LookupKuaishouVideoCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetKuaishouVideoParams = {
@@ -8914,16 +8914,16 @@ export type GetKuaishouVideoParams = {
 
 export type GetKuaishouVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupKuaishouVideoParams = {
@@ -8938,30 +8938,30 @@ export type LookupKuaishouVideoParams = {
 
 export type LookupKuaishouVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchKuaishouVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetMetaAdParams = {
@@ -8971,16 +8971,16 @@ export type GetMetaAdParams = {
 
 export type GetMetaAdHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupMetaAdParams = {
@@ -8995,30 +8995,30 @@ export type LookupMetaAdParams = {
 
 export type LookupMetaAdHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchMetaAdsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListMetaAdvertiserAdsParams = {
@@ -9079,16 +9079,16 @@ export const ListMetaAdvertiserAdsSort = {
 
 export type ListMetaAdvertiserAdsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupMetaAdvertiserAdsParams = {
@@ -9154,16 +9154,16 @@ export const LookupMetaAdvertiserAdsSort = {
 
 export type LookupMetaAdvertiserAdsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListRedditPopularPostsParams = {
@@ -9178,16 +9178,16 @@ export type ListRedditPopularPostsParams = {
 
 export type ListRedditPopularPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListRedditPostCommentsParams = {
@@ -9216,16 +9216,16 @@ export const ListRedditPostCommentsSort = {
 
 export type ListRedditPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupRedditPostCommentsParams = {
@@ -9259,16 +9259,16 @@ export const LookupRedditPostCommentsSort = {
 
 export type LookupRedditPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetRedditPostParams = {
@@ -9278,16 +9278,16 @@ export type GetRedditPostParams = {
 
 export type GetRedditPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupRedditPostParams = {
@@ -9302,30 +9302,30 @@ export type LookupRedditPostParams = {
 
 export type LookupRedditPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchRedditPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetRedditPostTranscriptParams = {
@@ -9335,16 +9335,16 @@ export type GetRedditPostTranscriptParams = {
 
 export type GetRedditPostTranscriptHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupRedditPostTranscriptParams = {
@@ -9359,16 +9359,16 @@ export type LookupRedditPostTranscriptParams = {
 
 export type LookupRedditPostTranscriptHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetRedditSubredditParams = {
@@ -9378,16 +9378,16 @@ export type GetRedditSubredditParams = {
 
 export type GetRedditSubredditHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListRedditSubredditPostsParams = {
@@ -9432,16 +9432,16 @@ export const ListRedditSubredditPostsPublishedWithin = {
 
 export type ListRedditSubredditPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListRedditTrendsParams = {
@@ -9456,16 +9456,16 @@ export type ListRedditTrendsParams = {
 
 export type ListRedditTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetRedditUserParams = {
@@ -9475,16 +9475,16 @@ export type GetRedditUserParams = {
 
 export type GetRedditUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListRedditUserPostsParams = {
@@ -9499,16 +9499,16 @@ export type ListRedditUserPostsParams = {
 
 export type ListRedditUserPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListRedditUserSubredditsParams = {
@@ -9523,16 +9523,16 @@ export type ListRedditUserSubredditsParams = {
 
 export type ListRedditUserSubredditsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTaobaoProductParams = {
@@ -9542,16 +9542,16 @@ export type GetTaobaoProductParams = {
 
 export type GetTaobaoProductHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTaobaoProductReviewsParams = {
@@ -9579,30 +9579,30 @@ export const ListTaobaoProductReviewsSort = {
 
 export type ListTaobaoProductReviewsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchTaobaoProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTaobaoShopProductsParams = {
@@ -9638,16 +9638,16 @@ export const ListTaobaoShopProductsSort = {
 
 export type ListTaobaoShopProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTelegramChannelParams = {
@@ -9657,16 +9657,16 @@ export type GetTelegramChannelParams = {
 
 export type GetTelegramChannelHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTelegramChannelMessagesParams = {
@@ -9681,16 +9681,16 @@ export type ListTelegramChannelMessagesParams = {
 
 export type ListTelegramChannelMessagesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTelegramMessageParams = {
@@ -9700,16 +9700,16 @@ export type GetTelegramMessageParams = {
 
 export type GetTelegramMessageHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupTelegramMessageParams = {
@@ -9724,30 +9724,30 @@ export type LookupTelegramMessageParams = {
 
 export type LookupTelegramMessageHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchTiktokAdsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTiktokCommentRepliesParams = {
@@ -9762,16 +9762,16 @@ export type ListTiktokCommentRepliesParams = {
 
 export type ListTiktokCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTiktokCreativeCenterAdParams = {
@@ -9781,30 +9781,30 @@ export type GetTiktokCreativeCenterAdParams = {
 
 export type GetTiktokCreativeCenterAdHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchTiktokCreativeCenterAdsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTiktokHashtagVideosParams = {
@@ -9819,16 +9819,16 @@ export type ListTiktokHashtagVideosParams = {
 
 export type ListTiktokHashtagVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTiktokLiveRoomProductsParams = {
@@ -9848,16 +9848,16 @@ export type ListTiktokLiveRoomProductsParams = {
 
 export type ListTiktokLiveRoomProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTiktokTrendingLiveStreamersParams = {
@@ -9867,16 +9867,16 @@ export type ListTiktokTrendingLiveStreamersParams = {
 
 export type ListTiktokTrendingLiveStreamersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTiktokLiveUserParams = {
@@ -9886,16 +9886,16 @@ export type GetTiktokLiveUserParams = {
 
 export type GetTiktokLiveUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTiktokShopProductParams = {
@@ -9910,16 +9910,16 @@ export type GetTiktokShopProductParams = {
 
 export type GetTiktokShopProductHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupTiktokShopProductParams = {
@@ -9939,16 +9939,16 @@ export type LookupTiktokShopProductParams = {
 
 export type LookupTiktokShopProductHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTiktokShopProductReviewsParams = {
@@ -9968,30 +9968,30 @@ export type ListTiktokShopProductReviewsParams = {
 
 export type ListTiktokShopProductReviewsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchTiktokShopProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTiktokShopSellerProductsParams = {
@@ -10006,16 +10006,16 @@ export type ListTiktokShopSellerProductsParams = {
 
 export type ListTiktokShopSellerProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTiktokUserFollowersParams = {
@@ -10030,16 +10030,16 @@ export type ListTiktokUserFollowersParams = {
 
 export type ListTiktokUserFollowersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupTiktokUserFollowersParams = {
@@ -10059,16 +10059,16 @@ export type LookupTiktokUserFollowersParams = {
 
 export type LookupTiktokUserFollowersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTiktokUserParams = {
@@ -10078,30 +10078,30 @@ export type GetTiktokUserParams = {
 
 export type GetTiktokUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchTiktokUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTiktokUserVideosParams = {
@@ -10129,16 +10129,16 @@ export const ListTiktokUserVideosSort = {
 
 export type ListTiktokUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListTiktokVideoCommentsParams = {
@@ -10153,16 +10153,16 @@ export type ListTiktokVideoCommentsParams = {
 
 export type ListTiktokVideoCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTiktokVideoParams = {
@@ -10172,16 +10172,16 @@ export type GetTiktokVideoParams = {
 
 export type GetTiktokVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupTiktokVideoParams = {
@@ -10196,30 +10196,30 @@ export type LookupTiktokVideoParams = {
 
 export type LookupTiktokVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchTiktokVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTiktokVideoTranscriptParams = {
@@ -10234,16 +10234,16 @@ export type GetTiktokVideoTranscriptParams = {
 
 export type GetTiktokVideoTranscriptHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupTiktokVideoTranscriptParams = {
@@ -10263,16 +10263,16 @@ export type LookupTiktokVideoTranscriptParams = {
 
 export type LookupTiktokVideoTranscriptHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetToutiaoArticleParams = {
@@ -10282,16 +10282,16 @@ export type GetToutiaoArticleParams = {
 
 export type GetToutiaoArticleHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupToutiaoArticleParams = {
@@ -10306,16 +10306,16 @@ export type LookupToutiaoArticleParams = {
 
 export type LookupToutiaoArticleHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListToutiaoPostCommentsParams = {
@@ -10330,16 +10330,16 @@ export type ListToutiaoPostCommentsParams = {
 
 export type ListToutiaoPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupToutiaoPostCommentsParams = {
@@ -10359,16 +10359,16 @@ export type LookupToutiaoPostCommentsParams = {
 
 export type LookupToutiaoPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListToutiaoTrendsParams = {
@@ -10378,16 +10378,16 @@ export type ListToutiaoTrendsParams = {
 
 export type ListToutiaoTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetToutiaoUserParams = {
@@ -10397,16 +10397,16 @@ export type GetToutiaoUserParams = {
 
 export type GetToutiaoUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupToutiaoUserParams = {
@@ -10421,16 +10421,16 @@ export type LookupToutiaoUserParams = {
 
 export type LookupToutiaoUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetToutiaoVideoParams = {
@@ -10440,16 +10440,16 @@ export type GetToutiaoVideoParams = {
 
 export type GetToutiaoVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupToutiaoVideoParams = {
@@ -10464,16 +10464,16 @@ export type LookupToutiaoVideoParams = {
 
 export type LookupToutiaoVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetTwitchLiveUserParams = {
@@ -10483,44 +10483,44 @@ export type GetTwitchLiveUserParams = {
 
 export type GetTwitchLiveUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWechatAccountsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWechatBackupPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWechatIndexKeywordsHistoryParams = {
@@ -10530,16 +10530,16 @@ export type GetWechatIndexKeywordsHistoryParams = {
 
 export type GetWechatIndexKeywordsHistoryHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatRelatedKeywordsParams = {
@@ -10549,44 +10549,44 @@ export type ListWechatRelatedKeywordsParams = {
 
 export type ListWechatRelatedKeywordsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWechatMiniprogramsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWechatPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWechatChannelsBackupUserParams = {
@@ -10596,16 +10596,16 @@ export type GetWechatChannelsBackupUserParams = {
 
 export type GetWechatChannelsBackupUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatChannelsBackupUserVideosParams = {
@@ -10620,30 +10620,30 @@ export type ListWechatChannelsBackupUserVideosParams = {
 
 export type ListWechatChannelsBackupUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWechatChannelsBackupVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatChannelsCollectionVideosParams = {
@@ -10658,16 +10658,16 @@ export type ListWechatChannelsCollectionVideosParams = {
 
 export type ListWechatChannelsCollectionVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatChannelsCommentRepliesParams = {
@@ -10682,16 +10682,16 @@ export type ListWechatChannelsCommentRepliesParams = {
 
 export type ListWechatChannelsCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWechatChannelsLiveRoomParams = {
@@ -10706,16 +10706,16 @@ export type GetWechatChannelsLiveRoomParams = {
 
 export type GetWechatChannelsLiveRoomHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWechatChannelsLiveUserParams = {
@@ -10725,16 +10725,16 @@ export type GetWechatChannelsLiveUserParams = {
 
 export type GetWechatChannelsLiveUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatChannelsUserCollectionsParams = {
@@ -10744,16 +10744,16 @@ export type ListWechatChannelsUserCollectionsParams = {
 
 export type ListWechatChannelsUserCollectionsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWechatChannelsUserParams = {
@@ -10763,16 +10763,16 @@ export type GetWechatChannelsUserParams = {
 
 export type GetWechatChannelsUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatChannelsUserLiveReplaysParams = {
@@ -10787,30 +10787,30 @@ export type ListWechatChannelsUserLiveReplaysParams = {
 
 export type ListWechatChannelsUserLiveReplaysHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWechatChannelsUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatChannelsUserVideosParams = {
@@ -10825,16 +10825,16 @@ export type ListWechatChannelsUserVideosParams = {
 
 export type ListWechatChannelsUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatChannelsVideoCommentsParams = {
@@ -10849,16 +10849,16 @@ export type ListWechatChannelsVideoCommentsParams = {
 
 export type ListWechatChannelsVideoCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWechatChannelsVideoParams = {
@@ -10868,16 +10868,16 @@ export type GetWechatChannelsVideoParams = {
 
 export type GetWechatChannelsVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupWechatChannelsVideoParams = {
@@ -10892,16 +10892,16 @@ export type LookupWechatChannelsVideoParams = {
 
 export type LookupWechatChannelsVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWechatChannelsVideoMetricsParams = {
@@ -10911,44 +10911,44 @@ export type GetWechatChannelsVideoMetricsParams = {
 
 export type GetWechatChannelsVideoMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWechatChannelsVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type CreateWechatChannelsVideoShareLinkHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatMpAccountArticlesParams = {
@@ -10977,16 +10977,16 @@ export const ListWechatMpAccountArticlesTab = {
 
 export type ListWechatMpAccountArticlesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWechatMpAccountParams = {
@@ -10996,16 +10996,16 @@ export type GetWechatMpAccountParams = {
 
 export type GetWechatMpAccountHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWechatMpAccountOwnerParams = {
@@ -11015,30 +11015,30 @@ export type GetWechatMpAccountOwnerParams = {
 
 export type GetWechatMpAccountOwnerHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWechatMpAccountsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupWechatMpArticleCommentsParams = {
@@ -11058,16 +11058,16 @@ export type LookupWechatMpArticleCommentsParams = {
 
 export type LookupWechatMpArticleCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupWechatMpArticleParams = {
@@ -11082,16 +11082,16 @@ export type LookupWechatMpArticleParams = {
 
 export type LookupWechatMpArticleHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupWechatMpArticleMetricsParams = {
@@ -11106,16 +11106,16 @@ export type LookupWechatMpArticleMetricsParams = {
 
 export type LookupWechatMpArticleMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWechatMpCommentRepliesParams = {
@@ -11130,16 +11130,16 @@ export type ListWechatMpCommentRepliesParams = {
 
 export type ListWechatMpCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWeiboBackupTrendsParams = {
@@ -11161,16 +11161,16 @@ export const ListWeiboBackupTrendsBoard = {
 
 export type ListWeiboBackupTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWeiboCommentRepliesParams = {
@@ -11185,16 +11185,16 @@ export type ListWeiboCommentRepliesParams = {
 
 export type ListWeiboCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWeiboPostCommentsParams = {
@@ -11209,16 +11209,16 @@ export type ListWeiboPostCommentsParams = {
 
 export type ListWeiboPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupWeiboPostCommentsParams = {
@@ -11238,16 +11238,16 @@ export type LookupWeiboPostCommentsParams = {
 
 export type LookupWeiboPostCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWeiboPostParams = {
@@ -11257,16 +11257,16 @@ export type GetWeiboPostParams = {
 
 export type GetWeiboPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupWeiboPostParams = {
@@ -11281,16 +11281,16 @@ export type LookupWeiboPostParams = {
 
 export type LookupWeiboPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWeiboPostLikersParams = {
@@ -11300,16 +11300,16 @@ export type ListWeiboPostLikersParams = {
 
 export type ListWeiboPostLikersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupWeiboPostLikersParams = {
@@ -11324,30 +11324,30 @@ export type LookupWeiboPostLikersParams = {
 
 export type LookupWeiboPostLikersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWeiboPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWeiboTrendsParams = {
@@ -11362,16 +11362,16 @@ export type ListWeiboTrendsParams = {
 
 export type ListWeiboTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWeiboUserFollowersParams = {
@@ -11386,16 +11386,16 @@ export type ListWeiboUserFollowersParams = {
 
 export type ListWeiboUserFollowersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetWeiboUserParams = {
@@ -11405,16 +11405,16 @@ export type GetWeiboUserParams = {
 
 export type GetWeiboUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListWeiboUserPostsParams = {
@@ -11429,30 +11429,30 @@ export type ListWeiboUserPostsParams = {
 
 export type ListWeiboUserPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchWeiboUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXCommunityParams = {
@@ -11462,16 +11462,16 @@ export type GetXCommunityParams = {
 
 export type GetXCommunityHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXCommunityMembersParams = {
@@ -11486,16 +11486,16 @@ export type ListXCommunityMembersParams = {
 
 export type ListXCommunityMembersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXCommunityPostsParams = {
@@ -11510,16 +11510,16 @@ export type ListXCommunityPostsParams = {
 
 export type ListXCommunityPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXListFollowersParams = {
@@ -11529,16 +11529,16 @@ export type ListXListFollowersParams = {
 
 export type ListXListFollowersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXListMembersParams = {
@@ -11553,16 +11553,16 @@ export type ListXListMembersParams = {
 
 export type ListXListMembersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXListPostsParams = {
@@ -11577,16 +11577,16 @@ export type ListXListPostsParams = {
 
 export type ListXListPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXPostArticleParams = {
@@ -11596,16 +11596,16 @@ export type GetXPostArticleParams = {
 
 export type GetXPostArticleHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXPostParams = {
@@ -11615,16 +11615,16 @@ export type GetXPostParams = {
 
 export type GetXPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupXPostParams = {
@@ -11639,16 +11639,16 @@ export type LookupXPostParams = {
 
 export type LookupXPostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXPostQuotesParams = {
@@ -11675,16 +11675,16 @@ export const ListXPostQuotesSort = {
 
 export type ListXPostQuotesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXPostRepliesParams = {
@@ -11699,16 +11699,16 @@ export type ListXPostRepliesParams = {
 
 export type ListXPostRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXPostRetweetersParams = {
@@ -11723,30 +11723,30 @@ export type ListXPostRetweetersParams = {
 
 export type ListXPostRetweetersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchXPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXThreadPostsParams = {
@@ -11761,16 +11761,16 @@ export type ListXThreadPostsParams = {
 
 export type ListXThreadPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXTrendsParams = {
@@ -11790,16 +11790,16 @@ export type ListXTrendsParams = {
 
 export type ListXTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXUserFollowersParams = {
@@ -11814,16 +11814,16 @@ export type ListXUserFollowersParams = {
 
 export type ListXUserFollowersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXUserFollowingParams = {
@@ -11838,16 +11838,16 @@ export type ListXUserFollowingParams = {
 
 export type ListXUserFollowingHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXUserParams = {
@@ -11857,16 +11857,16 @@ export type GetXUserParams = {
 
 export type GetXUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupXUserParams = {
@@ -11881,16 +11881,16 @@ export type LookupXUserParams = {
 
 export type LookupXUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type BatchGetXUsersParams = {
@@ -11908,16 +11908,16 @@ export type BatchGetXUsersParams = {
 
 export type BatchGetXUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXUserMentionsParams = {
@@ -11932,16 +11932,16 @@ export type ListXUserMentionsParams = {
 
 export type ListXUserMentionsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXUserPostsParams = {
@@ -11956,30 +11956,30 @@ export type ListXUserPostsParams = {
 
 export type ListXUserPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchXUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXianyuProductParams = {
@@ -11989,30 +11989,30 @@ export type GetXianyuProductParams = {
 
 export type GetXianyuProductHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchXianyuProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuCommentRepliesParams = {
@@ -12027,30 +12027,30 @@ export type ListXiaohongshuCommentRepliesParams = {
 
 export type ListXiaohongshuCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchXiaohongshuImagesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuRelatedKeywordsParams = {
@@ -12060,16 +12060,16 @@ export type ListXiaohongshuRelatedKeywordsParams = {
 
 export type ListXiaohongshuRelatedKeywordsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuNoteCommentsParams = {
@@ -12084,16 +12084,16 @@ export type ListXiaohongshuNoteCommentsParams = {
 
 export type ListXiaohongshuNoteCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuNoteParams = {
@@ -12103,16 +12103,16 @@ export type GetXiaohongshuNoteParams = {
 
 export type GetXiaohongshuNoteHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupXiaohongshuNoteParams = {
@@ -12127,30 +12127,30 @@ export type LookupXiaohongshuNoteParams = {
 
 export type LookupXiaohongshuNoteHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchXiaohongshuNotesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuPgyCreatorAudienceParams = {
@@ -12160,16 +12160,16 @@ export type GetXiaohongshuPgyCreatorAudienceParams = {
 
 export type GetXiaohongshuPgyCreatorAudienceHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuPgyCreatorCostsHistoryParams = {
@@ -12205,16 +12205,16 @@ export const GetXiaohongshuPgyCreatorCostsHistoryTab = {
 
 export type GetXiaohongshuPgyCreatorCostsHistoryHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuPgyCreatorCostsMetricsParams = {
@@ -12237,16 +12237,16 @@ export const GetXiaohongshuPgyCreatorCostsMetricsTab = {
 
 export type GetXiaohongshuPgyCreatorCostsMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuPgyCreatorFollowersHistoryParams = {
@@ -12269,16 +12269,16 @@ export const GetXiaohongshuPgyCreatorFollowersHistoryWindow = {
 
 export type GetXiaohongshuPgyCreatorFollowersHistoryHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuPgyCreatorFollowersMetricsParams = {
@@ -12288,16 +12288,16 @@ export type GetXiaohongshuPgyCreatorFollowersMetricsParams = {
 
 export type GetXiaohongshuPgyCreatorFollowersMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuPgyCreatorParams = {
@@ -12307,16 +12307,16 @@ export type GetXiaohongshuPgyCreatorParams = {
 
 export type GetXiaohongshuPgyCreatorHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuPgyCreatorMetricsParams = {
@@ -12352,16 +12352,16 @@ export const GetXiaohongshuPgyCreatorMetricsTab = {
 
 export type GetXiaohongshuPgyCreatorMetricsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuPgyCreatorNotesParams = {
@@ -12440,16 +12440,16 @@ export const ListXiaohongshuPgyCreatorNotesTraffic = {
 
 export type ListXiaohongshuPgyCreatorNotesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuRelatedPgyCreatorsParams = {
@@ -12464,30 +12464,30 @@ export type ListXiaohongshuRelatedPgyCreatorsParams = {
 
 export type ListXiaohongshuRelatedPgyCreatorsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchXiaohongshuPgyCreatorsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuPgyKeywordsHistoryParams = {
@@ -12497,16 +12497,16 @@ export type GetXiaohongshuPgyKeywordsHistoryParams = {
 
 export type GetXiaohongshuPgyKeywordsHistoryHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuRelatedPgyKeywordsParams = {
@@ -12516,16 +12516,16 @@ export type ListXiaohongshuRelatedPgyKeywordsParams = {
 
 export type ListXiaohongshuRelatedPgyKeywordsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuPgyNoteParams = {
@@ -12535,16 +12535,16 @@ export type GetXiaohongshuPgyNoteParams = {
 
 export type GetXiaohongshuPgyNoteHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuTrendingPgyNotesParams = {
@@ -12611,16 +12611,16 @@ export const ListXiaohongshuTrendingPgyNotesType = {
 
 export type ListXiaohongshuTrendingPgyNotesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuShopProductParams = {
@@ -12630,16 +12630,16 @@ export type GetXiaohongshuShopProductParams = {
 
 export type GetXiaohongshuShopProductHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuShopProductReviewsParams = {
@@ -12667,30 +12667,30 @@ export const ListXiaohongshuShopProductReviewsSort = {
 
 export type ListXiaohongshuShopProductReviewsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchXiaohongshuShopProductsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuTopicParams = {
@@ -12700,16 +12700,16 @@ export type GetXiaohongshuTopicParams = {
 
 export type GetXiaohongshuTopicHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuTopicNotesParams = {
@@ -12719,16 +12719,16 @@ export type ListXiaohongshuTopicNotesParams = {
 
 export type ListXiaohongshuTopicNotesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuTrendsParams = {
@@ -12743,16 +12743,16 @@ export type ListXiaohongshuTrendsParams = {
 
 export type ListXiaohongshuTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuUserParams = {
@@ -12762,16 +12762,16 @@ export type GetXiaohongshuUserParams = {
 
 export type GetXiaohongshuUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupXiaohongshuUserParams = {
@@ -12786,16 +12786,16 @@ export type LookupXiaohongshuUserParams = {
 
 export type LookupXiaohongshuUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiaohongshuUserNotesParams = {
@@ -12810,30 +12810,30 @@ export type ListXiaohongshuUserNotesParams = {
 
 export type ListXiaohongshuUserNotesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchXiaohongshuUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiaohongshuVideoParams = {
@@ -12843,16 +12843,16 @@ export type GetXiaohongshuVideoParams = {
 
 export type GetXiaohongshuVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupXiaohongshuVideoParams = {
@@ -12867,16 +12867,16 @@ export type LookupXiaohongshuVideoParams = {
 
 export type LookupXiaohongshuVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiguaUserParams = {
@@ -12886,16 +12886,16 @@ export type GetXiguaUserParams = {
 
 export type GetXiguaUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupXiguaUserParams = {
@@ -12910,16 +12910,16 @@ export type LookupXiguaUserParams = {
 
 export type LookupXiguaUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiguaUserVideosParams = {
@@ -12934,16 +12934,16 @@ export type ListXiguaUserVideosParams = {
 
 export type ListXiguaUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupXiguaUserVideosParams = {
@@ -12963,16 +12963,16 @@ export type LookupXiguaUserVideosParams = {
 
 export type LookupXiguaUserVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListXiguaVideoCommentsParams = {
@@ -12987,16 +12987,16 @@ export type ListXiguaVideoCommentsParams = {
 
 export type ListXiguaVideoCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupXiguaVideoCommentsParams = {
@@ -13016,16 +13016,16 @@ export type LookupXiguaVideoCommentsParams = {
 
 export type LookupXiguaVideoCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetXiguaVideoParams = {
@@ -13035,16 +13035,16 @@ export type GetXiguaVideoParams = {
 
 export type GetXiguaVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupXiguaVideoParams = {
@@ -13059,30 +13059,30 @@ export type LookupXiguaVideoParams = {
 
 export type LookupXiguaVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchXiguaVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetYoutubeChannelParams = {
@@ -13092,16 +13092,16 @@ export type GetYoutubeChannelParams = {
 
 export type GetYoutubeChannelHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupYoutubeChannelParams = {
@@ -13116,16 +13116,16 @@ export type LookupYoutubeChannelParams = {
 
 export type LookupYoutubeChannelHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListYoutubeChannelPostsParams = {
@@ -13140,16 +13140,16 @@ export type ListYoutubeChannelPostsParams = {
 
 export type ListYoutubeChannelPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupYoutubeChannelPostsParams = {
@@ -13169,30 +13169,30 @@ export type LookupYoutubeChannelPostsParams = {
 
 export type LookupYoutubeChannelPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchYoutubeChannelsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListYoutubeChannelVideosParams = {
@@ -13232,16 +13232,16 @@ export const ListYoutubeChannelVideosSort = {
 
 export type ListYoutubeChannelVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupYoutubeChannelVideosParams = {
@@ -13286,16 +13286,16 @@ export const LookupYoutubeChannelVideosSort = {
 
 export type LookupYoutubeChannelVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupYoutubeCommentRepliesParams = {
@@ -13315,16 +13315,16 @@ export type LookupYoutubeCommentRepliesParams = {
 
 export type LookupYoutubeCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetYoutubePostParams = {
@@ -13334,16 +13334,16 @@ export type GetYoutubePostParams = {
 
 export type GetYoutubePostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupYoutubePostParams = {
@@ -13358,16 +13358,16 @@ export type LookupYoutubePostParams = {
 
 export type LookupYoutubePostHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListYoutubeVideoCommentsParams = {
@@ -13395,16 +13395,16 @@ export const ListYoutubeVideoCommentsSort = {
 
 export type ListYoutubeVideoCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetYoutubeVideoParams = {
@@ -13414,16 +13414,16 @@ export type GetYoutubeVideoParams = {
 
 export type GetYoutubeVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupYoutubeVideoParams = {
@@ -13438,30 +13438,30 @@ export type LookupYoutubeVideoParams = {
 
 export type LookupYoutubeVideoHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchYoutubeVideosHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetYoutubeVideoTranscriptParams = {
@@ -13476,16 +13476,16 @@ export type GetYoutubeVideoTranscriptParams = {
 
 export type GetYoutubeVideoTranscriptHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListZhihuAnswerCommentsParams = {
@@ -13500,16 +13500,16 @@ export type ListZhihuAnswerCommentsParams = {
 
 export type ListZhihuAnswerCommentsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetZhihuAnswerParams = {
@@ -13519,16 +13519,16 @@ export type GetZhihuAnswerParams = {
 
 export type GetZhihuAnswerHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupZhihuAnswerParams = {
@@ -13543,16 +13543,16 @@ export type LookupZhihuAnswerParams = {
 
 export type LookupZhihuAnswerHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetZhihuArticleParams = {
@@ -13562,16 +13562,16 @@ export type GetZhihuArticleParams = {
 
 export type GetZhihuArticleHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupZhihuArticleParams = {
@@ -13586,16 +13586,16 @@ export type LookupZhihuArticleParams = {
 
 export type LookupZhihuArticleHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListZhihuColumnArticlesParams = {
@@ -13610,16 +13610,16 @@ export type ListZhihuColumnArticlesParams = {
 
 export type ListZhihuColumnArticlesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListZhihuCommentRepliesParams = {
@@ -13634,16 +13634,16 @@ export type ListZhihuCommentRepliesParams = {
 
 export type ListZhihuCommentRepliesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetZhihuPinParams = {
@@ -13653,16 +13653,16 @@ export type GetZhihuPinParams = {
 
 export type GetZhihuPinHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupZhihuPinParams = {
@@ -13677,30 +13677,30 @@ export type LookupZhihuPinParams = {
 
 export type LookupZhihuPinHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchZhihuPostsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListZhihuQuestionAnswersParams = {
@@ -13715,16 +13715,16 @@ export type ListZhihuQuestionAnswersParams = {
 
 export type ListZhihuQuestionAnswersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupZhihuQuestionAnswersParams = {
@@ -13744,16 +13744,16 @@ export type LookupZhihuQuestionAnswersParams = {
 
 export type LookupZhihuQuestionAnswersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetZhihuQuestionParams = {
@@ -13763,16 +13763,16 @@ export type GetZhihuQuestionParams = {
 
 export type GetZhihuQuestionHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type LookupZhihuQuestionParams = {
@@ -13787,16 +13787,16 @@ export type LookupZhihuQuestionParams = {
 
 export type LookupZhihuQuestionHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListZhihuTrendsParams = {
@@ -13806,16 +13806,16 @@ export type ListZhihuTrendsParams = {
 
 export type ListZhihuTrendsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListZhihuUserAnswersParams = {
@@ -13830,16 +13830,16 @@ export type ListZhihuUserAnswersParams = {
 
 export type ListZhihuUserAnswersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListZhihuUserArticlesParams = {
@@ -13854,16 +13854,16 @@ export type ListZhihuUserArticlesParams = {
 
 export type ListZhihuUserArticlesHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListZhihuUserFollowersParams = {
@@ -13878,16 +13878,16 @@ export type ListZhihuUserFollowersParams = {
 
 export type ListZhihuUserFollowersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type GetZhihuUserParams = {
@@ -13897,16 +13897,16 @@ export type GetZhihuUserParams = {
 
 export type GetZhihuUserHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type ListZhihuUserPinsParams = {
@@ -13921,28 +13921,28 @@ export type ListZhihuUserPinsParams = {
 
 export type ListZhihuUserPinsHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
 
 export type SearchZhihuUsersHeaders = {
   /**
-   * Use a new key for each query or page. Keys are scoped to the project and valid for 24 hours.
+   * Optional caller-supplied idempotency key for 24-hour retry replay (scoped to the project).
    *
-   * Retry with the same key and request parameters to replay a completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
+   * Omit this header for one-off queries. Supply a unique key per query or page when you want safe retries: retrying with the same key and request parameters replays the completed result at no extra charge (meta.replayed is true). Reusing a key with a different request returns 409 IDEMPOTENCY_CONFLICT; an in-flight request returns 409 QUERY_IN_PROGRESS.
    *
    * After 24 hours, the same key starts a new metered query.
    * @minLength 1
    * @maxLength 255
    * @pattern ^[!-~]+$
    */
-  "Idempotency-Key": string;
+  "Idempotency-Key"?: string;
 };
