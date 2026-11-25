@@ -16,6 +16,9 @@ export const PaymentMethod = zod.strictObject({
   exp_month: zod.int().nullish(),
   exp_year: zod.int().nullish(),
   is_default: zod.boolean(),
+  fingerprint: zod.string().nullish(),
+  invoice_collection_authorized_at: zod.iso.datetime({ offset: true }).nullish(),
+  created_at: zod.iso.datetime({ offset: true }),
   status: zod.enum(["active", "expired", "removed"]),
 });
 

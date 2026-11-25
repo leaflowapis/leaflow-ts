@@ -47,6 +47,12 @@ export const CheckoutSession = zod
         "When a change takes effect, as on the order it creates; `none` for anything that is not a change.",
       ),
     status: CheckoutSessionStatus.describe("`open` in a preview."),
+    revision: zod
+      .int()
+      .min(1)
+      .describe(
+        "Incremented on every persisted session change and used for optimistic concurrency.",
+      ),
     currency: zod.string(),
     checkout: CheckoutOptions.describe(
       "The checkout choices, as the purchase gave them and as you saved them since. Billing does not check\n`return_url`; validate it before navigating.",

@@ -11,11 +11,11 @@ import { Money } from "./money.zod.js";
 
 export const AccountBalance = zod
   .strictObject({
-    available_credit: Money.describe(
-      "Balance minus pending balance returns and the part of unbilled_amount and due that estimated_credit_applied does not cover. Open usage therefore reduces available_credit before a usage invoice exists. Negative only when the balance and applicable credit fall short of what the account owes.",
+    available_balance: Money.describe(
+      "Total funds available for current charges. It is the account balance plus remaining credits, minus pending balance returns, unbilled usage and the amount due on issued invoices. Credits with restrictions remain included and are detailed in credit_groups.",
     ),
     estimated_credit_applied: Money.describe(
-      "Credit expected to pay unbilled_amount and due, matching each charge to the grants whose scope, validity and conditions it meets, in the order credit is applied at payment. Nothing is deducted until an invoice is paid, so credits still includes this amount.",
+      "Credit expected to pay unbilled_amount and amount_due, matching each charge to the grants whose scope, validity and conditions it meets, in the order credit is applied at payment. Nothing is deducted until an invoice is paid, so credits still includes this amount.",
     ),
     unbilled_amount: Money.describe(
       "Current estimate of priced usage that has not been invoiced. Final pricing and tax are fixed at issuance.",
@@ -23,23 +23,23 @@ export const AccountBalance = zod
     billing_account_id: zod.int(),
     currency: zod.string(),
     balance: Money.describe(
-      "Topped-up funds in the account's currency, excluding credits. May be negative after a payment dispute. Amounts owed are reported in due; this is not a withdrawable amount.",
+      "Topped-up funds in the account's currency, excluding credits. May be negative after a payment dispute. Amounts owed are reported in amount_due; this is not a withdrawable amount.",
     ),
     credits: Money.describe(
       "Remaining credit, including restricted grants; not withdrawable and not part of balance. credit_groups shows currently valid credit by permitted use; positive credits do not mean due is zero.",
     ),
     restricted_credits: Money.describe(
-      "Currently valid credit restricted to certain products, operations or conditions; part of credits, not of balance.",
+      "Currently valid credit restricted to certain products, operations or conditions; part of credit_balance, not of balance.",
     ),
     credit_groups: zod
       .array(CreditGroup)
       .describe(
         "Currently valid unspent credit grouped by permitted use. Each group covers only the charges its restrictions and validity allow, and the groups may differ from the recorded credits total.",
       ),
-    due: Money.describe(
-      "Amount still payable on issued invoices. The invoice of an order not yet accepted is excluded, here and from available_credit. Usage not yet invoiced is reported separately.",
+    amount_due: Money.describe(
+      "Amount still payable on issued invoices. The invoice of an order not yet accepted is excluded, here and from available_balance. Usage not yet invoiced is reported separately.",
     ),
-    pending_returns_amount: Money,
+    pending_refund_amount: Money,
   })
   .describe("Balance, credits and unpaid charges, each reported separately.");
 

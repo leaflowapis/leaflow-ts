@@ -11,6 +11,11 @@ export const checkoutSessionUpdatePromotionCodeMax = 64;
 
 export const CheckoutSessionUpdate = zod
   .strictObject({
+    expected_revision: zod
+      .int()
+      .min(1)
+      .optional()
+      .describe("The revision returned with the session being updated."),
     promotion_code: zod
       .string()
       .min(1)

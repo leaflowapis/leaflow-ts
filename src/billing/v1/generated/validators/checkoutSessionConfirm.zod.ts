@@ -13,6 +13,11 @@ export const checkoutSessionConfirmExpectedAmountTwoRegExp = new RegExp(
 );
 
 export const CheckoutSessionConfirm = zod.strictObject({
+  expected_revision: zod
+    .int()
+    .min(1)
+    .optional()
+    .describe("The revision returned with the session being confirmed."),
   expected_amount: Money.and(
     zod.string().regex(checkoutSessionConfirmExpectedAmountTwoRegExp),
   ).describe(

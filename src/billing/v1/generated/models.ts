@@ -680,25 +680,25 @@ export interface CreditGroup {
  * Balance, credits and unpaid charges, each reported separately.
  */
 export interface AccountBalance {
-  /** Balance minus pending balance returns and the part of unbilled_amount and due that estimated_credit_applied does not cover. Open usage therefore reduces available_credit before a usage invoice exists. Negative only when the balance and applicable credit fall short of what the account owes. */
-  available_credit: Money;
-  /** Credit expected to pay unbilled_amount and due, matching each charge to the grants whose scope, validity and conditions it meets, in the order credit is applied at payment. Nothing is deducted until an invoice is paid, so credits still includes this amount. */
+  /** Total funds available for current charges. It is the account balance plus remaining credits, minus pending balance returns, unbilled usage and the amount due on issued invoices. Credits with restrictions remain included and are detailed in credit_groups. */
+  available_balance: Money;
+  /** Credit expected to pay unbilled_amount and amount_due, matching each charge to the grants whose scope, validity and conditions it meets, in the order credit is applied at payment. Nothing is deducted until an invoice is paid, so credits still includes this amount. */
   estimated_credit_applied: Money;
   /** Current estimate of priced usage that has not been invoiced. Final pricing and tax are fixed at issuance. */
   unbilled_amount: Money;
   billing_account_id: number;
   currency: string;
-  /** Topped-up funds in the account's currency, excluding credits. May be negative after a payment dispute. Amounts owed are reported in due; this is not a withdrawable amount. */
+  /** Topped-up funds in the account's currency, excluding credits. May be negative after a payment dispute. Amounts owed are reported in amount_due; this is not a withdrawable amount. */
   balance: Money;
   /** Remaining credit, including restricted grants; not withdrawable and not part of balance. credit_groups shows currently valid credit by permitted use; positive credits do not mean due is zero. */
   credits: Money;
-  /** Currently valid credit restricted to certain products, operations or conditions; part of credits, not of balance. */
+  /** Currently valid credit restricted to certain products, operations or conditions; part of credit_balance, not of balance. */
   restricted_credits: Money;
   /** Currently valid unspent credit grouped by permitted use. Each group covers only the charges its restrictions and validity allow, and the groups may differ from the recorded credits total. */
   credit_groups: CreditGroup[];
-  /** Amount still payable on issued invoices. The invoice of an order not yet accepted is excluded, here and from available_credit. Usage not yet invoiced is reported separately. */
-  due: Money;
-  pending_returns_amount: Money;
+  /** Amount still payable on issued invoices. The invoice of an order not yet accepted is excluded, here and from available_balance. Usage not yet invoiced is reported separately. */
+  amount_due: Money;
+  pending_refund_amount: Money;
 }
 
 /**
@@ -913,6 +913,11 @@ export interface PaymentMethod {
   /** @nullable */
   exp_year?: number | null;
   is_default: boolean;
+  /** @nullable */
+  fingerprint?: string | null;
+  /** @nullable */
+  invoice_collection_authorized_at?: string | null;
+  created_at: string;
   status: PaymentMethodStatus;
 }
 
@@ -2488,6 +2493,11 @@ export interface CheckoutSession {
   change_effective: CheckoutSessionChangeEffective;
   /** `open` in a preview. */
   status: CheckoutSessionStatus;
+  /**
+   * Incremented on every persisted session change and used for optimistic concurrency.
+   * @minimum 1
+   */
+  revision: number;
   currency: string;
   /**
    * The checkout choices, as the purchase gave them and as you saved them since. Billing does not check
@@ -2761,6 +2771,11 @@ export interface CheckoutSessionPreviewRequest {
  */
 export interface CheckoutSessionUpdate {
   /**
+   * The revision returned with the session being updated.
+   * @minimum 1
+   */
+  expected_revision?: number;
+  /**
    * The promotion code to complete the session with; null removes it, and the best applicable account discount applies instead.
    * @minLength 1
    * @maxLength 64
@@ -2824,6 +2839,11 @@ export interface CheckoutSessionCreate {
 }
 
 export interface CheckoutSessionConfirm {
+  /**
+   * The revision returned with the session being confirmed.
+   * @minimum 1
+   */
+  expected_revision?: number;
   /** The session's `total` as read, after discounts and tax and before credit grants or balance. */
   expected_amount: Money & string;
   /**
