@@ -54,6 +54,7 @@ import type {
   GetProductHeaders,
   GetStatementUsageParams,
   Invoice,
+  InvoiceCollection,
   InvoiceItemList,
   InvoiceList,
   ListAccountDiscountsParams,
@@ -1917,7 +1918,7 @@ export const getSetDefaultPaymentMethodUrl = (paymentMethodId: string) => {
 };
 
 /**
- * Makes an active saved payment method the default for its billing account and returns it. Expired or removed methods cannot be selected; selecting the current default changes nothing.
+ * Makes an active saved payment method the default for its billing account and returns it. The default is used as the fallback for authorized subscription renewals. Month-end usage collection requires a separate authorization.
  * @summary Set default payment method
  */
 export const setDefaultPaymentMethod = async (
@@ -1935,6 +1936,119 @@ export const setDefaultPaymentMethod = async (
     {},
   )) as setDefaultPaymentMethodResponse["data"];
   return { data, status: res.status, headers: res.headers } as setDefaultPaymentMethodResponse;
+};
+
+export type getInvoiceCollectionResponse200 = {
+  data: InvoiceCollection;
+  status: 200;
+};
+
+export type getInvoiceCollectionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getInvoiceCollectionResponseSuccess = getInvoiceCollectionResponse200 & {
+  headers: Headers;
+};
+export type getInvoiceCollectionResponseError = getInvoiceCollectionResponseDefault & {
+  headers: Headers;
+};
+
+export type getInvoiceCollectionResponse =
+  | getInvoiceCollectionResponseSuccess
+  | getInvoiceCollectionResponseError;
+
+export const getGetInvoiceCollectionUrl = (accountId: number) => {
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/invoice-collection`;
+};
+
+/**
+ * @summary Get monthly invoice collection settings
+ */
+export const getInvoiceCollection = async (
+  accountId: number,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getInvoiceCollectionResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetInvoiceCollectionUrl(accountId), {
+    ...options,
+    method: "GET",
+  });
+  const data: getInvoiceCollectionResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as getInvoiceCollectionResponse["data"];
+  return { data, status: res.status, headers: res.headers } as getInvoiceCollectionResponse;
+};
+
+export type setInvoiceCollectionResponse200 = {
+  data: InvoiceCollection;
+  status: 200;
+};
+
+export type setInvoiceCollectionResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type setInvoiceCollectionResponseSuccess = setInvoiceCollectionResponse200 & {
+  headers: Headers;
+};
+export type setInvoiceCollectionResponseError = setInvoiceCollectionResponseDefault & {
+  headers: Headers;
+};
+
+export type setInvoiceCollectionResponse =
+  | setInvoiceCollectionResponseSuccess
+  | setInvoiceCollectionResponseError;
+
+export const getSetInvoiceCollectionUrl = (accountId: number) => {
+  return `https://billing.leaflow.cloud/api/v1/billing-accounts/${encodeURIComponent(String(accountId))}/invoice-collection`;
+};
+
+/**
+ * Selects how future month-end usage invoices are collected. charge_automatically authorizes off-session payment of the amount remaining after eligible credits and account balance and requires an active saved card. send_invoice disables that authorization and must omit payment_method_id.
+ * @summary Set monthly invoice collection settings
+ */
+export const setInvoiceCollection = async (
+  accountId: number,
+  invoiceCollection: InvoiceCollection,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setInvoiceCollectionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getSetInvoiceCollectionUrl(accountId), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(invoiceCollection),
+  });
+  const data: setInvoiceCollectionResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as setInvoiceCollectionResponse["data"];
+  return { data, status: res.status, headers: res.headers } as setInvoiceCollectionResponse;
 };
 
 export type deletePaymentMethodResponse204 = {
@@ -5707,7 +5821,7 @@ export const getListMonthlyStatementsUrl = (params?: ListMonthlyStatementsParams
 };
 
 /**
- * Monthly statements of account per UTC calendar month for your billing accounts, newest first. Each month summarizes order invoices issued in the month, closed usage statements of the month, credit notes issued in the month and payments recorded on those invoices.
+ * Monthly statements of account per UTC calendar month for your billing accounts, newest first. Each month summarizes order invoices issued in the month, usage invoices issued for the month, credit notes issued in the month and payments recorded on those invoices.
  * @summary List monthly statements
  */
 export const listMonthlyStatements = async (
@@ -5766,7 +5880,7 @@ export const getDownloadMonthlyStatementPdfUrl = (params: DownloadMonthlyStateme
 };
 
 /**
- * Renders the statement of account of one finalized UTC calendar month from invoices, usage statements, credit notes and payments read at download time. Supplement statements, later credit notes and later payments are reflected in later downloads. Not a tax invoice or a demand for payment. A month that is not finalized returns 409 with `BILLING_STATEMENT_NOT_FINALIZED`.
+ * Renders the statement of account of one finalized UTC calendar month from invoices, usage statements, credit notes and payments read at download time. Later supplement statements, credit notes and payments are reflected in later downloads. Not a tax invoice or a demand for payment. A month that is not finalized returns 409 with `BILLING_STATEMENT_NOT_FINALIZED`.
  * @summary Download monthly statement PDF
  */
 export const downloadMonthlyStatementPdf = async (

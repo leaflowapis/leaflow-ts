@@ -49,6 +49,8 @@ import { ExportStatus } from "./validators/exportStatus.zod.js";
 
 import { FeatureGrantStatus } from "./validators/featureGrantStatus.zod.js";
 
+import { InvoiceCollection } from "./validators/invoiceCollection.zod.js";
+
 import { InvoiceStatus } from "./validators/invoiceStatus.zod.js";
 
 import { OrderCancel } from "./validators/orderCancel.zod.js";
@@ -571,12 +573,29 @@ export const ListPaymentMethodsQueryParams = zod.strictObject({
 export const CreatePaymentMethodSetupBody = PaymentMethodSetup;
 
 /**
- * Makes an active saved payment method the default for its billing account and returns it. Expired or removed methods cannot be selected; selecting the current default changes nothing.
+ * Makes an active saved payment method the default for its billing account and returns it. The default is used as the fallback for authorized subscription renewals. Month-end usage collection requires a separate authorization.
  * @summary Set default payment method
  */
 export const SetDefaultPaymentMethodParams = zod.strictObject({
   paymentMethodId: zod.uuid(),
 });
+
+/**
+ * @summary Get monthly invoice collection settings
+ */
+export const GetInvoiceCollectionParams = zod.strictObject({
+  accountId: zod.int(),
+});
+
+/**
+ * Selects how future month-end usage invoices are collected. charge_automatically authorizes off-session payment of the amount remaining after eligible credits and account balance and requires an active saved card. send_invoice disables that authorization and must omit payment_method_id.
+ * @summary Set monthly invoice collection settings
+ */
+export const SetInvoiceCollectionParams = zod.strictObject({
+  accountId: zod.int(),
+});
+
+export const SetInvoiceCollectionBody = InvoiceCollection;
 
 /**
  * Refused when it is the only payment method of an account with metered resources.
@@ -2267,7 +2286,7 @@ export const ListSpendQueryParams = zod.strictObject({
 });
 
 /**
- * Monthly statements of account per UTC calendar month for your billing accounts, newest first. Each month summarizes order invoices issued in the month, closed usage statements of the month, credit notes issued in the month and payments recorded on those invoices.
+ * Monthly statements of account per UTC calendar month for your billing accounts, newest first. Each month summarizes order invoices issued in the month, usage invoices issued for the month, credit notes issued in the month and payments recorded on those invoices.
  * @summary List monthly statements
  */
 export const listMonthlyStatementsQueryPageDefault = 1;
@@ -2295,7 +2314,7 @@ export const ListMonthlyStatementsQueryParams = zod.strictObject({
 });
 
 /**
- * Renders the statement of account of one finalized UTC calendar month from invoices, usage statements, credit notes and payments read at download time. Supplement statements, later credit notes and later payments are reflected in later downloads. Not a tax invoice or a demand for payment. A month that is not finalized returns 409 with `BILLING_STATEMENT_NOT_FINALIZED`.
+ * Renders the statement of account of one finalized UTC calendar month from invoices, usage statements, credit notes and payments read at download time. Later supplement statements, credit notes and payments are reflected in later downloads. Not a tax invoice or a demand for payment. A month that is not finalized returns 409 with `BILLING_STATEMENT_NOT_FINALIZED`.
  * @summary Download monthly statement PDF
  */
 export const DownloadMonthlyStatementPdfQueryParams = zod.strictObject({

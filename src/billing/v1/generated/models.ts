@@ -680,7 +680,7 @@ export interface CreditGroup {
  * Balance, credits and unpaid charges, each reported separately.
  */
 export interface AccountBalance {
-  /** Balance minus pending balance returns and the part of unbilled_amount and due that estimated_credit_applied does not cover. Negative only when the balance and applicable credit fall short of what the account owes. */
+  /** Balance minus pending balance returns and the part of unbilled_amount and due that estimated_credit_applied does not cover. Open usage therefore reduces available_credit before a usage invoice exists. Negative only when the balance and applicable credit fall short of what the account owes. */
   available_credit: Money;
   /** Credit expected to pay unbilled_amount and due, matching each charge to the grants whose scope, validity and conditions it meets, in the order credit is applied at payment. Nothing is deducted until an invoice is paid, so credits still includes this amount. */
   estimated_credit_applied: Money;
@@ -1161,7 +1161,7 @@ export const InvoiceSource = {
 } as const;
 
 /**
- * `open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage not yet invoiced is not on any invoice.
+ * `open`: issued and not yet settled; a zero-total invoice is paid at once. `paid` stays paid after a refund, with the refunded part in amount_refunded. `void`: collection has stopped and any funds received have been returned. Usage remains in the open Statement until the normal month-end closing and is not on an invoice before then.
  */
 export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
 
@@ -4046,6 +4046,19 @@ export interface PriceSearch {
   page_size?: number;
 }
 
+export type InvoiceCollectionCollectionMethod =
+  (typeof InvoiceCollectionCollectionMethod)[keyof typeof InvoiceCollectionCollectionMethod];
+
+export const InvoiceCollectionCollectionMethod = {
+  send_invoice: "send_invoice",
+  charge_automatically: "charge_automatically",
+} as const;
+
+export interface InvoiceCollection {
+  collection_method: InvoiceCollectionCollectionMethod;
+  payment_method_id?: string;
+}
+
 export interface CancelSubscriptionRequest {
   mode: CancellationMode;
   /** For immediate cancellation, the preview's `proration_date`, the whole second the refund is computed as of. Now when omitted. */
@@ -4104,7 +4117,7 @@ export const StatementStatus = {
 } as const;
 
 /**
- * `interim`: a closing before the period's usage is final, without minimum charges. `final`: the first closing after the period ended and its late usage was settled, applying the period's minimum charges. `supplement`: a closing after the final one, for usage priced late. An open statement is interim.
+ * `interim`: a closing before the period's usage is final, currently operator-triggered and also used by historical hourly billing, without minimum charges. `final`: the normal first closing after the period ended and its late usage was settled, applying the period's minimum charges. `supplement`: a closing after the final one, for usage priced late. An open statement is still being accumulated.
  */
 export type StatementType = (typeof StatementType)[keyof typeof StatementType];
 
@@ -4115,7 +4128,7 @@ export const StatementType = {
 } as const;
 
 /**
- * An account's consumption for one billing period up to one closing. Usage is invoiced after every settlement run, about hourly: each closing issues an invoice for the usage priced since the previous one and collects it from credits and balance, and later usage goes into the next statement of the same period. A closed statement does not change. The period's consumption is the sum of its statements.
+ * An account's consumption for one UTC calendar month up to one closing. Usage remains in the open statement while it is being priced, so its estimate participates in balance and arrears checks. The normal closing is after month end and the late-usage window, when one usage invoice is issued for the month and collected from credits and balance. A closed statement does not change.
  */
 export interface Statement {
   id: string;

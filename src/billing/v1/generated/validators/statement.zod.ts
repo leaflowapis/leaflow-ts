@@ -37,7 +37,7 @@ export const Statement = zod
     credited_amount: Money,
   })
   .describe(
-    "An account's consumption for one billing period up to one closing. Usage is invoiced after every settlement run, about hourly: each closing issues an invoice for the usage priced since the previous one and collects it from credits and balance, and later usage goes into the next statement of the same period. A closed statement does not change. The period's consumption is the sum of its statements.",
+    "An account's consumption for one UTC calendar month up to one closing. Usage remains in the open statement while it is being priced, so its estimate participates in balance and arrears checks. The normal closing is after month end and the late-usage window, when one usage invoice is issued for the month and collected from credits and balance. A closed statement does not change.",
   );
 
 export type Statement = zod.input<typeof Statement>;
