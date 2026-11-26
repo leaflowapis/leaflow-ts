@@ -30,6 +30,8 @@
 import { decodeResponse } from "../../../response.js";
 
 import type {
+  AgentListResponseBody,
+  AgentResource,
   AnswerQuestionRequestBody,
   ArtifactListResponseBody,
   ArtifactResource,
@@ -41,6 +43,7 @@ import type {
   ChannelWithSecretResponseBody,
   CheckSenderParams,
   CompleteUploadRequestBody,
+  CreateAgentRequestBody,
   CreateArtifactRequestBody,
   CreateArtifactVersionRequestBody,
   CreateChannelRequestBody,
@@ -50,6 +53,7 @@ import type {
   CreateThreadResponseBody,
   CreateUploadRequestBody,
   DecideToolCallsRequestBody,
+  DeleteMemoryParams,
   ErrorResponse,
   FileListResponseBody,
   FileResource,
@@ -62,6 +66,7 @@ import type {
   ListBindingsParams,
   ListChannelRejectionsParams,
   ListChannelsParams,
+  ListMemoriesParams,
   ListTaskRunsParams,
   ListThreadItemsParams,
   ListThreadMessagesParams,
@@ -101,6 +106,7 @@ import type {
   ThreadTurnListResponseBody,
   ToolResultRequestBody,
   TurnStartedResponseBody,
+  UpdateAgentRequestBody,
   UpdateArtifactRequestBody,
   UpdateChannelRequestBody,
   UpdateFileRequestBody,
@@ -159,6 +165,273 @@ export type HTTPStatusCodes =
   | HTTPStatusCode3xx
   | HTTPStatusCode4xx
   | HTTPStatusCode5xx;
+
+export type listAgentsResponse200 = {
+  data: AgentListResponseBody;
+  status: 200;
+};
+
+export type listAgentsResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listAgentsResponseSuccess = listAgentsResponse200 & {
+  headers: Headers;
+};
+export type listAgentsResponseError = listAgentsResponseDefault & {
+  headers: Headers;
+};
+
+export type listAgentsResponse = listAgentsResponseSuccess | listAgentsResponseError;
+
+export const getListAgentsUrl = () => {
+  return `https://assistant.leaflow.cloud/api/v1/agents`;
+};
+
+/**
+ * Lists the resident agents in this project, ordered by name. Each agent has a single living
+ * conversation (`threadId`), an isolated service account (`serviceAccountId`), and an optional
+ * Fleet machine binding (`machineId`).
+ * @summary List project agents
+ */
+export const listAgents = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAgentsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAgentsUrl(), {
+    ...options,
+    method: "GET",
+  });
+  const data: listAgentsResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listAgentsResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listAgentsResponse;
+};
+
+export type createAgentResponse201 = {
+  data: AgentResource;
+  status: 201;
+};
+
+export type createAgentResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 201>;
+};
+
+export type createAgentResponseSuccess = createAgentResponse201 & {
+  headers: Headers;
+};
+export type createAgentResponseError = createAgentResponseDefault & {
+  headers: Headers;
+};
+
+export type createAgentResponse = createAgentResponseSuccess | createAgentResponseError;
+
+export const getCreateAgentUrl = () => {
+  return `https://assistant.leaflow.cloud/api/v1/agents`;
+};
+
+/**
+ * Creates a resident agent visible to the whole project, provisions its dedicated IAM service
+ * account, grants machine login (and optional sudo) when `machineId` is bound, and creates its
+ * single conversation thread.
+ * @summary Create a project agent
+ */
+export const createAgent = async (
+  createAgentRequestBody: CreateAgentRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createAgentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateAgentUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(createAgentRequestBody),
+  });
+  const data: createAgentResponse["data"] = (await decodeResponse(
+    res,
+    { "201": "json", default: "json" },
+    {},
+  )) as createAgentResponse["data"];
+  return { data, status: res.status, headers: res.headers } as createAgentResponse;
+};
+
+export type getAgentResponse200 = {
+  data: AgentResource;
+  status: 200;
+};
+
+export type getAgentResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getAgentResponseSuccess = getAgentResponse200 & {
+  headers: Headers;
+};
+export type getAgentResponseError = getAgentResponseDefault & {
+  headers: Headers;
+};
+
+export type getAgentResponse = getAgentResponseSuccess | getAgentResponseError;
+
+export const getGetAgentUrl = (agent: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/agents/${encodeURIComponent(String(agent))}`;
+};
+
+/**
+ * @summary Get a project agent
+ */
+export const getAgent = async (
+  agent: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAgentResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetAgentUrl(agent), {
+    ...options,
+    method: "GET",
+  });
+  const data: getAgentResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as getAgentResponse["data"];
+  return { data, status: res.status, headers: res.headers } as getAgentResponse;
+};
+
+export type updateAgentResponse200 = {
+  data: AgentResource;
+  status: 200;
+};
+
+export type updateAgentResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updateAgentResponseSuccess = updateAgentResponse200 & {
+  headers: Headers;
+};
+export type updateAgentResponseError = updateAgentResponseDefault & {
+  headers: Headers;
+};
+
+export type updateAgentResponse = updateAgentResponseSuccess | updateAgentResponseError;
+
+export const getUpdateAgentUrl = (agent: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/agents/${encodeURIComponent(String(agent))}`;
+};
+
+/**
+ * Updates the agent's profile, instructions, machine binding, or conversation model settings.
+ * Omitted fields stay as they are; setting `machineId` to null unbinds the Fleet machine.
+ * @summary Update a project agent
+ */
+export const updateAgent = async (
+  agent: string,
+  updateAgentRequestBody: UpdateAgentRequestBody,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateAgentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateAgentUrl(agent), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateAgentRequestBody),
+  });
+  const data: updateAgentResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as updateAgentResponse["data"];
+  return { data, status: res.status, headers: res.headers } as updateAgentResponse;
+};
+
+export type deleteAgentResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteAgentResponseDefault = {
+  data: ErrorResponse;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type deleteAgentResponseSuccess = deleteAgentResponse204 & {
+  headers: Headers;
+};
+export type deleteAgentResponseError = deleteAgentResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteAgentResponse = deleteAgentResponseSuccess | deleteAgentResponseError;
+
+export const getDeleteAgentUrl = (agent: string) => {
+  return `https://assistant.leaflow.cloud/api/v1/agents/${encodeURIComponent(String(agent))}`;
+};
+
+/**
+ * Removes the agent and its conversation when idle. Fails with 409 and code THREAD_RUNNING while
+ * its conversation is running.
+ * @summary Delete a project agent
+ */
+export const deleteAgent = async (
+  agent: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteAgentResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteAgentUrl(agent), {
+    ...options,
+    method: "DELETE",
+  });
+  const data: deleteAgentResponse["data"] = (await decodeResponse(
+    res,
+    { "204": "json", default: "json" },
+    undefined,
+  )) as deleteAgentResponse["data"];
+  return { data, status: res.status, headers: res.headers } as deleteAgentResponse;
+};
 
 export type createThreadResponse201 = {
   data: CreateThreadResponseBody;
@@ -3708,19 +3981,33 @@ export type listMemoriesResponseError = listMemoriesResponseDefault & {
 
 export type listMemoriesResponse = listMemoriesResponseSuccess | listMemoriesResponseError;
 
-export const getListMemoriesUrl = () => {
-  return `https://assistant.leaflow.cloud/api/v1/memories`;
+export const getListMemoriesUrl = (params?: ListMemoriesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://assistant.leaflow.cloud/api/v1/memories?${stringifiedParams}`
+    : `https://assistant.leaflow.cloud/api/v1/memories`;
 };
 
 /**
- * Facts the assistant has written down for the current account in this project. They appear at the start of every later conversation. Members of the same project each have their own, and this returns only the current account's. Not paginated: there is a cap on how many there can be, and all of them come back at once.
+ * Facts the assistant has written down in this project. Without `agentId`, returns the current
+ * account's private memories; with `agentId`, returns that project agent's memories.
  * @summary List what the assistant remembers
  */
 export const listMemories = async (
+  params?: ListMemoriesParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<listMemoriesResponse> => {
-  const res = await (fetchFn ?? fetch)(getListMemoriesUrl(), {
+  const res = await (fetchFn ?? fetch)(getListMemoriesUrl(params), {
     ...options,
     method: "GET",
   });
@@ -3751,20 +4038,34 @@ export type deleteMemoryResponseError = deleteMemoryResponseDefault & {
 
 export type deleteMemoryResponse = deleteMemoryResponseSuccess | deleteMemoryResponseError;
 
-export const getDeleteMemoryUrl = (memory: string) => {
-  return `https://assistant.leaflow.cloud/api/v1/memories/${encodeURIComponent(String(memory))}`;
+export const getDeleteMemoryUrl = (memory: string, params?: DeleteMemoryParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://assistant.leaflow.cloud/api/v1/memories/${encodeURIComponent(String(memory))}?${stringifiedParams}`
+    : `https://assistant.leaflow.cloud/api/v1/memories/${encodeURIComponent(String(memory))}`;
 };
 
 /**
- * The assistant stops remembering this. It takes effect at once, so the next conversation will not carry it. The assistant may well learn the same thing again.
+ * Removes a stored memory immediately. Pass `agentId` when deleting a memory belonging to a
+ * project agent.
  * @summary Delete one memory
  */
 export const deleteMemory = async (
   memory: string,
+  params?: DeleteMemoryParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<deleteMemoryResponse> => {
-  const res = await (fetchFn ?? fetch)(getDeleteMemoryUrl(memory), {
+  const res = await (fetchFn ?? fetch)(getDeleteMemoryUrl(memory, params), {
     ...options,
     method: "DELETE",
   });

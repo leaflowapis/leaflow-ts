@@ -31,11 +31,17 @@ import * as zod from "zod";
 
 export const ItemSourceResource = zod.strictObject({
   type: zod
-    .enum(["subagent", "thread", "task", "channel"])
+    .enum(["subagent", "thread", "agent", "task", "channel", "plan", "document"])
     .describe(
-      "`subagent` for a subagent reporting to its parent, `thread` for another of the person's\nconversations, `task` for a task, `channel` for a chat app.",
+      "`subagent` for a subagent or its parent conversation, `thread` for another conversation,\n`agent` for a project agent, `task` for a task, `channel` for a chat app, `plan` or `document`\nfor a structured plan or collaborative document notification.",
     ),
-  id: zod.string().describe("The conversation, task or channel the message came from."),
+  id: zod
+    .string()
+    .describe("The conversation, agent, task, channel, plan or document the message came from."),
+  slug: zod
+    .string()
+    .nullish()
+    .describe("For `agent` sources or agent-owned subagents, the sending agent's slug."),
 });
 
 export type ItemSourceResource = zod.input<typeof ItemSourceResource>;

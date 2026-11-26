@@ -28,14 +28,21 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { SubagentSummaryResource } from "./subagentSummaryResource.zod.js";
 
 export const subagentCountResourceTotalMin = 0;
 
 export const subagentCountResourceRunningMin = 0;
 
+export const subagentCountResourceNeedsActionMin = 0;
+
 export const SubagentCountResource = zod.strictObject({
   total: zod.int().min(subagentCountResourceTotalMin),
   running: zod.int().min(subagentCountResourceRunningMin),
+  needsAction: zod.int().min(subagentCountResourceNeedsActionMin),
+  items: zod
+    .array(SubagentSummaryResource)
+    .describe("Up to 20 subagents of this conversation, ordered by creation time."),
 });
 
 export type SubagentCountResource = zod.input<typeof SubagentCountResource>;

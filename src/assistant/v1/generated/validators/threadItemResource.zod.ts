@@ -29,6 +29,7 @@
  */
 import * as zod from "zod";
 import { ClientContextPart } from "./clientContextPart.zod.js";
+import { ItemOriginResource } from "./itemOriginResource.zod.js";
 import { ItemSourceResource } from "./itemSourceResource.zod.js";
 import { PartResource } from "./partResource.zod.js";
 import { ToolCallResource } from "./toolCallResource.zod.js";
@@ -72,6 +73,16 @@ export const ThreadItemResource = zod
     source: zod
       .union([ItemSourceResource, zod.null()])
       .describe("Who wrote an `external_message`. Null for other items."),
+    origin: zod
+      .union([ItemOriginResource, zod.null()])
+      .optional()
+      .describe(
+        "Structured relational provenance for cross-delivered items (such as messages sent by a parent\nconversation, subagent, project agent, personal companion AI, task, or future plan/document\nnotification). Omitted or null for ordinary in-conversation items.",
+      ),
+    authorUserId: zod
+      .string()
+      .nullable()
+      .describe("The project member who sent a `user_message`. Null for other items."),
     modelId: zod
       .string()
       .nullable()

@@ -34,6 +34,10 @@ import { TaskTrigger } from "./taskTrigger.zod.js";
 
 export const TaskResource = zod.strictObject({
   id: zod.string(),
+  agentId: zod
+    .string()
+    .nullable()
+    .describe("The project agent this task belongs to. Null for a person's private task."),
   threadId: zod.string().describe("The conversation the task reports to."),
   name: zod.string(),
   status: zod

@@ -33,6 +33,8 @@ import { AnswerQuestionRequestBody } from "./validators/answerQuestionRequestBod
 
 import { CompleteUploadRequestBody } from "./validators/completeUploadRequestBody.zod.js";
 
+import { CreateAgentRequestBody } from "./validators/createAgentRequestBody.zod.js";
+
 import { CreateArtifactRequestBody } from "./validators/createArtifactRequestBody.zod.js";
 
 import { CreateArtifactVersionRequestBody } from "./validators/createArtifactVersionRequestBody.zod.js";
@@ -73,6 +75,8 @@ import { SkillRequestBody } from "./validators/skillRequestBody.zod.js";
 
 import { ToolResultRequestBody } from "./validators/toolResultRequestBody.zod.js";
 
+import { UpdateAgentRequestBody } from "./validators/updateAgentRequestBody.zod.js";
+
 import { UpdateArtifactRequestBody } from "./validators/updateArtifactRequestBody.zod.js";
 
 import { UpdateChannelRequestBody } from "./validators/updateChannelRequestBody.zod.js";
@@ -90,6 +94,47 @@ import { UpdateThreadRequestBody } from "./validators/updateThreadRequestBody.zo
 import { UpdateUploadRequestBody } from "./validators/updateUploadRequestBody.zod.js";
 
 import { VerifyCodeRequestBody } from "./validators/verifyCodeRequestBody.zod.js";
+
+/**
+ * Creates a resident agent visible to the whole project, provisions its dedicated IAM service
+ * account, grants machine login (and optional sudo) when `machineId` is bound, and creates its
+ * single conversation thread.
+ * @summary Create a project agent
+ */
+export const CreateAgentBody = CreateAgentRequestBody;
+
+/**
+ * @summary Get a project agent
+ */
+export const getAgentPathAgentMax = 64;
+
+export const GetAgentParams = zod.strictObject({
+  agent: zod.string().max(getAgentPathAgentMax).describe("A project agent id or slug."),
+});
+
+/**
+ * Updates the agent's profile, instructions, machine binding, or conversation model settings.
+ * Omitted fields stay as they are; setting `machineId` to null unbinds the Fleet machine.
+ * @summary Update a project agent
+ */
+export const updateAgentPathAgentMax = 64;
+
+export const UpdateAgentParams = zod.strictObject({
+  agent: zod.string().max(updateAgentPathAgentMax).describe("A project agent id or slug."),
+});
+
+export const UpdateAgentBody = UpdateAgentRequestBody;
+
+/**
+ * Removes the agent and its conversation when idle. Fails with 409 and code THREAD_RUNNING while
+ * its conversation is running.
+ * @summary Delete a project agent
+ */
+export const deleteAgentPathAgentMax = 64;
+
+export const DeleteAgentParams = zod.strictObject({
+  agent: zod.string().max(deleteAgentPathAgentMax).describe("A project agent id or slug."),
+});
 
 /**
  * Creates a conversation and, when `message` is given, sends it as the first message in the same
@@ -999,11 +1044,35 @@ export const GetArtifactVersionParams = zod.strictObject({
 });
 
 /**
- * The assistant stops remembering this. It takes effect at once, so the next conversation will not carry it. The assistant may well learn the same thing again.
+ * Facts the assistant has written down in this project. Without `agentId`, returns the current
+ * account's private memories; with `agentId`, returns that project agent's memories.
+ * @summary List what the assistant remembers
+ */
+export const listMemoriesQueryAgentIdMax = 64;
+
+export const ListMemoriesQueryParams = zod.strictObject({
+  agentId: zod
+    .string()
+    .max(listMemoriesQueryAgentIdMax)
+    .optional()
+    .describe(
+      "Return memories belonging to this project agent instead of the caller's personal assistant.",
+    ),
+});
+
+/**
+ * Removes a stored memory immediately. Pass `agentId` when deleting a memory belonging to a
+ * project agent.
  * @summary Delete one memory
  */
 export const DeleteMemoryParams = zod.strictObject({
   memory: zod.string(),
+});
+
+export const deleteMemoryQueryAgentIdMax = 64;
+
+export const DeleteMemoryQueryParams = zod.strictObject({
+  agentId: zod.string().max(deleteMemoryQueryAgentIdMax).optional(),
 });
 
 /**

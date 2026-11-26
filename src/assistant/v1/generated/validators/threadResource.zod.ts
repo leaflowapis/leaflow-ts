@@ -45,6 +45,10 @@ export const threadResourceMessageCountMin = 0;
 export const ThreadResource = zod
   .strictObject({
     id: zod.string(),
+    agentId: zod
+      .string()
+      .nullable()
+      .describe("The project agent this conversation belongs to. Null for personal conversations."),
     role: zod
       .enum(["main", "subagent"])
       .describe(
@@ -54,7 +58,7 @@ export const ThreadResource = zod
       .string()
       .nullable()
       .describe("The conversation that started this subagent. Null for main conversations."),
-    agentName: zod
+    subagentName: zod
       .string()
       .nullable()
       .describe(

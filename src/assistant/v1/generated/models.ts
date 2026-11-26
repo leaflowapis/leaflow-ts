@@ -178,13 +178,14 @@ export const TurnStatus = {
 } as const;
 
 /**
- * `main` for a conversation with a person, `subagent` for one started by another agent.
+ * How the agent executes turns: `hosted` runs on the platform's built-in model runtime;
+ * `external` reserves integration with external or local agent runtimes such as A2A endpoints.
  */
-export type ThreadResourceRole = (typeof ThreadResourceRole)[keyof typeof ThreadResourceRole];
+export type AgentRuntime = (typeof AgentRuntime)[keyof typeof AgentRuntime];
 
-export const ThreadResourceRole = {
-  main: "main",
-  subagent: "subagent",
+export const AgentRuntime = {
+  hosted: "hosted",
+  external: "external",
 } as const;
 
 /**
@@ -229,11 +230,39 @@ export interface PendingActionResource {
   type: PendingActionResourceType;
 }
 
+export type SubagentSummaryResourcePendingActionType =
+  | (typeof SubagentSummaryResourcePendingActionType)[keyof typeof SubagentSummaryResourcePendingActionType]
+  | null;
+
+export const SubagentSummaryResourcePendingActionType = {
+  approval: "approval",
+  question: "question",
+} as const;
+
+/**
+ * Lightweight live summary of a subagent conversation for sidebar navigation and status indicators.
+ */
+export interface SubagentSummaryResource {
+  id: string;
+  name: string;
+  status: ThreadStatus;
+  /** @nullable */
+  activity: string | null;
+  pendingActionType: SubagentSummaryResourcePendingActionType;
+  lastTurnStatus: TurnStatus | null;
+  unread: boolean;
+  updatedAt: string;
+}
+
 export interface SubagentCountResource {
   /** @minimum 0 */
   total: number;
   /** @minimum 0 */
   running: number;
+  /** @minimum 0 */
+  needsAction: number;
+  /** Up to 20 subagents of this conversation, ordered by creation time. */
+  items: SubagentSummaryResource[];
 }
 
 /**
@@ -259,6 +288,171 @@ export interface LastTurnResource {
   completedAt: string | null;
 }
 
+export type AgentCreatorResourceType =
+  (typeof AgentCreatorResourceType)[keyof typeof AgentCreatorResourceType];
+
+export const AgentCreatorResourceType = {
+  console: "console",
+  companion: "companion",
+  plan: "plan",
+} as const;
+
+/**
+ * Canonical `(namespace, tool)` identifier of the causal tool call item in the origin conversation, resolved directly from that item rather than stored as a mutable display string.
+ */
+export interface OriginToolCallResource {
+  namespace: string;
+  tool: string;
+}
+
+/**
+ * Provenance of who created this resident project agent and how. When created via a member's
+ * personal companion AI (`type: companion`), `accessible` is true only for that member; private
+ * conversation coordinates remain null for other project members.
+ */
+export interface AgentCreatorResource {
+  /** @nullable */
+  userId: string | null;
+  type: AgentCreatorResourceType;
+  accessible: boolean;
+  /** @nullable */
+  threadId: string | null;
+  /** @nullable */
+  turnId: string | null;
+  /**
+   * @minimum 1
+   * @nullable
+   */
+  turnNumber: number | null;
+  /** @nullable */
+  itemId: string | null;
+  /**
+   * @minimum 0
+   * @nullable
+   */
+  itemOrdinal: number | null;
+  toolCall: OriginToolCallResource | null;
+}
+
+/**
+ * A resident project agent with a dedicated service account and single living main thread.
+ */
+export interface AgentResource {
+  id: string;
+  /** Unique handle within the project, used in `@slug` mentions. */
+  slug: string;
+  name: string;
+  description: string;
+  instructions: string;
+  runtime: AgentRuntime;
+  /** The IAM service account user id this agent acts as. */
+  serviceAccountId: string;
+  /**
+   * The Fleet machine this agent is locked to. Null when unbound.
+   * @nullable
+   */
+  machineId: string | null;
+  /** Whether the agent's service account holds administrative sudo access on `machineId`. */
+  machineSudo: boolean;
+  /** The single conversation thread belonging to this agent. */
+  threadId: string;
+  modelId: string;
+  reasoningEffort: ReasoningEffort | null;
+  approvalMode: ApprovalMode;
+  status: ThreadStatus;
+  /** @nullable */
+  activity: string | null;
+  /** @nullable */
+  recentMessage: string | null;
+  unread: boolean;
+  todos: TodoResource[];
+  pendingAction: PendingActionResource | null;
+  subagents: SubagentCountResource;
+  lastTurn: LastTurnResource | null;
+  /** Who created this agent and via which channel (`console`, `companion`, or `plan`). Null when unknown. */
+  creator: AgentCreatorResource | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AgentListResponseBody {
+  agents: AgentResource[];
+}
+
+export interface CreateAgentRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z][a-z0-9-]{0,63}$
+   */
+  slug: string;
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  name: string;
+  /** @maxLength 500 */
+  description?: string;
+  /** @maxLength 32000 */
+  instructions?: string;
+  runtime?: AgentRuntime;
+  /**
+   * @maxLength 64
+   * @nullable
+   */
+  machineId?: string | null;
+  machineSudo?: boolean;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  modelId?: string;
+  reasoningEffort?: ReasoningEffort;
+  approvalMode?: ApprovalMode;
+}
+
+export interface UpdateAgentRequestBody {
+  /**
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z][a-z0-9-]{0,63}$
+   */
+  slug?: string;
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  name?: string;
+  /** @maxLength 500 */
+  description?: string;
+  /** @maxLength 32000 */
+  instructions?: string;
+  runtime?: AgentRuntime;
+  /**
+   * @maxLength 64
+   * @nullable
+   */
+  machineId?: string | null;
+  machineSudo?: boolean;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  modelId?: string;
+  reasoningEffort?: ReasoningEffort | null;
+  approvalMode?: ApprovalMode;
+}
+
+/**
+ * `main` for a conversation with a person, `subagent` for one started by another agent.
+ */
+export type ThreadResourceRole = (typeof ThreadResourceRole)[keyof typeof ThreadResourceRole];
+
+export const ThreadResourceRole = {
+  main: "main",
+  subagent: "subagent",
+} as const;
+
 /**
  * How much of the model's context window the conversation occupies.
  */
@@ -281,6 +475,11 @@ export interface ContextUsageResource {
  */
 export interface ThreadResource {
   id: string;
+  /**
+   * The project agent this conversation belongs to. Null for personal conversations.
+   * @nullable
+   */
+  agentId: string | null;
   /** `main` for a conversation with a person, `subagent` for one started by another agent. */
   role: ThreadResourceRole;
   /**
@@ -292,7 +491,7 @@ export interface ThreadResource {
    * The subagent's name, unique among the subagents of its parent. Null for main conversations.
    * @nullable
    */
-  agentName: string | null;
+  subagentName: string | null;
   /**
    * Null until the conversation has a name.
    * @nullable
@@ -357,6 +556,7 @@ export type MessagePartData = { [key: string]: unknown } | null;
  *
  * - `text` — the words, in `text`
  * - `file` — a file uploaded earlier, by id in `fileId`
+ * - `mention` — a project agent, by `agentId` or `slug`
  * - `data-<name>` — context from the client, in `data`. The name is shown to the assistant so it
  *   can tell one block from another.
  */
@@ -373,6 +573,16 @@ export interface MessagePart {
    * @nullable
    */
   fileId?: string | null;
+  /**
+   * For `mention` parts. Identifies the project agent by id.
+   * @nullable
+   */
+  agentId?: string | null;
+  /**
+   * For `mention` parts. Identifies the project agent by slug without `@`.
+   * @nullable
+   */
+  slug?: string | null;
   /** @nullable */
   data?: MessagePartData;
 }
@@ -559,6 +769,11 @@ export interface SearchThreadsRequestBody {
    * @maxLength 64
    */
   folderId?: string;
+  /**
+   * Only conversations belonging to this project agent.
+   * @maxLength 64
+   */
+  agentId?: string;
   /**
    * Only the subagents of this conversation.
    * @maxLength 64
@@ -780,8 +995,9 @@ export const ThreadItemResourceStatus = {
 } as const;
 
 /**
- * `subagent` for a subagent reporting to its parent, `thread` for another of the person's
- * conversations, `task` for a task, `channel` for a chat app.
+ * `subagent` for a subagent or its parent conversation, `thread` for another conversation,
+ * `agent` for a project agent, `task` for a task, `channel` for a chat app, `plan` or `document`
+ * for a structured plan or collaborative document notification.
  */
 export type ItemSourceResourceType =
   (typeof ItemSourceResourceType)[keyof typeof ItemSourceResourceType];
@@ -789,18 +1005,91 @@ export type ItemSourceResourceType =
 export const ItemSourceResourceType = {
   subagent: "subagent",
   thread: "thread",
+  agent: "agent",
   task: "task",
   channel: "channel",
+  plan: "plan",
+  document: "document",
 } as const;
 
 export interface ItemSourceResource {
   /**
-   * `subagent` for a subagent reporting to its parent, `thread` for another of the person's
-   * conversations, `task` for a task, `channel` for a chat app.
+   * `subagent` for a subagent or its parent conversation, `thread` for another conversation,
+   * `agent` for a project agent, `task` for a task, `channel` for a chat app, `plan` or `document`
+   * for a structured plan or collaborative document notification.
    */
   type: ItemSourceResourceType;
-  /** The conversation, task or channel the message came from. */
+  /** The conversation, agent, task, channel, plan or document the message came from. */
   id: string;
+  /**
+   * For `agent` sources or agent-owned subagents, the sending agent's slug.
+   * @nullable
+   */
+  slug?: string | null;
+}
+
+export type ItemOriginResourceType =
+  (typeof ItemOriginResourceType)[keyof typeof ItemOriginResourceType];
+
+export const ItemOriginResourceType = {
+  companion: "companion",
+  agent: "agent",
+  subagent: "subagent",
+  task: "task",
+  channel: "channel",
+  plan: "plan",
+  document: "document",
+} as const;
+
+/**
+ * Relational provenance of a cross-delivered item. Private companion conversation coordinates
+ * (`threadId`, `turnId`, `itemId`, `itemOrdinal`, `threadTitle`) are populated only when
+ * `accessible` is true for the current viewer.
+ */
+export interface ItemOriginResource {
+  type: ItemOriginResourceType;
+  /** @nullable */
+  agentId: string | null;
+  /** @nullable */
+  agentSlug: string | null;
+  /** @nullable */
+  agentName: string | null;
+  /** @nullable */
+  subagentName: string | null;
+  /** @nullable */
+  userId: string | null;
+  /** @nullable */
+  threadTitle: string | null;
+  /** Whether the current viewer is permitted to open the origin conversation (`false` when sent from another member's private companion AI). */
+  accessible: boolean;
+  /** @nullable */
+  threadId: string | null;
+  /** @nullable */
+  turnId: string | null;
+  /**
+   * 1-based turn number of `turnId` in the origin conversation.
+   * @minimum 1
+   * @nullable
+   */
+  turnNumber: number | null;
+  /** @nullable */
+  itemId: string | null;
+  /**
+   * @minimum 0
+   * @nullable
+   */
+  itemOrdinal: number | null;
+  /** @nullable */
+  itemType: string | null;
+  toolCall: OriginToolCallResource | null;
+  /** @nullable */
+  taskId: string | null;
+  /** @nullable */
+  documentId: string | null;
+  /** @nullable */
+  documentRevision: number | null;
+  /** @nullable */
+  dispatchedAt: string | null;
 }
 
 export type PartResourceType = (typeof PartResourceType)[keyof typeof PartResourceType];
@@ -808,6 +1097,7 @@ export type PartResourceType = (typeof PartResourceType)[keyof typeof PartResour
 export const PartResourceType = {
   text: "text",
   file: "file",
+  mention: "mention",
 } as const;
 
 /**
@@ -866,6 +1156,12 @@ export interface FileResource {
   updatedAt: string;
 }
 
+export interface MentionResource {
+  agentId: string;
+  slug: string;
+  name: string;
+}
+
 export interface PartResource {
   /**
    * Addresses this part in the realtime stream: text arrives as `append` frames pointing at
@@ -880,6 +1176,8 @@ export interface PartResource {
   text: string | null;
   /** For `file` parts. A file the person attached. */
   file: FileResource | null;
+  /** For `mention` parts. A project agent referenced inline. */
+  mention: MentionResource | null;
 }
 
 export type ClientContextPartData = { [key: string]: unknown };
@@ -1117,6 +1415,17 @@ export interface ThreadItemResource {
   /** Who wrote an `external_message`. Null for other items. */
   source: ItemSourceResource | null;
   /**
+   * Structured relational provenance for cross-delivered items (such as messages sent by a parent
+   * conversation, subagent, project agent, personal companion AI, task, or future plan/document
+   * notification). Omitted or null for ordinary in-conversation items.
+   */
+  origin?: ItemOriginResource | null;
+  /**
+   * The project member who sent a `user_message`. Null for other items.
+   * @nullable
+   */
+  authorUserId: string | null;
+  /**
    * The Canopy model that produced this item. Null for messages a person or another source sent.
    * @nullable
    */
@@ -1220,6 +1529,7 @@ export interface SendMessageResponseBody {
    * @minimum 0
    */
   queuedAhead: number;
+  item?: ThreadItemResource;
 }
 
 export interface DecideToolCallsRequestBody {
@@ -1673,6 +1983,11 @@ export interface TaskAction {
    */
   instanceId?: string | null;
   /**
+   * For `command`. The Fleet machine that runs it.
+   * @nullable
+   */
+  machineId?: string | null;
+  /**
    * For `command`. A shell command.
    * @maxLength 20000
    * @nullable
@@ -1776,6 +2091,11 @@ export interface TaskRunResource {
 
 export interface TaskResource {
   id: string;
+  /**
+   * The project agent this task belongs to. Null for a person's private task.
+   * @nullable
+   */
+  agentId: string | null;
   /** The conversation the task reports to. */
   threadId: string;
   name: string;
@@ -1858,6 +2178,11 @@ export const SearchTasksRequestBodyActionType = {
 
 export interface SearchTasksRequestBody {
   /**
+   * Only the tasks belonging to this project agent.
+   * @maxLength 64
+   */
+  agentId?: string;
+  /**
    * Only the tasks that report to this conversation.
    * @maxLength 64
    */
@@ -1936,6 +2261,11 @@ export interface UpdateSettingsRequestBody {
 }
 
 export interface MemoryResource {
+  /**
+   * The project agent this memory belongs to. Null for a person's private memory.
+   * @nullable
+   */
+  agentId?: string | null;
   /** The fact itself */
   body: string;
   createdAt: string;
@@ -2552,6 +2882,21 @@ export type ListArtifactVersionsParams = {
    * @maximum 200
    */
   limit?: number;
+};
+
+export type ListMemoriesParams = {
+  /**
+   * Return memories belonging to this project agent instead of the caller's personal assistant.
+   * @maxLength 64
+   */
+  agentId?: string;
+};
+
+export type DeleteMemoryParams = {
+  /**
+   * @maxLength 64
+   */
+  agentId?: string;
 };
 
 export type ListBindingsParams = {

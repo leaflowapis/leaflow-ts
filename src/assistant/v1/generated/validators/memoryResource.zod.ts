@@ -30,6 +30,10 @@
 import * as zod from "zod";
 
 export const MemoryResource = zod.strictObject({
+  agentId: zod
+    .string()
+    .nullish()
+    .describe("The project agent this memory belongs to. Null for a person's private memory."),
   body: zod.string().describe("The fact itself"),
   createdAt: zod.iso.datetime({ offset: true }),
   id: zod.string(),

@@ -29,6 +29,8 @@
  */
 import * as zod from "zod";
 
+export const searchTasksRequestBodyAgentIdMax = 64;
+
 export const searchTasksRequestBodyThreadIdMax = 64;
 
 export const searchTasksRequestBodyCursorMax = 1024;
@@ -37,6 +39,11 @@ export const searchTasksRequestBodyLimitDefault = 50;
 export const searchTasksRequestBodyLimitMax = 200;
 
 export const SearchTasksRequestBody = zod.strictObject({
+  agentId: zod
+    .string()
+    .max(searchTasksRequestBodyAgentIdMax)
+    .optional()
+    .describe("Only the tasks belonging to this project agent."),
   threadId: zod
     .string()
     .max(searchTasksRequestBodyThreadIdMax)

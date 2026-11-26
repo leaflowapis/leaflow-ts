@@ -39,10 +39,18 @@ export const MessagePart = zod
       .string()
       .nullish()
       .describe("The file must have been uploaded and not yet sent with another message."),
+    agentId: zod
+      .string()
+      .nullish()
+      .describe("For `mention` parts. Identifies the project agent by id."),
+    slug: zod
+      .string()
+      .nullish()
+      .describe("For `mention` parts. Identifies the project agent by slug without `@`."),
     data: zod.record(zod.string(), zod.unknown()).nullish(),
   })
   .describe(
-    "One piece of a message. `type` says which field carries it:\n\n- `text` — the words, in `text`\n- `file` — a file uploaded earlier, by id in `fileId`\n- `data-<name>` — context from the client, in `data`. The name is shown to the assistant so it\n  can tell one block from another.",
+    "One piece of a message. `type` says which field carries it:\n\n- `text` — the words, in `text`\n- `file` — a file uploaded earlier, by id in `fileId`\n- `mention` — a project agent, by `agentId` or `slug`\n- `data-<name>` — context from the client, in `data`. The name is shown to the assistant so it\n  can tell one block from another.",
   );
 
 export type MessagePart = zod.input<typeof MessagePart>;

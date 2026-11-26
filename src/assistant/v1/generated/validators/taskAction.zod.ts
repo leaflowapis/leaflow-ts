@@ -45,6 +45,7 @@ export const TaskAction = zod
       .nullish()
       .describe("For `prompt`. Sent to the conversation as a message from the task."),
     instanceId: zod.string().nullish().describe("For `command`. The instance that runs it."),
+    machineId: zod.string().nullish().describe("For `command`. The Fleet machine that runs it."),
     command: zod
       .string()
       .max(taskActionCommandMax)

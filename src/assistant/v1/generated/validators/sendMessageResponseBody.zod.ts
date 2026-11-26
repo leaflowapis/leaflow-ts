@@ -28,6 +28,7 @@
  * OpenAPI spec version: 2.0.0
  */
 import * as zod from "zod";
+import { ThreadItemResource } from "./threadItemResource.zod.js";
 
 export const sendMessageResponseBodyQueuedAheadMin = 0;
 
@@ -41,6 +42,7 @@ export const SendMessageResponseBody = zod.strictObject({
     .int()
     .min(sendMessageResponseBodyQueuedAheadMin)
     .describe("How many messages were waiting ahead of this one when it was queued."),
+  item: ThreadItemResource.optional(),
 });
 
 export type SendMessageResponseBody = zod.input<typeof SendMessageResponseBody>;

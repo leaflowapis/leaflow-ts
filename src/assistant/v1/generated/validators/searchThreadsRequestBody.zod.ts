@@ -33,6 +33,8 @@ export const searchThreadsRequestBodyIdsMax = 200;
 
 export const searchThreadsRequestBodyFolderIdMax = 64;
 
+export const searchThreadsRequestBodyAgentIdMax = 64;
+
 export const searchThreadsRequestBodyParentIdMax = 64;
 
 export const searchThreadsRequestBodyArchivedDefault = false;
@@ -58,6 +60,11 @@ export const SearchThreadsRequestBody = zod.strictObject({
     .max(searchThreadsRequestBodyFolderIdMax)
     .optional()
     .describe("Only conversations in this folder."),
+  agentId: zod
+    .string()
+    .max(searchThreadsRequestBodyAgentIdMax)
+    .optional()
+    .describe("Only conversations belonging to this project agent."),
   parentId: zod
     .string()
     .max(searchThreadsRequestBodyParentIdMax)

@@ -29,6 +29,7 @@
  */
 import * as zod from "zod";
 import { FileResource } from "./fileResource.zod.js";
+import { MentionResource } from "./mentionResource.zod.js";
 
 export const PartResource = zod.strictObject({
   id: zod
@@ -36,11 +37,14 @@ export const PartResource = zod.strictObject({
     .describe(
       "Addresses this part in the realtime stream: text arrives as `append` frames pointing at\n`/items/{item}/parts/{id}/text`. Not an array index.",
     ),
-  type: zod.enum(["text", "file"]),
+  type: zod.enum(["text", "file", "mention"]),
   text: zod.string().nullable().describe("For `text` parts. Grows as the answer is written."),
   file: zod
     .union([FileResource, zod.null()])
     .describe("For `file` parts. A file the person attached."),
+  mention: zod
+    .union([MentionResource, zod.null()])
+    .describe("For `mention` parts. A project agent referenced inline."),
 });
 
 export type PartResource = zod.input<typeof PartResource>;
