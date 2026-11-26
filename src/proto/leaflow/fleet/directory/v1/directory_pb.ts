@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/directory/v1/directory.proto.
  */
 export const file_leaflow_fleet_directory_v1_directory: GenFile = /*@__PURE__*/
-  fileDesc("CipsZWFmbG93L2ZsZWV0L2RpcmVjdG9yeS92MS9kaXJlY3RvcnkucHJvdG8SGmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxIocBCglEaXJlY3RvcnkSEAoIcmV2aXNpb24YASABKAkSNQoIYWNjb3VudHMYAiADKAsyIy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5BY2NvdW50EjEKBmdyb3VwcxgDIAMoCzIhLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdyb3VwIsIBCgdBY2NvdW50EhAKCHVzZXJuYW1lGAEgASgJEgsKA3VpZBgCIAEoDRILCgNnaWQYAyABKA0SFAoMZGlzcGxheV9uYW1lGAQgASgJEhYKDmhvbWVfZGlyZWN0b3J5GAUgASgJEg0KBXNoZWxsGAYgASgJEg8KB3VzZXJfaWQYByABKAkSFwoPc3NoX3B1YmxpY19rZXlzGAkgAygJEhUKDWxvZ2luX2FsbG93ZWQYCiABKAgSDQoFYWRtaW4YCyABKAgiMwoFR3JvdXASDAoEbmFtZRgBIAEoCRILCgNnaWQYAiABKA0SDwoHbWVtYmVycxgDIAMoCSJPChNTZXREaXJlY3RvcnlSZXF1ZXN0EjgKCWRpcmVjdG9yeRgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkRpcmVjdG9yeSIWChRTZXREaXJlY3RvcnlSZXNwb25zZSLdAQoWVXBkYXRlRGlyZWN0b3J5UmVxdWVzdBIVCg1iYXNlX3JldmlzaW9uGAEgASgJEhAKCHJldmlzaW9uGAIgASgJEjUKCGFjY291bnRzGAMgAygLMiMubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuQWNjb3VudBIxCgZncm91cHMYBCADKAsyIS5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5Hcm91cBIYChByZW1vdmVkX2FjY291bnRzGAUgAygJEhYKDnJlbW92ZWRfZ3JvdXBzGAYgAygJIhkKF1VwZGF0ZURpcmVjdG9yeVJlc3BvbnNlIiUKEUdldEFjY291bnRSZXF1ZXN0EhAKCHVzZXJuYW1lGAEgASgJIkoKEkdldEFjY291bnRSZXNwb25zZRI0CgdhY2NvdW50GAEgASgLMiMubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuQWNjb3VudCJCChxSZXBvcnREaXJlY3RvcnlTdGF0dXNSZXF1ZXN0EhAKCHJldmlzaW9uGAEgASgJEhAKCHNlcXVlbmNlGAIgASgEIh8KHVJlcG9ydERpcmVjdG9yeVN0YXR1c1Jlc3BvbnNlMpICChdNYWNoaW5lRGlyZWN0b3J5U2VydmljZRJ2CgxTZXREaXJlY3RvcnkSLy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5TZXREaXJlY3RvcnlSZXF1ZXN0GjAubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuU2V0RGlyZWN0b3J5UmVzcG9uc2UiA5ACAhJ/Cg9VcGRhdGVEaXJlY3RvcnkSMi5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5VcGRhdGVEaXJlY3RvcnlSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuVXBkYXRlRGlyZWN0b3J5UmVzcG9uc2UiA5ACAjKYAgoQRGlyZWN0b3J5U2VydmljZRJwCgpHZXRBY2NvdW50Ei0ubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuR2V0QWNjb3VudFJlcXVlc3QaLi5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5HZXRBY2NvdW50UmVzcG9uc2UiA5ACARKRAQoVUmVwb3J0RGlyZWN0b3J5U3RhdHVzEjgubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuUmVwb3J0RGlyZWN0b3J5U3RhdHVzUmVxdWVzdBo5LmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLlJlcG9ydERpcmVjdG9yeVN0YXR1c1Jlc3BvbnNlIgOQAgJCQlpAZ2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L2RpcmVjdG9yeS92MTtkaXJlY3Rvcnl2MWIGcHJvdG8z");
+  fileDesc("CipsZWFmbG93L2ZsZWV0L2RpcmVjdG9yeS92MS9kaXJlY3RvcnkucHJvdG8SGmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxIocBCglEaXJlY3RvcnkSEAoIcmV2aXNpb24YASABKAkSNQoIYWNjb3VudHMYAiADKAsyIy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5BY2NvdW50EjEKBmdyb3VwcxgDIAMoCzIhLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdyb3VwIsIBCgdBY2NvdW50EhAKCHVzZXJuYW1lGAEgASgJEgsKA3VpZBgCIAEoDRILCgNnaWQYAyABKA0SFAoMZGlzcGxheV9uYW1lGAQgASgJEhYKDmhvbWVfZGlyZWN0b3J5GAUgASgJEg0KBXNoZWxsGAYgASgJEg8KB3VzZXJfaWQYByABKAkSFwoPc3NoX3B1YmxpY19rZXlzGAkgAygJEhUKDWxvZ2luX2FsbG93ZWQYCiABKAgSDQoFYWRtaW4YCyABKAgiMwoFR3JvdXASDAoEbmFtZRgBIAEoCRILCgNnaWQYAiABKA0SDwoHbWVtYmVycxgDIAMoCSJPChNTZXREaXJlY3RvcnlSZXF1ZXN0EjgKCWRpcmVjdG9yeRgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkRpcmVjdG9yeSIWChRTZXREaXJlY3RvcnlSZXNwb25zZSLdAQoWVXBkYXRlRGlyZWN0b3J5UmVxdWVzdBIVCg1iYXNlX3JldmlzaW9uGAEgASgJEhAKCHJldmlzaW9uGAIgASgJEjUKCGFjY291bnRzGAMgAygLMiMubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuQWNjb3VudBIxCgZncm91cHMYBCADKAsyIS5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5Hcm91cBIYChByZW1vdmVkX2FjY291bnRzGAUgAygJEhYKDnJlbW92ZWRfZ3JvdXBzGAYgAygJIhkKF1VwZGF0ZURpcmVjdG9yeVJlc3BvbnNlIjIKEUdldEFjY291bnRSZXF1ZXN0EhAKCHVzZXJuYW1lGAEgASgJEgsKA3VpZBgCIAEoDSLFAQoSR2V0QWNjb3VudFJlc3BvbnNlEjQKB2FjY291bnQYASABKAsyIy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5BY2NvdW50Ej8KDWxvY2FsX2FjY291bnQYAiABKAsyKC5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5Mb2NhbEFjY291bnQSOAoGZ3JvdXBzGAMgAygLMigubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuQWNjb3VudEdyb3VwIkIKHFJlcG9ydERpcmVjdG9yeVN0YXR1c1JlcXVlc3QSEAoIcmV2aXNpb24YASABKAkSEAoIc2VxdWVuY2UYAiABKAQiHwodUmVwb3J0RGlyZWN0b3J5U3RhdHVzUmVzcG9uc2UicAoMTG9jYWxBY2NvdW50EhAKCHVzZXJuYW1lGAEgASgJEg8KB3VzZXJfaWQYAiABKAkSFwoPc3NoX3B1YmxpY19rZXlzGAMgAygJEhUKDWxvZ2luX2FsbG93ZWQYBCABKAgSDQoFYWRtaW4YBSABKAgiKQoMQWNjb3VudEdyb3VwEgwKBG5hbWUYASABKAkSCwoDZ2lkGAIgASgNIjkKD0dldEdyb3VwUmVxdWVzdBIOCgRuYW1lGAEgASgJSAASDQoDZ2lkGAIgASgNSABCBwoFcXVlcnkiRAoQR2V0R3JvdXBSZXNwb25zZRIwCgVncm91cBgBIAEoCzIhLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdyb3VwImMKGkludmFsaWRhdGVEaXJlY3RvcnlSZXF1ZXN0EhAKCHVzZXJfaWRzGAEgAygJEhEKCXVzZXJuYW1lcxgCIAMoCRITCgtncm91cF9uYW1lcxgDIAMoCRILCgNhbGwYBCABKAgiHQobSW52YWxpZGF0ZURpcmVjdG9yeVJlc3BvbnNlMqADChdNYWNoaW5lRGlyZWN0b3J5U2VydmljZRJ2CgxTZXREaXJlY3RvcnkSLy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5TZXREaXJlY3RvcnlSZXF1ZXN0GjAubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuU2V0RGlyZWN0b3J5UmVzcG9uc2UiA5ACAhJ/Cg9VcGRhdGVEaXJlY3RvcnkSMi5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5VcGRhdGVEaXJlY3RvcnlSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuVXBkYXRlRGlyZWN0b3J5UmVzcG9uc2UiA5ACAhKLAQoTSW52YWxpZGF0ZURpcmVjdG9yeRI2LmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkludmFsaWRhdGVEaXJlY3RvcnlSZXF1ZXN0GjcubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuSW52YWxpZGF0ZURpcmVjdG9yeVJlc3BvbnNlIgOQAgIyhAMKEERpcmVjdG9yeVNlcnZpY2UScAoKR2V0QWNjb3VudBItLmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLkdldEFjY291bnRSZXF1ZXN0Gi4ubGVhZmxvdy5mbGVldC5kaXJlY3RvcnkudjEuR2V0QWNjb3VudFJlc3BvbnNlIgOQAgESagoIR2V0R3JvdXASKy5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5HZXRHcm91cFJlcXVlc3QaLC5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5HZXRHcm91cFJlc3BvbnNlIgOQAgESkQEKFVJlcG9ydERpcmVjdG9yeVN0YXR1cxI4LmxlYWZsb3cuZmxlZXQuZGlyZWN0b3J5LnYxLlJlcG9ydERpcmVjdG9yeVN0YXR1c1JlcXVlc3QaOS5sZWFmbG93LmZsZWV0LmRpcmVjdG9yeS52MS5SZXBvcnREaXJlY3RvcnlTdGF0dXNSZXNwb25zZSIDkAICQkJaQGdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9kaXJlY3RvcnkvdjE7ZGlyZWN0b3J5djFiBnByb3RvMw");
 
 /**
  * The directory of the machine's project, as the machine sees it.
@@ -286,17 +286,26 @@ export const UpdateDirectoryResponseSchema: GenMessage<UpdateDirectoryResponse> 
   messageDesc(file_leaflow_fleet_directory_v1_directory, 6);
 
 /**
- * The request of GetAccount.
+ * The request of GetAccount. Exactly one of username or uid is set.
  *
  * @generated from message leaflow.fleet.directory.v1.GetAccountRequest
  */
 export type GetAccountRequest = Message<"leaflow.fleet.directory.v1.GetAccountRequest"> & {
   /**
-   * The account's login name.
+   * The login name to look up: either a bound local account of this machine or
+   * a directory account of the project.
    *
    * @generated from field: string username = 1;
    */
   username: string;
+
+  /**
+   * A directory account's uid, from 65536 to 2147483647, when looking up by
+   * uid instead of username.
+   *
+   * @generated from field: uint32 uid = 2;
+   */
+  uid: number;
 };
 
 /**
@@ -307,17 +316,34 @@ export const GetAccountRequestSchema: GenMessage<GetAccountRequest> = /*@__PURE_
   messageDesc(file_leaflow_fleet_directory_v1_directory, 7);
 
 /**
- * The response of GetAccount.
+ * The response of GetAccount. Exactly one of account or local_account is set.
  *
  * @generated from message leaflow.fleet.directory.v1.GetAccountResponse
  */
 export type GetAccountResponse = Message<"leaflow.fleet.directory.v1.GetAccountResponse"> & {
   /**
-   * The account as the calling machine's directory has it now.
+   * Set when the resolved account on this machine is a directory account
+   * served through NSS.
    *
    * @generated from field: leaflow.fleet.directory.v1.Account account = 1;
    */
   account?: Account | undefined;
+
+  /**
+   * Set instead of account when this machine binds an existing local account
+   * of /etc/passwd to a platform user.
+   *
+   * @generated from field: leaflow.fleet.directory.v1.LocalAccount local_account = 2;
+   */
+  localAccount?: LocalAccount | undefined;
+
+  /**
+   * The groups of the project's directory that this account belongs to,
+   * ordered by name, so that initgroups(3) needs no separate call.
+   *
+   * @generated from field: repeated leaflow.fleet.directory.v1.AccountGroup groups = 3;
+   */
+  groups: AccountGroup[];
 };
 
 /**
@@ -373,6 +399,220 @@ export type ReportDirectoryStatusResponse = Message<"leaflow.fleet.directory.v1.
  */
 export const ReportDirectoryStatusResponseSchema: GenMessage<ReportDirectoryStatusResponse> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_directory_v1_directory, 10);
+
+/**
+ * An existing local account of the machine (/etc/passwd) bound 1:1 to a
+ * platform user on this machine.
+ *
+ * Its uid, primary group, local supplementary groups, GECOS name, home
+ * directory and login shell come from the machine's own account files and are
+ * never overwritten. The Agent refuses to serve a LocalAccount when no local
+ * user of that name exists on the machine, when it is root (uid 0 or gid 0) or
+ * a system or non-login account (uid below UID_MIN, nobody, the Agent's own
+ * user, or a non-interactive shell), or when the machine's local configuration
+ * disallows binding it, and reports MACHINE_EVENT_TYPE_LOCAL_ACCOUNT_REFUSED
+ * (leaflow.fleet.machine.v1).
+ *
+ * @generated from message leaflow.fleet.directory.v1.LocalAccount
+ */
+export type LocalAccount = Message<"leaflow.fleet.directory.v1.LocalAccount"> & {
+  /**
+   * The local login name on this machine, by the rules of Account.username,
+   * never "root".
+   *
+   * @generated from field: string username = 1;
+   */
+  username: string;
+
+  /**
+   * The platform user bound to this local account on this machine.
+   *
+   * @generated from field: string user_id = 2;
+   */
+  userId: string;
+
+  /**
+   * The SSH public keys of the platform user, each an authorized_keys(5) key
+   * without options. sshd(8) accepts them through the Agent's
+   * AuthorizedKeysCommand in addition to the local account's own
+   * authorized_keys files while login_allowed is set.
+   *
+   * @generated from field: repeated string ssh_public_keys = 3;
+   */
+  sshPublicKeys: string[];
+
+  /**
+   * The platform user may open Fleet sessions, run commands, start MCP servers
+   * and log in with ssh_public_keys as this local account on this machine.
+   * Local passwords, local authorized_keys and non-Fleet PAM services of the
+   * local account are unaffected.
+   *
+   * @generated from field: bool login_allowed = 4;
+   */
+  loginAllowed: boolean;
+
+  /**
+   * The platform user may become root as this local account through Fleet's
+   * sudo approval (leaflow.fleet.privilege.v1) and inside Fleet commands
+   * (leaflow.fleet.command.v1).
+   *
+   * @generated from field: bool admin = 5;
+   */
+  admin: boolean;
+};
+
+/**
+ * Describes the message leaflow.fleet.directory.v1.LocalAccount.
+ * Use `create(LocalAccountSchema)` to create a new message.
+ */
+export const LocalAccountSchema: GenMessage<LocalAccount> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 11);
+
+/**
+ * A project group an account belongs to.
+ *
+ * @generated from message leaflow.fleet.directory.v1.AccountGroup
+ */
+export type AccountGroup = Message<"leaflow.fleet.directory.v1.AccountGroup"> & {
+  /**
+   * The group name, by the rules of Group.name.
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * The group id, from 65536 to 2147483647.
+   *
+   * @generated from field: uint32 gid = 2;
+   */
+  gid: number;
+};
+
+/**
+ * Describes the message leaflow.fleet.directory.v1.AccountGroup.
+ * Use `create(AccountGroupSchema)` to create a new message.
+ */
+export const AccountGroupSchema: GenMessage<AccountGroup> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 12);
+
+/**
+ * The request of GetGroup.
+ *
+ * @generated from message leaflow.fleet.directory.v1.GetGroupRequest
+ */
+export type GetGroupRequest = Message<"leaflow.fleet.directory.v1.GetGroupRequest"> & {
+  /**
+   * Which group to look up; set one.
+   *
+   * @generated from oneof leaflow.fleet.directory.v1.GetGroupRequest.query
+   */
+  query: {
+    /**
+     * The group name, by the rules of Group.name.
+     *
+     * @generated from field: string name = 1;
+     */
+    value: string;
+    case: "name";
+  } | {
+    /**
+     * The group id, from 65536 to 2147483647.
+     *
+     * @generated from field: uint32 gid = 2;
+     */
+    value: number;
+    case: "gid";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message leaflow.fleet.directory.v1.GetGroupRequest.
+ * Use `create(GetGroupRequestSchema)` to create a new message.
+ */
+export const GetGroupRequestSchema: GenMessage<GetGroupRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 13);
+
+/**
+ * The response of GetGroup.
+ *
+ * @generated from message leaflow.fleet.directory.v1.GetGroupResponse
+ */
+export type GetGroupResponse = Message<"leaflow.fleet.directory.v1.GetGroupResponse"> & {
+  /**
+   * The group as the calling machine's project directory has it now, with the
+   * effective usernames on this machine of its members.
+   *
+   * @generated from field: leaflow.fleet.directory.v1.Group group = 1;
+   */
+  group?: Group | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.directory.v1.GetGroupResponse.
+ * Use `create(GetGroupResponseSchema)` to create a new message.
+ */
+export const GetGroupResponseSchema: GenMessage<GetGroupResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 14);
+
+/**
+ * The request of InvalidateDirectory.
+ *
+ * @generated from message leaflow.fleet.directory.v1.InvalidateDirectoryRequest
+ */
+export type InvalidateDirectoryRequest = Message<"leaflow.fleet.directory.v1.InvalidateDirectoryRequest"> & {
+  /**
+   * Platform user ids whose resolved account, permissions, SSH keys or
+   * local-account binding changed.
+   *
+   * @generated from field: repeated string user_ids = 1;
+   */
+  userIds: string[];
+
+  /**
+   * Account usernames (directory or local) that changed or were unbound on
+   * this machine.
+   *
+   * @generated from field: repeated string usernames = 2;
+   */
+  usernames: string[];
+
+  /**
+   * Project group names that were renamed, removed or had membership changes.
+   *
+   * @generated from field: repeated string group_names = 3;
+   */
+  groupNames: string[];
+
+  /**
+   * When true, invalidates every cached directory entry on the machine.
+   *
+   * @generated from field: bool all = 4;
+   */
+  all: boolean;
+};
+
+/**
+ * Describes the message leaflow.fleet.directory.v1.InvalidateDirectoryRequest.
+ * Use `create(InvalidateDirectoryRequestSchema)` to create a new message.
+ */
+export const InvalidateDirectoryRequestSchema: GenMessage<InvalidateDirectoryRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 15);
+
+/**
+ * The response of InvalidateDirectory.
+ *
+ * @generated from message leaflow.fleet.directory.v1.InvalidateDirectoryResponse
+ */
+export type InvalidateDirectoryResponse = Message<"leaflow.fleet.directory.v1.InvalidateDirectoryResponse"> & {
+};
+
+/**
+ * Describes the message leaflow.fleet.directory.v1.InvalidateDirectoryResponse.
+ * Use `create(InvalidateDirectoryResponseSchema)` to create a new message.
+ */
+export const InvalidateDirectoryResponseSchema: GenMessage<InvalidateDirectoryResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_directory_v1_directory, 16);
 
 /**
  * Keeps the machine's copy of the directory. Served by the daemon; the
@@ -451,6 +691,28 @@ export const MachineDirectoryService: GenService<{
     input: typeof UpdateDirectoryRequestSchema;
     output: typeof UpdateDirectoryResponseSchema;
   },
+  /**
+   * Notifies the daemon that cached directory entries on this machine may be
+   * stale. For a machine that reports the "on_demand" detail, the service
+   * sends this instead of SetDirectory or UpdateDirectory whenever an
+   * account's access, SSH keys, attributes or local-account binding on this
+   * machine changes, or a project group changes.
+   *
+   * For each named user_id, username or group_name that the daemon currently
+   * caches or runs sessions or MCP servers for (or for every cached entry when
+   * all is true), the daemon refreshes or evicts its cached entry and ends any
+   * Fleet sessions and MCP servers of an account that may no longer log in
+   * (SESSION_CLOSE_REASON_ACCESS_REVOKED of leaflow.fleet.host.v1). Entries
+   * the daemon has never cached on this machine require no action and no call
+   * back.
+   *
+   * @generated from rpc leaflow.fleet.directory.v1.MachineDirectoryService.InvalidateDirectory
+   */
+  invalidateDirectory: {
+    methodKind: "unary";
+    input: typeof InvalidateDirectoryRequestSchema;
+    output: typeof InvalidateDirectoryResponseSchema;
+  },
 }> = /*@__PURE__*/
   serviceDesc(file_leaflow_fleet_directory_v1_directory, 0);
 
@@ -462,14 +724,28 @@ export const MachineDirectoryService: GenService<{
  */
 export const DirectoryService: GenService<{
   /**
-   * Returns an account of the calling machine's directory as it stands now,
-   * from the platform's current permissions and keys: the Account that
-   * SetDirectory would carry now. The Agent asks when the account logs in and
-   * when it asks to become root, and replaces its copy of the account with
-   * the answer.
+   * Returns an account on the calling machine as it stands now, by login name
+   * or directory uid, from the platform's current permissions, SSH keys and
+   * local-account bindings for this machine, together with the project groups
+   * the account belongs to. The Agent asks on demand (for NSS cache misses,
+   * AuthorizedKeysCommand, PAM checks, sessions, commands and MCP) and caches
+   * active entries locally across restarts for offline use.
    *
-   * Fails with NOT_FOUND and reason ACCOUNT_NOT_FOUND for a name that is not
-   * an account of the machine's directory.
+   * When this machine reports "local_accounts" and binds an existing local
+   * account of that username to a platform user, the response carries
+   * local_account instead of account: the machine keeps the local account's own
+   * passwd(5) entry, groups and authorized_keys, and uses local_account for
+   * Fleet sessions, commands, MCP servers, sudo approvals and additional SSH
+   * keys. A platform user bound to a local account on this machine resolves
+   * only as that local account here; querying their directory username or uid
+   * on this machine fails with ACCOUNT_NOT_FOUND.
+   *
+   * Fails with:
+   *   - INVALID_ARGUMENT and reason INVALID_REQUEST, with metadata "field"
+   *     naming the offending field, when neither username nor uid is set, both
+   *     are set, or the value breaks its field rules;
+   *   - NOT_FOUND and reason ACCOUNT_NOT_FOUND when no directory account or
+   *     bound local account of this machine matches.
    *
    * @generated from rpc leaflow.fleet.directory.v1.DirectoryService.GetAccount
    */
@@ -479,10 +755,25 @@ export const DirectoryService: GenService<{
     output: typeof GetAccountResponseSchema;
   },
   /**
-   * Reports the copy the Agent serves. The Agent reports after every connect
-   * and after every SetDirectory or UpdateDirectory that changed its copy.
-   * The service sends SetDirectory, or UpdateDirectory from the reported
-   * revision, when it is not the one the service holds.
+   * Returns a group of the calling machine's project directory by name or gid,
+   * on demand when NSS looks up a group not yet in the machine's cache.
+   *
+   * Fails with:
+   *   - INVALID_ARGUMENT and reason INVALID_REQUEST, with metadata "field"
+   *     naming the offending field, when neither name nor gid is set or the
+   *     value breaks its field rules;
+   *   - NOT_FOUND and reason GROUP_NOT_FOUND when no group of the project's
+   *     directory matches.
+   *
+   * @generated from rpc leaflow.fleet.directory.v1.DirectoryService.GetGroup
+   */
+  getGroup: {
+    methodKind: "unary";
+    input: typeof GetGroupRequestSchema;
+    output: typeof GetGroupResponseSchema;
+  },
+  /**
+   * Reports the copy the Agent serves. Kept for Agents without "on_demand".
    *
    * @generated from rpc leaflow.fleet.directory.v1.DirectoryService.ReportDirectoryStatus
    */

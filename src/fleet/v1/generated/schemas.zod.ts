@@ -98,25 +98,36 @@
  *
  * ## Directory
  *
- * Every user has one account, as with Google Cloud OS Login: a username and a uid that are the
- * same on every machine of every project. The account is created the first time the user may log
- * in to a machine or opens a session; its username comes from the email address, such as
- * `alice_example_com` for `alice@example.com`, and its owner can change it. A project's machines
- * know the accounts of the project's members and the groups the project defines. A member who
- * leaves the project can no longer log in, and files keep their owner.
+ * Every user has one directory account: a username and a uid that are the same on every machine
+ * of every project. The account is created the first time the user may log in to a machine or
+ * opens a session; its username comes from the email address, such as `alice_example_com` for
+ * `alice@example.com`, and its owner can change it. Machines resolve accounts and project groups
+ * on demand when they are used and cache active entries locally, rather than downloading the
+ * whole project directory up front, and never write directory entries into their local account
+ * files. A member who leaves the project can no longer log in through Fleet, and files keep
+ * their owner.
+ *
+ * On a machine that already has local Linux users configured in `/etc/passwd`, an existing
+ * non-system local account (never `root`) can be bound 1:1 to a project member
+ * (`PUT /api/v1/machines/{machineId}/local-accounts/{username}`, requiring `fleet:machines.admin`
+ * on the machine). On that machine, the member's sessions, commands, MCP servers and `sudo`
+ * approvals run as that local account — keeping its existing uid, home directory, shell, local
+ * groups and `~/.ssh/authorized_keys` — while `sshd` also accepts the member's SSH keys registered
+ * on the platform. Local passwords, local `authorized_keys` and non-Fleet logins of the local
+ * account remain as configured on the machine.
  *
  * Who may log in to which machines, and who may become root there through sudo, are permissions
  * of the project's roles: `fleet:machines.login` and `fleet:machines.admin`, each for all
- * machines or for chosen ones. Changes reach the machines within about a minute, and every login
- * and elevation is checked against the current permissions while the machine is connected. To
- * keep a member out of some machines, deny them `fleet:machines.login` on those machines.
- * Elevation through sudo is never approved by a password; see "Approving sudo".
+ * machines or for chosen ones. Every login and elevation checks the current permissions while
+ * the machine is connected, and revoking access ends open Fleet sessions on the machine. To keep
+ * a member out of some machines, deny them `fleet:machines.login` on those machines. Elevation
+ * through Fleet is approved without a password; see "Approving sudo".
  *
  * Members log in over SSH with the SSH keys of their own accounts (`/account/v1/me/ssh-keys` on
- * the account API), while they may log in to the machine.
+ * the account API), while they may log in to the machine; on a bound local account, those keys
+ * work alongside any keys already in the local account's `authorized_keys` files.
  *
- * Machines resolve directory accounts and groups themselves and never write them into their local
- * account files. A local account or group that already uses a name or id of the directory keeps
+ * An unbound local account or group that already uses a name or id of a directory entry keeps
  * it, and the machine records the conflict among its events.
  *
  * ## Running commands
@@ -283,6 +294,8 @@ import { UpdateAccountRequest } from "./validators/updateAccountRequest.zod.js";
 
 import { UpdateGroupRequest } from "./validators/updateGroupRequest.zod.js";
 
+import { UpdateMachineLocalAccountRequest } from "./validators/updateMachineLocalAccountRequest.zod.js";
+
 import { UpdateMachineRequest } from "./validators/updateMachineRequest.zod.js";
 
 import { UpdateMcpServerRequest } from "./validators/updateMcpServerRequest.zod.js";
@@ -380,9 +393,132 @@ export const ListMachineEventsQueryParams = zod.strictObject({
     .default(listMachineEventsQueryPageSizeDefault)
     .describe("Items per page. Defaults to 50; at most 200."),
   type: zod
-    .enum(["directory_account_conflict", "directory_group_conflict"])
+    .enum(["directory_account_conflict", "directory_group_conflict", "local_account_refused"])
     .optional()
     .describe("Return only events of this type"),
+});
+
+/**
+ * Returns the existing local Linux accounts on the machine that are bound to members of the
+ * project, ordered by `username`.
+ * @summary List bound local accounts on a machine
+ */
+export const ListMachineLocalAccountsParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+export const listMachineLocalAccountsQueryPageDefault = 1;
+export const listMachineLocalAccountsQueryPageMax = 2147483647;
+
+export const listMachineLocalAccountsQueryPageSizeDefault = 50;
+export const listMachineLocalAccountsQueryPageSizeMax = 200;
+
+export const listMachineLocalAccountsQueryKeywordMax = 128;
+
+export const ListMachineLocalAccountsQueryParams = zod.strictObject({
+  page: zod
+    .int()
+    .min(1)
+    .max(listMachineLocalAccountsQueryPageMax)
+    .default(listMachineLocalAccountsQueryPageDefault)
+    .describe("1-based page number. Defaults to 1."),
+  page_size: zod
+    .int()
+    .min(1)
+    .max(listMachineLocalAccountsQueryPageSizeMax)
+    .default(listMachineLocalAccountsQueryPageSizeDefault)
+    .describe("Items per page. Defaults to 50; at most 200."),
+  user_id: zod.uuid().optional().describe("Return only the binding of this member"),
+  keyword: zod
+    .string()
+    .max(listMachineLocalAccountsQueryKeywordMax)
+    .optional()
+    .describe("Match the local username or the member's name, case-insensitively"),
+});
+
+/**
+ * Returns the binding of a local account on the machine. Fails with `LOCAL_ACCOUNT_NOT_FOUND`
+ * when the local username is not bound on this machine.
+ * @summary Get a bound local account on a machine
+ */
+export const getMachineLocalAccountPathUsernameMax = 32;
+
+export const getMachineLocalAccountPathUsernameRegExp = new RegExp("^[a-z_][a-z0-9_-]*$");
+
+export const GetMachineLocalAccountParams = zod.strictObject({
+  machineId: zod.uuid(),
+  username: zod
+    .string()
+    .min(1)
+    .max(getMachineLocalAccountPathUsernameMax)
+    .regex(getMachineLocalAccountPathUsernameRegExp)
+    .describe(
+      "The login name of the existing local account on the machine (`/etc/passwd`), never `root`\nor a system account",
+    ),
+});
+
+/**
+ * Binds the existing local Linux account `username` on the machine to the project member
+ * `user_id`, or replaces which member `username` is bound to. On this machine, Fleet opens
+ * sessions, runs commands, starts MCP servers and approves `sudo` for that member as
+ * `username`, keeping the local account's existing uid, home directory, shell, local groups
+ * and `~/.ssh/authorized_keys`, while `sshd` also accepts the member's SSH keys from the
+ * platform. The member's directory account is created if they have none yet.
+ *
+ * If the machine has no such local user in `/etc/passwd`, if it is a system or non-login
+ * account, or if the machine's local configuration disallows binding it, the machine refuses
+ * to serve it and records a `local_account_refused` event.
+ *
+ * Requires `fleet:machines.login` and `fleet:machines.admin` on the machine, since whoever
+ * is bound to a local account inherits its existing files, groups and local `sudoers` rules.
+ *
+ * Fails with:
+ * - `USER_NOT_PROJECT_MEMBER` when `user_id` is not an active member of the project;
+ * - `LOCAL_ACCOUNT_RESERVED` when `username` is `root` or a reserved system account name;
+ * - `LOCAL_ACCOUNT_USER_BOUND` when `user_id` is already bound to another local account on
+ *   this machine, with `metadata.username` naming it; remove that binding first.
+ * @summary Bind or replace a local account on a machine
+ */
+export const updateMachineLocalAccountPathUsernameMax = 32;
+
+export const updateMachineLocalAccountPathUsernameRegExp = new RegExp("^[a-z_][a-z0-9_-]*$");
+
+export const UpdateMachineLocalAccountParams = zod.strictObject({
+  machineId: zod.uuid(),
+  username: zod
+    .string()
+    .min(1)
+    .max(updateMachineLocalAccountPathUsernameMax)
+    .regex(updateMachineLocalAccountPathUsernameRegExp)
+    .describe(
+      "The login name of the existing local account on the machine (`/etc/passwd`), never `root`\nor a system account",
+    ),
+});
+
+export const UpdateMachineLocalAccountBody = UpdateMachineLocalAccountRequest;
+
+/**
+ * Removes the binding of `username` on the machine; removing one that is not bound succeeds.
+ * Open Fleet sessions and MCP servers running under the binding end, while the local account
+ * on the machine itself is left untouched.
+ *
+ * Requires `fleet:machines.login` and `fleet:machines.admin` on the machine.
+ * @summary Unbind a local account on a machine
+ */
+export const deleteMachineLocalAccountPathUsernameMax = 32;
+
+export const deleteMachineLocalAccountPathUsernameRegExp = new RegExp("^[a-z_][a-z0-9_-]*$");
+
+export const DeleteMachineLocalAccountParams = zod.strictObject({
+  machineId: zod.uuid(),
+  username: zod
+    .string()
+    .min(1)
+    .max(deleteMachineLocalAccountPathUsernameMax)
+    .regex(deleteMachineLocalAccountPathUsernameRegExp)
+    .describe(
+      "The login name of the existing local account on the machine (`/etc/passwd`), never `root`\nor a system account",
+    ),
 });
 
 /**

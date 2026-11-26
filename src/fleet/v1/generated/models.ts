@@ -98,25 +98,36 @@
  *
  * ## Directory
  *
- * Every user has one account, as with Google Cloud OS Login: a username and a uid that are the
- * same on every machine of every project. The account is created the first time the user may log
- * in to a machine or opens a session; its username comes from the email address, such as
- * `alice_example_com` for `alice@example.com`, and its owner can change it. A project's machines
- * know the accounts of the project's members and the groups the project defines. A member who
- * leaves the project can no longer log in, and files keep their owner.
+ * Every user has one directory account: a username and a uid that are the same on every machine
+ * of every project. The account is created the first time the user may log in to a machine or
+ * opens a session; its username comes from the email address, such as `alice_example_com` for
+ * `alice@example.com`, and its owner can change it. Machines resolve accounts and project groups
+ * on demand when they are used and cache active entries locally, rather than downloading the
+ * whole project directory up front, and never write directory entries into their local account
+ * files. A member who leaves the project can no longer log in through Fleet, and files keep
+ * their owner.
+ *
+ * On a machine that already has local Linux users configured in `/etc/passwd`, an existing
+ * non-system local account (never `root`) can be bound 1:1 to a project member
+ * (`PUT /api/v1/machines/{machineId}/local-accounts/{username}`, requiring `fleet:machines.admin`
+ * on the machine). On that machine, the member's sessions, commands, MCP servers and `sudo`
+ * approvals run as that local account — keeping its existing uid, home directory, shell, local
+ * groups and `~/.ssh/authorized_keys` — while `sshd` also accepts the member's SSH keys registered
+ * on the platform. Local passwords, local `authorized_keys` and non-Fleet logins of the local
+ * account remain as configured on the machine.
  *
  * Who may log in to which machines, and who may become root there through sudo, are permissions
  * of the project's roles: `fleet:machines.login` and `fleet:machines.admin`, each for all
- * machines or for chosen ones. Changes reach the machines within about a minute, and every login
- * and elevation is checked against the current permissions while the machine is connected. To
- * keep a member out of some machines, deny them `fleet:machines.login` on those machines.
- * Elevation through sudo is never approved by a password; see "Approving sudo".
+ * machines or for chosen ones. Every login and elevation checks the current permissions while
+ * the machine is connected, and revoking access ends open Fleet sessions on the machine. To keep
+ * a member out of some machines, deny them `fleet:machines.login` on those machines. Elevation
+ * through Fleet is approved without a password; see "Approving sudo".
  *
  * Members log in over SSH with the SSH keys of their own accounts (`/account/v1/me/ssh-keys` on
- * the account API), while they may log in to the machine.
+ * the account API), while they may log in to the machine; on a bound local account, those keys
+ * work alongside any keys already in the local account's `authorized_keys` files.
  *
- * Machines resolve directory accounts and groups themselves and never write them into their local
- * account files. A local account or group that already uses a name or id of the directory keeps
+ * An unbound local account or group that already uses a name or id of a directory entry keeps
  * it, and the machine records the conflict among its events.
  *
  * ## Running commands
@@ -406,12 +417,17 @@ export interface MachineList {
  * `directory_group_conflict`: a group is not served because a local group uses its name or
  * gid, or its gid is among the subordinate ids of a local user; metadata `groupName`, and
  * `conflict` `name`, `gid` or `subordinate`.
+ * `local_account_refused`: a bound local account is not served on the machine because no
+ * such local user exists, because it is `root` or a system or non-login account, or because
+ * the machine's local configuration disallows binding it; metadata `username`, and `reason`
+ * `missing`, `system` or `disallowed`.
  */
 export type MachineEventType = (typeof MachineEventType)[keyof typeof MachineEventType];
 
 export const MachineEventType = {
   directory_account_conflict: "directory_account_conflict",
   directory_group_conflict: "directory_group_conflict",
+  local_account_refused: "local_account_refused",
 } as const;
 
 /**
@@ -616,6 +632,33 @@ export interface UpdateAccountRequest {
    * @pattern ^/[^\s:]+$
    */
   shell?: string;
+}
+
+export interface MachineLocalAccountResource {
+  id: string;
+  machine_id: string;
+  /** The existing local login name on the machine (`/etc/passwd`) */
+  username: string;
+  /** The bound member's account id */
+  account_id: string;
+  user: NamedIdentity;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MachineLocalAccountList {
+  items: MachineLocalAccountResource[];
+  /** @minimum 0 */
+  total_count: number;
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+}
+
+export interface UpdateMachineLocalAccountRequest {
+  /** The project member to bind to this local account on the machine */
+  user_id: string;
 }
 
 export interface GroupResource {
@@ -1640,6 +1683,30 @@ export type ListMachineEventsParams = {
    * Return only events of this type
    */
   type?: MachineEventType;
+};
+
+export type ListMachineLocalAccountsParams = {
+  /**
+   * 1-based page number. Defaults to 1.
+   * @minimum 1
+   * @maximum 2147483647
+   */
+  page?: number;
+  /**
+   * Items per page. Defaults to 50; at most 200.
+   * @minimum 1
+   * @maximum 200
+   */
+  page_size?: number;
+  /**
+   * Return only the binding of this member
+   */
+  user_id?: string;
+  /**
+   * Match the local username or the member's name, case-insensitively
+   * @maxLength 128
+   */
+  keyword?: string;
 };
 
 export type DeleteMcpServerParams = {

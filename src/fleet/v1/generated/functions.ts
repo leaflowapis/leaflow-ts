@@ -98,25 +98,36 @@
  *
  * ## Directory
  *
- * Every user has one account, as with Google Cloud OS Login: a username and a uid that are the
- * same on every machine of every project. The account is created the first time the user may log
- * in to a machine or opens a session; its username comes from the email address, such as
- * `alice_example_com` for `alice@example.com`, and its owner can change it. A project's machines
- * know the accounts of the project's members and the groups the project defines. A member who
- * leaves the project can no longer log in, and files keep their owner.
+ * Every user has one directory account: a username and a uid that are the same on every machine
+ * of every project. The account is created the first time the user may log in to a machine or
+ * opens a session; its username comes from the email address, such as `alice_example_com` for
+ * `alice@example.com`, and its owner can change it. Machines resolve accounts and project groups
+ * on demand when they are used and cache active entries locally, rather than downloading the
+ * whole project directory up front, and never write directory entries into their local account
+ * files. A member who leaves the project can no longer log in through Fleet, and files keep
+ * their owner.
+ *
+ * On a machine that already has local Linux users configured in `/etc/passwd`, an existing
+ * non-system local account (never `root`) can be bound 1:1 to a project member
+ * (`PUT /api/v1/machines/{machineId}/local-accounts/{username}`, requiring `fleet:machines.admin`
+ * on the machine). On that machine, the member's sessions, commands, MCP servers and `sudo`
+ * approvals run as that local account — keeping its existing uid, home directory, shell, local
+ * groups and `~/.ssh/authorized_keys` — while `sshd` also accepts the member's SSH keys registered
+ * on the platform. Local passwords, local `authorized_keys` and non-Fleet logins of the local
+ * account remain as configured on the machine.
  *
  * Who may log in to which machines, and who may become root there through sudo, are permissions
  * of the project's roles: `fleet:machines.login` and `fleet:machines.admin`, each for all
- * machines or for chosen ones. Changes reach the machines within about a minute, and every login
- * and elevation is checked against the current permissions while the machine is connected. To
- * keep a member out of some machines, deny them `fleet:machines.login` on those machines.
- * Elevation through sudo is never approved by a password; see "Approving sudo".
+ * machines or for chosen ones. Every login and elevation checks the current permissions while
+ * the machine is connected, and revoking access ends open Fleet sessions on the machine. To keep
+ * a member out of some machines, deny them `fleet:machines.login` on those machines. Elevation
+ * through Fleet is approved without a password; see "Approving sudo".
  *
  * Members log in over SSH with the SSH keys of their own accounts (`/account/v1/me/ssh-keys` on
- * the account API), while they may log in to the machine.
+ * the account API), while they may log in to the machine; on a bound local account, those keys
+ * work alongside any keys already in the local account's `authorized_keys` files.
  *
- * Machines resolve directory accounts and groups themselves and never write them into their local
- * account files. A local account or group that already uses a name or id of the directory keeps
+ * An unbound local account or group that already uses a name or id of a directory entry keeps
  * it, and the machine records the conflict among its events.
  *
  * ## Running commands
@@ -277,6 +288,7 @@ import type {
   ListGroupMembersParams,
   ListGroupsParams,
   ListMachineEventsParams,
+  ListMachineLocalAccountsParams,
   ListMachineRegistrationsParams,
   ListMachinesParams,
   ListPrivilegeAutoApprovalsParams,
@@ -285,6 +297,8 @@ import type {
   ListToolsParams,
   MachineEventList,
   MachineList,
+  MachineLocalAccountList,
+  MachineLocalAccountResource,
   MachineRegistrationList,
   MachineRegistrationResource,
   MachineResource,
@@ -312,6 +326,7 @@ import type {
   ToolList,
   UpdateAccountRequest,
   UpdateGroupRequest,
+  UpdateMachineLocalAccountRequest,
   UpdateMachineRequest,
   UpdateMcpServerRequest,
   UpdateMcpServerResponse,
@@ -632,6 +647,255 @@ export const listMachineEvents = async (
     {},
   )) as listMachineEventsResponse["data"];
   return { data, status: res.status, headers: res.headers } as listMachineEventsResponse;
+};
+
+export type listMachineLocalAccountsResponse200 = {
+  data: MachineLocalAccountList;
+  status: 200;
+};
+
+export type listMachineLocalAccountsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listMachineLocalAccountsResponseSuccess = listMachineLocalAccountsResponse200 & {
+  headers: Headers;
+};
+export type listMachineLocalAccountsResponseError = listMachineLocalAccountsResponseDefault & {
+  headers: Headers;
+};
+
+export type listMachineLocalAccountsResponse =
+  | listMachineLocalAccountsResponseSuccess
+  | listMachineLocalAccountsResponseError;
+
+export const getListMachineLocalAccountsUrl = (
+  machineId: string,
+  params?: ListMachineLocalAccountsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/local-accounts?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/local-accounts`;
+};
+
+/**
+ * Returns the existing local Linux accounts on the machine that are bound to members of the
+ * project, ordered by `username`.
+ * @summary List bound local accounts on a machine
+ */
+export const listMachineLocalAccounts = async (
+  machineId: string,
+  params?: ListMachineLocalAccountsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listMachineLocalAccountsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListMachineLocalAccountsUrl(machineId, params), {
+    ...options,
+    method: "GET",
+  });
+  const data: listMachineLocalAccountsResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listMachineLocalAccountsResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listMachineLocalAccountsResponse;
+};
+
+export type getMachineLocalAccountResponse200 = {
+  data: MachineLocalAccountResource;
+  status: 200;
+};
+
+export type getMachineLocalAccountResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getMachineLocalAccountResponseSuccess = getMachineLocalAccountResponse200 & {
+  headers: Headers;
+};
+export type getMachineLocalAccountResponseError = getMachineLocalAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type getMachineLocalAccountResponse =
+  | getMachineLocalAccountResponseSuccess
+  | getMachineLocalAccountResponseError;
+
+export const getGetMachineLocalAccountUrl = (machineId: string, username: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/local-accounts/${encodeURIComponent(String(username))}`;
+};
+
+/**
+ * Returns the binding of a local account on the machine. Fails with `LOCAL_ACCOUNT_NOT_FOUND`
+ * when the local username is not bound on this machine.
+ * @summary Get a bound local account on a machine
+ */
+export const getMachineLocalAccount = async (
+  machineId: string,
+  username: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getMachineLocalAccountResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetMachineLocalAccountUrl(machineId, username), {
+    ...options,
+    method: "GET",
+  });
+  const data: getMachineLocalAccountResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as getMachineLocalAccountResponse["data"];
+  return { data, status: res.status, headers: res.headers } as getMachineLocalAccountResponse;
+};
+
+export type updateMachineLocalAccountResponse200 = {
+  data: MachineLocalAccountResource;
+  status: 200;
+};
+
+export type updateMachineLocalAccountResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type updateMachineLocalAccountResponseSuccess = updateMachineLocalAccountResponse200 & {
+  headers: Headers;
+};
+export type updateMachineLocalAccountResponseError = updateMachineLocalAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type updateMachineLocalAccountResponse =
+  | updateMachineLocalAccountResponseSuccess
+  | updateMachineLocalAccountResponseError;
+
+export const getUpdateMachineLocalAccountUrl = (machineId: string, username: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/local-accounts/${encodeURIComponent(String(username))}`;
+};
+
+/**
+ * Binds the existing local Linux account `username` on the machine to the project member
+ * `user_id`, or replaces which member `username` is bound to. On this machine, Fleet opens
+ * sessions, runs commands, starts MCP servers and approves `sudo` for that member as
+ * `username`, keeping the local account's existing uid, home directory, shell, local groups
+ * and `~/.ssh/authorized_keys`, while `sshd` also accepts the member's SSH keys from the
+ * platform. The member's directory account is created if they have none yet.
+ *
+ * If the machine has no such local user in `/etc/passwd`, if it is a system or non-login
+ * account, or if the machine's local configuration disallows binding it, the machine refuses
+ * to serve it and records a `local_account_refused` event.
+ *
+ * Requires `fleet:machines.login` and `fleet:machines.admin` on the machine, since whoever
+ * is bound to a local account inherits its existing files, groups and local `sudoers` rules.
+ *
+ * Fails with:
+ * - `USER_NOT_PROJECT_MEMBER` when `user_id` is not an active member of the project;
+ * - `LOCAL_ACCOUNT_RESERVED` when `username` is `root` or a reserved system account name;
+ * - `LOCAL_ACCOUNT_USER_BOUND` when `user_id` is already bound to another local account on
+ *   this machine, with `metadata.username` naming it; remove that binding first.
+ * @summary Bind or replace a local account on a machine
+ */
+export const updateMachineLocalAccount = async (
+  machineId: string,
+  username: string,
+  updateMachineLocalAccountRequest: UpdateMachineLocalAccountRequest,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateMachineLocalAccountResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateMachineLocalAccountUrl(machineId, username), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateMachineLocalAccountRequest),
+  });
+  const data: updateMachineLocalAccountResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as updateMachineLocalAccountResponse["data"];
+  return { data, status: res.status, headers: res.headers } as updateMachineLocalAccountResponse;
+};
+
+export type deleteMachineLocalAccountResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteMachineLocalAccountResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 204>;
+};
+
+export type deleteMachineLocalAccountResponseSuccess = deleteMachineLocalAccountResponse204 & {
+  headers: Headers;
+};
+export type deleteMachineLocalAccountResponseError = deleteMachineLocalAccountResponseDefault & {
+  headers: Headers;
+};
+
+export type deleteMachineLocalAccountResponse =
+  | deleteMachineLocalAccountResponseSuccess
+  | deleteMachineLocalAccountResponseError;
+
+export const getDeleteMachineLocalAccountUrl = (machineId: string, username: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/local-accounts/${encodeURIComponent(String(username))}`;
+};
+
+/**
+ * Removes the binding of `username` on the machine; removing one that is not bound succeeds.
+ * Open Fleet sessions and MCP servers running under the binding end, while the local account
+ * on the machine itself is left untouched.
+ *
+ * Requires `fleet:machines.login` and `fleet:machines.admin` on the machine.
+ * @summary Unbind a local account on a machine
+ */
+export const deleteMachineLocalAccount = async (
+  machineId: string,
+  username: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteMachineLocalAccountResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeleteMachineLocalAccountUrl(machineId, username), {
+    ...options,
+    method: "DELETE",
+  });
+  const data: deleteMachineLocalAccountResponse["data"] = (await decodeResponse(
+    res,
+    { "204": "json", default: "json" },
+    undefined,
+  )) as deleteMachineLocalAccountResponse["data"];
+  return { data, status: res.status, headers: res.headers } as deleteMachineLocalAccountResponse;
 };
 
 export type runMachineCommandResponse200 = {
