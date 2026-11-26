@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/exec/v1/exec.proto.
  */
 export const file_leaflow_fleet_exec_v1_exec: GenFile = /*@__PURE__*/
-  fileDesc("CiBsZWFmbG93L2ZsZWV0L2V4ZWMvdjEvZXhlYy5wcm90bxIVbGVhZmxvdy5mbGVldC5leGVjLnYxIroBCg1DbGllbnRNZXNzYWdlEjEKBXN0YXJ0GAEgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNTdGFydEgAEjEKBWlucHV0GAIgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNJbnB1dEgAEjgKCWlucHV0X2VuZBgDIAEoCzIjLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjSW5wdXRFbmRIAEIJCgdtZXNzYWdlIoABCg1TZXJ2ZXJNZXNzYWdlEjMKBm91dHB1dBgBIAEoCzIhLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjT3V0cHV0SAASLwoEZXhpdBgCIAEoCzIfLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjRXhpdEgAQgkKB21lc3NhZ2Ui6wEKCUV4ZWNTdGFydBIMCgRhcmd2GAEgAygJEhkKEXdvcmtpbmdfZGlyZWN0b3J5GAIgASgJEioKB3RpbWVvdXQYAyABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SDQoFc3RkaW4YBCABKAgSRgoLZW52aXJvbm1lbnQYBSADKAsyMS5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY1N0YXJ0LkVudmlyb25tZW50RW50cnkaMgoQRW52aXJvbm1lbnRFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIhkKCUV4ZWNJbnB1dBIMCgRkYXRhGAEgASgMIg4KDEV4ZWNJbnB1dEVuZCJPCgpFeGVjT3V0cHV0EjMKBnN0cmVhbRgBIAEoDjIjLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5PdXRwdXRTdHJlYW0SDAoEZGF0YRgCIAEoDCJ4CghFeGVjRXhpdBITCglleGl0X2NvZGUYASABKA1IABIVCgtzaWduYWxfbmFtZRgCIAEoCUgAEhMKC2NvcmVfZHVtcGVkGAMgASgIEiEKBWVycm9yGAQgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNCCAoGc3RhdHVzIgwKCkV4ZWNQb2xpY3kqYQoMT3V0cHV0U3RyZWFtEh0KGU9VVFBVVF9TVFJFQU1fVU5TUEVDSUZJRUQQABIYChRPVVRQVVRfU1RSRUFNX1NURE9VVBABEhgKFE9VVFBVVF9TVFJFQU1fU1RERVJSEAJCOFo2Z2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L2V4ZWMvdjE7ZXhlY3YxYgZwcm90bzM", [file_google_protobuf_duration, file_google_rpc_status]);
+  fileDesc("CiBsZWFmbG93L2ZsZWV0L2V4ZWMvdjEvZXhlYy5wcm90bxIVbGVhZmxvdy5mbGVldC5leGVjLnYxIqACCg1DbGllbnRNZXNzYWdlEjEKBXN0YXJ0GAEgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNTdGFydEgAEjEKBWlucHV0GAIgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNJbnB1dEgAEjgKCWlucHV0X2VuZBgDIAEoCzIjLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjSW5wdXRFbmRIABIzCgZhdHRhY2gYBCABKAsyIS5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY0F0dGFjaEgAEi8KBHN0b3AYBSABKAsyHy5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY1N0b3BIAEIJCgdtZXNzYWdlIrcBCg1TZXJ2ZXJNZXNzYWdlEjMKBm91dHB1dBgBIAEoCzIhLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjT3V0cHV0SAASLwoEZXhpdBgCIAEoCzIfLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjRXhpdEgAEjUKB3N0YXJ0ZWQYAyABKAsyIi5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY1N0YXJ0ZWRIAEIJCgdtZXNzYWdlIusBCglFeGVjU3RhcnQSDAoEYXJndhgBIAMoCRIZChF3b3JraW5nX2RpcmVjdG9yeRgCIAEoCRIqCgd0aW1lb3V0GAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEg0KBXN0ZGluGAQgASgIEkYKC2Vudmlyb25tZW50GAUgAygLMjEubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNTdGFydC5FbnZpcm9ubWVudEVudHJ5GjIKEEVudmlyb25tZW50RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASIZCglFeGVjSW5wdXQSDAoEZGF0YRgBIAEoDCIOCgxFeGVjSW5wdXRFbmQiOQoLRXhlY1N0YXJ0ZWQSFAoMZXhlY3V0aW9uX2lkGAEgASgMEhQKDGF0dGFjaF90b2tlbhgCIAEoDCI4CgpFeGVjQXR0YWNoEhQKDGV4ZWN1dGlvbl9pZBgBIAEoDBIUCgxhdHRhY2hfdG9rZW4YAiABKAwiCgoIRXhlY1N0b3AiTwoKRXhlY091dHB1dBIzCgZzdHJlYW0YASABKA4yIy5sZWFmbG93LmZsZWV0LmV4ZWMudjEuT3V0cHV0U3RyZWFtEgwKBGRhdGEYAiABKAwieAoIRXhlY0V4aXQSEwoJZXhpdF9jb2RlGAEgASgNSAASFQoLc2lnbmFsX25hbWUYAiABKAlIABITCgtjb3JlX2R1bXBlZBgDIAEoCBIhCgVlcnJvchgEIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzQggKBnN0YXR1cyLkAQoKRXhlY1BvbGljeRIVCg1tYXhfcHJvY2Vzc2VzGAEgASgNEi8KDG1heF9saWZldGltZRgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIYChBtYXhfb3V0cHV0X2J5dGVzGAMgASgEEhoKEnVubGltaXRlZF9saWZldGltZRgEIAEoCBIYChB1bmxpbWl0ZWRfb3V0cHV0GAUgASgIEhoKEmJhY2tncm91bmRfYWxsb3dlZBgGIAEoCBIiChphbGxvd19wcml2aWxlZ2VfZXNjYWxhdGlvbhgHIAEoCCphCgxPdXRwdXRTdHJlYW0SHQoZT1VUUFVUX1NUUkVBTV9VTlNQRUNJRklFRBAAEhgKFE9VVFBVVF9TVFJFQU1fU1RET1VUEAESGAoUT1VUUFVUX1NUUkVBTV9TVERFUlIQAkI4WjZnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvZXhlYy92MTtleGVjdjFiBnByb3RvMw", [file_google_protobuf_duration, file_google_rpc_status]);
 
 /**
  * A message from the participant.
@@ -52,6 +52,22 @@ export type ClientMessage = Message<"leaflow.fleet.exec.v1.ClientMessage"> & {
      */
     value: ExecInputEnd;
     case: "inputEnd";
+  } | {
+    /**
+     * Reattaches to a background process. Only on the background channel.
+     *
+     * @generated from field: leaflow.fleet.exec.v1.ExecAttach attach = 4;
+     */
+    value: ExecAttach;
+    case: "attach";
+  } | {
+    /**
+     * Stops a background process. Only on the background channel.
+     *
+     * @generated from field: leaflow.fleet.exec.v1.ExecStop stop = 5;
+     */
+    value: ExecStop;
+    case: "stop";
   } | { case: undefined; value?: undefined };
 };
 
@@ -89,6 +105,14 @@ export type ServerMessage = Message<"leaflow.fleet.exec.v1.ServerMessage"> & {
      */
     value: ExecExit;
     case: "exit";
+  } | {
+    /**
+     * Identifies a background process for later attachment.
+     *
+     * @generated from field: leaflow.fleet.exec.v1.ExecStarted started = 3;
+     */
+    value: ExecStarted;
+    case: "started";
   } | { case: undefined; value?: undefined };
 };
 
@@ -122,8 +146,10 @@ export type ExecStart = Message<"leaflow.fleet.exec.v1.ExecStart"> & {
   workingDirectory: string;
 
   /**
-   * Kills the program when it runs longer, at most 10 minutes. Unset: 120
-   * seconds.
+   * The requested execution timeout, at most 10 minutes. Unset: 120 seconds
+   * for foreground execution. A background execution with
+   * ExecPolicy.unlimited_lifetime may leave this unset to run until it exits,
+   * is explicitly stopped, the session ends, or its authorization is revoked.
    *
    * @generated from field: google.protobuf.Duration timeout = 3;
    */
@@ -189,9 +215,71 @@ export const ExecInputEndSchema: GenMessage<ExecInputEnd> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_exec_v1_exec, 4);
 
 /**
+ * A background process handle. Both values are opaque to participants.
+ *
+ * @generated from message leaflow.fleet.exec.v1.ExecStarted
+ */
+export type ExecStarted = Message<"leaflow.fleet.exec.v1.ExecStarted"> & {
+  /**
+   * @generated from field: bytes execution_id = 1;
+   */
+  executionId: Uint8Array;
+
+  /**
+   * @generated from field: bytes attach_token = 2;
+   */
+  attachToken: Uint8Array;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ExecStarted.
+ * Use `create(ExecStartedSchema)` to create a new message.
+ */
+export const ExecStartedSchema: GenMessage<ExecStarted> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 5);
+
+/**
+ * Reattaches to a background process.
+ *
+ * @generated from message leaflow.fleet.exec.v1.ExecAttach
+ */
+export type ExecAttach = Message<"leaflow.fleet.exec.v1.ExecAttach"> & {
+  /**
+   * @generated from field: bytes execution_id = 1;
+   */
+  executionId: Uint8Array;
+
+  /**
+   * @generated from field: bytes attach_token = 2;
+   */
+  attachToken: Uint8Array;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ExecAttach.
+ * Use `create(ExecAttachSchema)` to create a new message.
+ */
+export const ExecAttachSchema: GenMessage<ExecAttach> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 6);
+
+/**
+ * Stops a background process owned by the session.
+ *
+ * @generated from message leaflow.fleet.exec.v1.ExecStop
+ */
+export type ExecStop = Message<"leaflow.fleet.exec.v1.ExecStop"> & {
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ExecStop.
+ * Use `create(ExecStopSchema)` to create a new message.
+ */
+export const ExecStopSchema: GenMessage<ExecStop> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 7);
+
+/**
  * Bytes the program wrote (RFC 4254 §5.2 data and extended data). Each
- * stream keeps its own order. A run writes at most 16 MiB in total; then the
- * session kills it.
+ * stream keeps its own order. The output limit comes from ExecPolicy.
  *
  * @generated from message leaflow.fleet.exec.v1.ExecOutput
  */
@@ -216,7 +304,7 @@ export type ExecOutput = Message<"leaflow.fleet.exec.v1.ExecOutput"> & {
  * Use `create(ExecOutputSchema)` to create a new message.
  */
 export const ExecOutputSchema: GenMessage<ExecOutput> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_exec_v1_exec, 5);
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 8);
 
 /**
  * How the program ended (RFC 4254 §6.10).
@@ -272,15 +360,54 @@ export type ExecExit = Message<"leaflow.fleet.exec.v1.ExecExit"> & {
  * Use `create(ExecExitSchema)` to create a new message.
  */
 export const ExecExitSchema: GenMessage<ExecExit> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_exec_v1_exec, 6);
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 9);
 
 /**
  * Allows a participant to run commands. Carried in the participant's signed
- * authorization.
+ * authorization. Limits that are absent use the Agent's defaults. The
+ * unlimited flags explicitly remove the corresponding application limit.
  *
  * @generated from message leaflow.fleet.exec.v1.ExecPolicy
  */
 export type ExecPolicy = Message<"leaflow.fleet.exec.v1.ExecPolicy"> & {
+  /**
+   * @generated from field: uint32 max_processes = 1;
+   */
+  maxProcesses: number;
+
+  /**
+   * @generated from field: google.protobuf.Duration max_lifetime = 2;
+   */
+  maxLifetime?: Duration | undefined;
+
+  /**
+   * @generated from field: uint64 max_output_bytes = 3;
+   */
+  maxOutputBytes: bigint;
+
+  /**
+   * @generated from field: bool unlimited_lifetime = 4;
+   */
+  unlimitedLifetime: boolean;
+
+  /**
+   * @generated from field: bool unlimited_output = 5;
+   */
+  unlimitedOutput: boolean;
+
+  /**
+   * @generated from field: bool background_allowed = 6;
+   */
+  backgroundAllowed: boolean;
+
+  /**
+   * Allows the Agent to start the process without PR_SET_NO_NEW_PRIVS. This
+   * is required when it must invoke sudo or another set-user-ID helper. Any
+   * elevation still goes through the machine's PAM and Fleet approval policy.
+   *
+   * @generated from field: bool allow_privilege_escalation = 7;
+   */
+  allowPrivilegeEscalation: boolean;
 };
 
 /**
@@ -288,7 +415,7 @@ export type ExecPolicy = Message<"leaflow.fleet.exec.v1.ExecPolicy"> & {
  * Use `create(ExecPolicySchema)` to create a new message.
  */
 export const ExecPolicySchema: GenMessage<ExecPolicy> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_exec_v1_exec, 7);
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 10);
 
 /**
  * An output stream of a program.

@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file leaflow/fleet/portforward/v1/portforward.proto.
  */
 export const file_leaflow_fleet_portforward_v1_portforward: GenFile = /*@__PURE__*/
-  fileDesc("Ci5sZWFmbG93L2ZsZWV0L3BvcnRmb3J3YXJkL3YxL3BvcnRmb3J3YXJkLnByb3RvEhxsZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxIpcBCg1TZXJ2ZXJNZXNzYWdlEjgKB2ZvcndhcmQYASABKAsyJS5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkZvcndhcmRIABJBCgxzbmFwc2hvdF9lbmQYAiABKAsyKS5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLlNuYXBzaG90RW5kSABCCQoHbWVzc2FnZSIpCghFbmRwb2ludBIPCgdhZGRyZXNzGAEgASgJEgwKBHBvcnQYAiABKA0ikwIKC0ZvcndhcmRTcGVjEkEKCWRpcmVjdGlvbhgBIAEoDjIuLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRm9yd2FyZERpcmVjdGlvbhI/Cg9saXN0ZW5fZW5kcG9pbnQYAiABKAsyJi5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkVuZHBvaW50Ej8KD3RhcmdldF9lbmRwb2ludBgDIAEoCzImLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnQSPwoIcHJvdG9jb2wYBCABKA4yLS5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkZvcndhcmRQcm90b2NvbCKOAgoHRm9yd2FyZBISCgpmb3J3YXJkX2lkGAEgASgEEjcKBHNwZWMYAiABKAsyKS5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkZvcndhcmRTcGVjEjkKBXN0YXRlGAMgASgOMioubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5Gb3J3YXJkU3RhdGUSPgoOYm91bmRfZW5kcG9pbnQYBCABKAsyJi5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkVuZHBvaW50EhgKEGNvbm5lY3Rpb25fY291bnQYBSABKA0SIQoFZXJyb3IYBiABKAsyEi5nb29nbGUucnBjLlN0YXR1cyINCgtTbmFwc2hvdEVuZCJPChRDcmVhdGVGb3J3YXJkUmVxdWVzdBI3CgRzcGVjGAEgASgLMikubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5Gb3J3YXJkU3BlYyJPChVDcmVhdGVGb3J3YXJkUmVzcG9uc2USNgoHZm9yd2FyZBgBIAEoCzIlLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRm9yd2FyZCKTAQoaUmVwb3J0TGlzdGVuZXJSZWFkeVJlcXVlc3QSEgoKZm9yd2FyZF9pZBgBIAEoBBI+Cg5ib3VuZF9lbmRwb2ludBgCIAEoCzImLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnQSIQoFZXJyb3IYAyABKAsyEi5nb29nbGUucnBjLlN0YXR1cyJVChtSZXBvcnRMaXN0ZW5lclJlYWR5UmVzcG9uc2USNgoHZm9yd2FyZBgBIAEoCzIlLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRm9yd2FyZCIqChREZWxldGVGb3J3YXJkUmVxdWVzdBISCgpmb3J3YXJkX2lkGAEgASgEIhcKFURlbGV0ZUZvcndhcmRSZXNwb25zZSJZCgdUY3BPcGVuEhIKCmZvcndhcmRfaWQYASABKAQSOgoKb3JpZ2luYXRvchgCIAEoCzImLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnQiZgoKVGNwTWVzc2FnZRIOCgRkYXRhGAEgASgMSAASPQoIc2h1dGRvd24YAiABKAsyKS5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLlRjcFNodXRkb3duSABCCQoHbWVzc2FnZSINCgtUY3BTaHV0ZG93biJZCgdVZHBPcGVuEhIKCmZvcndhcmRfaWQYASABKAQSOgoKb3JpZ2luYXRvchgCIAEoCzImLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnQiGQoJVWRwUGFja2V0EgwKBGRhdGEYASABKAwiqQUKEVBvcnRGb3J3YXJkUG9saWN5Eh8KF2xvY2FsX3RvX3JlbW90ZV9hbGxvd2VkGAEgASgIEh8KF3JlbW90ZV90b19sb2NhbF9hbGxvd2VkGAIgASgIEkUKD2xvY2FsX2xpc3RlbmVycxgDIAEoCzIsLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnRQb2xpY3kSRAoOcmVtb3RlX3RhcmdldHMYBCABKAsyLC5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkVuZHBvaW50UG9saWN5EkYKEHJlbW90ZV9saXN0ZW5lcnMYBSABKAsyLC5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkVuZHBvaW50UG9saWN5EkMKDWxvY2FsX3RhcmdldHMYBiABKAsyLC5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkVuZHBvaW50UG9saWN5EhQKDG1heF9mb3J3YXJkcxgHIAEoDRIXCg9tYXhfY29ubmVjdGlvbnMYCCABKA0SMgoPY29ubmVjdF90aW1lb3V0GAkgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEjoKF21heF9jb25uZWN0aW9uX2R1cmF0aW9uGAogASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEi8KDGlkbGVfdGltZW91dBgLIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhITCgt1ZHBfYWxsb3dlZBgMIAEoCBIeChZtYXhfdWRwX2RhdGFncmFtX2J5dGVzGA0gASgNEjMKEHVkcF9pZGxlX3RpbWVvdXQYDiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24iWgoORW5kcG9pbnRQb2xpY3kSEAoIcHJlZml4ZXMYASADKAkSNgoFcG9ydHMYAiADKAsyJy5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLlBvcnRSYW5nZSIoCglQb3J0UmFuZ2USDQoFZmlyc3QYASABKA0SDAoEbGFzdBgCIAEoDSqDAQoQRm9yd2FyZERpcmVjdGlvbhIhCh1GT1JXQVJEX0RJUkVDVElPTl9VTlNQRUNJRklFRBAAEiUKIUZPUldBUkRfRElSRUNUSU9OX0xPQ0FMX1RPX1JFTU9URRABEiUKIUZPUldBUkRfRElSRUNUSU9OX1JFTU9URV9UT19MT0NBTBACKmcKD0ZvcndhcmRQcm90b2NvbBIgChxGT1JXQVJEX1BST1RPQ09MX1VOU1BFQ0lGSUVEEAASGAoURk9SV0FSRF9QUk9UT0NPTF9UQ1AQARIYChRGT1JXQVJEX1BST1RPQ09MX1VEUBACKpgBCgxGb3J3YXJkU3RhdGUSHQoZRk9SV0FSRF9TVEFURV9VTlNQRUNJRklFRBAAEhsKF0ZPUldBUkRfU1RBVEVfUFJFUEFSSU5HEAESGAoURk9SV0FSRF9TVEFURV9BQ1RJVkUQAhIYChRGT1JXQVJEX1NUQVRFX0NMT1NFRBADEhgKFEZPUldBUkRfU1RBVEVfRkFJTEVEEAQylQMKElBvcnRGb3J3YXJkU2VydmljZRJ4Cg1DcmVhdGVGb3J3YXJkEjIubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5DcmVhdGVGb3J3YXJkUmVxdWVzdBozLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuQ3JlYXRlRm9yd2FyZFJlc3BvbnNlEooBChNSZXBvcnRMaXN0ZW5lclJlYWR5EjgubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5SZXBvcnRMaXN0ZW5lclJlYWR5UmVxdWVzdBo5LmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuUmVwb3J0TGlzdGVuZXJSZWFkeVJlc3BvbnNlEngKDURlbGV0ZUZvcndhcmQSMi5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkRlbGV0ZUZvcndhcmRSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5EZWxldGVGb3J3YXJkUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9sZWFmbG93YXBpcy9sZWFmbG93LWdvL2ZsZWV0L3BvcnRmb3J3YXJkL3YxO3BvcnRmb3J3YXJkdjFiBnByb3RvMw", [file_google_protobuf_duration, file_google_rpc_status]);
+  fileDesc("Ci5sZWFmbG93L2ZsZWV0L3BvcnRmb3J3YXJkL3YxL3BvcnRmb3J3YXJkLnByb3RvEhxsZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxIpcBCg1TZXJ2ZXJNZXNzYWdlEjgKB2ZvcndhcmQYASABKAsyJS5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkZvcndhcmRIABJBCgxzbmFwc2hvdF9lbmQYAiABKAsyKS5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLlNuYXBzaG90RW5kSABCCQoHbWVzc2FnZSIpCghFbmRwb2ludBIPCgdhZGRyZXNzGAEgASgJEgwKBHBvcnQYAiABKA0ikwIKC0ZvcndhcmRTcGVjEkEKCWRpcmVjdGlvbhgBIAEoDjIuLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRm9yd2FyZERpcmVjdGlvbhI/Cg9saXN0ZW5fZW5kcG9pbnQYAiABKAsyJi5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkVuZHBvaW50Ej8KD3RhcmdldF9lbmRwb2ludBgDIAEoCzImLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnQSPwoIcHJvdG9jb2wYBCABKA4yLS5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkZvcndhcmRQcm90b2NvbCJmCg1Tb2NrZXRBZGRyZXNzEjUKA3RjcBgBIAEoCzImLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnRIABITCgl1bml4X3BhdGgYAiABKAlIAEIJCgdhZGRyZXNzIo4CCgdGb3J3YXJkEhIKCmZvcndhcmRfaWQYASABKAQSNwoEc3BlYxgCIAEoCzIpLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRm9yd2FyZFNwZWMSOQoFc3RhdGUYAyABKA4yKi5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkZvcndhcmRTdGF0ZRI+Cg5ib3VuZF9lbmRwb2ludBgEIAEoCzImLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnQSGAoQY29ubmVjdGlvbl9jb3VudBgFIAEoDRIhCgVlcnJvchgGIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIg0KC1NuYXBzaG90RW5kIk8KFENyZWF0ZUZvcndhcmRSZXF1ZXN0EjcKBHNwZWMYASABKAsyKS5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkZvcndhcmRTcGVjIk8KFUNyZWF0ZUZvcndhcmRSZXNwb25zZRI2Cgdmb3J3YXJkGAEgASgLMiUubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5Gb3J3YXJkIpMBChpSZXBvcnRMaXN0ZW5lclJlYWR5UmVxdWVzdBISCgpmb3J3YXJkX2lkGAEgASgEEj4KDmJvdW5kX2VuZHBvaW50GAIgASgLMiYubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5FbmRwb2ludBIhCgVlcnJvchgDIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzIlUKG1JlcG9ydExpc3RlbmVyUmVhZHlSZXNwb25zZRI2Cgdmb3J3YXJkGAEgASgLMiUubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5Gb3J3YXJkIioKFERlbGV0ZUZvcndhcmRSZXF1ZXN0EhIKCmZvcndhcmRfaWQYASABKAQiFwoVRGVsZXRlRm9yd2FyZFJlc3BvbnNlIlkKB1RjcE9wZW4SEgoKZm9yd2FyZF9pZBgBIAEoBBI6CgpvcmlnaW5hdG9yGAIgASgLMiYubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5FbmRwb2ludCJmCgpUY3BNZXNzYWdlEg4KBGRhdGEYASABKAxIABI9CghzaHV0ZG93bhgCIAEoCzIpLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuVGNwU2h1dGRvd25IAEIJCgdtZXNzYWdlIg0KC1RjcFNodXRkb3duIk0KDkRpcmVjdERpYWxPcGVuEjsKBnRhcmdldBgBIAEoCzIrLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuU29ja2V0QWRkcmVzcyJsCg1TdHJlYW1NZXNzYWdlEg4KBGRhdGEYASABKAxIABJACghzaHV0ZG93bhgCIAEoCzIsLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuU3RyZWFtU2h1dGRvd25IAEIJCgdtZXNzYWdlIhAKDlN0cmVhbVNodXRkb3duIlkKB1VkcE9wZW4SEgoKZm9yd2FyZF9pZBgBIAEoBBI6CgpvcmlnaW5hdG9yGAIgASgLMiYubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5FbmRwb2ludCIZCglVZHBQYWNrZXQSDAoEZGF0YRgBIAEoDCLGBQoRUG9ydEZvcndhcmRQb2xpY3kSHwoXbG9jYWxfdG9fcmVtb3RlX2FsbG93ZWQYASABKAgSHwoXcmVtb3RlX3RvX2xvY2FsX2FsbG93ZWQYAiABKAgSRQoPbG9jYWxfbGlzdGVuZXJzGAMgASgLMiwubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5FbmRwb2ludFBvbGljeRJECg5yZW1vdGVfdGFyZ2V0cxgEIAEoCzIsLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnRQb2xpY3kSRgoQcmVtb3RlX2xpc3RlbmVycxgFIAEoCzIsLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnRQb2xpY3kSQwoNbG9jYWxfdGFyZ2V0cxgGIAEoCzIsLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRW5kcG9pbnRQb2xpY3kSFAoMbWF4X2ZvcndhcmRzGAcgASgNEhcKD21heF9jb25uZWN0aW9ucxgIIAEoDRIyCg9jb25uZWN0X3RpbWVvdXQYCSABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SOgoXbWF4X2Nvbm5lY3Rpb25fZHVyYXRpb24YCiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SLwoMaWRsZV90aW1lb3V0GAsgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEhMKC3VkcF9hbGxvd2VkGAwgASgIEh4KFm1heF91ZHBfZGF0YWdyYW1fYnl0ZXMYDSABKA0SMwoQdWRwX2lkbGVfdGltZW91dBgOIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIbChNkaXJlY3RfZGlhbF9hbGxvd2VkGA8gASgIIooBCg5FbmRwb2ludFBvbGljeRIQCghwcmVmaXhlcxgBIAMoCRI2CgVwb3J0cxgCIAMoCzInLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuUG9ydFJhbmdlEhIKCnVuaXhfcGF0aHMYAyADKAkSGgoSdW5peF9wYXRoX3ByZWZpeGVzGAQgAygJIigKCVBvcnRSYW5nZRINCgVmaXJzdBgBIAEoDRIMCgRsYXN0GAIgASgNKoMBChBGb3J3YXJkRGlyZWN0aW9uEiEKHUZPUldBUkRfRElSRUNUSU9OX1VOU1BFQ0lGSUVEEAASJQohRk9SV0FSRF9ESVJFQ1RJT05fTE9DQUxfVE9fUkVNT1RFEAESJQohRk9SV0FSRF9ESVJFQ1RJT05fUkVNT1RFX1RPX0xPQ0FMEAIqZwoPRm9yd2FyZFByb3RvY29sEiAKHEZPUldBUkRfUFJPVE9DT0xfVU5TUEVDSUZJRUQQABIYChRGT1JXQVJEX1BST1RPQ09MX1RDUBABEhgKFEZPUldBUkRfUFJPVE9DT0xfVURQEAIqmAEKDEZvcndhcmRTdGF0ZRIdChlGT1JXQVJEX1NUQVRFX1VOU1BFQ0lGSUVEEAASGwoXRk9SV0FSRF9TVEFURV9QUkVQQVJJTkcQARIYChRGT1JXQVJEX1NUQVRFX0FDVElWRRACEhgKFEZPUldBUkRfU1RBVEVfQ0xPU0VEEAMSGAoURk9SV0FSRF9TVEFURV9GQUlMRUQQBDKVAwoSUG9ydEZvcndhcmRTZXJ2aWNlEngKDUNyZWF0ZUZvcndhcmQSMi5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkNyZWF0ZUZvcndhcmRSZXF1ZXN0GjMubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5DcmVhdGVGb3J3YXJkUmVzcG9uc2USigEKE1JlcG9ydExpc3RlbmVyUmVhZHkSOC5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLlJlcG9ydExpc3RlbmVyUmVhZHlSZXF1ZXN0GjkubGVhZmxvdy5mbGVldC5wb3J0Zm9yd2FyZC52MS5SZXBvcnRMaXN0ZW5lclJlYWR5UmVzcG9uc2USeAoNRGVsZXRlRm9yd2FyZBIyLmxlYWZsb3cuZmxlZXQucG9ydGZvcndhcmQudjEuRGVsZXRlRm9yd2FyZFJlcXVlc3QaMy5sZWFmbG93LmZsZWV0LnBvcnRmb3J3YXJkLnYxLkRlbGV0ZUZvcndhcmRSZXNwb25zZUJGWkRnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvcG9ydGZvcndhcmQvdjE7cG9ydGZvcndhcmR2MWIGcHJvdG8z", [file_google_protobuf_duration, file_google_rpc_status]);
 
 /**
  * A message from the session on the portforward channel.
@@ -126,6 +126,41 @@ export const ForwardSpecSchema: GenMessage<ForwardSpec> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_portforward_v1_portforward, 2);
 
 /**
+ * An address a session or participant can bind or connect.
+ *
+ * @generated from message leaflow.fleet.portforward.v1.SocketAddress
+ */
+export type SocketAddress = Message<"leaflow.fleet.portforward.v1.SocketAddress"> & {
+  /**
+   * @generated from oneof leaflow.fleet.portforward.v1.SocketAddress.address
+   */
+  address: {
+    /**
+     * An IP literal and port.
+     *
+     * @generated from field: leaflow.fleet.portforward.v1.Endpoint tcp = 1;
+     */
+    value: Endpoint;
+    case: "tcp";
+  } | {
+    /**
+     * An absolute filesystem Unix Socket path.
+     *
+     * @generated from field: string unix_path = 2;
+     */
+    value: string;
+    case: "unixPath";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message leaflow.fleet.portforward.v1.SocketAddress.
+ * Use `create(SocketAddressSchema)` to create a new message.
+ */
+export const SocketAddressSchema: GenMessage<SocketAddress> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 3);
+
+/**
  * A forward of this connection.
  *
  * @generated from message leaflow.fleet.portforward.v1.Forward
@@ -179,7 +214,7 @@ export type Forward = Message<"leaflow.fleet.portforward.v1.Forward"> & {
  * Use `create(ForwardSchema)` to create a new message.
  */
 export const ForwardSchema: GenMessage<Forward> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 3);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 4);
 
 /**
  * Ends the snapshot.
@@ -194,7 +229,7 @@ export type SnapshotEnd = Message<"leaflow.fleet.portforward.v1.SnapshotEnd"> & 
  * Use `create(SnapshotEndSchema)` to create a new message.
  */
 export const SnapshotEndSchema: GenMessage<SnapshotEnd> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 4);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 5);
 
 /**
  * The request of CreateForward.
@@ -215,7 +250,7 @@ export type CreateForwardRequest = Message<"leaflow.fleet.portforward.v1.CreateF
  * Use `create(CreateForwardRequestSchema)` to create a new message.
  */
 export const CreateForwardRequestSchema: GenMessage<CreateForwardRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 5);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 6);
 
 /**
  * The response of CreateForward.
@@ -236,7 +271,7 @@ export type CreateForwardResponse = Message<"leaflow.fleet.portforward.v1.Create
  * Use `create(CreateForwardResponseSchema)` to create a new message.
  */
 export const CreateForwardResponseSchema: GenMessage<CreateForwardResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 6);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 7);
 
 /**
  * The request of ReportListenerReady.
@@ -272,7 +307,7 @@ export type ReportListenerReadyRequest = Message<"leaflow.fleet.portforward.v1.R
  * Use `create(ReportListenerReadyRequestSchema)` to create a new message.
  */
 export const ReportListenerReadyRequestSchema: GenMessage<ReportListenerReadyRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 7);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 8);
 
 /**
  * The response of ReportListenerReady.
@@ -293,7 +328,7 @@ export type ReportListenerReadyResponse = Message<"leaflow.fleet.portforward.v1.
  * Use `create(ReportListenerReadyResponseSchema)` to create a new message.
  */
 export const ReportListenerReadyResponseSchema: GenMessage<ReportListenerReadyResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 8);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 9);
 
 /**
  * The request of DeleteForward.
@@ -314,7 +349,7 @@ export type DeleteForwardRequest = Message<"leaflow.fleet.portforward.v1.DeleteF
  * Use `create(DeleteForwardRequestSchema)` to create a new message.
  */
 export const DeleteForwardRequestSchema: GenMessage<DeleteForwardRequest> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 9);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 10);
 
 /**
  * The response of DeleteForward.
@@ -329,7 +364,7 @@ export type DeleteForwardResponse = Message<"leaflow.fleet.portforward.v1.Delete
  * Use `create(DeleteForwardResponseSchema)` to create a new message.
  */
 export const DeleteForwardResponseSchema: GenMessage<DeleteForwardResponse> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 10);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 11);
 
 /**
  * The first message of a TCP channel.
@@ -357,7 +392,7 @@ export type TcpOpen = Message<"leaflow.fleet.portforward.v1.TcpOpen"> & {
  * Use `create(TcpOpenSchema)` to create a new message.
  */
 export const TcpOpenSchema: GenMessage<TcpOpen> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 11);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 12);
 
 /**
  * A message of a TCP channel after TcpOpen, from either end.
@@ -397,7 +432,7 @@ export type TcpMessage = Message<"leaflow.fleet.portforward.v1.TcpMessage"> & {
  * Use `create(TcpMessageSchema)` to create a new message.
  */
 export const TcpMessageSchema: GenMessage<TcpMessage> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 12);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 13);
 
 /**
  * The sender sends nothing more on the connection.
@@ -412,7 +447,72 @@ export type TcpShutdown = Message<"leaflow.fleet.portforward.v1.TcpShutdown"> & 
  * Use `create(TcpShutdownSchema)` to create a new message.
  */
 export const TcpShutdownSchema: GenMessage<TcpShutdown> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 13);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 14);
+
+/**
+ * The first message of a direct_dial channel.
+ *
+ * @generated from message leaflow.fleet.portforward.v1.DirectDialOpen
+ */
+export type DirectDialOpen = Message<"leaflow.fleet.portforward.v1.DirectDialOpen"> & {
+  /**
+   * @generated from field: leaflow.fleet.portforward.v1.SocketAddress target = 1;
+   */
+  target?: SocketAddress | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.portforward.v1.DirectDialOpen.
+ * Use `create(DirectDialOpenSchema)` to create a new message.
+ */
+export const DirectDialOpenSchema: GenMessage<DirectDialOpen> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 15);
+
+/**
+ * A byte stream message for direct_dial.
+ *
+ * @generated from message leaflow.fleet.portforward.v1.StreamMessage
+ */
+export type StreamMessage = Message<"leaflow.fleet.portforward.v1.StreamMessage"> & {
+  /**
+   * @generated from oneof leaflow.fleet.portforward.v1.StreamMessage.message
+   */
+  message: {
+    /**
+     * The next bytes of the stream. At most 64 KiB.
+     *
+     * @generated from field: bytes data = 1;
+     */
+    value: Uint8Array;
+    case: "data";
+  } | {
+    /**
+     * @generated from field: leaflow.fleet.portforward.v1.StreamShutdown shutdown = 2;
+     */
+    value: StreamShutdown;
+    case: "shutdown";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message leaflow.fleet.portforward.v1.StreamMessage.
+ * Use `create(StreamMessageSchema)` to create a new message.
+ */
+export const StreamMessageSchema: GenMessage<StreamMessage> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 16);
+
+/**
+ * @generated from message leaflow.fleet.portforward.v1.StreamShutdown
+ */
+export type StreamShutdown = Message<"leaflow.fleet.portforward.v1.StreamShutdown"> & {
+};
+
+/**
+ * Describes the message leaflow.fleet.portforward.v1.StreamShutdown.
+ * Use `create(StreamShutdownSchema)` to create a new message.
+ */
+export const StreamShutdownSchema: GenMessage<StreamShutdown> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 17);
 
 /**
  * The first message of a UDP channel.
@@ -440,7 +540,7 @@ export type UdpOpen = Message<"leaflow.fleet.portforward.v1.UdpOpen"> & {
  * Use `create(UdpOpenSchema)` to create a new message.
  */
 export const UdpOpenSchema: GenMessage<UdpOpen> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 14);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 18);
 
 /**
  * One UDP packet, sent as a Datagram of a UDP channel.
@@ -462,7 +562,7 @@ export type UdpPacket = Message<"leaflow.fleet.portforward.v1.UdpPacket"> & {
  * Use `create(UdpPacketSchema)` to create a new message.
  */
 export const UdpPacketSchema: GenMessage<UdpPacket> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 15);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 19);
 
 /**
  * What a participant may forward. Carried in the participant's signed
@@ -570,6 +670,14 @@ export type PortForwardPolicy = Message<"leaflow.fleet.portforward.v1.PortForwar
    * @generated from field: google.protobuf.Duration udp_idle_timeout = 14;
    */
   udpIdleTimeout?: Duration | undefined;
+
+  /**
+   * Allows direct_dial. Its target is checked against remote_targets and the
+   * Unix path fields of that policy.
+   *
+   * @generated from field: bool direct_dial_allowed = 15;
+   */
+  directDialAllowed: boolean;
 };
 
 /**
@@ -577,12 +685,13 @@ export type PortForwardPolicy = Message<"leaflow.fleet.portforward.v1.PortForwar
  * Use `create(PortForwardPolicySchema)` to create a new message.
  */
 export const PortForwardPolicySchema: GenMessage<PortForwardPolicy> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 16);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 20);
 
 /**
- * The addresses and ports a side may listen on or connect to. An endpoint is
- * allowed when its address lies in one of the prefixes and its port in one
- * of the ranges; empty lists allow nothing.
+ * The addresses, ports, and Unix Socket paths a side may listen on or connect
+ * to. An IP endpoint is allowed when its address lies in one of the prefixes
+ * and its port in one of the ranges. Unix Socket paths are allowed by exact
+ * path or prefix. Empty lists allow nothing.
  *
  * @generated from message leaflow.fleet.portforward.v1.EndpointPolicy
  */
@@ -601,6 +710,20 @@ export type EndpointPolicy = Message<"leaflow.fleet.portforward.v1.EndpointPolic
    * @generated from field: repeated leaflow.fleet.portforward.v1.PortRange ports = 2;
    */
   ports: PortRange[];
+
+  /**
+   * Exact absolute Unix Socket paths.
+   *
+   * @generated from field: repeated string unix_paths = 3;
+   */
+  unixPaths: string[];
+
+  /**
+   * Absolute Unix Socket path prefixes.
+   *
+   * @generated from field: repeated string unix_path_prefixes = 4;
+   */
+  unixPathPrefixes: string[];
 };
 
 /**
@@ -608,7 +731,7 @@ export type EndpointPolicy = Message<"leaflow.fleet.portforward.v1.EndpointPolic
  * Use `create(EndpointPolicySchema)` to create a new message.
  */
 export const EndpointPolicySchema: GenMessage<EndpointPolicy> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 17);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 21);
 
 /**
  * Ports from first to last, inclusive, each 1 to 65535.
@@ -636,7 +759,7 @@ export type PortRange = Message<"leaflow.fleet.portforward.v1.PortRange"> & {
  * Use `create(PortRangeSchema)` to create a new message.
  */
 export const PortRangeSchema: GenMessage<PortRange> = /*@__PURE__*/
-  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 18);
+  messageDesc(file_leaflow_fleet_portforward_v1_portforward, 22);
 
 /**
  * Which way a forward goes.
