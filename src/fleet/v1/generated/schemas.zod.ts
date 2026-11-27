@@ -75,16 +75,16 @@
  * A machine reports what it offers in `features`, each named after the protocol package that
  * defines it:
  *
- * - `leaflow.fleet.directory.v1`: the accounts of the project's members and the project's groups
+ * - `leaflow.fleet.controlplane.directory.v1`: the accounts of the project's members and the project's groups
  *   exist on the machine; members log in over SSH with their keys and become root through sudo
  *   as their permissions allow;
- * - `leaflow.fleet.command.v1`: running commands;
- * - `leaflow.fleet.mcp.v1`: the MCP servers each account configures on the machine, local ones
+ * - `leaflow.fleet.controlplane.command.v1`: running commands;
+ * - `leaflow.fleet.controlplane.mcp.v1`: the MCP servers each account configures on the machine, local ones
  *   and remote ones it connects to;
- * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
+ * - `leaflow.fleet.controlplane.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
- * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a graphical backend;
- * - `leaflow.fleet.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
+ * - `leaflow.fleet.controlplane.desktop.v1`: sessions with a graphical backend;
+ * - `leaflow.fleet.controlplane.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
  *   the virtual desktop capability is actually available; MCP is a separate source.
  *
  * A graphical backend does not require a full desktop environment. When the machine reports
@@ -140,7 +140,7 @@
  *
  * ## MCP servers
  *
- * A machine that offers `leaflow.fleet.mcp.v1` reaches the MCP servers its accounts configure:
+ * A machine that offers `leaflow.fleet.controlplane.mcp.v1` reaches the MCP servers its accounts configure:
  * servers it runs itself and remote servers it connects to. Each account configures them in
  * `~/.local/share/leaflow/agent/mcp.json` in its home directory, in the `mcpServers` format other
  * MCP clients use, by hand or through this API; the machine picks up every change by itself.
@@ -254,21 +254,6 @@
  * `project_deletion_requested` when deletion of the project was requested, `machine_removed` when
  * its machine was removed, or `key_revoked` when the key that signed its authorization was
  * revoked. A participant whose creation failed is not announced.
- *
- * ## Background executions
- *
- * Background programs started inside a session (`leaflow.fleet.exec.v1.background`) live only in
- * the session process and its per-boot runtime directory, so Fleet keeps no database table for
- * them and rebooting the machine clears every running execution. Fleet forwards live listing,
- * inspection, output reading (by tail lines, line range, or byte range from the persisted output
- * file), and stopping over the session process's control connection. Because these calls traverse
- * Fleet, their arguments, metadata and output are visible to the platform (never logged).
- *
- * While a background execution runs, the session process reports a heartbeat every 30 minutes
- * (`leaflow.fleet.exec.running`) and a terminal event when it finishes or is stopped
- * (`leaflow.fleet.exec.exited`, including `exit_code`, `signal_name`, `duration_seconds`,
- * `output_path`, full `argv`, `working_directory`, `user_id` and `username`), delivered through
- * EventBus to the session's user in the current project.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -551,9 +536,15 @@ export const DeleteMachineLocalAccountParams = zod.strictObject({
  * Inside the command, `sudo` works without a prompt while the caller has
  * `fleet:machines.admin` on the machine, and refuses otherwise.
  *
- * After any required context preparation, the request is held until the command ends, at most
- * `timeout_seconds` and a few seconds more. Neither the command nor its output is hidden from the platform: do not put secrets
- * into either.
+ * After any required context preparation, a foreground request is held until the command ends,
+ * at most `timeout_seconds` and a few seconds more. When `background` is true, the Agent
+ * starts the command detached, persists its output to a per-boot runtime file, and returns
+ * immediately with `command` (including `command_id` and `output_path`); while it runs, the
+ * Agent proactively reports a `leaflow.fleet.command.running` EventBus heartbeat every 30
+ * minutes and a terminal `leaflow.fleet.command.exited` EventBus event upon completion.
+ * Fleet keeps no database table for background commands; rebooting the machine clears all
+ * running commands. Neither the command nor its output is hidden from the platform: do not
+ * put secrets into either.
  *
  * Requires `fleet:machines.login` on the machine.
  *
@@ -577,13 +568,120 @@ export const RunMachineCommandParams = zod.strictObject({
 export const RunMachineCommandBody = RunCommandRequest;
 
 /**
+ * Queries the machine's Agent live for background commands belonging to the caller since the
+ * machine booted, newest first. Fleet does not store command state in its database; after a
+ * machine reboot, no running commands remain. Requires `fleet:machines.login` on the machine.
+ * @summary List background commands on a machine
+ */
+export const ListMachineCommandsParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+export const ListMachineCommandsQueryParams = zod.strictObject({
+  state: zod.enum(["running", "exited"]).optional().describe("Filter by background command state"),
+});
+
+/**
+ * Queries the machine's Agent live for the current metadata, duration, exit status, and output file path of one background command. Requires `fleet:machines.login` on the machine.
+ * @summary Get a background command
+ */
+export const getMachineCommandPathCommandIdMax = 64;
+
+export const getMachineCommandPathCommandIdRegExp = new RegExp("^[A-Za-z0-9-]+$");
+
+export const GetMachineCommandParams = zod.strictObject({
+  machineId: zod.uuid(),
+  commandId: zod
+    .string()
+    .min(1)
+    .max(getMachineCommandPathCommandIdMax)
+    .regex(getMachineCommandPathCommandIdRegExp),
+});
+
+/**
+ * Reads a bounded slice of a background command's persisted output file from the machine's
+ * Agent. Choose at most one addressing mode: `tail_lines`, `start_line` (with optional
+ * `max_lines`), or `offset` (with optional `max_bytes`). When none is specified, returns the
+ * last 200 lines of the combined output stream. Requires `fleet:machines.login` on the machine.
+ * @summary Read output of a background command
+ */
+export const readMachineCommandOutputPathCommandIdMax = 64;
+
+export const readMachineCommandOutputPathCommandIdRegExp = new RegExp("^[A-Za-z0-9-]+$");
+
+export const ReadMachineCommandOutputParams = zod.strictObject({
+  machineId: zod.uuid(),
+  commandId: zod
+    .string()
+    .min(1)
+    .max(readMachineCommandOutputPathCommandIdMax)
+    .regex(readMachineCommandOutputPathCommandIdRegExp),
+});
+
+export const readMachineCommandOutputQueryTailLinesMax = 5000;
+
+export const readMachineCommandOutputQueryMaxLinesMax = 5000;
+
+export const readMachineCommandOutputQueryOffsetMin = 0;
+
+export const readMachineCommandOutputQueryMaxBytesMax = 262144;
+
+export const ReadMachineCommandOutputQueryParams = zod.strictObject({
+  stream: zod
+    .enum(["combined", "stdout", "stderr"])
+    .optional()
+    .describe("Which output stream to read; defaults to `combined`"),
+  tail_lines: zod
+    .int()
+    .min(1)
+    .max(readMachineCommandOutputQueryTailLinesMax)
+    .optional()
+    .describe("Return at most the last N lines"),
+  start_line: zod.int().min(1).optional().describe("1-based starting line number"),
+  max_lines: zod
+    .int()
+    .min(1)
+    .max(readMachineCommandOutputQueryMaxLinesMax)
+    .optional()
+    .describe("Maximum lines to return from `start_line`"),
+  offset: zod
+    .int()
+    .min(readMachineCommandOutputQueryOffsetMin)
+    .optional()
+    .describe("0-based byte offset into the output stream"),
+  max_bytes: zod
+    .int()
+    .min(1)
+    .max(readMachineCommandOutputQueryMaxBytesMax)
+    .optional()
+    .describe("Maximum bytes to return from `offset` (at most 262144)"),
+});
+
+/**
+ * Stops a running background command belonging to the caller on the machine. Stopping an already exited command succeeds and returns its final metadata. Requires `fleet:machines.login` on the machine.
+ * @summary Stop a background command
+ */
+export const stopMachineCommandPathCommandIdMax = 64;
+
+export const stopMachineCommandPathCommandIdRegExp = new RegExp("^[A-Za-z0-9-]+$");
+
+export const StopMachineCommandParams = zod.strictObject({
+  machineId: zod.uuid(),
+  commandId: zod
+    .string()
+    .min(1)
+    .max(stopMachineCommandPathCommandIdMax)
+    .regex(stopMachineCommandPathCommandIdRegExp),
+});
+
+/**
  * Returns the caller's MCP configuration file on the machine and every server in it, with
  * what each is doing now. The values of `env` and `headers` are never returned, only their
  * keys. Requires `fleet:machines.login` on the machine.
  *
  * Fails with:
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.controlplane.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
@@ -607,7 +705,7 @@ export const GetMcpConfigurationParams = zod.strictObject({
  *   with `metadata.line` and `metadata.column`;
  * - `MCP_CONFIGURATION_WRITE_FAILED` when the machine could not write the file;
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.controlplane.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
@@ -633,7 +731,7 @@ export const ReplaceMcpConfigurationBody = ReplaceMcpConfigurationRequest;
  *   whole first;
  * - `MCP_CONFIGURATION_WRITE_FAILED` when the machine could not write the file;
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.controlplane.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
@@ -784,157 +882,6 @@ export const PollToolActivitiesParams = zod.strictObject({
     .min(1)
     .max(pollToolActivitiesPathSessionIdMax)
     .regex(pollToolActivitiesPathSessionIdRegExp),
-});
-
-/**
- * Queries all open sessions belonging to the caller on the machine in parallel and merges
- * their live background executions, newest first. Does not store process state in Fleet;
- * sessions that are temporarily unreachable or run an older Agent are reported in
- * `unavailable_sessions` rather than failing the whole response. Requires
- * `fleet:machines.login` on the machine.
- * @summary List background executions on a machine
- */
-export const ListMachineExecutionsParams = zod.strictObject({
-  machineId: zod.uuid(),
-});
-
-export const ListMachineExecutionsQueryParams = zod.strictObject({
-  state: zod.enum(["running", "exited"]).optional().describe("Filter by execution state"),
-});
-
-/**
- * Queries the session process live for its background executions, newest first. Returns an
- * empty list when the session is already closed (for example after the machine rebooted).
- * @summary List background executions in a session
- */
-export const listSessionExecutionsPathSessionIdMax = 40;
-
-export const listSessionExecutionsPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
-
-export const ListSessionExecutionsParams = zod.strictObject({
-  sessionId: zod
-    .string()
-    .min(1)
-    .max(listSessionExecutionsPathSessionIdMax)
-    .regex(listSessionExecutionsPathSessionIdRegExp),
-});
-
-export const ListSessionExecutionsQueryParams = zod.strictObject({
-  state: zod.enum(["running", "exited"]).optional().describe("Filter by execution state"),
-});
-
-/**
- * Queries the session process live for the current metadata and status of one background execution.
- * @summary Get a background execution
- */
-export const getSessionExecutionPathSessionIdMax = 40;
-
-export const getSessionExecutionPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
-export const getSessionExecutionPathExecutionIdMax = 64;
-
-export const getSessionExecutionPathExecutionIdRegExp = new RegExp("^[A-Za-z0-9-]+$");
-
-export const GetSessionExecutionParams = zod.strictObject({
-  sessionId: zod
-    .string()
-    .min(1)
-    .max(getSessionExecutionPathSessionIdMax)
-    .regex(getSessionExecutionPathSessionIdRegExp),
-  executionId: zod
-    .string()
-    .min(1)
-    .max(getSessionExecutionPathExecutionIdMax)
-    .regex(getSessionExecutionPathExecutionIdRegExp),
-});
-
-/**
- * Reads a bounded slice of a background execution's persisted output file from the session
- * process. Choose at most one addressing mode: `tail_lines`, `start_line` (with optional
- * `max_lines`), or `offset` (with optional `max_bytes`). When none is specified, returns the
- * last 200 lines of the combined output stream.
- * @summary Read output of a background execution
- */
-export const readSessionExecutionOutputPathSessionIdMax = 40;
-
-export const readSessionExecutionOutputPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
-export const readSessionExecutionOutputPathExecutionIdMax = 64;
-
-export const readSessionExecutionOutputPathExecutionIdRegExp = new RegExp("^[A-Za-z0-9-]+$");
-
-export const ReadSessionExecutionOutputParams = zod.strictObject({
-  sessionId: zod
-    .string()
-    .min(1)
-    .max(readSessionExecutionOutputPathSessionIdMax)
-    .regex(readSessionExecutionOutputPathSessionIdRegExp),
-  executionId: zod
-    .string()
-    .min(1)
-    .max(readSessionExecutionOutputPathExecutionIdMax)
-    .regex(readSessionExecutionOutputPathExecutionIdRegExp),
-});
-
-export const readSessionExecutionOutputQueryTailLinesMax = 5000;
-
-export const readSessionExecutionOutputQueryMaxLinesMax = 5000;
-
-export const readSessionExecutionOutputQueryOffsetMin = 0;
-
-export const readSessionExecutionOutputQueryMaxBytesMax = 262144;
-
-export const ReadSessionExecutionOutputQueryParams = zod.strictObject({
-  stream: zod
-    .enum(["combined", "stdout", "stderr"])
-    .optional()
-    .describe("Which output stream to read; defaults to `combined`"),
-  tail_lines: zod
-    .int()
-    .min(1)
-    .max(readSessionExecutionOutputQueryTailLinesMax)
-    .optional()
-    .describe("Return at most the last N lines"),
-  start_line: zod.int().min(1).optional().describe("1-based starting line number"),
-  max_lines: zod
-    .int()
-    .min(1)
-    .max(readSessionExecutionOutputQueryMaxLinesMax)
-    .optional()
-    .describe("Maximum lines to return from `start_line`"),
-  offset: zod
-    .int()
-    .min(readSessionExecutionOutputQueryOffsetMin)
-    .optional()
-    .describe("0-based byte offset into the output stream"),
-  max_bytes: zod
-    .int()
-    .min(1)
-    .max(readSessionExecutionOutputQueryMaxBytesMax)
-    .optional()
-    .describe("Maximum bytes to return from `offset` (at most 262144)"),
-});
-
-/**
- * Stops a running background execution in the session. Stopping an already exited execution succeeds and returns its final metadata.
- * @summary Stop a background execution
- */
-export const stopSessionExecutionPathSessionIdMax = 40;
-
-export const stopSessionExecutionPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
-export const stopSessionExecutionPathExecutionIdMax = 64;
-
-export const stopSessionExecutionPathExecutionIdRegExp = new RegExp("^[A-Za-z0-9-]+$");
-
-export const StopSessionExecutionParams = zod.strictObject({
-  sessionId: zod
-    .string()
-    .min(1)
-    .max(stopSessionExecutionPathSessionIdMax)
-    .regex(stopSessionExecutionPathSessionIdRegExp),
-  executionId: zod
-    .string()
-    .min(1)
-    .max(stopSessionExecutionPathExecutionIdMax)
-    .regex(stopSessionExecutionPathExecutionIdRegExp),
 });
 
 /**

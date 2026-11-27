@@ -75,16 +75,16 @@
  * A machine reports what it offers in `features`, each named after the protocol package that
  * defines it:
  *
- * - `leaflow.fleet.directory.v1`: the accounts of the project's members and the project's groups
+ * - `leaflow.fleet.controlplane.directory.v1`: the accounts of the project's members and the project's groups
  *   exist on the machine; members log in over SSH with their keys and become root through sudo
  *   as their permissions allow;
- * - `leaflow.fleet.command.v1`: running commands;
- * - `leaflow.fleet.mcp.v1`: the MCP servers each account configures on the machine, local ones
+ * - `leaflow.fleet.controlplane.command.v1`: running commands;
+ * - `leaflow.fleet.controlplane.mcp.v1`: the MCP servers each account configures on the machine, local ones
  *   and remote ones it connects to;
- * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
+ * - `leaflow.fleet.controlplane.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
- * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a graphical backend;
- * - `leaflow.fleet.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
+ * - `leaflow.fleet.controlplane.desktop.v1`: sessions with a graphical backend;
+ * - `leaflow.fleet.controlplane.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
  *   the virtual desktop capability is actually available; MCP is a separate source.
  *
  * A graphical backend does not require a full desktop environment. When the machine reports
@@ -140,7 +140,7 @@
  *
  * ## MCP servers
  *
- * A machine that offers `leaflow.fleet.mcp.v1` reaches the MCP servers its accounts configure:
+ * A machine that offers `leaflow.fleet.controlplane.mcp.v1` reaches the MCP servers its accounts configure:
  * servers it runs itself and remote servers it connects to. Each account configures them in
  * `~/.local/share/leaflow/agent/mcp.json` in its home directory, in the `mcpServers` format other
  * MCP clients use, by hand or through this API; the machine picks up every change by itself.
@@ -254,21 +254,6 @@
  * `project_deletion_requested` when deletion of the project was requested, `machine_removed` when
  * its machine was removed, or `key_revoked` when the key that signed its authorization was
  * revoked. A participant whose creation failed is not announced.
- *
- * ## Background executions
- *
- * Background programs started inside a session (`leaflow.fleet.exec.v1.background`) live only in
- * the session process and its per-boot runtime directory, so Fleet keeps no database table for
- * them and rebooting the machine clears every running execution. Fleet forwards live listing,
- * inspection, output reading (by tail lines, line range, or byte range from the persisted output
- * file), and stopping over the session process's control connection. Because these calls traverse
- * Fleet, their arguments, metadata and output are visible to the platform (never logged).
- *
- * While a background execution runs, the session process reports a heartbeat every 30 minutes
- * (`leaflow.fleet.exec.running`) and a terminal event when it finishes or is stopped
- * (`leaflow.fleet.exec.exited`, including `exit_code`, `signal_name`, `duration_seconds`,
- * `output_path`, full `argv`, `working_directory`, `user_id` and `username`), delivered through
- * EventBus to the session's user in the current project.
  * OpenAPI spec version: 1.0.0
  */
 import { decodeResponse } from "../../../response.js";
@@ -294,9 +279,6 @@ import type {
   DenyPrivilegeRequestRequest,
   EnrollmentResource,
   Error,
-  ExecutionList,
-  ExecutionOutput,
-  ExecutionResource,
   FindEnrollmentByPairingCodeParams,
   FindEnrollmentResponse,
   GetPeerConnectionParams,
@@ -305,16 +287,18 @@ import type {
   ListAccountsParams,
   ListGroupMembersParams,
   ListGroupsParams,
+  ListMachineCommandsParams,
   ListMachineEventsParams,
-  ListMachineExecutionsParams,
   ListMachineLocalAccountsParams,
   ListMachineRegistrationsParams,
   ListMachinesParams,
   ListPrivilegeAutoApprovalsParams,
   ListPrivilegeRequestsParams,
-  ListSessionExecutionsParams,
   ListSessionsParams,
   ListToolsParams,
+  MachineCommandList,
+  MachineCommandOutput,
+  MachineCommandResource,
   MachineEventList,
   MachineList,
   MachineLocalAccountList,
@@ -332,7 +316,7 @@ import type {
   PrivilegeAutoApprovalResource,
   PrivilegeRequestList,
   PrivilegeRequestResource,
-  ReadSessionExecutionOutputParams,
+  ReadMachineCommandOutputParams,
   RenewParticipantRequest,
   RenewParticipantResponse,
   ReplaceMcpConfigurationRequest,
@@ -959,9 +943,15 @@ export const getRunMachineCommandUrl = (machineId: string) => {
  * Inside the command, `sudo` works without a prompt while the caller has
  * `fleet:machines.admin` on the machine, and refuses otherwise.
  *
- * After any required context preparation, the request is held until the command ends, at most
- * `timeout_seconds` and a few seconds more. Neither the command nor its output is hidden from the platform: do not put secrets
- * into either.
+ * After any required context preparation, a foreground request is held until the command ends,
+ * at most `timeout_seconds` and a few seconds more. When `background` is true, the Agent
+ * starts the command detached, persists its output to a per-boot runtime file, and returns
+ * immediately with `command` (including `command_id` and `output_path`); while it runs, the
+ * Agent proactively reports a `leaflow.fleet.command.running` EventBus heartbeat every 30
+ * minutes and a terminal `leaflow.fleet.command.exited` EventBus event upon completion.
+ * Fleet keeps no database table for background commands; rebooting the machine clears all
+ * running commands. Neither the command nor its output is hidden from the platform: do not
+ * put secrets into either.
  *
  * Requires `fleet:machines.login` on the machine.
  *
@@ -1017,6 +1007,234 @@ export const runMachineCommand = async (
   return { data, status: res.status, headers: res.headers } as runMachineCommandResponse;
 };
 
+export type listMachineCommandsResponse200 = {
+  data: MachineCommandList;
+  status: 200;
+};
+
+export type listMachineCommandsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listMachineCommandsResponseSuccess = listMachineCommandsResponse200 & {
+  headers: Headers;
+};
+export type listMachineCommandsResponseError = listMachineCommandsResponseDefault & {
+  headers: Headers;
+};
+
+export type listMachineCommandsResponse =
+  | listMachineCommandsResponseSuccess
+  | listMachineCommandsResponseError;
+
+export const getListMachineCommandsUrl = (
+  machineId: string,
+  params?: ListMachineCommandsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/commands?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/commands`;
+};
+
+/**
+ * Queries the machine's Agent live for background commands belonging to the caller since the
+ * machine booted, newest first. Fleet does not store command state in its database; after a
+ * machine reboot, no running commands remain. Requires `fleet:machines.login` on the machine.
+ * @summary List background commands on a machine
+ */
+export const listMachineCommands = async (
+  machineId: string,
+  params?: ListMachineCommandsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listMachineCommandsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListMachineCommandsUrl(machineId, params), {
+    ...options,
+    method: "GET",
+  });
+  const data: listMachineCommandsResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listMachineCommandsResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listMachineCommandsResponse;
+};
+
+export type getMachineCommandResponse200 = {
+  data: MachineCommandResource;
+  status: 200;
+};
+
+export type getMachineCommandResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getMachineCommandResponseSuccess = getMachineCommandResponse200 & {
+  headers: Headers;
+};
+export type getMachineCommandResponseError = getMachineCommandResponseDefault & {
+  headers: Headers;
+};
+
+export type getMachineCommandResponse =
+  | getMachineCommandResponseSuccess
+  | getMachineCommandResponseError;
+
+export const getGetMachineCommandUrl = (machineId: string, commandId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/commands/${encodeURIComponent(String(commandId))}`;
+};
+
+/**
+ * Queries the machine's Agent live for the current metadata, duration, exit status, and output file path of one background command. Requires `fleet:machines.login` on the machine.
+ * @summary Get a background command
+ */
+export const getMachineCommand = async (
+  machineId: string,
+  commandId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getMachineCommandResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetMachineCommandUrl(machineId, commandId), {
+    ...options,
+    method: "GET",
+  });
+  const data: getMachineCommandResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as getMachineCommandResponse["data"];
+  return { data, status: res.status, headers: res.headers } as getMachineCommandResponse;
+};
+
+export type readMachineCommandOutputResponse200 = {
+  data: MachineCommandOutput;
+  status: 200;
+};
+
+export type readMachineCommandOutputResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type readMachineCommandOutputResponseSuccess = readMachineCommandOutputResponse200 & {
+  headers: Headers;
+};
+export type readMachineCommandOutputResponseError = readMachineCommandOutputResponseDefault & {
+  headers: Headers;
+};
+
+export type readMachineCommandOutputResponse =
+  | readMachineCommandOutputResponseSuccess
+  | readMachineCommandOutputResponseError;
+
+export const getReadMachineCommandOutputUrl = (
+  machineId: string,
+  commandId: string,
+  params?: ReadMachineCommandOutputParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/commands/${encodeURIComponent(String(commandId))}/output?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/commands/${encodeURIComponent(String(commandId))}/output`;
+};
+
+/**
+ * Reads a bounded slice of a background command's persisted output file from the machine's
+ * Agent. Choose at most one addressing mode: `tail_lines`, `start_line` (with optional
+ * `max_lines`), or `offset` (with optional `max_bytes`). When none is specified, returns the
+ * last 200 lines of the combined output stream. Requires `fleet:machines.login` on the machine.
+ * @summary Read output of a background command
+ */
+export const readMachineCommandOutput = async (
+  machineId: string,
+  commandId: string,
+  params?: ReadMachineCommandOutputParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<readMachineCommandOutputResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getReadMachineCommandOutputUrl(machineId, commandId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+  const data: readMachineCommandOutputResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as readMachineCommandOutputResponse["data"];
+  return { data, status: res.status, headers: res.headers } as readMachineCommandOutputResponse;
+};
+
+export type stopMachineCommandResponse200 = {
+  data: MachineCommandResource;
+  status: 200;
+};
+
+export type stopMachineCommandResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type stopMachineCommandResponseSuccess = stopMachineCommandResponse200 & {
+  headers: Headers;
+};
+export type stopMachineCommandResponseError = stopMachineCommandResponseDefault & {
+  headers: Headers;
+};
+
+export type stopMachineCommandResponse =
+  | stopMachineCommandResponseSuccess
+  | stopMachineCommandResponseError;
+
+export const getStopMachineCommandUrl = (machineId: string, commandId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/commands/${encodeURIComponent(String(commandId))}:stop`;
+};
+
+/**
+ * Stops a running background command belonging to the caller on the machine. Stopping an already exited command succeeds and returns its final metadata. Requires `fleet:machines.login` on the machine.
+ * @summary Stop a background command
+ */
+export const stopMachineCommand = async (
+  machineId: string,
+  commandId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<stopMachineCommandResponse> => {
+  const res = await (fetchFn ?? fetch)(getStopMachineCommandUrl(machineId, commandId), {
+    ...options,
+    method: "POST",
+  });
+  const data: stopMachineCommandResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as stopMachineCommandResponse["data"];
+  return { data, status: res.status, headers: res.headers } as stopMachineCommandResponse;
+};
+
 export type getMcpConfigurationResponse200 = {
   data: McpConfigurationResource;
   status: 200;
@@ -1049,7 +1267,7 @@ export const getGetMcpConfigurationUrl = (machineId: string) => {
  *
  * Fails with:
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.controlplane.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
@@ -1111,7 +1329,7 @@ export const getReplaceMcpConfigurationUrl = (machineId: string) => {
  *   with `metadata.line` and `metadata.column`;
  * - `MCP_CONFIGURATION_WRITE_FAILED` when the machine could not write the file;
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.controlplane.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
@@ -1193,7 +1411,7 @@ export const getUpdateMcpServerUrl = (machineId: string, serverName: string) => 
  *   whole first;
  * - `MCP_CONFIGURATION_WRITE_FAILED` when the machine could not write the file;
  * - `MACHINE_OFFLINE` when the machine is not connected and does not connect again in time;
- * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.mcp.v1`;
+ * - `FEATURE_UNAVAILABLE` when the machine does not offer `leaflow.fleet.controlplane.mcp.v1`;
  * - `USER_NOT_FOUND`, `USER_NOT_ALLOWED`, `ACCOUNT_EXPIRED` or `PAM_PERMISSION_DENIED` when
  *   the machine refuses the account, as for opening a session;
  * - `MCP_START_FAILED` when the machine could not start MCP for the caller's account;
@@ -1500,299 +1718,6 @@ export const pollToolActivities = async (
     {},
   )) as pollToolActivitiesResponse["data"];
   return { data, status: res.status, headers: res.headers } as pollToolActivitiesResponse;
-};
-
-export type listMachineExecutionsResponse200 = {
-  data: ExecutionList;
-  status: 200;
-};
-
-export type listMachineExecutionsResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type listMachineExecutionsResponseSuccess = listMachineExecutionsResponse200 & {
-  headers: Headers;
-};
-export type listMachineExecutionsResponseError = listMachineExecutionsResponseDefault & {
-  headers: Headers;
-};
-
-export type listMachineExecutionsResponse =
-  | listMachineExecutionsResponseSuccess
-  | listMachineExecutionsResponseError;
-
-export const getListMachineExecutionsUrl = (
-  machineId: string,
-  params?: ListMachineExecutionsParams,
-) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/executions?${stringifiedParams}`
-    : `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/executions`;
-};
-
-/**
- * Queries all open sessions belonging to the caller on the machine in parallel and merges
- * their live background executions, newest first. Does not store process state in Fleet;
- * sessions that are temporarily unreachable or run an older Agent are reported in
- * `unavailable_sessions` rather than failing the whole response. Requires
- * `fleet:machines.login` on the machine.
- * @summary List background executions on a machine
- */
-export const listMachineExecutions = async (
-  machineId: string,
-  params?: ListMachineExecutionsParams,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<listMachineExecutionsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListMachineExecutionsUrl(machineId, params), {
-    ...options,
-    method: "GET",
-  });
-  const data: listMachineExecutionsResponse["data"] = (await decodeResponse(
-    res,
-    { "200": "json", default: "json" },
-    {},
-  )) as listMachineExecutionsResponse["data"];
-  return { data, status: res.status, headers: res.headers } as listMachineExecutionsResponse;
-};
-
-export type listSessionExecutionsResponse200 = {
-  data: ExecutionList;
-  status: 200;
-};
-
-export type listSessionExecutionsResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type listSessionExecutionsResponseSuccess = listSessionExecutionsResponse200 & {
-  headers: Headers;
-};
-export type listSessionExecutionsResponseError = listSessionExecutionsResponseDefault & {
-  headers: Headers;
-};
-
-export type listSessionExecutionsResponse =
-  | listSessionExecutionsResponseSuccess
-  | listSessionExecutionsResponseError;
-
-export const getListSessionExecutionsUrl = (
-  sessionId: string,
-  params?: ListSessionExecutionsParams,
-) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions?${stringifiedParams}`
-    : `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions`;
-};
-
-/**
- * Queries the session process live for its background executions, newest first. Returns an
- * empty list when the session is already closed (for example after the machine rebooted).
- * @summary List background executions in a session
- */
-export const listSessionExecutions = async (
-  sessionId: string,
-  params?: ListSessionExecutionsParams,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<listSessionExecutionsResponse> => {
-  const res = await (fetchFn ?? fetch)(getListSessionExecutionsUrl(sessionId, params), {
-    ...options,
-    method: "GET",
-  });
-  const data: listSessionExecutionsResponse["data"] = (await decodeResponse(
-    res,
-    { "200": "json", default: "json" },
-    {},
-  )) as listSessionExecutionsResponse["data"];
-  return { data, status: res.status, headers: res.headers } as listSessionExecutionsResponse;
-};
-
-export type getSessionExecutionResponse200 = {
-  data: ExecutionResource;
-  status: 200;
-};
-
-export type getSessionExecutionResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type getSessionExecutionResponseSuccess = getSessionExecutionResponse200 & {
-  headers: Headers;
-};
-export type getSessionExecutionResponseError = getSessionExecutionResponseDefault & {
-  headers: Headers;
-};
-
-export type getSessionExecutionResponse =
-  | getSessionExecutionResponseSuccess
-  | getSessionExecutionResponseError;
-
-export const getGetSessionExecutionUrl = (sessionId: string, executionId: string) => {
-  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions/${encodeURIComponent(String(executionId))}`;
-};
-
-/**
- * Queries the session process live for the current metadata and status of one background execution.
- * @summary Get a background execution
- */
-export const getSessionExecution = async (
-  sessionId: string,
-  executionId: string,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<getSessionExecutionResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetSessionExecutionUrl(sessionId, executionId), {
-    ...options,
-    method: "GET",
-  });
-  const data: getSessionExecutionResponse["data"] = (await decodeResponse(
-    res,
-    { "200": "json", default: "json" },
-    {},
-  )) as getSessionExecutionResponse["data"];
-  return { data, status: res.status, headers: res.headers } as getSessionExecutionResponse;
-};
-
-export type readSessionExecutionOutputResponse200 = {
-  data: ExecutionOutput;
-  status: 200;
-};
-
-export type readSessionExecutionOutputResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type readSessionExecutionOutputResponseSuccess = readSessionExecutionOutputResponse200 & {
-  headers: Headers;
-};
-export type readSessionExecutionOutputResponseError = readSessionExecutionOutputResponseDefault & {
-  headers: Headers;
-};
-
-export type readSessionExecutionOutputResponse =
-  | readSessionExecutionOutputResponseSuccess
-  | readSessionExecutionOutputResponseError;
-
-export const getReadSessionExecutionOutputUrl = (
-  sessionId: string,
-  executionId: string,
-  params?: ReadSessionExecutionOutputParams,
-) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions/${encodeURIComponent(String(executionId))}/output?${stringifiedParams}`
-    : `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions/${encodeURIComponent(String(executionId))}/output`;
-};
-
-/**
- * Reads a bounded slice of a background execution's persisted output file from the session
- * process. Choose at most one addressing mode: `tail_lines`, `start_line` (with optional
- * `max_lines`), or `offset` (with optional `max_bytes`). When none is specified, returns the
- * last 200 lines of the combined output stream.
- * @summary Read output of a background execution
- */
-export const readSessionExecutionOutput = async (
-  sessionId: string,
-  executionId: string,
-  params?: ReadSessionExecutionOutputParams,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<readSessionExecutionOutputResponse> => {
-  const res = await (fetchFn ?? fetch)(
-    getReadSessionExecutionOutputUrl(sessionId, executionId, params),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-  const data: readSessionExecutionOutputResponse["data"] = (await decodeResponse(
-    res,
-    { "200": "json", default: "json" },
-    {},
-  )) as readSessionExecutionOutputResponse["data"];
-  return { data, status: res.status, headers: res.headers } as readSessionExecutionOutputResponse;
-};
-
-export type stopSessionExecutionResponse200 = {
-  data: ExecutionResource;
-  status: 200;
-};
-
-export type stopSessionExecutionResponseDefault = {
-  data: Error;
-  status: Exclude<HTTPStatusCodes, 200>;
-};
-
-export type stopSessionExecutionResponseSuccess = stopSessionExecutionResponse200 & {
-  headers: Headers;
-};
-export type stopSessionExecutionResponseError = stopSessionExecutionResponseDefault & {
-  headers: Headers;
-};
-
-export type stopSessionExecutionResponse =
-  | stopSessionExecutionResponseSuccess
-  | stopSessionExecutionResponseError;
-
-export const getStopSessionExecutionUrl = (sessionId: string, executionId: string) => {
-  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions/${encodeURIComponent(String(executionId))}:stop`;
-};
-
-/**
- * Stops a running background execution in the session. Stopping an already exited execution succeeds and returns its final metadata.
- * @summary Stop a background execution
- */
-export const stopSessionExecution = async (
-  sessionId: string,
-  executionId: string,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<stopSessionExecutionResponse> => {
-  const res = await (fetchFn ?? fetch)(getStopSessionExecutionUrl(sessionId, executionId), {
-    ...options,
-    method: "POST",
-  });
-  const data: stopSessionExecutionResponse["data"] = (await decodeResponse(
-    res,
-    { "200": "json", default: "json" },
-    {},
-  )) as stopSessionExecutionResponse["data"];
-  return { data, status: res.status, headers: res.headers } as stopSessionExecutionResponse;
 };
 
 export type sendMcpRequestResponse200 = {

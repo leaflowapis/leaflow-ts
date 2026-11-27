@@ -75,16 +75,16 @@
  * A machine reports what it offers in `features`, each named after the protocol package that
  * defines it:
  *
- * - `leaflow.fleet.directory.v1`: the accounts of the project's members and the project's groups
+ * - `leaflow.fleet.controlplane.directory.v1`: the accounts of the project's members and the project's groups
  *   exist on the machine; members log in over SSH with their keys and become root through sudo
  *   as their permissions allow;
- * - `leaflow.fleet.command.v1`: running commands;
- * - `leaflow.fleet.mcp.v1`: the MCP servers each account configures on the machine, local ones
+ * - `leaflow.fleet.controlplane.command.v1`: running commands;
+ * - `leaflow.fleet.controlplane.mcp.v1`: the MCP servers each account configures on the machine, local ones
  *   and remote ones it connects to;
- * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
+ * - `leaflow.fleet.controlplane.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
- * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a graphical backend;
- * - `leaflow.fleet.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
+ * - `leaflow.fleet.controlplane.desktop.v1`: sessions with a graphical backend;
+ * - `leaflow.fleet.controlplane.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
  *   the virtual desktop capability is actually available; MCP is a separate source.
  *
  * A graphical backend does not require a full desktop environment. When the machine reports
@@ -140,7 +140,7 @@
  *
  * ## MCP servers
  *
- * A machine that offers `leaflow.fleet.mcp.v1` reaches the MCP servers its accounts configure:
+ * A machine that offers `leaflow.fleet.controlplane.mcp.v1` reaches the MCP servers its accounts configure:
  * servers it runs itself and remote servers it connects to. Each account configures them in
  * `~/.local/share/leaflow/agent/mcp.json` in its home directory, in the `mcpServers` format other
  * MCP clients use, by hand or through this API; the machine picks up every change by itself.
@@ -254,29 +254,16 @@
  * `project_deletion_requested` when deletion of the project was requested, `machine_removed` when
  * its machine was removed, or `key_revoked` when the key that signed its authorization was
  * revoked. A participant whose creation failed is not announced.
- *
- * ## Background executions
- *
- * Background programs started inside a session (`leaflow.fleet.exec.v1.background`) live only in
- * the session process and its per-boot runtime directory, so Fleet keeps no database table for
- * them and rebooting the machine clears every running execution. Fleet forwards live listing,
- * inspection, output reading (by tail lines, line range, or byte range from the persisted output
- * file), and stopping over the session process's control connection. Because these calls traverse
- * Fleet, their arguments, metadata and output are visible to the platform (never logged).
- *
- * While a background execution runs, the session process reports a heartbeat every 30 minutes
- * (`leaflow.fleet.exec.running`) and a terminal event when it finishes or is stopped
- * (`leaflow.fleet.exec.exited`, including `exit_code`, `signal_name`, `duration_seconds`,
- * `output_path`, full `argv`, `working_directory`, `user_id` and `username`), delivered through
- * EventBus to the session's user in the current project.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
 
 export const runCommandRequestCommandMax = 65536;
 
-export const runCommandRequestTimeoutSecondsDefault = 60;
-export const runCommandRequestTimeoutSecondsMax = 300;
+export const runCommandRequestTimeoutSecondsMax = 86400;
+
+export const runCommandRequestBackgroundDefault = false;
+export const runCommandRequestWorkingDirectoryMax = 4096;
 
 export const RunCommandRequest = zod.strictObject({
   command: zod
@@ -290,8 +277,21 @@ export const RunCommandRequest = zod.strictObject({
     .int()
     .min(1)
     .max(runCommandRequestTimeoutSecondsMax)
-    .default(runCommandRequestTimeoutSecondsDefault)
-    .describe("Kills the command, and every process it started, this long after it started"),
+    .optional()
+    .describe(
+      "Kills the command, and every process it started, this long after it started.\nFor foreground commands: 1–300 seconds (default 60).\nFor background commands: optional upper bound (omitted means unlimited until exit, stop, or reboot).",
+    ),
+  background: zod
+    .boolean()
+    .default(runCommandRequestBackgroundDefault)
+    .describe(
+      "Run the command detached in the background, persist output to a file, and return immediately with `command`",
+    ),
+  working_directory: zod
+    .string()
+    .max(runCommandRequestWorkingDirectoryMax)
+    .optional()
+    .describe("Optional working directory on the machine; empty uses the account's home directory"),
 });
 
 export type RunCommandRequest = zod.input<typeof RunCommandRequest>;

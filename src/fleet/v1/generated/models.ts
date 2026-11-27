@@ -75,16 +75,16 @@
  * A machine reports what it offers in `features`, each named after the protocol package that
  * defines it:
  *
- * - `leaflow.fleet.directory.v1`: the accounts of the project's members and the project's groups
+ * - `leaflow.fleet.controlplane.directory.v1`: the accounts of the project's members and the project's groups
  *   exist on the machine; members log in over SSH with their keys and become root through sudo
  *   as their permissions allow;
- * - `leaflow.fleet.command.v1`: running commands;
- * - `leaflow.fleet.mcp.v1`: the MCP servers each account configures on the machine, local ones
+ * - `leaflow.fleet.controlplane.command.v1`: running commands;
+ * - `leaflow.fleet.controlplane.mcp.v1`: the MCP servers each account configures on the machine, local ones
  *   and remote ones it connects to;
- * - `leaflow.fleet.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
+ * - `leaflow.fleet.controlplane.host.v1`: terminal sessions, with programs, files, ports, sound, devices,
  *   printers and privilege approvals;
- * - `leaflow.fleet.virtualdesktop.host.v1`: sessions with a graphical backend;
- * - `leaflow.fleet.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
+ * - `leaflow.fleet.controlplane.desktop.v1`: sessions with a graphical backend;
+ * - `leaflow.fleet.controlplane.tool.v1`: live session tools. Builtin `computer.*` tools are exposed only while
  *   the virtual desktop capability is actually available; MCP is a separate source.
  *
  * A graphical backend does not require a full desktop environment. When the machine reports
@@ -140,7 +140,7 @@
  *
  * ## MCP servers
  *
- * A machine that offers `leaflow.fleet.mcp.v1` reaches the MCP servers its accounts configure:
+ * A machine that offers `leaflow.fleet.controlplane.mcp.v1` reaches the MCP servers its accounts configure:
  * servers it runs itself and remote servers it connects to. Each account configures them in
  * `~/.local/share/leaflow/agent/mcp.json` in its home directory, in the `mcpServers` format other
  * MCP clients use, by hand or through this API; the machine picks up every change by itself.
@@ -254,21 +254,6 @@
  * `project_deletion_requested` when deletion of the project was requested, `machine_removed` when
  * its machine was removed, or `key_revoked` when the key that signed its authorization was
  * revoked. A participant whose creation failed is not announced.
- *
- * ## Background executions
- *
- * Background programs started inside a session (`leaflow.fleet.exec.v1.background`) live only in
- * the session process and its per-boot runtime directory, so Fleet keeps no database table for
- * them and rebooting the machine clears every running execution. Fleet forwards live listing,
- * inspection, output reading (by tail lines, line range, or byte range from the persisted output
- * file), and stopping over the session process's control connection. Because these calls traverse
- * Fleet, their arguments, metadata and output are visible to the platform (never logged).
- *
- * While a background execution runs, the session process reports a heartbeat every 30 minutes
- * (`leaflow.fleet.exec.running`) and a terminal event when it finishes or is stopped
- * (`leaflow.fleet.exec.exited`, including `exit_code`, `signal_name`, `duration_seconds`,
- * `output_path`, full `argv`, `working_directory`, `user_id` and `username`), delivered through
- * EventBus to the session's user in the current project.
  * OpenAPI spec version: 1.0.0
  */
 export interface FieldViolation {
@@ -377,7 +362,7 @@ export const FeatureState = {
 } as const;
 
 export interface MachineFeature {
-  /** The protocol package that defines the feature, such as `leaflow.fleet.command.v1` */
+  /** The protocol package that defines the feature, such as `leaflow.fleet.controlplane.command.v1` */
   name: string;
   state: FeatureState;
   /** Why it cannot be used, such as `Xwayland is not installed`; empty while available */
@@ -802,7 +787,7 @@ export interface SessionList {
 }
 
 /**
- * A desktop for the session, on a machine that offers `leaflow.fleet.virtualdesktop.host.v1`
+ * A desktop for the session, on a machine that offers `leaflow.fleet.controlplane.desktop.v1`
  */
 export interface DesktopOptions {
   mode: SessionMode;
@@ -820,7 +805,7 @@ export interface DesktopOptions {
   height?: number;
   /**
    * In `desktop` mode, the desktop environment to start: a detail of the machine's
-   * `leaflow.fleet.virtualdesktop.host.v1` feature without its `desktop.` prefix, such as
+   * `leaflow.fleet.controlplane.desktop.v1` feature without its `desktop.` prefix, such as
    * `XFCE`; the machine's default when omitted
    * @maxLength 128
    */
@@ -840,21 +825,83 @@ export interface RunCommandRequest {
    */
   command: string;
   /**
-   * Kills the command, and every process it started, this long after it started
+   * Kills the command, and every process it started, this long after it started.
+   * For foreground commands: 1–300 seconds (default 60).
+   * For background commands: optional upper bound (omitted means unlimited until exit, stop, or reboot).
    * @minimum 1
-   * @maximum 300
+   * @maximum 86400
    */
   timeout_seconds?: number;
+  /** Run the command detached in the background, persist output to a file, and return immediately with `command` */
+  background?: boolean;
+  /**
+   * Optional working directory on the machine; empty uses the account's home directory
+   * @maxLength 4096
+   */
+  working_directory?: string;
 }
 
-export interface RunCommandResponse {
+export type CommandState = (typeof CommandState)[keyof typeof CommandState];
+
+export const CommandState = {
+  running: "running",
+  exited: "exited",
+} as const;
+
+export interface MachineCommandResource {
+  machine_id: string;
+  command_id: string;
+  user_id: string;
+  username: string;
+  /** Full shell command line when started via RunCommand; empty when started with argv only */
+  command: string;
+  /** Full argument vector executed on the machine */
+  argv: string[];
+  working_directory: string;
   /**
-   * The status it exited with, 0 being success; null when a signal ended it
+   * Fleet session_id when this background process belongs to a session; null otherwise
+   * @nullable
+   */
+  session_id: string | null;
+  state: CommandState;
+  started_at: string;
+  /** @nullable */
+  finished_at: string | null;
+  /**
+   * Elapsed runtime in seconds (while running) or total runtime in seconds (once exited)
+   * @minimum 0
+   */
+  duration_seconds: number;
+  /**
+   * Exit status (0–255) when exited normally; null otherwise
    * @nullable
    */
   exit_status: number | null;
   /**
-   * The signal that ended it, such as 9 when the timeout killed it; null when it exited
+   * Signal number that terminated the process; null otherwise
+   * @nullable
+   */
+  signal: number | null;
+  timed_out: boolean;
+  /** Termination reason (`exited`, `signaled`, `stopped`, `timed_out`, `output_limit`, `start_failed`, or `failed`); empty while running */
+  reason: string;
+  /** Absolute path on the machine where the combined output file is persisted */
+  output_path: string;
+  /** @minimum 0 */
+  output_bytes: number;
+  /** @minimum 0 */
+  output_lines: number;
+  output_truncated: boolean;
+}
+
+export interface RunCommandResponse {
+  /**
+   * The status it exited with, 0 being success; null when a signal ended it or when started in the background
+   * @nullable
+   */
+  exit_status: number | null;
+  /**
+   * The signal that ended it, such as 9 when the timeout killed it; null when it exited or when started in the background
    * @nullable
    */
   signal: number | null;
@@ -868,6 +915,43 @@ export interface RunCommandResponse {
   stderr: string;
   /** `stderr` is cut short */
   stderr_truncated: boolean;
+  /** Metadata of the started background command when `background` is true; null for foreground commands */
+  command?: MachineCommandResource | null;
+}
+
+export type CommandOutputStream = (typeof CommandOutputStream)[keyof typeof CommandOutputStream];
+
+export const CommandOutputStream = {
+  combined: "combined",
+  stdout: "stdout",
+  stderr: "stderr",
+} as const;
+
+export interface MachineCommandList {
+  items: MachineCommandResource[];
+}
+
+export interface MachineCommandOutput {
+  machine_id: string;
+  command_id: string;
+  stream: CommandOutputStream;
+  /** Output bytes in standard Base64 (RFC 4648) */
+  data: string;
+  /** @minimum 0 */
+  start_line: number;
+  /** @minimum 0 */
+  end_line: number;
+  /** @minimum 0 */
+  total_lines: number;
+  /** @minimum 0 */
+  start_offset: number;
+  /** @minimum 0 */
+  next_offset: number;
+  /** @minimum 0 */
+  total_bytes: number;
+  has_more: boolean;
+  output_truncated: boolean;
+  output_path: string;
 }
 
 /**
@@ -1639,102 +1723,6 @@ export interface MigrationStep {
   checkpoint: string;
 }
 
-export type ExecutionState = (typeof ExecutionState)[keyof typeof ExecutionState];
-
-export const ExecutionState = {
-  running: "running",
-  exited: "exited",
-} as const;
-
-export type ExecutionStream = (typeof ExecutionStream)[keyof typeof ExecutionStream];
-
-export const ExecutionStream = {
-  combined: "combined",
-  stdout: "stdout",
-  stderr: "stderr",
-} as const;
-
-export interface ExecutionExit {
-  /**
-   * Exit status (0–255) when the process exited normally; null otherwise
-   * @minimum 0
-   * @maximum 255
-   * @nullable
-   */
-  exit_code: number | null;
-  /**
-   * Signal name without "SIG" (for example `KILL`) when terminated by a signal; null otherwise
-   * @nullable
-   */
-  signal_name: string | null;
-  core_dumped: boolean;
-  /** Machine-readable termination reason (`exited`, `signaled`, `stopped`, `timed_out`, `output_limit`, `start_failed`, or `failed`) */
-  reason: string;
-}
-
-export interface ExecutionResource {
-  machine_id: string;
-  session_id: string;
-  execution_id: string;
-  user_id: string;
-  username: string;
-  /** Full argument vector of the background command */
-  argv: string[];
-  working_directory: string;
-  state: ExecutionState;
-  started_at: string;
-  /** @nullable */
-  finished_at: string | null;
-  /**
-   * Elapsed runtime in seconds (while running) or total runtime in seconds (once exited)
-   * @minimum 0
-   */
-  duration_seconds: number;
-  exit: ExecutionExit | null;
-  /** Absolute path on the machine where the combined output file is persisted */
-  output_path: string;
-  /** @minimum 0 */
-  output_bytes: number;
-  /** @minimum 0 */
-  output_lines: number;
-  output_truncated: boolean;
-}
-
-export interface UnavailableExecutionSession {
-  session_id: string;
-  reason: string;
-}
-
-export interface ExecutionList {
-  items: ExecutionResource[];
-  /** Open sessions that could not be queried during a machine-wide fan-out */
-  unavailable_sessions: UnavailableExecutionSession[];
-}
-
-export interface ExecutionOutput {
-  machine_id: string;
-  session_id: string;
-  execution_id: string;
-  stream: ExecutionStream;
-  /** Output bytes in standard Base64 (RFC 4648) */
-  data: string;
-  /** @minimum 0 */
-  start_line: number;
-  /** @minimum 0 */
-  end_line: number;
-  /** @minimum 0 */
-  total_lines: number;
-  /** @minimum 0 */
-  start_offset: number;
-  /** @minimum 0 */
-  next_offset: number;
-  /** @minimum 0 */
-  total_bytes: number;
-  has_more: boolean;
-  output_truncated: boolean;
-  output_path: string;
-}
-
 /**
  * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
  */
@@ -1820,6 +1808,48 @@ export type ListMachineLocalAccountsParams = {
   keyword?: string;
 };
 
+export type ListMachineCommandsParams = {
+  /**
+   * Filter by background command state
+   */
+  state?: CommandState;
+};
+
+export type ReadMachineCommandOutputParams = {
+  /**
+   * Which output stream to read; defaults to `combined`
+   */
+  stream?: CommandOutputStream;
+  /**
+   * Return at most the last N lines
+   * @minimum 1
+   * @maximum 5000
+   */
+  tail_lines?: number;
+  /**
+   * 1-based starting line number
+   * @minimum 1
+   */
+  start_line?: number;
+  /**
+   * Maximum lines to return from `start_line`
+   * @minimum 1
+   * @maximum 5000
+   */
+  max_lines?: number;
+  /**
+   * 0-based byte offset into the output stream
+   * @minimum 0
+   */
+  offset?: number;
+  /**
+   * Maximum bytes to return from `offset` (at most 262144)
+   * @minimum 1
+   * @maximum 262144
+   */
+  max_bytes?: number;
+};
+
 export type DeleteMcpServerParams = {
   /**
    * The configuration's `revision` as last read; absent only for one that was `missing`
@@ -1870,55 +1900,6 @@ export const ListToolsSource = {
   builtin: "builtin",
   mcp: "mcp",
 } as const;
-
-export type ListMachineExecutionsParams = {
-  /**
-   * Filter by execution state
-   */
-  state?: ExecutionState;
-};
-
-export type ListSessionExecutionsParams = {
-  /**
-   * Filter by execution state
-   */
-  state?: ExecutionState;
-};
-
-export type ReadSessionExecutionOutputParams = {
-  /**
-   * Which output stream to read; defaults to `combined`
-   */
-  stream?: ExecutionStream;
-  /**
-   * Return at most the last N lines
-   * @minimum 1
-   * @maximum 5000
-   */
-  tail_lines?: number;
-  /**
-   * 1-based starting line number
-   * @minimum 1
-   */
-  start_line?: number;
-  /**
-   * Maximum lines to return from `start_line`
-   * @minimum 1
-   * @maximum 5000
-   */
-  max_lines?: number;
-  /**
-   * 0-based byte offset into the output stream
-   * @minimum 0
-   */
-  offset?: number;
-  /**
-   * Maximum bytes to return from `offset` (at most 262144)
-   * @minimum 1
-   * @maximum 262144
-   */
-  max_bytes?: number;
-};
 
 export type ListPrivilegeAutoApprovalsParams = {
   /**
