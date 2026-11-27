@@ -254,6 +254,21 @@
  * `project_deletion_requested` when deletion of the project was requested, `machine_removed` when
  * its machine was removed, or `key_revoked` when the key that signed its authorization was
  * revoked. A participant whose creation failed is not announced.
+ *
+ * ## Background executions
+ *
+ * Background programs started inside a session (`leaflow.fleet.exec.v1.background`) live only in
+ * the session process and its per-boot runtime directory, so Fleet keeps no database table for
+ * them and rebooting the machine clears every running execution. Fleet forwards live listing,
+ * inspection, output reading (by tail lines, line range, or byte range from the persisted output
+ * file), and stopping over the session process's control connection. Because these calls traverse
+ * Fleet, their arguments, metadata and output are visible to the platform (never logged).
+ *
+ * While a background execution runs, the session process reports a heartbeat every 30 minutes
+ * (`leaflow.fleet.exec.running`) and a terminal event when it finishes or is stopped
+ * (`leaflow.fleet.exec.exited`, including `exit_code`, `signal_name`, `duration_seconds`,
+ * `output_path`, full `argv`, `working_directory`, `user_id` and `username`), delivered through
+ * EventBus to the session's user in the current project.
  * OpenAPI spec version: 1.0.0
  */
 export interface FieldViolation {
@@ -1624,6 +1639,102 @@ export interface MigrationStep {
   checkpoint: string;
 }
 
+export type ExecutionState = (typeof ExecutionState)[keyof typeof ExecutionState];
+
+export const ExecutionState = {
+  running: "running",
+  exited: "exited",
+} as const;
+
+export type ExecutionStream = (typeof ExecutionStream)[keyof typeof ExecutionStream];
+
+export const ExecutionStream = {
+  combined: "combined",
+  stdout: "stdout",
+  stderr: "stderr",
+} as const;
+
+export interface ExecutionExit {
+  /**
+   * Exit status (0–255) when the process exited normally; null otherwise
+   * @minimum 0
+   * @maximum 255
+   * @nullable
+   */
+  exit_code: number | null;
+  /**
+   * Signal name without "SIG" (for example `KILL`) when terminated by a signal; null otherwise
+   * @nullable
+   */
+  signal_name: string | null;
+  core_dumped: boolean;
+  /** Machine-readable termination reason (`exited`, `signaled`, `stopped`, `timed_out`, `output_limit`, `start_failed`, or `failed`) */
+  reason: string;
+}
+
+export interface ExecutionResource {
+  machine_id: string;
+  session_id: string;
+  execution_id: string;
+  user_id: string;
+  username: string;
+  /** Full argument vector of the background command */
+  argv: string[];
+  working_directory: string;
+  state: ExecutionState;
+  started_at: string;
+  /** @nullable */
+  finished_at: string | null;
+  /**
+   * Elapsed runtime in seconds (while running) or total runtime in seconds (once exited)
+   * @minimum 0
+   */
+  duration_seconds: number;
+  exit: ExecutionExit | null;
+  /** Absolute path on the machine where the combined output file is persisted */
+  output_path: string;
+  /** @minimum 0 */
+  output_bytes: number;
+  /** @minimum 0 */
+  output_lines: number;
+  output_truncated: boolean;
+}
+
+export interface UnavailableExecutionSession {
+  session_id: string;
+  reason: string;
+}
+
+export interface ExecutionList {
+  items: ExecutionResource[];
+  /** Open sessions that could not be queried during a machine-wide fan-out */
+  unavailable_sessions: UnavailableExecutionSession[];
+}
+
+export interface ExecutionOutput {
+  machine_id: string;
+  session_id: string;
+  execution_id: string;
+  stream: ExecutionStream;
+  /** Output bytes in standard Base64 (RFC 4648) */
+  data: string;
+  /** @minimum 0 */
+  start_line: number;
+  /** @minimum 0 */
+  end_line: number;
+  /** @minimum 0 */
+  total_lines: number;
+  /** @minimum 0 */
+  start_offset: number;
+  /** @minimum 0 */
+  next_offset: number;
+  /** @minimum 0 */
+  total_bytes: number;
+  has_more: boolean;
+  output_truncated: boolean;
+  output_path: string;
+}
+
 /**
  * Pagination metadata for stable numbered pages. total_count is returned only when the operation can determine it without an unbounded scan.
  */
@@ -1759,6 +1870,55 @@ export const ListToolsSource = {
   builtin: "builtin",
   mcp: "mcp",
 } as const;
+
+export type ListMachineExecutionsParams = {
+  /**
+   * Filter by execution state
+   */
+  state?: ExecutionState;
+};
+
+export type ListSessionExecutionsParams = {
+  /**
+   * Filter by execution state
+   */
+  state?: ExecutionState;
+};
+
+export type ReadSessionExecutionOutputParams = {
+  /**
+   * Which output stream to read; defaults to `combined`
+   */
+  stream?: ExecutionStream;
+  /**
+   * Return at most the last N lines
+   * @minimum 1
+   * @maximum 5000
+   */
+  tail_lines?: number;
+  /**
+   * 1-based starting line number
+   * @minimum 1
+   */
+  start_line?: number;
+  /**
+   * Maximum lines to return from `start_line`
+   * @minimum 1
+   * @maximum 5000
+   */
+  max_lines?: number;
+  /**
+   * 0-based byte offset into the output stream
+   * @minimum 0
+   */
+  offset?: number;
+  /**
+   * Maximum bytes to return from `offset` (at most 262144)
+   * @minimum 1
+   * @maximum 262144
+   */
+  max_bytes?: number;
+};
 
 export type ListPrivilegeAutoApprovalsParams = {
   /**

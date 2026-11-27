@@ -254,6 +254,21 @@
  * `project_deletion_requested` when deletion of the project was requested, `machine_removed` when
  * its machine was removed, or `key_revoked` when the key that signed its authorization was
  * revoked. A participant whose creation failed is not announced.
+ *
+ * ## Background executions
+ *
+ * Background programs started inside a session (`leaflow.fleet.exec.v1.background`) live only in
+ * the session process and its per-boot runtime directory, so Fleet keeps no database table for
+ * them and rebooting the machine clears every running execution. Fleet forwards live listing,
+ * inspection, output reading (by tail lines, line range, or byte range from the persisted output
+ * file), and stopping over the session process's control connection. Because these calls traverse
+ * Fleet, their arguments, metadata and output are visible to the platform (never logged).
+ *
+ * While a background execution runs, the session process reports a heartbeat every 30 minutes
+ * (`leaflow.fleet.exec.running`) and a terminal event when it finishes or is stopped
+ * (`leaflow.fleet.exec.exited`, including `exit_code`, `signal_name`, `duration_seconds`,
+ * `output_path`, full `argv`, `working_directory`, `user_id` and `username`), delivered through
+ * EventBus to the session's user in the current project.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -769,6 +784,157 @@ export const PollToolActivitiesParams = zod.strictObject({
     .min(1)
     .max(pollToolActivitiesPathSessionIdMax)
     .regex(pollToolActivitiesPathSessionIdRegExp),
+});
+
+/**
+ * Queries all open sessions belonging to the caller on the machine in parallel and merges
+ * their live background executions, newest first. Does not store process state in Fleet;
+ * sessions that are temporarily unreachable or run an older Agent are reported in
+ * `unavailable_sessions` rather than failing the whole response. Requires
+ * `fleet:machines.login` on the machine.
+ * @summary List background executions on a machine
+ */
+export const ListMachineExecutionsParams = zod.strictObject({
+  machineId: zod.uuid(),
+});
+
+export const ListMachineExecutionsQueryParams = zod.strictObject({
+  state: zod.enum(["running", "exited"]).optional().describe("Filter by execution state"),
+});
+
+/**
+ * Queries the session process live for its background executions, newest first. Returns an
+ * empty list when the session is already closed (for example after the machine rebooted).
+ * @summary List background executions in a session
+ */
+export const listSessionExecutionsPathSessionIdMax = 40;
+
+export const listSessionExecutionsPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+
+export const ListSessionExecutionsParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(listSessionExecutionsPathSessionIdMax)
+    .regex(listSessionExecutionsPathSessionIdRegExp),
+});
+
+export const ListSessionExecutionsQueryParams = zod.strictObject({
+  state: zod.enum(["running", "exited"]).optional().describe("Filter by execution state"),
+});
+
+/**
+ * Queries the session process live for the current metadata and status of one background execution.
+ * @summary Get a background execution
+ */
+export const getSessionExecutionPathSessionIdMax = 40;
+
+export const getSessionExecutionPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const getSessionExecutionPathExecutionIdMax = 64;
+
+export const getSessionExecutionPathExecutionIdRegExp = new RegExp("^[A-Za-z0-9-]+$");
+
+export const GetSessionExecutionParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(getSessionExecutionPathSessionIdMax)
+    .regex(getSessionExecutionPathSessionIdRegExp),
+  executionId: zod
+    .string()
+    .min(1)
+    .max(getSessionExecutionPathExecutionIdMax)
+    .regex(getSessionExecutionPathExecutionIdRegExp),
+});
+
+/**
+ * Reads a bounded slice of a background execution's persisted output file from the session
+ * process. Choose at most one addressing mode: `tail_lines`, `start_line` (with optional
+ * `max_lines`), or `offset` (with optional `max_bytes`). When none is specified, returns the
+ * last 200 lines of the combined output stream.
+ * @summary Read output of a background execution
+ */
+export const readSessionExecutionOutputPathSessionIdMax = 40;
+
+export const readSessionExecutionOutputPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const readSessionExecutionOutputPathExecutionIdMax = 64;
+
+export const readSessionExecutionOutputPathExecutionIdRegExp = new RegExp("^[A-Za-z0-9-]+$");
+
+export const ReadSessionExecutionOutputParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(readSessionExecutionOutputPathSessionIdMax)
+    .regex(readSessionExecutionOutputPathSessionIdRegExp),
+  executionId: zod
+    .string()
+    .min(1)
+    .max(readSessionExecutionOutputPathExecutionIdMax)
+    .regex(readSessionExecutionOutputPathExecutionIdRegExp),
+});
+
+export const readSessionExecutionOutputQueryTailLinesMax = 5000;
+
+export const readSessionExecutionOutputQueryMaxLinesMax = 5000;
+
+export const readSessionExecutionOutputQueryOffsetMin = 0;
+
+export const readSessionExecutionOutputQueryMaxBytesMax = 262144;
+
+export const ReadSessionExecutionOutputQueryParams = zod.strictObject({
+  stream: zod
+    .enum(["combined", "stdout", "stderr"])
+    .optional()
+    .describe("Which output stream to read; defaults to `combined`"),
+  tail_lines: zod
+    .int()
+    .min(1)
+    .max(readSessionExecutionOutputQueryTailLinesMax)
+    .optional()
+    .describe("Return at most the last N lines"),
+  start_line: zod.int().min(1).optional().describe("1-based starting line number"),
+  max_lines: zod
+    .int()
+    .min(1)
+    .max(readSessionExecutionOutputQueryMaxLinesMax)
+    .optional()
+    .describe("Maximum lines to return from `start_line`"),
+  offset: zod
+    .int()
+    .min(readSessionExecutionOutputQueryOffsetMin)
+    .optional()
+    .describe("0-based byte offset into the output stream"),
+  max_bytes: zod
+    .int()
+    .min(1)
+    .max(readSessionExecutionOutputQueryMaxBytesMax)
+    .optional()
+    .describe("Maximum bytes to return from `offset` (at most 262144)"),
+});
+
+/**
+ * Stops a running background execution in the session. Stopping an already exited execution succeeds and returns its final metadata.
+ * @summary Stop a background execution
+ */
+export const stopSessionExecutionPathSessionIdMax = 40;
+
+export const stopSessionExecutionPathSessionIdRegExp = new RegExp("^[a-z0-9-]+$");
+export const stopSessionExecutionPathExecutionIdMax = 64;
+
+export const stopSessionExecutionPathExecutionIdRegExp = new RegExp("^[A-Za-z0-9-]+$");
+
+export const StopSessionExecutionParams = zod.strictObject({
+  sessionId: zod
+    .string()
+    .min(1)
+    .max(stopSessionExecutionPathSessionIdMax)
+    .regex(stopSessionExecutionPathSessionIdRegExp),
+  executionId: zod
+    .string()
+    .min(1)
+    .max(stopSessionExecutionPathExecutionIdMax)
+    .regex(stopSessionExecutionPathExecutionIdRegExp),
 });
 
 /**

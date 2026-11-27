@@ -254,6 +254,21 @@
  * `project_deletion_requested` when deletion of the project was requested, `machine_removed` when
  * its machine was removed, or `key_revoked` when the key that signed its authorization was
  * revoked. A participant whose creation failed is not announced.
+ *
+ * ## Background executions
+ *
+ * Background programs started inside a session (`leaflow.fleet.exec.v1.background`) live only in
+ * the session process and its per-boot runtime directory, so Fleet keeps no database table for
+ * them and rebooting the machine clears every running execution. Fleet forwards live listing,
+ * inspection, output reading (by tail lines, line range, or byte range from the persisted output
+ * file), and stopping over the session process's control connection. Because these calls traverse
+ * Fleet, their arguments, metadata and output are visible to the platform (never logged).
+ *
+ * While a background execution runs, the session process reports a heartbeat every 30 minutes
+ * (`leaflow.fleet.exec.running`) and a terminal event when it finishes or is stopped
+ * (`leaflow.fleet.exec.exited`, including `exit_code`, `signal_name`, `duration_seconds`,
+ * `output_path`, full `argv`, `working_directory`, `user_id` and `username`), delivered through
+ * EventBus to the session's user in the current project.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";

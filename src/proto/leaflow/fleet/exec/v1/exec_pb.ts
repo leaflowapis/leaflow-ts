@@ -2,19 +2,21 @@
 // @generated from file leaflow/fleet/exec/v1/exec.proto (package leaflow.fleet.exec.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Duration } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_duration } from "@bufbuild/protobuf/wkt";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { Duration, Timestamp } from "@bufbuild/protobuf/wkt";
+import { file_google_protobuf_duration, file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
 import type { Status } from "../../../../google/rpc/status_pb.js";
 import { file_google_rpc_status } from "../../../../google/rpc/status_pb.js";
+import type { SignedAuthorization } from "../../control/v1/control_pb.js";
+import { file_leaflow_fleet_control_v1_control } from "../../control/v1/control_pb.js";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file leaflow/fleet/exec/v1/exec.proto.
  */
 export const file_leaflow_fleet_exec_v1_exec: GenFile = /*@__PURE__*/
-  fileDesc("CiBsZWFmbG93L2ZsZWV0L2V4ZWMvdjEvZXhlYy5wcm90bxIVbGVhZmxvdy5mbGVldC5leGVjLnYxIqACCg1DbGllbnRNZXNzYWdlEjEKBXN0YXJ0GAEgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNTdGFydEgAEjEKBWlucHV0GAIgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNJbnB1dEgAEjgKCWlucHV0X2VuZBgDIAEoCzIjLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjSW5wdXRFbmRIABIzCgZhdHRhY2gYBCABKAsyIS5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY0F0dGFjaEgAEi8KBHN0b3AYBSABKAsyHy5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY1N0b3BIAEIJCgdtZXNzYWdlIrcBCg1TZXJ2ZXJNZXNzYWdlEjMKBm91dHB1dBgBIAEoCzIhLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjT3V0cHV0SAASLwoEZXhpdBgCIAEoCzIfLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjRXhpdEgAEjUKB3N0YXJ0ZWQYAyABKAsyIi5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY1N0YXJ0ZWRIAEIJCgdtZXNzYWdlIusBCglFeGVjU3RhcnQSDAoEYXJndhgBIAMoCRIZChF3b3JraW5nX2RpcmVjdG9yeRgCIAEoCRIqCgd0aW1lb3V0GAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEg0KBXN0ZGluGAQgASgIEkYKC2Vudmlyb25tZW50GAUgAygLMjEubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNTdGFydC5FbnZpcm9ubWVudEVudHJ5GjIKEEVudmlyb25tZW50RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASIZCglFeGVjSW5wdXQSDAoEZGF0YRgBIAEoDCIOCgxFeGVjSW5wdXRFbmQiOQoLRXhlY1N0YXJ0ZWQSFAoMZXhlY3V0aW9uX2lkGAEgASgMEhQKDGF0dGFjaF90b2tlbhgCIAEoDCI4CgpFeGVjQXR0YWNoEhQKDGV4ZWN1dGlvbl9pZBgBIAEoDBIUCgxhdHRhY2hfdG9rZW4YAiABKAwiCgoIRXhlY1N0b3AiTwoKRXhlY091dHB1dBIzCgZzdHJlYW0YASABKA4yIy5sZWFmbG93LmZsZWV0LmV4ZWMudjEuT3V0cHV0U3RyZWFtEgwKBGRhdGEYAiABKAwieAoIRXhlY0V4aXQSEwoJZXhpdF9jb2RlGAEgASgNSAASFQoLc2lnbmFsX25hbWUYAiABKAlIABITCgtjb3JlX2R1bXBlZBgDIAEoCBIhCgVlcnJvchgEIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzQggKBnN0YXR1cyLkAQoKRXhlY1BvbGljeRIVCg1tYXhfcHJvY2Vzc2VzGAEgASgNEi8KDG1heF9saWZldGltZRgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIYChBtYXhfb3V0cHV0X2J5dGVzGAMgASgEEhoKEnVubGltaXRlZF9saWZldGltZRgEIAEoCBIYChB1bmxpbWl0ZWRfb3V0cHV0GAUgASgIEhoKEmJhY2tncm91bmRfYWxsb3dlZBgGIAEoCBIiChphbGxvd19wcml2aWxlZ2VfZXNjYWxhdGlvbhgHIAEoCCphCgxPdXRwdXRTdHJlYW0SHQoZT1VUUFVUX1NUUkVBTV9VTlNQRUNJRklFRBAAEhgKFE9VVFBVVF9TVFJFQU1fU1RET1VUEAESGAoUT1VUUFVUX1NUUkVBTV9TVERFUlIQAkI4WjZnaXRodWIuY29tL2xlYWZsb3dhcGlzL2xlYWZsb3ctZ28vZmxlZXQvZXhlYy92MTtleGVjdjFiBnByb3RvMw", [file_google_protobuf_duration, file_google_rpc_status]);
+  fileDesc("CiBsZWFmbG93L2ZsZWV0L2V4ZWMvdjEvZXhlYy5wcm90bxIVbGVhZmxvdy5mbGVldC5leGVjLnYxIqACCg1DbGllbnRNZXNzYWdlEjEKBXN0YXJ0GAEgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNTdGFydEgAEjEKBWlucHV0GAIgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNJbnB1dEgAEjgKCWlucHV0X2VuZBgDIAEoCzIjLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjSW5wdXRFbmRIABIzCgZhdHRhY2gYBCABKAsyIS5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY0F0dGFjaEgAEi8KBHN0b3AYBSABKAsyHy5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY1N0b3BIAEIJCgdtZXNzYWdlIrcBCg1TZXJ2ZXJNZXNzYWdlEjMKBm91dHB1dBgBIAEoCzIhLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjT3V0cHV0SAASLwoEZXhpdBgCIAEoCzIfLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjRXhpdEgAEjUKB3N0YXJ0ZWQYAyABKAsyIi5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY1N0YXJ0ZWRIAEIJCgdtZXNzYWdlIusBCglFeGVjU3RhcnQSDAoEYXJndhgBIAMoCRIZChF3b3JraW5nX2RpcmVjdG9yeRgCIAEoCRIqCgd0aW1lb3V0GAMgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEg0KBXN0ZGluGAQgASgIEkYKC2Vudmlyb25tZW50GAUgAygLMjEubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNTdGFydC5FbnZpcm9ubWVudEVudHJ5GjIKEEVudmlyb25tZW50RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASIZCglFeGVjSW5wdXQSDAoEZGF0YRgBIAEoDCIOCgxFeGVjSW5wdXRFbmQiTgoLRXhlY1N0YXJ0ZWQSFAoMZXhlY3V0aW9uX2lkGAEgASgMEhQKDGF0dGFjaF90b2tlbhgCIAEoDBITCgtvdXRwdXRfcGF0aBgDIAEoCSI4CgpFeGVjQXR0YWNoEhQKDGV4ZWN1dGlvbl9pZBgBIAEoDBIUCgxhdHRhY2hfdG9rZW4YAiABKAwiCgoIRXhlY1N0b3AiTwoKRXhlY091dHB1dBIzCgZzdHJlYW0YASABKA4yIy5sZWFmbG93LmZsZWV0LmV4ZWMudjEuT3V0cHV0U3RyZWFtEgwKBGRhdGEYAiABKAwieAoIRXhlY0V4aXQSEwoJZXhpdF9jb2RlGAEgASgNSAASFQoLc2lnbmFsX25hbWUYAiABKAlIABITCgtjb3JlX2R1bXBlZBgDIAEoCBIhCgVlcnJvchgEIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzQggKBnN0YXR1cyLkAQoKRXhlY1BvbGljeRIVCg1tYXhfcHJvY2Vzc2VzGAEgASgNEi8KDG1heF9saWZldGltZRgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIYChBtYXhfb3V0cHV0X2J5dGVzGAMgASgEEhoKEnVubGltaXRlZF9saWZldGltZRgEIAEoCBIYChB1bmxpbWl0ZWRfb3V0cHV0GAUgASgIEhoKEmJhY2tncm91bmRfYWxsb3dlZBgGIAEoCBIiChphbGxvd19wcml2aWxlZ2VfZXNjYWxhdGlvbhgHIAEoCCK/AwoNRXhlY3V0aW9uSW5mbxIUCgxleGVjdXRpb25faWQYASABKAkSDAoEYXJndhgCIAMoCRIZChF3b3JraW5nX2RpcmVjdG9yeRgDIAEoCRIPCgd1c2VyX2lkGAQgASgJEhAKCHVzZXJuYW1lGAUgASgJEjQKBXN0YXRlGAYgASgOMiUubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWN1dGlvblN0YXRlEi4KCnN0YXJ0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi8KC2ZpbmlzaGVkX2F0GAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIrCghkdXJhdGlvbhgJIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhItCgRleGl0GAogASgLMh8ubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWNFeGl0EhMKC291dHB1dF9wYXRoGAsgASgJEhQKDG91dHB1dF9ieXRlcxgMIAEoBBIUCgxvdXRwdXRfbGluZXMYDSABKAQSGAoQb3V0cHV0X3RydW5jYXRlZBgOIAEoCCKTAQoVTGlzdEV4ZWN1dGlvbnNSZXF1ZXN0EjQKBXN0YXRlGAEgASgOMiUubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWN1dGlvblN0YXRlEkQKDWF1dGhvcml6YXRpb24YAiABKAsyLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmVkQXV0aG9yaXphdGlvbiJSChZMaXN0RXhlY3V0aW9uc1Jlc3BvbnNlEjgKCmV4ZWN1dGlvbnMYASADKAsyJC5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY3V0aW9uSW5mbyJxChNHZXRFeGVjdXRpb25SZXF1ZXN0EhQKDGV4ZWN1dGlvbl9pZBgBIAEoCRJECg1hdXRob3JpemF0aW9uGAIgASgLMi0ubGVhZmxvdy5mbGVldC5jb250cm9sLnYxLlNpZ25lZEF1dGhvcml6YXRpb24iTwoUR2V0RXhlY3V0aW9uUmVzcG9uc2USNwoJZXhlY3V0aW9uGAEgASgLMiQubGVhZmxvdy5mbGVldC5leGVjLnYxLkV4ZWN1dGlvbkluZm8iMgoJTGluZVJhbmdlEhIKCnN0YXJ0X2xpbmUYASABKAQSEQoJbWF4X2xpbmVzGAIgASgNIi4KCUJ5dGVSYW5nZRIOCgZvZmZzZXQYASABKAQSEQoJbWF4X2J5dGVzGAIgASgNIrwCChpSZWFkRXhlY3V0aW9uT3V0cHV0UmVxdWVzdBIUCgxleGVjdXRpb25faWQYASABKAkSMwoGc3RyZWFtGAIgASgOMiMubGVhZmxvdy5mbGVldC5leGVjLnYxLk91dHB1dFN0cmVhbRIUCgp0YWlsX2xpbmVzGAMgASgNSAASNgoKbGluZV9yYW5nZRgEIAEoCzIgLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5MaW5lUmFuZ2VIABI2CgpieXRlX3JhbmdlGAUgASgLMiAubGVhZmxvdy5mbGVldC5leGVjLnYxLkJ5dGVSYW5nZUgAEkQKDWF1dGhvcml6YXRpb24YBiABKAsyLS5sZWFmbG93LmZsZWV0LmNvbnRyb2wudjEuU2lnbmVkQXV0aG9yaXphdGlvbkIHCgVyYW5nZSLnAQobUmVhZEV4ZWN1dGlvbk91dHB1dFJlc3BvbnNlEgwKBGRhdGEYASABKAwSEgoKc3RhcnRfbGluZRgCIAEoBBIQCghlbmRfbGluZRgDIAEoBBITCgt0b3RhbF9saW5lcxgEIAEoBBIUCgxzdGFydF9vZmZzZXQYBSABKAQSEwoLbmV4dF9vZmZzZXQYBiABKAQSEwoLdG90YWxfYnl0ZXMYByABKAQSEAoIaGFzX21vcmUYCCABKAgSGAoQb3V0cHV0X3RydW5jYXRlZBgJIAEoCBITCgtvdXRwdXRfcGF0aBgKIAEoCSJyChRTdG9wRXhlY3V0aW9uUmVxdWVzdBIUCgxleGVjdXRpb25faWQYASABKAkSRAoNYXV0aG9yaXphdGlvbhgCIAEoCzItLmxlYWZsb3cuZmxlZXQuY29udHJvbC52MS5TaWduZWRBdXRob3JpemF0aW9uIlAKFVN0b3BFeGVjdXRpb25SZXNwb25zZRI3CglleGVjdXRpb24YASABKAsyJC5sZWFmbG93LmZsZWV0LmV4ZWMudjEuRXhlY3V0aW9uSW5mbyLvAQoORXhlY3V0aW9uRXZlbnQSEgoKc2Vzc2lvbl9pZBgBIAEoCRIUCgxleGVjdXRpb25faWQYAiABKAkSNwoEa2luZBgDIAEoDjIpLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjdXRpb25FdmVudEtpbmQSEAoIc2VxdWVuY2UYBCABKAQSLwoLb2JzZXJ2ZWRfYXQYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjcKCWV4ZWN1dGlvbhgGIAEoCzIkLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjdXRpb25JbmZvIlMKG1JlcG9ydEV4ZWN1dGlvbkV2ZW50UmVxdWVzdBI0CgVldmVudBgBIAEoCzIlLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5FeGVjdXRpb25FdmVudCIeChxSZXBvcnRFeGVjdXRpb25FdmVudFJlc3BvbnNlKn0KDE91dHB1dFN0cmVhbRIdChlPVVRQVVRfU1RSRUFNX1VOU1BFQ0lGSUVEEAASGAoUT1VUUFVUX1NUUkVBTV9TVERPVVQQARIYChRPVVRQVVRfU1RSRUFNX1NUREVSUhACEhoKFk9VVFBVVF9TVFJFQU1fQ09NQklORUQQAypqCg5FeGVjdXRpb25TdGF0ZRIfChtFWEVDVVRJT05fU1RBVEVfVU5TUEVDSUZJRUQQABIbChdFWEVDVVRJT05fU1RBVEVfUlVOTklORxABEhoKFkVYRUNVVElPTl9TVEFURV9FWElURUQQAip9ChJFeGVjdXRpb25FdmVudEtpbmQSJAogRVhFQ1VUSU9OX0VWRU5UX0tJTkRfVU5TUEVDSUZJRUQQABIgChxFWEVDVVRJT05fRVZFTlRfS0lORF9SVU5OSU5HEAESHwobRVhFQ1VUSU9OX0VWRU5UX0tJTkRfRVhJVEVEEAIyzwMKC0V4ZWNTZXJ2aWNlEm0KDkxpc3RFeGVjdXRpb25zEiwubGVhZmxvdy5mbGVldC5leGVjLnYxLkxpc3RFeGVjdXRpb25zUmVxdWVzdBotLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5MaXN0RXhlY3V0aW9uc1Jlc3BvbnNlEmcKDEdldEV4ZWN1dGlvbhIqLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5HZXRFeGVjdXRpb25SZXF1ZXN0GisubGVhZmxvdy5mbGVldC5leGVjLnYxLkdldEV4ZWN1dGlvblJlc3BvbnNlEnwKE1JlYWRFeGVjdXRpb25PdXRwdXQSMS5sZWFmbG93LmZsZWV0LmV4ZWMudjEuUmVhZEV4ZWN1dGlvbk91dHB1dFJlcXVlc3QaMi5sZWFmbG93LmZsZWV0LmV4ZWMudjEuUmVhZEV4ZWN1dGlvbk91dHB1dFJlc3BvbnNlEmoKDVN0b3BFeGVjdXRpb24SKy5sZWFmbG93LmZsZWV0LmV4ZWMudjEuU3RvcEV4ZWN1dGlvblJlcXVlc3QaLC5sZWFmbG93LmZsZWV0LmV4ZWMudjEuU3RvcEV4ZWN1dGlvblJlc3BvbnNlMpMBChBFeGVjRXZlbnRTZXJ2aWNlEn8KFFJlcG9ydEV4ZWN1dGlvbkV2ZW50EjIubGVhZmxvdy5mbGVldC5leGVjLnYxLlJlcG9ydEV4ZWN1dGlvbkV2ZW50UmVxdWVzdBozLmxlYWZsb3cuZmxlZXQuZXhlYy52MS5SZXBvcnRFeGVjdXRpb25FdmVudFJlc3BvbnNlQjhaNmdpdGh1Yi5jb20vbGVhZmxvd2FwaXMvbGVhZmxvdy1nby9mbGVldC9leGVjL3YxO2V4ZWN2MWIGcHJvdG8z", [file_google_protobuf_duration, file_google_protobuf_timestamp, file_google_rpc_status, file_leaflow_fleet_control_v1_control]);
 
 /**
  * A message from the participant.
@@ -215,20 +217,34 @@ export const ExecInputEndSchema: GenMessage<ExecInputEnd> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_exec_v1_exec, 4);
 
 /**
- * A background process handle. Both values are opaque to participants.
+ * A background process handle.
  *
  * @generated from message leaflow.fleet.exec.v1.ExecStarted
  */
 export type ExecStarted = Message<"leaflow.fleet.exec.v1.ExecStarted"> & {
   /**
+   * 16-byte UUID identifying the background execution. ExecService, REST APIs
+   * and EventBus represent this same identifier in canonical lowercase UUID
+   * string form.
+   *
    * @generated from field: bytes execution_id = 1;
    */
   executionId: Uint8Array;
 
   /**
+   * Opaque token required for ExecAttach on the WebRTC background channel.
+   *
    * @generated from field: bytes attach_token = 2;
    */
   attachToken: Uint8Array;
+
+  /**
+   * Absolute path on the machine where the session persists combined output
+   * for this background execution, when file persistence is enabled.
+   *
+   * @generated from field: string output_path = 3;
+   */
+  outputPath: string;
 };
 
 /**
@@ -418,6 +434,516 @@ export const ExecPolicySchema: GenMessage<ExecPolicy> = /*@__PURE__*/
   messageDesc(file_leaflow_fleet_exec_v1_exec, 10);
 
 /**
+ * Metadata and current status of a background execution.
+ *
+ * @generated from message leaflow.fleet.exec.v1.ExecutionInfo
+ */
+export type ExecutionInfo = Message<"leaflow.fleet.exec.v1.ExecutionInfo"> & {
+  /**
+   * Canonical lowercase UUID matching ExecStarted.execution_id.
+   *
+   * @generated from field: string execution_id = 1;
+   */
+  executionId: string;
+
+  /**
+   * Full argument vector passed to ExecStart.
+   *
+   * @generated from field: repeated string argv = 2;
+   */
+  argv: string[];
+
+  /**
+   * Resolved working directory where the process was started.
+   *
+   * @generated from field: string working_directory = 3;
+   */
+  workingDirectory: string;
+
+  /**
+   * Platform user UUID owning the session.
+   *
+   * @generated from field: string user_id = 4;
+   */
+  userId: string;
+
+  /**
+   * Effective OS username running the process on the machine.
+   *
+   * @generated from field: string username = 5;
+   */
+  username: string;
+
+  /**
+   * @generated from field: leaflow.fleet.exec.v1.ExecutionState state = 6;
+   */
+  state: ExecutionState;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp started_at = 7;
+   */
+  startedAt?: Timestamp | undefined;
+
+  /**
+   * Set when state is EXECUTION_STATE_EXITED.
+   *
+   * @generated from field: google.protobuf.Timestamp finished_at = 8;
+   */
+  finishedAt?: Timestamp | undefined;
+
+  /**
+   * Elapsed wall time since started_at (while running) or total runtime (once exited).
+   *
+   * @generated from field: google.protobuf.Duration duration = 9;
+   */
+  duration?: Duration | undefined;
+
+  /**
+   * Terminal exit status or signal. Set when state is EXECUTION_STATE_EXITED.
+   *
+   * @generated from field: leaflow.fleet.exec.v1.ExecExit exit = 10;
+   */
+  exit?: ExecExit | undefined;
+
+  /**
+   * Absolute path on the machine where combined output is persisted so callers
+   * and AI tools can search or inspect it locally.
+   *
+   * @generated from field: string output_path = 11;
+   */
+  outputPath: string;
+
+  /**
+   * Total bytes written to the combined output file so far.
+   *
+   * @generated from field: uint64 output_bytes = 12;
+   */
+  outputBytes: bigint;
+
+  /**
+   * Total lines written to the combined output file so far.
+   *
+   * @generated from field: uint64 output_lines = 13;
+   */
+  outputLines: bigint;
+
+  /**
+   * Output was capped at the policy limit and further bytes were discarded.
+   *
+   * @generated from field: bool output_truncated = 14;
+   */
+  outputTruncated: boolean;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ExecutionInfo.
+ * Use `create(ExecutionInfoSchema)` to create a new message.
+ */
+export const ExecutionInfoSchema: GenMessage<ExecutionInfo> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 11);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.ListExecutionsRequest
+ */
+export type ListExecutionsRequest = Message<"leaflow.fleet.exec.v1.ListExecutionsRequest"> & {
+  /**
+   * Optional filter. Unspecified returns both running and retained exited
+   * executions.
+   *
+   * @generated from field: leaflow.fleet.exec.v1.ExecutionState state = 1;
+   */
+  state: ExecutionState;
+
+  /**
+   * Required when Fleet forwards over the session control connection;
+   * Authorization.control_only must be true.
+   *
+   * @generated from field: leaflow.fleet.control.v1.SignedAuthorization authorization = 2;
+   */
+  authorization?: SignedAuthorization | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ListExecutionsRequest.
+ * Use `create(ListExecutionsRequestSchema)` to create a new message.
+ */
+export const ListExecutionsRequestSchema: GenMessage<ListExecutionsRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 12);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.ListExecutionsResponse
+ */
+export type ListExecutionsResponse = Message<"leaflow.fleet.exec.v1.ListExecutionsResponse"> & {
+  /**
+   * @generated from field: repeated leaflow.fleet.exec.v1.ExecutionInfo executions = 1;
+   */
+  executions: ExecutionInfo[];
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ListExecutionsResponse.
+ * Use `create(ListExecutionsResponseSchema)` to create a new message.
+ */
+export const ListExecutionsResponseSchema: GenMessage<ListExecutionsResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 13);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.GetExecutionRequest
+ */
+export type GetExecutionRequest = Message<"leaflow.fleet.exec.v1.GetExecutionRequest"> & {
+  /**
+   * @generated from field: string execution_id = 1;
+   */
+  executionId: string;
+
+  /**
+   * @generated from field: leaflow.fleet.control.v1.SignedAuthorization authorization = 2;
+   */
+  authorization?: SignedAuthorization | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.GetExecutionRequest.
+ * Use `create(GetExecutionRequestSchema)` to create a new message.
+ */
+export const GetExecutionRequestSchema: GenMessage<GetExecutionRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 14);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.GetExecutionResponse
+ */
+export type GetExecutionResponse = Message<"leaflow.fleet.exec.v1.GetExecutionResponse"> & {
+  /**
+   * @generated from field: leaflow.fleet.exec.v1.ExecutionInfo execution = 1;
+   */
+  execution?: ExecutionInfo | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.GetExecutionResponse.
+ * Use `create(GetExecutionResponseSchema)` to create a new message.
+ */
+export const GetExecutionResponseSchema: GenMessage<GetExecutionResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 15);
+
+/**
+ * Line-based slice of an output file.
+ *
+ * @generated from message leaflow.fleet.exec.v1.LineRange
+ */
+export type LineRange = Message<"leaflow.fleet.exec.v1.LineRange"> & {
+  /**
+   * 1-based starting line number.
+   *
+   * @generated from field: uint64 start_line = 1;
+   */
+  startLine: bigint;
+
+  /**
+   * Maximum lines to return.
+   *
+   * @generated from field: uint32 max_lines = 2;
+   */
+  maxLines: number;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.LineRange.
+ * Use `create(LineRangeSchema)` to create a new message.
+ */
+export const LineRangeSchema: GenMessage<LineRange> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 16);
+
+/**
+ * Byte-based slice of an output file.
+ *
+ * @generated from message leaflow.fleet.exec.v1.ByteRange
+ */
+export type ByteRange = Message<"leaflow.fleet.exec.v1.ByteRange"> & {
+  /**
+   * 0-based byte offset.
+   *
+   * @generated from field: uint64 offset = 1;
+   */
+  offset: bigint;
+
+  /**
+   * Maximum bytes to return.
+   *
+   * @generated from field: uint32 max_bytes = 2;
+   */
+  maxBytes: number;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ByteRange.
+ * Use `create(ByteRangeSchema)` to create a new message.
+ */
+export const ByteRangeSchema: GenMessage<ByteRange> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 17);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.ReadExecutionOutputRequest
+ */
+export type ReadExecutionOutputRequest = Message<"leaflow.fleet.exec.v1.ReadExecutionOutputRequest"> & {
+  /**
+   * @generated from field: string execution_id = 1;
+   */
+  executionId: string;
+
+  /**
+   * Output stream to read. Unspecified defaults to OUTPUT_STREAM_COMBINED.
+   *
+   * @generated from field: leaflow.fleet.exec.v1.OutputStream stream = 2;
+   */
+  stream: OutputStream;
+
+  /**
+   * Slice of the output file to read. Unset defaults to the last 200 lines.
+   *
+   * @generated from oneof leaflow.fleet.exec.v1.ReadExecutionOutputRequest.range
+   */
+  range: {
+    /**
+     * Return at most the last N lines.
+     *
+     * @generated from field: uint32 tail_lines = 3;
+     */
+    value: number;
+    case: "tailLines";
+  } | {
+    /**
+     * Return lines starting at a 1-based line number.
+     *
+     * @generated from field: leaflow.fleet.exec.v1.LineRange line_range = 4;
+     */
+    value: LineRange;
+    case: "lineRange";
+  } | {
+    /**
+     * Return bytes starting at a 0-based byte offset.
+     *
+     * @generated from field: leaflow.fleet.exec.v1.ByteRange byte_range = 5;
+     */
+    value: ByteRange;
+    case: "byteRange";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * @generated from field: leaflow.fleet.control.v1.SignedAuthorization authorization = 6;
+   */
+  authorization?: SignedAuthorization | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ReadExecutionOutputRequest.
+ * Use `create(ReadExecutionOutputRequestSchema)` to create a new message.
+ */
+export const ReadExecutionOutputRequestSchema: GenMessage<ReadExecutionOutputRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 18);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.ReadExecutionOutputResponse
+ */
+export type ReadExecutionOutputResponse = Message<"leaflow.fleet.exec.v1.ReadExecutionOutputResponse"> & {
+  /**
+   * Output bytes in the requested slice, capped by the transfer budget (at most
+   * 256 KiB per response).
+   *
+   * @generated from field: bytes data = 1;
+   */
+  data: Uint8Array;
+
+  /**
+   * 1-based first line returned (0 when data is empty).
+   *
+   * @generated from field: uint64 start_line = 2;
+   */
+  startLine: bigint;
+
+  /**
+   * 1-based last line returned (0 when data is empty).
+   *
+   * @generated from field: uint64 end_line = 3;
+   */
+  endLine: bigint;
+
+  /**
+   * Total lines currently in the requested stream.
+   *
+   * @generated from field: uint64 total_lines = 4;
+   */
+  totalLines: bigint;
+
+  /**
+   * 0-based byte offset where data starts.
+   *
+   * @generated from field: uint64 start_offset = 5;
+   */
+  startOffset: bigint;
+
+  /**
+   * 0-based byte offset immediately after data, usable as the next offset.
+   *
+   * @generated from field: uint64 next_offset = 6;
+   */
+  nextOffset: bigint;
+
+  /**
+   * Total bytes currently in the requested stream.
+   *
+   * @generated from field: uint64 total_bytes = 7;
+   */
+  totalBytes: bigint;
+
+  /**
+   * More output exists beyond the returned slice.
+   *
+   * @generated from field: bool has_more = 8;
+   */
+  hasMore: boolean;
+
+  /**
+   * The underlying output file was truncated at the policy limit.
+   *
+   * @generated from field: bool output_truncated = 9;
+   */
+  outputTruncated: boolean;
+
+  /**
+   * Absolute path on the machine for the persisted output file.
+   *
+   * @generated from field: string output_path = 10;
+   */
+  outputPath: string;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ReadExecutionOutputResponse.
+ * Use `create(ReadExecutionOutputResponseSchema)` to create a new message.
+ */
+export const ReadExecutionOutputResponseSchema: GenMessage<ReadExecutionOutputResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 19);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.StopExecutionRequest
+ */
+export type StopExecutionRequest = Message<"leaflow.fleet.exec.v1.StopExecutionRequest"> & {
+  /**
+   * @generated from field: string execution_id = 1;
+   */
+  executionId: string;
+
+  /**
+   * @generated from field: leaflow.fleet.control.v1.SignedAuthorization authorization = 2;
+   */
+  authorization?: SignedAuthorization | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.StopExecutionRequest.
+ * Use `create(StopExecutionRequestSchema)` to create a new message.
+ */
+export const StopExecutionRequestSchema: GenMessage<StopExecutionRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 20);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.StopExecutionResponse
+ */
+export type StopExecutionResponse = Message<"leaflow.fleet.exec.v1.StopExecutionResponse"> & {
+  /**
+   * @generated from field: leaflow.fleet.exec.v1.ExecutionInfo execution = 1;
+   */
+  execution?: ExecutionInfo | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.StopExecutionResponse.
+ * Use `create(StopExecutionResponseSchema)` to create a new message.
+ */
+export const StopExecutionResponseSchema: GenMessage<StopExecutionResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 21);
+
+/**
+ * A lifecycle event for one background execution.
+ *
+ * @generated from message leaflow.fleet.exec.v1.ExecutionEvent
+ */
+export type ExecutionEvent = Message<"leaflow.fleet.exec.v1.ExecutionEvent"> & {
+  /**
+   * Must match the session_id of the reporting session process connection.
+   *
+   * @generated from field: string session_id = 1;
+   */
+  sessionId: string;
+
+  /**
+   * @generated from field: string execution_id = 2;
+   */
+  executionId: string;
+
+  /**
+   * @generated from field: leaflow.fleet.exec.v1.ExecutionEventKind kind = 3;
+   */
+  kind: ExecutionEventKind;
+
+  /**
+   * Strictly increasing per execution_id (starting at 1) to order events and
+   * deduplicate retries.
+   *
+   * @generated from field: uint64 sequence = 4;
+   */
+  sequence: bigint;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp observed_at = 5;
+   */
+  observedAt?: Timestamp | undefined;
+
+  /**
+   * @generated from field: leaflow.fleet.exec.v1.ExecutionInfo execution = 6;
+   */
+  execution?: ExecutionInfo | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ExecutionEvent.
+ * Use `create(ExecutionEventSchema)` to create a new message.
+ */
+export const ExecutionEventSchema: GenMessage<ExecutionEvent> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 22);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.ReportExecutionEventRequest
+ */
+export type ReportExecutionEventRequest = Message<"leaflow.fleet.exec.v1.ReportExecutionEventRequest"> & {
+  /**
+   * @generated from field: leaflow.fleet.exec.v1.ExecutionEvent event = 1;
+   */
+  event?: ExecutionEvent | undefined;
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ReportExecutionEventRequest.
+ * Use `create(ReportExecutionEventRequestSchema)` to create a new message.
+ */
+export const ReportExecutionEventRequestSchema: GenMessage<ReportExecutionEventRequest> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 23);
+
+/**
+ * @generated from message leaflow.fleet.exec.v1.ReportExecutionEventResponse
+ */
+export type ReportExecutionEventResponse = Message<"leaflow.fleet.exec.v1.ReportExecutionEventResponse"> & {
+};
+
+/**
+ * Describes the message leaflow.fleet.exec.v1.ReportExecutionEventResponse.
+ * Use `create(ReportExecutionEventResponseSchema)` to create a new message.
+ */
+export const ReportExecutionEventResponseSchema: GenMessage<ReportExecutionEventResponse> = /*@__PURE__*/
+  messageDesc(file_leaflow_fleet_exec_v1_exec, 24);
+
+/**
  * An output stream of a program.
  *
  * @generated from enum leaflow.fleet.exec.v1.OutputStream
@@ -441,6 +967,13 @@ export enum OutputStream {
    * @generated from enum value: OUTPUT_STREAM_STDERR = 2;
    */
   STDERR = 2,
+
+  /**
+   * Merged standard output and standard error in write order.
+   *
+   * @generated from enum value: OUTPUT_STREAM_COMBINED = 3;
+   */
+  COMBINED = 3,
 }
 
 /**
@@ -448,4 +981,152 @@ export enum OutputStream {
  */
 export const OutputStreamSchema: GenEnum<OutputStream> = /*@__PURE__*/
   enumDesc(file_leaflow_fleet_exec_v1_exec, 0);
+
+/**
+ * Lifecycle state of a background execution.
+ *
+ * @generated from enum leaflow.fleet.exec.v1.ExecutionState
+ */
+export enum ExecutionState {
+  /**
+   * @generated from enum value: EXECUTION_STATE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * Process is still running.
+   *
+   * @generated from enum value: EXECUTION_STATE_RUNNING = 1;
+   */
+  RUNNING = 1,
+
+  /**
+   * Process has exited or was terminated; metadata and output remain readable
+   * until the session ends or the retention limit is reached.
+   *
+   * @generated from enum value: EXECUTION_STATE_EXITED = 2;
+   */
+  EXITED = 2,
+}
+
+/**
+ * Describes the enum leaflow.fleet.exec.v1.ExecutionState.
+ */
+export const ExecutionStateSchema: GenEnum<ExecutionState> = /*@__PURE__*/
+  enumDesc(file_leaflow_fleet_exec_v1_exec, 1);
+
+/**
+ * Kind of lifecycle event reported by a session process.
+ *
+ * @generated from enum leaflow.fleet.exec.v1.ExecutionEventKind
+ */
+export enum ExecutionEventKind {
+  /**
+   * @generated from enum value: EXECUTION_EVENT_KIND_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * Periodic heartbeat while the execution continues to run (every 30 minutes).
+   *
+   * @generated from enum value: EXECUTION_EVENT_KIND_RUNNING = 1;
+   */
+  RUNNING = 1,
+
+  /**
+   * Terminal notification once the execution exits or is terminated.
+   *
+   * @generated from enum value: EXECUTION_EVENT_KIND_EXITED = 2;
+   */
+  EXITED = 2,
+}
+
+/**
+ * Describes the enum leaflow.fleet.exec.v1.ExecutionEventKind.
+ */
+export const ExecutionEventKindSchema: GenEnum<ExecutionEventKind> = /*@__PURE__*/
+  enumDesc(file_leaflow_fleet_exec_v1_exec, 2);
+
+/**
+ * Inspects and controls background executions owned by a session. Served by the
+ * session process on its control connection; Fleet calls it with a control-only
+ * SignedAuthorization carrying ExecPolicy.
+ *
+ * @generated from service leaflow.fleet.exec.v1.ExecService
+ */
+export const ExecService: GenService<{
+  /**
+   * Lists background executions currently tracked by the session process,
+   * newest first. Includes recently exited executions retained until the
+   * session ends so callers can read their final status and output files.
+   *
+   * @generated from rpc leaflow.fleet.exec.v1.ExecService.ListExecutions
+   */
+  listExecutions: {
+    methodKind: "unary";
+    input: typeof ListExecutionsRequestSchema;
+    output: typeof ListExecutionsResponseSchema;
+  },
+  /**
+   * Returns the current metadata and status of one background execution.
+   * Fails with NOT_FOUND and reason EXECUTION_NOT_FOUND when unknown.
+   *
+   * @generated from rpc leaflow.fleet.exec.v1.ExecService.GetExecution
+   */
+  getExecution: {
+    methodKind: "unary";
+    input: typeof GetExecutionRequestSchema;
+    output: typeof GetExecutionResponseSchema;
+  },
+  /**
+   * Reads a bounded slice of a background execution's persisted output file by
+   * tail lines, line range, or byte offset.
+   * Fails with NOT_FOUND and reason EXECUTION_NOT_FOUND when unknown.
+   *
+   * @generated from rpc leaflow.fleet.exec.v1.ExecService.ReadExecutionOutput
+   */
+  readExecutionOutput: {
+    methodKind: "unary";
+    input: typeof ReadExecutionOutputRequestSchema;
+    output: typeof ReadExecutionOutputResponseSchema;
+  },
+  /**
+   * Stops a running background execution owned by the session. Stopping an
+   * execution that has already exited succeeds and returns its current info.
+   * Fails with NOT_FOUND and reason EXECUTION_NOT_FOUND when unknown, or
+   * PERMISSION_DENIED when the authorization is read-only.
+   *
+   * @generated from rpc leaflow.fleet.exec.v1.ExecService.StopExecution
+   */
+  stopExecution: {
+    methodKind: "unary";
+    input: typeof StopExecutionRequestSchema;
+    output: typeof StopExecutionResponseSchema;
+  },
+}> = /*@__PURE__*/
+  serviceDesc(file_leaflow_fleet_exec_v1_exec, 0);
+
+/**
+ * Receives background execution lifecycle reports from a session process and
+ * forwards them to EventBus. Served by Fleet on the session process's control
+ * connection; reports are not persisted in Fleet's database.
+ *
+ * @generated from service leaflow.fleet.exec.v1.ExecEventService
+ */
+export const ExecEventService: GenService<{
+  /**
+   * Reports a periodic running heartbeat (typically every 30 minutes) or a
+   * terminal exit event for a background execution. The session process retains
+   * unacknowledged EXITED events in memory and retries after reconnecting until
+   * answered with success; missed RUNNING heartbeats are not replayed.
+   *
+   * @generated from rpc leaflow.fleet.exec.v1.ExecEventService.ReportExecutionEvent
+   */
+  reportExecutionEvent: {
+    methodKind: "unary";
+    input: typeof ReportExecutionEventRequestSchema;
+    output: typeof ReportExecutionEventResponseSchema;
+  },
+}> = /*@__PURE__*/
+  serviceDesc(file_leaflow_fleet_exec_v1_exec, 1);
 

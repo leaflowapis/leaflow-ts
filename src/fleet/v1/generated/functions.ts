@@ -254,6 +254,21 @@
  * `project_deletion_requested` when deletion of the project was requested, `machine_removed` when
  * its machine was removed, or `key_revoked` when the key that signed its authorization was
  * revoked. A participant whose creation failed is not announced.
+ *
+ * ## Background executions
+ *
+ * Background programs started inside a session (`leaflow.fleet.exec.v1.background`) live only in
+ * the session process and its per-boot runtime directory, so Fleet keeps no database table for
+ * them and rebooting the machine clears every running execution. Fleet forwards live listing,
+ * inspection, output reading (by tail lines, line range, or byte range from the persisted output
+ * file), and stopping over the session process's control connection. Because these calls traverse
+ * Fleet, their arguments, metadata and output are visible to the platform (never logged).
+ *
+ * While a background execution runs, the session process reports a heartbeat every 30 minutes
+ * (`leaflow.fleet.exec.running`) and a terminal event when it finishes or is stopped
+ * (`leaflow.fleet.exec.exited`, including `exit_code`, `signal_name`, `duration_seconds`,
+ * `output_path`, full `argv`, `working_directory`, `user_id` and `username`), delivered through
+ * EventBus to the session's user in the current project.
  * OpenAPI spec version: 1.0.0
  */
 import { decodeResponse } from "../../../response.js";
@@ -279,6 +294,9 @@ import type {
   DenyPrivilegeRequestRequest,
   EnrollmentResource,
   Error,
+  ExecutionList,
+  ExecutionOutput,
+  ExecutionResource,
   FindEnrollmentByPairingCodeParams,
   FindEnrollmentResponse,
   GetPeerConnectionParams,
@@ -288,11 +306,13 @@ import type {
   ListGroupMembersParams,
   ListGroupsParams,
   ListMachineEventsParams,
+  ListMachineExecutionsParams,
   ListMachineLocalAccountsParams,
   ListMachineRegistrationsParams,
   ListMachinesParams,
   ListPrivilegeAutoApprovalsParams,
   ListPrivilegeRequestsParams,
+  ListSessionExecutionsParams,
   ListSessionsParams,
   ListToolsParams,
   MachineEventList,
@@ -312,6 +332,7 @@ import type {
   PrivilegeAutoApprovalResource,
   PrivilegeRequestList,
   PrivilegeRequestResource,
+  ReadSessionExecutionOutputParams,
   RenewParticipantRequest,
   RenewParticipantResponse,
   ReplaceMcpConfigurationRequest,
@@ -1479,6 +1500,299 @@ export const pollToolActivities = async (
     {},
   )) as pollToolActivitiesResponse["data"];
   return { data, status: res.status, headers: res.headers } as pollToolActivitiesResponse;
+};
+
+export type listMachineExecutionsResponse200 = {
+  data: ExecutionList;
+  status: 200;
+};
+
+export type listMachineExecutionsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listMachineExecutionsResponseSuccess = listMachineExecutionsResponse200 & {
+  headers: Headers;
+};
+export type listMachineExecutionsResponseError = listMachineExecutionsResponseDefault & {
+  headers: Headers;
+};
+
+export type listMachineExecutionsResponse =
+  | listMachineExecutionsResponseSuccess
+  | listMachineExecutionsResponseError;
+
+export const getListMachineExecutionsUrl = (
+  machineId: string,
+  params?: ListMachineExecutionsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/executions?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/machines/${encodeURIComponent(String(machineId))}/executions`;
+};
+
+/**
+ * Queries all open sessions belonging to the caller on the machine in parallel and merges
+ * their live background executions, newest first. Does not store process state in Fleet;
+ * sessions that are temporarily unreachable or run an older Agent are reported in
+ * `unavailable_sessions` rather than failing the whole response. Requires
+ * `fleet:machines.login` on the machine.
+ * @summary List background executions on a machine
+ */
+export const listMachineExecutions = async (
+  machineId: string,
+  params?: ListMachineExecutionsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listMachineExecutionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListMachineExecutionsUrl(machineId, params), {
+    ...options,
+    method: "GET",
+  });
+  const data: listMachineExecutionsResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listMachineExecutionsResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listMachineExecutionsResponse;
+};
+
+export type listSessionExecutionsResponse200 = {
+  data: ExecutionList;
+  status: 200;
+};
+
+export type listSessionExecutionsResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type listSessionExecutionsResponseSuccess = listSessionExecutionsResponse200 & {
+  headers: Headers;
+};
+export type listSessionExecutionsResponseError = listSessionExecutionsResponseDefault & {
+  headers: Headers;
+};
+
+export type listSessionExecutionsResponse =
+  | listSessionExecutionsResponseSuccess
+  | listSessionExecutionsResponseError;
+
+export const getListSessionExecutionsUrl = (
+  sessionId: string,
+  params?: ListSessionExecutionsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions`;
+};
+
+/**
+ * Queries the session process live for its background executions, newest first. Returns an
+ * empty list when the session is already closed (for example after the machine rebooted).
+ * @summary List background executions in a session
+ */
+export const listSessionExecutions = async (
+  sessionId: string,
+  params?: ListSessionExecutionsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listSessionExecutionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListSessionExecutionsUrl(sessionId, params), {
+    ...options,
+    method: "GET",
+  });
+  const data: listSessionExecutionsResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as listSessionExecutionsResponse["data"];
+  return { data, status: res.status, headers: res.headers } as listSessionExecutionsResponse;
+};
+
+export type getSessionExecutionResponse200 = {
+  data: ExecutionResource;
+  status: 200;
+};
+
+export type getSessionExecutionResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type getSessionExecutionResponseSuccess = getSessionExecutionResponse200 & {
+  headers: Headers;
+};
+export type getSessionExecutionResponseError = getSessionExecutionResponseDefault & {
+  headers: Headers;
+};
+
+export type getSessionExecutionResponse =
+  | getSessionExecutionResponseSuccess
+  | getSessionExecutionResponseError;
+
+export const getGetSessionExecutionUrl = (sessionId: string, executionId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions/${encodeURIComponent(String(executionId))}`;
+};
+
+/**
+ * Queries the session process live for the current metadata and status of one background execution.
+ * @summary Get a background execution
+ */
+export const getSessionExecution = async (
+  sessionId: string,
+  executionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getSessionExecutionResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetSessionExecutionUrl(sessionId, executionId), {
+    ...options,
+    method: "GET",
+  });
+  const data: getSessionExecutionResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as getSessionExecutionResponse["data"];
+  return { data, status: res.status, headers: res.headers } as getSessionExecutionResponse;
+};
+
+export type readSessionExecutionOutputResponse200 = {
+  data: ExecutionOutput;
+  status: 200;
+};
+
+export type readSessionExecutionOutputResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type readSessionExecutionOutputResponseSuccess = readSessionExecutionOutputResponse200 & {
+  headers: Headers;
+};
+export type readSessionExecutionOutputResponseError = readSessionExecutionOutputResponseDefault & {
+  headers: Headers;
+};
+
+export type readSessionExecutionOutputResponse =
+  | readSessionExecutionOutputResponseSuccess
+  | readSessionExecutionOutputResponseError;
+
+export const getReadSessionExecutionOutputUrl = (
+  sessionId: string,
+  executionId: string,
+  params?: ReadSessionExecutionOutputParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions/${encodeURIComponent(String(executionId))}/output?${stringifiedParams}`
+    : `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions/${encodeURIComponent(String(executionId))}/output`;
+};
+
+/**
+ * Reads a bounded slice of a background execution's persisted output file from the session
+ * process. Choose at most one addressing mode: `tail_lines`, `start_line` (with optional
+ * `max_lines`), or `offset` (with optional `max_bytes`). When none is specified, returns the
+ * last 200 lines of the combined output stream.
+ * @summary Read output of a background execution
+ */
+export const readSessionExecutionOutput = async (
+  sessionId: string,
+  executionId: string,
+  params?: ReadSessionExecutionOutputParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<readSessionExecutionOutputResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getReadSessionExecutionOutputUrl(sessionId, executionId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+  const data: readSessionExecutionOutputResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as readSessionExecutionOutputResponse["data"];
+  return { data, status: res.status, headers: res.headers } as readSessionExecutionOutputResponse;
+};
+
+export type stopSessionExecutionResponse200 = {
+  data: ExecutionResource;
+  status: 200;
+};
+
+export type stopSessionExecutionResponseDefault = {
+  data: Error;
+  status: Exclude<HTTPStatusCodes, 200>;
+};
+
+export type stopSessionExecutionResponseSuccess = stopSessionExecutionResponse200 & {
+  headers: Headers;
+};
+export type stopSessionExecutionResponseError = stopSessionExecutionResponseDefault & {
+  headers: Headers;
+};
+
+export type stopSessionExecutionResponse =
+  | stopSessionExecutionResponseSuccess
+  | stopSessionExecutionResponseError;
+
+export const getStopSessionExecutionUrl = (sessionId: string, executionId: string) => {
+  return `https://fleet.leaflow.cloud/api/v1/sessions/${encodeURIComponent(String(sessionId))}/executions/${encodeURIComponent(String(executionId))}:stop`;
+};
+
+/**
+ * Stops a running background execution in the session. Stopping an already exited execution succeeds and returns its final metadata.
+ * @summary Stop a background execution
+ */
+export const stopSessionExecution = async (
+  sessionId: string,
+  executionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<stopSessionExecutionResponse> => {
+  const res = await (fetchFn ?? fetch)(getStopSessionExecutionUrl(sessionId, executionId), {
+    ...options,
+    method: "POST",
+  });
+  const data: stopSessionExecutionResponse["data"] = (await decodeResponse(
+    res,
+    { "200": "json", default: "json" },
+    {},
+  )) as stopSessionExecutionResponse["data"];
+  return { data, status: res.status, headers: res.headers } as stopSessionExecutionResponse;
 };
 
 export type sendMcpRequestResponse200 = {
