@@ -27,6 +27,10 @@
  *   (`POST /api/v1/logins/{secretId}:generateTotp`). `vault:secret.reveal` permits human members
  *   to read stored secret material through `:reveal` while `revealable` is `true`. Service
  *   accounts cannot call `:reveal`, and sealing (`revealable: false`) is irreversible.
+ * - Secrets may carry optional `managed_by` and `managed_resource_id` fields identifying an
+ *   external tool or service that synchronizes the secret (for example, `terraform`).
+ *   Identifiers prefixed with `leaflow.` are reserved for platform-managed secrets, which are
+ *   read-only on this API.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -39,6 +43,10 @@ export const updateKvSecretRequestTagsItemMax = 64;
 
 export const updateKvSecretRequestTagsMax = 32;
 
+export const updateKvSecretRequestManagedByMax = 64;
+
+export const updateKvSecretRequestManagedResourceIdMax = 128;
+
 export const updateKvSecretRequestDataMaxOne = 32768;
 
 export const UpdateKvSecretRequest = zod.strictObject({
@@ -48,6 +56,20 @@ export const UpdateKvSecretRequest = zod.strictObject({
     .array(zod.string().min(1).max(updateKvSecretRequestTagsItemMax))
     .max(updateKvSecretRequestTagsMax)
     .optional(),
+  managed_by: zod
+    .string()
+    .max(updateKvSecretRequestManagedByMax)
+    .nullish()
+    .describe(
+      "Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.",
+    ),
+  managed_resource_id: zod
+    .string()
+    .max(updateKvSecretRequestManagedResourceIdMax)
+    .nullish()
+    .describe(
+      "Optional resource identifier within the managing service. Requires `managed_by` to be set.",
+    ),
   revealable: zod.boolean().optional(),
   clear_expires_at: zod.boolean().optional(),
   expires_at: zod.iso.datetime({ offset: true }).nullish(),

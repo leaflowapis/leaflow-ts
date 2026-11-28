@@ -27,6 +27,10 @@
  *   (`POST /api/v1/logins/{secretId}:generateTotp`). `vault:secret.reveal` permits human members
  *   to read stored secret material through `:reveal` while `revealable` is `true`. Service
  *   accounts cannot call `:reveal`, and sealing (`revealable: false`) is irreversible.
+ * - Secrets may carry optional `managed_by` and `managed_resource_id` fields identifying an
+ *   external tool or service that synchronizes the secret (for example, `terraform`).
+ *   Identifiers prefixed with `leaflow.` are reserved for platform-managed secrets, which are
+ *   read-only on this API.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -47,6 +51,14 @@ export const DockerRegistrySecretResource = zod.strictObject({
   expires_at: zod.iso.datetime({ offset: true }).nullable(),
   last_used_at: zod.iso.datetime({ offset: true }).nullable(),
   created_by: zod.string(),
+  managed_by: zod
+    .string()
+    .nullable()
+    .describe("Optional owner or service identifier managing this secret; null when unmanaged."),
+  managed_resource_id: zod
+    .string()
+    .nullable()
+    .describe("Optional resource identifier within the managing service; null when unset."),
   created_at: zod.iso.datetime({ offset: true }),
   updated_at: zod.iso.datetime({ offset: true }),
 });

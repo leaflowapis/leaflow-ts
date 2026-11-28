@@ -27,6 +27,10 @@
  *   (`POST /api/v1/logins/{secretId}:generateTotp`). `vault:secret.reveal` permits human members
  *   to read stored secret material through `:reveal` while `revealable` is `true`. Service
  *   accounts cannot call `:reveal`, and sealing (`revealable: false`) is irreversible.
+ * - Secrets may carry optional `managed_by` and `managed_resource_id` fields identifying an
+ *   external tool or service that synchronizes the secret (for example, `terraform`).
+ *   Identifiers prefixed with `leaflow.` are reserved for platform-managed secrets, which are
+ *   read-only on this API.
  * OpenAPI spec version: 1.0.0
  */
 export interface FieldViolation {
@@ -137,6 +141,16 @@ export interface SecretSummaryResource {
   /** @nullable */
   last_used_at: string | null;
   created_by: string;
+  /**
+   * Optional owner or service identifier managing this secret; null when unmanaged.
+   * @nullable
+   */
+  managed_by: string | null;
+  /**
+   * Optional resource identifier within the managing service; null when unset.
+   * @nullable
+   */
+  managed_resource_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -170,6 +184,16 @@ export interface LoginSecretResource {
   /** @nullable */
   last_used_at: string | null;
   created_by: string;
+  /**
+   * Optional owner or service identifier managing this secret; null when unmanaged.
+   * @nullable
+   */
+  managed_by: string | null;
+  /**
+   * Optional resource identifier within the managing service; null when unset.
+   * @nullable
+   */
+  managed_resource_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -206,6 +230,18 @@ export interface CreateLoginRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   /** @nullable */
   expires_at?: string | null;
@@ -243,6 +279,18 @@ export interface UpdateLoginRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   clear_expires_at?: boolean;
   /** @nullable */
@@ -300,6 +348,16 @@ export interface BasicAuthSecretResource {
   /** @nullable */
   last_used_at: string | null;
   created_by: string;
+  /**
+   * Optional owner or service identifier managing this secret; null when unmanaged.
+   * @nullable
+   */
+  managed_by: string | null;
+  /**
+   * Optional resource identifier within the managing service; null when unset.
+   * @nullable
+   */
+  managed_resource_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -334,6 +392,18 @@ export interface CreateBasicAuthRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   /** @nullable */
   expires_at?: string | null;
@@ -363,6 +433,18 @@ export interface UpdateBasicAuthRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   clear_expires_at?: boolean;
   /** @nullable */
@@ -406,6 +488,16 @@ export interface ApiKeySecretResource {
   /** @nullable */
   last_used_at: string | null;
   created_by: string;
+  /**
+   * Optional owner or service identifier managing this secret; null when unmanaged.
+   * @nullable
+   */
+  managed_by: string | null;
+  /**
+   * Optional resource identifier within the managing service; null when unset.
+   * @nullable
+   */
+  managed_resource_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -442,6 +534,18 @@ export interface CreateApiKeyRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   /** @nullable */
   expires_at?: string | null;
@@ -468,6 +572,18 @@ export interface UpdateApiKeyRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   clear_expires_at?: boolean;
   /** @nullable */
@@ -507,6 +623,16 @@ export interface KvSecretResource {
   /** @nullable */
   last_used_at: string | null;
   created_by: string;
+  /**
+   * Optional owner or service identifier managing this secret; null when unmanaged.
+   * @nullable
+   */
+  managed_by: string | null;
+  /**
+   * Optional resource identifier within the managing service; null when unset.
+   * @nullable
+   */
+  managed_resource_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -543,6 +669,18 @@ export interface CreateKvSecretRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   /** @nullable */
   expires_at?: string | null;
@@ -565,6 +703,18 @@ export interface UpdateKvSecretRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   clear_expires_at?: boolean;
   /** @nullable */
@@ -601,6 +751,16 @@ export interface SshKeySecretResource {
   /** @nullable */
   last_used_at: string | null;
   created_by: string;
+  /**
+   * Optional owner or service identifier managing this secret; null when unmanaged.
+   * @nullable
+   */
+  managed_by: string | null;
+  /**
+   * Optional resource identifier within the managing service; null when unset.
+   * @nullable
+   */
+  managed_resource_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -635,6 +795,18 @@ export interface CreateSshKeyRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   /** @nullable */
   expires_at?: string | null;
@@ -662,6 +834,18 @@ export interface UpdateSshKeyRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   clear_expires_at?: boolean;
   /** @nullable */
@@ -711,6 +895,16 @@ export interface TlsCertificateSecretResource {
   /** @nullable */
   last_used_at: string | null;
   created_by: string;
+  /**
+   * Optional owner or service identifier managing this secret; null when unmanaged.
+   * @nullable
+   */
+  managed_by: string | null;
+  /**
+   * Optional resource identifier within the managing service; null when unset.
+   * @nullable
+   */
+  managed_resource_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -745,6 +939,18 @@ export interface CreateTlsCertificateRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   /** @nullable */
   expires_at?: string | null;
@@ -778,6 +984,18 @@ export interface UpdateTlsCertificateRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   clear_expires_at?: boolean;
   /** @nullable */
@@ -824,6 +1042,16 @@ export interface DockerRegistrySecretResource {
   /** @nullable */
   last_used_at: string | null;
   created_by: string;
+  /**
+   * Optional owner or service identifier managing this secret; null when unmanaged.
+   * @nullable
+   */
+  managed_by: string | null;
+  /**
+   * Optional resource identifier within the managing service; null when unset.
+   * @nullable
+   */
+  managed_resource_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -858,6 +1086,18 @@ export interface CreateDockerRegistryRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   /** @nullable */
   expires_at?: string | null;
@@ -894,6 +1134,18 @@ export interface UpdateDockerRegistryRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   clear_expires_at?: boolean;
   /** @nullable */
@@ -947,6 +1199,16 @@ export interface SecureNoteSecretResource {
   /** @nullable */
   last_used_at: string | null;
   created_by: string;
+  /**
+   * Optional owner or service identifier managing this secret; null when unmanaged.
+   * @nullable
+   */
+  managed_by: string | null;
+  /**
+   * Optional resource identifier within the managing service; null when unset.
+   * @nullable
+   */
+  managed_resource_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -981,6 +1243,18 @@ export interface CreateSecureNoteRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   /** @nullable */
   expires_at?: string | null;
@@ -1005,6 +1279,18 @@ export interface UpdateSecureNoteRequest {
    * @items.maxLength 64
    */
   tags?: string[];
+  /**
+   * Optional controller or service identifier managing this secret (for example, `terraform`). The `leaflow.` prefix is reserved for platform-managed secrets.
+   * @maxLength 64
+   * @nullable
+   */
+  managed_by?: string | null;
+  /**
+   * Optional resource identifier within the managing service. Requires `managed_by` to be set.
+   * @maxLength 128
+   * @nullable
+   */
+  managed_resource_id?: string | null;
   revealable?: boolean;
   clear_expires_at?: boolean;
   /** @nullable */
@@ -1061,6 +1347,16 @@ export type QueryParameter = string;
  */
 export type TagParameter = string;
 
+/**
+ * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+ */
+export type ManagedParameter = boolean;
+
+/**
+ * Filter by exact `managed_by` owner or service identifier.
+ */
+export type ManagedByParameter = string;
+
 export type ListSecretsParams = {
   /**
    * Keyword search over slug, name, public locator fields (domains, URIs, server, username, fingerprint, field keys), tags, and description.
@@ -1077,6 +1373,17 @@ export type ListSecretsParams = {
    * @maxLength 64
    */
   tag?: TagParameter;
+  /**
+   * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+   */
+  managed?: ManagedParameter;
+  /**
+   * Filter by exact `managed_by` owner or service identifier.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$
+   */
+  managed_by?: ManagedByParameter;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -1114,6 +1421,17 @@ export type ListLoginsParams = {
    */
   tag?: TagParameter;
   /**
+   * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+   */
+  managed?: ManagedParameter;
+  /**
+   * Filter by exact `managed_by` owner or service identifier.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$
+   */
+  managed_by?: ManagedByParameter;
+  /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
    * @maximum 2147483647
@@ -1139,6 +1457,17 @@ export type ListBasicAuthsParams = {
    * @maxLength 64
    */
   tag?: TagParameter;
+  /**
+   * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+   */
+  managed?: ManagedParameter;
+  /**
+   * Filter by exact `managed_by` owner or service identifier.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$
+   */
+  managed_by?: ManagedByParameter;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -1166,6 +1495,17 @@ export type ListApiKeysParams = {
    */
   tag?: TagParameter;
   /**
+   * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+   */
+  managed?: ManagedParameter;
+  /**
+   * Filter by exact `managed_by` owner or service identifier.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$
+   */
+  managed_by?: ManagedByParameter;
+  /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
    * @maximum 2147483647
@@ -1191,6 +1531,17 @@ export type ListKvSecretsParams = {
    * @maxLength 64
    */
   tag?: TagParameter;
+  /**
+   * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+   */
+  managed?: ManagedParameter;
+  /**
+   * Filter by exact `managed_by` owner or service identifier.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$
+   */
+  managed_by?: ManagedByParameter;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
@@ -1218,6 +1569,17 @@ export type ListSshKeysParams = {
    */
   tag?: TagParameter;
   /**
+   * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+   */
+  managed?: ManagedParameter;
+  /**
+   * Filter by exact `managed_by` owner or service identifier.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$
+   */
+  managed_by?: ManagedByParameter;
+  /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
    * @maximum 2147483647
@@ -1243,6 +1605,17 @@ export type ListTlsCertificatesParams = {
    * @maxLength 64
    */
   tag?: TagParameter;
+  /**
+   * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+   */
+  managed?: ManagedParameter;
+  /**
+   * Filter by exact `managed_by` owner or service identifier.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$
+   */
+  managed_by?: ManagedByParameter;
   /**
    * Return only certificates whose `not_after` is at or before this timestamp.
    */
@@ -1274,6 +1647,17 @@ export type ListDockerRegistriesParams = {
    */
   tag?: TagParameter;
   /**
+   * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+   */
+  managed?: ManagedParameter;
+  /**
+   * Filter by exact `managed_by` owner or service identifier.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$
+   */
+  managed_by?: ManagedByParameter;
+  /**
    * 1-based page number. Defaults to 1.
    * @minimum 1
    * @maximum 2147483647
@@ -1299,6 +1683,17 @@ export type ListSecureNotesParams = {
    * @maxLength 64
    */
   tag?: TagParameter;
+  /**
+   * Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).
+   */
+  managed?: ManagedParameter;
+  /**
+   * Filter by exact `managed_by` owner or service identifier.
+   * @minLength 1
+   * @maxLength 64
+   * @pattern ^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$
+   */
+  managed_by?: ManagedByParameter;
   /**
    * 1-based page number. Defaults to 1.
    * @minimum 1

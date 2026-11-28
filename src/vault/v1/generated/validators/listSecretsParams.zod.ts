@@ -27,6 +27,10 @@
  *   (`POST /api/v1/logins/{secretId}:generateTotp`). `vault:secret.reveal` permits human members
  *   to read stored secret material through `:reveal` while `revealable` is `true`. Service
  *   accounts cannot call `:reveal`, and sealing (`revealable: false`) is irreversible.
+ * - Secrets may carry optional `managed_by` and `managed_resource_id` fields identifying an
+ *   external tool or service that synchronizes the secret (for example, `terraform`).
+ *   Identifiers prefixed with `leaflow.` are reserved for platform-managed secrets, which are
+ *   read-only on this API.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -36,6 +40,11 @@ export const listSecretsParamsQMax = 200;
 
 export const listSecretsParamsTagMax = 64;
 
+export const listSecretsParamsManagedByMax = 64;
+
+export const listSecretsParamsManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listSecretsParamsPageDefault = 1;
 export const listSecretsParamsPageMax = 2147483647;
 
@@ -46,6 +55,13 @@ export const ListSecretsParams = zod.strictObject({
   q: zod.string().max(listSecretsParamsQMax).optional(),
   type: SecretType.optional(),
   tag: zod.string().min(1).max(listSecretsParamsTagMax).optional(),
+  managed: zod.boolean().optional(),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listSecretsParamsManagedByMax)
+    .regex(listSecretsParamsManagedByRegExp)
+    .optional(),
   page: zod.int().min(1).max(listSecretsParamsPageMax).default(listSecretsParamsPageDefault),
   page_size: zod
     .int()

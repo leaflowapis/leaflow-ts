@@ -27,6 +27,10 @@
  *   (`POST /api/v1/logins/{secretId}:generateTotp`). `vault:secret.reveal` permits human members
  *   to read stored secret material through `:reveal` while `revealable` is `true`. Service
  *   accounts cannot call `:reveal`, and sealing (`revealable: false`) is irreversible.
+ * - Secrets may carry optional `managed_by` and `managed_resource_id` fields identifying an
+ *   external tool or service that synchronizes the secret (for example, `terraform`).
+ *   Identifiers prefixed with `leaflow.` are reserved for platform-managed secrets, which are
+ *   read-only on this API.
  * OpenAPI spec version: 1.0.0
  */
 import * as zod from "zod";
@@ -70,6 +74,11 @@ export const listSecretsQueryQMax = 200;
 
 export const listSecretsQueryTagMax = 64;
 
+export const listSecretsQueryManagedByMax = 64;
+
+export const listSecretsQueryManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listSecretsQueryPageDefault = 1;
 export const listSecretsQueryPageMax = 2147483647;
 
@@ -98,6 +107,19 @@ export const ListSecretsQueryParams = zod.strictObject({
     .optional()
     .describe("Narrow to a single credential type."),
   tag: zod.string().min(1).max(listSecretsQueryTagMax).optional().describe("Filter by exact tag."),
+  managed: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).",
+    ),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listSecretsQueryManagedByMax)
+    .regex(listSecretsQueryManagedByRegExp)
+    .optional()
+    .describe("Filter by exact `managed_by` owner or service identifier."),
   page: zod
     .int()
     .min(1)
@@ -142,6 +164,11 @@ export const listLoginsQueryQMax = 200;
 
 export const listLoginsQueryTagMax = 64;
 
+export const listLoginsQueryManagedByMax = 64;
+
+export const listLoginsQueryManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listLoginsQueryPageDefault = 1;
 export const listLoginsQueryPageMax = 2147483647;
 
@@ -157,6 +184,19 @@ export const ListLoginsQueryParams = zod.strictObject({
       "Keyword search over slug, name, public locator fields (domains, URIs, server, username, fingerprint, field keys), tags, and description.",
     ),
   tag: zod.string().min(1).max(listLoginsQueryTagMax).optional().describe("Filter by exact tag."),
+  managed: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).",
+    ),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listLoginsQueryManagedByMax)
+    .regex(listLoginsQueryManagedByRegExp)
+    .optional()
+    .describe("Filter by exact `managed_by` owner or service identifier."),
   page: zod
     .int()
     .min(1)
@@ -220,6 +260,11 @@ export const listBasicAuthsQueryQMax = 200;
 
 export const listBasicAuthsQueryTagMax = 64;
 
+export const listBasicAuthsQueryManagedByMax = 64;
+
+export const listBasicAuthsQueryManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listBasicAuthsQueryPageDefault = 1;
 export const listBasicAuthsQueryPageMax = 2147483647;
 
@@ -240,6 +285,19 @@ export const ListBasicAuthsQueryParams = zod.strictObject({
     .max(listBasicAuthsQueryTagMax)
     .optional()
     .describe("Filter by exact tag."),
+  managed: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).",
+    ),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listBasicAuthsQueryManagedByMax)
+    .regex(listBasicAuthsQueryManagedByRegExp)
+    .optional()
+    .describe("Filter by exact `managed_by` owner or service identifier."),
   page: zod
     .int()
     .min(1)
@@ -296,6 +354,11 @@ export const listApiKeysQueryQMax = 200;
 
 export const listApiKeysQueryTagMax = 64;
 
+export const listApiKeysQueryManagedByMax = 64;
+
+export const listApiKeysQueryManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listApiKeysQueryPageDefault = 1;
 export const listApiKeysQueryPageMax = 2147483647;
 
@@ -311,6 +374,19 @@ export const ListApiKeysQueryParams = zod.strictObject({
       "Keyword search over slug, name, public locator fields (domains, URIs, server, username, fingerprint, field keys), tags, and description.",
     ),
   tag: zod.string().min(1).max(listApiKeysQueryTagMax).optional().describe("Filter by exact tag."),
+  managed: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).",
+    ),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listApiKeysQueryManagedByMax)
+    .regex(listApiKeysQueryManagedByRegExp)
+    .optional()
+    .describe("Filter by exact `managed_by` owner or service identifier."),
   page: zod
     .int()
     .min(1)
@@ -367,6 +443,11 @@ export const listKvSecretsQueryQMax = 200;
 
 export const listKvSecretsQueryTagMax = 64;
 
+export const listKvSecretsQueryManagedByMax = 64;
+
+export const listKvSecretsQueryManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listKvSecretsQueryPageDefault = 1;
 export const listKvSecretsQueryPageMax = 2147483647;
 
@@ -387,6 +468,19 @@ export const ListKvSecretsQueryParams = zod.strictObject({
     .max(listKvSecretsQueryTagMax)
     .optional()
     .describe("Filter by exact tag."),
+  managed: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).",
+    ),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listKvSecretsQueryManagedByMax)
+    .regex(listKvSecretsQueryManagedByRegExp)
+    .optional()
+    .describe("Filter by exact `managed_by` owner or service identifier."),
   page: zod
     .int()
     .min(1)
@@ -443,6 +537,11 @@ export const listSshKeysQueryQMax = 200;
 
 export const listSshKeysQueryTagMax = 64;
 
+export const listSshKeysQueryManagedByMax = 64;
+
+export const listSshKeysQueryManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listSshKeysQueryPageDefault = 1;
 export const listSshKeysQueryPageMax = 2147483647;
 
@@ -458,6 +557,19 @@ export const ListSshKeysQueryParams = zod.strictObject({
       "Keyword search over slug, name, public locator fields (domains, URIs, server, username, fingerprint, field keys), tags, and description.",
     ),
   tag: zod.string().min(1).max(listSshKeysQueryTagMax).optional().describe("Filter by exact tag."),
+  managed: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).",
+    ),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listSshKeysQueryManagedByMax)
+    .regex(listSshKeysQueryManagedByRegExp)
+    .optional()
+    .describe("Filter by exact `managed_by` owner or service identifier."),
   page: zod
     .int()
     .min(1)
@@ -514,6 +626,11 @@ export const listTlsCertificatesQueryQMax = 200;
 
 export const listTlsCertificatesQueryTagMax = 64;
 
+export const listTlsCertificatesQueryManagedByMax = 64;
+
+export const listTlsCertificatesQueryManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listTlsCertificatesQueryPageDefault = 1;
 export const listTlsCertificatesQueryPageMax = 2147483647;
 
@@ -534,6 +651,19 @@ export const ListTlsCertificatesQueryParams = zod.strictObject({
     .max(listTlsCertificatesQueryTagMax)
     .optional()
     .describe("Filter by exact tag."),
+  managed: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).",
+    ),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listTlsCertificatesQueryManagedByMax)
+    .regex(listTlsCertificatesQueryManagedByRegExp)
+    .optional()
+    .describe("Filter by exact `managed_by` owner or service identifier."),
   expiring_before: zod.iso
     .datetime({ offset: true })
     .optional()
@@ -594,6 +724,11 @@ export const listDockerRegistriesQueryQMax = 200;
 
 export const listDockerRegistriesQueryTagMax = 64;
 
+export const listDockerRegistriesQueryManagedByMax = 64;
+
+export const listDockerRegistriesQueryManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listDockerRegistriesQueryPageDefault = 1;
 export const listDockerRegistriesQueryPageMax = 2147483647;
 
@@ -614,6 +749,19 @@ export const ListDockerRegistriesQueryParams = zod.strictObject({
     .max(listDockerRegistriesQueryTagMax)
     .optional()
     .describe("Filter by exact tag."),
+  managed: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).",
+    ),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listDockerRegistriesQueryManagedByMax)
+    .regex(listDockerRegistriesQueryManagedByRegExp)
+    .optional()
+    .describe("Filter by exact `managed_by` owner or service identifier."),
   page: zod
     .int()
     .min(1)
@@ -670,6 +818,11 @@ export const listSecureNotesQueryQMax = 200;
 
 export const listSecureNotesQueryTagMax = 64;
 
+export const listSecureNotesQueryManagedByMax = 64;
+
+export const listSecureNotesQueryManagedByRegExp = new RegExp(
+  "^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])?$",
+);
 export const listSecureNotesQueryPageDefault = 1;
 export const listSecureNotesQueryPageMax = 2147483647;
 
@@ -690,6 +843,19 @@ export const ListSecureNotesQueryParams = zod.strictObject({
     .max(listSecureNotesQueryTagMax)
     .optional()
     .describe("Filter by exact tag."),
+  managed: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Filter by management state (`true` for secrets with `managed_by` set, `false` for unmanaged secrets).",
+    ),
+  managed_by: zod
+    .string()
+    .min(1)
+    .max(listSecureNotesQueryManagedByMax)
+    .regex(listSecureNotesQueryManagedByRegExp)
+    .optional()
+    .describe("Filter by exact `managed_by` owner or service identifier."),
   page: zod
     .int()
     .min(1)
