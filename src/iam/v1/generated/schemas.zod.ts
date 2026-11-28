@@ -454,7 +454,7 @@ export const ListServiceAccountsQueryParams = zod.strictObject({
     .string()
     .max(listServiceAccountsQueryKeywordMax)
     .optional()
-    .describe("Matches against service account id, name, email or description"),
+    .describe("Matches against service account id, name or description"),
   include_deleted: zod
     .boolean()
     .default(listServiceAccountsQueryIncludeDeletedDefault)
@@ -478,7 +478,7 @@ export const GetServiceAccountParams = zod.strictObject({
 });
 
 /**
- * Updates the display name, description or optional email address of an active or suspended service account. Requires `iam:service_accounts.manage`.
+ * Updates the display name or description of an active or suspended service account. Requires `iam:service_accounts.manage`.
  * @summary Update a service account
  */
 export const UpdateServiceAccountParams = zod.strictObject({

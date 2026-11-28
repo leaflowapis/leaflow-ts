@@ -19,7 +19,6 @@ export const ServiceAccountResource = zod.strictObject({
   project_id: zod.uuid(),
   name: zod.string(),
   description: zod.string(),
-  email: zod.string().describe("Optional email address; empty when not configured"),
   status: zod.enum(["ACTIVE", "SUSPENDED", "BANNED", "DELETED"]),
   roles: zod
     .array(zod.string())

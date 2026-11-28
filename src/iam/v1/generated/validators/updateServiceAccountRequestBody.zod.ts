@@ -18,16 +18,9 @@ export const updateServiceAccountRequestBodyNameMax = 128;
 
 export const updateServiceAccountRequestBodyDescriptionMax = 500;
 
-export const updateServiceAccountRequestBodyEmailMax = 320;
-
 export const UpdateServiceAccountRequestBody = zod.strictObject({
   name: zod.string().min(1).max(updateServiceAccountRequestBodyNameMax).optional(),
   description: zod.string().max(updateServiceAccountRequestBodyDescriptionMax).optional(),
-  email: zod
-    .string()
-    .max(updateServiceAccountRequestBodyEmailMax)
-    .optional()
-    .describe("Optional email address; pass an empty string to clear it"),
 });
 
 export type UpdateServiceAccountRequestBody = zod.input<typeof UpdateServiceAccountRequestBody>;

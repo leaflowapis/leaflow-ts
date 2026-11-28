@@ -2183,7 +2183,7 @@ export const getUpdateServiceAccountUrl = (serviceAccountId: string) => {
 };
 
 /**
- * Updates the display name, description or optional email address of an active or suspended service account. Requires `iam:service_accounts.manage`.
+ * Updates the display name or description of an active or suspended service account. Requires `iam:service_accounts.manage`.
  * @summary Update a service account
  */
 export const updateServiceAccount = async (

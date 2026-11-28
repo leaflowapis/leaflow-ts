@@ -648,8 +648,6 @@ export interface ServiceAccountResource {
   project_id: string;
   name: string;
   description: string;
-  /** Optional email address; empty when not configured */
-  email: string;
   status: ServiceAccountResourceStatus;
   /** Role codes currently assigned to this service account in the project */
   roles: string[];
@@ -676,11 +674,6 @@ export interface CreateServiceAccountRequestBody {
   name: string;
   /** @maxLength 500 */
   description?: string;
-  /**
-   * Optional email address; omit or leave empty unless using an allowed domain
-   * @maxLength 320
-   */
-  email?: string;
   /** Optional initial role codes to assign at creation; `OWNER` is not accepted */
   roles?: string[];
 }
@@ -693,11 +686,6 @@ export interface UpdateServiceAccountRequestBody {
   name?: string;
   /** @maxLength 500 */
   description?: string;
-  /**
-   * Optional email address; pass an empty string to clear it
-   * @maxLength 320
-   */
-  email?: string;
 }
 
 export type ServiceAccountKeyResourceOrigin =
@@ -779,7 +767,6 @@ export interface ServiceAccountCredentialsResource {
   project_id: string;
   service_account_id: string;
   name: string;
-  email: string;
   key_id: string;
   algorithm: string;
   /** PKCS#8 PEM Ed25519 private key, returned once and never stored */
@@ -960,7 +947,7 @@ export type ListServiceAccountsParams = {
    */
   offset?: number;
   /**
-   * Matches against service account id, name, email or description
+   * Matches against service account id, name or description
    * @maxLength 255
    */
   keyword?: string;

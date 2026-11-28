@@ -18,16 +18,9 @@ export const createServiceAccountRequestBodyNameMax = 128;
 
 export const createServiceAccountRequestBodyDescriptionMax = 500;
 
-export const createServiceAccountRequestBodyEmailMax = 320;
-
 export const CreateServiceAccountRequestBody = zod.strictObject({
   name: zod.string().min(1).max(createServiceAccountRequestBodyNameMax),
   description: zod.string().max(createServiceAccountRequestBodyDescriptionMax).optional(),
-  email: zod
-    .string()
-    .max(createServiceAccountRequestBodyEmailMax)
-    .optional()
-    .describe("Optional email address; omit or leave empty unless using an allowed domain"),
   roles: zod
     .array(zod.string())
     .optional()

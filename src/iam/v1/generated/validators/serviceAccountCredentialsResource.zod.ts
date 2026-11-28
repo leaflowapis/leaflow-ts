@@ -20,7 +20,6 @@ export const ServiceAccountCredentialsResource = zod
     project_id: zod.uuid(),
     service_account_id: zod.uuid(),
     name: zod.string(),
-    email: zod.string(),
     key_id: zod.uuid(),
     algorithm: zod.string(),
     private_key: zod
